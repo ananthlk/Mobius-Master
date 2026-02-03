@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobius – Module Hub</title>
+  <link rel="icon" type="image/svg+xml" href="logo.svg" />
+  <link rel="stylesheet" href="tokens-dark.css" />
+  <style>
+    :root {
+      --bg: var(--mobius-bg-primary);
+      --card: var(--mobius-bg-card);
+      --text: var(--mobius-text-primary);
+      --muted: var(--mobius-text-muted);
+      --accent: var(--mobius-accent);
+      --danger: var(--mobius-error);
+      --danger-hover: #da3633;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.5;
+    }
+    .page-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+    .page-header .header-spacer { flex: 1; min-width: 1rem; }
+    .page-logo { flex-shrink: 0; display: block; }
+    h1 { font-size: 1.75rem; margin: 0; }
+    .hamburger-wrap { position: relative; flex-shrink: 0; }
+    .hamburger-btn {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      padding: 0.5rem; line-height: 1; border-radius: 4px;
+      font-size: 1.25rem; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+    }
+    .hamburger-btn:hover { color: var(--text); background: rgba(255,255,255,0.08); }
+    .hamburger-btn:focus { outline: none; }
+    .hamburger-dropdown {
+      display: none; position: absolute; top: 100%; right: 0; margin-top: 4px;
+      background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3); min-width: 140px; z-index: 20;
+    }
+    .hamburger-dropdown.open { display: block; }
+    .hamburger-dropdown button {
+      display: block; width: 100%; text-align: left; padding: 0.6rem 0.9rem;
+      background: none; border: none; color: var(--text); cursor: pointer; font-size: 0.95rem;
+      border-radius: 0;
+    }
+    .hamburger-dropdown button:hover { background: rgba(255,255,255,0.08); }
+    .hamburger-dropdown button.start { color: var(--accent); }
+    .hamburger-dropdown button.stop-all { color: var(--danger); }
+    .subtitle { color: var(--muted); font-size: 0.95rem; margin-bottom: 2rem; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      padding: 1.25rem;
+      text-decoration: none;
+      color: var(--text);
+      display: block;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .card:hover { border-color: var(--accent); background: #1e2d3d; }
+    .card h2 { font-size: 1rem; margin: 0 0 0.25rem 0; }
+    .card .port { color: var(--muted); font-size: 0.85rem; }
+    .card .note { font-size: 0.8rem; color: var(--muted); margin-top: 0.5rem; }
+    button {
+      background: var(--danger);
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+    button:hover { background: var(--danger-hover); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .footer { color: var(--muted); font-size: 0.85rem; margin-top: 2rem; }
+    .card-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; }
+    .card-header h2 { margin: 0; flex: 1; }
+    .status-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .status-dot.up { background: #22c55e; }
+    .status-dot.slow { background: #eab308; }
+    .status-dot.degraded { background: #eab308; }
+    .status-dot.down { background: #ef4444; }
+    .status-dot.unknown { background: #6b7280; }
+    .status-dot.no_endpoint { background: #6b7280; }
+    .card-status-text { font-size: 0.8rem; color: var(--muted); margin-top: 0.15rem; }
+    .status-footer { font-size: 0.85rem; color: var(--muted); margin-bottom: 1rem; }
+    .section-heading { font-size: 1rem; margin: 1.5rem 0 0.5rem 0; }
+    .section-desc { color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem; }
+    .worker-card { cursor: default; }
+    .worker-card .port a { color: var(--accent); text-decoration: none; }
+    .worker-card .port a:hover { text-decoration: underline; }
+    .card-actions { position: relative; flex-shrink: 0; }
+    .kebab-btn {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      padding: 0.25rem; line-height: 1; border-radius: 4px;
+      font-size: 1.1rem; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+    }
+    .kebab-btn:hover { color: var(--text); background: rgba(255,255,255,0.08); }
+    .kebab-btn:focus { outline: none; }
+    .card-actions .dropdown {
+      display: none; position: absolute; top: 100%; right: 0; margin-top: 2px;
+      background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3); min-width: 120px; z-index: 10;
+    }
+    .card-actions .dropdown.open { display: block; }
+    .card-actions .dropdown button {
+      display: block; width: 100%; text-align: left; padding: 0.5rem 0.75rem;
+      background: none; border: none; color: var(--text); cursor: pointer; font-size: 0.9rem;
+      border-radius: 0;
+    }
+    .card-actions .dropdown button:hover { background: rgba(255,255,255,0.08); }
+    .card-actions .dropdown button.restart { color: var(--accent); }
+    .card-actions .dropdown button.stop { color: var(--danger); }
+  </style>
+</head>
+<body>
+  <header class="page-header">
+    <img src="logo.svg" alt="Mobius" class="page-logo" width="32" height="32" />
+    <h1>Mobius – Module Hub</h1>
+    <span class="header-spacer"></span>
+    <div class="hamburger-wrap">
+      <button type="button" class="hamburger-btn" aria-label="Menu" aria-haspopup="true" title="Stop all or Start all">&#9776;</button>
+      <div class="hamburger-dropdown">
+        <button type="button" class="stop-all">Stop all</button>
+        <button type="button" class="start">Start all</button>
+      </div>
+    </div>
+  </header>
+  <p class="subtitle">Use the menu to Stop all or Start all. Landing stays on 3999.</p>
+  <p class="status-footer" id="status-footer">Status: loading…</p>
+
+  <h2 class="section-heading">Processes</h2>
+  <p class="section-desc">Frontend + backend available = you can use this.</p>
+  <div class="cards">
+    <a class="card" href="http://localhost:5001" target="_blank" rel="noopener" data-process-id="os">
+      <div class="card-header">
+        <h2>OS</h2>
+        <span class="status-dot unknown" role="status" aria-label="OS: checking" id="dot-os"></span>
+        <div class="card-actions" onclick="event.preventDefault(); event.stopPropagation();">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">⋮</button>
+          <div class="dropdown" onclick="event.preventDefault(); event.stopPropagation();">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port">http://localhost:5001 — Backend; extension runs separately.</span>
+      <p class="card-status-text" id="text-os" aria-live="polite"></p>
+    </a>
+    <a class="card" href="http://localhost:8000" target="_blank" rel="noopener" data-process-id="chat">
+      <div class="card-header">
+        <h2>Chat</h2>
+        <span class="status-dot unknown" role="status" aria-label="Chat: checking" id="dot-chat"></span>
+        <div class="card-actions" onclick="event.preventDefault(); event.stopPropagation();">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">⋮</button>
+          <div class="dropdown" onclick="event.preventDefault(); event.stopPropagation();">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port">http://localhost:8000</span>
+      <p class="card-status-text" id="text-chat" aria-live="polite"></p>
+    </a>
+    <a class="card" href="http://localhost:5173" target="_blank" rel="noopener" data-process-id="rag">
+      <div class="card-header">
+        <h2>RAG</h2>
+        <span class="status-dot unknown" role="status" aria-label="RAG: checking" id="dot-rag"></span>
+        <div class="card-actions" onclick="event.preventDefault(); event.stopPropagation();">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">⋮</button>
+          <div class="dropdown" onclick="event.preventDefault(); event.stopPropagation();">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port">http://localhost:5173 — Docs (frontend + backend).</span>
+      <p class="card-status-text" id="text-rag" aria-live="polite"></p>
+    </a>
+    <a class="card" href="http://localhost:6500" target="_blank" rel="noopener" data-process-id="dbt">
+      <div class="card-header">
+        <h2>DBT</h2>
+        <span class="status-dot unknown" role="status" aria-label="DBT: checking" id="dot-dbt"></span>
+        <div class="card-actions" onclick="event.preventDefault(); event.stopPropagation();">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">⋮</button>
+          <div class="dropdown" onclick="event.preventDefault(); event.stopPropagation();">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port">http://localhost:6500 — Job UI (run on demand).</span>
+      <p class="card-status-text" id="text-dbt" aria-live="polite"></p>
+    </a>
+  </div>
+
+  <h2 class="section-heading">Workers</h2>
+  <p class="section-desc">Shared resources for load balancing; status for ops.</p>
+  <div class="cards">
+    <div class="card worker-card" data-worker-id="chat-worker">
+      <div class="card-header">
+        <h2>Chat worker</h2>
+        <span class="status-dot no_endpoint" role="status" aria-label="Chat worker: no endpoint" id="dot-chat-worker" title="No health endpoint yet."></span>
+        <div class="card-actions">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">⋮</button>
+          <div class="dropdown">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port">No health endpoint yet.</span>
+    </div>
+    <div class="card worker-card" data-worker-id="scraper">
+      <div class="card-header">
+        <h2>Scraper</h2>
+        <span class="status-dot unknown" role="status" aria-label="Scraper: checking" id="dot-scraper"></span>
+        <div class="card-actions">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">⋮</button>
+          <div class="dropdown">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port"><a href="http://localhost:8002" target="_blank" rel="noopener">http://localhost:8002</a> — Required for RAG Scrape from URL.</span>
+    </div>
+    <div class="card worker-card" data-worker-id="rag-chunking">
+      <div class="card-header">
+        <h2>RAG chunking</h2>
+        <span class="status-dot no_endpoint" role="status" aria-label="RAG chunking: no endpoint" id="dot-rag-chunking" title="No health endpoint yet."></span>
+        <div class="card-actions">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">⋮</button>
+          <div class="dropdown">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port">No health endpoint yet.</span>
+    </div>
+    <div class="card worker-card" data-worker-id="rag-embedding">
+      <div class="card-header">
+        <h2>RAG embedding</h2>
+        <span class="status-dot no_endpoint" role="status" aria-label="RAG embedding: no endpoint" id="dot-rag-embedding" title="No health endpoint yet."></span>
+        <div class="card-actions">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">⋮</button>
+          <div class="dropdown">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port">No health endpoint yet.</span>
+    </div>
+  </div>
+
+  <p class="subtitle">mobius-user is a library (auth); no standalone server. mobius-config holds shared env.</p>
+
+  <p class="footer">Use the menu to Stop all or Start all. Landing stays on 3999. From repo root: <code>./mstop</code> stops everything including landing.</p>
+
+  <script>
+    var hamburgerBtn = document.querySelector('.hamburger-btn');
+    var hamburgerDropdown = document.querySelector('.hamburger-dropdown');
+    if (hamburgerBtn && hamburgerDropdown) {
+      hamburgerBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        hamburgerDropdown.classList.toggle('open');
+      });
+      document.addEventListener('click', function () { hamburgerDropdown.classList.remove('open'); });
+    }
+    document.querySelectorAll('.hamburger-dropdown .stop-all').forEach(function (btn) {
+      btn.addEventListener('click', async function (e) {
+        e.stopPropagation();
+        document.querySelector('.hamburger-dropdown').classList.remove('open');
+        var footer = document.getElementById('status-footer');
+        footer.textContent = 'Stopping…';
+        try {
+          var res = await fetch('/api/stop-all', { method: 'POST' });
+          var data = await res.json().catch(function () { return {}; });
+          footer.textContent = data.ok ? 'Stopped. ' + (data.message || '') : 'Error: ' + (data.message || res.statusText);
+          setTimeout(refreshStatus, 1500);
+        } catch (err) {
+          footer.textContent = 'Error: ' + err.message;
+        }
+      });
+    });
+    document.querySelectorAll('.hamburger-dropdown .start').forEach(function (btn) {
+      btn.addEventListener('click', async function (e) {
+        e.stopPropagation();
+        document.querySelector('.hamburger-dropdown').classList.remove('open');
+        var footer = document.getElementById('status-footer');
+        footer.textContent = 'Starting…';
+        try {
+          var res = await fetch('/api/start-all', { method: 'POST' });
+          var data = await res.json().catch(function () { return {}; });
+          footer.textContent = data.ok ? data.message : 'Error: ' + (data.message || res.statusText);
+          setTimeout(refreshStatus, 3000);
+        } catch (err) {
+          footer.textContent = 'Error: ' + err.message;
+        }
+      });
+    });
+
+    function setProcessCard(p) {
+      const id = p.id;
+      const dot = document.getElementById('dot-' + id);
+      const text = document.getElementById('text-' + id);
+      if (!dot || !text) return;
+      const status = p.status || 'unknown';
+      dot.className = 'status-dot ' + (status === 'up' ? 'up' : status === 'slow' ? 'slow' : status === 'degraded' ? 'degraded' : status === 'down' ? 'down' : 'unknown');
+      let label = id + ': ' + status;
+      if (status === 'up' && p.ms != null) label += ' (' + p.ms + 'ms)';
+      else if (status === 'slow' && p.ms != null) label += ' (' + p.ms + 'ms)';
+      dot.setAttribute('aria-label', label);
+      dot.title = label;
+      if (status === 'up' && p.ms != null) text.textContent = p.ms + 'ms';
+      else if (status === 'slow') text.textContent = (p.ms != null ? p.ms + 'ms ' : '') + '(slow)';
+      else if (status === 'degraded') text.textContent = p.degraded_reason || 'degraded';
+      else if (status === 'down') text.textContent = 'down';
+      else text.textContent = '';
+    }
+
+    function setWorkerRow(w) {
+      const id = w.id;
+      const dot = document.getElementById('dot-' + id);
+      if (!dot) return;
+      const status = w.status || 'unknown';
+      dot.className = 'status-dot ' + (status === 'up' ? 'up' : status === 'slow' ? 'slow' : status === 'down' ? 'down' : status === 'no_endpoint' ? 'no_endpoint' : 'unknown');
+      let label = w.name + ': ' + status;
+      if (status === 'up' && w.ms != null) label += ' (' + w.ms + 'ms)';
+      else if (status === 'no_endpoint') label += ' (no health endpoint yet)';
+      dot.setAttribute('aria-label', label);
+      dot.title = label;
+    }
+
+    async function refreshStatus() {
+      const footer = document.getElementById('status-footer');
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json().catch(() => ({}));
+        const processes = data.processes || [];
+        const workers = data.workers || [];
+        processes.forEach(setProcessCard);
+        workers.forEach(setWorkerRow);
+        const updatedAt = data.updated_at ? new Date(data.updated_at).toLocaleTimeString() : '';
+        footer.textContent = 'Status: last updated ' + (updatedAt || 'just now') + '. Auto-refresh every 15s.';
+      } catch (e) {
+        footer.textContent = 'Status: error — ' + e.message;
+      }
+    }
+
+    refreshStatus();
+    setInterval(refreshStatus, 15000);
+
+    // Kebab menu: toggle dropdown, close on outside click, Stop/Restart
+    document.querySelectorAll('.kebab-btn').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var dropdown = this.nextElementSibling;
+        var wasOpen = dropdown.classList.contains('open');
+        document.querySelectorAll('.card-actions .dropdown').forEach(function (d) { d.classList.remove('open'); });
+        if (!wasOpen) dropdown.classList.add('open');
+      });
+    });
+    document.addEventListener('click', function () {
+      document.querySelectorAll('.card-actions .dropdown').forEach(function (d) { d.classList.remove('open'); });
+    });
+    document.querySelectorAll('.card-actions .dropdown .stop').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        var card = this.closest('.card');
+        var id = card.dataset.processId || card.dataset.workerId;
+        if (!id) return;
+        this.closest('.dropdown').classList.remove('open');
+        fetch('/api/service/stop', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: id }),
+        })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            var footer = document.getElementById('status-footer');
+            footer.textContent = data.ok ? 'Stopped: ' + data.message : 'Error: ' + data.message;
+            setTimeout(refreshStatus, 2000);
+          })
+          .catch(function (err) {
+            document.getElementById('status-footer').textContent = 'Error: ' + err.message;
+          });
+      });
+    });
+    document.querySelectorAll('.card-actions .dropdown .restart').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        var card = this.closest('.card');
+        var id = card.dataset.processId || card.dataset.workerId;
+        if (!id) return;
+        this.closest('.dropdown').classList.remove('open');
+        var footer = document.getElementById('status-footer');
+        footer.textContent = 'Restarting ' + id + '…';
+        fetch('/api/service/restart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: id }),
+        })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            footer.textContent = data.ok ? data.message : 'Error: ' + data.message;
+            setTimeout(refreshStatus, 3000);
+          })
+          .catch(function (err) {
+            footer.textContent = 'Error: ' + err.message;
+          });
+      });
+    });
+  </script>
+</body>
+</html>

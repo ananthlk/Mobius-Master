@@ -1,0 +1,213 @@
+#!/usr/bin/env bash
+# Start all Mobius backends, frontends, and workers. Kills any existing first. Run from anywhere.
+# Usage: mstart [--no-rag-frontend] [--no-os-extension] [--no-landing]
+
+set -e
+SCRIPT="$0"
+while [ -L "$SCRIPT" ]; do
+  TARGET="$(readlink "$SCRIPT")"
+  [[ "$TARGET" == /* ]] && SCRIPT="$TARGET" || SCRIPT="$(dirname "$SCRIPT")/$TARGET"
+done
+MOBIUS_ROOT="$(cd "$(dirname "$SCRIPT")" && pwd)"
+cd "$MOBIUS_ROOT" || exit 1
+
+PIDFILE="$MOBIUS_ROOT/.mobius_start_all.pids"
+LOGDIR="$MOBIUS_ROOT/.mobius_logs"
+mkdir -p "$LOGDIR"
+
+START_RAG_FRONTEND=true
+START_OS_EXTENSION=true
+START_LANDING=true
+for arg in "$@"; do
+  case "$arg" in
+    --no-rag-frontend) START_RAG_FRONTEND=false ;;
+    --no-os-extension) START_OS_EXTENSION=false ;;
+    --no-landing) START_LANDING=false ;;
+  esac
+done
+
+# When --no-landing, preserve mobius-landing PIDs (don't kill, keep in file at end)
+LANDING_LINES=""
+if [[ "$START_LANDING" == "false" ]] && [[ -f "$PIDFILE" ]]; then
+  while read -r pid name; do
+    [[ -z "$pid" ]] || [[ ! "$name" ]] && continue
+    if [[ "$name" == "mobius-landing" ]]; then
+      LANDING_LINES="${LANDING_LINES}${pid} ${name}"$'\n'
+    fi
+  done < "$PIDFILE"
+fi
+
+# --- Kill existing servers first ---
+if [[ -f "$PIDFILE" ]]; then
+  echo "[mstart] Stopping existing Mobius processes ..."
+  while read -r pid name; do
+    [[ -z "$pid" ]] && continue
+    if [[ "$START_LANDING" == "false" ]] && [[ "$name" == "mobius-landing" ]]; then
+      continue
+    fi
+    if kill -0 "$pid" 2>/dev/null; then
+      kill "$pid" 2>/dev/null || true
+      echo "  Stopped $name (PID $pid)"
+    fi
+  done < "$PIDFILE"
+  if [[ "$START_LANDING" == "true" ]]; then
+    rm -f "$PIDFILE"
+  fi
+  echo "[mstart] Waiting for processes to exit ..."
+  sleep 2
+fi
+
+: > "$PIDFILE"
+
+_log() { echo "[mstart] $*"; }
+# Kill any process bound to port so RAG (and others) can bind to fixed ports.
+_kill_port() {
+  local port=$1
+  local pids
+  pids=$(lsof -ti :"$port" 2>/dev/null) || true
+  if [[ -n "$pids" ]]; then
+    _log "Freeing port $port (killing existing process)"
+    echo "$pids" | xargs kill -9 2>/dev/null || true
+    sleep 2
+  fi
+}
+_start() {
+  local name="$1"
+  local cmd="$2"
+  _log "Starting $name ..."
+  eval "$cmd" >> "$LOGDIR/${name}.log" 2>&1 &
+  local pid=$!
+  echo "$pid $name" >> "$PIDFILE"
+  _log "  PID $pid"
+}
+
+# --- mobius-chat DB migrations (run before starting chat services) ---
+if [[ -f "$MOBIUS_ROOT/mobius-chat/mchatc" ]] && [[ -d "$MOBIUS_ROOT/mobius-chat/.venv" ]]; then
+  _log "Running mobius-chat DB migrations ..."
+  if [[ -f "$MOBIUS_ROOT/mobius-chat/.env" ]]; then
+    while IFS= read -r _mline || [[ -n "$_mline" ]]; do
+      [[ -z "$_mline" || "$_mline" =~ ^[[:space:]]*# ]] && continue
+      if [[ "$_mline" =~ ^([A-Za-z_][A-Za-z0-9_]*)=(.*)$ ]]; then
+        export "${BASH_REMATCH[1]}=${BASH_REMATCH[2]}"
+      fi
+    done < "$MOBIUS_ROOT/mobius-chat/.env"
+  fi
+  if (cd "$MOBIUS_ROOT/mobius-chat" && .venv/bin/python3 -m app.db.run_migrations 2>&1); then
+    _log "Migrations OK"
+  else
+    _log "Migrations failed or skipped (check CHAT_RAG_DATABASE_URL in mobius-chat/.env)"
+  fi
+fi
+
+# --- mobius-os backend (port 5001) ---
+if [[ -d "$MOBIUS_ROOT/mobius-os/backend" ]]; then
+  if [[ -d "$MOBIUS_ROOT/mobius-os/backend/.venv" ]]; then
+    _start "mobius-os-backend" "cd $MOBIUS_ROOT/mobius-os/backend && .venv/bin/python server.py"
+  else
+    _log "Skip mobius-os backend (no .venv in mobius-os/backend)"
+  fi
+else
+  _log "Skip mobius-os (backend not found)"
+fi
+
+# --- mobius-os extension (webpack watch) ---
+if [[ "$START_OS_EXTENSION" == "true" ]] && [[ -d "$MOBIUS_ROOT/mobius-os/extension" ]]; then
+  if command -v npm >/dev/null 2>&1; then
+    _start "mobius-os-extension" "cd $MOBIUS_ROOT/mobius-os/extension && npm run dev"
+  else
+    _log "Skip mobius-os extension (npm not found)"
+  fi
+fi
+
+# --- mobius-chat API + frontend (port 8000) ---
+if [[ -f "$MOBIUS_ROOT/mobius-chat/mchatc" ]]; then
+  if [[ -d "$MOBIUS_ROOT/mobius-chat/.venv" ]]; then
+    _start "mobius-chat-api" "cd $MOBIUS_ROOT/mobius-chat && ./mchatc"
+  else
+    _log "Skip mobius-chat API (no .venv in mobius-chat)"
+  fi
+else
+  _log "Skip mobius-chat (mchatc not found)"
+fi
+
+# --- mobius-chat worker (Redis + worker) ---
+if [[ -f "$MOBIUS_ROOT/mobius-chat/mchatcw" ]] && [[ -d "$MOBIUS_ROOT/mobius-chat/.venv" ]]; then
+  _start "mobius-chat-worker" "cd $MOBIUS_ROOT/mobius-chat && ./mchatcw"
+fi
+
+# --- mobius-rag backend (port 8001) ---
+if [[ -d "$MOBIUS_ROOT/mobius-rag/.venv" ]]; then
+  _kill_port 8001
+  _start "mobius-rag-backend" "cd $MOBIUS_ROOT/mobius-rag && .venv/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload"
+else
+  _log "Skip mobius-rag backend (no .venv in mobius-rag)"
+fi
+
+# --- mobius-rag chunking worker ---
+if [[ -d "$MOBIUS_ROOT/mobius-rag/.venv" ]]; then
+  _start "mobius-rag-chunking-worker" "cd $MOBIUS_ROOT/mobius-rag && .venv/bin/python3 -m app.worker"
+fi
+
+# --- mobius-rag embedding worker ---
+if [[ -d "$MOBIUS_ROOT/mobius-rag/.venv" ]] && [[ -f "$MOBIUS_ROOT/mobius-rag/app/embedding_worker.py" ]]; then
+  _start "mobius-rag-embedding-worker" "cd $MOBIUS_ROOT/mobius-rag && .venv/bin/python3 -m app.embedding_worker"
+fi
+
+# --- mobius-skills web-scraper API (port 8002) ---
+if [[ -d "$MOBIUS_ROOT/mobius-skills/web-scraper/.venv" ]]; then
+  _kill_port 8002
+  _start "mobius-scraper-api" "cd $MOBIUS_ROOT/mobius-skills/web-scraper && .venv/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8002"
+else
+  _log "Skip mobius-scraper API (no .venv in mobius-skills/web-scraper)"
+fi
+
+# --- mobius-skills web-scraper worker ---
+if [[ -d "$MOBIUS_ROOT/mobius-skills/web-scraper/.venv" ]] && [[ -f "$MOBIUS_ROOT/mobius-skills/web-scraper/mscrapew" ]]; then
+  _start "mobius-scraper-worker" "cd $MOBIUS_ROOT/mobius-skills/web-scraper && ./mscrapew"
+fi
+
+# --- mobius-rag frontend (port 5173) ---
+if [[ "$START_RAG_FRONTEND" == "true" ]] && [[ -d "$MOBIUS_ROOT/mobius-rag/frontend" ]]; then
+  if command -v npm >/dev/null 2>&1; then
+    _kill_port 5173
+    _start "mobius-rag-frontend" "cd $MOBIUS_ROOT/mobius-rag/frontend && VITE_API_BASE=http://localhost:8001 VITE_SCRAPER_API_BASE=http://localhost:8002 npm run dev"
+  else
+    _log "Skip mobius-rag frontend (npm not found)"
+  fi
+fi
+
+# --- Master landing (port 3999) ---
+if [[ "$START_LANDING" == "true" ]] && [[ -f "$MOBIUS_ROOT/landing_server.py" ]]; then
+  if command -v python3 >/dev/null 2>&1; then
+    _start "mobius-landing" "cd $MOBIUS_ROOT && python3 landing_server.py"
+  else
+    _log "Skip master landing (python3 not found)"
+  fi
+fi
+
+# Restore mobius-landing lines to PID file when we did --no-landing
+if [[ "$START_LANDING" == "false" ]] && [[ -n "$LANDING_LINES" ]]; then
+  printf "%s" "$LANDING_LINES" >> "$PIDFILE"
+fi
+
+sleep 1
+echo ""
+echo "=============================================="
+echo "  Mobius status — services started"
+echo "=============================================="
+echo ""
+printf "  %-24s  %s\n" "Service" "URL"
+printf "  %-24s  %s\n" "-------" "---"
+printf "  %-24s  %s\n" "mobius-os backend"    "http://localhost:5001"
+printf "  %-24s  %s\n" "mobius-chat"         "http://localhost:8000"
+printf "  %-24s  %s\n" "mobius-rag backend"  "http://localhost:8001"
+printf "  %-24s  %s\n" "mobius-scraper API"  "http://localhost:8002"
+printf "  %-24s  %s\n" "mobius-rag frontend" "http://localhost:5173"
+if [[ "$START_LANDING" == "true" ]]; then
+  printf "  %-24s  %s\n" "Master landing"     "http://localhost:3999"
+fi
+echo ""
+echo "  PIDs: $PIDFILE"
+echo "  Logs: $LOGDIR"
+echo "  Stop: ./mstop  (or mstop if Mobius is on PATH); or use Stop all on Master landing"
+echo ""
