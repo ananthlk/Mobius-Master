@@ -224,6 +224,7 @@
         </div>
       </div>
       <span class="port">No health endpoint yet.</span>
+      <p class="card-status-text" id="text-chat-worker" aria-live="polite"></p>
     </div>
     <div class="card worker-card" data-worker-id="scraper">
       <div class="card-header">
@@ -238,6 +239,7 @@
         </div>
       </div>
       <span class="port"><a href="http://localhost:8002" target="_blank" rel="noopener">http://localhost:8002</a> — Required for RAG Scrape from URL.</span>
+      <p class="card-status-text" id="text-scraper" aria-live="polite"></p>
     </div>
     <div class="card worker-card" data-worker-id="rag-chunking">
       <div class="card-header">
@@ -266,6 +268,7 @@
         </div>
       </div>
       <span class="port">No health endpoint yet.</span>
+      <p class="card-status-text" id="text-rag-embedding" aria-live="polite"></p>
     </div>
   </div>
 
@@ -338,6 +341,7 @@
     function setWorkerRow(w) {
       const id = w.id;
       const dot = document.getElementById('dot-' + id);
+      const text = document.getElementById('text-' + id);
       if (!dot) return;
       const status = w.status || 'unknown';
       dot.className = 'status-dot ' + (status === 'up' ? 'up' : status === 'slow' ? 'slow' : status === 'down' ? 'down' : status === 'no_endpoint' ? 'no_endpoint' : 'unknown');
@@ -346,6 +350,13 @@
       else if (status === 'no_endpoint') label += ' (no health endpoint yet)';
       dot.setAttribute('aria-label', label);
       dot.title = label;
+      if (text) {
+        if (status === 'up' && w.ms != null) text.textContent = w.ms + 'ms';
+        else if (status === 'slow') text.textContent = (w.ms != null ? w.ms + 'ms ' : '') + '(slow)';
+        else if (status === 'down') text.textContent = 'down';
+        else if (status === 'no_endpoint') text.textContent = 'no endpoint';
+        else text.textContent = '';
+      }
     }
 
     async function refreshStatus() {
