@@ -125,6 +125,30 @@
     .card-actions .dropdown button:hover { background: rgba(255,255,255,0.08); }
     .card-actions .dropdown button.restart { color: var(--accent); }
     .card-actions .dropdown button.stop { color: var(--danger); }
+    .redis-row { margin-bottom: 2rem; }
+    .redis-card .start-redis-btn {
+      background: var(--accent); color: #fff; border: none;
+      padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.9rem; cursor: pointer;
+    }
+    .redis-card .start-redis-btn:hover { opacity: 0.9; }
+    .card-actions .dropdown button.logs { color: var(--accent); }
+    .log-modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100;
+      align-items: center; justify-content: center; padding: 1rem;
+    }
+    .log-modal-overlay.open { display: flex; }
+    .log-modal {
+      background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+      max-width: 90vw; width: 700px; max-height: 85vh; display: flex; flex-direction: column;
+    }
+    .log-modal-header { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .log-modal-header h3 { margin: 0; font-size: 1rem; }
+    .log-modal-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.25rem; padding: 0.25rem; }
+    .log-modal-close:hover { color: var(--text); }
+    .log-modal-content {
+      flex: 1; overflow: auto; padding: 1rem; font-family: ui-monospace, monospace; font-size: 0.8rem;
+      white-space: pre-wrap; word-break: break-all; background: #0d1117; color: #c9d1d9;
+    }
   </style>
 </head>
 <body>
@@ -146,7 +170,7 @@
   <h2 class="section-heading">Processes</h2>
   <p class="section-desc">Frontend + backend available = you can use this.</p>
   <div class="cards">
-    <a class="card" href="http://localhost:5001" target="_blank" rel="noopener" data-process-id="os">
+    <a class="card" href="http://localhost:5001" target="_blank" rel="noopener" data-process-id="os" data-log-name="mobius-os-backend">
       <div class="card-header">
         <h2>OS</h2>
         <span class="status-dot unknown" role="status" aria-label="OS: checking" id="dot-os"></span>
@@ -155,13 +179,14 @@
           <div class="dropdown" onclick="event.preventDefault(); event.stopPropagation();">
             <button type="button" class="stop">Stop</button>
             <button type="button" class="restart">Restart</button>
+            <button type="button" class="logs">Logs</button>
           </div>
         </div>
       </div>
       <span class="port">http://localhost:5001 — Backend; extension runs separately.</span>
       <p class="card-status-text" id="text-os" aria-live="polite"></p>
     </a>
-    <a class="card" href="http://localhost:8000" target="_blank" rel="noopener" data-process-id="chat">
+    <a class="card" href="http://localhost:8000" target="_blank" rel="noopener" data-process-id="chat" data-log-name="mobius-chat-api">
       <div class="card-header">
         <h2>Chat</h2>
         <span class="status-dot unknown" role="status" aria-label="Chat: checking" id="dot-chat"></span>
@@ -170,13 +195,14 @@
           <div class="dropdown" onclick="event.preventDefault(); event.stopPropagation();">
             <button type="button" class="stop">Stop</button>
             <button type="button" class="restart">Restart</button>
+            <button type="button" class="logs">Logs</button>
           </div>
         </div>
       </div>
       <span class="port">http://localhost:8000</span>
       <p class="card-status-text" id="text-chat" aria-live="polite"></p>
     </a>
-    <a class="card" href="http://localhost:5173" target="_blank" rel="noopener" data-process-id="rag">
+    <a class="card" href="http://localhost:5173" target="_blank" rel="noopener" data-process-id="rag" data-log-name="mobius-rag-backend">
       <div class="card-header">
         <h2>RAG</h2>
         <span class="status-dot unknown" role="status" aria-label="RAG: checking" id="dot-rag"></span>
@@ -185,13 +211,14 @@
           <div class="dropdown" onclick="event.preventDefault(); event.stopPropagation();">
             <button type="button" class="stop">Stop</button>
             <button type="button" class="restart">Restart</button>
+            <button type="button" class="logs">Logs</button>
           </div>
         </div>
       </div>
       <span class="port">http://localhost:5173 — Docs (frontend + backend).</span>
       <p class="card-status-text" id="text-rag" aria-live="polite"></p>
     </a>
-    <a class="card" href="http://localhost:6500" target="_blank" rel="noopener" data-process-id="dbt">
+    <a class="card" href="http://localhost:6500" target="_blank" rel="noopener" data-process-id="dbt" data-log-name="mobius-dbt">
       <div class="card-header">
         <h2>DBT</h2>
         <span class="status-dot unknown" role="status" aria-label="DBT: checking" id="dot-dbt"></span>
@@ -200,6 +227,7 @@
           <div class="dropdown" onclick="event.preventDefault(); event.stopPropagation();">
             <button type="button" class="stop">Stop</button>
             <button type="button" class="restart">Restart</button>
+            <button type="button" class="logs">Logs</button>
           </div>
         </div>
       </div>
@@ -211,7 +239,7 @@
   <h2 class="section-heading">Workers</h2>
   <p class="section-desc">Shared resources for load balancing; status for ops.</p>
   <div class="cards">
-    <div class="card worker-card" data-worker-id="chat-worker">
+    <div class="card worker-card" data-worker-id="chat-worker" data-log-name="mobius-chat-worker">
       <div class="card-header">
         <h2>Chat worker</h2>
         <span class="status-dot no_endpoint" role="status" aria-label="Chat worker: no endpoint" id="dot-chat-worker" title="No health endpoint yet."></span>
@@ -220,13 +248,14 @@
           <div class="dropdown">
             <button type="button" class="stop">Stop</button>
             <button type="button" class="restart">Restart</button>
+            <button type="button" class="logs">Logs</button>
           </div>
         </div>
       </div>
       <span class="port">No health endpoint yet.</span>
       <p class="card-status-text" id="text-chat-worker" aria-live="polite"></p>
     </div>
-    <div class="card worker-card" data-worker-id="scraper">
+    <div class="card worker-card" data-worker-id="scraper" data-log-name="mobius-scraper-api">
       <div class="card-header">
         <h2>Scraper</h2>
         <span class="status-dot unknown" role="status" aria-label="Scraper: checking" id="dot-scraper"></span>
@@ -235,13 +264,14 @@
           <div class="dropdown">
             <button type="button" class="stop">Stop</button>
             <button type="button" class="restart">Restart</button>
+            <button type="button" class="logs">Logs</button>
           </div>
         </div>
       </div>
       <span class="port"><a href="http://localhost:8002" target="_blank" rel="noopener">http://localhost:8002</a> — Required for RAG Scrape from URL.</span>
       <p class="card-status-text" id="text-scraper" aria-live="polite"></p>
     </div>
-    <div class="card worker-card" data-worker-id="rag-chunking">
+    <div class="card worker-card" data-worker-id="rag-chunking" data-log-name="mobius-rag-chunking-worker">
       <div class="card-header">
         <h2>RAG chunking</h2>
         <span class="status-dot no_endpoint" role="status" aria-label="RAG chunking: no endpoint" id="dot-rag-chunking" title="No health endpoint yet."></span>
@@ -250,12 +280,13 @@
           <div class="dropdown">
             <button type="button" class="stop">Stop</button>
             <button type="button" class="restart">Restart</button>
+            <button type="button" class="logs">Logs</button>
           </div>
         </div>
       </div>
       <span class="port">No health endpoint yet.</span>
     </div>
-    <div class="card worker-card" data-worker-id="rag-embedding">
+    <div class="card worker-card" data-worker-id="rag-embedding" data-log-name="mobius-rag-embedding-worker">
       <div class="card-header">
         <h2>RAG embedding</h2>
         <span class="status-dot no_endpoint" role="status" aria-label="RAG embedding: no endpoint" id="dot-rag-embedding" title="No health endpoint yet."></span>
@@ -264,6 +295,7 @@
           <div class="dropdown">
             <button type="button" class="stop">Stop</button>
             <button type="button" class="restart">Restart</button>
+            <button type="button" class="logs">Logs</button>
           </div>
         </div>
       </div>
@@ -272,9 +304,33 @@
     </div>
   </div>
 
+  <h2 class="section-heading">Dependencies</h2>
+  <p class="section-desc">Required for Chat worker and Scraper.</p>
+  <div class="redis-row">
+    <div class="card worker-card redis-card">
+      <div class="card-header">
+        <h2>Redis</h2>
+        <span class="status-dot unknown" role="status" aria-label="Redis: checking" id="dot-redis" title="Port 6379"></span>
+        <button type="button" class="start-redis-btn" id="start-redis-btn" style="display: none;">Start Redis</button>
+      </div>
+      <span class="port">Port 6379 — Chat worker and Scraper queue.</span>
+      <p class="card-status-text" id="text-redis" aria-live="polite"></p>
+    </div>
+  </div>
+
   <p class="subtitle">mobius-user is a library (auth); no standalone server. mobius-config holds shared env.</p>
 
   <p class="footer">Use the menu to Stop all or Start all. Landing stays on 3999. From repo root: <code>./mstop</code> stops everything including landing.</p>
+
+  <div class="log-modal-overlay" id="log-modal-overlay" aria-hidden="true">
+    <div class="log-modal">
+      <div class="log-modal-header">
+        <h3 id="log-modal-title">Logs</h3>
+        <button type="button" class="log-modal-close" id="log-modal-close" aria-label="Close">×</button>
+      </div>
+      <pre class="log-modal-content" id="log-modal-content"></pre>
+    </div>
+  </div>
 
   <script>
     var hamburgerBtn = document.querySelector('.hamburger-btn');
@@ -359,6 +415,21 @@
       }
     }
 
+    function setRedis(redis) {
+      if (!redis) return;
+      const dot = document.getElementById('dot-redis');
+      const text = document.getElementById('text-redis');
+      const btn = document.getElementById('start-redis-btn');
+      const status = redis.status || 'unknown';
+      if (dot) {
+        dot.className = 'status-dot ' + (status === 'up' ? 'up' : 'down');
+        dot.setAttribute('aria-label', 'Redis: ' + status);
+        dot.title = status === 'up' ? 'Redis running on port 6379' : 'Redis not running';
+      }
+      if (text) text.textContent = status === 'up' ? 'running' : 'down';
+      if (btn) btn.style.display = status === 'down' ? 'inline-block' : 'none';
+    }
+
     async function refreshStatus() {
       const footer = document.getElementById('status-footer');
       try {
@@ -368,6 +439,7 @@
         const workers = data.workers || [];
         processes.forEach(setProcessCard);
         workers.forEach(setWorkerRow);
+        setRedis(data.redis);
         const updatedAt = data.updated_at ? new Date(data.updated_at).toLocaleTimeString() : '';
         footer.textContent = 'Status: last updated ' + (updatedAt || 'just now') + '. Auto-refresh every 15s.';
       } catch (e) {
@@ -417,6 +489,74 @@
           });
       });
     });
+    var logEventSource = null;
+    function openLogStream(logName, title) {
+      var overlay = document.getElementById('log-modal-overlay');
+      var content = document.getElementById('log-modal-content');
+      var titleEl = document.getElementById('log-modal-title');
+      if (logEventSource) { logEventSource.close(); logEventSource = null; }
+      titleEl.textContent = 'Logs: ' + (title || logName);
+      content.textContent = 'Loading…';
+      overlay.classList.add('open');
+      overlay.setAttribute('aria-hidden', 'false');
+      var tailUrl = '/api/logs?name=' + encodeURIComponent(logName);
+      fetch(tailUrl).then(function (r) { return r.json(); }).then(function (data) {
+        if (data.error) { content.textContent = data.error; return; }
+        if (data.tail !== undefined) { content.textContent = data.tail; content.scrollTop = content.scrollHeight; }
+        var streamUrl = '/api/logs/stream?name=' + encodeURIComponent(logName);
+        logEventSource = new EventSource(streamUrl);
+        logEventSource.onmessage = function (e) {
+          try {
+            var d = JSON.parse(e.data);
+            if (d.error) { content.textContent = d.error; return; }
+            if (d.tail !== undefined) { content.textContent = d.tail; content.scrollTop = content.scrollHeight; return; }
+            if (d.lines !== undefined) { content.textContent += d.lines; content.scrollTop = content.scrollHeight; }
+          } catch (err) { content.textContent += (e.data || '') + '\n'; content.scrollTop = content.scrollHeight; }
+        };
+        logEventSource.onerror = function () { logEventSource.close(); logEventSource = null; };
+      }).catch(function (err) {
+        content.textContent = 'Failed to load logs: ' + err.message;
+      });
+    }
+    function closeLogModal() {
+      if (logEventSource) { logEventSource.close(); logEventSource = null; }
+      document.getElementById('log-modal-overlay').classList.remove('open');
+      document.getElementById('log-modal-overlay').setAttribute('aria-hidden', 'true');
+    }
+    document.getElementById('log-modal-close').addEventListener('click', closeLogModal);
+    document.getElementById('log-modal-overlay').addEventListener('click', function (e) {
+      if (e.target === this) closeLogModal();
+    });
+    document.querySelectorAll('.card-actions .dropdown .logs').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        var card = this.closest('.card');
+        var logName = card && card.dataset.logName;
+        if (!logName) return;
+        var title = card ? (card.querySelector('h2') && card.querySelector('h2').textContent) : logName;
+        this.closest('.dropdown').classList.remove('open');
+        openLogStream(logName, title);
+      });
+    });
+
+    document.getElementById('start-redis-btn')?.addEventListener('click', async function () {
+      this.disabled = true;
+      var footer = document.getElementById('status-footer');
+      footer.textContent = 'Starting Redis…';
+      try {
+        var res = await fetch('/api/redis/start', { method: 'POST' });
+        var data = await res.json().catch(function () { return {}; });
+        footer.textContent = data.ok ? data.message : 'Error: ' + (data.message || res.statusText);
+        setTimeout(refreshStatus, 2000);
+      } catch (err) {
+        footer.textContent = 'Error: ' + err.message;
+      } finally {
+        this.disabled = false;
+      }
+    });
+
     document.querySelectorAll('.card-actions .dropdown .restart').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.preventDefault();

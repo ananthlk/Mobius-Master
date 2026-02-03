@@ -119,6 +119,19 @@ if [[ "$START_OS_EXTENSION" == "true" ]] && [[ -d "$MOBIUS_ROOT/mobius-os/extens
   fi
 fi
 
+# --- Redis (required for mobius-chat worker and mobius-scraper API + worker) ---
+if ! lsof -i :6379 >/dev/null 2>&1; then
+  if command -v redis-server >/dev/null 2>&1; then
+    _log "Starting Redis (port 6379) for Chat worker and Scraper ..."
+    redis-server --daemonize yes 2>/dev/null || true
+    sleep 1
+  fi
+  if ! lsof -i :6379 >/dev/null 2>&1; then
+    _log "WARNING: Redis not running on port 6379. Chat worker and Scraper need Redis."
+    _log "  Start Redis: brew services start redis   (or: redis-server)"
+  fi
+fi
+
 # --- mobius-chat API + frontend (port 8000) ---
 if [[ -f "$MOBIUS_ROOT/mobius-chat/mchatc" ]]; then
   if [[ -d "$MOBIUS_ROOT/mobius-chat/.venv" ]]; then
@@ -210,4 +223,5 @@ echo ""
 echo "  PIDs: $PIDFILE"
 echo "  Logs: $LOGDIR"
 echo "  Stop: ./mstop  (or mstop if Mobius is on PATH); or use Stop all on Master landing"
+echo "  Redis (port 6379) is required for Chat worker and Scraper; mstart tries to start it if missing."
 echo ""

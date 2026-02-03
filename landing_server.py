@@ -6,6 +6,7 @@ Uses stdlib only (no FastAPI dependency at repo root).
 """
 import json
 import os
+import socket
 import subprocess
 import time
 from datetime import datetime, timezone
@@ -13,6 +14,7 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 from urllib.request import urlopen, Request
 from urllib.error import URLError, HTTPError
+from urllib.parse import urlparse, parse_qs
 
 MOBIUS_ROOT = Path(__file__).resolve().parent
 LANDING_DIR = MOBIUS_ROOT / "landing"
@@ -40,6 +42,11 @@ SERVICE_STOP = {
     "rag-chunking": {"names": ["mobius-rag-chunking-worker"], "ports": []},
     "rag-embedding": {"names": ["mobius-rag-embedding-worker"], "ports": []},
 }
+
+# Log file names we are allowed to stream (no path traversal).
+ALLOWED_LOG_NAMES = set()
+for info in SERVICE_STOP.values():
+    ALLOWED_LOG_NAMES.update(info["names"])
 
 # Service id -> list of (name, cmd) to start. {root} = MOBIUS_ROOT.
 def _start_commands(root: Path) -> dict:
@@ -292,11 +299,116 @@ def _get_status() -> dict:
                 "note": note,
             })
 
+    redis_status = _redis_status()
+
     return {
         "processes": processes,
         "workers": workers,
+        "redis": redis_status,
         "updated_at": datetime.now(timezone.utc).isoformat(),
     }
+
+
+def _redis_status() -> dict:
+    """Check if Redis is reachable on port 6379. Returns {status: 'up'|'down'}."""
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(1)
+    try:
+        s.connect(("127.0.0.1", 6379))
+        return {"status": "up"}
+    except (socket.error, OSError):
+        return {"status": "down"}
+    finally:
+        try:
+            s.close()
+        except Exception:
+            pass
+
+
+def _read_log_tail(name: str, max_lines: int = 500) -> dict:
+    """Return last N lines of a log file as {tail: str} or {error: str}. For one-shot GET /api/logs."""
+    if name not in ALLOWED_LOG_NAMES:
+        return {"error": "Invalid log name"}
+    path = LOGDIR / f"{name}.log"
+    if not path.exists():
+        return {"tail": f"(log file not found: {name}.log)"}
+    try:
+        with open(path, "r", encoding="utf-8", errors="replace") as f:
+            lines = f.readlines()
+        tail = "".join(lines[-max_lines:]) if len(lines) > max_lines else "".join(lines)
+        return {"tail": tail}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+def _stream_log_generator(name: str):
+    """Yield SSE-formatted chunks (bytes) for log file tail + follow. name must be in ALLOWED_LOG_NAMES."""
+    if name not in ALLOWED_LOG_NAMES:
+        yield b"data: " + json.dumps({"error": "Invalid log name"}).encode("utf-8") + b"\n\n"
+        return
+    path = LOGDIR / f"{name}.log"
+    if not path.exists():
+        yield b"data: " + json.dumps({"tail": f"(log file not found: {name}.log)"}).encode("utf-8") + b"\n\n"
+        return
+    try:
+        with open(path, "r", encoding="utf-8", errors="replace") as f:
+            lines = f.readlines()
+        tail = "".join(lines[-500:]) if len(lines) > 500 else "".join(lines)
+        yield b"data: " + json.dumps({"tail": tail}).encode("utf-8") + b"\n\n"
+    except Exception as e:
+        yield b"data: " + json.dumps({"error": str(e)}).encode("utf-8") + b"\n\n"
+        return
+    last_size = path.stat().st_size
+    for _ in range(3600):  # ~1 hour max
+        time.sleep(1)
+        try:
+            size = path.stat().st_size
+            if size > last_size:
+                with open(path, "r", encoding="utf-8", errors="replace") as f:
+                    f.seek(last_size)
+                    new_text = f.read()
+                last_size = size
+                if new_text:
+                    yield b"data: " + json.dumps({"lines": new_text}).encode("utf-8") + b"\n\n"
+        except (OSError, IOError):
+            break
+
+
+def _start_redis() -> tuple[bool, str]:
+    """Start Redis if not running. Returns (ok, message)."""
+    if _redis_status()["status"] == "up":
+        return (True, "Redis already running")
+    # Try redis-server --daemonize yes first
+    try:
+        out = subprocess.run(
+            ["redis-server", "--daemonize", "yes"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            cwd=str(MOBIUS_ROOT),
+        )
+        if out.returncode == 0:
+            time.sleep(1)
+            if _redis_status()["status"] == "up":
+                return (True, "Redis started")
+        # Fallback: brew services start redis
+        out = subprocess.run(
+            ["brew", "services", "start", "redis"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+            cwd=str(MOBIUS_ROOT),
+        )
+        time.sleep(1)
+        if _redis_status()["status"] == "up":
+            return (True, "Redis started via brew services")
+        return (False, out.stderr or out.stdout or "Redis did not start")
+    except FileNotFoundError:
+        return (False, "redis-server not in PATH. Install Redis: brew install redis")
+    except subprocess.TimeoutExpired:
+        return (False, "Start command timed out")
+    except Exception as e:
+        return (False, str(e))
 
 
 class LandingHandler(SimpleHTTPRequestHandler):
@@ -307,22 +419,69 @@ class LandingHandler(SimpleHTTPRequestHandler):
         if self.path == "/api/status":
             self._handle_status()
             return
+        if self.path.startswith("/api/logs/stream"):
+            self._handle_logs_stream()
+            return
+        if self.path.startswith("/api/logs"):
+            self._handle_logs_tail()
+            return
         if self.path == "/" or self.path == "/index.html":
             self.path = "/index.html"
         return super().do_GET()
+
+    def _handle_logs_tail(self):
+        """One-shot: return last N lines of log as JSON. GET /api/logs?name=xxx"""
+        parsed = urlparse(self.path)
+        if parsed.path != "/api/logs":
+            self.send_error(404)
+            return
+        params = parse_qs(parsed.query)
+        name = (params.get("name") or [None])[0]
+        if not name or not name.strip():
+            self._send_json(400, {"error": "Missing name parameter"})
+            return
+        name = name.strip()
+        data = _read_log_tail(name)
+        self._send_json(200, data)
+
+    def _handle_logs_stream(self):
+        parsed = urlparse(self.path)
+        params = parse_qs(parsed.query)
+        name = (params.get("name") or [None])[0]
+        if not name or not name.strip():
+            self._send_json(400, {"error": "Missing name parameter"})
+            return
+        name = name.strip()
+        if name not in ALLOWED_LOG_NAMES:
+            self._send_json(400, {"error": "Invalid log name"})
+            return
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream")
+        self.send_header("Cache-Control", "no-cache")
+        self.send_header("Connection", "keep-alive")
+        self.send_header("X-Accel-Buffering", "no")
+        self.end_headers()
+        try:
+            for chunk in _stream_log_generator(name):
+                self.wfile.write(chunk)
+                self.wfile.flush()
+        except (BrokenPipeError, ConnectionResetError, OSError):
+            pass
 
     def _handle_status(self):
         try:
             data = _get_status()
             self._send_json(200, data)
         except Exception as e:
-            self._send_json(500, {"processes": [], "workers": [], "updated_at": None, "error": str(e)})
+            self._send_json(500, {"processes": [], "workers": [], "redis": {"status": "down"}, "updated_at": None, "error": str(e)})
 
     def do_POST(self):
         if self.path == "/api/stop-all":
             self._handle_stop_all()
         elif self.path == "/api/start-all":
             self._handle_start_all()
+        elif self.path == "/api/redis/start":
+            self._handle_redis_start()
         elif self.path == "/api/service/stop":
             self._handle_service_stop()
         elif self.path == "/api/service/restart":
@@ -356,6 +515,10 @@ class LandingHandler(SimpleHTTPRequestHandler):
             self._send_json(200, {"ok": False, "message": "Stop script timed out.", "output": ""})
         except Exception as e:
             self._send_json(200, {"ok": False, "message": str(e), "output": ""})
+
+    def _handle_redis_start(self):
+        ok, message = _start_redis()
+        self._send_json(200, {"ok": ok, "message": message})
 
     def _handle_start_all(self):
         mstart = MOBIUS_ROOT / "mstart"
