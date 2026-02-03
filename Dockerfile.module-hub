@@ -1,0 +1,14 @@
+# Module Hub (Landing / Dashboard) for Cloud Run.
+# Uses stdlib only; no pip install. Server binds 0.0.0.0 when ENV=prod and PORT from env.
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY landing_server.py ./
+COPY landing ./landing/
+
+ENV PORT=8080
+ENV ENV=prod
+EXPOSE 8080
+
+CMD ["python3", "landing_server.py"]

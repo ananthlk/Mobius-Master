@@ -164,7 +164,7 @@
       </div>
     </div>
   </header>
-  <p class="subtitle">Use the menu to Stop all or Start all. Landing stays on 3999.</p>
+  <p class="subtitle" id="subtitle-text">Use the menu to Stop all or Start all. Landing stays on 3999.</p>
   <p class="status-footer" id="status-footer">Status: loading…</p>
 
   <h2 class="section-heading">Processes</h2>
@@ -179,11 +179,11 @@
           <div class="dropdown" onclick="event.preventDefault(); event.stopPropagation();">
             <button type="button" class="stop">Stop</button>
             <button type="button" class="restart">Restart</button>
-            <button type="button" class="logs">Logs</button>
+            <button type="button" class="logs logs-btn">Logs</button>
           </div>
         </div>
       </div>
-      <span class="port">http://localhost:5001 — Backend; extension runs separately.</span>
+      <span class="port" data-process-id="os">http://localhost:5001 — Backend; extension runs separately.</span>
       <p class="card-status-text" id="text-os" aria-live="polite"></p>
     </a>
     <a class="card" href="http://localhost:8000" target="_blank" rel="noopener" data-process-id="chat" data-log-name="mobius-chat-api">
@@ -195,11 +195,11 @@
           <div class="dropdown" onclick="event.preventDefault(); event.stopPropagation();">
             <button type="button" class="stop">Stop</button>
             <button type="button" class="restart">Restart</button>
-            <button type="button" class="logs">Logs</button>
+            <button type="button" class="logs logs-btn">Logs</button>
           </div>
         </div>
       </div>
-      <span class="port">http://localhost:8000</span>
+      <span class="port" data-process-id="chat">http://localhost:8000</span>
       <p class="card-status-text" id="text-chat" aria-live="polite"></p>
     </a>
     <a class="card" href="http://localhost:5173" target="_blank" rel="noopener" data-process-id="rag" data-log-name="mobius-rag-backend">
@@ -211,11 +211,11 @@
           <div class="dropdown" onclick="event.preventDefault(); event.stopPropagation();">
             <button type="button" class="stop">Stop</button>
             <button type="button" class="restart">Restart</button>
-            <button type="button" class="logs">Logs</button>
+            <button type="button" class="logs logs-btn">Logs</button>
           </div>
         </div>
       </div>
-      <span class="port">http://localhost:5173 — Docs (frontend + backend).</span>
+      <span class="port" data-process-id="rag">http://localhost:5173 — Docs (frontend + backend).</span>
       <p class="card-status-text" id="text-rag" aria-live="polite"></p>
     </a>
     <a class="card" href="http://localhost:6500" target="_blank" rel="noopener" data-process-id="dbt" data-log-name="mobius-dbt">
@@ -227,11 +227,11 @@
           <div class="dropdown" onclick="event.preventDefault(); event.stopPropagation();">
             <button type="button" class="stop">Stop</button>
             <button type="button" class="restart">Restart</button>
-            <button type="button" class="logs">Logs</button>
+            <button type="button" class="logs logs-btn">Logs</button>
           </div>
         </div>
       </div>
-      <span class="port">http://localhost:6500 — Job UI (run on demand).</span>
+      <span class="port" data-process-id="dbt">http://localhost:6500 — Job UI (run on demand).</span>
       <p class="card-status-text" id="text-dbt" aria-live="polite"></p>
     </a>
   </div>
@@ -248,7 +248,7 @@
           <div class="dropdown">
             <button type="button" class="stop">Stop</button>
             <button type="button" class="restart">Restart</button>
-            <button type="button" class="logs">Logs</button>
+            <button type="button" class="logs logs-btn">Logs</button>
           </div>
         </div>
       </div>
@@ -264,11 +264,11 @@
           <div class="dropdown">
             <button type="button" class="stop">Stop</button>
             <button type="button" class="restart">Restart</button>
-            <button type="button" class="logs">Logs</button>
+            <button type="button" class="logs logs-btn">Logs</button>
           </div>
         </div>
       </div>
-      <span class="port"><a href="http://localhost:8002" target="_blank" rel="noopener">http://localhost:8002</a> — Required for RAG Scrape from URL.</span>
+      <span class="port" data-worker-id="scraper"><a href="http://localhost:8002" target="_blank" rel="noopener">http://localhost:8002</a> — Required for RAG Scrape from URL.</span>
       <p class="card-status-text" id="text-scraper" aria-live="polite"></p>
     </div>
     <div class="card worker-card" data-worker-id="rag-chunking" data-log-name="mobius-rag-chunking-worker">
@@ -280,7 +280,7 @@
           <div class="dropdown">
             <button type="button" class="stop">Stop</button>
             <button type="button" class="restart">Restart</button>
-            <button type="button" class="logs">Logs</button>
+            <button type="button" class="logs logs-btn">Logs</button>
           </div>
         </div>
       </div>
@@ -295,7 +295,7 @@
           <div class="dropdown">
             <button type="button" class="stop">Stop</button>
             <button type="button" class="restart">Restart</button>
-            <button type="button" class="logs">Logs</button>
+            <button type="button" class="logs logs-btn">Logs</button>
           </div>
         </div>
       </div>
@@ -415,11 +415,49 @@
       }
     }
 
+    var PROCESS_PORT_SUFFIX = {
+      os: ' — Backend; extension runs separately.',
+      chat: '',
+      rag: ' — Docs (frontend + backend).',
+      dbt: ' — Job UI (run on demand).',
+    };
+
+    function applyConfig(config) {
+      if (!config) return;
+      window.MOBIUS_CONFIG = config;
+      (config.processes || []).forEach(function (p) {
+        const card = document.querySelector('.card[data-process-id="' + p.id + '"]');
+        if (!card) return;
+        card.href = p.url || '#';
+        const portEl = card.querySelector('.port[data-process-id="' + p.id + '"]');
+        if (portEl) portEl.textContent = (p.url || '') + (PROCESS_PORT_SUFFIX[p.id] || '');
+      });
+      (config.workers || []).forEach(function (w) {
+        if (w.id === 'scraper' && w.url) {
+          const portEl = document.querySelector('.port[data-worker-id="scraper"]');
+          if (portEl) portEl.innerHTML = '<a href="' + w.url + '" target="_blank" rel="noopener">' + w.url + '</a> — Required for RAG Scrape from URL.';
+        }
+      });
+      const hamburgerWrap = document.querySelector('.hamburger-wrap');
+      if (hamburgerWrap) hamburgerWrap.style.display = config.controls_enabled ? '' : 'none';
+      document.querySelectorAll('.card-actions').forEach(function (el) {
+        el.style.display = config.controls_enabled ? '' : 'none';
+      });
+      document.querySelectorAll('.logs-btn').forEach(function (el) {
+        el.style.display = config.logs_enabled ? '' : 'none';
+      });
+      const subtitle = document.getElementById('subtitle-text');
+      if (subtitle) subtitle.textContent = config.controls_enabled
+        ? 'Use the menu to Stop all or Start all. Landing stays on 3999.'
+        : 'Status and links only. Control actions are disabled in production.';
+    }
+
     function setRedis(redis) {
       if (!redis) return;
       const dot = document.getElementById('dot-redis');
       const text = document.getElementById('text-redis');
       const btn = document.getElementById('start-redis-btn');
+      const config = window.MOBIUS_CONFIG;
       const status = redis.status || 'unknown';
       if (dot) {
         dot.className = 'status-dot ' + (status === 'up' ? 'up' : 'down');
@@ -427,7 +465,7 @@
         dot.title = status === 'up' ? 'Redis running on port 6379' : 'Redis not running';
       }
       if (text) text.textContent = status === 'up' ? 'running' : 'down';
-      if (btn) btn.style.display = status === 'down' ? 'inline-block' : 'none';
+      if (btn) btn.style.display = (config && !config.redis_start_enabled) ? 'none' : (status === 'down' ? 'inline-block' : 'none');
     }
 
     async function refreshStatus() {
@@ -447,8 +485,20 @@
       }
     }
 
-    refreshStatus();
-    setInterval(refreshStatus, 15000);
+    (function init() {
+      fetch('/api/config')
+        .then(function (r) { return r.json().catch(function () { return {}; }); })
+        .then(function (config) {
+          applyConfig(config);
+          refreshStatus();
+          setInterval(refreshStatus, 15000);
+        })
+        .catch(function (err) {
+          document.getElementById('status-footer').textContent = 'Config error — ' + err.message;
+          refreshStatus();
+          setInterval(refreshStatus, 15000);
+        });
+    })();
 
     // Kebab menu: toggle dropdown, close on outside click, Stop/Restart
     document.querySelectorAll('.kebab-btn').forEach(function (btn) {

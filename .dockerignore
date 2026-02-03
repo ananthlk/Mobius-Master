@@ -1,0 +1,25 @@
+# Reduces build context for Module Hub image (docker build -f Dockerfile.module-hub .).
+# Keeps landing_server.py and landing/ in context.
+.git
+.mobius_logs
+.cursor
+mobius-rag
+mobius-chat
+mobius-dbt
+mobius-os
+mobius-skills
+mobius-qa
+mobius-auth
+mobius-config
+mobius-design
+Mobius-user
+mobius-web-scrapper
+docs
+node_modules
+mstart
+mstop
+.mobius_start_all.pids
+*.pyc
+__pycache__
+.venv
+*.log
