@@ -166,17 +166,17 @@ if [[ -d "$MOBIUS_ROOT/mobius-rag/.venv" ]] && [[ -f "$MOBIUS_ROOT/mobius-rag/ap
   _start "mobius-rag-embedding-worker" "cd $MOBIUS_ROOT/mobius-rag && .venv/bin/python3 -m app.embedding_worker"
 fi
 
-# --- mobius-skills web-scraper API (port 8002) ---
-if [[ -d "$MOBIUS_ROOT/mobius-skills/web-scraper/.venv" ]]; then
+# --- mobius-web-scrapper API (port 8002) ---
+if [[ -d "$MOBIUS_ROOT/mobius-web-scrapper/.venv" ]]; then
   _kill_port 8002
-  _start "mobius-scraper-api" "cd $MOBIUS_ROOT/mobius-skills/web-scraper && .venv/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8002"
+  _start "mobius-scraper-api" "cd $MOBIUS_ROOT/mobius-web-scrapper && .venv/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8002"
 else
-  _log "Skip mobius-scraper API (no .venv in mobius-skills/web-scraper)"
+  _log "Skip mobius-scraper API (no .venv in mobius-web-scrapper)"
 fi
 
-# --- mobius-skills web-scraper worker ---
-if [[ -d "$MOBIUS_ROOT/mobius-skills/web-scraper/.venv" ]] && [[ -f "$MOBIUS_ROOT/mobius-skills/web-scraper/mscrapew" ]]; then
-  _start "mobius-scraper-worker" "cd $MOBIUS_ROOT/mobius-skills/web-scraper && ./mscrapew"
+# --- mobius-web-scrapper worker ---
+if [[ -d "$MOBIUS_ROOT/mobius-web-scrapper/.venv" ]] && [[ -f "$MOBIUS_ROOT/mobius-web-scrapper/mscrapew" ]]; then
+  _start "mobius-scraper-worker" "cd $MOBIUS_ROOT/mobius-web-scrapper && ./mscrapew"
 fi
 
 # --- mobius-rag frontend (port 5173) ---
