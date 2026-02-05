@@ -36,7 +36,7 @@ gcloud builds submit --config=cloudbuild.module-hub.yaml --project="$PROJECT_ID"
 echo "Deploying to Cloud Run..."
 
 # Build --set-env-vars: ENV=prod and PORT (Cloud Run sets PORT; we set ENV).
-ENV_VARS="ENV=prod,PORT=8080"
+ENV_VARS="ENV=prod"
 if [[ -n "$MOBIUS_OS_URL" ]]; then ENV_VARS="${ENV_VARS},MOBIUS_OS_URL=${MOBIUS_OS_URL}"; fi
 if [[ -n "$MOBIUS_CHAT_URL" ]]; then ENV_VARS="${ENV_VARS},MOBIUS_CHAT_URL=${MOBIUS_CHAT_URL}"; fi
 if [[ -n "$MOBIUS_RAG_BACKEND_URL" ]]; then ENV_VARS="${ENV_VARS},MOBIUS_RAG_BACKEND_URL=${MOBIUS_RAG_BACKEND_URL}"; fi

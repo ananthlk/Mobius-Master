@@ -1,9 +1,7 @@
 # Cloud Build config for Module Hub (landing/dashboard).
-# Usage: gcloud builds submit --config=cloudbuild.module-hub.yaml --tag gcr.io/PROJECT_ID/module-hub:latest .
+# Usage: gcloud builds submit --config=cloudbuild.module-hub.yaml --project=PROJECT_ID .
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-f', 'Dockerfile.module-hub', '-t', '${_IMAGE}', '.']
+    args: ['build', '-f', 'Dockerfile.module-hub', '-t', 'gcr.io/$PROJECT_ID/module-hub:latest', '.']
 images:
-  - '${_IMAGE}'
-substitutions:
-  _IMAGE: 'gcr.io/${PROJECT_ID}/module-hub:latest'
+  - 'gcr.io/$PROJECT_ID/module-hub:latest'
