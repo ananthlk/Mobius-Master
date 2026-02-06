@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Start all Mobius backends, frontends, and workers. Kills any existing first. Run from anywhere.
+# Start all Mobius backends, frontends, and workers using shared venv.
 # Usage: mstart [--no-rag-frontend] [--no-os-extension] [--no-landing]
 
 set -e
@@ -13,7 +13,15 @@ cd "$MOBIUS_ROOT" || exit 1
 
 PIDFILE="$MOBIUS_ROOT/.mobius_start_all.pids"
 LOGDIR="$MOBIUS_ROOT/.mobius_logs"
+VENV="$MOBIUS_ROOT/.venv"
 mkdir -p "$LOGDIR"
+
+# Check for shared venv
+if [[ ! -d "$VENV" ]]; then
+  echo "[mstart] ERROR: Shared venv not found at $VENV"
+  echo "  Create it: cd $MOBIUS_ROOT && python3.11 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt"
+  exit 1
+fi
 
 START_RAG_FRONTEND=true
 START_OS_EXTENSION=true
@@ -60,7 +68,8 @@ fi
 : > "$PIDFILE"
 
 _log() { echo "[mstart] $*"; }
-# Kill any process bound to port so RAG (and others) can bind to fixed ports.
+
+# Kill any process bound to port so services can bind to fixed ports.
 _kill_port() {
   local port=$1
   local pids
@@ -71,6 +80,7 @@ _kill_port() {
     sleep 2
   fi
 }
+
 _start() {
   local name="$1"
   local cmd="$2"
@@ -81,18 +91,42 @@ _start() {
   _log "  PID $pid"
 }
 
-# --- mobius-chat DB migrations (run before starting chat services) ---
-if [[ -f "$MOBIUS_ROOT/mobius-chat/mchatc" ]] && [[ -d "$MOBIUS_ROOT/mobius-chat/.venv" ]]; then
-  _log "Running mobius-chat DB migrations ..."
-  if [[ -f "$MOBIUS_ROOT/mobius-chat/.env" ]]; then
+# Wait for Redis at REDIS_URL (used after starting tunnel). Up to 15s.
+_wait_redis() {
+  sleep 2
+  if [[ ! -x "$VENV/bin/python3" ]]; then return; fi
+  local i
+  for (( i=0; i<15; i++ )); do
+    if ( cd "$MOBIUS_ROOT/mobius-skills/web-scraper" 2>/dev/null && "$VENV/bin/python3" -c "
+import sys; sys.path.insert(0, '.'); from app.config import REDIS_URL
+import redis; redis.from_url(REDIS_URL, socket_connect_timeout=2).ping()
+" 2>/dev/null ); then
+      _log "  Redis reachable"
+      return
+    fi
+    sleep 1
+  done
+  _log "  Redis not reachable yet (tunnel may still be connecting)"
+}
+
+# Load .env files for services that need env vars
+_load_env() {
+  local envfile="$1"
+  if [[ -f "$envfile" ]]; then
     while IFS= read -r _mline || [[ -n "$_mline" ]]; do
       [[ -z "$_mline" || "$_mline" =~ ^[[:space:]]*# ]] && continue
       if [[ "$_mline" =~ ^([A-Za-z_][A-Za-z0-9_]*)=(.*)$ ]]; then
         export "${BASH_REMATCH[1]}=${BASH_REMATCH[2]}"
       fi
-    done < "$MOBIUS_ROOT/mobius-chat/.env"
+    done < "$envfile"
   fi
-  if (cd "$MOBIUS_ROOT/mobius-chat" && .venv/bin/python3 -m app.db.run_migrations 2>&1); then
+}
+
+# --- mobius-chat DB migrations (run before starting chat services) ---
+if [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
+  _log "Running mobius-chat DB migrations ..."
+  _load_env "$MOBIUS_ROOT/mobius-chat/.env"
+  if (cd "$MOBIUS_ROOT/mobius-chat" && "$VENV/bin/python3" -m app.db.run_migrations 2>&1); then
     _log "Migrations OK"
   else
     _log "Migrations failed or skipped (check CHAT_RAG_DATABASE_URL in mobius-chat/.env)"
@@ -101,13 +135,8 @@ fi
 
 # --- mobius-os backend (port 5001) ---
 if [[ -d "$MOBIUS_ROOT/mobius-os/backend" ]]; then
-  if [[ -d "$MOBIUS_ROOT/mobius-os/backend/.venv" ]]; then
-    _start "mobius-os-backend" "cd $MOBIUS_ROOT/mobius-os/backend && .venv/bin/python server.py"
-  else
-    _log "Skip mobius-os backend (no .venv in mobius-os/backend)"
-  fi
-else
-  _log "Skip mobius-os (backend not found)"
+  _load_env "$MOBIUS_ROOT/mobius-os/backend/.env"
+  _start "mobius-os-backend" "cd $MOBIUS_ROOT/mobius-os/backend && $VENV/bin/python server.py"
 fi
 
 # --- mobius-os extension (webpack watch) ---
@@ -119,64 +148,71 @@ if [[ "$START_OS_EXTENSION" == "true" ]] && [[ -d "$MOBIUS_ROOT/mobius-os/extens
   fi
 fi
 
-# --- Redis (required for mobius-chat worker and mobius-scraper API + worker) ---
-if ! lsof -i :6379 >/dev/null 2>&1; then
-  if command -v redis-server >/dev/null 2>&1; then
-    _log "Starting Redis (port 6379) for Chat worker and Scraper ..."
-    redis-server --daemonize yes 2>/dev/null || true
-    sleep 1
-  fi
-  if ! lsof -i :6379 >/dev/null 2>&1; then
-    _log "WARNING: Redis not running on port 6379. Chat worker and Scraper need Redis."
-    _log "  Start Redis: brew services start redis   (or: redis-server)"
-  fi
+# --- Redis: start tunnel if REDIS_URL is localhost:6380 (IAP/SSH tunnel to cloud Redis) ---
+_load_env "$MOBIUS_ROOT/mobius-skills/web-scraper/.env"
+if [[ -f "$MOBIUS_ROOT/mobius-config/.env" ]]; then
+  _load_env "$MOBIUS_ROOT/mobius-config/.env"
 fi
-
-# --- mobius-chat API + frontend (port 8000) ---
-if [[ -f "$MOBIUS_ROOT/mobius-chat/mchatc" ]]; then
-  if [[ -d "$MOBIUS_ROOT/mobius-chat/.venv" ]]; then
-    _start "mobius-chat-api" "cd $MOBIUS_ROOT/mobius-chat && ./mchatc"
+REDIS_URL="${REDIS_URL:-}"
+if [[ "$REDIS_URL" == *"127.0.0.1:6380"* ]] || [[ "$REDIS_URL" == *"localhost:6380"* ]]; then
+  _log "Redis tunnel target (127.0.0.1:6380) detected; starting tunnel if configured ..."
+  _kill_port 6380
+  if [[ -n "${REDIS_TUNNEL_CMD:-}" ]]; then
+    _start "mobius-redis-tunnel" "$REDIS_TUNNEL_CMD"
+    _wait_redis
+  elif [[ -n "${REDIS_TUNNEL_JUMP_INSTANCE:-}" ]]; then
+    REDIS_TUNNEL_JUMP_ZONE="${REDIS_TUNNEL_JUMP_ZONE:-us-central1-a}"
+    _start "mobius-redis-tunnel" "gcloud compute ssh $REDIS_TUNNEL_JUMP_INSTANCE --zone=$REDIS_TUNNEL_JUMP_ZONE -- -L 6380:10.40.102.67:6379 -N -o ServerAliveInterval=60 -o ServerAliveCountMax=3"
+    _wait_redis
   else
-    _log "Skip mobius-chat API (no .venv in mobius-chat)"
+    _log "  Set REDIS_TUNNEL_CMD or REDIS_TUNNEL_JUMP_INSTANCE (and optional REDIS_TUNNEL_JUMP_ZONE) in mobius-config/.env or web-scraper/.env to start the tunnel automatically."
+    _log "  Or use local Redis: REDIS_URL=redis://localhost:6379/0 and run: brew services start redis"
   fi
-else
-  _log "Skip mobius-chat (mchatc not found)"
+fi
+_log "Note: Redis at ${REDIS_URL:-redis://10.40.102.67:6379/0}"
+
+# --- mobius-chat API (port 8000) ---
+if [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
+  _load_env "$MOBIUS_ROOT/mobius-chat/.env"
+  _start "mobius-chat-api" "cd $MOBIUS_ROOT/mobius-chat && $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000"
 fi
 
-# --- mobius-chat worker (Redis + worker) ---
-if [[ -f "$MOBIUS_ROOT/mobius-chat/mchatcw" ]] && [[ -d "$MOBIUS_ROOT/mobius-chat/.venv" ]]; then
-  _start "mobius-chat-worker" "cd $MOBIUS_ROOT/mobius-chat && ./mchatcw"
+# --- mobius-chat worker ---
+if [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
+  _load_env "$MOBIUS_ROOT/mobius-chat/.env"
+  _start "mobius-chat-worker" "cd $MOBIUS_ROOT/mobius-chat && $VENV/bin/python3 -m app.worker"
 fi
 
 # --- mobius-rag backend (port 8001) ---
-if [[ -d "$MOBIUS_ROOT/mobius-rag/.venv" ]]; then
+if [[ -d "$MOBIUS_ROOT/mobius-rag" ]]; then
   _kill_port 8001
-  _start "mobius-rag-backend" "cd $MOBIUS_ROOT/mobius-rag && .venv/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload"
-else
-  _log "Skip mobius-rag backend (no .venv in mobius-rag)"
+  _load_env "$MOBIUS_ROOT/mobius-rag/.env"
+  _start "mobius-rag-backend" "cd $MOBIUS_ROOT/mobius-rag && $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload"
 fi
 
 # --- mobius-rag chunking worker ---
-if [[ -d "$MOBIUS_ROOT/mobius-rag/.venv" ]]; then
-  _start "mobius-rag-chunking-worker" "cd $MOBIUS_ROOT/mobius-rag && .venv/bin/python3 -m app.worker"
+if [[ -d "$MOBIUS_ROOT/mobius-rag" ]]; then
+  _load_env "$MOBIUS_ROOT/mobius-rag/.env"
+  _start "mobius-rag-chunking-worker" "cd $MOBIUS_ROOT/mobius-rag && $VENV/bin/python3 -m app.worker"
 fi
 
 # --- mobius-rag embedding worker ---
-if [[ -d "$MOBIUS_ROOT/mobius-rag/.venv" ]] && [[ -f "$MOBIUS_ROOT/mobius-rag/app/embedding_worker.py" ]]; then
-  _start "mobius-rag-embedding-worker" "cd $MOBIUS_ROOT/mobius-rag && .venv/bin/python3 -m app.embedding_worker"
+if [[ -f "$MOBIUS_ROOT/mobius-rag/app/embedding_worker.py" ]]; then
+  _load_env "$MOBIUS_ROOT/mobius-rag/.env"
+  _start "mobius-rag-embedding-worker" "cd $MOBIUS_ROOT/mobius-rag && $VENV/bin/python3 -m app.embedding_worker"
 fi
 
-# --- mobius-web-scrapper API (port 8002) ---
-if [[ -d "$MOBIUS_ROOT/mobius-web-scrapper/.venv" ]]; then
+# --- mobius-skills scraper API (port 8002) ---
+if [[ -d "$MOBIUS_ROOT/mobius-skills/web-scraper" ]]; then
   _kill_port 8002
-  _start "mobius-scraper-api" "cd $MOBIUS_ROOT/mobius-web-scrapper && .venv/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8002"
-else
-  _log "Skip mobius-scraper API (no .venv in mobius-web-scrapper)"
+  _load_env "$MOBIUS_ROOT/mobius-skills/web-scraper/.env"
+  _start "mobius-scraper-api" "cd $MOBIUS_ROOT/mobius-skills/web-scraper && $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8002"
 fi
 
-# --- mobius-web-scrapper worker ---
-if [[ -d "$MOBIUS_ROOT/mobius-web-scrapper/.venv" ]] && [[ -f "$MOBIUS_ROOT/mobius-web-scrapper/mscrapew" ]]; then
-  _start "mobius-scraper-worker" "cd $MOBIUS_ROOT/mobius-web-scrapper && ./mscrapew"
+# --- mobius-skills scraper worker ---
+if [[ -d "$MOBIUS_ROOT/mobius-skills/web-scraper" ]]; then
+  _load_env "$MOBIUS_ROOT/mobius-skills/web-scraper/.env"
+  _start "mobius-scraper-worker" "cd $MOBIUS_ROOT/mobius-skills/web-scraper && $VENV/bin/python3 -m app.worker"
 fi
 
 # --- mobius-rag frontend (port 5173) ---
@@ -191,11 +227,7 @@ fi
 
 # --- Master landing (port 3999) ---
 if [[ "$START_LANDING" == "true" ]] && [[ -f "$MOBIUS_ROOT/landing_server.py" ]]; then
-  if command -v python3 >/dev/null 2>&1; then
-    _start "mobius-landing" "cd $MOBIUS_ROOT && python3 landing_server.py"
-  else
-    _log "Skip master landing (python3 not found)"
-  fi
+  _start "mobius-landing" "cd $MOBIUS_ROOT && $VENV/bin/python3 landing_server.py"
 fi
 
 # Restore mobius-landing lines to PID file when we did --no-landing
@@ -220,8 +252,12 @@ if [[ "$START_LANDING" == "true" ]]; then
   printf "  %-24s  %s\n" "Master landing"     "http://localhost:3999"
 fi
 echo ""
+echo "  Shared venv: $VENV"
 echo "  PIDs: $PIDFILE"
 echo "  Logs: $LOGDIR"
-echo "  Stop: ./mstop  (or mstop if Mobius is on PATH); or use Stop all on Master landing"
-echo "  Redis (port 6379) is required for Chat worker and Scraper; mstart tries to start it if missing."
+echo "  Stop: ./mstop  (or mstop if Mobius is on PATH)"
+echo ""
+echo "  Cloud resources (dev):"
+echo "    PostgreSQL: 34.135.72.145:5432"
+echo "    Redis: 10.40.102.67:6379 (requires VPN/tunnel)"
 echo ""

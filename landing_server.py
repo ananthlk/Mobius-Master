@@ -32,6 +32,7 @@ def _env_url(key: str, default: str) -> str:
 
 
 # Config-driven service URLs (defaults = dev localhost). Set MOBIUS_*_URL in production.
+# Redis defaults to dev cloud (10.40.102.67) - requires VPN/tunnel from local machine.
 def _service_config() -> dict:
     return {
         "os_url": _env_url("MOBIUS_OS_URL", "http://127.0.0.1:5001"),
@@ -40,7 +41,7 @@ def _service_config() -> dict:
         "rag_frontend_url": _env_url("MOBIUS_RAG_FRONTEND_URL", "http://127.0.0.1:5173"),
         "dbt_url": _env_url("MOBIUS_DBT_URL", "http://127.0.0.1:6500"),
         "scraper_url": _env_url("MOBIUS_SCRAPER_URL", "http://127.0.0.1:8002"),
-        "redis_host": os.getenv("MOBIUS_REDIS_HOST", "127.0.0.1").strip() or "127.0.0.1",
+        "redis_host": os.getenv("MOBIUS_REDIS_HOST", "10.40.102.67").strip() or "10.40.102.67",
         "redis_port": int(os.getenv("MOBIUS_REDIS_PORT", "6379").strip() or "6379"),
     }
 
@@ -93,41 +94,42 @@ ALLOWED_LOG_NAMES = set()
 for info in SERVICE_STOP.values():
     ALLOWED_LOG_NAMES.update(info["names"])
 
-# Service id -> list of (name, cmd) to start. {root} = MOBIUS_ROOT.
+# Service id -> list of (name, cmd) to start. Uses shared venv at MOBIUS_ROOT/.venv
 def _start_commands(root: Path) -> dict:
     r = str(root)
+    venv = f"{r}/.venv/bin/python3"
     rag_cmds = [
-        ("mobius-rag-backend", f"cd {r}/mobius-rag && .venv/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload"),
-        ("mobius-rag-chunking-worker", f"cd {r}/mobius-rag && .venv/bin/python3 -m app.worker"),
+        ("mobius-rag-backend", f"cd {r}/mobius-rag && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload"),
+        ("mobius-rag-chunking-worker", f"cd {r}/mobius-rag && {venv} -m app.worker"),
         ("mobius-rag-frontend", f"cd {r}/mobius-rag/frontend && VITE_API_BASE=http://localhost:8001 VITE_SCRAPER_API_BASE=http://localhost:8002 npm run dev"),
     ]
     if (root / "mobius-rag" / "app" / "embedding_worker.py").exists():
-        rag_cmds.insert(2, ("mobius-rag-embedding-worker", f"cd {r}/mobius-rag && .venv/bin/python3 -m app.embedding_worker"))
+        rag_cmds.insert(2, ("mobius-rag-embedding-worker", f"cd {r}/mobius-rag && {venv} -m app.embedding_worker"))
     return {
         "os": [
-            ("mobius-os-backend", f"cd {r}/mobius-os/backend && .venv/bin/python server.py"),
+            ("mobius-os-backend", f"cd {r}/mobius-os/backend && {venv} server.py"),
             ("mobius-os-extension", f"cd {r}/mobius-os/extension && npm run dev"),
         ],
         "chat": [
-            ("mobius-chat-api", f"cd {r}/mobius-chat && ./mchatc"),
-            ("mobius-chat-worker", f"cd {r}/mobius-chat && ./mchatcw"),
+            ("mobius-chat-api", f"cd {r}/mobius-chat && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8000"),
+            ("mobius-chat-worker", f"cd {r}/mobius-chat && {venv} -m app.worker"),
         ],
         "rag": rag_cmds,
         "dbt": [
-            ("mobius-dbt", f"cd {r}/mobius-dbt && .venv/bin/python3 -m uvicorn app.main:app --reload --host 0.0.0.0 --port 6500"),
+            ("mobius-dbt", f"cd {r}/mobius-dbt && {venv} -m uvicorn app.main:app --reload --host 0.0.0.0 --port 6500"),
         ],
         "chat-worker": [
-            ("mobius-chat-worker", f"cd {r}/mobius-chat && ./mchatcw"),
+            ("mobius-chat-worker", f"cd {r}/mobius-chat && {venv} -m app.worker"),
         ],
         "scraper": [
-            ("mobius-scraper-api", f"cd {r}/mobius-skills/web-scraper && .venv/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8002"),
-            ("mobius-scraper-worker", f"cd {r}/mobius-skills/web-scraper && ./mscrapew"),
+            ("mobius-scraper-api", f"cd {r}/mobius-skills/web-scraper && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8002"),
+            ("mobius-scraper-worker", f"cd {r}/mobius-skills/web-scraper && {venv} -m app.worker"),
         ],
         "rag-chunking": [
-            ("mobius-rag-chunking-worker", f"cd {r}/mobius-rag && .venv/bin/python3 -m app.worker"),
+            ("mobius-rag-chunking-worker", f"cd {r}/mobius-rag && {venv} -m app.worker"),
         ],
         "rag-embedding": (
-            [("mobius-rag-embedding-worker", f"cd {r}/mobius-rag && .venv/bin/python3 -m app.embedding_worker")]
+            [("mobius-rag-embedding-worker", f"cd {r}/mobius-rag && {venv} -m app.embedding_worker")]
             if (root / "mobius-rag" / "app" / "embedding_worker.py").exists()
             else []
         ),
@@ -432,40 +434,11 @@ def _stream_log_generator(name: str):
 
 
 def _start_redis() -> tuple[bool, str]:
-    """Start Redis if not running. Returns (ok, message)."""
+    """Check Redis status. Dev uses cloud Redis (no local start needed)."""
     if _redis_status()["status"] == "up":
-        return (True, "Redis already running")
-    # Try redis-server --daemonize yes first
-    try:
-        out = subprocess.run(
-            ["redis-server", "--daemonize", "yes"],
-            capture_output=True,
-            text=True,
-            timeout=5,
-            cwd=str(MOBIUS_ROOT),
-        )
-        if out.returncode == 0:
-            time.sleep(1)
-            if _redis_status()["status"] == "up":
-                return (True, "Redis started")
-        # Fallback: brew services start redis
-        out = subprocess.run(
-            ["brew", "services", "start", "redis"],
-            capture_output=True,
-            text=True,
-            timeout=10,
-            cwd=str(MOBIUS_ROOT),
-        )
-        time.sleep(1)
-        if _redis_status()["status"] == "up":
-            return (True, "Redis started via brew services")
-        return (False, out.stderr or out.stdout or "Redis did not start")
-    except FileNotFoundError:
-        return (False, "redis-server not in PATH. Install Redis: brew install redis")
-    except subprocess.TimeoutExpired:
-        return (False, "Start command timed out")
-    except Exception as e:
-        return (False, str(e))
+        return (True, "Redis is reachable (cloud)")
+    # Cloud Redis is on private IP - requires VPN/tunnel
+    return (False, "Cloud Redis (10.40.102.67:6379) not reachable. Requires VPN or SSH tunnel to GCP VPC.")
 
 
 class LandingHandler(SimpleHTTPRequestHandler):
