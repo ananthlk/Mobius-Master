@@ -1,0 +1,31 @@
+[submodule "Mobius-user"]
+	path = Mobius-user
+	url = https://github.com/ananthlk/mobius-user.git
+
+[submodule "mobius-auth"]
+	path = mobius-auth
+	url = https://github.com/ananthlk/mobius-auth.git
+
+[submodule "mobius-chat"]
+	path = mobius-chat
+	url = https://github.com/ananthlk/mobius-chat.git
+
+[submodule "mobius-config"]
+	path = mobius-config
+	url = https://github.com/ananthlk/mobius-config.git
+
+[submodule "mobius-dbt"]
+	path = mobius-dbt
+	url = https://github.com/ananthlk/mobius-dbt.git
+
+[submodule "mobius-migrations"]
+	path = mobius-migrations
+	url = https://github.com/ananthlk/mobius-migrations.git
+
+[submodule "mobius-os"]
+	path = mobius-os
+	url = https://github.com/ananthlk/MOBIUS-OS-NEW.git
+
+[submodule "mobius-rag"]
+	path = mobius-rag
+	url = https://github.com/ananthlk/Mobius-RAG.git
