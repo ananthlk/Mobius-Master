@@ -1,0 +1,27 @@
+# Local credentials — never commit
+credentials.local.env
+credentials.env
+
+# Python virtual environment
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Environment files (use .env.example as template)
+.env
+
+# IDE
+.idea/
+.vscode/
+.cursor/
+*.swp
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+.mobius_logs/

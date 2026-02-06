@@ -1,0 +1,27 @@
+# Mobius Chat Test Bot – config
+# API, auth, run options, adjudicator LLM (reuses chat env when use_chat_llm: true).
+#
+# Using Redis queue: set on the mobius-chat server (not here): QUEUE_TYPE=redis, REDIS_URL=redis://...
+# Run the worker separately: python -m app.worker. For SSE streaming, set CHAT_LIVE_STREAM=1 on the API.
+
+api_base: "http://localhost:8000"
+# Optional Bearer token if mobius-chat is behind auth
+# auth_token: ""
+
+# Run options
+typing_delay_ms: 0   # 0 = no typing simulation; e.g. 50 = 50ms per char or fixed delay
+use_sse: true        # true = GET /chat/stream/{id}; false = poll GET /chat/response/{id}
+poll_interval_sec: 0.4
+max_wait_sec: 300
+
+# Adjudicator: use same LLM as chat (Vertex/Ollama from mobius-chat .env) when use_chat_llm is true
+use_chat_llm: true
+# Optional override if use_chat_llm is false (e.g. OpenAI API key for adjudicator only)
+# adjudicator:
+#   provider: "openai"
+#   model: "gpt-4o-mini"
+#   api_key_env: "OPENAI_API_KEY"
+
+# Report output (relative to mobius-chat-qa directory)
+report_dir: "reports"
+report_filename_prefix: "chat-bot-report"

@@ -1,0 +1,14 @@
+---
+description: Mobius branding and global styling – use mobius-design as single source of truth
+globs: "**/*.{css,ts,tsx,html,svg}"
+alwaysApply: true
+---
+
+# Mobius branding and style guidelines
+
+For **Mobius logo** and **global CSS styling**, use assets and tokens from **`mobius-design/`**. Do not duplicate the logo path or invent new global color/spacing values.
+
+- **Logo**: Use `mobius-design/assets/logo.svg` (light backgrounds) or `mobius-design/assets/logo-dark.svg` (dark backgrounds). Do not recreate the infinity/Mobius path elsewhere; reference these files or `mobius-design/logo-spec.json` for programmatic use.
+- **Tokens**: Import or copy `mobius-design/tokens.css` (and optionally `tokens-dark.css` for dark UIs). Prefer `--mobius-*` CSS variables over local hex codes in new or updated UIs.
+
+See **`mobius-design/STYLE_GUIDELINES.md`** for full rules and do's/don'ts.

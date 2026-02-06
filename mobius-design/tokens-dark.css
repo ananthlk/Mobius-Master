@@ -1,0 +1,40 @@
+/**
+ * Mobius Design Tokens (dark theme)
+ * Use on dark backgrounds (e.g. landing, extension dark theme).
+ * Apply to a scope like .dark or [data-theme="dark"].
+ */
+
+:root.dark,
+[data-theme="dark"] {
+  --mobius-logo-stroke-start: #94a3b8;
+  --mobius-logo-stroke-mid: #ffffff;
+  --mobius-logo-stroke-end: #94a3b8;
+
+  --mobius-text-primary: #e6edf3;
+  --mobius-text-secondary: #8b949e;
+  --mobius-text-muted: #8b949e;
+  --mobius-text-tertiary: #6e7681;
+
+  --mobius-bg-primary: #0f1419;
+  --mobius-bg-secondary: #1a2332;
+  --mobius-bg-tertiary: #161b22;
+  --mobius-bg-card: #1a2332;
+  --mobius-bg-hover: #1e2d3d;
+
+  --mobius-border: rgba(255, 255, 255, 0.08);
+  --mobius-border-light: rgba(255, 255, 255, 0.06);
+  --mobius-border-medium: rgba(255, 255, 255, 0.12);
+
+  --mobius-accent: #58a6ff;
+  --mobius-accent-hover: #79b8ff;
+  --mobius-accent-text: #ffffff;
+
+  --mobius-success: #22c55e;
+  --mobius-warning: #eab308;
+  --mobius-error: #f85149;
+  --mobius-info: #58a6ff;
+
+  --mobius-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --mobius-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --mobius-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+}

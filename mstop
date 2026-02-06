@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Stop all Mobius processes started by mstart (and stragglers). Run from anywhere.
+# Delegates to scripts/stop_all_mobius.sh for full stop logic.
+
+set -e
+SCRIPT="$0"
+while [ -L "$SCRIPT" ]; do
+  TARGET="$(readlink "$SCRIPT")"
+  [[ "$TARGET" == /* ]] && SCRIPT="$TARGET" || SCRIPT="$(dirname "$SCRIPT")/$TARGET"
+done
+MOBIUS_ROOT="$(cd "$(dirname "$SCRIPT")" && pwd)"
+
+if [[ -f "$MOBIUS_ROOT/scripts/stop_all_mobius.sh" ]]; then
+  MOBIUS_ROOT="$MOBIUS_ROOT" bash "$MOBIUS_ROOT/scripts/stop_all_mobius.sh"
+else
+  echo "[mstop] scripts/stop_all_mobius.sh not found; run from Mobius repo root."
+  exit 1
+fi

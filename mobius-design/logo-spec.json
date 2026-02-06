@@ -1,0 +1,9 @@
+{
+  "pathD": "M 50 50 C 50 22 22 22 22 50 C 22 78 50 78 50 50 C 50 78 78 78 78 50 C 78 22 50 22 50 50",
+  "strokeWidth": 4.5,
+  "viewBox": "0 0 100 100",
+  "gradient": {
+    "normal": { "start": "#4a4a4a", "mid": "#e8e8e8", "end": "#4a4a4a" },
+    "processing": { "start": "#5a5a5a", "mid": "#ffffff", "end": "#5a5a5a" }
+  }
+}

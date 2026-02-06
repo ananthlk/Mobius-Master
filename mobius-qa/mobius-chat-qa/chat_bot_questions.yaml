@@ -1,0 +1,297 @@
+# Mobius Chat Test Bot – curated question set (50–60 questions)
+# Categories: in_manual (factually verifiable from RAG), out_of_manual (should refrain), off_topic (should refrain).
+# Each entry: question, category, expected_answer (in_manual) or should_refrain (true), optional expected_refrain_phrases, optional payor/manual_hint.
+
+questions:
+  # ---------- IN-MANUAL (scheduling, eligibility, transportation/SDoH, UM/prior auth, claims/denials, executives) ----------
+  - question: "What are the eligibility criteria for Medicaid behavioral health services?"
+    category: in_manual
+    expected_answer: "Eligibility is based on the Medicaid state plan and includes income, residency, and categorical requirements. Specific behavioral health criteria may include diagnosis or need as defined in the provider manual."
+    manual_hint: "Medicaid eligibility"
+
+  - question: "How do I request prior authorization for outpatient therapy?"
+    category: in_manual
+    expected_answer: "Prior authorization for outpatient therapy typically requires submitting a request with clinical documentation; the process and timelines are described in the payor's prior authorization section of the provider manual."
+    manual_hint: "Prior authorization"
+
+  - question: "What is the timely filing limit for submitting Medicaid claims?"
+    category: in_manual
+    expected_answer: "Timely filing limits (e.g. 12 months from date of service) are specified in the provider manual; exact months may vary by payor."
+    manual_hint: "Claims timely filing"
+
+  - question: "Does Medicaid cover non-emergency medical transportation for behavioral health appointments?"
+    category: in_manual
+    expected_answer: "NEMT coverage for behavioral health is addressed in the Medicaid provider manual; coverage and prior approval requirements vary by state and payor."
+    manual_hint: "Transportation NEMT"
+
+  - question: "What codes are required for billing a psychiatric diagnostic evaluation?"
+    category: in_manual
+    expected_answer: "CPT/HCPCS codes for psychiatric diagnostic evaluation (e.g. 90791, 90792) and any payor-specific requirements are listed in the billing section of the provider manual."
+    manual_hint: "Billing codes"
+
+  - question: "How do I check member eligibility for the current month?"
+    category: in_manual
+    expected_answer: "Eligibility verification is done via the payor's portal, EDI 270/271, or phone; the provider manual describes the recommended method and frequency."
+    manual_hint: "Eligibility verification"
+
+  - question: "What documentation is required for initial prior authorization of intensive outpatient program?"
+    category: in_manual
+    expected_answer: "Clinical documentation requirements for IOP prior authorization (e.g. assessment, treatment plan, medical necessity) are specified in the prior authorization or UM section of the provider manual."
+    manual_hint: "Prior authorization IOP"
+
+  - question: "What is the process for appealing a denied claim?"
+    category: in_manual
+    expected_answer: "Appeal process and deadlines for denied claims are described in the provider manual; typically includes first-level appeal, reconsideration, and external review steps."
+    manual_hint: "Appeals denials"
+
+  - question: "Are peer support services covered under Medicaid for behavioral health?"
+    category: in_manual
+    expected_answer: "Coverage of peer support services is defined in the state Medicaid plan and provider manual; criteria and billing codes vary by payor."
+    manual_hint: "Peer support"
+
+  - question: "What are the requirements for progress notes for ongoing therapy?"
+    category: in_manual
+    expected_answer: "Progress note requirements (frequency, content, signatures) are outlined in the provider manual documentation section."
+    manual_hint: "Documentation progress notes"
+
+  - question: "How do I submit a claim for a same-day E&M and therapy service?"
+    category: in_manual
+    expected_answer: "Billing rules for same-day E&M and therapy (modifiers, unit limits) are in the provider manual billing section."
+    manual_hint: "Billing same day"
+
+  - question: "What is the definition of medical necessity for partial hospitalization?"
+    category: in_manual
+    expected_answer: "Medical necessity criteria for PHP (e.g. risk level, intensity, alternatives) are defined in the UM or prior authorization section of the provider manual."
+    manual_hint: "Medical necessity PHP"
+
+  - question: "Does the plan cover crisis stabilization services?"
+    category: in_manual
+    expected_answer: "Crisis stabilization coverage and authorization requirements are described in the provider manual benefit or UM section."
+    manual_hint: "Crisis stabilization"
+
+  - question: "What is the member liability (copay) for outpatient mental health visits?"
+    category: in_manual
+    expected_answer: "Copay and cost-sharing for outpatient mental health visits are listed in the provider manual or member benefits section; Medicaid often has $0 copay for many BH services."
+    manual_hint: "Copay cost-sharing"
+
+  - question: "How many units of group therapy are allowed per day?"
+    category: in_manual
+    expected_answer: "Unit limits per day for group therapy are specified in the provider manual billing or benefit limits section."
+    manual_hint: "Group therapy units"
+
+  - question: "What are the credentialing requirements for LPCs and LCSWs?"
+    category: in_manual
+    expected_answer: "Credentialing requirements for LPC, LCSW, and other BH providers are in the provider manual enrollment or credentialing section."
+    manual_hint: "Credentialing"
+
+  - question: "Is prior authorization required for psychological testing?"
+    category: in_manual
+    expected_answer: "Prior authorization requirements for psychological testing (when required, how to submit) are in the prior authorization section of the provider manual."
+    manual_hint: "Prior auth testing"
+
+  - question: "What modifiers do I use when billing for a supervised intern?"
+    category: in_manual
+    expected_answer: "Modifiers for supervised services (e.g. AH, U1) are described in the provider manual billing section."
+    manual_hint: "Modifiers supervised"
+
+  - question: "What are the requirements for treatment plan updates?"
+    category: in_manual
+    expected_answer: "Treatment plan update frequency and content are specified in the provider manual documentation or UM section."
+    manual_hint: "Treatment plan"
+
+  - question: "How do I request an exception for a non-covered code?"
+    category: in_manual
+    expected_answer: "Exception or single-case agreement processes for non-covered services are described in the provider manual if available."
+    manual_hint: "Exception non-covered"
+
+  - question: "What is the reauthorization process for ongoing IOP?"
+    category: in_manual
+    expected_answer: "Reauthorization timelines and documentation for IOP are in the prior authorization or UM section of the provider manual."
+    manual_hint: "Reauthorization IOP"
+
+  - question: "Are school-based mental health services billable to Medicaid?"
+    category: in_manual
+    expected_answer: "School-based services billing and documentation requirements are addressed in the provider manual if covered by the plan."
+    manual_hint: "School-based"
+
+  - question: "What place of service code should I use for telehealth?"
+    category: in_manual
+    expected_answer: "Place of service codes for telehealth (e.g. 02) and any payor-specific rules are in the provider manual telehealth or billing section."
+    manual_hint: "Telehealth POS"
+
+  - question: "What is the deadline for submitting a corrected claim?"
+    category: in_manual
+    expected_answer: "Corrected claim submission rules and deadlines are in the provider manual claims section."
+    manual_hint: "Corrected claims"
+
+  - question: "Does the plan cover family therapy when the member is a child?"
+    category: in_manual
+    expected_answer: "Family therapy coverage for child members and any session limits are in the provider manual benefits or BH section."
+    manual_hint: "Family therapy"
+
+  - question: "What are the requirements for discharge summaries?"
+    category: in_manual
+    expected_answer: "Discharge summary content and timing are outlined in the provider manual documentation section."
+    manual_hint: "Discharge summary"
+
+  - question: "How do I verify if a service requires prior authorization?"
+    category: in_manual
+    expected_answer: "The provider manual lists which services require prior authorization; some plans also provide a PA checklist or portal."
+    manual_hint: "Prior auth list"
+
+  - question: "What is the process for retroactive authorization?"
+    category: in_manual
+    expected_answer: "Retroactive authorization process and eligibility are described in the prior authorization section of the provider manual."
+    manual_hint: "Retro PA"
+
+  - question: "Are medication management visits covered separately from therapy?"
+    category: in_manual
+    expected_answer: "Coverage for medication management (e.g. 99213–99215) vs therapy and same-day billing rules are in the provider manual."
+    manual_hint: "Medication management"
+
+  - question: "What are the member rights regarding grievances and appeals?"
+    category: in_manual
+    expected_answer: "Member rights for grievances and appeals are summarized in the provider manual or reference the member handbook."
+    manual_hint: "Member rights"
+
+  - question: "How do I bill for a no-show or late cancellation?"
+    category: in_manual
+    expected_answer: "No-show and late cancellation billing policies (if allowed) are in the provider manual billing section."
+    manual_hint: "No-show billing"
+
+  - question: "What is the definition of a qualified clinician for BH services?"
+    category: in_manual
+    expected_answer: "Qualified clinician types (e.g. psychiatrist, LCSW, LPC, LMHC) are listed in the provider manual credentialing or scope section."
+    manual_hint: "Qualified clinician"
+
+  - question: "Does the plan cover applied behavior analysis for autism?"
+    category: in_manual
+    expected_answer: "ABA coverage and prior authorization requirements are in the provider manual if the plan covers ABA."
+    manual_hint: "ABA autism"
+
+  - question: "What are the requirements for initial assessment and intake?"
+    category: in_manual
+    expected_answer: "Initial assessment and intake documentation requirements are in the provider manual documentation or UM section."
+    manual_hint: "Intake assessment"
+
+  - question: "How do I obtain a copy of the provider manual?"
+    category: in_manual
+    expected_answer: "Provider manual access (portal, PDF, or request) is described on the plan's provider website or in communications."
+    manual_hint: "Provider manual access"
+
+  - question: "What is the reimbursement rate for CPT 90834?"
+    category: in_manual
+    expected_answer: "Reimbursement rates are in the fee schedule or provider manual; 90834 is a 45-minute therapy code."
+    manual_hint: "Fee schedule"
+
+  - question: "Are social determinants of health screenings covered?"
+    category: in_manual
+    expected_answer: "SDoH screening coverage and billing (if any) are addressed in the provider manual or value-based programs section."
+    manual_hint: "SDoH screening"
+
+  - question: "What is the process for adding a new rendering provider to an existing group?"
+    category: in_manual
+    expected_answer: "Process for adding rendering providers (credentialing, effective date) is in the provider manual enrollment section."
+    manual_hint: "Add rendering provider"
+
+  # ---------- OUT-OF-MANUAL (answers not in the 3 payors' manuals – system should refrain) ----------
+  - question: "What is the prior authorization process for Medicare Part B in California?"
+    category: out_of_manual
+    should_refrain: true
+    expected_refrain_phrases: ["Medicare", "not in our materials", "don't have", "outside"]
+
+  - question: "What are the eligibility rules for Tricare behavioral health in Texas?"
+    category: out_of_manual
+    should_refrain: true
+    expected_refrain_phrases: ["Tricare", "not covered", "don't have", "outside"]
+
+  - question: "How does Aetna commercial plan handle IOP authorization in New York?"
+    category: out_of_manual
+    should_refrain: true
+    expected_refrain_phrases: ["Aetna", "commercial", "not in our materials", "don't have"]
+
+  - question: "What is the Kaiser Permanente prior auth phone number for Washington?"
+    category: out_of_manual
+    should_refrain: true
+    expected_refrain_phrases: ["Kaiser", "don't have", "not in our materials"]
+
+  - question: "What are the Blue Cross Blue Shield of Florida credentialing timelines?"
+    category: out_of_manual
+    should_refrain: true
+    expected_refrain_phrases: ["BCBS", "Florida", "not in our materials", "don't have"]
+
+  - question: "Does UnitedHealthcare Medicare Advantage cover TMS in Ohio?"
+    category: out_of_manual
+    should_refrain: true
+    expected_refrain_phrases: ["UnitedHealthcare", "Medicare Advantage", "TMS", "not in our materials"]
+
+  - question: "What is the Cigna prior authorization portal URL for commercial plans?"
+    category: out_of_manual
+    should_refrain: true
+    expected_refrain_phrases: ["Cigna", "don't have", "not in our materials"]
+
+  - question: "What are the Humana Medicaid timely filing limits in Kentucky?"
+    category: out_of_manual
+    should_refrain: true
+    expected_refrain_phrases: ["Humana", "Kentucky", "not in our materials", "don't have"]
+
+  - question: "How does the VA handle community care referrals for mental health?"
+    category: out_of_manual
+    should_refrain: true
+    expected_refrain_phrases: ["VA", "community care", "not in our materials"]
+
+  - question: "What is the Centene Medicaid appeal deadline in Illinois?"
+    category: out_of_manual
+    should_refrain: true
+    expected_refrain_phrases: ["Centene", "Illinois", "not in our materials", "don't have"]
+
+  - question: "What are the Magellan behavioral health network requirements for Arizona?"
+    category: out_of_manual
+    should_refrain: true
+    expected_refrain_phrases: ["Magellan", "Arizona", "not in our materials"]
+
+  - question: "Does Molina Medicaid cover equine therapy in Nevada?"
+    category: out_of_manual
+    should_refrain: true
+    expected_refrain_phrases: ["Molina", "equine", "Nevada", "not in our materials"]
+
+  - question: "What is the Anthem Medicaid provider enrollment fax number for Indiana?"
+    category: out_of_manual
+    should_refrain: true
+    expected_refrain_phrases: ["Anthem", "Indiana", "don't have", "not in our materials"]
+
+  - question: "What are the WellCare Medicare Part D formulary rules for antidepressants?"
+    category: out_of_manual
+    should_refrain: true
+    expected_refrain_phrases: ["WellCare", "Part D", "formulary", "not in our materials"]
+
+  # ---------- OFF-TOPIC (system should refrain from answering) ----------
+  - question: "Tell me a joke."
+    category: off_topic
+    should_refrain: true
+    expected_refrain_phrases: ["focus", "provider manual", "don't", "can't", "out of scope"]
+
+  - question: "What's the weather like today?"
+    category: off_topic
+    should_refrain: true
+    expected_refrain_phrases: ["focus", "provider manual", "don't", "can't", "out of scope"]
+
+  - question: "Who won the Super Bowl in 2024?"
+    category: off_topic
+    should_refrain: true
+    expected_refrain_phrases: ["focus", "provider manual", "don't", "can't", "out of scope"]
+
+  - question: "Can you help me write a poem?"
+    category: off_topic
+    should_refrain: true
+    expected_refrain_phrases: ["focus", "provider manual", "don't", "can't", "out of scope"]
+
+  - question: "What is the capital of France?"
+    category: off_topic
+    should_refrain: true
+    expected_refrain_phrases: ["focus", "provider manual", "don't", "can't", "out of scope"]
+
+  - question: "Recommend a good restaurant nearby."
+    category: off_topic
+    should_refrain: true
+    expected_refrain_phrases: ["focus", "provider manual", "don't", "can't", "out of scope"]

@@ -1,0 +1,36 @@
+release_id: YYYY-MM-DD-dev
+description: Dry-run rehearsal for first production build
+
+commits:
+  mobius-os: <git-sha-or-tag>
+  mobius-rag: <git-sha-or-tag>
+  mobius-chat: <git-sha-or-tag>
+  mobius-dbt: <git-sha-or-tag>
+  mobius-auth: <git-sha-or-tag>
+  mobius-skills: <git-sha-or-tag>
+  mobius-user: <git-sha-or-tag>
+  mobius-qa: <git-sha-or-tag>
+
+images:
+  mobius-os-backend: gcr.io/<project>/mobius-os-backend:<tag>
+  mobius-rag-backend: gcr.io/<project>/mobius-rag-backend:<tag>
+  mobius-rag-worker: gcr.io/<project>/mobius-rag-worker:<tag>
+  mobius-chat-api: gcr.io/<project>/mobius-chat-api:<tag>
+  mobius-chat-worker: gcr.io/<project>/mobius-chat-worker:<tag>
+  mobius-skills-scraper: gcr.io/<project>/mobius-skills-scraper:<tag>
+
+migrations:
+  mobius-os: <alembic_revision_id>
+  mobius-rag:
+    - python:add_publish_tables
+    - sql:add_error_tracking.sql
+  mobius-user: <alembic_revision_id>
+  mobius-chat: db/schema/002_published_rag_metadata.sql
+
+feature_flags:
+  chat_live_stream: true
+  rag_publish_gate: true
+
+verification:
+  verify_script: ./verify_production.sh
+  qa_suite: mobius-qa/mobius-chat-qa/chat_bot.py --limit 15

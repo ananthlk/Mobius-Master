@@ -1,0 +1,28 @@
+# Used by gcloud builds submit - excludes heavy dirs so Module Hub build is fast.
+# Module Hub only needs: landing_server.py, landing/, Dockerfile.module-hub, cloudbuild.module-hub.yaml
+.git
+.mobius_logs
+.cursor
+node_modules
+.venv
+*.pyc
+__pycache__
+*.log
+.mobius_start_all.pids
+
+mobius-rag
+mobius-chat
+mobius-dbt
+mobius-os
+mobius-skills
+mobius-qa
+mobius-auth
+mobius-config
+mobius-design
+Mobius-user
+mobius-web-scrapper
+release-manifests
+scripts
+docs
+mstart
+mstop
