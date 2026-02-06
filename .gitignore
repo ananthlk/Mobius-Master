@@ -25,3 +25,6 @@ __pycache__/
 # Logs
 *.log
 .mobius_logs/
+
+# Runtime
+.mobius_start_all.pids
