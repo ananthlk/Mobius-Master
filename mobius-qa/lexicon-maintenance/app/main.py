@@ -85,6 +85,79 @@ def _conn(url: str):
     return psycopg2.connect(url)
 
 
+# ---------------------------------------------------------------------------
+# Taxonomy structure validation
+# ---------------------------------------------------------------------------
+_TAG_CODE_RE = re.compile(r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)?$")
+
+
+def _validate_tag_structure(kind: str, code: str, parent_code: str | None, qa_url: str,
+                            spec: dict | None = None) -> None:
+    """
+    Enforce 2-level taxonomy rules on tag create/update.
+    Raises HTTPException(400) on violations.
+
+    Rules:
+      1. code matches ^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)?$  (max 2 segments)
+      2. Domain containers (no dot): parent_code must be null, NO matching metadata
+      3. Tags (has dot): parent_code must be set and must exist in same kind
+    """
+    if not _TAG_CODE_RE.match(code):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid tag code '{code}'. Must be lowercase_snake with max 2 dot-segments "
+                   f"(e.g. 'claims' or 'claims.submission'). Regex: {_TAG_CODE_RE.pattern}"
+        )
+
+    has_dot = "." in code
+    if not has_dot and parent_code:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Domain container '{code}' must not have a parent_code (got '{parent_code}')"
+        )
+
+    # Domain containers must not carry matching metadata
+    if not has_dot and spec:
+        for field in ("strong_phrases", "aliases", "refuted_words"):
+            val = spec.get(field)
+            if val and isinstance(val, list) and len(val) > 0:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Domain container '{code}' must not have {field} -- "
+                           f"add a .general leaf tag instead"
+                )
+
+    if has_dot:
+        expected_parent = code.rsplit(".", 1)[0]
+        if not parent_code:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Child tag '{code}' requires parent_code (expected '{expected_parent}')"
+            )
+        # Verify parent exists
+        try:
+            qa = _conn(qa_url)
+            qa.autocommit = True
+            cur = qa.cursor()
+            cur.execute(
+                "SELECT 1 FROM policy_lexicon_entries WHERE kind = %s AND code = %s LIMIT 1",
+                (kind, parent_code),
+            )
+            exists = cur.fetchone()
+            cur.close()
+            qa.close()
+            if not exists:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Parent tag '{kind}.{parent_code}' does not exist. "
+                           f"Create the root tag first."
+                )
+        except HTTPException:
+            raise
+        except Exception:
+            pass  # best-effort; don't block on transient DB issues
+
+
 @app.get("/health")
 def health():
     u = _urls()
@@ -460,6 +533,10 @@ def patch_policy_lexicon_tag(kind: str, code: str, body: dict = Body(...)) -> di
     active = bool(body.get("active")) if "active" in body else True
     parent_code = spec.get("parent_code") if isinstance(spec.get("parent_code"), str) else None
 
+    # Enforce taxonomy structure on new tags (skip validation for existing tag updates
+    # that don't change code, to avoid blocking spec-only edits)
+    _validate_tag_structure(k, c, parent_code, u.qa, spec=spec)
+
     try:
         qa = _conn(u.qa)
         qa.autocommit = True
@@ -556,6 +633,155 @@ def move_policy_lexicon_tag(body: dict = Body(...)) -> dict[str, Any]:
         raise HTTPException(status_code=500, detail=f"Failed to move tag: {type(e).__name__}: {e}")
 
 
+@app.delete("/policy/lexicon/tags/{kind}/{code}")
+def delete_policy_lexicon_tag(kind: str, code: str) -> dict[str, Any]:
+    """
+    Hard-delete a tag from QA DB. Also orphan-promotes any children to root.
+    """
+    u = _urls()
+    k = (kind or "").strip().lower()
+    c = (code or "").strip()
+    if k not in ("p", "d", "j") or not c:
+        raise HTTPException(status_code=400, detail="kind must be p|d|j and code is required")
+
+    try:
+        qa = _conn(u.qa)
+        qa.autocommit = True
+        cur = qa.cursor()
+
+        # Promote children to root (clear their parent_code)
+        cur.execute(
+            """
+            UPDATE policy_lexicon_entries
+            SET parent_code = NULL,
+                updated_at = NOW()
+            WHERE kind = %s AND parent_code = %s
+            """,
+            (k, c),
+        )
+        promoted = cur.rowcount
+
+        # Delete the tag
+        cur.execute(
+            """
+            DELETE FROM policy_lexicon_entries
+            WHERE kind = %s AND code = %s
+            """,
+            (k, c),
+        )
+        deleted = cur.rowcount
+
+        new_rev = _bump_lexicon_revision(cur)
+        cur.close()
+        qa.close()
+        return {"status": "ok", "kind": k, "code": c, "deleted": deleted, "children_promoted": promoted, "lexicon_revision": new_rev}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete tag: {type(e).__name__}: {e}")
+
+
+@app.post("/policy/lexicon/tags/merge")
+def merge_policy_lexicon_tags(body: dict = Body(...)) -> dict[str, Any]:
+    """
+    Merge source tag into target tag:
+      1. Copies all strong_phrases/aliases from source to target spec
+      2. Re-parents source's children to target
+      3. Deletes source
+
+    Body: { kind: str, source_code: str, target_code: str }
+    """
+    u = _urls()
+    k = str(body.get("kind") or "").strip().lower()
+    src = str(body.get("source_code") or "").strip()
+    tgt = str(body.get("target_code") or "").strip()
+    if k not in ("p", "d", "j") or not src or not tgt:
+        raise HTTPException(status_code=400, detail="kind/source_code/target_code are required")
+    if src == tgt:
+        raise HTTPException(status_code=400, detail="source and target must differ")
+
+    try:
+        qa = _conn(u.qa)
+        qa.autocommit = True
+        cur = qa.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        # Load source and target
+        cur.execute(
+            "SELECT kind, code, spec, parent_code FROM policy_lexicon_entries WHERE kind = %s AND code = %s LIMIT 1",
+            (k, src),
+        )
+        src_row = cur.fetchone()
+        if not src_row:
+            raise HTTPException(status_code=404, detail=f"Source tag {k}.{src} not found")
+
+        cur.execute(
+            "SELECT id, kind, code, spec, parent_code FROM policy_lexicon_entries WHERE kind = %s AND code = %s LIMIT 1",
+            (k, tgt),
+        )
+        tgt_row = cur.fetchone()
+        if not tgt_row:
+            raise HTTPException(status_code=404, detail=f"Target tag {k}.{tgt} not found")
+
+        # Merge phrases from source → target
+        src_spec = src_row.get("spec") if isinstance(src_row.get("spec"), dict) else {}
+        tgt_spec = tgt_row.get("spec") if isinstance(tgt_row.get("spec"), dict) else {}
+
+        src_phrases = set()
+        for field in ("strong_phrases", "phrases"):
+            for p in (src_spec.get(field) or []):
+                src_phrases.add(str(p).strip())
+        # Also add the source code itself as an alias
+        src_phrases.add(src.replace("_", " ").strip())
+
+        existing_phrases = set(str(p).strip() for p in (tgt_spec.get("strong_phrases") or []))
+        new_phrases = [p for p in src_phrases if p and p not in existing_phrases]
+
+        tgt_strong = list(tgt_spec.get("strong_phrases") or []) + new_phrases
+        tgt_spec["strong_phrases"] = tgt_strong
+
+        # Update target with merged spec
+        cur.execute(
+            """
+            UPDATE policy_lexicon_entries
+            SET spec = %s::jsonb, updated_at = NOW()
+            WHERE kind = %s AND code = %s
+            """,
+            (json.dumps(tgt_spec), k, tgt),
+        )
+
+        # Re-parent source's children to target
+        cur.execute(
+            """
+            UPDATE policy_lexicon_entries
+            SET parent_code = %s, updated_at = NOW()
+            WHERE kind = %s AND parent_code = %s
+            """,
+            (tgt, k, src),
+        )
+        reparented = cur.rowcount
+
+        # Delete source
+        cur.execute(
+            "DELETE FROM policy_lexicon_entries WHERE kind = %s AND code = %s",
+            (k, src),
+        )
+
+        new_rev = _bump_lexicon_revision(cur)
+        cur.close()
+        qa.close()
+        return {
+            "status": "ok",
+            "kind": k,
+            "source": src,
+            "target": tgt,
+            "phrases_merged": len(new_phrases),
+            "children_reparented": reparented,
+            "lexicon_revision": new_rev,
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to merge tags: {type(e).__name__}: {e}")
+
+
 @app.get("/policy/lexicon/overview")
 def get_policy_lexicon_overview(
     kind: str = Query("all"),
@@ -600,7 +826,7 @@ def get_policy_lexicon_overview(
         if status_norm in ("all", "approved"):
             qcur.execute(
                 """
-                SELECT kind::text, code::text, spec, active::bool
+                SELECT kind::text, code::text, parent_code::text, spec, active::bool
                 FROM policy_lexicon_entries
                 WHERE active = true
                 """
@@ -614,6 +840,7 @@ def get_policy_lexicon_overview(
                     continue
                 if q_search and q_search.lower() not in code.lower() and q_search.lower() not in str(r.get("spec") or "").lower():
                     continue
+                spec = r.get("spec") if isinstance(r.get("spec"), dict) else {}
                 tag_rows.append(
                     {
                         "id": f"tag:{k}:{code}",
@@ -621,8 +848,10 @@ def get_policy_lexicon_overview(
                         "kind": k,
                         "status": "approved",
                         "code": code,
-                        "category": (r.get("spec") or {}).get("category") if isinstance(r.get("spec"), dict) else None,
-                        "description": (r.get("spec") or {}).get("description") if isinstance(r.get("spec"), dict) else None,
+                        "parent_code": r.get("parent_code") or None,
+                        "category": spec.get("category") if isinstance(spec, dict) else None,
+                        "description": spec.get("description") if isinstance(spec, dict) else None,
+                        "strong_phrases": spec.get("strong_phrases") or spec.get("phrases") or [],
                         # Filled from RAG DB (policy_lines) below.
                         "hit_lines": 0,
                         "hit_docs": 0,
@@ -738,7 +967,14 @@ def get_policy_lexicon_overview(
                 max(state) AS state,
                 count(DISTINCT document_id) AS doc_count,
                 COALESCE(sum(COALESCE(occurrences, 1)), count(*)) AS total_occurrences,
-                COALESCE(max(COALESCE(confidence, 0)), 0) AS max_confidence
+                COALESCE(max(COALESCE(confidence, 0)), 0) AS max_confidence,
+                -- LLM triage fields (take the first non-null across rows for same normalized phrase)
+                max(llm_verdict) AS llm_verdict,
+                max(llm_confidence) AS llm_confidence,
+                max(llm_reason) AS llm_reason,
+                max(llm_suggested_kind) AS llm_suggested_kind,
+                max(llm_suggested_code) AS llm_suggested_code,
+                max(llm_suggested_parent) AS llm_suggested_parent
               FROM policy_lexicon_candidates
               WHERE {" AND ".join(where)}
               GROUP BY trim(lower(normalized))
@@ -764,6 +1000,13 @@ def get_policy_lexicon_overview(
                         "proposed_tags": [str(x) for x in (r.get("proposed_tags") or []) if x],
                         "examples": [],
                         "top_documents": [],
+                        # LLM triage fields
+                        "llm_verdict": str(r.get("llm_verdict") or "") or None,
+                        "llm_confidence": float(r.get("llm_confidence") or 0) if r.get("llm_confidence") is not None else None,
+                        "llm_reason": str(r.get("llm_reason") or "") or None,
+                        "llm_suggested_kind": str(r.get("llm_suggested_kind") or "") or None,
+                        "llm_suggested_code": str(r.get("llm_suggested_code") or "") or None,
+                        "llm_suggested_parent": str(r.get("llm_suggested_parent") or "") or None,
                     }
                 )
 
@@ -965,14 +1208,17 @@ def review_policy_candidates_aggregate_bulk(body: dict = Body(...)):
                         (json.dumps(spec), row["id"]),
                     )
                 else:
-                    # Create a new tag with the phrase as a strong alias
-                    spec = {"kind": tk, "description": "", "strong_phrases": [phrase]}
+                    # Creating a brand-new tag -- validate structure first
+                    new_parent = tc.rsplit(".", 1)[0] if "." in tc else None
+                    new_spec = {"kind": tk, "description": "", "strong_phrases": [phrase]}
+                    _validate_tag_structure(tk, tc, new_parent, u.qa, spec=new_spec)
+                    spec = new_spec
                     qcur.execute(
                         """
                         INSERT INTO policy_lexicon_entries(id, kind, code, parent_code, spec, active, created_at, updated_at)
-                        VALUES (%s, %s, %s, NULL, %s::jsonb, true, NOW(), NOW())
+                        VALUES (%s, %s, %s, %s, %s::jsonb, true, NOW(), NOW())
                         """,
-                        (str(uuid.uuid4()), tk, tc, json.dumps(spec)),
+                        (str(uuid.uuid4()), tk, tc, new_parent, json.dumps(spec)),
                     )
                 updated_tags.add((tk, tc))
 
@@ -1044,4 +1290,683 @@ def review_policy_candidates_aggregate_bulk(body: dict = Body(...)):
         return {"status": "ok", "updated": updated, "errors": errors, "lexicon_revision": (new_rev if next_state == "approved" else None)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Bulk review failed: {type(e).__name__}: {e}")
+
+
+# ---------------------------------------------------------------------------
+# LLM Triage (on-demand, triggered from UI)
+# ---------------------------------------------------------------------------
+
+def _build_lexicon_tree_text(qa_conn) -> str:
+    """Build a compact text representation of the approved lexicon for the LLM prompt."""
+    cur = qa_conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute(
+        "SELECT kind, code, parent_code, spec FROM policy_lexicon_entries WHERE active=true ORDER BY kind, code"
+    )
+    rows = cur.fetchall()
+    cur.close()
+
+    by_kind: dict[str, list[str]] = {"j": [], "d": [], "p": []}
+    for r in rows:
+        k = str(r.get("kind", "")).strip().lower()
+        c = str(r.get("code", "")).strip()
+        pc = str(r.get("parent_code") or "").strip()
+        spec = r.get("spec") if isinstance(r.get("spec"), dict) else {}
+        desc = str(spec.get("description", ""))[:80]
+        aliases = ", ".join(str(p) for p in (spec.get("strong_phrases") or spec.get("phrases") or [])[:3])
+        indent = "  " if pc else ""
+        entry = f"{indent}{c}"
+        if aliases:
+            entry += f"  (aliases: {aliases})"
+        if desc:
+            entry += f"  -- {desc}"
+        if k in by_kind:
+            by_kind[k].append(entry)
+
+    lines = []
+    for kind, label in (("j", "Jurisdiction"), ("d", "Domain"), ("p", "Procedural")):
+        entries = by_kind.get(kind, [])
+        if entries:
+            lines.append(f"\n[{label} tags ({len(entries)})]")
+            lines.extend(entries)
+    return "\n".join(lines)
+
+
+def _build_rejected_text(rag_conn, limit: int = 100) -> str:
+    """Build a text list of recently rejected candidates."""
+    cur = rag_conn.cursor()
+    cur.execute(
+        "SELECT DISTINCT normalized FROM policy_lexicon_candidate_catalog WHERE state='rejected' ORDER BY normalized LIMIT %s",
+        (limit,),
+    )
+    rejected = [r[0] for r in cur.fetchall() if r[0]]
+    cur.close()
+    if not rejected:
+        return "(none)"
+    return ", ".join(rejected[:limit])
+
+
+@app.post("/policy/candidates/llm-triage")
+def llm_triage_candidates(body: dict = Body(default={})) -> dict[str, Any]:
+    """
+    On-demand LLM triage of all pending candidates.
+
+    Fetches all proposed candidates (llm_verdict IS NULL) from RAG DB,
+    the full approved lexicon from QA DB, and the rejected catalog,
+    then calls Vertex Gemini to classify each candidate as new_tag / alias / reject.
+
+    Body (optional):
+      force: bool  -- re-triage candidates that already have an llm_verdict
+    """
+    import yaml
+
+    u = _urls()
+    force = bool(body.get("force", False))
+
+    # 1. Fetch pending candidates from RAG DB
+    try:
+        rag = _conn(u.rag)
+        rag.autocommit = True
+        rcur = rag.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        where_clause = "state = 'proposed'"
+        if not force:
+            where_clause += " AND (llm_verdict IS NULL OR llm_verdict = '')"
+
+        rcur.execute(f"""
+            SELECT id::text, normalized, candidate_type, occurrences, confidence
+            FROM policy_lexicon_candidates
+            WHERE {where_clause}
+            ORDER BY occurrences DESC NULLS LAST, normalized
+            LIMIT 300
+        """)
+        candidates = [dict(r) for r in rcur.fetchall()]
+
+        # Also fetch rejected catalog for context
+        rejected_text = _build_rejected_text(rag, limit=100)
+        rcur.close()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load candidates: {type(e).__name__}: {e}")
+
+    if not candidates:
+        try:
+            rag.close()
+        except Exception:
+            pass
+        return {"status": "ok", "triaged": 0, "message": "No pending candidates to triage"}
+
+    # 2. Fetch approved lexicon tree from QA DB
+    try:
+        qa = _conn(u.qa)
+        qa.autocommit = True
+        lexicon_tree = _build_lexicon_tree_text(qa)
+        qa.close()
+    except Exception as e:
+        try:
+            rag.close()
+        except Exception:
+            pass
+        raise HTTPException(status_code=500, detail=f"Failed to load lexicon: {type(e).__name__}: {e}")
+
+    # 3. Build prompt
+    cand_lines = []
+    for c in candidates:
+        occ = c.get("occurrences") or 0
+        conf = c.get("confidence") or 0.0
+        ctype = c.get("candidate_type") or "d"
+        cand_lines.append(f'- "{c["normalized"]}" (type={ctype}, occurrences={occ}, confidence={conf:.2f})')
+    cand_text = "\n".join(cand_lines)
+
+    prompt = f"""You are an expert healthcare policy taxonomy maintainer.
+
+Below is the current APPROVED lexicon tree for tagging healthcare policy documents:
+
+{lexicon_tree}
+
+Previously REJECTED candidates (do not suggest these again):
+{rejected_text}
+
+The following {len(candidates)} candidate phrases were extracted from recent document processing.
+For EACH candidate, decide:
+1. **verdict**: one of `new_tag` (genuinely new domain concept worth adding), `alias` (already covered by an existing tag -- specify which), or `reject` (junk, noise, too generic, not a real domain concept)
+2. **confidence**: 0.0 to 1.0 (how confident you are in the verdict)
+3. **reason**: one brief sentence explaining why
+4. **suggested_kind**: p, d, or j (only for new_tag or alias; empty string for reject)
+5. **suggested_code**: the full tag code (e.g. "health_care_services.chronic_pain") -- for alias, use the existing tag code; for new_tag, propose a new code following the tree conventions
+6. **suggested_parent**: the parent tag code (e.g. "health_care_services") -- empty string for reject
+
+Guidelines:
+- Be AGGRESSIVE about rejecting junk: time references, copyright notices, generic phrases like "health care", partial sentences, conjunctions
+- For alias verdicts, match to the MOST SPECIFIC existing tag, not a broad parent
+- For new_tag verdicts, suggest placement that follows the existing tree structure and naming conventions
+- If a candidate is a near-duplicate of an existing tag, verdict should be alias, not new_tag
+
+Candidates:
+{cand_text}
+
+Respond with ONLY a YAML list. Do NOT wrap in code fences. Output raw YAML only.
+Each item: phrase, verdict, confidence, reason, suggested_kind, suggested_code, suggested_parent.
+"""
+
+    # 4. Call Vertex Gemini
+    try:
+        import vertexai
+        from vertexai.generative_models import GenerativeModel
+
+        project = os.environ.get("VERTEX_PROJECT") or os.environ.get("VERTEX_PROJECT_ID") or ""
+        region = os.environ.get("VERTEX_REGION") or os.environ.get("VERTEX_LOCATION") or "us-central1"
+        model_name = os.environ.get("VERTEX_LLM_MODEL") or "gemini-2.0-flash"
+
+        if not project:
+            # Try extracting from VERTEX_INDEX_ENDPOINT_ID
+            endpoint_id = os.environ.get("VERTEX_INDEX_ENDPOINT_ID") or ""
+            import re as _re
+            m = _re.search(r"projects/([^/]+)/", endpoint_id)
+            if m:
+                project = m.group(1)
+
+        if not project:
+            try:
+                rag.close()
+            except Exception:
+                pass
+            raise HTTPException(status_code=400, detail="VERTEX_PROJECT not configured. Set VERTEX_PROJECT or VERTEX_PROJECT_ID env var.")
+
+        vertexai.init(project=project, location=region)
+        model = GenerativeModel(model_name)
+        response = model.generate_content(prompt)
+        raw_text = response.text.strip()
+
+        # Strip code fences if LLM wrapped them
+        if raw_text.startswith("```"):
+            lines_raw = raw_text.split("\n")
+            raw_text = "\n".join(
+                line for line in lines_raw
+                if not line.strip().startswith("```")
+            )
+
+        triage_results = yaml.safe_load(raw_text)
+        if not isinstance(triage_results, list):
+            try:
+                rag.close()
+            except Exception:
+                pass
+            raise HTTPException(status_code=500, detail=f"LLM returned unexpected format. Raw: {raw_text[:500]}")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        try:
+            rag.close()
+        except Exception:
+            pass
+        raise HTTPException(status_code=500, detail=f"LLM call failed: {type(e).__name__}: {e}")
+
+    # 5. Build lookup and update candidates in RAG DB
+    triage_by_phrase: dict[str, dict] = {}
+    for item in triage_results:
+        if not isinstance(item, dict):
+            continue
+        phrase = (str(item.get("phrase", "")) or "").strip().lower()
+        if phrase:
+            triage_by_phrase[phrase] = item
+
+    try:
+        rcur = rag.cursor()
+        updated = 0
+        skipped = 0
+        for c in candidates:
+            norm = (c.get("normalized") or "").strip().lower()
+            triage = triage_by_phrase.get(norm)
+            if not triage:
+                skipped += 1
+                continue
+
+            verdict = str(triage.get("verdict", "")).strip().lower()
+            if verdict not in ("new_tag", "alias", "reject"):
+                skipped += 1
+                continue
+
+            confidence = 0.0
+            try:
+                confidence = float(triage.get("confidence", 0.0))
+            except (ValueError, TypeError):
+                pass
+            reason = str(triage.get("reason", ""))[:500]
+            suggested_kind = str(triage.get("suggested_kind", ""))[:10]
+            suggested_code = str(triage.get("suggested_code", ""))[:500]
+            suggested_parent = str(triage.get("suggested_parent", ""))[:500]
+
+            rcur.execute(
+                """
+                UPDATE policy_lexicon_candidates
+                SET llm_verdict = %s,
+                    llm_confidence = %s,
+                    llm_reason = %s,
+                    llm_suggested_kind = %s,
+                    llm_suggested_code = %s,
+                    llm_suggested_parent = %s
+                WHERE id = %s::uuid
+                """,
+                (verdict, confidence, reason, suggested_kind, suggested_code, suggested_parent, c["id"]),
+            )
+            updated += 1
+
+        rcur.close()
+        rag.close()
+
+        return {
+            "status": "ok",
+            "triaged": updated,
+            "skipped": skipped,
+            "total_candidates": len(candidates),
+            "llm_model": model_name,
+        }
+
+    except Exception as e:
+        try:
+            rag.close()
+        except Exception:
+            pass
+        raise HTTPException(status_code=500, detail=f"Failed to update triage results: {type(e).__name__}: {e}")
+
+
+# ---------------------------------------------------------------------------
+# Purge stale candidates (on-demand, triggered from UI)
+# ---------------------------------------------------------------------------
+
+@app.post("/policy/candidates/purge-stale")
+def purge_stale_candidates(body: dict = Body(default={})) -> dict[str, Any]:
+    """
+    Remove proposed candidates that duplicate already-decided entries.
+
+    Purges candidates where:
+      1. state='proposed' AND normalized matches an approved/rejected entry
+         in policy_lexicon_candidate_catalog (RAG DB).
+      2. state='proposed' AND normalized matches an existing approved tag phrase
+         in policy_lexicon_entries (QA DB).
+
+    Body (optional):
+      dry_run: bool  -- if true, only count without deleting
+    """
+    u = _urls()
+    dry_run = bool(body.get("dry_run", False))
+
+    # 1. Collect known-decided phrases from candidate catalog (RAG DB)
+    decided_norms: set[str] = set()
+    try:
+        rag = _conn(u.rag)
+        rag.autocommit = True
+        rcur = rag.cursor()
+
+        # Phrases decided in catalog (approved or rejected)
+        rcur.execute(
+            """
+            SELECT DISTINCT trim(lower(normalized_key))
+            FROM policy_lexicon_candidate_catalog
+            WHERE state IN ('approved', 'rejected')
+              AND normalized_key IS NOT NULL
+              AND normalized_key <> ''
+            """
+        )
+        for (nk,) in rcur.fetchall():
+            if nk:
+                decided_norms.add(nk.strip().lower())
+
+        # Also collect phrases already approved in candidates table itself
+        rcur.execute(
+            """
+            SELECT DISTINCT trim(lower(normalized))
+            FROM policy_lexicon_candidates
+            WHERE state IN ('approved', 'rejected')
+              AND normalized IS NOT NULL
+              AND normalized <> ''
+            """
+        )
+        for (nk,) in rcur.fetchall():
+            if nk:
+                decided_norms.add(nk.strip().lower())
+
+        rcur.close()
+    except Exception as e:
+        try:
+            rag.close()
+        except Exception:
+            pass
+        raise HTTPException(status_code=500, detail=f"Failed to load decided candidates: {type(e).__name__}: {e}")
+
+    # 2. Collect approved tag phrases from QA lexicon
+    tag_norms: set[str] = set()
+    try:
+        qa = _conn(u.qa)
+        qa.autocommit = True
+        qcur = qa.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        qcur.execute(
+            "SELECT code, spec FROM policy_lexicon_entries WHERE active = true"
+        )
+        for row in qcur.fetchall():
+            code = str(row.get("code") or "").strip()
+            if code:
+                # The tag code itself (e.g. "member_services" -> "member services")
+                tag_norms.add(code.replace("_", " ").strip().lower())
+            spec = row.get("spec") if isinstance(row.get("spec"), dict) else {}
+            for key in ("strong_phrases", "phrases"):
+                for p in (spec.get(key) or []):
+                    if isinstance(p, str) and p.strip():
+                        tag_norms.add(p.strip().lower())
+        qcur.close()
+        qa.close()
+    except Exception as e:
+        try:
+            qa.close()
+        except Exception:
+            pass
+        raise HTTPException(status_code=500, detail=f"Failed to load QA lexicon: {type(e).__name__}: {e}")
+
+    all_known = decided_norms | tag_norms
+    if not all_known:
+        try:
+            rag.close()
+        except Exception:
+            pass
+        return {"status": "ok", "purged": 0, "dry_run": dry_run, "message": "No decided/approved phrases found"}
+
+    # 3. Find and purge stale proposed candidates
+    try:
+        rcur = rag.cursor()
+
+        # Count first
+        rcur.execute(
+            """
+            SELECT count(*) FROM policy_lexicon_candidates
+            WHERE state = 'proposed'
+              AND trim(lower(normalized)) = ANY(%s)
+            """,
+            (list(all_known),),
+        )
+        stale_count = rcur.fetchone()[0] or 0
+
+        if stale_count > 0 and not dry_run:
+            # Delete stale rows (they can be regenerated by re-running extraction)
+            rcur.execute(
+                """
+                DELETE FROM policy_lexicon_candidates
+                WHERE state = 'proposed'
+                  AND trim(lower(normalized)) = ANY(%s)
+                """,
+                (list(all_known),),
+            )
+            purged = rcur.rowcount or 0
+        else:
+            purged = 0
+
+        rcur.close()
+        rag.close()
+
+        return {
+            "status": "ok",
+            "purged": purged,
+            "stale_found": stale_count,
+            "dry_run": dry_run,
+            "decided_phrases": len(decided_norms),
+            "tag_phrases": len(tag_norms),
+            "total_known": len(all_known),
+        }
+
+    except Exception as e:
+        try:
+            rag.close()
+        except Exception:
+            pass
+        raise HTTPException(status_code=500, detail=f"Purge failed: {type(e).__name__}: {e}")
+
+
+# ---------------------------------------------------------------------------
+# LLM Health Analysis (on-demand, triggered from Health tab)
+# ---------------------------------------------------------------------------
+
+@app.post("/policy/lexicon/health/analyze")
+def llm_health_analyze(body: dict = Body(default={})) -> dict[str, Any]:
+    """
+    Run an LLM-powered health analysis of the entire lexicon tree.
+
+    Checks for: orphans, duplicates, naming inconsistencies, missing parents,
+    coverage gaps, tag depth issues, alias conflicts, and structural suggestions.
+
+    Returns a scored health report with specific recommendations.
+    """
+    import yaml
+
+    u = _urls()
+
+    # 1. Load entire lexicon from QA
+    try:
+        qa = _conn(u.qa)
+        qa.autocommit = True
+        qcur = qa.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        qcur.execute(
+            "SELECT kind::text, code::text, parent_code::text, spec, active::bool FROM policy_lexicon_entries ORDER BY kind, code"
+        )
+        entries = [dict(r) for r in qcur.fetchall()]
+        qcur.close()
+        qa.close()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load lexicon: {type(e).__name__}: {e}")
+
+    if not entries:
+        return {"status": "ok", "score": 0, "issues": [], "suggestions": [], "summary": "Lexicon is empty."}
+
+    # 2. Build compact tree representation for the LLM
+    tree_lines = []
+    by_kind: dict[str, list[dict]] = {"p": [], "d": [], "j": []}
+    for e in entries:
+        k = str(e.get("kind") or "").strip().lower()
+        if k in by_kind:
+            by_kind[k].append(e)
+
+    for kind, label in (("j", "Jurisdiction"), ("d", "Domain"), ("p", "Procedural")):
+        items = by_kind.get(kind, [])
+        if not items:
+            continue
+        tree_lines.append(f"\n## {label} Tags ({len(items)})")
+        for e in items:
+            code = e.get("code", "")
+            parent = e.get("parent_code") or ""
+            spec = e.get("spec") if isinstance(e.get("spec"), dict) else {}
+            desc = str(spec.get("description", ""))[:60]
+            is_domain = "." not in code
+            strong = ", ".join(str(p) for p in (spec.get("strong_phrases") or spec.get("phrases") or [])[:4])
+            alias_list = ", ".join(str(p) for p in (spec.get("aliases") or [])[:3])
+            refuted = ", ".join(str(p) for p in (spec.get("refuted_words") or [])[:3])
+            active = e.get("active", True)
+            indent = "  " if parent else ""
+            marker = "[DOMAIN]" if is_domain else "[TAG]"
+            line = f"{indent}{marker} {code}"
+            if parent:
+                line += f"  [parent: {parent}]"
+            if strong:
+                line += f"  phrases: [{strong}]"
+            if alias_list:
+                line += f"  aliases: [{alias_list}]"
+            if refuted:
+                line += f"  refuted: [{refuted}]"
+            if desc:
+                line += f"  -- {desc}"
+            if not active:
+                line += "  (INACTIVE)"
+            tree_lines.append(line)
+
+    tree_text = "\n".join(tree_lines)
+
+    # 3. Build prompt
+    prompt = f"""You are an expert taxonomy analyst reviewing a healthcare policy lexicon tree.
+
+TAXONOMY TERMINOLOGY:
+- Type (kind): j, d, or p
+- Domain (code without dot, e.g. "claims"): organizational container ONLY -- must NOT have aliases or matching phrases
+- Tag (code with dot, e.g. "claims.denial"): the actual matchable unit with strong_phrases, aliases, refuted_words
+
+DESIGN RULES (do NOT flag violations of these as issues -- they are intentional):
+1. Three distinct tag KINDS that serve different purposes:
+   - J (Jurisdiction): WHO/WHERE -- geographic entities, payers, agencies, programs
+   - D (Domain): WHAT ABOUT -- subject matter topics (claims, eligibility, pharmacy)
+   - P (Procedural): ACTION VERBS -- what the user/provider does (submit, appeal, verify)
+2. It is CORRECT and INTENTIONAL for the same concept to appear in both D and P with different aliases.
+   For example: D.claims.submission (the topic) and P.submission.submit (the action) are NOT duplicates.
+   D-tags have topic-oriented phrases, P-tags have action-oriented phrases. Do NOT flag these as conflicts.
+3. Tags with similar code names across different kinds (like D.contact_information.email and P.communication.email)
+   are NOT alias conflicts IF their strong_phrases are different. Only flag ACTUAL alias duplicates (same exact phrase).
+4. Code format is lowercase_snake_case with max 2 dot-segments (domain.tag). This is enforced.
+5. Domain containers (no dot in code) are containers ONLY. They must NOT have aliases or matching phrases.
+   Each domain should have a .general leaf tag as its catch-all (e.g. claims.general).
+   Do NOT flag domains without aliases -- that is correct behavior.
+6. Tags with 0 hits may simply need a RAG extraction run -- do NOT flag 0-hit tags as issues.
+7. If a domain container still has aliases/strong_phrases, flag it as CRITICAL -- those should be on a .general leaf.
+8. Tag metadata includes: strong_phrases (exact match), aliases (alternative names), refuted_words (negative signals), weak_keywords (fuzzy match).
+
+CURRENT LEXICON TREE:
+{tree_text}
+
+ANALYZE this lexicon for ACTIONABLE quality issues only. Focus on:
+- duplicate: truly redundant tags that should be merged (same kind, overlapping purpose)
+- alias_conflict: SAME EXACT phrase string mapped to multiple tags WITHIN the same kind
+- coverage: significant gaps for a Medicaid managed care policy lexicon (Florida-focused)
+- structural: improvements to the hierarchy that would meaningfully improve tagging accuracy
+
+Do NOT report:
+- Cross-kind overlaps (D and P having similar concepts is intentional)
+- Tags with 0 hits (extraction hasn't run yet)
+- Domain containers without aliases (that is CORRECT -- domains are containers only)
+- Naming style issues (snake_case is the standard, all tags follow it)
+- Common words like "provider" being on a .general leaf tag (that is intentional for catch-all matching)
+
+Only report issues with severity "critical" or "warning". Skip trivial "info" level items.
+Limit to the TOP 10-15 most impactful issues maximum.
+
+For each issue provide: type, severity, tags (affected codes), message, fix.
+
+Also provide:
+- overall_score: 0-100 (100 = perfect taxonomy, score based on structure and coverage quality)
+- summary: 2-3 sentence assessment of the taxonomy health
+- top_suggestions: 3-5 highest-impact improvements
+
+Respond with ONLY valid JSON (no markdown, no code fences). Schema:
+{{
+  "overall_score": <number>,
+  "summary": "<text>",
+  "top_suggestions": ["<suggestion>", ...],
+  "issues": [
+    {{
+      "type": "<type>",
+      "severity": "<critical|warning>",
+      "tags": ["<code>"],
+      "message": "<description>",
+      "fix": "<fix>"
+    }}
+  ]
+}}
+"""
+
+    # 4. Call Vertex Gemini
+    try:
+        import vertexai
+        from vertexai.generative_models import GenerativeModel
+
+        project = os.environ.get("VERTEX_PROJECT") or os.environ.get("VERTEX_PROJECT_ID") or ""
+        region = os.environ.get("VERTEX_REGION") or os.environ.get("VERTEX_LOCATION") or "us-central1"
+        # Allow caller to pick model; fall back to env then default (pro for deeper analysis)
+        model_name = body.get("model") or os.environ.get("VERTEX_HEALTH_LLM_MODEL") or os.environ.get("VERTEX_LLM_MODEL") or "gemini-2.5-pro"
+
+        if not project:
+            endpoint_id = os.environ.get("VERTEX_INDEX_ENDPOINT_ID") or ""
+            m = re.search(r"projects/([^/]+)/", endpoint_id)
+            if m:
+                project = m.group(1)
+
+        if not project:
+            raise HTTPException(status_code=400, detail="VERTEX_PROJECT not configured")
+
+        vertexai.init(project=project, location=region)
+        model = GenerativeModel(model_name)
+        response = model.generate_content(prompt)
+        raw_text = response.text.strip()
+
+        # Strip code fences if present
+        if raw_text.startswith("```"):
+            lines_raw = raw_text.split("\n")
+            raw_text = "\n".join(line for line in lines_raw if not line.strip().startswith("```"))
+            raw_text = raw_text.strip()
+
+        # Try JSON first (preferred), fall back to YAML
+        result = None
+        try:
+            result = json.loads(raw_text)
+        except json.JSONDecodeError:
+            # Try extracting JSON from surrounding text
+            json_start = raw_text.find("{")
+            json_end = raw_text.rfind("}") + 1
+            if json_start >= 0 and json_end > json_start:
+                try:
+                    result = json.loads(raw_text[json_start:json_end])
+                except json.JSONDecodeError:
+                    pass
+        if result is None:
+            # Last resort: try YAML
+            try:
+                result = yaml.safe_load(raw_text)
+            except Exception:
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Could not parse LLM response as JSON or YAML. First 500 chars: {raw_text[:500]}"
+                )
+
+        if not isinstance(result, dict):
+            raise HTTPException(status_code=500, detail="LLM returned unexpected format (not a dict)")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"LLM health analysis failed: {type(e).__name__}: {e}")
+
+    return {
+        "status": "ok",
+        "score": int(result.get("overall_score", 0)),
+        "summary": str(result.get("summary", "")),
+        "top_suggestions": result.get("top_suggestions") or [],
+        "issues": result.get("issues") or [],
+        "llm_model": model_name,
+        "tag_count": len(entries),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Publish QA lexicon → RAG DB
+# ---------------------------------------------------------------------------
+
+@app.post("/policy/lexicon/publish")
+def publish_lexicon_to_rag(body: dict = Body(default={})) -> dict[str, Any]:
+    """
+    Copy approved QA lexicon entries to RAG DB so extraction uses the latest tags.
+    Body (optional): { dry_run: bool }
+    """
+    dry_run = bool(body.get("dry_run", False))
+    u = _urls()
+
+    try:
+        # Import the sync script
+        import importlib.util
+        sync_path = Path(__file__).resolve().parents[3] / "mobius-dbt" / "scripts" / "sync_qa_lexicon_to_rag.py"
+        if not sync_path.exists():
+            raise HTTPException(status_code=500, detail=f"Sync script not found at {sync_path}")
+
+        spec = importlib.util.spec_from_file_location("sync_qa_lexicon_to_rag", sync_path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+
+        result = mod.publish_lexicon(u.qa, u.rag, dry_run=dry_run)
+        return {"status": "ok", **result}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Publish failed: {type(e).__name__}: {e}")
 
