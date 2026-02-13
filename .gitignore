@@ -28,3 +28,15 @@ __pycache__/
 
 # Runtime
 .mobius_start_all.pids
+
+# Node / frontend
+node_modules/
+.vite/
+
+# Local-only repos / notes
+mobius-qa-modules/
+Mobius Diary/
+
+# QA eval artifacts
+mobius-qa/retrieval-eval/reports/
+mobius-qa/retrieval-eval/questions_generated.yaml

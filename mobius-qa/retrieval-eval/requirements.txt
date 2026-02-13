@@ -1,0 +1,9 @@
+google-cloud-aiplatform
+psycopg2-binary
+PyYAML
+httpx
+pandas
+numpy
+matplotlib
+tabulate
+rank-bm25

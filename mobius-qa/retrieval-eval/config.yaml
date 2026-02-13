@@ -1,0 +1,41 @@
+# Retrieval Eval config (Vertex Vector Search)
+
+vertex:
+  # Prefer env vars if set:
+  # - VERTEX_PROJECT
+  # - VERTEX_REGION
+  # - VERTEX_INDEX_ENDPOINT_ID
+  # - VERTEX_DEPLOYED_INDEX_ID
+  project: ""
+  region: "us-central1"
+  index_endpoint_id: ""
+  deployed_index_id: ""
+
+embedding:
+  # Query embedding model must match the index embeddings (default matches mobius-chat embedding_provider.py)
+  model: "gemini-embedding-001"
+  output_dimensionality: 1536
+  task_type: "RETRIEVAL_DOCUMENT"
+
+filters:
+  # Strongly recommended: use a unique authority_level to isolate the Sunshine manual in Vertex.
+  # This token should be set on the RAG `documents.authority_level` before publish+sync.
+  document_authority_level: "lexicon_qa_sunshine_manual_v1"
+
+  # Optional additional filters (leave empty to skip):
+  document_payer: ""
+  document_state: ""
+  document_program: ""
+
+run:
+  top_k: 10
+  limit_questions: 50
+  report_dir: "reports"
+
+modes:
+  - name: "hier_only"
+    source_type_allow: ["hierarchical"]
+  - name: "atomic_plus_hier"
+    # If null/empty, no source_type filter is applied (effectively allows both hierarchical + fact).
+    # You can also set ["hierarchical", "fact"] explicitly.
+    source_type_allow: null

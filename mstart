@@ -91,6 +91,31 @@ _start() {
   _log "  PID $pid"
 }
 
+# Ensure Cloud SQL Auth Proxy (or local Postgres) is available on 127.0.0.1:5432.
+_ensure_cloud_sql_proxy() {
+  # If something already listens on 5432 (local postgres or proxy), we're good.
+  if lsof -nP -iTCP:5432 -sTCP:LISTEN >/dev/null 2>&1; then
+    return
+  fi
+
+  # Best-effort default for dev if not set.
+  if [[ -z "${CLOUDSQL_CONNECTION_NAME:-}" ]]; then
+    CLOUDSQL_CONNECTION_NAME="mobius-os-dev:us-central1:mobius-platform-dev-db"
+    export CLOUDSQL_CONNECTION_NAME
+  fi
+
+  # If cloud-sql-proxy is available, start it.
+  if command -v cloud-sql-proxy >/dev/null 2>&1; then
+    _log "Starting Cloud SQL Auth Proxy on 127.0.0.1:5432 ..."
+    _start "mobius-cloud-sql-proxy" "cloud-sql-proxy \"${CLOUDSQL_CONNECTION_NAME}\" --address=127.0.0.1 --port=5432"
+    # Give it a moment to bind.
+    sleep 1
+  else
+    _log "WARNING: Nothing is listening on 127.0.0.1:5432 and cloud-sql-proxy is not installed."
+    _log "  Install: brew install cloud-sql-proxy"
+  fi
+}
+
 # Wait for Redis at REDIS_URL (used after starting tunnel). Up to 15s.
 _wait_redis() {
   sleep 2
@@ -116,10 +141,33 @@ _load_env() {
     while IFS= read -r _mline || [[ -n "$_mline" ]]; do
       [[ -z "$_mline" || "$_mline" =~ ^[[:space:]]*# ]] && continue
       if [[ "$_mline" =~ ^([A-Za-z_][A-Za-z0-9_]*)=(.*)$ ]]; then
-        export "${BASH_REMATCH[1]}=${BASH_REMATCH[2]}"
+        # Export literally (avoid shell expansion of $... sequences in values).
+        local k="${BASH_REMATCH[1]}"
+        local v="${BASH_REMATCH[2]}"
+        printf -v "$k" '%s' "$v"
+        export "$k"
       fi
     done < "$envfile"
   fi
+}
+
+# Derive Postgres user/pass from a URL (best-effort; works for simple passwords).
+_pg_user_from_url() {
+  local url="$1"
+  if [[ "$url" =~ ^postgresql(\+asyncpg)?://([^:/]+):([^@]+)@ ]]; then
+    printf "%s" "${BASH_REMATCH[2]}"
+  fi
+}
+_pg_pass_from_url() {
+  local url="$1"
+  if [[ "$url" =~ ^postgresql(\+asyncpg)?://([^:/]+):([^@]+)@ ]]; then
+    printf "%s" "${BASH_REMATCH[3]}"
+  fi
+}
+_to_psycopg_url() {
+  local url="$1"
+  # Convert postgresql+asyncpg:// → postgresql:// for psycopg2
+  printf "%s" "${url/postgresql+asyncpg:\/\//postgresql:\/\/}"
 }
 
 # --- mobius-chat DB migrations (run before starting chat services) ---
@@ -153,6 +201,10 @@ _load_env "$MOBIUS_ROOT/mobius-skills/web-scraper/.env"
 if [[ -f "$MOBIUS_ROOT/mobius-config/.env" ]]; then
   _load_env "$MOBIUS_ROOT/mobius-config/.env"
 fi
+
+# If DB access is via Cloud SQL proxy locally, ensure it's running early.
+_ensure_cloud_sql_proxy
+
 REDIS_URL="${REDIS_URL:-}"
 if [[ "$REDIS_URL" == *"127.0.0.1:6380"* ]] || [[ "$REDIS_URL" == *"localhost:6380"* ]]; then
   _log "Redis tunnel target (127.0.0.1:6380) detected; starting tunnel if configured ..."
@@ -202,6 +254,84 @@ if [[ -f "$MOBIUS_ROOT/mobius-rag/app/embedding_worker.py" ]]; then
   _start "mobius-rag-embedding-worker" "cd $MOBIUS_ROOT/mobius-rag && $VENV/bin/python3 -m app.embedding_worker"
 fi
 
+# --- mobius-qa lexicon maintenance API (port 8010) ---
+# Serves the Lexicon UI data endpoints used by the static app under /lexicon/.
+if [[ -d "$MOBIUS_ROOT/mobius-qa/lexicon-maintenance" ]]; then
+  _kill_port 8010
+  # Prefer explicit URLs if provided; else derive from RAG/chat creds and assume local Cloud SQL proxy on 127.0.0.1:5432.
+  _load_env "$MOBIUS_ROOT/mobius-qa/lexicon-maintenance/.env"
+  _load_env "$MOBIUS_ROOT/mobius-rag/.env"
+  _load_env "$MOBIUS_ROOT/mobius-chat/.env"
+
+  if [[ -z "${QA_DATABASE_URL:-}" ]]; then
+    # Derive credentials from DATABASE_URL or CHAT_RAG_DATABASE_URL, then point to mobius_qa on localhost.
+    local_src="${DATABASE_URL:-${CHAT_RAG_DATABASE_URL:-}}"
+    local_user="$(_pg_user_from_url "$local_src")"
+    local_pass="$(_pg_pass_from_url "$local_src")"
+    if [[ -n "$local_user" && -n "$local_pass" ]]; then
+      QA_DATABASE_URL="postgresql://${local_user}:${local_pass}@127.0.0.1:5432/mobius_qa?connect_timeout=5"
+    fi
+  fi
+  if [[ -z "${RAG_DATABASE_URL:-}" ]]; then
+    # Derive credentials from DATABASE_URL and force local DB name/host.
+    local_src="${DATABASE_URL:-${CHAT_RAG_DATABASE_URL:-}}"
+    local_user="$(_pg_user_from_url "$local_src")"
+    local_pass="$(_pg_pass_from_url "$local_src")"
+    if [[ -n "$local_user" && -n "$local_pass" ]]; then
+      RAG_DATABASE_URL="postgresql://${local_user}:${local_pass}@127.0.0.1:5432/mobius_rag?connect_timeout=5"
+    fi
+  fi
+
+  export QA_DATABASE_URL RAG_DATABASE_URL
+  _start "mobius-qa-lexicon-api" "cd $MOBIUS_ROOT/mobius-qa/lexicon-maintenance && $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8010"
+fi
+
+# --- mobius-qa retrieval eval studio API (port 8020) ---
+# Persists retrieval test suites + runs in mobius_qa; runs BM25 vs Vertex hierarchical eval.
+if [[ -d "$MOBIUS_ROOT/mobius-qa/retrieval-eval-studio" ]]; then
+  _kill_port 8020
+  _load_env "$MOBIUS_ROOT/mobius-qa/retrieval-eval-studio/.env"
+  _load_env "$MOBIUS_ROOT/mobius-chat/.env"
+  _load_env "$MOBIUS_ROOT/mobius-rag/.env"
+
+  # Ensure QA_DATABASE_URL points to local Cloud SQL proxy (same pattern as lexicon API).
+  if [[ -z "${QA_DATABASE_URL:-}" ]]; then
+    local_src="${DATABASE_URL:-${CHAT_RAG_DATABASE_URL:-}}"
+    local_user="$(_pg_user_from_url "$local_src")"
+    local_pass="$(_pg_pass_from_url "$local_src")"
+    if [[ -n "$local_user" && -n "$local_pass" ]]; then
+      QA_DATABASE_URL="postgresql://${local_user}:${local_pass}@127.0.0.1:5432/mobius_qa?connect_timeout=5"
+      export QA_DATABASE_URL
+    fi
+  fi
+
+  # Normalize Vertex env var names (Chat uses *PROJECT_ID/*LOCATION and CHAT_* aliases).
+  if [[ -z "${VERTEX_PROJECT:-}" ]]; then
+    VERTEX_PROJECT="${VERTEX_PROJECT_ID:-${CHAT_VERTEX_PROJECT_ID:-}}"
+    export VERTEX_PROJECT
+  fi
+  if [[ -z "${VERTEX_REGION:-}" ]]; then
+    VERTEX_REGION="${VERTEX_LOCATION:-${CHAT_VERTEX_LOCATION:-us-central1}}"
+    export VERTEX_REGION
+  fi
+  if [[ -z "${VERTEX_INDEX_ENDPOINT_ID:-}" ]]; then
+    VERTEX_INDEX_ENDPOINT_ID="${CHAT_VERTEX_INDEX_ENDPOINT_ID:-}"
+    export VERTEX_INDEX_ENDPOINT_ID
+  fi
+  if [[ -z "${VERTEX_DEPLOYED_INDEX_ID:-}" ]]; then
+    VERTEX_DEPLOYED_INDEX_ID="${CHAT_VERTEX_DEPLOYED_INDEX_ID:-}"
+    export VERTEX_DEPLOYED_INDEX_ID
+  fi
+  # If endpoint id is a full resource name, prefer its project over placeholder defaults.
+  if [[ -n "${VERTEX_INDEX_ENDPOINT_ID:-}" ]] && [[ "${VERTEX_INDEX_ENDPOINT_ID}" =~ projects/([^/]+)/ ]]; then
+    VERTEX_PROJECT="${BASH_REMATCH[1]}"
+    export VERTEX_PROJECT
+  fi
+
+  export QA_DATABASE_URL CHAT_RAG_DATABASE_URL VERTEX_PROJECT VERTEX_REGION VERTEX_INDEX_ENDPOINT_ID VERTEX_DEPLOYED_INDEX_ID
+  _start "mobius-qa-retrieval-eval-studio" "cd $MOBIUS_ROOT/mobius-qa/retrieval-eval-studio && $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8020"
+fi
+
 # --- mobius-skills scraper API (port 8002) ---
 if [[ -d "$MOBIUS_ROOT/mobius-skills/web-scraper" ]]; then
   _kill_port 8002
@@ -227,6 +357,7 @@ fi
 
 # --- Master landing (port 3999) ---
 if [[ "$START_LANDING" == "true" ]] && [[ -f "$MOBIUS_ROOT/landing_server.py" ]]; then
+  _kill_port 3999
   _start "mobius-landing" "cd $MOBIUS_ROOT && $VENV/bin/python3 landing_server.py"
 fi
 
@@ -248,6 +379,8 @@ printf "  %-24s  %s\n" "mobius-chat"         "http://localhost:8000"
 printf "  %-24s  %s\n" "mobius-rag backend"  "http://localhost:8001"
 printf "  %-24s  %s\n" "mobius-scraper API"  "http://localhost:8002"
 printf "  %-24s  %s\n" "mobius-rag frontend" "http://localhost:5173"
+printf "  %-24s  %s\n" "mobius-qa lexicon API" "http://localhost:8010"
+printf "  %-24s  %s\n" "mobius-qa retrieval eval" "http://localhost:8020"
 if [[ "$START_LANDING" == "true" ]]; then
   printf "  %-24s  %s\n" "Master landing"     "http://localhost:3999"
 fi

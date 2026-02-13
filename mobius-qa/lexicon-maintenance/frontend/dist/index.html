@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mobius QA — Lexicon Maintenance</title>
+    <!-- NOTE: This app is served by Module Hub under /lexicon/, so assets must be prefixed accordingly. -->
+    <script type="module" crossorigin src="/lexicon/assets/index-16rcq74m.js"></script>
+    <link rel="stylesheet" crossorigin href="/lexicon/assets/index-D83g2rRj.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      // UX helper (built bundle hotfix): add "Select all" + "Clear" for candidate checkboxes.
+      // This clicks the actual checkbox inputs so React state updates correctly.
+      (function () {
+        function clickAll(selector, shouldBeChecked) {
+          try {
+            var nodes = document.querySelectorAll(selector);
+            for (var i = 0; i < nodes.length; i++) {
+              var n = nodes[i];
+              if (!n || n.type !== "checkbox") continue;
+              if (shouldBeChecked && !n.checked) n.click();
+              if (!shouldBeChecked && n.checked) n.click();
+            }
+          } catch (e) {}
+        }
+
+        function ensureButtons() {
+          try {
+            var titles = document.querySelectorAll(".lexicon-tree-title");
+            for (var i = 0; i < titles.length; i++) {
+              var el = titles[i];
+              if (!el || !el.textContent) continue;
+              if (el.textContent.trim() !== "Candidates") continue;
+              if (el.querySelector(".qa-cand-selectall")) continue;
+
+              // Make room on the right.
+              el.style.display = "flex";
+              el.style.alignItems = "center";
+              el.style.justifyContent = "space-between";
+              el.style.gap = "8px";
+
+              var actions = document.createElement("span");
+              actions.className = "qa-cand-selectall";
+              actions.style.display = "inline-flex";
+              actions.style.gap = "8px";
+
+              var btnAll = document.createElement("button");
+              btnAll.type = "button";
+              btnAll.className = "btn btn-secondary lexicon-mini-btn";
+              btnAll.textContent = "Select all";
+              btnAll.onclick = function () {
+                clickAll(".lexicon-merged-left .lexicon-merged-check input[type=checkbox]", true);
+              };
+
+              var btnClear = document.createElement("button");
+              btnClear.type = "button";
+              btnClear.className = "btn btn-secondary lexicon-mini-btn";
+              btnClear.textContent = "Clear";
+              btnClear.onclick = function () {
+                clickAll(".lexicon-merged-left .lexicon-merged-check input[type=checkbox]", false);
+              };
+
+              actions.appendChild(btnAll);
+              actions.appendChild(btnClear);
+              el.appendChild(actions);
+            }
+          } catch (e) {}
+        }
+
+        // Re-run when React renders.
+        try {
+          var mo = new MutationObserver(function () {
+            ensureButtons();
+          });
+          mo.observe(document.documentElement, { childList: true, subtree: true });
+        } catch (e) {}
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", ensureButtons);
+        } else {
+          ensureButtons();
+        }
+      })();
+    </script>
+  </body>
+</html>
+

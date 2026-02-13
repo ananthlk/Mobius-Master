@@ -1,0 +1,487 @@
+questions:
+- id: Q001
+  intent: factual
+  bucket: in_manual
+  question: What is the timely filing limit for initial claims submission?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 66e819af-27eb-474d-a4e9-3b0ba6b47c3c
+- id: Q002
+  intent: factual
+  bucket: in_manual
+  question: What is the deadline for submitting corrected claims or adjustments?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 908a3a0a-541b-434d-af74-04d8d09b43b1
+    answer_regex: (?i)submit\ a\ corrected\ claim\ via\ the\ secure\ provider\ portal\ and
+- id: Q003
+  intent: factual
+  bucket: in_manual
+  question: How do providers verify member eligibility and coverage (portal, EDI 270/271, phone)?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 1d908b4b-e792-4d1c-a7c8-f1dbc19191cf
+    answer_regex: (?i)secure\ provider\ portal\ to\ verify\ member\ eligibility\ manage\ claims\ and
+- id: Q004
+  intent: factual
+  bucket: in_manual
+  question: Is prior authorization required for outpatient therapy services? If yes, how is it requested?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - d35afa4a-746f-422c-aa30-448808e5a3f9
+    answer_regex: (?i)outpatient\ services\ when\ the\ member\ is\ still\ receiving\ outpatient\ services
+- id: Q005
+  intent: factual
+  bucket: in_manual
+  question: What documentation is required when requesting prior authorization for intensive outpatient program (IOP)?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 66e819af-27eb-474d-a4e9-3b0ba6b47c3c
+    answer_regex: (?i)outpatient\ services\ when\ the\ member\ is\ still\ receiving\ outpatient\ services
+- id: Q006
+  intent: factual
+  bucket: in_manual
+  question: What is the process and timeline for appealing a denied claim?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - de2061c9-7423-42a4-bd8a-5eadc6386e89
+    answer_regex: (?i)medical\ providers\ may\ submit\ the\ claim\ for\ processing\ which\ will
+- id: Q007
+  intent: factual
+  bucket: in_manual
+  question: How are grievances different from appeals, and where are they submitted?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - c0dd7a8f-9dbd-421d-91a7-78dd7805b6ec
+    answer_regex: (?i)grievances\ and\ appeals\ member\ rights\ for\ grievances\ and\ appeals
+- id: Q008
+  intent: factual
+  bucket: in_manual
+  question: What are the requirements for discharge summaries (content and timing)?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 2d584f6b-9c06-4413-acee-0d87aaafcefc
+    answer_regex: (?i)educational\ content\ includes\ but\ is\ not\ limited\ to
+- id: Q009
+  intent: factual
+  bucket: in_manual
+  question: What are the requirements for progress notes for ongoing behavioral health therapy?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 2d584f6b-9c06-4413-acee-0d87aaafcefc
+- id: Q010
+  intent: factual
+  bucket: in_manual
+  question: Are crisis stabilization services covered, and do they require authorization?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - ed233268-6249-4141-a99b-68508280a3af
+    answer_regex: (?i)in\ addition\ some\ covered\ services\ require\ prior\ authorization
+- id: Q011
+  intent: factual
+  bucket: in_manual
+  question: Is retroactive authorization allowed? If so, under what circumstances?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 98cc0175-c25b-4d91-a886-613c942fb954
+    answer_regex: (?i)the\ code\ editing\ assistant\ is\ intended\ for\ use\ as\ a
+- id: Q012
+  intent: factual
+  bucket: in_manual
+  question: How can a provider determine whether a service requires prior authorization?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 3392cb87-c6a3-4e03-a2f3-04370a050793
+    answer_regex: (?i)be\ told\ prior\ to\ getting\ a\ service\ how\ much\ it
+- id: Q013
+  intent: factual
+  bucket: in_manual
+  question: What place of service code should be used for telehealth services?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 02218399-e88f-4d47-a951-6f7eda7553fc
+    answer_regex: (?i)procedure\ code\ unbundling\ two\ or\ more\ procedure\ codes\ are\ used
+- id: Q014
+  intent: factual
+  bucket: in_manual
+  question: What modifiers are required for telehealth billing (if any)?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 2e4d581f-7081-456d-8b51-d07678575dfe
+    answer_regex: (?i)know\ what\ member\ services\ are\ available\ including\ whether\ an\ interpreter
+- id: Q015
+  intent: factual
+  bucket: in_manual
+  question: Does the plan cover non-emergency medical transportation (NEMT) for appointments, and how is it accessed?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - ba6f937d-aaa4-42df-80d7-693dfaa66494
+    answer_regex: (?i)be\ told\ prior\ to\ getting\ a\ service\ how\ much\ it
+- id: Q016
+  intent: factual
+  bucket: in_manual
+  question: What are the credentialing requirements for behavioral health clinicians (e.g., LCSW, LMHC, psychiatrist)?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 2d584f6b-9c06-4413-acee-0d87aaafcefc
+- id: Q017
+  intent: factual
+  bucket: in_manual
+  question: Are peer support services covered? If so, what are the billing requirements?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 54fde5d9-b910-419e-93d2-ef3955b98f0d
+    answer_regex: (?i)know\ what\ member\ services\ are\ available\ including\ whether\ an\ interpreter
+- id: Q018
+  intent: factual
+  bucket: in_manual
+  question: What is the definition of medical necessity for partial hospitalization (PHP)?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - f0345809-3646-4aa3-8116-7421e8b75901
+    answer_regex: (?i)for\ purposes\ of\ determining\ medicaid\ reimbursement\ the\ agency\ is\ the
+- id: Q019
+  intent: factual
+  bucket: in_manual
+  question: What is the reauthorization process for ongoing IOP services?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 2e4d581f-7081-456d-8b51-d07678575dfe
+    answer_regex: (?i)know\ what\ member\ services\ are\ available\ including\ whether\ an\ interpreter
+- id: Q020
+  intent: factual
+  bucket: in_manual
+  question: How do providers submit claims (portal, clearinghouse, paper), and what information is required?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 052286bf-d4d8-4786-99e7-2d267c80a176
+    answer_regex: (?i)providers\ who\ have\ internet\ access\ and\ choose\ not\ to\ submit
+- id: Q021
+  intent: factual
+  bucket: in_manual
+  question: What are the standard denial reasons for behavioral health claims, and how can they be prevented?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 2e4d581f-7081-456d-8b51-d07678575dfe
+    answer_regex: (?i)decide\ how\ they\ want\ medical\ decisions\ made\ if\ they\ can
+- id: Q022
+  intent: factual
+  bucket: in_manual
+  question: What is the process for checking claim status and remittance advice?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - b5331606-6dbb-45a0-8c39-1c5d357f40c5
+    answer_regex: (?i)in\ addition\ sunshine\ health\ can\ generate\ an\ ansi\ x12n\ 835
+- id: Q023
+  intent: factual
+  bucket: in_manual
+  question: What are the rules for same-day billing of an E&M visit and psychotherapy?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 2ae46dd1-dec3-4163-98ac-17c6328538c2
+    answer_regex: (?i)if\ a\ minor\ surgical\ procedure\ is\ performed\ on\ a\ new
+- id: Q024
+  intent: factual
+  bucket: in_manual
+  question: Are no-show or late cancellation fees billable? If not, what does the policy say?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 2e4d581f-7081-456d-8b51-d07678575dfe
+    answer_regex: (?i)know\ if\ medical\ treatment\ is\ for\ experimental\ research\ and\ to
+- id: Q025
+  intent: factual
+  bucket: in_manual
+  question: What is the policy for coordination of benefits (COB) if the member has other insurance?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 98cc0175-c25b-4d91-a886-613c942fb954
+    answer_regex: (?i)sunshine\ health\ can\ receive\ coordination\ of\ benefits\ cob\ or\ secondary
+- id: Q026
+  intent: factual
+  bucket: in_manual
+  question: How should providers handle referrals, authorizations, and continuity of care during transitions?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - f0345809-3646-4aa3-8116-7421e8b75901
+    answer_regex: (?i)document\ referrals\ and\ follow\ up\ appointments\ made\ during\ pregnancy
+- id: Q027
+  intent: canonical
+  bucket: in_manual
+  question: In general, what is the plan's philosophy and approach to utilization management for behavioral health?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 431abef4-aa22-4ee7-898c-67701cb59762
+    crux_contains:
+    - Assist Sunshine Health with identifying members at high risk for readmission and coordination of discharge planning,
+      which includes scheduling a post-discharge follow-up appointment with the member’s PCP or treating specialist before
+      discharge
+    - Notify Sunshine Health’s Utilization Management Department of all newborn deliveries on the same day as the delivery
+    - Notify Sunshine Health’s Utilization Management Department of all non-maternity admissions by close of the next business
+      day
+- id: Q028
+  intent: canonical
+  bucket: in_manual
+  question: Summarize the overall prior authorization workflow end-to-end (who submits, what is reviewed, timelines, outcomes).
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - ff1d8977-c47e-4a55-b73a-e7c91f2cd6bb
+    crux_contains:
+    - Eastern for rescheduling with an alternate provider who is able to meet the access standards and the member’s needs.
+    - All providers are responsible for providing appointments to Sunshine Health members within a reasonable amount of time
+      based on the nature of the visit.
+    - Practitioners unable to offer an appointment within the time frames listed below should refer the member to Sunshine
+      Health Member Services, which can be reached by calling 1-866-796-0530 (TTY at 1-800-955-8770) Monday through Friday
+      from 8 a.m. to 8 p.m.
+- id: Q029
+  intent: canonical
+  bucket: in_manual
+  question: What is the overall process for provider onboarding and credentialing with the plan?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 456ce4b9-ce54-43dc-a0e1-f5e1ed4920e7
+    crux_contains:
+    - Understanding the perspective of our provider network will continue to support the health plan in developing interventions
+      and ideas that enhance our programs, operational processes, resources, and overall improve our communication with you.
+    - 'MMA, Comprehensive, HIV/AIDS and CWSP Provider Satisfaction Survey The MMA, Comprehensive and CWSP provider satisfaction
+      survey include, but is not limited to, assessment of the provider experience in the following areas:'
+    - Surveys are distributed to a random sampling of our participating provider network and this is done around May time
+      frame of each year.
+- id: Q030
+  intent: canonical
+  bucket: in_manual
+  question: What are the main categories of services that typically require authorization, and why?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - d35afa4a-746f-422c-aa30-448808e5a3f9
+    crux_contains:
+    - Requests for residential treatment (behavioral health or substance abuse) and admission into a State Inpatient Psychiatric
+      Program are available on our Behavioral Health web page, require prior authorization and should be submitted via fax
+      to 1-844-244-9755.
+    - Medical practitioners and providers are to submit requests for inpatient or outpatient authorizations — except for home-health
+      requests and DME related to hospital discharges — through the Secure Provider Portal unless otherwise previously approved
+      by Sunshine Health.
+    - Behavioral health providers are to submit requests for inpatient psychiatric services through the Secure Provider Portal,
+      by calling 1-844-477- 8313 or via fax at 1-866-796-0526.
+- id: Q031
+  intent: canonical
+  bucket: in_manual
+  question: Explain how providers should use the manual to find billing rules and required modifiers.
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - ab868f29-e4fa-4586-9072-b868cc2f695f
+    crux_contains:
+    - Code Bundling Rules Not Sourced to CMS NCCI Edit Tables Many specialty medical organizations and health advisory committees
+      have developed rules concerning the proper use of codes in their area of expertise.
+    - These rules are published and available for use by the public.
+    - Rules are specifically designed for professional and outpatient facility claims editing.
+- id: Q032
+  intent: canonical
+  bucket: in_manual
+  question: Summarize the appeals process (levels, timelines, what to include) in plain language.
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - c0dd7a8f-9dbd-421d-91a7-78dd7805b6ec
+    crux_contains:
+    - '48 Chapter 8: Member Complaints, Grievances and Appeals ....................................................................................'
+    - 49 Member Rights for Grievances and Appeals .....................................................................................................
+    - Behavioral Health Screening and Assessment ...................................................................................................
+- id: Q033
+  intent: canonical
+  bucket: in_manual
+  question: What are the provider's general responsibilities for documentation and record retention?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - db5f8e7f-28d6-42fb-a735-be419eaeeca0
+    crux_contains:
+    - 64 Monitoring Provider Access and Availability .........................................................................................
+    - 68 Fraud, Waste and Abuse (FWA).........................................................................................................................
+    - 68 Office of Inspector General (OIG)/General Services Administration (GSA) Exclusion ...........................
+- id: Q034
+  intent: canonical
+  bucket: in_manual
+  question: Describe the plan’s expectations for coordination between behavioral health and primary care.
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - c2d866ed-9593-480e-8887-c2e2edd817f2
+    crux_contains:
+    - Sunshine Health contracts with the CBCs to provide care coordination for Sunshine Health’s Child Welfare Specialty Plan
+      (CWSP) members by nurse care coordinators and behavioral health care coordinators at local CBCs.
+    - for CWSP Members Partnership with Community-Based Care (CBC) Lead Agencies Sunshine Health partners with Community-Based
+      Care (CBC) lead agencies across the state to facilitate the integration of medical, behavioral and social services.
+    - This coordination includes joint operational and clinical processes focused on coordinating with individual CBC lead
+      agencies supporting the continuum of care and providing care coordination services using a Trauma-Informed Care Model.
+      ➢ See Trauma-Informed Care
+- id: Q035
+  intent: canonical
+  bucket: in_manual
+  question: What are the plan’s general rules for reimbursement, billing, and timely filing (high level)?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 2e4d581f-7081-456d-8b51-d07678575dfe
+    crux_contains:
+    - Know what rules and laws apply to their conduct
+    - Administration Member Rights As a recipient of Medicaid and a member in a Plan, members have certain rights.
+    - Know who is providing medical services and who is responsible for their care
+- id: Q036
+  intent: canonical
+  bucket: in_manual
+  question: What are the plan's general definitions of urgent vs routine requests and how are they handled?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 2e4d581f-7081-456d-8b51-d07678575dfe
+    crux_contains:
+    - Administration Member Rights As a recipient of Medicaid and a member in a Plan, members have certain rights.
+    - Know what member services are available, including whether an interpreter is available if they do not speak English
+- id: Q037
+  intent: factual
+  bucket: out_of_manual
+  question: What is the Medicare Part B prior authorization process in California?
+  gold:
+    expect_in_manual: false
+    parent_metadata_ids:
+    - 66e819af-27eb-474d-a4e9-3b0ba6b47c3c
+- id: Q038
+  intent: factual
+  bucket: out_of_manual
+  question: What are the Tricare behavioral health eligibility requirements in Texas?
+  gold:
+    expect_in_manual: false
+    parent_metadata_ids:
+    - 908a3a0a-541b-434d-af74-04d8d09b43b1
+- id: Q039
+  intent: factual
+  bucket: out_of_manual
+  question: What is the Aetna commercial IOP authorization process in New York?
+  gold:
+    expect_in_manual: false
+    parent_metadata_ids:
+    - 9120d1fe-9777-452d-81e3-5071ef4a0d7a
+- id: Q040
+  intent: factual
+  bucket: out_of_manual
+  question: What is the UnitedHealthcare Medicare Advantage policy for TMS in Ohio?
+  gold:
+    expect_in_manual: false
+    parent_metadata_ids:
+    - 98cc0175-c25b-4d91-a886-613c942fb954
+- id: Q041
+  intent: factual
+  bucket: out_of_manual
+  question: What are BCBS of Florida credentialing timelines for group practices?
+  gold:
+    expect_in_manual: false
+    parent_metadata_ids:
+    - 2d584f6b-9c06-4413-acee-0d87aaafcefc
+- id: Q042
+  intent: canonical
+  bucket: out_of_manual
+  question: Write a summary of the latest changes to federal parity law in 2025.
+  gold:
+    expect_in_manual: false
+    parent_metadata_ids:
+    - 77c3a2aa-8375-4587-9606-3edc0d01f5fc
+- id: Q043
+  intent: canonical
+  bucket: out_of_manual
+  question: Explain how to implement a secure OAuth2 flow for a mobile app.
+  gold:
+    expect_in_manual: false
+    parent_metadata_ids:
+    - 052286bf-d4d8-4786-99e7-2d267c80a176
+- id: Q044
+  intent: factual
+  bucket: in_manual
+  question: What is the process for adding a new rendering provider to an existing group contract?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - ea9f9196-c948-4361-8a66-0fd3ca4e3edd
+- id: Q045
+  intent: factual
+  bucket: in_manual
+  question: Are school-based mental health services covered, and what are the billing/documentation rules?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 2e4d581f-7081-456d-8b51-d07678575dfe
+    answer_regex: (?i)know\ what\ rules\ and\ laws\ apply\ to\ their\ conduct
+- id: Q046
+  intent: factual
+  bucket: in_manual
+  question: Is psychological testing covered and does it require prior authorization?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - ed233268-6249-4141-a99b-68508280a3af
+    answer_regex: (?i)in\ addition\ some\ covered\ services\ require\ prior\ authorization
+- id: Q047
+  intent: factual
+  bucket: in_manual
+  question: What are the covered crisis services (e.g., mobile crisis, stabilization) and any limits?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - db5f8e7f-28d6-42fb-a735-be419eaeeca0
+- id: Q048
+  intent: factual
+  bucket: in_manual
+  question: What are the member rights and responsibilities relevant to grievances and appeals?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - c0dd7a8f-9dbd-421d-91a7-78dd7805b6ec
+    answer_regex: (?i)grievances\ and\ appeals\ member\ rights\ for\ grievances\ and\ appeals
+- id: Q049
+  intent: factual
+  bucket: in_manual
+  question: What is the process for requesting a single-case agreement or exception for a non-covered service?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 540cf99f-2c84-44be-8a25-2c334ff0d59b
+    answer_regex: (?i)the\ code\ editing\ assistant\ is\ intended\ for\ use\ as\ a
+- id: Q050
+  intent: factual
+  bucket: in_manual
+  question: How do providers obtain a copy of the provider manual and locate key contact information?
+  gold:
+    expect_in_manual: true
+    parent_metadata_ids:
+    - 2e4d581f-7081-456d-8b51-d07678575dfe
+    answer_regex: (?i)the\ requirement\ that\ sunshine\ health\ provides\ information\ to\ providers\ about

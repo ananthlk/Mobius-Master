@@ -3,6 +3,8 @@
 Master landing server for Mobius. Serves the landing page and exposes POST /api/stop-all,
 GET /api/status, GET /api/config. In dev binds 127.0.0.1:3999; in prod (ENV=prod) binds 0.0.0.0:PORT.
 Uses stdlib only (no FastAPI dependency at repo root).
+
+NOTE: This file is intentionally a single script; keep it simple.
 """
 import json
 import os
@@ -15,9 +17,12 @@ from pathlib import Path
 from urllib.request import urlopen, Request
 from urllib.error import URLError, HTTPError
 from urllib.parse import urlparse, parse_qs
+from urllib.parse import unquote
+import posixpath
 
 MOBIUS_ROOT = Path(__file__).resolve().parent
 LANDING_DIR = MOBIUS_ROOT / "landing"
+LEXICON_DIST_DIR = MOBIUS_ROOT / "mobius-qa" / "lexicon-maintenance" / "frontend" / "dist"
 STOP_SCRIPT = MOBIUS_ROOT / "scripts" / "stop_all_mobius.sh"
 PIDFILE = MOBIUS_ROOT / ".mobius_start_all.pids"
 LOGDIR = MOBIUS_ROOT / ".mobius_logs"
@@ -35,12 +40,18 @@ def _env_url(key: str, default: str) -> str:
 # Redis defaults to dev cloud (10.40.102.67) - requires VPN/tunnel from local machine.
 def _service_config() -> dict:
     return {
+        "landing_url": _env_url("MOBIUS_LANDING_URL", f"http://127.0.0.1:{PORT}"),
         "os_url": _env_url("MOBIUS_OS_URL", "http://127.0.0.1:5001"),
         "chat_url": _env_url("MOBIUS_CHAT_URL", "http://127.0.0.1:8000"),
         "rag_backend_url": _env_url("MOBIUS_RAG_BACKEND_URL", "http://127.0.0.1:8001"),
         "rag_frontend_url": _env_url("MOBIUS_RAG_FRONTEND_URL", "http://127.0.0.1:5173"),
         "dbt_url": _env_url("MOBIUS_DBT_URL", "http://127.0.0.1:6500"),
         "scraper_url": _env_url("MOBIUS_SCRAPER_URL", "http://127.0.0.1:8002"),
+        # Lexicon UI is served statically by landing under /lexicon/
+        "lexicon_url": _env_url("MOBIUS_LEXICON_URL", f"http://127.0.0.1:{PORT}/lexicon/"),
+        # Retrieval Eval UI is served statically by landing under /retrieval-eval/
+        "retrieval_eval_url": _env_url("MOBIUS_RETRIEVAL_EVAL_URL", f"http://127.0.0.1:{PORT}/retrieval-eval/"),
+        "retrieval_eval_api_url": _env_url("MOBIUS_RETRIEVAL_EVAL_API_URL", "http://127.0.0.1:8020"),
         "redis_host": os.getenv("MOBIUS_REDIS_HOST", "10.40.102.67").strip() or "10.40.102.67",
         "redis_port": int(os.getenv("MOBIUS_REDIS_PORT", "6379").strip() or "6379"),
     }
@@ -51,6 +62,7 @@ def _get_process_probes() -> list:
     return [
         ("os", "OS (extension + backend)", c["os_url"], c["os_url"], "/health"),
         ("chat", "Chat", c["chat_url"], c["chat_url"], "/health"),
+        ("retrieval-eval", "Retrieval Eval", c["retrieval_eval_url"], c["retrieval_eval_api_url"], "/health"),
         ("dbt", "DBT", c["dbt_url"], c["dbt_url"], "/config"),
     ]
 
@@ -73,6 +85,7 @@ def _get_worker_probes() -> list:
 SERVICE_STOP = {
     "os": {"names": ["mobius-os-backend", "mobius-os-extension"], "ports": [5001]},
     "chat": {"names": ["mobius-chat-api", "mobius-chat-worker"], "ports": [8000]},
+    "retrieval-eval": {"names": ["mobius-qa-retrieval-eval-studio"], "ports": [8020]},
     "rag": {
         "names": [
             "mobius-rag-backend",
@@ -113,6 +126,12 @@ def _start_commands(root: Path) -> dict:
         "chat": [
             ("mobius-chat-api", f"cd {r}/mobius-chat && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8000"),
             ("mobius-chat-worker", f"cd {r}/mobius-chat && {venv} -m app.worker"),
+        ],
+        "retrieval-eval": [
+            (
+                "mobius-qa-retrieval-eval-studio",
+                f"cd {r}/mobius-qa/retrieval-eval-studio && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8020",
+            ),
         ],
         "rag": rag_cmds,
         "dbt": [
@@ -308,10 +327,33 @@ def _get_status() -> dict:
             "status": status,
             "ms": ms,
         })
+    # Lexicon (static): don't self-probe via HTTP (landing is single-threaded).
+    # Instead, mark up if the built dist index exists.
+    try:
+        lex_ok = (LEXICON_DIST_DIR / "index.html").exists()
+    except Exception:
+        lex_ok = False
+    c = _service_config()
+    processes.append({
+        "id": "lexicon",
+        "name": "Lexicon",
+        "url": c.get("lexicon_url"),
+        "status": "up" if lex_ok else "down",
+        "ms": 0,
+    })
     # RAG (combined)
     processes.append(_probe_rag())
-    # Reorder so RAG is third: os, chat, rag, dbt
-    processes.sort(key=lambda p: {"os": 0, "chat": 1, "rag": 2, "dbt": 3}.get(p["id"], 4))
+    # Reorder so key apps are grouped: os, chat, rag, lexicon, dbt
+    processes.sort(
+        key=lambda p: {
+            "os": 0,
+            "chat": 1,
+            "rag": 2,
+            "lexicon": 3,
+            "retrieval-eval": 4,
+            "dbt": 5,
+        }.get(p["id"], 9)
+    )
 
     workers = []
     for wid, name, base_url, path, note in _get_worker_probes():
@@ -346,6 +388,8 @@ def _get_api_config() -> dict:
         {"id": "os", "url": c["os_url"]},
         {"id": "chat", "url": c["chat_url"]},
         {"id": "rag", "url": rag_link_url},
+        {"id": "lexicon", "url": c["lexicon_url"]},
+        {"id": "retrieval-eval", "url": c["retrieval_eval_url"]},
         {"id": "dbt", "url": c["dbt_url"]},
     ]
     workers = [
@@ -444,6 +488,45 @@ def _start_redis() -> tuple[bool, str]:
 class LandingHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(LANDING_DIR), **kwargs)
+
+    def translate_path(self, path: str) -> str:
+        """
+        Route /lexicon/* to the built Lexicon UI dist directory.
+
+        Everything else is served from LANDING_DIR.
+        """
+        # Remove query/fragment and decode.
+        path = path.split("?", 1)[0].split("#", 1)[0]
+        path = unquote(path)
+
+        # Choose root based on prefix.
+        use_lexicon = path == "/lexicon" or path.startswith("/lexicon/")
+        root = LEXICON_DIST_DIR if use_lexicon else LANDING_DIR
+
+        if use_lexicon:
+            # Normalize prefix and strip /lexicon
+            if path == "/lexicon":
+                path = "/lexicon/"
+            path = path[len("/lexicon") :] or "/"
+
+        # Re-implement the core of SimpleHTTPRequestHandler.translate_path safely.
+        path = posixpath.normpath(path)
+        parts = [p for p in path.split("/") if p and p not in (".", "..")]
+        full = root
+        for p in parts:
+            full = full / p
+
+        # SPA fallback: if a nested route is requested, serve index.html.
+        if use_lexicon:
+            try:
+                if full.exists() and full.is_dir():
+                    full = full / "index.html"
+                elif not full.exists():
+                    full = root / "index.html"
+            except Exception:
+                full = root / "index.html"
+
+        return str(full)
 
     def do_GET(self):
         if self.path == "/api/status":

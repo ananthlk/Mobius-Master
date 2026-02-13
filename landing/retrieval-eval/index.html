@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mobius QA — Retrieval Eval Studio</title>
+    <link rel="icon" type="image/svg+xml" href="../logo.svg" />
+    <link rel="stylesheet" href="../tokens-dark.css" />
+    <link rel="stylesheet" href="./style.css?v=20260212c" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-left">
+        <a class="back" href="/">← Module Hub</a>
+        <h1>Retrieval Eval Studio</h1>
+        <span class="muted">BM25 vs Vertex hierarchical</span>
+      </div>
+      <div class="topbar-right">
+        <span class="pill" id="api-status">API: …</span>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="card">
+        <h2>Suites</h2>
+        <p class="muted small">A suite is a questionnaire: config + questions. Each run is persisted and drillable.</p>
+
+        <div class="row">
+          <input id="suite-name" placeholder="New suite name (e.g., sunshine_manual_v1)" />
+          <button id="btn-create-suite" class="primary">Create</button>
+        </div>
+
+        <div class="row">
+          <select id="suite-select"></select>
+          <button id="btn-refresh-suites">Refresh</button>
+        </div>
+
+        <div class="suite-spec">
+          <h3>Suite config</h3>
+          <div class="form-grid">
+            <label>
+              <span>Documents (multi-select)</span>
+              <select id="spec-docs" multiple size="6"></select>
+            </label>
+            <label>
+              <span>Search docs</span>
+              <input id="doc-search" placeholder="filter by display name / filename" />
+              <div class="row">
+                <button id="btn-refresh-docs" type="button">Refresh docs</button>
+                <button id="btn-clear-docs" type="button">Clear</button>
+              </div>
+              <div class="muted small" id="docs-status"></div>
+            </label>
+            <label>
+              <span>Corpus tag (advanced / optional)</span>
+              <input id="spec-authority" placeholder="optional (auto-inferred if possible)" />
+            </label>
+            <label>
+              <span>Top K</span>
+              <input id="spec-topk" type="number" min="1" max="50" value="10" />
+            </label>
+            <label>
+              <span>Limit questions</span>
+              <input id="spec-limitq" type="number" min="1" placeholder="(optional)" />
+            </label>
+            <label>
+              <span>BM25 answer threshold</span>
+              <input id="spec-bm25th" type="number" step="0.01" min="0" max="1" value="0.65" />
+            </label>
+            <label>
+              <span>Hier answer threshold</span>
+              <input id="spec-hierth" type="number" step="0.01" min="0" max="1" value="0.88" />
+            </label>
+          </div>
+          <div class="row">
+            <button id="btn-save-spec" class="primary">Save config</button>
+            <button id="btn-run" class="accent">Run eval</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Questions (YAML import)</h2>
+        <p class="muted small">Paste a `questions.yaml` (same schema as `mobius-qa/retrieval-eval/questions.yaml`). Import is idempotent per `qid`.</p>
+        <div class="row">
+          <button id="btn-auto-generate" class="accent" type="button">Auto-select questions</button>
+          <label class="muted small">Total <input id="gen-total" type="number" min="1" max="80" value="20" style="min-width:90px;width:90px"/></label>
+          <label class="muted small">Canonical <input id="gen-canonical" type="number" min="0" max="80" value="6" style="min-width:90px;width:90px"/></label>
+          <label class="muted small">Out <input id="gen-out" type="number" min="0" max="80" value="3" style="min-width:90px;width:90px"/></label>
+          <span class="muted small" id="gen-status"></span>
+        </div>
+        <textarea id="yaml" rows="12" spellcheck="false" placeholder="questions:\n- id: Q001\n  intent: factual\n  bucket: in_manual\n  question: ...\n  gold:\n    expect_in_manual: true\n    parent_metadata_ids:\n    - ..."></textarea>
+        <div class="row">
+          <button id="btn-import-yaml" class="primary">Import YAML</button>
+          <button id="btn-load-sample">Load sample</button>
+        </div>
+        <div class="muted small" id="import-status"></div>
+      </section>
+
+      <section class="card wide">
+        <div class="wide-header">
+          <div>
+            <h2>Runs</h2>
+            <p class="muted small">Each run stores per-question metrics and top-K retrieval rows for both methods.</p>
+          </div>
+          <div class="row">
+            <button id="btn-refresh-runs">Refresh</button>
+          </div>
+        </div>
+        <div class="runs" id="runs"></div>
+      </section>
+
+      <section class="card wide" id="run-view" style="display:none;">
+        <div class="wide-header">
+          <div>
+            <h2 id="run-title">Run</h2>
+            <p class="muted small" id="run-subtitle"></p>
+          </div>
+          <div class="row">
+            <button id="btn-close-run">Close</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="tbl" id="run-table">
+            <thead>
+              <tr>
+                <th>QID</th>
+                <th>Question</th>
+                <th>BM25 rank</th>
+                <th>BM25 max</th>
+                <th>Hier rank</th>
+                <th>Hier top1</th>
+                <th>Drill</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card wide" id="qdetail" style="display:none;">
+        <div class="wide-header">
+          <div>
+            <h2 id="qdetail-title">Question detail</h2>
+            <p class="muted small" id="qdetail-subtitle"></p>
+          </div>
+          <div class="row">
+            <button id="btn-close-qdetail">Close</button>
+          </div>
+        </div>
+        <div class="compare">
+          <div class="col">
+            <h3>BM25</h3>
+            <div class="muted small" id="bm25-metric"></div>
+            <div id="bm25-rows"></div>
+          </div>
+          <div class="col">
+            <h3>Hierarchical (Vertex)</h3>
+            <div class="muted small" id="hier-metric"></div>
+            <div id="hier-rows"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="./app.js?v=20260212c"></script>
+  </body>
+</html>
+
