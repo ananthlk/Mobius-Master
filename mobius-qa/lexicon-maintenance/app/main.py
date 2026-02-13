@@ -8,6 +8,8 @@ from typing import Any
 
 import psycopg2
 import psycopg2.extras
+import json
+import uuid
 from fastapi import Body, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -165,6 +167,393 @@ def _pick_kind(candidate_types: list[str]) -> str:
     if "j" in uniq:
         return "j"
     return "p"
+
+
+def _parse_kind_code(s: str, default_kind: str) -> tuple[str, str]:
+    """
+    Accept either 'd:contact_information' or 'contact_information'.
+    Returns (kind, code).
+    """
+    raw = (s or "").strip()
+    dk = (default_kind or "d").strip().lower() or "d"
+    if ":" in raw:
+        k, c = raw.split(":", 1)
+        k = (k or "").strip().lower() or dk
+        c = (c or "").strip()
+        return (k, c)
+    return (dk, raw)
+
+
+def _bump_lexicon_revision(qcur) -> int:
+    """Increment policy_lexicon_meta.revision (create row if missing). Returns new revision."""
+    qcur.execute(
+        """
+        SELECT id, COALESCE(revision,0)::bigint AS revision
+        FROM policy_lexicon_meta
+        ORDER BY updated_at DESC NULLS LAST
+        LIMIT 1
+        """
+    )
+    row = qcur.fetchone()
+    # Works with both tuple cursors and RealDictCursor.
+    rid = None
+    rev = 0
+    if isinstance(row, dict):
+        rid = row.get("id")
+        rev = int(row.get("revision") or 0)
+    elif isinstance(row, (list, tuple)) and row:
+        rid = row[0]
+        rev = int(row[1] or 0) if len(row) > 1 else 0
+    if rid:
+        new_rev = int(rev or 0) + 1
+        qcur.execute(
+            "UPDATE policy_lexicon_meta SET revision=%s, updated_at=NOW() WHERE id=%s",
+            (new_rev, rid),
+        )
+        return new_rev
+    new_rev = 1
+    qcur.execute(
+        """
+        INSERT INTO policy_lexicon_meta(id, lexicon_version, lexicon_meta, revision, created_at, updated_at)
+        VALUES (%s, %s, %s::jsonb, %s, NOW(), NOW())
+        """,
+        (str(uuid.uuid4()), "v1", json.dumps({}), new_rev),
+    )
+    return new_rev
+
+
+def _ensure_list(obj: dict, key: str) -> list[str]:
+    v = obj.get(key)
+    if isinstance(v, list):
+        return [str(x) for x in v if str(x).strip()]
+    obj[key] = []
+    return obj[key]
+
+
+def _add_alias_phrase(spec: dict[str, Any], phrase: str, strength: str = "strong") -> dict[str, Any]:
+    """
+    Add phrase to spec as an alias.
+    - strong: spec.strong_phrases: [phrase, ...]
+    - weak: spec.weak_keywords.any_of: [phrase, ...] (min_hits default 1)
+    """
+    p = (phrase or "").strip()
+    if not p:
+        return spec
+    st = (strength or "strong").strip().lower()
+    if st == "weak":
+        wk = spec.get("weak_keywords")
+        if not isinstance(wk, dict):
+            wk = {}
+        any_of = wk.get("any_of")
+        if not isinstance(any_of, list):
+            any_of = []
+        if p not in [str(x) for x in any_of]:
+            any_of.append(p)
+        wk["any_of"] = any_of
+        wk.setdefault("min_hits", 1)
+        spec["weak_keywords"] = wk
+        return spec
+    # default: strong
+    sp = _ensure_list(spec, "strong_phrases")
+    if p not in [str(x) for x in sp]:
+        sp.append(p)
+    spec["strong_phrases"] = sp
+    return spec
+
+
+@app.get("/policy/lexicon/tag-details")
+def get_policy_lexicon_tag_details(
+    kind: str = Query(...),
+    code: str = Query(...),
+    min_score: float = Query(0.6),
+    top_docs: int = Query(15),
+    sample_lines: int = Query(25),
+) -> dict[str, Any]:
+    """
+    UI helper: show one tag's details + usage counts and sample lines from RAG policy_lines.
+    """
+    u = _urls()
+    k = (kind or "").strip().lower()
+    c = (code or "").strip()
+    if k not in ("p", "d", "j") or not c:
+        raise HTTPException(status_code=400, detail="kind and code are required")
+    td = max(0, min(int(top_docs or 15), 50))
+    sl = max(0, min(int(sample_lines or 25), 200))
+    ms = float(min_score or 0.0)
+
+    # Load tag spec from QA
+    try:
+        qa = _conn(u.qa)
+        qa.autocommit = True
+        qcur = qa.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        qcur.execute(
+            """
+            SELECT kind::text, code::text, parent_code::text, spec, active::bool
+            FROM policy_lexicon_entries
+            WHERE kind = %s AND code = %s
+            LIMIT 1
+            """,
+            (k, c),
+        )
+        tag = qcur.fetchone() or None
+        qcur.close()
+        qa.close()
+        if not tag:
+            raise HTTPException(status_code=404, detail="tag not found")
+        tag_out = {
+            "kind": k,
+            "code": c,
+            "parent_code": tag.get("parent_code"),
+            "active": bool(tag.get("active")) if tag.get("active") is not None else True,
+            "spec": tag.get("spec") if isinstance(tag.get("spec"), dict) else {},
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load tag: {type(e).__name__}: {e}")
+
+    # Usage counts + examples from RAG
+    try:
+        rag = _conn(u.rag)
+        rag.autocommit = True
+        rcur = rag.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        tag_expr = (
+            "policy_lines.p_tags"
+            if k == "p"
+            else ("COALESCE(policy_lines.inferred_d_tags, policy_lines.d_tags)" if k == "d" else "COALESCE(policy_lines.inferred_j_tags, policy_lines.j_tags)")
+        )
+
+        rcur.execute(
+            f"""
+            WITH expanded AS (
+              SELECT
+                policy_lines.document_id::text AS document_id,
+                policy_lines.page_number AS page_number,
+                policy_lines.text AS text,
+                e.key AS code,
+                CASE
+                  WHEN e.value ~ '^[0-9]+(\\.[0-9]+)?$' THEN (e.value)::double precision
+                  ELSE NULL
+                END AS score
+              FROM policy_lines
+              CROSS JOIN LATERAL jsonb_each_text({tag_expr}) AS e
+              WHERE policy_lines.is_atomic = TRUE
+                AND jsonb_typeof({tag_expr}) = 'object'
+                AND e.key = %s
+            )
+            SELECT
+              COUNT(*)::bigint AS hit_lines,
+              COUNT(DISTINCT document_id)::bigint AS hit_docs,
+              COALESCE(MAX(score), 0.0) AS max_score
+            FROM expanded
+            WHERE score IS NOT NULL AND score >= %s
+            """,
+            (c, ms),
+        )
+        usage = rcur.fetchone() or {}
+
+        top_documents = []
+        if td > 0:
+            rcur.execute(
+                f"""
+                WITH expanded AS (
+                  SELECT
+                    policy_lines.document_id::text AS document_id,
+                    CASE
+                      WHEN e.value ~ '^[0-9]+(\\.[0-9]+)?$' THEN (e.value)::double precision
+                      ELSE NULL
+                    END AS score
+                  FROM policy_lines
+                  CROSS JOIN LATERAL jsonb_each_text({tag_expr}) AS e
+                  WHERE policy_lines.is_atomic = TRUE
+                    AND jsonb_typeof({tag_expr}) = 'object'
+                    AND e.key = %s
+                )
+                SELECT document_id, COUNT(*)::bigint AS hit_lines, COALESCE(MAX(score), 0.0) AS max_score
+                FROM expanded
+                WHERE score IS NOT NULL AND score >= %s
+                GROUP BY document_id
+                ORDER BY hit_lines DESC, max_score DESC, document_id ASC
+                LIMIT {td}
+                """,
+                (c, ms),
+            )
+            for rr in rcur.fetchall() or []:
+                top_documents.append(
+                    {
+                        "document_id": rr.get("document_id"),
+                        "hit_lines": int(rr.get("hit_lines") or 0),
+                        "max_score": float(rr.get("max_score") or 0.0),
+                    }
+                )
+
+        samples = []
+        if sl > 0:
+            rcur.execute(
+                f"""
+                WITH expanded AS (
+                  SELECT
+                    policy_lines.document_id::text AS document_id,
+                    policy_lines.page_number AS page_number,
+                    policy_lines.text AS text,
+                    CASE
+                      WHEN e.value ~ '^[0-9]+(\\.[0-9]+)?$' THEN (e.value)::double precision
+                      ELSE NULL
+                    END AS score
+                  FROM policy_lines
+                  CROSS JOIN LATERAL jsonb_each_text({tag_expr}) AS e
+                  WHERE policy_lines.is_atomic = TRUE
+                    AND jsonb_typeof({tag_expr}) = 'object'
+                    AND e.key = %s
+                )
+                SELECT document_id, page_number, score, text
+                FROM expanded
+                WHERE score IS NOT NULL AND score >= %s
+                ORDER BY score DESC NULLS LAST, document_id ASC, page_number ASC
+                LIMIT {sl}
+                """,
+                (c, ms),
+            )
+            for rr in rcur.fetchall() or []:
+                txt = str(rr.get("text") or "")
+                samples.append(
+                    {
+                        "document_id": rr.get("document_id"),
+                        "page_number": rr.get("page_number"),
+                        "score": float(rr.get("score") or 0.0),
+                        "text": txt,
+                        "snippet": txt[:240].replace("\n", " ").strip(),
+                    }
+                )
+
+        rcur.close()
+        rag.close()
+    except Exception as e:
+        usage = {"hit_lines": 0, "hit_docs": 0, "max_score": 0.0, "error": f"{type(e).__name__}: {e}"}
+        top_documents = []
+        samples = []
+
+    return {
+        "tag": tag_out,
+        "usage": {
+            "hit_lines": int((usage or {}).get("hit_lines") or 0),
+            "hit_docs": int((usage or {}).get("hit_docs") or 0),
+            "max_score": float((usage or {}).get("max_score") or 0.0),
+        },
+        "top_documents": top_documents,
+        "sample_lines": samples,
+    }
+
+
+@app.patch("/policy/lexicon/tags/{kind}/{code}")
+def patch_policy_lexicon_tag(kind: str, code: str, body: dict = Body(...)) -> dict[str, Any]:
+    """
+    Update tag spec/active flag in QA DB. Used by the bundled UI for editing and soft-delete.
+    Body: { spec: object, active: bool, reviewer?: string }
+    """
+    u = _urls()
+    k = (kind or "").strip().lower()
+    c = (code or "").strip()
+    if k not in ("p", "d", "j") or not c:
+        raise HTTPException(status_code=400, detail="kind must be p|d|j and code is required")
+    spec = body.get("spec") if isinstance(body.get("spec"), dict) else {}
+    active = bool(body.get("active")) if "active" in body else True
+    parent_code = spec.get("parent_code") if isinstance(spec.get("parent_code"), str) else None
+
+    try:
+        qa = _conn(u.qa)
+        qa.autocommit = True
+        cur = qa.cursor()
+
+        # Upsert tag row
+        cur.execute(
+            """
+            SELECT id
+            FROM policy_lexicon_entries
+            WHERE kind = %s AND code = %s
+            LIMIT 1
+            """,
+            (k, c),
+        )
+        row = cur.fetchone()
+        if row and row[0]:
+            cur.execute(
+                """
+                UPDATE policy_lexicon_entries
+                SET spec = %s::jsonb,
+                    active = %s,
+                    parent_code = COALESCE(%s, parent_code),
+                    updated_at = NOW()
+                WHERE id = %s
+                """,
+                (json.dumps(spec), active, parent_code, row[0]),
+            )
+        else:
+            cur.execute(
+                """
+                INSERT INTO policy_lexicon_entries(id, kind, code, parent_code, spec, active, created_at, updated_at)
+                VALUES (%s, %s, %s, %s, %s::jsonb, %s, NOW(), NOW())
+                """,
+                (str(uuid.uuid4()), k, c, parent_code, json.dumps(spec), active),
+            )
+
+        new_rev = _bump_lexicon_revision(cur)
+        cur.close()
+        qa.close()
+        return {"status": "ok", "kind": k, "code": c, "active": active, "lexicon_revision": new_rev}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update tag: {type(e).__name__}: {e}")
+
+
+@app.post("/policy/lexicon/tags/move")
+def move_policy_lexicon_tag(body: dict = Body(...)) -> dict[str, Any]:
+    """
+    Move/rename a tag code (currently used by UI for reorganizing D tags).
+    Body: { kind: 'd', from_code: str, to_code: str, parent_code?: str|null }
+    """
+    u = _urls()
+    k = str(body.get("kind") or "").strip().lower()
+    from_code = str(body.get("from_code") or "").strip()
+    to_code = str(body.get("to_code") or "").strip()
+    parent_code = body.get("parent_code")
+    parent_code = str(parent_code).strip() if isinstance(parent_code, str) and str(parent_code).strip() else None
+    if k not in ("p", "d", "j") or not from_code or not to_code:
+        raise HTTPException(status_code=400, detail="kind/from_code/to_code are required")
+    try:
+        qa = _conn(u.qa)
+        qa.autocommit = True
+        cur = qa.cursor()
+        # Rename the tag
+        cur.execute(
+            """
+            UPDATE policy_lexicon_entries
+            SET code = %s,
+                parent_code = %s,
+                updated_at = NOW()
+            WHERE kind = %s AND code = %s
+            """,
+            (to_code, parent_code, k, from_code),
+        )
+        if cur.rowcount <= 0:
+            raise HTTPException(status_code=404, detail="from_code not found")
+        # Best-effort: update children referencing old parent_code
+        cur.execute(
+            """
+            UPDATE policy_lexicon_entries
+            SET parent_code = %s,
+                updated_at = NOW()
+            WHERE kind = %s AND parent_code = %s
+            """,
+            (to_code, k, from_code),
+        )
+        new_rev = _bump_lexicon_revision(cur)
+        cur.close()
+        qa.close()
+        return {"status": "ok", "kind": k, "from_code": from_code, "to_code": to_code, "parent_code": parent_code, "lexicon_revision": new_rev}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to move tag: {type(e).__name__}: {e}")
 
 
 @app.get("/policy/lexicon/overview")
@@ -504,20 +893,97 @@ def list_policy_candidates_related(
 
 @app.post("/policy/candidates/aggregate/review-bulk")
 def review_policy_candidates_aggregate_bulk(body: dict = Body(...)):
-    """Bulk update candidate states in RAG DB (supports reject/flag/restore)."""
+    """
+    Bulk update candidate states in RAG DB.
+    Supports: proposed|rejected|flagged and approved (writes aliases into QA lexicon).
+    UI payload shape (bundle):
+      { normalized_list: [...], state: 'approved'|'rejected'|..., candidate_type_override?: 'p'|'d'|'j',
+        tag_code_map?: { <normalized>: <tag_code or 'd:tag_code'>, ... } }
+    """
     u = _urls()
     norms = body.get("normalized_list") or []
     if not isinstance(norms, list) or not norms:
         raise HTTPException(status_code=400, detail="normalized_list is required")
     next_state = str(body.get("state") or "").strip().lower()
-    if next_state not in ("proposed", "rejected", "flagged"):
-        raise HTTPException(status_code=400, detail="state must be proposed|rejected|flagged (approve not wired in this build)")
+    if next_state not in ("proposed", "rejected", "flagged", "approved"):
+        raise HTTPException(status_code=400, detail="state must be proposed|rejected|flagged|approved")
     reviewer = str(body.get("reviewer") or "").strip() or None
     notes = body.get("reviewer_notes")
 
     norm_keys = [str(x).strip().lower() for x in norms if str(x).strip()]
     if not norm_keys:
         raise HTTPException(status_code=400, detail="normalized_list is empty")
+
+    # Approval wiring: when approving, we must write into QA lexicon first (as alias to tag_code_map).
+    candidate_type_override = str(body.get("candidate_type_override") or "").strip().lower() or None
+    tag_code_map = body.get("tag_code_map") if isinstance(body.get("tag_code_map"), dict) else None
+    if next_state == "approved":
+        if candidate_type_override not in ("p", "d", "j"):
+            raise HTTPException(status_code=400, detail="candidate_type_override is required for state=approved (p|d|j)")
+        if not tag_code_map:
+            raise HTTPException(status_code=400, detail="tag_code_map is required for state=approved")
+
+        # Update QA lexicon entries: add each normalized phrase as alias to its mapped tag code.
+        try:
+            qa = _conn(u.qa)
+            qa.autocommit = True
+            qcur = qa.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+            updated_tags: set[tuple[str, str]] = set()
+            for nk in norm_keys:
+                mapped = tag_code_map.get(nk) or tag_code_map.get(nk.strip()) or None
+                if not mapped:
+                    continue
+                tk, tc = _parse_kind_code(str(mapped), candidate_type_override)
+                if tk not in ("p", "d", "j") or not tc:
+                    continue
+                phrase = nk
+
+                qcur.execute(
+                    """
+                    SELECT id, spec
+                    FROM policy_lexicon_entries
+                    WHERE kind = %s AND code = %s
+                    LIMIT 1
+                    """,
+                    (tk, tc),
+                )
+                row = qcur.fetchone()
+                if row and row.get("id"):
+                    spec = row.get("spec") if isinstance(row.get("spec"), dict) else {}
+                    spec = dict(spec)
+                    spec.setdefault("kind", tk)
+                    spec = _add_alias_phrase(spec, phrase, strength="strong")
+                    qcur.execute(
+                        """
+                        UPDATE policy_lexicon_entries
+                        SET spec = %s::jsonb,
+                            active = true,
+                            updated_at = NOW()
+                        WHERE id = %s
+                        """,
+                        (json.dumps(spec), row["id"]),
+                    )
+                else:
+                    # Create a new tag with the phrase as a strong alias
+                    spec = {"kind": tk, "description": "", "strong_phrases": [phrase]}
+                    qcur.execute(
+                        """
+                        INSERT INTO policy_lexicon_entries(id, kind, code, parent_code, spec, active, created_at, updated_at)
+                        VALUES (%s, %s, %s, NULL, %s::jsonb, true, NOW(), NOW())
+                        """,
+                        (str(uuid.uuid4()), tk, tc, json.dumps(spec)),
+                    )
+                updated_tags.add((tk, tc))
+
+            # Bump revision once per bulk action
+            new_rev = _bump_lexicon_revision(qcur)
+            qcur.close()
+            qa.close()
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to approve into QA lexicon: {type(e).__name__}: {e}")
 
     try:
         rag = _conn(u.rag)
@@ -527,16 +993,27 @@ def review_policy_candidates_aggregate_bulk(body: dict = Body(...)):
         errors = []
         for nk in norm_keys:
             try:
+                # Keep proposed_tag in sync for approved
+                proposed_tag = None
+                candidate_type = None
+                if next_state == "approved" and tag_code_map:
+                    mapped = tag_code_map.get(nk) or tag_code_map.get(nk.strip()) or None
+                    if mapped:
+                        tk, tc = _parse_kind_code(str(mapped), candidate_type_override or "d")
+                        candidate_type = tk
+                        proposed_tag = tc
                 cur.execute(
                     """
                     UPDATE policy_lexicon_candidates
                     SET state = %s,
+                        candidate_type = COALESCE(%s, candidate_type),
+                        proposed_tag = COALESCE(%s, proposed_tag),
                         reviewer = %s,
                         reviewer_notes = %s
                     WHERE trim(lower(normalized)) = %s
                     RETURNING normalized
                     """,
-                    (next_state, reviewer, notes, nk),
+                    (next_state, candidate_type, proposed_tag, reviewer, notes, nk),
                 )
                 touched = [r[0] for r in cur.fetchall()] if cur.rowcount else []
                 if not touched:
@@ -564,7 +1041,7 @@ def review_policy_candidates_aggregate_bulk(body: dict = Body(...)):
                 errors.append({"normalized": nk, "error": str(e)})
         cur.close()
         rag.close()
-        return {"status": "ok", "updated": updated, "errors": errors, "lexicon_revision": None}
+        return {"status": "ok", "updated": updated, "errors": errors, "lexicon_revision": (new_rev if next_state == "approved" else None)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Bulk review failed: {type(e).__name__}: {e}")
 
