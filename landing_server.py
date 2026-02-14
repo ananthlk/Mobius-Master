@@ -22,7 +22,10 @@ import posixpath
 
 MOBIUS_ROOT = Path(__file__).resolve().parent
 LANDING_DIR = MOBIUS_ROOT / "landing"
-LEXICON_DIST_DIR = MOBIUS_ROOT / "mobius-qa" / "lexicon-maintenance" / "frontend" / "dist"
+# Prefer the new React/Vite v2 build, fall back to the old one
+_LEXICON_V2_DIR = MOBIUS_ROOT / "mobius-qa" / "lexicon-maintenance" / "frontend-v2" / "dist"
+_LEXICON_V1_DIR = MOBIUS_ROOT / "mobius-qa" / "lexicon-maintenance" / "frontend" / "dist"
+LEXICON_DIST_DIR = _LEXICON_V2_DIR if (_LEXICON_V2_DIR / "index.html").exists() else _LEXICON_V1_DIR
 STOP_SCRIPT = MOBIUS_ROOT / "scripts" / "stop_all_mobius.sh"
 PIDFILE = MOBIUS_ROOT / ".mobius_start_all.pids"
 LOGDIR = MOBIUS_ROOT / ".mobius_logs"
