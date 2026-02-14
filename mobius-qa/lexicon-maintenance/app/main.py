@@ -591,16 +591,17 @@ def patch_policy_lexicon_tag(kind: str, code: str, body: dict = Body(...)) -> di
     active = bool(body.get("active")) if "active" in body else True
     parent_code = spec.get("parent_code") if isinstance(spec.get("parent_code"), str) else None
 
-    # Enforce taxonomy structure on new tags (skip validation for existing tag updates
-    # that don't change code, to avoid blocking spec-only edits)
-    _validate_tag_structure(k, c, parent_code, u.qa, spec=spec)
+    # Auto-derive parent_code from dotted code when not explicitly provided
+    if not parent_code and "." in c:
+        parent_code = c.rsplit(".", 1)[0]
 
     try:
         qa = _conn(u.qa)
         qa.autocommit = True
         cur = qa.cursor()
 
-        # Upsert tag row
+        # Check if tag already exists (skip structure validation for spec-only edits
+        # on existing tags to avoid blocking alias additions etc.)
         cur.execute(
             """
             SELECT id
@@ -611,6 +612,10 @@ def patch_policy_lexicon_tag(kind: str, code: str, body: dict = Body(...)) -> di
             (k, c),
         )
         row = cur.fetchone()
+        if not row or not row[0]:
+            # New tag: enforce full taxonomy validation
+            _validate_tag_structure(k, c, parent_code, u.qa, spec=spec)
+
         if row and row[0]:
             cur.execute(
                 """
