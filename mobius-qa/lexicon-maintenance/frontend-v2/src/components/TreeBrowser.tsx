@@ -73,9 +73,41 @@ function filterTree(nodes: TreeNode[], q: string): TreeNode[] {
 const KIND_LABELS: Record<TagKind, string> = { p: 'Procedural', d: 'Domain', j: 'Jurisdiction' }
 const KIND_COLORS: Record<TagKind, string> = { p: 'var(--clr-p)', d: 'var(--clr-d)', j: 'var(--clr-j)' }
 
+/** Collect all collapsible keys from the tree, grouped by depth. */
+function collectKeys(tree: Record<TagKind, TreeNode[]>): { all: string[]; byDepth: Map<number, string[]> } {
+  const all: string[] = []
+  const byDepth = new Map<number, string[]>()
+
+  const walk = (nodes: TreeNode[], depth: number) => {
+    for (const n of nodes) {
+      if (n.children.length > 0) {
+        const key = `${n.tag.kind}:${n.tag.code}`
+        all.push(key)
+        const arr = byDepth.get(depth) || []
+        arr.push(key)
+        byDepth.set(depth, arr)
+        walk(n.children, depth + 1)
+      }
+    }
+  }
+
+  // Kind-level keys
+  for (const kind of ['p', 'd', 'j'] as TagKind[]) {
+    const kindKey = `kind:${kind}`
+    all.push(kindKey)
+    const arr = byDepth.get(-1) || []
+    arr.push(kindKey)
+    byDepth.set(-1, arr)
+    walk(tree[kind], 0)
+  }
+
+  return { all, byDepth }
+}
+
 export function TreeBrowser({ tags, loading, filter, selectedTag, onSelect }: Props) {
   const tree = useMemo(() => buildTree(tags), [tags])
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
+  const keys = useMemo(() => collectKeys(tree), [tree])
 
   const toggle = (key: string) => {
     setCollapsed(prev => {
@@ -85,10 +117,51 @@ export function TreeBrowser({ tags, loading, filter, selectedTag, onSelect }: Pr
     })
   }
 
+  const collapseAll = () => setCollapsed(new Set(keys.all))
+  const expandAll = () => setCollapsed(new Set())
+
+  const toggleLevel = (depth: number) => {
+    const levelKeys = keys.byDepth.get(depth) || []
+    if (levelKeys.length === 0) return
+    setCollapsed(prev => {
+      const next = new Set(prev)
+      // If most are already collapsed, expand them; otherwise collapse them
+      const collapsedCount = levelKeys.filter(k => prev.has(k)).length
+      const shouldExpand = collapsedCount > levelKeys.length / 2
+      for (const k of levelKeys) {
+        shouldExpand ? next.delete(k) : next.add(k)
+      }
+      return next
+    })
+  }
+
+  // Determine max depth for level buttons
+  const maxDepth = Math.max(...Array.from(keys.byDepth.keys()))
+  const depthLabels: Record<number, string> = { [-1]: 'Kinds', 0: 'Groups', 1: 'Tags' }
+
   if (loading) return <div className="tree-loading">Loading tags…</div>
 
   return (
     <div className="tree-browser">
+      <div className="tree-toolbar">
+        <button className="tree-tb-btn" onClick={expandAll} title="Expand all">
+          <span className="tree-tb-icon">⊞</span>
+        </button>
+        <button className="tree-tb-btn" onClick={collapseAll} title="Collapse all">
+          <span className="tree-tb-icon">⊟</span>
+        </button>
+        <span className="tree-tb-sep" />
+        {Array.from(keys.byDepth.keys()).sort((a, b) => a - b).filter(d => d <= maxDepth).map(depth => (
+          <button
+            key={depth}
+            className="tree-tb-btn"
+            onClick={() => toggleLevel(depth)}
+            title={`Toggle ${depthLabels[depth] || `Level ${depth + 2}`}`}
+          >
+            {depthLabels[depth] || `L${depth + 2}`}
+          </button>
+        ))}
+      </div>
       {(['p', 'd', 'j'] as TagKind[]).map(kind => {
         const roots = filter ? filterTree(tree[kind], filter) : tree[kind]
         const kindKey = `kind:${kind}`

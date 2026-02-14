@@ -125,6 +125,36 @@ html, body, #root {
 /* ── Tree browser ── */
 .tree-browser { flex: 1; overflow-y: auto; padding-bottom: 16px; }
 .tree-loading { padding: 16px; color: var(--text-muted); }
+.tree-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-secondary);
+}
+.tree-tb-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  padding: 2px 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tree-tb-btn:hover {
+  background: var(--bg-primary);
+  border-color: var(--border-medium);
+  color: var(--text-primary);
+}
+.tree-tb-icon { font-size: 13px; }
+.tree-tb-sep {
+  width: 1px;
+  height: 14px;
+  background: var(--border-medium);
+  margin: 0 3px;
+}
 .tree-kind-group { }
 .tree-kind-header {
   display: flex;
