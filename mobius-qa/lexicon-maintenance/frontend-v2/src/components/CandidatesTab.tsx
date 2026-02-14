@@ -27,6 +27,7 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect }: Props) {
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'proposed' | 'rejected'>('proposed')
   const [verdictFilter, setVerdictFilter] = useState<string>('')
   const [sortBy, setSortBy] = useState<string>('occurrences')
   const [triaging, setTriaging] = useState(false)
@@ -47,7 +48,7 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect }: Props) {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetchCandidates({ status: 'proposed', search, llm_verdict: verdictFilter, sort: sortBy, limit: 500 })
+      const res = await fetchCandidates({ status: statusFilter, search, llm_verdict: verdictFilter, sort: sortBy, limit: 500 })
       setRows((res.rows || []).map(r => ({
         normalized: String(r.normalized || ''),
         candidate_type: String(r.candidate_type || r.kind || 'd'),
@@ -67,7 +68,7 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect }: Props) {
     } finally {
       setLoading(false)
     }
-  }, [search, verdictFilter, sortBy])
+  }, [statusFilter, search, verdictFilter, sortBy])
 
   useEffect(() => { load() }, [load])
 
@@ -84,6 +85,33 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect }: Props) {
     setSelected(new Set(rows.filter(pred).map(r => r.normalized)))
   }
   const clearSelection = () => setSelected(new Set())
+
+  // -- Restore rejected candidates back to proposed --
+  const handleBulkRestore = async (phrases: string[]) => {
+    if (phrases.length === 0) return
+    setBusy(true)
+    setMessage(`Restoring ${phrases.length} candidates to proposed…`)
+    try {
+      await bulkReview({
+        normalized_list: phrases,
+        state: 'proposed',
+        reviewer: 'lexicon-ui',
+        reviewer_notes: 'Restored from rejected',
+      })
+      setMessage(`${phrases.length} candidates restored to proposed`)
+      setSelected(prev => {
+        const next = new Set(prev)
+        phrases.forEach(p => next.delete(p))
+        return next
+      })
+      load()
+      onRefresh()
+    } catch (e) {
+      setMessage(`Error: ${e}`)
+    } finally {
+      setBusy(false)
+    }
+  }
 
   // -- Bulk reject --
   const handleBulkReject = async (phrases: string[], note?: string) => {
@@ -310,42 +338,58 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect }: Props) {
     <div className="candidates-tab">
       {/* Top stats bar */}
       <div className="stats-bar">
-        <span className="stat-chip">{rows.length} candidates</span>
-        {unscored > 0 && <span className="stat-chip warn">{unscored} unscored</span>}
-        {llmNewCount > 0 && <span className="stat-chip new">{llmNewCount} new tags</span>}
-        {llmAliasCount > 0 && <span className="stat-chip alias">{llmAliasCount} aliases</span>}
-        {llmRejectCount > 0 && <span className="stat-chip rej">{llmRejectCount} rejects</span>}
-      </div>
-
-      {/* Action bar row 1: LLM + maintenance */}
-      <div className="action-bar">
-        <button className="btn primary" onClick={handleLlmTriage} disabled={triaging || busy}>
-          {triaging ? 'Triaging…' : `Run LLM Triage${unscored > 0 ? ` (${unscored})` : ''}`}
-        </button>
-        <button className="btn" onClick={handlePurgeStale} disabled={purging || busy}>
-          {purging ? 'Purging…' : 'Purge Stale'}
-        </button>
-        <div className="action-bar-spacer" />
-        <div className="filter-chips">
-          {[
-            { val: '', label: 'All', count: rows.length },
-            { val: 'new_tag', label: 'New Tag', count: llmNewCount },
-            { val: 'alias', label: 'Alias', count: llmAliasCount },
-            { val: 'reject', label: 'Reject', count: llmRejectCount },
-          ].map(v => (
-            <button
-              key={v.val || 'all'}
-              className={`chip ${verdictFilter === v.val ? 'active' : ''}`}
-              onClick={() => setVerdictFilter(v.val)}
-            >
-              {v.label}{v.count > 0 ? ` (${v.count})` : ''}
-            </button>
-          ))}
+        <div className="status-toggle">
+          <button
+            className={`chip ${statusFilter === 'proposed' ? 'active' : ''}`}
+            onClick={() => { setStatusFilter('proposed'); setSelected(new Set()); setVerdictFilter('') }}
+          >
+            Proposed
+          </button>
+          <button
+            className={`chip ${statusFilter === 'rejected' ? 'active' : ''}`}
+            onClick={() => { setStatusFilter('rejected'); setSelected(new Set()); setVerdictFilter('') }}
+          >
+            Rejected
+          </button>
         </div>
+        <span className="stat-chip">{rows.length} candidates</span>
+        {statusFilter === 'proposed' && unscored > 0 && <span className="stat-chip warn">{unscored} unscored</span>}
+        {statusFilter === 'proposed' && llmNewCount > 0 && <span className="stat-chip new">{llmNewCount} new tags</span>}
+        {statusFilter === 'proposed' && llmAliasCount > 0 && <span className="stat-chip alias">{llmAliasCount} aliases</span>}
+        {statusFilter === 'proposed' && llmRejectCount > 0 && <span className="stat-chip rej">{llmRejectCount} rejects</span>}
       </div>
 
-      {/* Action bar row 2: Quick bulk actions based on LLM results */}
-      {(llmAliasCount > 0 || llmRejectCount > 0) && (
+      {/* Action bar row 1: LLM + maintenance (proposed view only) */}
+      {statusFilter === 'proposed' && (
+        <div className="action-bar">
+          <button className="btn primary" onClick={handleLlmTriage} disabled={triaging || busy}>
+            {triaging ? 'Triaging…' : `Run LLM Triage${unscored > 0 ? ` (${unscored})` : ''}`}
+          </button>
+          <button className="btn" onClick={handlePurgeStale} disabled={purging || busy}>
+            {purging ? 'Purging…' : 'Purge Stale'}
+          </button>
+          <div className="action-bar-spacer" />
+          <div className="filter-chips">
+            {[
+              { val: '', label: 'All', count: rows.length },
+              { val: 'new_tag', label: 'New Tag', count: llmNewCount },
+              { val: 'alias', label: 'Alias', count: llmAliasCount },
+              { val: 'reject', label: 'Reject', count: llmRejectCount },
+            ].map(v => (
+              <button
+                key={v.val || 'all'}
+                className={`chip ${verdictFilter === v.val ? 'active' : ''}`}
+                onClick={() => setVerdictFilter(v.val)}
+              >
+                {v.label}{v.count > 0 ? ` (${v.count})` : ''}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Action bar row 2: Quick bulk actions based on LLM results (proposed view only) */}
+      {statusFilter === 'proposed' && (llmAliasCount > 0 || llmRejectCount > 0) && (
         <div className="action-bar quick-actions">
           {llmAliasCount > 0 && (
             <button className="btn success" onClick={handleAcceptLlmAliases} disabled={busy}>
@@ -372,8 +416,8 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect }: Props) {
           />
         </div>
       )}
-      {/* Fallback sort/search when no LLM results */}
-      {llmAliasCount === 0 && llmRejectCount === 0 && (
+      {/* Fallback sort/search when no LLM results (proposed) or always for rejected */}
+      {(statusFilter === 'rejected' || (statusFilter === 'proposed' && llmAliasCount === 0 && llmRejectCount === 0)) && (
         <div className="action-bar">
           <div className="action-bar-spacer" />
           <select className="sort-select" value={sortBy} onChange={e => setSortBy(e.target.value)}>
@@ -397,22 +441,30 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect }: Props) {
       {selected.size > 0 && (
         <div className="bulk-bar">
           <span>{selected.size} selected</span>
-          <button className="btn sm success" onClick={() => openApproveModal(Array.from(selected))} disabled={busy}>
-            Approve Selected
-          </button>
-          <button className="btn sm danger" onClick={() => handleBulkReject(Array.from(selected))} disabled={busy}>
-            Reject Selected
-          </button>
-          <span className="bulk-sep">|</span>
-          <button className="btn sm" onClick={() => selectFiltered(r => r.llm_verdict === 'new_tag')}>
-            Select New Tags
-          </button>
-          <button className="btn sm" onClick={() => selectFiltered(r => r.llm_verdict === 'alias')}>
-            Select Aliases
-          </button>
-          <button className="btn sm" onClick={() => selectFiltered(r => r.llm_verdict === 'reject')}>
-            Select Rejects
-          </button>
+          {statusFilter === 'rejected' ? (
+            <button className="btn sm success" onClick={() => handleBulkRestore(Array.from(selected))} disabled={busy}>
+              Restore to Proposed
+            </button>
+          ) : (
+            <>
+              <button className="btn sm success" onClick={() => openApproveModal(Array.from(selected))} disabled={busy}>
+                Approve Selected
+              </button>
+              <button className="btn sm danger" onClick={() => handleBulkReject(Array.from(selected))} disabled={busy}>
+                Reject Selected
+              </button>
+              <span className="bulk-sep">|</span>
+              <button className="btn sm" onClick={() => selectFiltered(r => r.llm_verdict === 'new_tag')}>
+                Select New Tags
+              </button>
+              <button className="btn sm" onClick={() => selectFiltered(r => r.llm_verdict === 'alias')}>
+                Select Aliases
+              </button>
+              <button className="btn sm" onClick={() => selectFiltered(r => r.llm_verdict === 'reject')}>
+                Select Rejects
+              </button>
+            </>
+          )}
           <div className="action-bar-spacer" />
           <button className="btn sm" onClick={clearSelection}>Clear</button>
         </div>
@@ -464,14 +516,22 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect }: Props) {
                   <td className="col-num">{r.total_occurrences}</td>
                   <td className="col-num">{r.doc_count}</td>
                   <td className="actions-cell">
-                    <button className="btn xs success" onClick={() => handleRowApprove(r)} disabled={busy} title="Approve (add as alias or new tag)">
-                      ✓
-                    </button>
-                    <button className="btn xs danger" onClick={() => {
-                      handleBulkReject([r.normalized])
-                    }} disabled={busy} title="Reject">
-                      ✕
-                    </button>
+                    {statusFilter === 'rejected' ? (
+                      <button className="btn xs success" onClick={() => handleBulkRestore([r.normalized])} disabled={busy} title="Restore to proposed">
+                        ↺
+                      </button>
+                    ) : (
+                      <>
+                        <button className="btn xs success" onClick={() => handleRowApprove(r)} disabled={busy} title="Approve (add as alias or new tag)">
+                          ✓
+                        </button>
+                        <button className="btn xs danger" onClick={() => {
+                          handleBulkReject([r.normalized])
+                        }} disabled={busy} title="Reject">
+                          ✕
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               )
