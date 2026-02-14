@@ -1134,3 +1134,333 @@ html, body, #root {
   font-style: italic;
   margin-top: 4px;
 }
+
+/* ── Fix button on issue cards ──────────────────────────── */
+.fix-btn {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.fix-btn:hover {
+  background: var(--accent-hover, #1a6dd4);
+}
+
+/* ── Fix modal ──────────────────────────────────────────── */
+.fix-modal {
+  max-width: 640px;
+  width: 95vw;
+}
+.fix-issue-summary {
+  background: var(--bg-card, #f6f8fa);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+}
+.fix-issue-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.fix-issue-type {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--text-secondary);
+}
+.fix-issue-msg {
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 4px 0 8px;
+}
+.fix-issue-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.fix-suggestion-box {
+  font-size: 12px;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+.fix-instructions {
+  resize: vertical;
+  min-height: 60px;
+  font-size: 13px;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Fix loading ──────────────────────────────────────── */
+.fix-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 0;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+.fix-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: fix-spin 0.7s linear infinite;
+}
+@keyframes fix-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Fix preview ──────────────────────────────────────── */
+.fix-preview {
+  margin-top: 12px;
+}
+.fix-preview h4 {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+.fix-explanation {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  background: var(--bg-card, #f6f8fa);
+  border-radius: 6px;
+  border-left: 3px solid var(--accent);
+}
+.fix-ops-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.fix-op-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  font-size: 12px;
+}
+.fix-op-card.op-success {
+  border-color: var(--success);
+  background: color-mix(in srgb, var(--success) 5%, var(--bg));
+}
+.fix-op-card.op-error {
+  border-color: var(--error);
+  background: color-mix(in srgb, var(--error) 5%, var(--bg));
+}
+.fix-op-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 1px;
+  background: var(--bg-card, #e8e8e8);
+  color: var(--text-secondary);
+}
+.fix-op-badge.op-create_tag { background: #dbeafe; color: #1e40af; }
+.fix-op-badge.op-update_tag { background: #fef3c7; color: #92400e; }
+.fix-op-badge.op-delete_tag { background: #fde2e2; color: #991b1b; }
+.fix-op-badge.op-merge_tags { background: #e0e7ff; color: #3730a3; }
+.fix-op-badge.op-move_tag   { background: #d1fae5; color: #065f46; }
+.fix-op-badge.op-ok   { background: #d1fae5; color: #065f46; }
+.fix-op-badge.op-fail  { background: #fde2e2; color: #991b1b; }
+
+.fix-op-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.fix-op-code {
+  font-weight: 600;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 12px;
+  word-break: break-all;
+}
+.fix-op-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.fix-op-meta.error-text {
+  color: var(--error);
+}
+.fix-op-spec {
+  margin-top: 2px;
+  padding: 4px 8px;
+  background: var(--bg-card, #f6f8fa);
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: var(--text-secondary);
+}
+.fix-op-spec-line {
+  line-height: 1.5;
+  word-break: break-all;
+}
+
+/* ── Fix results ──────────────────────────────────────── */
+.fix-results {
+  margin-top: 12px;
+}
+.fix-results h4 {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+/* ── Inline operations on issue cards ─────────────────── */
+.inline-ops-section {
+  margin-top: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 6px;
+}
+.inline-ops-toggle {
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 2px 0;
+}
+.inline-ops-toggle:hover {
+  text-decoration: underline;
+}
+.inline-ops-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+.issue-resolved {
+  opacity: 0.55;
+  pointer-events: none;
+}
+.issue-resolved .issue-actions {
+  pointer-events: auto;
+}
+
+/* ── Inline results chips ─────────────────────────────── */
+.inline-results {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+.inline-result-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.inline-result-chip.result-ok {
+  background: #d1fae5;
+  color: #065f46;
+}
+.inline-result-chip.result-fail {
+  background: #fde2e2;
+  color: #991b1b;
+}
+
+/* ── Dismissed issues section ─────────────────────────── */
+.dismissed-section {
+  margin-top: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+.dismissed-toggle {
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px 0;
+}
+.dismissed-toggle:hover {
+  color: var(--text-primary);
+}
+.dismissed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+.dismissed-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  opacity: 0.7;
+}
+.dismissed-card:hover {
+  opacity: 1;
+}
+.dismissed-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.dismissed-type {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--text-muted);
+}
+.dismissed-msg {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 500px;
+}
+.dismissed-meta {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── Dropdown divider & dismiss item ──────────────────── */
+.dropdown-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 4px 0;
+}
+.dismiss-item {
+  color: var(--text-muted) !important;
+  font-style: italic;
+}

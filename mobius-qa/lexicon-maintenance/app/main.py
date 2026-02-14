@@ -86,6 +86,64 @@ def _conn(url: str):
 
 
 # ---------------------------------------------------------------------------
+# Dismissed health issues — persistent overrule store
+# ---------------------------------------------------------------------------
+_DISMISSED_TABLE_ENSURED = False
+
+
+def _ensure_dismissed_table(qa_url: str) -> None:
+    """Auto-create policy_lexicon_dismissed_issues table if it doesn't exist."""
+    global _DISMISSED_TABLE_ENSURED
+    if _DISMISSED_TABLE_ENSURED:
+        return
+    try:
+        qa = _conn(qa_url)
+        qa.autocommit = True
+        cur = qa.cursor()
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS policy_lexicon_dismissed_issues (
+                id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+                issue_type TEXT NOT NULL,
+                issue_tags TEXT[] NOT NULL DEFAULT '{}',
+                issue_message TEXT NOT NULL DEFAULT '',
+                issue_fingerprint TEXT NOT NULL UNIQUE,
+                reason TEXT NOT NULL DEFAULT '',
+                dismissed_by TEXT NOT NULL DEFAULT 'user',
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            )
+        """)
+        cur.close()
+        qa.close()
+        _DISMISSED_TABLE_ENSURED = True
+    except Exception:
+        pass  # best-effort; will retry next time
+
+
+def _dismissed_fingerprint(issue_type: str, tags: list[str]) -> str:
+    """Stable fingerprint for an issue: type + sorted tags."""
+    return f"{issue_type}::{','.join(sorted(t.strip().lower() for t in tags))}"
+
+
+def _load_dismissed(qa_url: str) -> list[dict]:
+    """Load all dismissed issues from QA DB."""
+    _ensure_dismissed_table(qa_url)
+    try:
+        qa = _conn(qa_url)
+        qa.autocommit = True
+        cur = qa.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute(
+            "SELECT id, issue_type, issue_tags, issue_message, issue_fingerprint, reason, dismissed_by, created_at "
+            "FROM policy_lexicon_dismissed_issues ORDER BY created_at DESC"
+        )
+        rows = [dict(r) for r in cur.fetchall()]
+        cur.close()
+        qa.close()
+        return rows
+    except Exception:
+        return []
+
+
+# ---------------------------------------------------------------------------
 # Taxonomy structure validation
 # ---------------------------------------------------------------------------
 _TAG_CODE_RE = re.compile(r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)?$")
@@ -1721,6 +1779,93 @@ def purge_stale_candidates(body: dict = Body(default={})) -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# Dismissed Issues — CRUD endpoints
+# ---------------------------------------------------------------------------
+
+@app.post("/policy/lexicon/health/dismiss")
+def dismiss_health_issue(body: dict = Body(...)) -> dict[str, Any]:
+    """
+    Dismiss/overrule a health issue so LLM skips it in future analyses.
+    Body: { issue_type, tags: [], message, reason? }
+    """
+    u = _urls()
+    issue_type = str(body.get("issue_type") or body.get("type") or "").strip()
+    tags = body.get("tags") or []
+    if not isinstance(tags, list):
+        tags = [str(tags)]
+    tags = [str(t).strip() for t in tags if str(t).strip()]
+    message = str(body.get("message") or "").strip()
+    reason = str(body.get("reason") or "").strip() or "User overruled"
+    dismissed_by = str(body.get("dismissed_by") or "user").strip()
+
+    if not issue_type:
+        raise HTTPException(status_code=400, detail="issue_type is required")
+
+    fingerprint = _dismissed_fingerprint(issue_type, tags)
+    _ensure_dismissed_table(u.qa)
+
+    try:
+        qa = _conn(u.qa)
+        qa.autocommit = True
+        cur = qa.cursor()
+        cur.execute(
+            """
+            INSERT INTO policy_lexicon_dismissed_issues
+                (id, issue_type, issue_tags, issue_message, issue_fingerprint, reason, dismissed_by, created_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
+            ON CONFLICT (issue_fingerprint) DO UPDATE SET
+                reason = EXCLUDED.reason,
+                dismissed_by = EXCLUDED.dismissed_by,
+                issue_message = EXCLUDED.issue_message,
+                created_at = NOW()
+            """,
+            (str(uuid.uuid4()), issue_type, tags, message, fingerprint, reason, dismissed_by),
+        )
+        cur.close()
+        qa.close()
+        return {"status": "ok", "fingerprint": fingerprint}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to dismiss: {type(e).__name__}: {e}")
+
+
+@app.get("/policy/lexicon/health/dismissed")
+def list_dismissed_issues() -> dict[str, Any]:
+    """List all dismissed/overruled health issues."""
+    u = _urls()
+    rows = _load_dismissed(u.qa)
+    # Convert timestamps to string for JSON
+    for r in rows:
+        if r.get("created_at"):
+            r["created_at"] = str(r["created_at"])
+    return {"status": "ok", "dismissed": rows, "count": len(rows)}
+
+
+@app.delete("/policy/lexicon/health/dismiss/{fingerprint}")
+def undismiss_health_issue(fingerprint: str) -> dict[str, Any]:
+    """Re-enable a previously dismissed issue."""
+    u = _urls()
+    _ensure_dismissed_table(u.qa)
+    try:
+        qa = _conn(u.qa)
+        qa.autocommit = True
+        cur = qa.cursor()
+        cur.execute(
+            "DELETE FROM policy_lexicon_dismissed_issues WHERE issue_fingerprint = %s",
+            (fingerprint,),
+        )
+        deleted = cur.rowcount
+        cur.close()
+        qa.close()
+        if deleted == 0:
+            raise HTTPException(status_code=404, detail="Dismissed issue not found")
+        return {"status": "ok", "fingerprint": fingerprint}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to un-dismiss: {type(e).__name__}: {e}")
+
+
+# ---------------------------------------------------------------------------
 # LLM Health Analysis (on-demand, triggered from Health tab)
 # ---------------------------------------------------------------------------
 
@@ -1797,6 +1942,21 @@ def llm_health_analyze(body: dict = Body(default={})) -> dict[str, Any]:
 
     tree_text = "\n".join(tree_lines)
 
+    # 2b. Load dismissed issues to exclude from analysis
+    dismissed_rows = _load_dismissed(u.qa)
+    dismissed_fingerprints = set()
+    dismissed_block = ""
+    if dismissed_rows:
+        dismissed_lines = []
+        for dr in dismissed_rows:
+            fp = dr.get("issue_fingerprint", "")
+            dismissed_fingerprints.add(fp)
+            d_type = dr.get("issue_type", "")
+            d_tags = ", ".join(dr.get("issue_tags") or [])
+            d_reason = dr.get("reason", "")
+            dismissed_lines.append(f"  - type: {d_type}, tags: [{d_tags}], reason: {d_reason}")
+        dismissed_block = "\n\nPREVIOUSLY DISMISSED ISSUES (DO NOT report these again -- the user has reviewed and overruled them):\n" + "\n".join(dismissed_lines)
+
     # 3. Build prompt
     prompt = f"""You are an expert taxonomy analyst reviewing a healthcare policy lexicon tree.
 
@@ -1838,11 +1998,24 @@ Do NOT report:
 - Domain containers without aliases (that is CORRECT -- domains are containers only)
 - Naming style issues (snake_case is the standard, all tags follow it)
 - Common words like "provider" being on a .general leaf tag (that is intentional for catch-all matching)
+{dismissed_block}
 
 Only report issues with severity "critical" or "warning". Skip trivial "info" level items.
 Limit to the TOP 10-15 most impactful issues maximum.
 
-For each issue provide: type, severity, tags (affected codes), message, fix.
+CRITICAL REQUIREMENT: Every single issue -- both "critical" AND "warning" severity -- MUST include
+a non-empty "operations" array with concrete, executable DB operations.
+Do NOT leave operations empty or omit them for warnings. Do NOT provide only text suggestions.
+Every issue, regardless of severity, must have at least one operation. NO EXCEPTIONS.
+
+Available operation types:
+1. create_tag: {{ "op": "create_tag", "kind": "<p|d|j>", "code": "<tag_code>", "parent_code": "<domain_code or null>",
+     "spec": {{ "description": "...", "strong_phrases": [...], "aliases": [...], "refuted_words": [...] }} }}
+2. update_tag: {{ "op": "update_tag", "kind": "<p|d|j>", "code": "<existing_code>",
+     "spec": {{ ... }} }}   (provide COMPLETE new value for each field you change; omitted fields are preserved)
+3. delete_tag: {{ "op": "delete_tag", "kind": "<p|d|j>", "code": "<tag_code>" }}
+4. merge_tags: {{ "op": "merge_tags", "kind": "<p|d|j>", "source_code": "<src>", "target_code": "<tgt>" }}
+5. move_tag: {{ "op": "move_tag", "kind": "<p|d|j>", "from_code": "<old>", "to_code": "<new>", "parent_code": "<parent or null>" }}
 
 Also provide:
 - overall_score: 0-100 (100 = perfect taxonomy, score based on structure and coverage quality)
@@ -1860,10 +2033,17 @@ Respond with ONLY valid JSON (no markdown, no code fences). Schema:
       "severity": "<critical|warning>",
       "tags": ["<code>"],
       "message": "<description>",
-      "fix": "<fix>"
+      "fix": "<text explanation of the fix>",
+      "operations": [
+        {{ "op": "create_tag|update_tag|delete_tag|merge_tags|move_tag", "kind": "p|d|j", "code": "...", ... }}
+      ]
     }}
   ]
 }}
+
+REMEMBER: The "operations" array is REQUIRED and must be non-empty for EVERY issue,
+including warnings. If you report an issue, you MUST provide the operations to fix it.
+An issue without operations is useless -- do not include it.
 """
 
     # 4. Call Vertex Gemini
@@ -1927,14 +2107,468 @@ Respond with ONLY valid JSON (no markdown, no code fences). Schema:
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"LLM health analysis failed: {type(e).__name__}: {e}")
 
+    # Validate operations in each issue + filter out dismissed
+    valid_op_types = ("create_tag", "update_tag", "delete_tag", "merge_tags", "move_tag")
+    issues_out = []
+    for iss in (result.get("issues") or []):
+        if not isinstance(iss, dict):
+            continue
+        iss_type = str(iss.get("type", "")).strip()
+        iss_tags = iss.get("tags") or []
+        # Skip if this issue was dismissed by the user
+        fp = _dismissed_fingerprint(iss_type, iss_tags)
+        if fp in dismissed_fingerprints:
+            continue
+        ops = []
+        for op in (iss.get("operations") or []):
+            if isinstance(op, dict) and str(op.get("op", "")).strip() in valid_op_types:
+                ops.append(op)
+        iss_out = {
+            "type": iss_type,
+            "severity": str(iss.get("severity", "warning")),
+            "tags": iss_tags,
+            "message": str(iss.get("message", "")),
+            "fix": str(iss.get("fix", "")),
+            "operations": ops,
+        }
+        issues_out.append(iss_out)
+
     return {
         "status": "ok",
         "score": int(result.get("overall_score", 0)),
         "summary": str(result.get("summary", "")),
         "top_suggestions": result.get("top_suggestions") or [],
-        "issues": result.get("issues") or [],
+        "issues": issues_out,
         "llm_model": model_name,
         "tag_count": len(entries),
+        "dismissed_count": len(dismissed_rows),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Health Fix — LLM-powered auto-fix (preview + apply)
+# ---------------------------------------------------------------------------
+
+@app.post("/policy/lexicon/health/fix/preview")
+def health_fix_preview(body: dict = Body(...)) -> dict[str, Any]:
+    """
+    Given a health issue + optional user instructions, ask the LLM to produce
+    a concrete list of structured operations to fix the issue.
+
+    Body: {
+      issue: { type, severity, tags, message, fix },
+      user_instructions?: string,
+      model?: string
+    }
+
+    Returns the operations array + explanation WITHOUT executing.
+    """
+    issue = body.get("issue")
+    if not isinstance(issue, dict):
+        raise HTTPException(status_code=400, detail="'issue' object is required")
+
+    user_instructions = str(body.get("user_instructions") or "").strip()
+    u = _urls()
+
+    # 1. Load full specs for affected tags
+    issue_tags = issue.get("tags") or []
+    tag_specs: dict[str, dict] = {}
+    try:
+        qa = _conn(u.qa)
+        qa.autocommit = True
+        qcur = qa.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        if issue_tags:
+            qcur.execute(
+                "SELECT kind::text, code::text, parent_code::text, spec, active::bool "
+                "FROM policy_lexicon_entries WHERE code = ANY(%s)",
+                (list(issue_tags),),
+            )
+            for r in qcur.fetchall():
+                code = str(r.get("code") or "")
+                kind_val = str(r.get("kind") or "")
+                spec_val = r.get("spec") if isinstance(r.get("spec"), dict) else {}
+                tag_specs[code] = {
+                    "kind": kind_val,
+                    "code": code,
+                    "parent_code": r.get("parent_code"),
+                    "spec": spec_val,
+                    "active": r.get("active", True),
+                }
+
+        # Also load all domain containers so LLM knows what exists
+        qcur.execute(
+            "SELECT kind::text, code::text, parent_code::text, spec "
+            "FROM policy_lexicon_entries WHERE active = true "
+            "ORDER BY kind, code"
+        )
+        all_entries = [dict(r) for r in qcur.fetchall()]
+        qcur.close()
+        qa.close()
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load tags: {type(e).__name__}: {e}")
+
+    # Build a compact summary of existing tags for context
+    existing_codes = []
+    for ent in all_entries:
+        k = str(ent.get("kind") or "")
+        c = str(ent.get("code") or "")
+        is_domain = "." not in c
+        marker = "[DOMAIN]" if is_domain else "[TAG]"
+        sp = ent.get("spec") if isinstance(ent.get("spec"), dict) else {}
+        phrases = ", ".join(str(p) for p in (sp.get("strong_phrases") or [])[:3])
+        aliases = ", ".join(str(p) for p in (sp.get("aliases") or [])[:3])
+        line = f"  {marker} {k}.{c}"
+        if phrases:
+            line += f"  phrases: [{phrases}]"
+        if aliases:
+            line += f"  aliases: [{aliases}]"
+        existing_codes.append(line)
+    existing_tree = "\n".join(existing_codes)
+
+    # Build detail block for affected tags
+    affected_detail = ""
+    for code, info in tag_specs.items():
+        sp = info.get("spec") or {}
+        affected_detail += f"\n  Tag: {info['kind']}.{code}\n"
+        affected_detail += f"    parent_code: {info.get('parent_code')}\n"
+        affected_detail += f"    description: {sp.get('description', '')}\n"
+        affected_detail += f"    strong_phrases: {sp.get('strong_phrases', [])}\n"
+        affected_detail += f"    aliases: {sp.get('aliases', [])}\n"
+        affected_detail += f"    refuted_words: {sp.get('refuted_words', [])}\n"
+        affected_detail += f"    active: {info.get('active', True)}\n"
+
+    # 2. Build the LLM prompt
+    prompt = f"""You are an expert taxonomy maintenance assistant. You must produce EXACT structured operations
+to fix a health issue in a healthcare policy lexicon.
+
+TAXONOMY RULES:
+- Tag codes are lowercase_snake_case, max 2 dot-segments (domain.tag)
+- Domain containers (no dot, e.g. "claims") are organizational only -- NO strong_phrases, aliases, or refuted_words
+- Leaf tags (with dot, e.g. "claims.general") are the matchable units
+- Each domain should have a .general leaf tag as catch-all
+- parent_code for leaf tags must reference an existing domain container of the same kind
+
+THE ISSUE:
+  Type: {issue.get('type', '')}
+  Severity: {issue.get('severity', '')}
+  Message: {issue.get('message', '')}
+  Affected tags: {', '.join(issue_tags)}
+  Original fix suggestion: {issue.get('fix', '')}
+
+AFFECTED TAG DETAILS:
+{affected_detail}
+
+{"USER INSTRUCTIONS: " + user_instructions if user_instructions else "No additional user instructions."}
+
+EXISTING LEXICON (for reference — do not duplicate existing tags):
+{existing_tree}
+
+PRODUCE a list of operations to fix this issue. Available operations:
+
+1. create_tag: Create a new tag
+   {{ "op": "create_tag", "kind": "<p|d|j>", "code": "<tag_code>", "parent_code": "<domain_code or null>",
+      "spec": {{ "description": "...", "strong_phrases": [...], "aliases": [...], "refuted_words": [...] }} }}
+
+2. update_tag: Update an existing tag's spec (merges with existing spec)
+   {{ "op": "update_tag", "kind": "<p|d|j>", "code": "<existing_code>",
+      "spec": {{ "description": "...", "strong_phrases": [...], "aliases": [...] }} }}
+   NOTE: For update_tag, provide the COMPLETE new value for each field you want to change.
+   For example, to REMOVE all strong_phrases, set "strong_phrases": [].
+   Fields not included will be preserved from the existing spec.
+
+3. delete_tag: Delete a tag
+   {{ "op": "delete_tag", "kind": "<p|d|j>", "code": "<tag_code>" }}
+
+4. merge_tags: Merge source into target (moves phrases, re-parents children, deletes source)
+   {{ "op": "merge_tags", "kind": "<p|d|j>", "source_code": "<src>", "target_code": "<tgt>" }}
+
+5. move_tag: Rename/re-parent a tag
+   {{ "op": "move_tag", "kind": "<p|d|j>", "from_code": "<old>", "to_code": "<new>", "parent_code": "<parent or null>" }}
+
+Respond with ONLY valid JSON (no markdown, no code fences). Schema:
+{{
+  "explanation": "<human-readable summary of what will happen, 2-3 sentences>",
+  "operations": [ <list of operation objects> ]
+}}
+"""
+
+    # 3. Call LLM
+    try:
+        import vertexai
+        from vertexai.generative_models import GenerativeModel
+
+        project = os.environ.get("VERTEX_PROJECT") or os.environ.get("VERTEX_PROJECT_ID") or ""
+        region = os.environ.get("VERTEX_REGION") or os.environ.get("VERTEX_LOCATION") or "us-central1"
+        model_name = body.get("model") or os.environ.get("VERTEX_HEALTH_LLM_MODEL") or os.environ.get("VERTEX_LLM_MODEL") or "gemini-2.5-pro"
+
+        if not project:
+            endpoint_id = os.environ.get("VERTEX_INDEX_ENDPOINT_ID") or ""
+            m = re.search(r"projects/([^/]+)/", endpoint_id)
+            if m:
+                project = m.group(1)
+        if not project:
+            raise HTTPException(status_code=400, detail="VERTEX_PROJECT not configured")
+
+        vertexai.init(project=project, location=region)
+        model = GenerativeModel(model_name)
+        response = model.generate_content(prompt)
+        raw_text = response.text.strip()
+
+        # Strip code fences
+        if raw_text.startswith("```"):
+            lines_raw = raw_text.split("\n")
+            raw_text = "\n".join(line for line in lines_raw if not line.strip().startswith("```"))
+            raw_text = raw_text.strip()
+
+        # Parse JSON
+        result = None
+        try:
+            result = json.loads(raw_text)
+        except json.JSONDecodeError:
+            json_start = raw_text.find("{")
+            json_end = raw_text.rfind("}") + 1
+            if json_start >= 0 and json_end > json_start:
+                try:
+                    result = json.loads(raw_text[json_start:json_end])
+                except json.JSONDecodeError:
+                    pass
+        if result is None:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Could not parse LLM fix response. First 500 chars: {raw_text[:500]}"
+            )
+        if not isinstance(result, dict):
+            raise HTTPException(status_code=500, detail="LLM returned unexpected format")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"LLM fix preview failed: {type(e).__name__}: {e}")
+
+    operations = result.get("operations") or []
+    explanation = str(result.get("explanation", ""))
+
+    # Validate operation shapes
+    valid_ops = []
+    for op in operations:
+        if not isinstance(op, dict):
+            continue
+        op_type = str(op.get("op", "")).strip()
+        if op_type not in ("create_tag", "update_tag", "delete_tag", "merge_tags", "move_tag"):
+            continue
+        valid_ops.append(op)
+
+    return {
+        "status": "ok",
+        "explanation": explanation,
+        "operations": valid_ops,
+        "llm_model": model_name,
+    }
+
+
+@app.post("/policy/lexicon/health/fix/apply")
+def health_fix_apply(body: dict = Body(...)) -> dict[str, Any]:
+    """
+    Execute a list of structured fix operations against the QA DB.
+    Body: { operations: [ { op, kind, code, ... }, ... ] }
+    """
+    operations = body.get("operations")
+    if not isinstance(operations, list) or not operations:
+        raise HTTPException(status_code=400, detail="'operations' array is required and must not be empty")
+
+    u = _urls()
+    results: list[dict[str, Any]] = []
+    new_rev = 0
+
+    try:
+        qa = _conn(u.qa)
+        qa.autocommit = True
+        cur = qa.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        for idx, op in enumerate(operations):
+            if not isinstance(op, dict):
+                results.append({"index": idx, "op": "unknown", "status": "error", "detail": "Invalid operation object"})
+                continue
+
+            op_type = str(op.get("op", "")).strip()
+            kind = str(op.get("kind", "")).strip().lower()
+            code = str(op.get("code", "")).strip()
+
+            try:
+                if op_type == "create_tag":
+                    parent_code = op.get("parent_code")
+                    parent_code = str(parent_code).strip() if isinstance(parent_code, str) and str(parent_code).strip() else None
+                    spec_val = op.get("spec") if isinstance(op.get("spec"), dict) else {}
+
+                    if kind not in ("p", "d", "j") or not code:
+                        raise ValueError("kind (p/d/j) and code are required")
+
+                    _validate_tag_structure(kind, code, parent_code, u.qa, spec=spec_val)
+
+                    cur.execute(
+                        "SELECT id FROM policy_lexicon_entries WHERE kind = %s AND code = %s LIMIT 1",
+                        (kind, code),
+                    )
+                    existing = cur.fetchone()
+                    if existing:
+                        # Update instead of create if it already exists
+                        cur.execute(
+                            "UPDATE policy_lexicon_entries SET spec = %s::jsonb, parent_code = COALESCE(%s, parent_code), "
+                            "active = true, updated_at = NOW() WHERE kind = %s AND code = %s",
+                            (json.dumps(spec_val), parent_code, kind, code),
+                        )
+                        results.append({"index": idx, "op": "create_tag", "code": f"{kind}.{code}", "status": "ok", "note": "updated existing"})
+                    else:
+                        cur.execute(
+                            "INSERT INTO policy_lexicon_entries(id, kind, code, parent_code, spec, active, created_at, updated_at) "
+                            "VALUES (%s, %s, %s, %s, %s::jsonb, true, NOW(), NOW())",
+                            (str(uuid.uuid4()), kind, code, parent_code, json.dumps(spec_val)),
+                        )
+                        results.append({"index": idx, "op": "create_tag", "code": f"{kind}.{code}", "status": "ok"})
+
+                elif op_type == "update_tag":
+                    spec_delta = op.get("spec") if isinstance(op.get("spec"), dict) else {}
+
+                    if kind not in ("p", "d", "j") or not code:
+                        raise ValueError("kind (p/d/j) and code are required")
+
+                    # Load existing spec and merge
+                    cur.execute(
+                        "SELECT spec, parent_code FROM policy_lexicon_entries WHERE kind = %s AND code = %s LIMIT 1",
+                        (kind, code),
+                    )
+                    row = cur.fetchone()
+                    if not row:
+                        raise ValueError(f"Tag {kind}.{code} not found")
+
+                    existing_spec = row.get("spec") if isinstance(row.get("spec"), dict) else {}
+                    parent_code = row.get("parent_code")
+
+                    # Merge: spec_delta fields overwrite existing
+                    merged_spec = {**existing_spec, **spec_delta}
+
+                    _validate_tag_structure(kind, code, parent_code, u.qa, spec=merged_spec)
+
+                    cur.execute(
+                        "UPDATE policy_lexicon_entries SET spec = %s::jsonb, updated_at = NOW() "
+                        "WHERE kind = %s AND code = %s",
+                        (json.dumps(merged_spec), kind, code),
+                    )
+                    results.append({"index": idx, "op": "update_tag", "code": f"{kind}.{code}", "status": "ok"})
+
+                elif op_type == "delete_tag":
+                    if kind not in ("p", "d", "j") or not code:
+                        raise ValueError("kind (p/d/j) and code are required")
+
+                    # Promote children
+                    cur.execute(
+                        "UPDATE policy_lexicon_entries SET parent_code = NULL, updated_at = NOW() "
+                        "WHERE kind = %s AND parent_code = %s",
+                        (kind, code),
+                    )
+                    cur.execute(
+                        "DELETE FROM policy_lexicon_entries WHERE kind = %s AND code = %s",
+                        (kind, code),
+                    )
+                    results.append({"index": idx, "op": "delete_tag", "code": f"{kind}.{code}", "status": "ok", "deleted": cur.rowcount})
+
+                elif op_type == "merge_tags":
+                    src_code = str(op.get("source_code", "")).strip()
+                    tgt_code = str(op.get("target_code", "")).strip()
+                    if kind not in ("p", "d", "j") or not src_code or not tgt_code:
+                        raise ValueError("kind/source_code/target_code required")
+
+                    # Load source and target
+                    cur.execute(
+                        "SELECT spec FROM policy_lexicon_entries WHERE kind = %s AND code = %s LIMIT 1",
+                        (kind, src_code),
+                    )
+                    src_row = cur.fetchone()
+                    if not src_row:
+                        raise ValueError(f"Source {kind}.{src_code} not found")
+
+                    cur.execute(
+                        "SELECT spec FROM policy_lexicon_entries WHERE kind = %s AND code = %s LIMIT 1",
+                        (kind, tgt_code),
+                    )
+                    tgt_row = cur.fetchone()
+                    if not tgt_row:
+                        raise ValueError(f"Target {kind}.{tgt_code} not found")
+
+                    src_spec = src_row.get("spec") if isinstance(src_row.get("spec"), dict) else {}
+                    tgt_spec = tgt_row.get("spec") if isinstance(tgt_row.get("spec"), dict) else {}
+
+                    # Merge phrases
+                    src_phrases = set(str(p).strip() for p in (src_spec.get("strong_phrases") or []))
+                    src_phrases.add(src_code.replace("_", " ").strip())
+                    existing_phrases = set(str(p).strip() for p in (tgt_spec.get("strong_phrases") or []))
+                    new_phrases = [p for p in src_phrases if p and p not in existing_phrases]
+                    tgt_spec["strong_phrases"] = list(tgt_spec.get("strong_phrases") or []) + new_phrases
+
+                    cur.execute(
+                        "UPDATE policy_lexicon_entries SET spec = %s::jsonb, updated_at = NOW() WHERE kind = %s AND code = %s",
+                        (json.dumps(tgt_spec), kind, tgt_code),
+                    )
+                    cur.execute(
+                        "UPDATE policy_lexicon_entries SET parent_code = %s, updated_at = NOW() WHERE kind = %s AND parent_code = %s",
+                        (tgt_code, kind, src_code),
+                    )
+                    cur.execute(
+                        "DELETE FROM policy_lexicon_entries WHERE kind = %s AND code = %s",
+                        (kind, src_code),
+                    )
+                    results.append({"index": idx, "op": "merge_tags", "source": f"{kind}.{src_code}", "target": f"{kind}.{tgt_code}", "status": "ok"})
+
+                elif op_type == "move_tag":
+                    from_code = str(op.get("from_code", "")).strip()
+                    to_code = str(op.get("to_code", "")).strip()
+                    parent_code = op.get("parent_code")
+                    parent_code = str(parent_code).strip() if isinstance(parent_code, str) and str(parent_code).strip() else None
+
+                    if kind not in ("p", "d", "j") or not from_code or not to_code:
+                        raise ValueError("kind/from_code/to_code required")
+
+                    cur.execute(
+                        "UPDATE policy_lexicon_entries SET code = %s, parent_code = %s, updated_at = NOW() "
+                        "WHERE kind = %s AND code = %s",
+                        (to_code, parent_code, kind, from_code),
+                    )
+                    if cur.rowcount <= 0:
+                        raise ValueError(f"Tag {kind}.{from_code} not found")
+                    # Update children
+                    cur.execute(
+                        "UPDATE policy_lexicon_entries SET parent_code = %s, updated_at = NOW() "
+                        "WHERE kind = %s AND parent_code = %s",
+                        (to_code, kind, from_code),
+                    )
+                    results.append({"index": idx, "op": "move_tag", "from": f"{kind}.{from_code}", "to": f"{kind}.{to_code}", "status": "ok"})
+
+                else:
+                    results.append({"index": idx, "op": op_type, "status": "error", "detail": f"Unknown operation: {op_type}"})
+
+            except ValueError as ve:
+                results.append({"index": idx, "op": op_type, "code": f"{kind}.{code}" if code else "", "status": "error", "detail": str(ve)})
+            except HTTPException as he:
+                results.append({"index": idx, "op": op_type, "code": f"{kind}.{code}" if code else "", "status": "error", "detail": he.detail})
+            except Exception as ex:
+                results.append({"index": idx, "op": op_type, "code": f"{kind}.{code}" if code else "", "status": "error", "detail": f"{type(ex).__name__}: {ex}"})
+
+        new_rev = _bump_lexicon_revision(cur)
+        cur.close()
+        qa.close()
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Fix apply failed: {type(e).__name__}: {e}")
+
+    failed = [r for r in results if r.get("status") != "ok"]
+    return {
+        "status": "ok" if not failed else "partial",
+        "results": results,
+        "failed_count": len(failed),
+        "lexicon_revision": new_rev,
     }
 
 

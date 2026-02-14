@@ -158,6 +158,89 @@ export async function runHealthAnalysis(model?: string) {
   })
 }
 
+export interface FixOperation {
+  op: 'create_tag' | 'update_tag' | 'delete_tag' | 'merge_tags' | 'move_tag'
+  kind?: string
+  code?: string
+  parent_code?: string | null
+  spec?: Record<string, unknown>
+  source_code?: string
+  target_code?: string
+  from_code?: string
+  to_code?: string
+}
+
+export interface FixPreviewResponse {
+  status: string
+  explanation: string
+  operations: FixOperation[]
+  llm_model: string
+}
+
+export interface FixApplyResponse {
+  status: string
+  results: Array<{ index: number; op: string; code?: string; status: string; detail?: string; note?: string }>
+  failed_count: number
+  lexicon_revision: number
+}
+
+export async function previewHealthFix(
+  issue: { type: string; severity: string; tags: string[]; message: string; fix: string },
+  userInstructions?: string,
+  model?: string,
+): Promise<FixPreviewResponse> {
+  return _fetch<FixPreviewResponse>('/policy/lexicon/health/fix/preview', {
+    method: 'POST',
+    body: JSON.stringify({
+      issue,
+      user_instructions: userInstructions || '',
+      model: model || undefined,
+    }),
+  })
+}
+
+export async function applyHealthFix(operations: FixOperation[]): Promise<FixApplyResponse> {
+  return _fetch<FixApplyResponse>('/policy/lexicon/health/fix/apply', {
+    method: 'POST',
+    body: JSON.stringify({ operations }),
+  })
+}
+
+// ── Dismissed issues ──
+
+export interface DismissedIssue {
+  id: string
+  issue_type: string
+  issue_tags: string[]
+  issue_message: string
+  issue_fingerprint: string
+  reason: string
+  dismissed_by: string
+  created_at: string
+}
+
+export async function dismissHealthIssue(body: {
+  issue_type: string
+  tags: string[]
+  message: string
+  reason?: string
+}) {
+  return _fetch<{ status: string; fingerprint: string }>('/policy/lexicon/health/dismiss', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  })
+}
+
+export async function listDismissedIssues() {
+  return _fetch<{ status: string; dismissed: DismissedIssue[]; count: number }>('/policy/lexicon/health/dismissed')
+}
+
+export async function undismissHealthIssue(fingerprint: string) {
+  return _fetch<{ status: string; fingerprint: string }>(`/policy/lexicon/health/dismiss/${encodeURIComponent(fingerprint)}`, {
+    method: 'DELETE',
+  })
+}
+
 // ── API status ──
 
 export async function checkHealth() {

@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import type { TagEntry, TagKind } from '../types'
-import { runHealthAnalysis, deleteTag, mergeTags, patchTag, moveTag } from '../api'
+import { runHealthAnalysis, deleteTag, mergeTags, patchTag, moveTag, previewHealthFix, applyHealthFix, dismissHealthIssue, listDismissedIssues, undismissHealthIssue } from '../api'
+import type { FixOperation, DismissedIssue } from '../api'
 
 interface Props {
   tags: TagEntry[]
@@ -16,6 +17,7 @@ interface HealthIssue {
   fix: string
   action?: ActionType
   actionData?: ActionData
+  operations?: FixOperation[]
 }
 
 type ActionType = 'delete' | 'merge' | 'reparent' | 'deactivate' | 'reclassify' | 'add_alias' | 'rename'
@@ -42,6 +44,7 @@ interface LlmIssue {
   tags: string[]
   message: string
   fix: string
+  operations?: FixOperation[]
 }
 
 function inferAction(type: string): ActionType | undefined {
@@ -193,6 +196,31 @@ export function HealthTab({ tags, onRefresh }: Props) {
   const [modalParent, setModalParent] = useState('')
   const [modalNewKind, setModalNewKind] = useState<TagKind>('d')
 
+  // ── Inline operations state (per-issue) ──
+  const [expandedOps, setExpandedOps] = useState<Set<string>>(new Set())
+  const [inlineApplying, setInlineApplying] = useState<string | null>(null)
+  const [inlineResults, setInlineResults] = useState<Record<string, Array<{ op: string; code?: string; status: string; detail?: string }>>>({})
+
+  // ── Dismissed issues state ──
+  const [dismissedIssues, setDismissedIssues] = useState<DismissedIssue[]>([])
+  const [showDismissed, setShowDismissed] = useState(false)
+  const [dismissingId, setDismissingId] = useState<string | null>(null)
+
+  // Load dismissed issues on mount
+  useEffect(() => {
+    listDismissedIssues().then(res => setDismissedIssues(res.dismissed || [])).catch(() => {})
+  }, [])
+
+  // ── Fix modal state (for Revise flow) ──
+  const [fixModalOpen, setFixModalOpen] = useState(false)
+  const [fixIssue, setFixIssue] = useState<HealthIssue | null>(null)
+  const [fixInstructions, setFixInstructions] = useState('')
+  const [fixPreviewLoading, setFixPreviewLoading] = useState(false)
+  const [fixOperations, setFixOperations] = useState<FixOperation[] | null>(null)
+  const [fixExplanation, setFixExplanation] = useState('')
+  const [fixApplying, setFixApplying] = useState(false)
+  const [fixResults, setFixResults] = useState<Array<{ op: string; code?: string; status: string; detail?: string }> | null>(null)
+
   // Close dropdown when clicking outside
   useEffect(() => {
     if (!openMenuId) return
@@ -339,17 +367,31 @@ export function HealthTab({ tags, onRefresh }: Props) {
             sourceCode: (li.tags || [])[0] || '',
             targetCode: (li.tags || [])[1] || '',
           },
+          operations: (li.operations || []) as FixOperation[],
         })
       }
     }
     return combined.sort((a, b) => (SEV_ORDER[a.severity] ?? 9) - (SEV_ORDER[b.severity] ?? 9))
   }, [localIssues, llmReport, tags])
 
-  const filtered = filterSev === 'all' ? allIssues : allIssues.filter(i => i.severity === filterSev)
+  // Build fingerprints of dismissed issues for client-side filtering
+  const dismissedFingerprints = useMemo(() => {
+    const fps = new Set<string>()
+    for (const d of dismissedIssues) {
+      fps.add(d.issue_fingerprint)
+    }
+    return fps
+  }, [dismissedIssues])
 
-  const critCount = allIssues.filter(i => i.severity === 'critical').length
-  const warnCount = allIssues.filter(i => i.severity === 'warning').length
-  const infoCount = allIssues.filter(i => i.severity === 'info').length
+  const issueFingerprint = (type: string, issueTags: string[]) =>
+    `${type}::${[...issueTags].map(t => t.trim().toLowerCase()).sort().join(',')}`
+
+  const activeIssues = allIssues.filter(i => !dismissedFingerprints.has(issueFingerprint(i.type, i.tags)))
+  const filtered = filterSev === 'all' ? activeIssues : activeIssues.filter(i => i.severity === filterSev)
+
+  const critCount = activeIssues.filter(i => i.severity === 'critical').length
+  const warnCount = activeIssues.filter(i => i.severity === 'warning').length
+  const infoCount = activeIssues.filter(i => i.severity === 'info').length
 
   const menuActions: { key: ActionType; label: string; needsModal: boolean }[] = [
     { key: 'delete', label: 'Delete Tag', needsModal: false },
@@ -366,6 +408,138 @@ export function HealthTab({ tags, onRefresh }: Props) {
     else if (action === 'deactivate') handleDeactivate(issue)
     else openActionModal(action, issue)
   }
+
+  // ── Fix modal handlers ──
+  const openFixModal = useCallback((issue: HealthIssue) => {
+    setFixIssue(issue)
+    setFixInstructions('')
+    setFixOperations(null)
+    setFixExplanation('')
+    setFixResults(null)
+    setFixModalOpen(true)
+    setOpenMenuId(null)
+  }, [])
+
+  const handleFixPreview = useCallback(async () => {
+    if (!fixIssue) return
+    setFixPreviewLoading(true)
+    setError('')
+    setFixOperations(null)
+    setFixExplanation('')
+    setFixResults(null)
+    try {
+      const res = await previewHealthFix(
+        { type: fixIssue.type, severity: fixIssue.severity, tags: fixIssue.tags, message: fixIssue.message, fix: fixIssue.fix },
+        fixInstructions || undefined,
+        selectedModel,
+      )
+      setFixOperations(res.operations)
+      setFixExplanation(res.explanation)
+    } catch (e) {
+      setError(String(e))
+    } finally {
+      setFixPreviewLoading(false)
+    }
+  }, [fixIssue, fixInstructions, selectedModel])
+
+  const handleFixApply = useCallback(async () => {
+    if (!fixOperations || fixOperations.length === 0) return
+    setFixApplying(true)
+    setError('')
+    try {
+      const res = await applyHealthFix(fixOperations)
+      setFixResults(res.results)
+      if (res.failed_count === 0) {
+        setSuccessMsg(`Fix applied successfully (${res.results.length} operation${res.results.length > 1 ? 's' : ''})`)
+        onRefresh()
+      } else {
+        setError(`${res.failed_count} operation(s) failed. Check results below.`)
+      }
+    } catch (e) {
+      setError(String(e))
+    } finally {
+      setFixApplying(false)
+    }
+  }, [fixOperations, onRefresh])
+
+  const closeFixModal = useCallback(() => {
+    setFixModalOpen(false)
+    setFixIssue(null)
+    setFixOperations(null)
+    setFixExplanation('')
+    setFixResults(null)
+    setFixInstructions('')
+  }, [])
+
+  const OP_LABELS: Record<string, string> = {
+    create_tag: 'CREATE',
+    update_tag: 'UPDATE',
+    delete_tag: 'DELETE',
+    merge_tags: 'MERGE',
+    move_tag: 'MOVE',
+  }
+
+  const handleDismiss = useCallback(async (issue: HealthIssue) => {
+    setDismissingId(issue.id)
+    setError('')
+    try {
+      await dismissHealthIssue({
+        issue_type: issue.type,
+        tags: issue.tags,
+        message: issue.message,
+        reason: 'User overruled',
+      })
+      // Reload dismissed list
+      const res = await listDismissedIssues()
+      setDismissedIssues(res.dismissed || [])
+      setSuccessMsg(`Dismissed: ${issue.type} (${issue.tags.join(', ')})`)
+    } catch (e) {
+      setError(String(e))
+    } finally {
+      setDismissingId(null)
+    }
+  }, [])
+
+  const handleUndismiss = useCallback(async (fingerprint: string) => {
+    setError('')
+    try {
+      await undismissHealthIssue(fingerprint)
+      const res = await listDismissedIssues()
+      setDismissedIssues(res.dismissed || [])
+      setSuccessMsg('Issue re-enabled — will appear in next analysis')
+    } catch (e) {
+      setError(String(e))
+    }
+  }, [])
+
+  const toggleOps = useCallback((issueId: string) => {
+    setExpandedOps(prev => {
+      const next = new Set(prev)
+      if (next.has(issueId)) next.delete(issueId)
+      else next.add(issueId)
+      return next
+    })
+  }, [])
+
+  const handleInlineApply = useCallback(async (issue: HealthIssue) => {
+    if (!issue.operations || issue.operations.length === 0) return
+    setInlineApplying(issue.id)
+    setError('')
+    try {
+      const res = await applyHealthFix(issue.operations)
+      setInlineResults(prev => ({ ...prev, [issue.id]: res.results }))
+      if (res.failed_count === 0) {
+        setSuccessMsg(`Fix applied: ${res.results.length} operation${res.results.length > 1 ? 's' : ''} succeeded`)
+        onRefresh()
+      } else {
+        setError(`${res.failed_count} operation(s) failed`)
+      }
+    } catch (e) {
+      setError(String(e))
+    } finally {
+      setInlineApplying(null)
+    }
+  }, [onRefresh])
 
   return (
     <div className="health-tab">
@@ -444,8 +618,13 @@ export function HealthTab({ tags, onRefresh }: Props) {
       <div className="health-section">
         <h4>Issues ({filtered.length})</h4>
         <div className="health-issues-list">
-          {filtered.map(issue => (
-            <div key={issue.id} className={`health-issue-card sev-${issue.severity}`}>
+          {filtered.map(issue => {
+            const hasOps = issue.operations && issue.operations.length > 0
+            const isExpanded = expandedOps.has(issue.id)
+            const results = inlineResults[issue.id]
+            const applying = inlineApplying === issue.id
+            return (
+            <div key={issue.id} className={`health-issue-card sev-${issue.severity}${results ? ' issue-resolved' : ''}`}>
               <div className="issue-left">
                 <span className={`sev-dot severity-${issue.severity}`}>{SEV_ICON[issue.severity]}</span>
                 <div className="issue-content">
@@ -456,23 +635,87 @@ export function HealthTab({ tags, onRefresh }: Props) {
                     {issue.tags.length > 4 && <span className="muted">+{issue.tags.length - 4}</span>}
                   </div>
                   {issue.fix && <div className="issue-fix">{issue.fix}</div>}
+
+                  {/* Inline operations preview */}
+                  {hasOps && !results && (
+                    <div className="inline-ops-section">
+                      <button className="inline-ops-toggle" onClick={() => toggleOps(issue.id)}>
+                        {isExpanded ? '▾' : '▸'} {issue.operations!.length} operation{issue.operations!.length > 1 ? 's' : ''} planned
+                      </button>
+                      {isExpanded && (
+                        <div className="inline-ops-list">
+                          {issue.operations!.map((op, i) => {
+                            const opLabel = OP_LABELS[op.op] || op.op
+                            const tagCode = op.code || op.source_code || op.from_code || ''
+                            const kind = op.kind || ''
+                            const targetInfo = op.target_code ? ` -> ${kind}.${op.target_code}` : op.to_code ? ` -> ${kind}.${op.to_code}` : ''
+                            const specInfo = op.spec ? Object.entries(op.spec)
+                              .filter(([, v]) => v !== undefined && v !== null)
+                              .map(([k, v]) => {
+                                if (Array.isArray(v)) return `${k}: [${(v as string[]).slice(0, 3).join(', ')}${(v as string[]).length > 3 ? '...' : ''}]`
+                                if (typeof v === 'string' && v.length > 50) return `${k}: "${v.slice(0, 50)}..."`
+                                return `${k}: ${JSON.stringify(v)}`
+                              })
+                              .slice(0, 4)
+                              : []
+                            return (
+                              <div key={i} className="fix-op-card">
+                                <span className={`fix-op-badge op-${op.op}`}>{opLabel}</span>
+                                <div className="fix-op-detail">
+                                  <span className="fix-op-code">{kind}.{tagCode}{targetInfo}</span>
+                                  {op.parent_code && <span className="fix-op-meta">parent: {op.parent_code}</span>}
+                                  {specInfo.length > 0 && (
+                                    <div className="fix-op-spec">
+                                      {specInfo.map((s, j) => <div key={j} className="fix-op-spec-line">{s}</div>)}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Inline results after apply */}
+                  {results && (
+                    <div className="inline-results">
+                      {results.map((r, i) => (
+                        <span key={i} className={`inline-result-chip ${r.status === 'ok' ? 'result-ok' : 'result-fail'}`}>
+                          {r.status === 'ok' ? '✓' : '✗'} {r.op}{r.code ? `: ${r.code}` : ''}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="issue-actions" ref={openMenuId === issue.id ? menuRef : undefined}>
-                {busy === issue.id ? (
+                {(busy === issue.id || applying) ? (
                   <span className="muted" style={{ fontSize: 12 }}>Working…</span>
+                ) : results ? (
+                  <span className="muted" style={{ fontSize: 12, color: 'var(--success)' }}>Applied</span>
                 ) : (
                   <>
-                    {/* Primary suggested action as a direct button */}
-                    {issue.action && (
+                    {/* Apply button if operations are available */}
+                    {hasOps && (
                       <button
-                        className="btn compact primary"
-                        onClick={() => handleMenuClick(issue.action!, issue)}
+                        className="btn compact fix-btn"
+                        onClick={() => handleInlineApply(issue)}
+                        title={`Apply ${issue.operations!.length} operation(s)`}
                       >
-                        {ACTION_LABELS[issue.action]}
+                        Apply
                       </button>
                     )}
-                    {/* More actions */}
+                    {/* Revise button — opens modal to refine with user input */}
+                    <button
+                      className="btn compact"
+                      onClick={() => openFixModal(issue)}
+                      title={hasOps ? 'Revise with additional instructions' : 'Ask LLM to generate a fix'}
+                    >
+                      {hasOps ? 'Revise' : 'Fix'}
+                    </button>
+                    {/* More manual actions */}
                     <button
                       className="btn compact"
                       onClick={() => setOpenMenuId(openMenuId === issue.id ? null : issue.id)}
@@ -493,13 +736,26 @@ export function HealthTab({ tags, onRefresh }: Props) {
                             {a.label}{a.key === issue.action ? ' (recommended)' : ''}
                           </button>
                         ))}
+                        <hr className="dropdown-divider" />
+                        <button
+                          className="dropdown-item dismiss-item"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setOpenMenuId(null)
+                            handleDismiss(issue)
+                          }}
+                          disabled={dismissingId === issue.id}
+                        >
+                          {dismissingId === issue.id ? 'Dismissing...' : 'Dismiss (overrule)'}
+                        </button>
                       </div>
                     )}
                   </>
                 )}
               </div>
             </div>
-          ))}
+            )
+          })}
           {filtered.length === 0 && (
             <div className="center-text muted" style={{ padding: 32 }}>
               {allIssues.length === 0 && !llmReport ? 'No issues detected. Run LLM analysis for a deeper review.' : 'No issues match this filter.'}
@@ -508,7 +764,38 @@ export function HealthTab({ tags, onRefresh }: Props) {
         </div>
       </div>
 
-      {/* Action modal */}
+      {/* Dismissed issues section */}
+      {dismissedIssues.length > 0 && (
+        <div className="health-section dismissed-section">
+          <button className="dismissed-toggle" onClick={() => setShowDismissed(!showDismissed)}>
+            {showDismissed ? '▾' : '▸'} Dismissed Issues ({dismissedIssues.length})
+          </button>
+          {showDismissed && (
+            <div className="dismissed-list">
+              {dismissedIssues.map(d => (
+                <div key={d.id} className="dismissed-card">
+                  <div className="dismissed-info">
+                    <span className="dismissed-type">{d.issue_type.replace(/_/g, ' ')}</span>
+                    <span className="dismissed-msg">{d.issue_message || d.issue_tags.join(', ')}</span>
+                    <span className="dismissed-meta">
+                      {d.reason} — {d.dismissed_by}, {new Date(d.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <button
+                    className="btn compact"
+                    onClick={() => handleUndismiss(d.issue_fingerprint)}
+                    title="Re-enable this issue in future analyses"
+                  >
+                    Restore
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Action modal (manual) */}
       {modalOpen && modalIssue && (
         <div className="modal-overlay" onClick={() => setModalOpen(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
@@ -612,6 +899,146 @@ export function HealthTab({ tags, onRefresh }: Props) {
               <button className="btn primary" onClick={executeModal} disabled={busy != null}>
                 {busy ? 'Working…' : ACTION_LABELS[modalAction]}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fix modal (LLM-powered) */}
+      {fixModalOpen && fixIssue && (
+        <div className="modal-overlay" onClick={closeFixModal}>
+          <div className="modal fix-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Fix Issue</h3>
+              <button className="btn compact" onClick={closeFixModal}>x</button>
+            </div>
+            <div className="modal-body">
+              {/* Issue summary */}
+              <div className="fix-issue-summary">
+                <div className="fix-issue-header">
+                  <span className={`sev-dot severity-${fixIssue.severity}`}>{SEV_ICON[fixIssue.severity]}</span>
+                  <span className="fix-issue-type">{fixIssue.type.replace(/_/g, ' ')}</span>
+                </div>
+                <p className="fix-issue-msg">{fixIssue.message}</p>
+                <div className="fix-issue-tags">
+                  {fixIssue.tags.map(t => <span key={t} className="alias-chip">{t}</span>)}
+                </div>
+                {fixIssue.fix && (
+                  <div className="fix-suggestion-box">
+                    <strong>Suggested fix:</strong> {fixIssue.fix}
+                  </div>
+                )}
+              </div>
+
+              {/* Instructions textarea */}
+              {!fixResults && (
+                <div className="modal-field-group">
+                  <label className="modal-label">Additional instructions (optional):</label>
+                  <textarea
+                    className="modal-input fix-instructions"
+                    value={fixInstructions}
+                    onChange={e => setFixInstructions(e.target.value)}
+                    placeholder="Accept the suggestion as-is, or provide additional guidance..."
+                    rows={3}
+                    disabled={fixPreviewLoading || fixApplying}
+                  />
+                </div>
+              )}
+
+              {/* Preview button */}
+              {!fixOperations && !fixResults && (
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+                  <button
+                    className="btn primary"
+                    onClick={handleFixPreview}
+                    disabled={fixPreviewLoading}
+                  >
+                    {fixPreviewLoading ? 'Generating fix...' : 'Preview Fix'}
+                  </button>
+                </div>
+              )}
+
+              {/* Loading indicator */}
+              {fixPreviewLoading && (
+                <div className="fix-loading">
+                  <div className="fix-spinner" />
+                  <span>LLM is generating operations...</span>
+                </div>
+              )}
+
+              {/* Operations preview */}
+              {fixOperations && !fixResults && (
+                <div className="fix-preview">
+                  <h4>Planned Operations</h4>
+                  {fixExplanation && <p className="fix-explanation">{fixExplanation}</p>}
+                  <div className="fix-ops-list">
+                    {fixOperations.map((op, i) => {
+                      const opLabel = OP_LABELS[op.op] || op.op
+                      const tagCode = op.code || op.source_code || op.from_code || ''
+                      const kind = op.kind || ''
+                      const targetInfo = op.target_code ? ` -> ${kind}.${op.target_code}` : op.to_code ? ` -> ${kind}.${op.to_code}` : ''
+                      const specInfo = op.spec ? Object.entries(op.spec)
+                        .filter(([, v]) => v !== undefined && v !== null)
+                        .map(([k, v]) => {
+                          if (Array.isArray(v)) return `${k}: [${(v as string[]).slice(0, 3).join(', ')}${(v as string[]).length > 3 ? '...' : ''}]`
+                          if (typeof v === 'string' && v.length > 50) return `${k}: "${v.slice(0, 50)}..."`
+                          return `${k}: ${JSON.stringify(v)}`
+                        })
+                        .slice(0, 4)
+                        : []
+                      return (
+                        <div key={i} className="fix-op-card">
+                          <span className={`fix-op-badge op-${op.op}`}>{opLabel}</span>
+                          <div className="fix-op-detail">
+                            <span className="fix-op-code">{kind}.{tagCode}{targetInfo}</span>
+                            {op.parent_code && <span className="fix-op-meta">parent: {op.parent_code}</span>}
+                            {specInfo.length > 0 && (
+                              <div className="fix-op-spec">
+                                {specInfo.map((s, j) => <div key={j} className="fix-op-spec-line">{s}</div>)}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Apply results */}
+              {fixResults && (
+                <div className="fix-results">
+                  <h4>Results</h4>
+                  <div className="fix-ops-list">
+                    {fixResults.map((r, i) => (
+                      <div key={i} className={`fix-op-card ${r.status === 'ok' ? 'op-success' : 'op-error'}`}>
+                        <span className={`fix-op-badge ${r.status === 'ok' ? 'op-ok' : 'op-fail'}`}>
+                          {r.status === 'ok' ? 'OK' : 'FAIL'}
+                        </span>
+                        <div className="fix-op-detail">
+                          <span className="fix-op-code">{r.op}: {r.code || ''}</span>
+                          {r.detail && <span className="fix-op-meta error-text">{r.detail}</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="modal-footer">
+              <button className="btn" onClick={closeFixModal}>
+                {fixResults ? 'Close' : 'Cancel'}
+              </button>
+              {fixOperations && !fixResults && (
+                <button
+                  className="btn primary"
+                  onClick={handleFixApply}
+                  disabled={fixApplying}
+                >
+                  {fixApplying ? 'Applying...' : `Apply ${fixOperations.length} Operation${fixOperations.length > 1 ? 's' : ''}`}
+                </button>
+              )}
             </div>
           </div>
         </div>
