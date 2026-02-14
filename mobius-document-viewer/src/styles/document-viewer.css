@@ -919,6 +919,20 @@
   margin: 0.25rem 0;
 }
 
+.dv-context-menu-sublabel {
+  display: block;
+  padding: 0.3rem 1rem 0.15rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-tertiary, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dv-context-menu-item-indented {
+  padding-left: 1.5rem;
+}
+
 /* ─── Responsive ─── */
 @media (max-width: 1024px) {
   .dv-layout {
