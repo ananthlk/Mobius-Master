@@ -1,6 +1,7 @@
 /* Lexicon Maintenance — API client */
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8010'
+const RAG_API_BASE = import.meta.env.VITE_RAG_API_BASE || 'http://localhost:8001'
 
 async function _fetch<T>(path: string, opts?: RequestInit): Promise<T> {
   const url = `${API_BASE}${path}`
@@ -245,4 +246,38 @@ export async function undismissHealthIssue(fingerprint: string) {
 
 export async function checkHealth() {
   return _fetch<{ status: string }>('/health')
+}
+
+// ── RAG retag (calls RAG API directly) ──
+
+export interface RetagStatus {
+  current_lexicon_revision: number
+  total_documents: number
+  stale_count: number
+  current_count: number
+  untagged_count: number
+  stale: Array<{ document_id: string; filename: string; display_name?: string; lexicon_revision: number | null; tagged_at: string | null }>
+  untagged: Array<{ document_id: string; filename: string; display_name?: string; lexicon_revision: number | null; tagged_at: string | null }>
+}
+
+export async function fetchRetagStatus(): Promise<RetagStatus> {
+  const res = await fetch(`${RAG_API_BASE}/documents/retag/status`)
+  if (!res.ok) {
+    const body = await res.text().catch(() => '')
+    throw new Error(`RAG API ${res.status}: ${body.slice(0, 300)}`)
+  }
+  return res.json()
+}
+
+export async function triggerBulkRetag(): Promise<{ status: string; queued: number; skipped: number }> {
+  const res = await fetch(`${RAG_API_BASE}/documents/retag`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({}),
+  })
+  if (!res.ok) {
+    const body = await res.text().catch(() => '')
+    throw new Error(`RAG API ${res.status}: ${body.slice(0, 300)}`)
+  }
+  return res.json()
 }

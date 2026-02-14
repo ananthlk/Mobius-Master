@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { TagEntry, CenterTab, TagKind } from './types'
-import { fetchLexiconOverview, checkHealth, publishToRag } from './api'
+import { fetchLexiconOverview, checkHealth, publishToRag, fetchRetagStatus, triggerBulkRetag, type RetagStatus } from './api'
 import { TreeBrowser } from './components/TreeBrowser'
 import { CandidatesTab } from './components/CandidatesTab'
 import { TagOverviewTab } from './components/TagOverviewTab'
@@ -62,6 +62,47 @@ function App() {
   const [publishing, setPublishing] = useState(false)
   const [publishMsg, setPublishMsg] = useState('')
 
+  // Retag / impact status
+  const [retagStatus, setRetagStatus] = useState<RetagStatus | null>(null)
+  const [retagLoading, setRetagLoading] = useState(false)
+  const [retagMsg, setRetagMsg] = useState('')
+  const [impactOpen, setImpactOpen] = useState(false)
+
+  const loadRetagStatus = useCallback(async () => {
+    try {
+      const st = await fetchRetagStatus()
+      setRetagStatus(st)
+    } catch (e) {
+      console.warn('Could not fetch retag status:', e)
+      setRetagStatus(null)
+    }
+  }, [])
+
+  // Poll retag status every 30s
+  useEffect(() => {
+    loadRetagStatus()
+    const iv = setInterval(loadRetagStatus, 30_000)
+    return () => clearInterval(iv)
+  }, [loadRetagStatus])
+
+  const handleRetag = useCallback(async () => {
+    if (!retagStatus) return
+    const n = retagStatus.stale_count + retagStatus.untagged_count
+    if (!confirm(`Retag ${n} impacted document(s)?\n\nThis will re-run Path B tagging (no re-embedding).`)) return
+    setRetagLoading(true)
+    setRetagMsg('')
+    try {
+      const result = await triggerBulkRetag()
+      setRetagMsg(`Queued ${result.queued} retag job(s)`)
+      // Refresh status after a short delay
+      setTimeout(loadRetagStatus, 3000)
+    } catch (e) {
+      setRetagMsg(`Retag failed: ${e}`)
+    } finally {
+      setRetagLoading(false)
+    }
+  }, [retagStatus, loadRetagStatus])
+
   const handlePublish = useCallback(async () => {
     // First dry run to show what would happen
     try {
@@ -85,12 +126,14 @@ function App() {
     try {
       const result = await publishToRag(false)
       setPublishMsg(`Published: ${result.rag_entries_after} entries, revision ${result.rag_revision_after}`)
+      // After publishing, refresh retag status to show newly-stale docs
+      setTimeout(loadRetagStatus, 2000)
     } catch (e) {
       setPublishMsg(`Publish failed: ${e}`)
     } finally {
       setPublishing(false)
     }
-  }, [])
+  }, [loadRetagStatus])
 
   const tagCounts = {
     p: tags.filter(t => t.kind === 'p').length,
@@ -125,6 +168,66 @@ function App() {
           </span>
         </div>
       </header>
+
+      {/* Impact banner */}
+      {retagStatus && (retagStatus.stale_count > 0 || retagStatus.untagged_count > 0) && (
+        <div className="impact-banner">
+          <div className="impact-summary" onClick={() => setImpactOpen(o => !o)}>
+            <span className="impact-icon">{impactOpen ? '▾' : '▸'}</span>
+            <span className="impact-label">
+              <strong>{retagStatus.stale_count + retagStatus.untagged_count}</strong> document(s) need retagging
+              <span className="impact-detail">
+                {retagStatus.stale_count > 0 && ` (${retagStatus.stale_count} stale)`}
+                {retagStatus.untagged_count > 0 && ` (${retagStatus.untagged_count} untagged)`}
+              </span>
+              {' '}&mdash; Lexicon rev {retagStatus.current_lexicon_revision}
+            </span>
+            <span className="impact-actions">
+              {retagMsg && <span className="impact-msg">{retagMsg}</span>}
+              <button
+                className="btn retag-btn"
+                onClick={e => { e.stopPropagation(); handleRetag() }}
+                disabled={retagLoading}
+              >
+                {retagLoading ? 'Retagging…' : `Retag ${retagStatus.stale_count + retagStatus.untagged_count} docs`}
+              </button>
+              <button className="btn-sm" onClick={e => { e.stopPropagation(); loadRetagStatus() }} title="Refresh status">↻</button>
+            </span>
+          </div>
+          {impactOpen && (
+            <div className="impact-list">
+              <table className="impact-table">
+                <thead>
+                  <tr>
+                    <th>Document</th>
+                    <th>Status</th>
+                    <th>Tagged Rev</th>
+                    <th>Tagged At</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {retagStatus.stale.map(d => (
+                    <tr key={d.document_id}>
+                      <td title={d.document_id}>{d.display_name || d.filename}</td>
+                      <td><span className="badge stale">stale</span></td>
+                      <td>{d.lexicon_revision ?? '—'}</td>
+                      <td>{d.tagged_at ? new Date(d.tagged_at).toLocaleString() : '—'}</td>
+                    </tr>
+                  ))}
+                  {retagStatus.untagged.map(d => (
+                    <tr key={d.document_id}>
+                      <td title={d.document_id}>{d.display_name || d.filename}</td>
+                      <td><span className="badge untagged">untagged</span></td>
+                      <td>—</td>
+                      <td>—</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="layout">
         {/* Left sidebar: tree browser */}
