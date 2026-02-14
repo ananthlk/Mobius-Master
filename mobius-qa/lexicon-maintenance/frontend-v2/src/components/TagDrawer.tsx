@@ -22,6 +22,64 @@ interface TagDetailData {
   sample_lines: Array<{ document_id: string; page_number: number; score: number; text: string; snippet: string }>
 }
 
+/* ── Reusable chip-list editor ── */
+function ChipListEditor({
+  label,
+  sublabel,
+  items,
+  onChange,
+  placeholder,
+  chipClass,
+}: {
+  label: string
+  sublabel?: string
+  items: string[]
+  onChange: (items: string[]) => void
+  placeholder?: string
+  chipClass?: string
+}) {
+  const [draft, setDraft] = useState('')
+
+  const add = () => {
+    const v = draft.trim()
+    if (v && !items.includes(v)) {
+      onChange([...items, v])
+      setDraft('')
+    }
+  }
+  const remove = (item: string) => onChange(items.filter(i => i !== item))
+
+  return (
+    <div className="chip-editor-section">
+      <label className="field-label">
+        {label}
+        {sublabel && <span className="field-sublabel"> {sublabel}</span>}
+        <span className="field-count">{items.length}</span>
+      </label>
+      {items.length > 0 && (
+        <div className="phrase-chips">
+          {items.map(p => (
+            <span key={p} className={`alias-chip editable ${chipClass || ''}`}>
+              {p}
+              <button className="chip-remove" onClick={() => remove(p)}>×</button>
+            </span>
+          ))}
+        </div>
+      )}
+      <div className="phrase-add-row">
+        <input
+          type="text"
+          placeholder={placeholder || 'Add…'}
+          value={draft}
+          onChange={e => setDraft(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && add()}
+        />
+        <button className="btn xs" onClick={add}>+</button>
+      </div>
+    </div>
+  )
+}
+
 export function TagDrawer({ kind, code, onClose, onSaved }: Props) {
   const [data, setData] = useState<TagDetailData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -30,7 +88,9 @@ export function TagDrawer({ kind, code, onClose, onSaved }: Props) {
   // Editable state
   const [description, setDescription] = useState('')
   const [strongPhrases, setStrongPhrases] = useState<string[]>([])
-  const [newPhrase, setNewPhrase] = useState('')
+  const [aliases, setAliases] = useState<string[]>([])
+  const [weakKeywords, setWeakKeywords] = useState<string[]>([])
+  const [refutedWords, setRefutedWords] = useState<string[]>([])
   const [active, setActive] = useState(true)
   const [saving, setSaving] = useState(false)
   const [dirty, setDirty] = useState(false)
@@ -44,6 +104,10 @@ export function TagDrawer({ kind, code, onClose, onSaved }: Props) {
       const spec = (res.tag?.spec || {}) as Record<string, unknown>
       setDescription(String(spec.description || ''))
       setStrongPhrases((spec.strong_phrases as string[]) || (spec.phrases as string[]) || [])
+      setAliases((spec.aliases as string[]) || [])
+      const wk = spec.weak_keywords as { any_of?: string[] } | undefined
+      setWeakKeywords(wk?.any_of || [])
+      setRefutedWords((spec.refuted_words as string[]) || [])
       setActive(res.tag?.active !== false)
       setDirty(false)
     } catch (e) {
@@ -55,37 +119,37 @@ export function TagDrawer({ kind, code, onClose, onSaved }: Props) {
 
   useEffect(() => { load() }, [load])
 
+  const markDirty = <T,>(setter: React.Dispatch<React.SetStateAction<T>>) => {
+    return (val: T) => { setter(val); setDirty(true) }
+  }
+
   const handleSave = async () => {
     setSaving(true)
     try {
-      const spec = {
+      const spec: Record<string, unknown> = {
         ...(data?.tag?.spec || {}),
         description,
         strong_phrases: strongPhrases,
         phrases: strongPhrases, // Keep in sync
+        aliases,
+        refuted_words: refutedWords,
+      }
+      // Build weak_keywords only if there are entries
+      if (weakKeywords.length > 0) {
+        spec.weak_keywords = { any_of: weakKeywords, min_hits: 1 }
+      } else {
+        spec.weak_keywords = undefined
       }
       await patchTag(kind, code, { spec, active })
       setDirty(false)
       onSaved()
+      // Reload to get fresh data
+      load()
     } catch (e) {
       setError(String(e))
     } finally {
       setSaving(false)
     }
-  }
-
-  const addPhrase = () => {
-    const p = newPhrase.trim()
-    if (p && !strongPhrases.includes(p)) {
-      setStrongPhrases([...strongPhrases, p])
-      setNewPhrase('')
-      setDirty(true)
-    }
-  }
-
-  const removePhrase = (phrase: string) => {
-    setStrongPhrases(strongPhrases.filter(p => p !== phrase))
-    setDirty(true)
   }
 
   return (
@@ -113,32 +177,51 @@ export function TagDrawer({ kind, code, onClose, onSaved }: Props) {
             className="field-textarea"
             value={description}
             onChange={e => { setDescription(e.target.value); setDirty(true) }}
-            rows={3}
+            rows={2}
           />
 
           {/* Strong phrases */}
-          <label className="field-label">Strong phrases (aliases)</label>
-          <div className="phrase-chips">
-            {strongPhrases.map(p => (
-              <span key={p} className="alias-chip editable">
-                {p}
-                <button className="chip-remove" onClick={() => removePhrase(p)}>×</button>
-              </span>
-            ))}
-          </div>
-          <div className="phrase-add-row">
-            <input
-              type="text"
-              placeholder="Add phrase…"
-              value={newPhrase}
-              onChange={e => setNewPhrase(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && addPhrase()}
-            />
-            <button className="btn xs" onClick={addPhrase}>+</button>
-          </div>
+          <ChipListEditor
+            label="Strong phrases"
+            sublabel="(high-confidence matches)"
+            items={strongPhrases}
+            onChange={markDirty(setStrongPhrases)}
+            placeholder="Add strong phrase…"
+            chipClass="chip-strong"
+          />
+
+          {/* Aliases */}
+          <ChipListEditor
+            label="Aliases"
+            sublabel="(short forms, abbreviations)"
+            items={aliases}
+            onChange={markDirty(setAliases)}
+            placeholder="Add alias…"
+            chipClass="chip-alias"
+          />
+
+          {/* Weak keywords */}
+          <ChipListEditor
+            label="Weak keywords"
+            sublabel="(lower confidence, need multiple hits)"
+            items={weakKeywords}
+            onChange={markDirty(setWeakKeywords)}
+            placeholder="Add weak keyword…"
+            chipClass="chip-weak"
+          />
+
+          {/* Refuted words */}
+          <ChipListEditor
+            label="Refuted words"
+            sublabel="(suppress match when present)"
+            items={refutedWords}
+            onChange={markDirty(setRefutedWords)}
+            placeholder="Add refuted word…"
+            chipClass="chip-refuted"
+          />
 
           {/* Active toggle */}
-          <label className="field-label">
+          <label className="field-label active-toggle">
             <input
               type="checkbox"
               checked={active}
@@ -181,7 +264,7 @@ export function TagDrawer({ kind, code, onClose, onSaved }: Props) {
           {/* Actions */}
           <div className="drawer-actions">
             <button className="btn primary" onClick={handleSave} disabled={saving || !dirty}>
-              {saving ? 'Saving…' : dirty ? 'Save ●' : 'Save'}
+              {saving ? 'Saving…' : dirty ? 'Save changes' : 'Save'}
             </button>
             <button className="btn" onClick={load} disabled={loading}>Revert</button>
           </div>

@@ -23,7 +23,9 @@ export interface TagSpec {
   category?: string
   strong_phrases?: string[]
   phrases?: string[]
+  aliases?: string[]
   weak_keywords?: { any_of?: string[]; min_hits?: number }
+  refuted_words?: string[]
   children?: Record<string, unknown>
 }
 

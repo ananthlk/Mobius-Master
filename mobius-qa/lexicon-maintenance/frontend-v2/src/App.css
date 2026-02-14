@@ -400,6 +400,60 @@ html, body, #root {
 
 .alias-cell { max-width: 200px; overflow: hidden; white-space: nowrap; }
 
+/* Chip type colors */
+.alias-chip.chip-strong {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #1e40af;
+}
+.alias-chip.chip-alias {
+  background: #e0e7ff;
+  border-color: #a5b4fc;
+  color: #3730a3;
+}
+.alias-chip.chip-weak {
+  background: #fef3c7;
+  border-color: #fcd34d;
+  color: #92400e;
+}
+.alias-chip.chip-refuted {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+/* Chip editor section */
+.chip-editor-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.field-sublabel {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-muted);
+  font-size: 10px;
+}
+.field-count {
+  display: inline-block;
+  margin-left: 4px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  padding: 0 5px;
+  font-size: 10px;
+  font-weight: 600;
+  min-width: 14px;
+  text-align: center;
+}
+.active-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+}
+
 /* ── Tag drawer ── */
 .tag-drawer {
   width: var(--drawer-width);
