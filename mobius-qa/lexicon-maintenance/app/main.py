@@ -8,8 +8,10 @@ from typing import Any
 
 import psycopg2
 import psycopg2.extras
+import psycopg2.pool
 import json
 import uuid
+import contextlib
 from fastapi import Body, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -81,8 +83,65 @@ app.add_middleware(
 )
 
 
+# ── Connection pooling ──────────────────────────────────────────────────────
+# Use ThreadedConnectionPool so we never exceed a small cap per DB.
+# _conn() returns a PooledConnection wrapper whose .close() returns it to the
+# pool (with rollback) instead of truly closing, so existing code (conn.close())
+# keeps working without leaking.
+
+_pools: dict[str, psycopg2.pool.ThreadedConnectionPool] = {}
+_POOL_MIN = 1
+_POOL_MAX = 3  # max simultaneous connections per database
+
+
+def _get_pool(url: str) -> psycopg2.pool.ThreadedConnectionPool:
+    if url not in _pools:
+        _pools[url] = psycopg2.pool.ThreadedConnectionPool(_POOL_MIN, _POOL_MAX, url)
+    return _pools[url]
+
+
+class _PooledConnection:
+    """Thin wrapper: delegates everything to the real connection but overrides
+    close() to return the connection to the pool instead of destroying it."""
+
+    def __init__(self, real_conn, pool: psycopg2.pool.ThreadedConnectionPool):
+        self._conn = real_conn
+        self._pool = pool
+        self._returned = False
+
+    def close(self):
+        if not self._returned:
+            self._returned = True
+            try:
+                self._conn.rollback()
+            except Exception:
+                pass
+            self._pool.putconn(self._conn)
+
+    def __del__(self):
+        # Safety net: return to pool if caller forgot close()
+        self.close()
+
+    # Delegate everything else to the real connection
+    def __getattr__(self, name):
+        return getattr(self._conn, name)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        self.close()
+        return False
+
+    def cursor(self, *args, **kwargs):
+        return self._conn.cursor(*args, **kwargs)
+
+
 def _conn(url: str):
-    return psycopg2.connect(url)
+    """Get a pooled connection.  Call .close() when done (returns to pool)."""
+    pool = _get_pool(url)
+    real = pool.getconn()
+    return _PooledConnection(real, pool)
 
 
 # ---------------------------------------------------------------------------

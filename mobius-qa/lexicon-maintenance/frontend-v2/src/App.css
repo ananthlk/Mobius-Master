@@ -1657,8 +1657,20 @@ html, body, #root {
   background: #bf360c;
 }
 .retag-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
+}
+.retag-btn.queued {
+  background: #558b2f;
+  animation: pulse-retag 1.5s ease-in-out infinite;
+}
+@keyframes pulse-retag {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+.impact-msg.processing {
+  color: #558b2f;
+  animation: pulse-retag 1.5s ease-in-out infinite;
 }
 .btn-sm {
   background: none;

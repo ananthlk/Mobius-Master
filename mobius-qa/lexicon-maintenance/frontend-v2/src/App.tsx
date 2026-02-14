@@ -66,24 +66,30 @@ function App() {
   const [retagStatus, setRetagStatus] = useState<RetagStatus | null>(null)
   const [retagLoading, setRetagLoading] = useState(false)
   const [retagMsg, setRetagMsg] = useState('')
+  const [retagQueued, setRetagQueued] = useState(false)
   const [impactOpen, setImpactOpen] = useState(false)
 
   const loadRetagStatus = useCallback(async () => {
     try {
       const st = await fetchRetagStatus()
       setRetagStatus(st)
+      // Clear the "queued" state once all docs are current (jobs finished)
+      if (st.stale_count === 0 && st.untagged_count === 0) {
+        setRetagQueued(false)
+        setRetagMsg('')
+      }
     } catch (e) {
       console.warn('Could not fetch retag status:', e)
       setRetagStatus(null)
     }
   }, [])
 
-  // Poll retag status every 30s
+  // Poll retag status — faster (every 10s) when jobs are queued, otherwise every 30s
   useEffect(() => {
     loadRetagStatus()
-    const iv = setInterval(loadRetagStatus, 30_000)
+    const iv = setInterval(loadRetagStatus, retagQueued ? 10_000 : 30_000)
     return () => clearInterval(iv)
-  }, [loadRetagStatus])
+  }, [loadRetagStatus, retagQueued])
 
   const handleRetag = useCallback(async () => {
     if (!retagStatus) return
@@ -93,7 +99,8 @@ function App() {
     setRetagMsg('')
     try {
       const result = await triggerBulkRetag()
-      setRetagMsg(`Queued ${result.queued} retag job(s)`)
+      setRetagQueued(true)
+      setRetagMsg(`Queued ${result.queued} retag job(s) — processing…`)
       // Refresh status after a short delay
       setTimeout(loadRetagStatus, 3000)
     } catch (e) {
@@ -183,13 +190,13 @@ function App() {
               {' '}&mdash; Lexicon rev {retagStatus.current_lexicon_revision}
             </span>
             <span className="impact-actions">
-              {retagMsg && <span className="impact-msg">{retagMsg}</span>}
+              {retagMsg && <span className={`impact-msg ${retagQueued ? 'processing' : ''}`}>{retagMsg}</span>}
               <button
-                className="btn retag-btn"
+                className={`btn retag-btn ${retagQueued ? 'queued' : ''}`}
                 onClick={e => { e.stopPropagation(); handleRetag() }}
-                disabled={retagLoading}
+                disabled={retagLoading || retagQueued}
               >
-                {retagLoading ? 'Retagging…' : `Retag ${retagStatus.stale_count + retagStatus.untagged_count} docs`}
+                {retagLoading ? 'Submitting…' : retagQueued ? 'Retag in progress…' : `Retag ${retagStatus.stale_count + retagStatus.untagged_count} docs`}
               </button>
               <button className="btn-sm" onClick={e => { e.stopPropagation(); loadRetagStatus() }} title="Refresh status">↻</button>
             </span>
