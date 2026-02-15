@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import logging
 import os
 import re
+import threading
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -14,6 +16,17 @@ import uuid
 import contextlib
 from fastapi import Body, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.candidate_ops import (
+    _normalize_phrase,
+    fetch_candidate_types_by_ids,
+    reject_candidate_by_ids,
+    resolve_normalized_to_ids,
+    update_candidate_state_by_ids,
+    upsert_catalog,
+)
+
+logger = logging.getLogger(__name__)
 
 
 def _load_env() -> None:
@@ -61,7 +74,15 @@ def _qa_url() -> str:
 
 
 def _rag_url() -> str:
-    return _env("RAG_DATABASE_URL") or _build_pg_url("mobius_rag")
+    # Prefer RAG_DATABASE_URL; fall back to DATABASE_URL (RAG service) so we hit the same DB.
+    url = _env("RAG_DATABASE_URL")
+    if url:
+        return url
+    url = _env("DATABASE_URL")
+    if url:
+        # Strip SQLAlchemy async driver for psycopg2
+        return url.replace("postgresql+asyncpg://", "postgresql://")
+    return _build_pg_url("mobius_rag")
 
 
 @dataclass
@@ -75,6 +96,7 @@ def _urls() -> DbUrls:
 
 
 app = FastAPI(title="Mobius QA — Lexicon Maintenance API", version="0.1.0")
+logging.getLogger("app").setLevel(logging.INFO)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -84,27 +106,47 @@ app.add_middleware(
 
 
 # ── Connection pooling ──────────────────────────────────────────────────────
-# Use ThreadedConnectionPool so we never exceed a small cap per DB.
-# _conn() returns a PooledConnection wrapper whose .close() returns it to the
-# pool (with rollback) instead of truly closing, so existing code (conn.close())
-# keeps working without leaking.
+# Use ThreadedConnectionPool with a blocking wrapper so getconn() waits instead
+# of raising PoolError when exhausted. _conn() returns PooledConnection whose
+# close() returns the connection to the pool.
 
-_pools: dict[str, psycopg2.pool.ThreadedConnectionPool] = {}
+_pools: dict[str, "BlockingConnectionPool"] = {}
 _POOL_MIN = 1
-_POOL_MAX = 3  # max simultaneous connections per database
+_POOL_MAX = int(os.getenv("LEXICON_POOL_MAX", "8"))  # Per-DB cap; increase if many concurrent requests
 
 
-def _get_pool(url: str) -> psycopg2.pool.ThreadedConnectionPool:
+class BlockingConnectionPool(psycopg2.pool.ThreadedConnectionPool):
+    """Wraps ThreadedConnectionPool so getconn() blocks instead of raising PoolError."""
+
+    def __init__(self, minconn: int, maxconn: int, *args: Any, **kwargs: Any):
+        super().__init__(minconn, maxconn, *args, **kwargs)
+        self._sem = threading.Semaphore(maxconn)
+
+    def getconn(self, *args: Any, **kwargs: Any):
+        self._sem.acquire()
+        try:
+            return super().getconn(*args, **kwargs)
+        except Exception:
+            self._sem.release()
+            raise
+
+    def putconn(self, *args: Any, **kwargs: Any):
+        try:
+            super().putconn(*args, **kwargs)
+        finally:
+            self._sem.release()
+
+
+def _get_pool(url: str) -> BlockingConnectionPool:
     if url not in _pools:
-        _pools[url] = psycopg2.pool.ThreadedConnectionPool(_POOL_MIN, _POOL_MAX, url)
+        _pools[url] = BlockingConnectionPool(_POOL_MIN, _POOL_MAX, url, connect_timeout=10)
     return _pools[url]
 
 
 class _PooledConnection:
-    """Thin wrapper: delegates everything to the real connection but overrides
-    close() to return the connection to the pool instead of destroying it."""
+    """Thin wrapper: delegates to the real connection; close() returns it to the pool."""
 
-    def __init__(self, real_conn, pool: psycopg2.pool.ThreadedConnectionPool):
+    def __init__(self, real_conn, pool: BlockingConnectionPool):
         self._conn = real_conn
         self._pool = pool
         self._returned = False
@@ -113,7 +155,11 @@ class _PooledConnection:
         if not self._returned:
             self._returned = True
             try:
-                self._conn.rollback()
+                self._conn.commit()
+            except Exception:
+                pass
+            try:
+                self._conn.rollback()  # Reset any aborted transaction so next user gets clean connection
             except Exception:
                 pass
             self._pool.putconn(self._conn)
@@ -926,6 +972,8 @@ def get_policy_lexicon_overview(
     q_search = (search or "").strip()
 
     # Pull lexicon meta + entries from QA (source of truth)
+    qa = None
+    qcur = None
     try:
         qa = _conn(u.qa)
         qa.autocommit = True
@@ -980,10 +1028,19 @@ def get_policy_lexicon_overview(
                         "max_score": 0.0,
                     }
                 )
-        qcur.close()
-        qa.close()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to read QA lexicon: {type(e).__name__}: {e}")
+    finally:
+        try:
+            if qcur is not None:
+                qcur.close()
+        except Exception:
+            pass
+        try:
+            if qa is not None:
+                qa.close()
+        except Exception:
+            pass
 
     # Tag usage counts for approved tags (from RAG Path B artifacts)
     # These are computed from policy_lines.*_tags JSONB maps (tag_code -> weight).
@@ -1084,6 +1141,7 @@ def get_policy_lexicon_overview(
               SELECT
                 trim(lower(normalized)) AS norm_key,
                 max(normalized) AS normalized,
+                array_agg(id::text) AS ids,
                 array_agg(DISTINCT candidate_type) AS candidate_types,
                 array_agg(DISTINCT proposed_tag) FILTER (WHERE proposed_tag IS NOT NULL AND proposed_tag <> '') AS proposed_tags,
                 max(state) AS state,
@@ -1107,9 +1165,12 @@ def get_policy_lexicon_overview(
             for r in rcur.fetchall():
                 c_types = [str(x or "").strip().lower() for x in (r.get("candidate_types") or []) if str(x or "").strip()]
                 kk = _pick_kind(c_types)
+                ids_raw = r.get("ids") or []
+                ids = [str(x) for x in ids_raw if x] if isinstance(ids_raw, (list, tuple)) else []
                 cand_rows.append(
                     {
                         "id": f"cand:{str(r.get('state') or 'proposed').lower()}:{kk}:{str(r.get('norm_key') or '')}",
+                        "ids": ids,
                         "row_type": "candidate",
                         "kind": kk,
                         "status": str(r.get("state") or "proposed").lower(),
@@ -1256,162 +1317,250 @@ def list_policy_candidates_related(
         raise HTTPException(status_code=500, detail=f"Failed to load related candidates: {type(e).__name__}: {e}")
 
 
+@app.get("/policy/candidates/debug")
+def debug_candidate_state(normalized: str = Query(..., description="Phrase to inspect")):
+    """Return raw rows from policy_lexicon_candidates for a phrase (for debugging)."""
+    nk = (normalized or "").strip().lower()
+    if not nk:
+        raise HTTPException(status_code=400, detail="normalized is required")
+    u = _urls()
+    try:
+        rag = _conn(u.rag)
+        rag.autocommit = True
+        cur = rag.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute(
+            """
+            SELECT id, document_id, candidate_type, normalized, state, reviewer, reviewer_notes, created_at
+            FROM policy_lexicon_candidates
+            WHERE trim(lower(regexp_replace(normalized, E'\\s+', ' ', 'g'))) = %s
+            ORDER BY state, document_id
+            """,
+            (_normalize_phrase(normalized),),
+        )
+        raw = cur.fetchall()
+        rows = []
+        for r in raw:
+            d = dict(r)
+            out = {}
+            for k, v in d.items():
+                if v is None or isinstance(v, (bool, int, float, str)):
+                    out[k] = v
+                else:
+                    out[k] = str(v)
+            rows.append(out)
+        cur.close()
+        rag.close()
+        return {"normalized": nk, "count": len(rows), "rows": rows}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"{type(e).__name__}: {e}")
+
+
 @app.post("/policy/candidates/aggregate/review-bulk")
 def review_policy_candidates_aggregate_bulk(body: dict = Body(...)):
     """
-    Bulk update candidate states in RAG DB.
-    Supports: proposed|rejected|flagged and approved (writes aliases into QA lexicon).
-    UI payload shape (bundle):
-      { normalized_list: [...], state: 'approved'|'rejected'|..., candidate_type_override?: 'p'|'d'|'j',
-        tag_code_map?: { <normalized>: <tag_code or 'd:tag_code'>, ... } }
+    Bulk update candidate states in RAG DB by ID.
+    Payload: { id_list: [...], state: 'approved'|'rejected'|'proposed'|'flagged',
+      candidate_type_override?: 'p'|'d'|'j', tag_code_map?: { <normalized>: <tag_code>, ... } }
+    tag_code_map is used only for state=approved; keys are normalized phrases (from DB).
+
+    Backward compat: if id_list is missing/empty but normalized_list is provided,
+    resolve normalized phrases to ids before proceeding.
     """
     u = _urls()
-    norms = body.get("normalized_list") or []
-    if not isinstance(norms, list) or not norms:
-        raise HTTPException(status_code=400, detail="normalized_list is required")
+    id_list = body.get("id_list") or []
+    ids = [str(x).strip() for x in id_list if str(x).strip()] if isinstance(id_list, list) else []
+
+    # Fallback: resolve normalized_list to ids (for legacy clients)
+    if not ids:
+        normalized_list = body.get("normalized_list") or []
+        norms = [str(x).strip() for x in normalized_list if str(x).strip()] if isinstance(normalized_list, list) else []
+        if norms:
+            try:
+                rag = _conn(u.rag)
+                rag.autocommit = True
+                cur = rag.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+                norm_keys = [re.sub(r"\s+", " ", n.strip().lower()) for n in norms]
+                cur.execute(
+                    """
+                    SELECT DISTINCT id::text
+                    FROM policy_lexicon_candidates
+                    WHERE trim(lower(regexp_replace(normalized, E'\\\\s+', ' ', 'g'))) = ANY(%s)
+                    """,
+                    (norm_keys,),
+                )
+                ids = [str(r.get("id", "")) for r in cur.fetchall() if r.get("id")]
+                cur.close()
+                rag.close()
+                if ids:
+                    logger.info("[review-bulk] resolved normalized_list (%d phrases) -> %d ids", len(norms), len(ids))
+            except Exception as e:
+                logger.warning("[review-bulk] normalized_list fallback failed: %s", e)
+
+    if not ids:
+        raise HTTPException(status_code=400, detail="id_list is required (or normalized_list for backward compat)")
+
     next_state = str(body.get("state") or "").strip().lower()
     if next_state not in ("proposed", "rejected", "flagged", "approved"):
         raise HTTPException(status_code=400, detail="state must be proposed|rejected|flagged|approved")
     reviewer = str(body.get("reviewer") or "").strip() or None
     notes = body.get("reviewer_notes")
-
-    norm_keys = [str(x).strip().lower() for x in norms if str(x).strip()]
-    if not norm_keys:
-        raise HTTPException(status_code=400, detail="normalized_list is empty")
-
-    # Approval wiring: when approving, we must write into QA lexicon first (as alias to tag_code_map).
     candidate_type_override = str(body.get("candidate_type_override") or "").strip().lower() or None
     tag_code_map = body.get("tag_code_map") if isinstance(body.get("tag_code_map"), dict) else None
+
+    logger.info("[review-bulk] state=%r id_list len=%d", next_state, len(ids))
+    new_rev = None
+    rag = cur = qa = qcur = None
+
     if next_state == "approved":
         if candidate_type_override not in ("p", "d", "j"):
             raise HTTPException(status_code=400, detail="candidate_type_override is required for state=approved (p|d|j)")
         if not tag_code_map:
             raise HTTPException(status_code=400, detail="tag_code_map is required for state=approved")
 
-        # Update QA lexicon entries: add each normalized phrase as alias to its mapped tag code.
-        try:
-            qa = _conn(u.qa)
-            qa.autocommit = True
-            qcur = qa.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-
-            updated_tags: set[tuple[str, str]] = set()
-            for nk in norm_keys:
-                mapped = tag_code_map.get(nk) or tag_code_map.get(nk.strip()) or None
-                if not mapped:
-                    continue
-                tk, tc = _parse_kind_code(str(mapped), candidate_type_override)
-                if tk not in ("p", "d", "j") or not tc:
-                    continue
-                phrase = nk
-
-                qcur.execute(
-                    """
-                    SELECT id, spec
-                    FROM policy_lexicon_entries
-                    WHERE kind = %s AND code = %s
-                    LIMIT 1
-                    """,
-                    (tk, tc),
-                )
-                row = qcur.fetchone()
-                if row and row.get("id"):
-                    spec = row.get("spec") if isinstance(row.get("spec"), dict) else {}
-                    spec = dict(spec)
-                    spec.setdefault("kind", tk)
-                    spec = _add_alias_phrase(spec, phrase, strength="strong")
-                    qcur.execute(
-                        """
-                        UPDATE policy_lexicon_entries
-                        SET spec = %s::jsonb,
-                            active = true,
-                            updated_at = NOW()
-                        WHERE id = %s
-                        """,
-                        (json.dumps(spec), row["id"]),
-                    )
-                else:
-                    # Creating a brand-new tag -- validate structure first
-                    new_parent = tc.rsplit(".", 1)[0] if "." in tc else None
-                    new_spec = {"kind": tk, "description": "", "strong_phrases": [phrase]}
-                    _validate_tag_structure(tk, tc, new_parent, u.qa, spec=new_spec)
-                    spec = new_spec
-                    qcur.execute(
-                        """
-                        INSERT INTO policy_lexicon_entries(id, kind, code, parent_code, spec, active, created_at, updated_at)
-                        VALUES (%s, %s, %s, %s, %s::jsonb, true, NOW(), NOW())
-                        """,
-                        (str(uuid.uuid4()), tk, tc, new_parent, json.dumps(spec)),
-                    )
-                updated_tags.add((tk, tc))
-
-            # Bump revision once per bulk action
-            new_rev = _bump_lexicon_revision(qcur)
-            qcur.close()
-            qa.close()
-        except HTTPException:
-            raise
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to approve into QA lexicon: {type(e).__name__}: {e}")
-
     try:
         rag = _conn(u.rag)
         rag.autocommit = True
-        cur = rag.cursor()
+        cur = rag.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        cur.execute(
+            "SELECT id::text, normalized FROM policy_lexicon_candidates WHERE id::text = ANY(%s)",
+            (ids,),
+        )
+        rows = cur.fetchall()
+        id_to_norm: dict[str, str] = {}
+        for r in rows:
+            i = str(r.get("id", ""))
+            n = str(r.get("normalized", "")).strip()
+            if i:
+                id_to_norm[i] = n
+
+        # Resolve unique normals for approve path (and for catalog)
+        normals_found = list(dict.fromkeys(id_to_norm.values()))
+
+        if next_state == "approved":
+            try:
+                qa = _conn(u.qa)
+                qa.autocommit = True
+                qcur = qa.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+                for nk in normals_found:
+                    mapped = tag_code_map.get(nk) or tag_code_map.get(nk.strip()) or tag_code_map.get(nk.lower()) or None
+                    if not mapped:
+                        continue
+                    tk, tc = _parse_kind_code(str(mapped), candidate_type_override or "d")
+                    if tk not in ("p", "d", "j") or not tc:
+                        continue
+                    qcur.execute(
+                        "SELECT id, spec FROM policy_lexicon_entries WHERE kind = %s AND code = %s LIMIT 1",
+                        (tk, tc),
+                    )
+                    row = qcur.fetchone()
+                    if row and row.get("id"):
+                        spec = row.get("spec") if isinstance(row.get("spec"), dict) else {}
+                        spec = dict(spec)
+                        spec.setdefault("kind", tk)
+                        spec = _add_alias_phrase(spec, nk, strength="strong")
+                        qcur.execute(
+                            "UPDATE policy_lexicon_entries SET spec = %s::jsonb, active = true, updated_at = NOW() WHERE id = %s",
+                            (json.dumps(spec), row["id"]),
+                        )
+                    else:
+                        new_parent = tc.rsplit(".", 1)[0] if "." in tc else None
+                        new_spec = {"kind": tk, "description": "", "strong_phrases": [nk]}
+                        _validate_tag_structure(tk, tc, new_parent, u.qa, spec=new_spec)
+                        qcur.execute(
+                            "INSERT INTO policy_lexicon_entries(id, kind, code, parent_code, spec, active, created_at, updated_at) VALUES (%s, %s, %s, %s, %s::jsonb, true, NOW(), NOW())",
+                            (str(uuid.uuid4()), tk, tc, new_parent, json.dumps(new_spec)),
+                        )
+                new_rev = _bump_lexicon_revision(qcur)
+                qcur.close()
+                qa.close()
+            except HTTPException:
+                raise
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Failed to approve into QA lexicon: {type(e).__name__}: {e}")
+
+        ct_by_id = fetch_candidate_types_by_ids(cur, ids)
+
         updated = []
         errors = []
-        for nk in norm_keys:
-            try:
-                # Keep proposed_tag in sync for approved
-                proposed_tag = None
-                candidate_type = None
-                if next_state == "approved" and tag_code_map:
-                    mapped = tag_code_map.get(nk) or tag_code_map.get(nk.strip()) or None
-                    if mapped:
-                        tk, tc = _parse_kind_code(str(mapped), candidate_type_override or "d")
-                        candidate_type = tk
-                        proposed_tag = tc
-                cur.execute(
-                    """
-                    UPDATE policy_lexicon_candidates
-                    SET state = %s,
-                        candidate_type = COALESCE(%s, candidate_type),
-                        proposed_tag = COALESCE(%s, proposed_tag),
-                        reviewer = %s,
-                        reviewer_notes = %s
-                    WHERE trim(lower(normalized)) = %s
-                    RETURNING normalized
-                    """,
-                    (next_state, candidate_type, proposed_tag, reviewer, notes, nk),
+        # Group ids by normalized for per-phrase catalog upsert
+        by_norm: dict[str, list[str]] = {}
+        for i, n in id_to_norm.items():
+            nk = _normalize_phrase(n)
+            by_norm.setdefault(nk, []).append(i)
+
+        proposed_tag = None
+        prop_key = ""
+        if next_state == "approved" and tag_code_map and normals_found:
+            first_norm = normals_found[0]
+            mapped = tag_code_map.get(first_norm) or tag_code_map.get(first_norm.strip()) or tag_code_map.get(first_norm.lower()) or None
+            if mapped:
+                tk, tc = _parse_kind_code(str(mapped), candidate_type_override or "d")
+                proposed_tag = tc
+                prop_key = f"{tk}:{tc}".lower()[:300]
+
+        rows_updated = update_candidate_state_by_ids(
+            cur,
+            ids,
+            next_state,
+            reviewer=reviewer or "lexicon-ui",
+            reviewer_notes=notes,
+            candidate_type=candidate_type_override,
+            proposed_tag=proposed_tag if next_state == "approved" else None,
+        )
+        if rows_updated == 0:
+            for i in ids:
+                errors.append({"id": i, "normalized": id_to_norm.get(i, ""), "error": "no_rows_updated"})
+        else:
+            for nk, sub_ids in by_norm.items():
+                updated.append({"ids": sub_ids, "normalized": nk, "state": next_state})
+                ct = ct_by_id.get(sub_ids[0]) if sub_ids else "d"
+                if ct not in ("p", "d", "j"):
+                    ct = "d"
+                upsert_catalog(
+                    cur,
+                    candidate_type=ct,
+                    normalized_key=nk[:500],
+                    proposed_tag_key=prop_key,
+                    proposed_tag=proposed_tag,
+                    state=next_state,
+                    reviewer=reviewer or "lexicon-ui",
+                    reviewer_notes=notes,
                 )
-                touched = [r[0] for r in cur.fetchall()] if cur.rowcount else []
-                if not touched:
-                    errors.append({"normalized": nk, "error": "no_rows_updated"})
-                else:
-                    updated.append({"normalized": nk, "state": next_state})
-                # Best-effort: update catalog too (for global suppression)
-                try:
-                    cur.execute(
-                        """
-                        INSERT INTO policy_lexicon_candidate_catalog(candidate_type, normalized_key, normalized, proposed_tag_key, proposed_tag, state, reviewer, reviewer_notes, decided_at, created_at, updated_at)
-                        VALUES ('alias', %s, %s, '', NULL, %s, %s, %s, NOW(), NOW(), NOW())
-                        ON CONFLICT (candidate_type, normalized_key, proposed_tag_key)
-                        DO UPDATE SET state = EXCLUDED.state,
-                                      reviewer = COALESCE(EXCLUDED.reviewer, policy_lexicon_candidate_catalog.reviewer),
-                                      reviewer_notes = COALESCE(EXCLUDED.reviewer_notes, policy_lexicon_candidate_catalog.reviewer_notes),
-                                      decided_at = NOW(),
-                                      updated_at = NOW()
-                        """,
-                        (nk[:200], nk[:200], next_state, reviewer, notes),
-                    )
-                except Exception:
-                    pass
-            except Exception as e:
-                errors.append({"normalized": nk, "error": str(e)})
-        cur.close()
-        rag.close()
-        return {"status": "ok", "updated": updated, "errors": errors, "lexicon_revision": (new_rev if next_state == "approved" else None)}
+
+        logger.info("[review-bulk] done: updated=%d errors=%d", len(updated), len(errors))
+        return {
+            "status": "ok",
+            "updated": updated,
+            "errors": errors,
+            "lexicon_revision": (new_rev if next_state == "approved" else None),
+        }
+    except HTTPException:
+        raise
     except Exception as e:
+        logger.exception("[review-bulk] failed: %s", e)
         raise HTTPException(status_code=500, detail=f"Bulk review failed: {type(e).__name__}: {e}")
+    finally:
+        if cur is not None:
+            try:
+                cur.close()
+            except Exception:
+                pass
+        if rag is not None:
+            try:
+                rag.close()
+            except Exception:
+                pass
+        if qcur is not None:
+            try:
+                qcur.close()
+            except Exception:
+                pass
+        if qa is not None:
+            try:
+                qa.close()
+            except Exception:
+                pass
 
 
 # ---------------------------------------------------------------------------
@@ -1472,15 +1621,20 @@ def llm_triage_candidates(body: dict = Body(default={})) -> dict[str, Any]:
     """
     On-demand LLM triage of all pending candidates.
 
-    Fetches all proposed candidates (llm_verdict IS NULL) from RAG DB,
-    the full approved lexicon from QA DB, and the rejected catalog,
-    then calls Vertex Gemini to classify each candidate as new_tag / alias / reject.
+    Fetches all proposed candidates from RAG DB, the full approved lexicon
+    from QA DB, and the rejected catalog, then calls Vertex Gemini to
+    produce a structured **operation** per candidate:
+
+      - reject_candidate: junk/noise/generic, should be rejected
+      - add_alias:        already covered by an existing tag, add as alias
+      - create_tag:       genuinely new domain concept, create new tag
+
+    Returns both the operations list (for immediate UI display / mass-apply)
+    and persists verdict fields on each candidate row (for reload persistence).
 
     Body (optional):
       force: bool  -- re-triage candidates that already have an llm_verdict
     """
-    import yaml
-
     u = _urls()
     force = bool(body.get("force", False))
 
@@ -1514,7 +1668,7 @@ def llm_triage_candidates(body: dict = Body(default={})) -> dict[str, Any]:
             rag.close()
         except Exception:
             pass
-        return {"status": "ok", "triaged": 0, "message": "No pending candidates to triage"}
+        return {"status": "ok", "triaged": 0, "operations": [], "message": "No pending candidates to triage"}
 
     # 2. Fetch approved lexicon tree from QA DB
     try:
@@ -1529,16 +1683,19 @@ def llm_triage_candidates(body: dict = Body(default={})) -> dict[str, Any]:
             pass
         raise HTTPException(status_code=500, detail=f"Failed to load lexicon: {type(e).__name__}: {e}")
 
-    # 3. Build prompt
-    cand_lines = []
-    for c in candidates:
-        occ = c.get("occurrences") or 0
-        conf = c.get("confidence") or 0.0
-        ctype = c.get("candidate_type") or "d"
-        cand_lines.append(f'- "{c["normalized"]}" (type={ctype}, occurrences={occ}, confidence={conf:.2f})')
-    cand_text = "\n".join(cand_lines)
+    # 3. Build prompt template and call LLM in batches of 50
+    _BATCH_SIZE = 50
 
-    prompt = f"""You are an expert healthcare policy taxonomy maintainer.
+    def _build_triage_prompt(batch: list[dict]) -> str:
+        cand_lines = []
+        for c in batch:
+            occ = c.get("occurrences") or 0
+            conf = c.get("confidence") or 0.0
+            ctype = c.get("candidate_type") or "d"
+            cand_lines.append(f'- "{c["normalized"]}" (type={ctype}, occurrences={occ}, confidence={conf:.2f})')
+        cand_text = "\n".join(cand_lines)
+
+        return f"""You are an expert healthcare policy taxonomy maintainer.
 
 Below is the current APPROVED lexicon tree for tagging healthcare policy documents:
 
@@ -1547,29 +1704,78 @@ Below is the current APPROVED lexicon tree for tagging healthcare policy documen
 Previously REJECTED candidates (do not suggest these again):
 {rejected_text}
 
-The following {len(candidates)} candidate phrases were extracted from recent document processing.
-For EACH candidate, decide:
-1. **verdict**: one of `new_tag` (genuinely new domain concept worth adding), `alias` (already covered by an existing tag -- specify which), or `reject` (junk, noise, too generic, not a real domain concept)
-2. **confidence**: 0.0 to 1.0 (how confident you are in the verdict)
-3. **reason**: one brief sentence explaining why
-4. **suggested_kind**: p, d, or j (only for new_tag or alias; empty string for reject)
-5. **suggested_code**: the full tag code (e.g. "health_care_services.chronic_pain") -- for alias, use the existing tag code; for new_tag, propose a new code following the tree conventions
-6. **suggested_parent**: the parent tag code (e.g. "health_care_services") -- empty string for reject
+The following {len(batch)} candidate phrases were extracted from recent document processing.
+For EACH candidate, produce exactly one structured operation:
+
+1. **reject_candidate** — for junk, noise, too-generic phrases, partial sentences, conjunctions,
+   time references, copyright notices, or anything not a real domain concept.
+   Format: {{ "op": "reject_candidate", "normalized": "<phrase>", "reason": "<brief>", "confidence": 0.0-1.0 }}
+
+2. **add_alias** — the phrase is already covered by an existing tag. Add it as an alias.
+   Match to the MOST SPECIFIC existing tag, not a broad parent.
+   Format: {{ "op": "add_alias", "normalized": "<phrase>", "target_kind": "p|d|j", "target_code": "<existing.tag.code>", "reason": "<brief>", "confidence": 0.0-1.0 }}
+
+3. **create_tag** — a genuinely new domain concept worth adding to the taxonomy.
+   Propose placement following existing tree structure and naming conventions.
+   Format: {{ "op": "create_tag", "normalized": "<phrase>", "kind": "p|d|j", "code": "<new.tag.code>", "parent_code": "<parent>", "description": "<brief description>", "reason": "<brief>", "confidence": 0.0-1.0 }}
 
 Guidelines:
-- Be AGGRESSIVE about rejecting junk: time references, copyright notices, generic phrases like "health care", partial sentences, conjunctions
-- For alias verdicts, match to the MOST SPECIFIC existing tag, not a broad parent
-- For new_tag verdicts, suggest placement that follows the existing tree structure and naming conventions
-- If a candidate is a near-duplicate of an existing tag, verdict should be alias, not new_tag
+- Be AGGRESSIVE about rejecting junk. Most candidates should be reject_candidate.
+- If a candidate is a near-duplicate of an existing tag, use add_alias not create_tag.
+- For add_alias, the target_code MUST be an existing tag from the lexicon tree above.
+- For create_tag, propose a code and parent that follow the tree conventions.
+- Keep reason fields SHORT (under 15 words) to save space.
 
 Candidates:
 {cand_text}
 
-Respond with ONLY a YAML list. Do NOT wrap in code fences. Output raw YAML only.
-Each item: phrase, verdict, confidence, reason, suggested_kind, suggested_code, suggested_parent.
+CRITICAL: Respond with ONLY a JSON array of operation objects. Do NOT wrap in code fences.
+Output raw JSON only. Every candidate MUST have exactly one operation.
 """
 
-    # 4. Call Vertex Gemini
+    def _parse_llm_json(raw_text: str) -> list[dict]:
+        """Parse JSON from LLM response, with recovery for truncated output."""
+        text = raw_text.strip()
+
+        # Strip code fences if LLM wrapped them
+        if text.startswith("```"):
+            lines_raw = text.split("\n")
+            text = "\n".join(line for line in lines_raw if not line.strip().startswith("```"))
+
+        # Try direct parse first
+        try:
+            result = json.loads(text)
+            if isinstance(result, list):
+                return result
+        except json.JSONDecodeError:
+            pass
+
+        # Truncated JSON recovery: find the last complete object in the array
+        # Look for the last "}," or "}" followed by possible whitespace before truncation
+        last_complete = text.rfind("},")
+        if last_complete > 0:
+            recovered = text[:last_complete + 1] + "]"
+            try:
+                result = json.loads(recovered)
+                if isinstance(result, list):
+                    return result
+            except json.JSONDecodeError:
+                pass
+
+        # Try closing with just }]
+        last_brace = text.rfind("}")
+        if last_brace > 0:
+            recovered = text[:last_brace + 1] + "]"
+            try:
+                result = json.loads(recovered)
+                if isinstance(result, list):
+                    return result
+            except json.JSONDecodeError:
+                pass
+
+        raise ValueError(f"Could not parse LLM JSON (len={len(text)}). First 200 chars: {text[:200]}")
+
+    # 4. Call Vertex Gemini in batches
     try:
         import vertexai
         from vertexai.generative_models import GenerativeModel
@@ -1579,7 +1785,6 @@ Each item: phrase, verdict, confidence, reason, suggested_kind, suggested_code, 
         model_name = os.environ.get("VERTEX_LLM_MODEL") or "gemini-2.0-flash"
 
         if not project:
-            # Try extracting from VERTEX_INDEX_ENDPOINT_ID
             endpoint_id = os.environ.get("VERTEX_INDEX_ENDPOINT_ID") or ""
             import re as _re
             m = _re.search(r"projects/([^/]+)/", endpoint_id)
@@ -1594,25 +1799,18 @@ Each item: phrase, verdict, confidence, reason, suggested_kind, suggested_code, 
             raise HTTPException(status_code=400, detail="VERTEX_PROJECT not configured. Set VERTEX_PROJECT or VERTEX_PROJECT_ID env var.")
 
         vertexai.init(project=project, location=region)
-        model = GenerativeModel(model_name)
-        response = model.generate_content(prompt)
-        raw_text = response.text.strip()
+        llm_model = GenerativeModel(model_name)
 
-        # Strip code fences if LLM wrapped them
-        if raw_text.startswith("```"):
-            lines_raw = raw_text.split("\n")
-            raw_text = "\n".join(
-                line for line in lines_raw
-                if not line.strip().startswith("```")
-            )
+        # Process in batches
+        triage_results: list[dict] = []
+        batches = [candidates[i:i + _BATCH_SIZE] for i in range(0, len(candidates), _BATCH_SIZE)]
 
-        triage_results = yaml.safe_load(raw_text)
-        if not isinstance(triage_results, list):
-            try:
-                rag.close()
-            except Exception:
-                pass
-            raise HTTPException(status_code=500, detail=f"LLM returned unexpected format. Raw: {raw_text[:500]}")
+        for batch_idx, batch in enumerate(batches):
+            prompt = _build_triage_prompt(batch)
+            response = llm_model.generate_content(prompt)
+            raw_text = response.text.strip()
+            batch_results = _parse_llm_json(raw_text)
+            triage_results.extend(batch_results)
 
     except HTTPException:
         raise
@@ -1623,41 +1821,57 @@ Each item: phrase, verdict, confidence, reason, suggested_kind, suggested_code, 
             pass
         raise HTTPException(status_code=500, detail=f"LLM call failed: {type(e).__name__}: {e}")
 
-    # 5. Build lookup and update candidates in RAG DB
-    triage_by_phrase: dict[str, dict] = {}
+    # 5. Build lookup, update candidates in RAG DB, collect operations
+    ops_by_phrase: dict[str, dict] = {}
     for item in triage_results:
         if not isinstance(item, dict):
             continue
-        phrase = (str(item.get("phrase", "")) or "").strip().lower()
+        phrase = (str(item.get("normalized", "")) or "").strip().lower()
         if phrase:
-            triage_by_phrase[phrase] = item
+            ops_by_phrase[phrase] = item
 
+    operations: list[dict] = []
     try:
         rcur = rag.cursor()
         updated = 0
         skipped = 0
         for c in candidates:
             norm = (c.get("normalized") or "").strip().lower()
-            triage = triage_by_phrase.get(norm)
-            if not triage:
+            op = ops_by_phrase.get(norm)
+            if not op:
                 skipped += 1
                 continue
 
-            verdict = str(triage.get("verdict", "")).strip().lower()
-            if verdict not in ("new_tag", "alias", "reject"):
+            op_type = str(op.get("op", "")).strip().lower()
+            # Map op type to legacy verdict for backward compat
+            verdict_map = {"reject_candidate": "reject", "add_alias": "alias", "create_tag": "new_tag"}
+            verdict = verdict_map.get(op_type, "")
+            if not verdict:
                 skipped += 1
                 continue
 
             confidence = 0.0
             try:
-                confidence = float(triage.get("confidence", 0.0))
+                confidence = float(op.get("confidence", 0.0))
             except (ValueError, TypeError):
                 pass
-            reason = str(triage.get("reason", ""))[:500]
-            suggested_kind = str(triage.get("suggested_kind", ""))[:10]
-            suggested_code = str(triage.get("suggested_code", ""))[:500]
-            suggested_parent = str(triage.get("suggested_parent", ""))[:500]
+            reason = str(op.get("reason", ""))[:500]
 
+            # Determine suggested fields from op
+            if op_type == "add_alias":
+                suggested_kind = str(op.get("target_kind", ""))[:10]
+                suggested_code = str(op.get("target_code", ""))[:500]
+                suggested_parent = ""
+            elif op_type == "create_tag":
+                suggested_kind = str(op.get("kind", ""))[:10]
+                suggested_code = str(op.get("code", ""))[:500]
+                suggested_parent = str(op.get("parent_code", ""))[:500]
+            else:
+                suggested_kind = ""
+                suggested_code = ""
+                suggested_parent = ""
+
+            # Update legacy fields on candidate row
             rcur.execute(
                 """
                 UPDATE policy_lexicon_candidates
@@ -1673,6 +1887,12 @@ Each item: phrase, verdict, confidence, reason, suggested_kind, suggested_code, 
             )
             updated += 1
 
+            # Build the operation for frontend display — ensure normalized is present
+            clean_op = {**op, "normalized": norm}
+            if "confidence" not in clean_op:
+                clean_op["confidence"] = confidence
+            operations.append(clean_op)
+
         rcur.close()
         rag.close()
 
@@ -1681,6 +1901,7 @@ Each item: phrase, verdict, confidence, reason, suggested_kind, suggested_code, 
             "triaged": updated,
             "skipped": skipped,
             "total_candidates": len(candidates),
+            "operations": operations,
             "llm_model": model_name,
         }
 
@@ -1690,6 +1911,363 @@ Each item: phrase, verdict, confidence, reason, suggested_kind, suggested_code, 
         except Exception:
             pass
         raise HTTPException(status_code=500, detail=f"Failed to update triage results: {type(e).__name__}: {e}")
+
+
+# ---------------------------------------------------------------------------
+# Apply candidate operations (batch)
+# ---------------------------------------------------------------------------
+
+@app.post("/policy/candidates/apply-operations")
+def apply_candidate_operations(body: dict = Body(...)) -> dict[str, Any]:
+    """
+    Execute a batch of candidate operations produced by LLM triage.
+
+    Body: { operations: [ { op, normalized, ... }, ... ] }
+
+    Supported ops:
+      - reject_candidate: reject the candidate phrase
+      - add_alias: add the phrase as an alias to an existing tag, then mark candidate absorbed
+      - create_tag: create a new lexicon tag with phrase as strong_phrase, then approve candidate
+    """
+    operations = body.get("operations")
+    if not isinstance(operations, list) or not operations:
+        raise HTTPException(status_code=400, detail="'operations' array is required and must not be empty")
+
+    u = _urls()
+    results: list[dict[str, Any]] = []
+    qa = rag = None
+    qa_cur = rag_cur = None
+
+    try:
+        qa = _conn(u.qa)
+        qa.autocommit = True
+        qa_cur = qa.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        rag = _conn(u.rag)
+        rag.autocommit = True
+        rag_cur = rag.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        logger.info("[apply-operations] ops=%d", len(operations))
+
+        for idx, op in enumerate(operations):
+            if not isinstance(op, dict):
+                results.append({"index": idx, "op": "unknown", "status": "error", "detail": "Invalid operation object"})
+                continue
+
+            op_type = str(op.get("op", "")).strip()
+            normalized = str(op.get("normalized", "")).strip()
+
+            if not normalized:
+                results.append({"index": idx, "op": op_type, "status": "error", "detail": "Missing 'normalized' field"})
+                continue
+
+            # Prefer ids from client (loaded from overview); else resolve by normalized
+            ids_raw = op.get("ids") if isinstance(op.get("ids"), list) else []
+            ids = [str(x).strip() for x in ids_raw if str(x).strip()]
+            if not ids:
+                ids = resolve_normalized_to_ids(rag_cur, normalized, state_filter="proposed")
+            if not ids:
+                results.append({"index": idx, "op": op_type, "normalized": normalized, "status": "error", "detail": "no_matching_proposed_rows"})
+                continue
+
+            ct_by_id = fetch_candidate_types_by_ids(rag_cur, ids)
+
+            try:
+                if op_type == "reject_candidate":
+                    rows_updated, err = reject_candidate_by_ids(
+                        rag_cur,
+                        ids,
+                        normalized,
+                        reviewer="llm-ops",
+                        reviewer_notes=str(op.get("reason", "LLM-recommended reject"))[:500],
+                        ct_by_id=ct_by_id,
+                    )
+                    if rows_updated == 0:
+                        logger.warning("[apply-operations] reject_candidate normalized=%r rows=0", normalized)
+                        results.append({"index": idx, "op": "reject_candidate", "normalized": normalized, "status": "error", "detail": err or "no_rows_updated"})
+                    else:
+                        logger.info("[apply-operations] reject_candidate normalized=%r rows=%d ok", normalized, rows_updated)
+                        results.append({"index": idx, "op": "reject_candidate", "normalized": normalized, "status": "ok"})
+
+                elif op_type == "add_alias":
+                    target_kind = str(op.get("target_kind", "d")).strip().lower()
+                    target_code = str(op.get("target_code", "")).strip()
+                    if target_kind not in ("p", "d", "j") or not target_code:
+                        raise ValueError("target_kind (p/d/j) and target_code are required")
+
+                    # Load existing spec from QA DB; try exact match first, then code ending (e.g. coding.hcpcs for "hcpcs")
+                    qa_cur.execute(
+                        "SELECT code, spec FROM policy_lexicon_entries WHERE kind = %s AND code = %s LIMIT 1",
+                        (target_kind, target_code),
+                    )
+                    tag_row = qa_cur.fetchone()
+                    if not tag_row:
+                        qa_cur.execute(
+                            "SELECT code, spec FROM policy_lexicon_entries WHERE kind = %s AND (code = %s OR code LIKE %s) AND active = true LIMIT 1",
+                            (target_kind, target_code, f"%.{target_code}"),
+                        )
+                        tag_row = qa_cur.fetchone()
+                    if not tag_row:
+                        raise ValueError(f"Target tag {target_kind}.{target_code} not found")
+
+                    resolved_code = str(tag_row.get("code", target_code))
+                    existing_spec = tag_row.get("spec") if isinstance(tag_row.get("spec"), dict) else {}
+                    phrases = list(existing_spec.get("strong_phrases") or existing_spec.get("phrases") or existing_spec.get("aliases") or [])
+                    if normalized.lower() not in [str(p).lower() for p in phrases]:
+                        phrases.append(normalized)
+                    existing_spec["strong_phrases"] = phrases
+
+                    qa_cur.execute(
+                        "UPDATE policy_lexicon_entries SET spec = %s::jsonb, updated_at = NOW() "
+                        "WHERE kind = %s AND code = %s",
+                        (json.dumps(existing_spec), target_kind, resolved_code),
+                    )
+                    qa_rowcount = qa_cur.rowcount
+                    if qa_rowcount == 0:
+                        logger.warning("[apply-operations] add_alias QA UPDATE matched 0 rows for %s.%s", target_kind, resolved_code)
+
+                    # Mark candidate as rejected (absorbed) in RAG DB by ID
+                    note = f"Added as alias to {target_kind}.{resolved_code}"
+                    rows_updated = update_candidate_state_by_ids(
+                        rag_cur, ids, "rejected",
+                        reviewer="llm-ops", reviewer_notes=note,
+                    )
+                    if rows_updated == 0:
+                        logger.warning("[apply-operations] add_alias normalized=%r rows=0", normalized)
+                        results.append({"index": idx, "op": "add_alias", "normalized": normalized, "status": "error", "detail": "no_rows_updated"})
+                    else:
+                        nk = _normalize_phrase(normalized)
+                        prop_key = f"{target_kind}:{resolved_code}".lower()[:300]
+                        ct = ct_by_id.get(ids[0]) if ids else target_kind
+                        if ct not in ("p", "d", "j"):
+                            ct = target_kind
+                        upsert_catalog(rag_cur, ct, nk, prop_key, f"{target_kind}.{resolved_code}", "rejected", "llm-ops", note)
+                        results.append({"index": idx, "op": "add_alias", "normalized": normalized, "target": f"{target_kind}.{resolved_code}", "status": "ok"})
+
+                elif op_type == "create_tag":
+                    kind = str(op.get("kind", "d")).strip().lower()
+                    code = str(op.get("code", "")).strip()
+                    parent_code = str(op.get("parent_code", "")).strip() or None
+                    description = str(op.get("description", ""))[:500]
+
+                    if kind not in ("p", "d", "j") or not code:
+                        raise ValueError("kind (p/d/j) and code are required")
+
+                    spec_val: dict[str, Any] = {"strong_phrases": [normalized]}
+                    if description:
+                        spec_val["description"] = description
+
+                    # Check if tag already exists — just add as alias if so
+                    qa_cur.execute(
+                        "SELECT spec FROM policy_lexicon_entries WHERE kind = %s AND code = %s LIMIT 1",
+                        (kind, code),
+                    )
+                    existing = qa_cur.fetchone()
+                    if existing:
+                        ex_spec = existing.get("spec") if isinstance(existing.get("spec"), dict) else {}
+                        phrases = list(ex_spec.get("strong_phrases") or [])
+                        if normalized.lower() not in [p.lower() for p in phrases]:
+                            phrases.append(normalized)
+                        ex_spec["strong_phrases"] = phrases
+                        if description and not ex_spec.get("description"):
+                            ex_spec["description"] = description
+                        qa_cur.execute(
+                            "UPDATE policy_lexicon_entries SET spec = %s::jsonb, updated_at = NOW() "
+                            "WHERE kind = %s AND code = %s",
+                            (json.dumps(ex_spec), kind, code),
+                        )
+                        note = "added phrase to existing tag"
+                    else:
+                        qa_cur.execute(
+                            "INSERT INTO policy_lexicon_entries(id, kind, code, parent_code, spec, active, created_at, updated_at) "
+                            "VALUES (%s, %s, %s, %s, %s::jsonb, true, NOW(), NOW())",
+                            (str(uuid.uuid4()), kind, code, parent_code, json.dumps(spec_val)),
+                        )
+                        note = "created new tag"
+
+                    # Mark candidate as approved in RAG DB by ID
+                    note_rag = f"Created as {kind}.{code}"
+                    rows_updated = update_candidate_state_by_ids(
+                        rag_cur, ids, "approved",
+                        reviewer="llm-ops", reviewer_notes=note_rag,
+                    )
+                    if rows_updated == 0:
+                        logger.warning("[apply-operations] create_tag normalized=%r rows=0", normalized)
+                        results.append({"index": idx, "op": "create_tag", "normalized": normalized, "status": "error", "detail": "no_rows_updated"})
+                    else:
+                        nk = _normalize_phrase(normalized)
+                        prop_key = f"{kind}.{code}".lower()[:300]
+                        ct = ct_by_id.get(ids[0]) if ids else kind
+                        if ct not in ("p", "d", "j"):
+                            ct = kind
+                        upsert_catalog(rag_cur, ct, nk, prop_key, f"{kind}.{code}", "approved", "llm-ops", note_rag)
+                        results.append({"index": idx, "op": "create_tag", "normalized": normalized, "tag": f"{kind}.{code}", "status": "ok", "note": note})
+
+                else:
+                    results.append({"index": idx, "op": op_type, "normalized": normalized, "status": "error", "detail": f"Unknown op: {op_type}"})
+
+            except Exception as ex:
+                results.append({"index": idx, "op": op_type, "normalized": normalized, "status": "error", "detail": str(ex)[:500]})
+                # Rollback both connections so next op gets a clean state (avoids "transaction is aborted")
+                try:
+                    rag.rollback()
+                except Exception:
+                    pass
+                try:
+                    qa.rollback()
+                except Exception:
+                    pass
+
+        # Bump lexicon revision if any create/alias ops succeeded
+        lexicon_ops = [r for r in results if r.get("op") in ("add_alias", "create_tag") and r.get("status") == "ok"]
+        new_rev = 0
+        if lexicon_ops:
+            qa_cur.execute("UPDATE policy_lexicon_meta SET revision = revision + 1, updated_at = NOW() RETURNING revision")
+            rev_row = qa_cur.fetchone()
+            new_rev = int(rev_row["revision"]) if rev_row else 0
+
+        failed_count = sum(1 for r in results if r.get("status") == "error")
+        return {
+            "status": "ok" if failed_count == 0 else "partial",
+            "results": results,
+            "failed_count": failed_count,
+            "applied_count": len(results) - failed_count,
+            "lexicon_revision": new_rev,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to apply operations: {type(e).__name__}: {e}")
+    finally:
+        if qa_cur is not None:
+            try:
+                qa_cur.close()
+            except Exception:
+                pass
+        if qa is not None:
+            try:
+                qa.close()
+            except Exception:
+                pass
+        if rag_cur is not None:
+            try:
+                rag_cur.close()
+            except Exception:
+                pass
+        if rag is not None:
+            try:
+                rag.close()
+            except Exception:
+                pass
+
+
+# ---------------------------------------------------------------------------
+# Revise a single candidate operation via LLM
+# ---------------------------------------------------------------------------
+
+@app.post("/policy/candidates/revise")
+def revise_candidate_operation(body: dict = Body(...)) -> dict[str, Any]:
+    """
+    Ask the LLM to revise a suggested operation for a single candidate,
+    incorporating user instructions.
+
+    Body: {
+      normalized: str,
+      current_operation: { op, ... },
+      user_instructions: str,
+    }
+    """
+    normalized = str(body.get("normalized", "")).strip()
+    current_op = body.get("current_operation") or {}
+    user_instructions = str(body.get("user_instructions", "")).strip()
+
+    if not normalized:
+        raise HTTPException(status_code=400, detail="'normalized' is required")
+    if not user_instructions:
+        raise HTTPException(status_code=400, detail="'user_instructions' is required")
+
+    u = _urls()
+
+    # Fetch lexicon context
+    try:
+        qa = _conn(u.qa)
+        qa.autocommit = True
+        lexicon_tree = _build_lexicon_tree_text(qa)
+        qa.close()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load lexicon: {type(e).__name__}: {e}")
+
+    prompt = f"""You are an expert healthcare policy taxonomy maintainer.
+
+Below is the current APPROVED lexicon tree:
+
+{lexicon_tree}
+
+A candidate phrase was extracted from document processing:
+  Phrase: "{normalized}"
+
+The LLM previously suggested this operation:
+{json.dumps(current_op, indent=2)}
+
+The user has provided additional instructions:
+"{user_instructions}"
+
+Based on the user's feedback, produce a REVISED operation for this candidate.
+Use one of these operation types:
+
+1. reject_candidate: {{ "op": "reject_candidate", "normalized": "{normalized}", "reason": "<reason>", "confidence": 0.0-1.0 }}
+2. add_alias: {{ "op": "add_alias", "normalized": "{normalized}", "target_kind": "p|d|j", "target_code": "<existing.tag>", "reason": "<reason>", "confidence": 0.0-1.0 }}
+3. create_tag: {{ "op": "create_tag", "normalized": "{normalized}", "kind": "p|d|j", "code": "<new.tag.code>", "parent_code": "<parent>", "description": "<desc>", "reason": "<reason>", "confidence": 0.0-1.0 }}
+
+CRITICAL: Respond with ONLY a single JSON object. No code fences, no explanation, just the operation object.
+"""
+
+    try:
+        import vertexai
+        from vertexai.generative_models import GenerativeModel
+
+        project = os.environ.get("VERTEX_PROJECT") or os.environ.get("VERTEX_PROJECT_ID") or ""
+        region = os.environ.get("VERTEX_REGION") or os.environ.get("VERTEX_LOCATION") or "us-central1"
+        model_name = os.environ.get("VERTEX_LLM_MODEL") or "gemini-2.0-flash"
+
+        if not project:
+            endpoint_id = os.environ.get("VERTEX_INDEX_ENDPOINT_ID") or ""
+            import re as _re
+            m = _re.search(r"projects/([^/]+)/", endpoint_id)
+            if m:
+                project = m.group(1)
+
+        if not project:
+            raise HTTPException(status_code=400, detail="VERTEX_PROJECT not configured.")
+
+        vertexai.init(project=project, location=region)
+        model_inst = GenerativeModel(model_name)
+        response = model_inst.generate_content(prompt)
+        raw_text = response.text.strip()
+
+        # Strip code fences
+        if raw_text.startswith("```"):
+            lines_raw = raw_text.split("\n")
+            raw_text = "\n".join(line for line in lines_raw if not line.strip().startswith("```"))
+
+        revised_op = json.loads(raw_text)
+        if not isinstance(revised_op, dict):
+            raise HTTPException(status_code=500, detail=f"LLM returned unexpected format: {raw_text[:300]}")
+
+        # Ensure normalized is set
+        revised_op["normalized"] = normalized
+
+        return {
+            "status": "ok",
+            "operation": revised_op,
+            "llm_model": model_name,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Revise LLM call failed: {type(e).__name__}: {e}")
 
 
 # ---------------------------------------------------------------------------

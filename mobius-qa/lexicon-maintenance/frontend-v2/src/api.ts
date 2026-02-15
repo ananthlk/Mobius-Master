@@ -110,7 +110,7 @@ export async function fetchCandidates(params: {
 }
 
 export async function bulkReview(body: {
-  normalized_list: string[]
+  id_list: string[]
   state: string
   reviewer?: string
   reviewer_notes?: string
@@ -123,12 +123,84 @@ export async function bulkReview(body: {
   })
 }
 
-// ── LLM Triage ──
+// ── LLM Triage (operations-based) ──
+
+export interface CandidateOperation {
+  op: 'reject_candidate' | 'add_alias' | 'create_tag'
+  normalized: string
+  ids?: string[]  // Row UUIDs from overview; pass when available to avoid backend resolution
+  reason?: string
+  confidence?: number
+  // add_alias fields
+  target_kind?: string
+  target_code?: string
+  // create_tag fields
+  kind?: string
+  code?: string
+  parent_code?: string
+  description?: string
+}
+
+export interface TriageResponse {
+  status: string
+  triaged: number
+  skipped: number
+  total_candidates: number
+  operations: CandidateOperation[]
+  llm_model: string
+}
 
 export async function runLlmTriage(force = false) {
-  return _fetch<Record<string, unknown>>('/policy/candidates/llm-triage', {
+  return _fetch<TriageResponse>('/policy/candidates/llm-triage', {
     method: 'POST',
     body: JSON.stringify({ force }),
+  })
+}
+
+export interface CandidateApplyResult {
+  index: number
+  op: string
+  normalized: string
+  status: string
+  detail?: string
+  target?: string
+  tag?: string
+  note?: string
+}
+
+export interface CandidateApplyResponse {
+  status: string
+  results: CandidateApplyResult[]
+  failed_count: number
+  applied_count: number
+  lexicon_revision: number
+}
+
+export async function applyCandidateOperations(operations: CandidateOperation[]): Promise<CandidateApplyResponse> {
+  return _fetch<CandidateApplyResponse>('/policy/candidates/apply-operations', {
+    method: 'POST',
+    body: JSON.stringify({ operations }),
+  })
+}
+
+export interface ReviseResponse {
+  status: string
+  operation: CandidateOperation
+  llm_model: string
+}
+
+export async function reviseCandidateOperation(
+  normalized: string,
+  currentOperation: CandidateOperation,
+  userInstructions: string,
+): Promise<ReviseResponse> {
+  return _fetch<ReviseResponse>('/policy/candidates/revise', {
+    method: 'POST',
+    body: JSON.stringify({
+      normalized,
+      current_operation: currentOperation,
+      user_instructions: userInstructions,
+    }),
   })
 }
 
