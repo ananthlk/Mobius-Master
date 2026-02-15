@@ -3,20 +3,27 @@ from __future__ import annotations
 import logging
 import os
 import re
-import threading
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import psycopg2
 import psycopg2.extras
-import psycopg2.pool
 import json
 import uuid
-import contextlib
 from fastapi import Body, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.config import get_urls
+from app.routers import health as health_router
+from app.db import dual_session, get_conn, qa_session, rag_session
+from app.repositories import (
+    bump_revision as _bump_revision_repo,
+    ensure_dismissed_table,
+    get_lexicon_meta_and_tags,
+    load_dismissed as _load_dismissed_repo,
+    parent_exists as _parent_exists_repo,
+)
+from app.repositories.dismissed_repo import dismissed_fingerprint as _dismissed_fingerprint_repo
 from app.candidate_ops import (
     _normalize_phrase,
     fetch_candidate_types_by_ids,
@@ -29,70 +36,13 @@ from app.candidate_ops import (
 logger = logging.getLogger(__name__)
 
 
-def _load_env() -> None:
-    """Best-effort: load mobius-config/.env (without clobbering process overrides)."""
-    try:
-        root = Path(__file__).resolve().parents[3]  # /Mobius
-        cfg_dir = root / "mobius-config"
-        env_path = cfg_dir / ".env"
-        if not env_path.exists():
-            return
-        try:
-            from dotenv import load_dotenv  # type: ignore
-        except Exception:
-            return
-        # Preserve explicit DB URL overrides, but otherwise prefer mobius-config/.env.
-        # This avoids picking up stale shell env (e.g. POSTGRES_HOST pointing to a public IP).
-        preserve = {k: os.environ.get(k) for k in ("QA_DATABASE_URL", "RAG_DATABASE_URL") if os.environ.get(k)}
-        load_dotenv(env_path, override=True)
-        for k, v in preserve.items():
-            if v is not None:
-                os.environ[k] = v
-    except Exception:
-        return
+def _urls():
+    return get_urls()
 
 
-_load_env()
-
-
-def _env(key: str, default: str = "") -> str:
-    return (os.getenv(key) or default).strip()
-
-
-def _build_pg_url(db: str) -> str:
-    user = _env("POSTGRES_USER", "postgres") or "postgres"
-    pwd = _env("POSTGRES_PASSWORD", "")
-    host = _env("POSTGRES_HOST", "127.0.0.1") or "127.0.0.1"
-    port = _env("POSTGRES_PORT", "5432") or "5432"
-    if pwd:
-        return f"postgresql://{user}:{pwd}@{host}:{port}/{db}?connect_timeout=5"
-    return f"postgresql://{user}@{host}:{port}/{db}?connect_timeout=5"
-
-
-def _qa_url() -> str:
-    return _env("QA_DATABASE_URL") or _build_pg_url("mobius_qa")
-
-
-def _rag_url() -> str:
-    # Prefer RAG_DATABASE_URL; fall back to DATABASE_URL (RAG service) so we hit the same DB.
-    url = _env("RAG_DATABASE_URL")
-    if url:
-        return url
-    url = _env("DATABASE_URL")
-    if url:
-        # Strip SQLAlchemy async driver for psycopg2
-        return url.replace("postgresql+asyncpg://", "postgresql://")
-    return _build_pg_url("mobius_rag")
-
-
-@dataclass
-class DbUrls:
-    qa: str
-    rag: str
-
-
-def _urls() -> DbUrls:
-    return DbUrls(qa=_qa_url(), rag=_rag_url())
+def _conn(url: str):
+    """Get a pooled connection. Call .close() when done. Prefer qa_session/rag_session/dual_session."""
+    return get_conn(url)
 
 
 app = FastAPI(title="Mobius QA — Lexicon Maintenance API", version="0.1.0")
@@ -103,147 +53,28 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-# ── Connection pooling ──────────────────────────────────────────────────────
-# Use ThreadedConnectionPool with a blocking wrapper so getconn() waits instead
-# of raising PoolError when exhausted. _conn() returns PooledConnection whose
-# close() returns the connection to the pool.
-
-_pools: dict[str, "BlockingConnectionPool"] = {}
-_POOL_MIN = 1
-_POOL_MAX = int(os.getenv("LEXICON_POOL_MAX", "8"))  # Per-DB cap; increase if many concurrent requests
-
-
-class BlockingConnectionPool(psycopg2.pool.ThreadedConnectionPool):
-    """Wraps ThreadedConnectionPool so getconn() blocks instead of raising PoolError."""
-
-    def __init__(self, minconn: int, maxconn: int, *args: Any, **kwargs: Any):
-        super().__init__(minconn, maxconn, *args, **kwargs)
-        self._sem = threading.Semaphore(maxconn)
-
-    def getconn(self, *args: Any, **kwargs: Any):
-        self._sem.acquire()
-        try:
-            return super().getconn(*args, **kwargs)
-        except Exception:
-            self._sem.release()
-            raise
-
-    def putconn(self, *args: Any, **kwargs: Any):
-        try:
-            super().putconn(*args, **kwargs)
-        finally:
-            self._sem.release()
-
-
-def _get_pool(url: str) -> BlockingConnectionPool:
-    if url not in _pools:
-        _pools[url] = BlockingConnectionPool(_POOL_MIN, _POOL_MAX, url, connect_timeout=10)
-    return _pools[url]
-
-
-class _PooledConnection:
-    """Thin wrapper: delegates to the real connection; close() returns it to the pool."""
-
-    def __init__(self, real_conn, pool: BlockingConnectionPool):
-        self._conn = real_conn
-        self._pool = pool
-        self._returned = False
-
-    def close(self):
-        if not self._returned:
-            self._returned = True
-            try:
-                self._conn.commit()
-            except Exception:
-                pass
-            try:
-                self._conn.rollback()  # Reset any aborted transaction so next user gets clean connection
-            except Exception:
-                pass
-            self._pool.putconn(self._conn)
-
-    def __del__(self):
-        # Safety net: return to pool if caller forgot close()
-        self.close()
-
-    # Delegate everything else to the real connection
-    def __getattr__(self, name):
-        return getattr(self._conn, name)
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *exc):
-        self.close()
-        return False
-
-    def cursor(self, *args, **kwargs):
-        return self._conn.cursor(*args, **kwargs)
-
-
-def _conn(url: str):
-    """Get a pooled connection.  Call .close() when done (returns to pool)."""
-    pool = _get_pool(url)
-    real = pool.getconn()
-    return _PooledConnection(real, pool)
+app.include_router(health_router.router)
 
 
 # ---------------------------------------------------------------------------
 # Dismissed health issues — persistent overrule store
 # ---------------------------------------------------------------------------
-_DISMISSED_TABLE_ENSURED = False
-
-
 def _ensure_dismissed_table(qa_url: str) -> None:
-    """Auto-create policy_lexicon_dismissed_issues table if it doesn't exist."""
-    global _DISMISSED_TABLE_ENSURED
-    if _DISMISSED_TABLE_ENSURED:
-        return
-    try:
-        qa = _conn(qa_url)
-        qa.autocommit = True
-        cur = qa.cursor()
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS policy_lexicon_dismissed_issues (
-                id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-                issue_type TEXT NOT NULL,
-                issue_tags TEXT[] NOT NULL DEFAULT '{}',
-                issue_message TEXT NOT NULL DEFAULT '',
-                issue_fingerprint TEXT NOT NULL UNIQUE,
-                reason TEXT NOT NULL DEFAULT '',
-                dismissed_by TEXT NOT NULL DEFAULT 'user',
-                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-            )
-        """)
-        cur.close()
-        qa.close()
-        _DISMISSED_TABLE_ENSURED = True
-    except Exception:
-        pass  # best-effort; will retry next time
+    with qa_session() as qa:
+        ensure_dismissed_table(qa)
 
 
 def _dismissed_fingerprint(issue_type: str, tags: list[str]) -> str:
-    """Stable fingerprint for an issue: type + sorted tags."""
-    return f"{issue_type}::{','.join(sorted(t.strip().lower() for t in tags))}"
+    return _dismissed_fingerprint_repo(issue_type, tags)
 
 
 def _load_dismissed(qa_url: str) -> list[dict]:
-    """Load all dismissed issues from QA DB."""
-    _ensure_dismissed_table(qa_url)
     try:
-        qa = _conn(qa_url)
-        qa.autocommit = True
-        cur = qa.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cur.execute(
-            "SELECT id, issue_type, issue_tags, issue_message, issue_fingerprint, reason, dismissed_by, created_at "
-            "FROM policy_lexicon_dismissed_issues ORDER BY created_at DESC"
-        )
-        rows = [dict(r) for r in cur.fetchall()]
-        cur.close()
-        qa.close()
-        return rows
+        with qa_session() as qa:
+            qa.autocommit = True
+            ensure_dismissed_table(qa)
+            cur = qa.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            return _load_dismissed_repo(cur)
     except Exception:
         return []
 
@@ -297,87 +128,29 @@ def _validate_tag_structure(kind: str, code: str, parent_code: str | None, qa_ur
                 status_code=400,
                 detail=f"Child tag '{code}' requires parent_code (expected '{expected_parent}')"
             )
-        # Verify parent exists
         try:
-            qa = _conn(qa_url)
-            qa.autocommit = True
-            cur = qa.cursor()
-            cur.execute(
-                "SELECT 1 FROM policy_lexicon_entries WHERE kind = %s AND code = %s LIMIT 1",
-                (kind, parent_code),
-            )
-            exists = cur.fetchone()
-            cur.close()
-            qa.close()
-            if not exists:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Parent tag '{kind}.{parent_code}' does not exist. "
-                           f"Create the root tag first."
-                )
+            with qa_session() as qa:
+                cur = qa.cursor()
+                if not _parent_exists_repo(cur, kind, parent_code):
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Parent tag '{kind}.{parent_code}' does not exist. "
+                               f"Create the root tag first."
+                    )
         except HTTPException:
             raise
         except Exception:
             pass  # best-effort; don't block on transient DB issues
 
 
-@app.get("/health")
-def health():
-    u = _urls()
-    try:
-        c = _conn(u.qa)
-        cur = c.cursor()
-        cur.execute("SELECT 1")
-        cur.fetchone()
-        cur.close()
-        c.close()
-        return {"status": "ok"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"qa_db unhealthy: {type(e).__name__}: {e}")
-
-
 @app.get("/policy/lexicon")
 def get_policy_lexicon():
     """Return lexicon tags + meta from QA DB."""
-    u = _urls()
     try:
-        c = _conn(u.qa)
-        c.autocommit = True
-        cur = c.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-
-        cur.execute(
-            """
-            SELECT COALESCE(revision,0)::bigint AS revision,
-                   COALESCE(lexicon_version,'v1')::text AS lexicon_version,
-                   lexicon_meta
-            FROM policy_lexicon_meta
-            ORDER BY updated_at DESC NULLS LAST
-            LIMIT 1
-            """
-        )
-        meta = cur.fetchone() or {}
+        with qa_session() as c:
+            cur = c.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            meta, tags = get_lexicon_meta_and_tags(cur)
         lexicon_meta = meta.get("lexicon_meta") if isinstance(meta.get("lexicon_meta"), dict) else (meta.get("lexicon_meta") or {})
-
-        cur.execute(
-            """
-            SELECT kind::text, code::text, parent_code::text, spec, active::bool
-            FROM policy_lexicon_entries
-            WHERE active = true
-            ORDER BY kind, code
-            """
-        )
-        tags = []
-        for r in cur.fetchall():
-            tags.append(
-                {
-                    "kind": (r.get("kind") or "").strip().lower(),
-                    "code": r.get("code"),
-                    "parent": r.get("parent_code"),
-                    "spec": r.get("spec") if isinstance(r.get("spec"), dict) else {},
-                }
-            )
-        cur.close()
-        c.close()
         return {
             "lexicon_version": meta.get("lexicon_version") or "v1",
             "lexicon_revision": int(meta.get("revision") or 0),
@@ -421,41 +194,7 @@ def _parse_kind_code(s: str, default_kind: str) -> tuple[str, str]:
 
 
 def _bump_lexicon_revision(qcur) -> int:
-    """Increment policy_lexicon_meta.revision (create row if missing). Returns new revision."""
-    qcur.execute(
-        """
-        SELECT id, COALESCE(revision,0)::bigint AS revision
-        FROM policy_lexicon_meta
-        ORDER BY updated_at DESC NULLS LAST
-        LIMIT 1
-        """
-    )
-    row = qcur.fetchone()
-    # Works with both tuple cursors and RealDictCursor.
-    rid = None
-    rev = 0
-    if isinstance(row, dict):
-        rid = row.get("id")
-        rev = int(row.get("revision") or 0)
-    elif isinstance(row, (list, tuple)) and row:
-        rid = row[0]
-        rev = int(row[1] or 0) if len(row) > 1 else 0
-    if rid:
-        new_rev = int(rev or 0) + 1
-        qcur.execute(
-            "UPDATE policy_lexicon_meta SET revision=%s, updated_at=NOW() WHERE id=%s",
-            (new_rev, rid),
-        )
-        return new_rev
-    new_rev = 1
-    qcur.execute(
-        """
-        INSERT INTO policy_lexicon_meta(id, lexicon_version, lexicon_meta, revision, created_at, updated_at)
-        VALUES (%s, %s, %s::jsonb, %s, NOW(), NOW())
-        """,
-        (str(uuid.uuid4()), "v1", json.dumps({}), new_rev),
-    )
-    return new_rev
+    return _bump_revision_repo(qcur)
 
 
 def _ensure_list(obj: dict, key: str) -> list[str]:
