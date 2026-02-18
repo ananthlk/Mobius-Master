@@ -5,10 +5,9 @@ const RAG_API_BASE = import.meta.env.VITE_RAG_API_BASE || 'http://localhost:8001
 
 async function _fetch<T>(path: string, opts?: RequestInit): Promise<T> {
   const url = `${API_BASE}${path}`
-  const res = await fetch(url, {
-    ...opts,
-    headers: { 'Content-Type': 'application/json', ...opts?.headers },
-  })
+  const isForm = opts?.body instanceof FormData
+  const headers: HeadersInit = isForm ? (opts?.headers ?? {}) : { 'Content-Type': 'application/json', ...opts?.headers }
+  const res = await fetch(url, { ...opts, headers })
   if (!res.ok) {
     const body = await res.text().catch(() => '')
     throw new Error(`API ${res.status}: ${body.slice(0, 300)}`)
@@ -66,6 +65,27 @@ export async function mergeTags(body: { kind: string; source_code: string; targe
   return _fetch<Record<string, unknown>>('/policy/lexicon/tags/merge', {
     method: 'POST',
     body: JSON.stringify(body),
+  })
+}
+
+export interface SuggestFromDocumentItem {
+  code: string
+  description: string
+}
+
+export async function suggestSubtagsFromDocument(
+  parentKind: string,
+  parentCode: string,
+  opts: { text?: string; file?: File }
+): Promise<{ suggestions: SuggestFromDocumentItem[] }> {
+  const form = new FormData()
+  form.set('parent_kind', parentKind)
+  form.set('parent_code', parentCode)
+  if (opts.text?.trim()) form.set('text', opts.text.trim())
+  if (opts.file) form.set('file', opts.file)
+  return _fetch<{ suggestions: SuggestFromDocumentItem[] }>('/policy/lexicon/tags/suggest-from-document', {
+    method: 'POST',
+    body: form,
   })
 }
 
@@ -201,6 +221,22 @@ export async function reviseCandidateOperation(
       current_operation: currentOperation,
       user_instructions: userInstructions,
     }),
+  })
+}
+
+export interface LlmSuggestResponse {
+  status: string
+  operation: CandidateOperation
+  llm_model: string
+}
+
+export async function getLlmSuggestion(
+  normalized: string,
+  ids?: string[],
+): Promise<LlmSuggestResponse> {
+  return _fetch<LlmSuggestResponse>('/policy/candidates/llm-suggest', {
+    method: 'POST',
+    body: JSON.stringify({ normalized, ids }),
   })
 }
 

@@ -1,11 +1,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { TagEntry, CenterTab, TagKind } from './types'
 import { fetchLexiconOverview, checkHealth, publishToRag, fetchRetagStatus, triggerBulkRetag, type RetagStatus } from './api'
-import { TreeBrowser } from './components/TreeBrowser'
+import { TreeBrowser, type AddSubtagFlow } from './components/TreeBrowser'
 import { CandidatesTab } from './components/CandidatesTab'
 import { TagOverviewTab } from './components/TagOverviewTab'
 import { HealthTab } from './components/HealthTab'
 import { TagDrawer } from './components/TagDrawer'
+import { AddSubtagManualModal } from './components/AddSubtagManualModal'
+import { AddSubtagSuggestionsModal } from './components/AddSubtagSuggestionsModal'
+import { AddSubtagDocumentModal } from './components/AddSubtagDocumentModal'
 import './App.css'
 
 function App() {
@@ -17,6 +20,11 @@ function App() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [treeFilter, setTreeFilter] = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
+  const [addSubtagTarget, setAddSubtagTarget] = useState<{
+    flow: AddSubtagFlow
+    kind: TagKind
+    parentCode: string
+  } | null>(null)
 
   // Fetch all approved tags for the tree
   const loadTags = useCallback(async () => {
@@ -253,6 +261,9 @@ function App() {
             filter={treeFilter}
             selectedTag={selectedTag}
             onSelect={handleTagSelect}
+            onAddSubtag={(flow, kind, parentCode) =>
+              setAddSubtagTarget({ flow, kind, parentCode })
+            }
           />
         </aside>
 
@@ -304,6 +315,32 @@ function App() {
             code={selectedTag.code}
             onClose={() => setDrawerOpen(false)}
             onSaved={handleRefresh}
+          />
+        )}
+
+        {/* Add sub-tag modals */}
+        {addSubtagTarget?.flow === 'manual' && (
+          <AddSubtagManualModal
+            kind={addSubtagTarget.kind}
+            parentCode={addSubtagTarget.parentCode}
+            onClose={() => setAddSubtagTarget(null)}
+            onSuccess={handleRefresh}
+          />
+        )}
+        {addSubtagTarget?.flow === 'suggestions' && (
+          <AddSubtagSuggestionsModal
+            kind={addSubtagTarget.kind}
+            parentCode={addSubtagTarget.parentCode}
+            onClose={() => setAddSubtagTarget(null)}
+            onSuccess={handleRefresh}
+          />
+        )}
+        {addSubtagTarget?.flow === 'document' && (
+          <AddSubtagDocumentModal
+            kind={addSubtagTarget.kind}
+            parentCode={addSubtagTarget.parentCode}
+            onClose={() => setAddSubtagTarget(null)}
+            onSuccess={handleRefresh}
           />
         )}
       </div>

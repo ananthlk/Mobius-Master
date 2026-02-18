@@ -212,6 +212,46 @@ html, body, #root {
   padding: 0 5px;
   border-radius: 6px;
 }
+.tree-suggestions-badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: rgba(72, 187, 120, 0.2);
+  border: 1px solid rgba(72, 187, 120, 0.5);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-right: 6px;
+}
+.tree-context-menu {
+  position: fixed;
+  z-index: 1000;
+  min-width: 200px;
+  padding: 4px 0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.tree-context-item {
+  display: block;
+  width: 100%;
+  padding: 8px 14px;
+  text-align: left;
+  border: none;
+  background: none;
+  font-size: 13px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+.tree-context-item:hover {
+  background: var(--bg-hover);
+}
+.tree-context-hint {
+  display: block;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
 
 /* ── Center panel ── */
 .center {
@@ -358,7 +398,27 @@ html, body, #root {
 .phrase-cell { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .code-cell { font-family: monospace; font-size: 12px; }
 
-/* ── Verdict badges ── */
+/* ── Operation badges (replaces verdict-badge) ── */
+.op-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.op-reject { background: rgba(248, 81, 73, 0.15); color: var(--error); }
+.op-alias { background: rgba(234, 179, 8, 0.15); color: var(--warning); }
+.op-new { background: rgba(34, 197, 94, 0.15); color: var(--success); }
+.op-unscored { background: var(--bg-tertiary); color: var(--text-muted); }
+.op-applied { background: rgba(34, 197, 94, 0.25); color: var(--success); font-style: italic; }
+.op-error { background: rgba(248, 81, 73, 0.25); color: var(--error); cursor: help; }
+
+/* Legacy verdict-badge (backward compat) */
 .verdict-badge {
   display: inline-block;
   padding: 2px 7px;
@@ -370,6 +430,178 @@ html, body, #root {
 .badge-new { background: rgba(34, 197, 94, 0.2); color: var(--success); }
 .badge-alias { background: rgba(234, 179, 8, 0.2); color: var(--warning); }
 .badge-reject { background: rgba(248, 81, 73, 0.15); color: var(--error); }
+.badge-unscored { background: var(--bg-tertiary); color: var(--text-muted); }
+
+/* ── Operation cell and reason ── */
+.op-cell { min-width: 120px; }
+.reason-cell { max-width: 220px; }
+.reason-text {
+  font-size: 11px;
+  color: var(--text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.row-applied {
+  background: rgba(34, 197, 94, 0.05) !important;
+}
+.status-cell { min-width: 90px; }
+.status-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.status-badge.status-pending {
+  background: rgba(234, 179, 8, 0.2);
+  color: var(--warning);
+}
+.status-badge.status-applied {
+  background: rgba(34, 197, 94, 0.2);
+  color: var(--success);
+}
+.status-badge.status-rejected {
+  background: rgba(248, 81, 73, 0.15);
+  color: var(--error);
+}
+.applied-check {
+  color: var(--success);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* ── Revise modal ── */
+.revise-modal { max-width: 560px; }
+.revise-phrase {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 10px;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+.revise-current-op {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 4px;
+}
+.revise-reason {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.revise-detail {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 4px 10px;
+  margin-bottom: 8px;
+}
+.revise-detail strong {
+  color: var(--text-primary);
+  font-family: monospace;
+  font-size: 11.5px;
+}
+.revise-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid var(--border-medium);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  resize: vertical;
+  background: var(--bg);
+  color: var(--text-primary);
+}
+.revise-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(56, 132, 255, 0.15);
+}
+
+/* ── Unified decision modal ── */
+.unified-decision-modal { max-width: 560px; }
+.unified-phrases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 0;
+}
+.unified-mode-toggle {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.unified-llm-section,
+.unified-manual-section {
+  margin-bottom: 16px;
+}
+.unified-get-suggestion {
+  padding: 12px;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+}
+.unified-get-suggestion p { margin: 0 0 10px 0; }
+.unified-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.unified-footer .footer-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── Filter bar: scored-only + confidence slider ── */
+.filter-bar {
+  flex-wrap: wrap;
+}
+.scored-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.scored-toggle input { cursor: pointer; }
+.confidence-slider {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.slider-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.confidence-slider input[type="range"] {
+  width: 100px;
+  height: 4px;
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+.slider-value {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 32px;
+  text-align: right;
+}
+.filter-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
 
 /* ── Confidence bar ── */
 .conf-bar-wrap {

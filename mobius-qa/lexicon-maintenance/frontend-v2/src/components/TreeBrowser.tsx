@@ -1,5 +1,8 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import type { TagEntry, TagKind } from '../types'
+import { SUGGESTIONS_BY_PARENT } from '../suggestionsByParent'
+
+export type AddSubtagFlow = 'manual' | 'suggestions' | 'document'
 
 interface Props {
   tags: TagEntry[]
@@ -7,6 +10,7 @@ interface Props {
   filter: string
   selectedTag: { kind: TagKind; code: string } | null
   onSelect: (kind: TagKind, code: string) => void
+  onAddSubtag?: (flow: AddSubtagFlow, kind: TagKind, parentCode: string) => void
 }
 
 interface TreeNode {
@@ -104,10 +108,24 @@ function collectKeys(tree: Record<TagKind, TreeNode[]>): { all: string[]; byDept
   return { all, byDepth }
 }
 
-export function TreeBrowser({ tags, loading, filter, selectedTag, onSelect }: Props) {
+export function TreeBrowser({ tags, loading, filter, selectedTag, onSelect, onAddSubtag }: Props) {
   const tree = useMemo(() => buildTree(tags), [tags])
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; node: TreeNode } | null>(null)
   const keys = useMemo(() => collectKeys(tree), [tree])
+
+  useEffect(() => {
+    const close = () => setContextMenu(null)
+    const onKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
+    if (contextMenu) {
+      window.addEventListener('click', close)
+      window.addEventListener('keydown', onKeyDown)
+      return () => {
+        window.removeEventListener('click', close)
+        window.removeEventListener('keydown', onKeyDown)
+      }
+    }
+  }, [contextMenu])
 
   const toggle = (key: string) => {
     setCollapsed(prev => {
@@ -191,6 +209,7 @@ export function TreeBrowser({ tags, loading, filter, selectedTag, onSelect }: Pr
                     toggle={toggle}
                     selectedTag={selectedTag}
                     onSelect={onSelect}
+                    onContextMenuOpen={onAddSubtag ? (e, n) => setContextMenu({ x: e.clientX, y: e.clientY, node: n }) : undefined}
                   />
                 ))}
               </div>
@@ -198,23 +217,71 @@ export function TreeBrowser({ tags, loading, filter, selectedTag, onSelect }: Pr
           </div>
         )
       })}
+      {contextMenu && (
+        <div
+          className="tree-context-menu"
+          style={{ left: contextMenu.x, top: contextMenu.y }}
+          onClick={e => e.stopPropagation()}
+        >
+          {!contextMenu.node.tag.code.includes('.') ? (
+            <>
+              <button
+                type="button"
+                className="tree-context-item"
+                onClick={() => {
+                  onAddSubtag?.('manual', contextMenu.node.tag.kind, contextMenu.node.tag.code)
+                  setContextMenu(null)
+                }}
+              >
+                Add sub-tag manually…
+              </button>
+              <button
+                type="button"
+                className="tree-context-item"
+                onClick={() => {
+                  onAddSubtag?.('suggestions', contextMenu.node.tag.kind, contextMenu.node.tag.code)
+                  setContextMenu(null)
+                }}
+              >
+                Add from suggestions…
+              </button>
+              <button
+                type="button"
+                className="tree-context-item"
+                onClick={() => {
+                  onAddSubtag?.('document', contextMenu.node.tag.kind, contextMenu.node.tag.code)
+                  setContextMenu(null)
+                }}
+              >
+                Extract from document…
+              </button>
+            </>
+          ) : (
+            <span className="tree-context-hint">Only domain containers can have sub-tags</span>
+          )}
+        </div>
+      )}
     </div>
   )
 }
 
-function TreeNodeView({ node, depth, collapsed, toggle, selectedTag, onSelect }: {
+function TreeNodeView({ node, depth, collapsed, toggle, selectedTag, onSelect, onContextMenuOpen }: {
   node: TreeNode
   depth: number
   collapsed: Set<string>
   toggle: (key: string) => void
   selectedTag: { kind: TagKind; code: string } | null
   onSelect: (kind: TagKind, code: string) => void
+  onContextMenuOpen?: (e: React.MouseEvent, node: TreeNode) => void
 }) {
   const { tag, children } = node
   const key = `${tag.kind}:${tag.code}`
   const isCollapsed = collapsed.has(key)
   const isSelected = selectedTag?.kind === tag.kind && selectedTag?.code === tag.code
   const hasChildren = children.length > 0
+  const isContainer = !tag.code.includes('.')
+  const suggestionsList = isContainer ? SUGGESTIONS_BY_PARENT[tag.code] : undefined
+  const hasSuggestions = Boolean(suggestionsList?.length)
   // Display the last segment of the code for readability
   const label = tag.code.includes('.') ? tag.code.split('.').pop()! : tag.code
 
@@ -224,6 +291,11 @@ function TreeNodeView({ node, depth, collapsed, toggle, selectedTag, onSelect }:
         className={`tree-node-row ${isSelected ? 'selected' : ''}`}
         style={{ paddingLeft: `${12 + depth * 16}px` }}
         onClick={() => onSelect(tag.kind, tag.code)}
+        onContextMenu={e => {
+          e.preventDefault()
+          e.stopPropagation()
+          onContextMenuOpen?.(e, node)
+        }}
       >
         {hasChildren ? (
           <span className="tree-chevron" onClick={e => { e.stopPropagation(); toggle(key) }}>
@@ -235,6 +307,11 @@ function TreeNodeView({ node, depth, collapsed, toggle, selectedTag, onSelect }:
         <span className="tree-node-label" title={tag.code}>
           {label.replace(/_/g, ' ')}
         </span>
+        {hasSuggestions && (
+          <span className="tree-suggestions-badge" title={`${suggestionsList!.length} suggested sub-tags — right-click to add`}>
+            Suggestions
+          </span>
+        )}
         {hasChildren && <span className="tree-child-count">{children.length}</span>}
         {(tag.hit_lines || 0) > 0 && (
           <span className="tree-hit-badge" title={`${tag.hit_lines} lines, ${tag.hit_docs} docs`}>
@@ -253,6 +330,7 @@ function TreeNodeView({ node, depth, collapsed, toggle, selectedTag, onSelect }:
               toggle={toggle}
               selectedTag={selectedTag}
               onSelect={onSelect}
+              onContextMenuOpen={onContextMenuOpen}
             />
           ))}
         </div>

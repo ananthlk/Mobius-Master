@@ -10,7 +10,7 @@ import psycopg2
 import psycopg2.extras
 import json
 import uuid
-from fastapi import Body, FastAPI, HTTPException, Query
+from fastapi import Body, File, Form, FastAPI, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_urls
@@ -689,6 +689,130 @@ def merge_policy_lexicon_tags(body: dict = Body(...)) -> dict[str, Any]:
         raise HTTPException(status_code=500, detail=f"Failed to merge tags: {type(e).__name__}: {e}")
 
 
+_MAX_SUGGEST_FROM_DOCUMENT_CHARS = 50_000
+
+
+def _extract_text_from_upload(file: UploadFile) -> str:
+    """Extract plain text from an uploaded file. PDF supported if pypdf available."""
+    raw = file.file.read()
+    filename = (file.filename or "").lower()
+    if filename.endswith(".pdf") and raw[:5] == b"%PDF-":
+        try:
+            from io import BytesIO
+            from pypdf import PdfReader
+            reader = PdfReader(BytesIO(raw))
+            parts = []
+            for page in reader.pages:
+                parts.append(page.extract_text() or "")
+            return "\n".join(parts)
+        except Exception:
+            pass
+    try:
+        return raw.decode("utf-8")
+    except UnicodeDecodeError:
+        return raw.decode("utf-8", errors="replace")
+
+
+@app.post("/policy/lexicon/tags/suggest-from-document")
+async def suggest_subtags_from_document(
+    parent_kind: str = Form(...),
+    parent_code: str = Form(...),
+    text: str | None = Form(None),
+    file: UploadFile | None = File(None),
+) -> dict[str, Any]:
+    """
+    Extract suggested sub-tags for a domain from document text or uploaded file.
+    Body (form): parent_kind, parent_code, and either text or file.
+    Returns { suggestions: [ { code: str, description: str } ] } (no DB write).
+    """
+    k = (parent_kind or "").strip().lower()
+    pc = (parent_code or "").strip()
+    if k not in ("p", "d", "j") or not pc:
+        raise HTTPException(status_code=400, detail="parent_kind must be p|d|j and parent_code is required")
+
+    doc_text = ""
+    if file and file.filename:
+        doc_text = _extract_text_from_upload(file)
+    if text and isinstance(text, str):
+        doc_text = (doc_text + "\n" + text).strip() if doc_text else text.strip()
+    if not doc_text:
+        raise HTTPException(status_code=400, detail="Provide either 'text' or 'file' with content")
+    if len(doc_text) > _MAX_SUGGEST_FROM_DOCUMENT_CHARS:
+        doc_text = doc_text[:_MAX_SUGGEST_FROM_DOCUMENT_CHARS]
+        logger.warning("suggest-from-document: truncated to %s chars", _MAX_SUGGEST_FROM_DOCUMENT_CHARS)
+
+    u = _urls()
+    try:
+        qa = _conn(u.qa)
+        qa.autocommit = True
+        branch_text = _build_lexicon_branch_text(qa, k, pc)
+        qa.close()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load lexicon branch: {type(e).__name__}: {e}")
+
+    prompt = f"""You are an expert healthcare policy taxonomy maintainer.
+
+{branch_text}
+
+The following document text is provided. Extract key concepts that would make good **sub-tags** under the domain "{pc}" only.
+- Each sub-tag must be a single segment (e.g. transportation, housing). No dots in the segment.
+- Prefer lowercase with underscores for multi-word concepts (e.g. food_assistance).
+- Return a JSON array of objects with "code" and "description" (short, optional).
+- Do not suggest tags that already exist in the branch above.
+- Suggest at most 15 sub-tags.
+
+Document text:
+---
+{doc_text[:30000]}
+---
+
+Respond with ONLY a JSON array. No code fences, no explanation. Example: [{{"code": "transportation", "description": "Transport benefits"}}, ...]
+"""
+
+    try:
+        import vertexai
+        from vertexai.generative_models import GenerativeModel
+
+        project = os.environ.get("VERTEX_PROJECT") or os.environ.get("VERTEX_PROJECT_ID") or ""
+        region = os.environ.get("VERTEX_REGION") or os.environ.get("VERTEX_LOCATION") or "us-central1"
+        model_name = os.environ.get("VERTEX_LLM_MODEL") or "gemini-2.0-flash"
+        if not project:
+            import re as _re
+            endpoint_id = os.environ.get("VERTEX_INDEX_ENDPOINT_ID") or ""
+            m = _re.search(r"projects/([^/]+)/", endpoint_id)
+            if m:
+                project = m.group(1)
+        if not project:
+            raise HTTPException(status_code=400, detail="VERTEX_PROJECT not configured.")
+
+        vertexai.init(project=project, location=region)
+        model_inst = GenerativeModel(model_name)
+        response = model_inst.generate_content(prompt)
+        raw_text = (response.text or "").strip()
+        if raw_text.startswith("```"):
+            lines = raw_text.split("\n")
+            raw_text = "\n".join(line for line in lines if not line.strip().startswith("```"))
+        suggestions = json.loads(raw_text)
+        if not isinstance(suggestions, list):
+            suggestions = []
+        out = []
+        for item in suggestions:
+            if not isinstance(item, dict):
+                continue
+            code = str(item.get("code", "")).strip().lower().replace(" ", "_")
+            if not code or "." in code:
+                continue
+            desc = str(item.get("description", "")).strip() if item.get("description") else ""
+            out.append({"code": code, "description": desc})
+        return {"suggestions": out}
+    except HTTPException:
+        raise
+    except json.JSONDecodeError as e:
+        raise HTTPException(status_code=500, detail=f"LLM returned invalid JSON: {e}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get suggestions: {type(e).__name__}: {e}")
+
+
 @app.get("/policy/lexicon/overview")
 def get_policy_lexicon_overview(
     kind: str = Query("all"),
@@ -1268,6 +1392,11 @@ def review_policy_candidates_aggregate_bulk(body: dict = Body(...)):
                 )
 
         logger.info("[review-bulk] done: updated=%d errors=%d", len(updated), len(errors))
+        # Explicit commit to ensure persistence before returning connection to pool
+        try:
+            rag.commit()
+        except Exception:
+            pass
         return {
             "status": "ok",
             "updated": updated,
@@ -1338,6 +1467,34 @@ def _build_lexicon_tree_text(qa_conn) -> str:
         if entries:
             lines.append(f"\n[{label} tags ({len(entries)})]")
             lines.extend(entries)
+    return "\n".join(lines)
+
+
+def _build_lexicon_branch_text(qa_conn, kind: str, parent_code: str) -> str:
+    """Build compact text for the branch under parent_code (parent + its children) for LLM context."""
+    cur = qa_conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute(
+        """
+        SELECT kind, code, parent_code, spec FROM policy_lexicon_entries
+        WHERE active = true AND kind = %s AND (code = %s OR parent_code = %s)
+        ORDER BY code
+        """,
+        (kind.strip().lower(), parent_code.strip(), parent_code.strip()),
+    )
+    rows = cur.fetchall()
+    cur.close()
+    lines = [f"Domain '{parent_code}' and its current sub-tags:"]
+    for r in rows:
+        c = str(r.get("code", "")).strip()
+        spec = r.get("spec") if isinstance(r.get("spec"), dict) else {}
+        desc = str(spec.get("description", ""))[:80]
+        aliases = ", ".join(str(p) for p in (spec.get("strong_phrases") or spec.get("phrases") or [])[:3])
+        entry = f"  - {c}"
+        if aliases:
+            entry += f"  (aliases: {aliases})"
+        if desc:
+            entry += f"  -- {desc}"
+        lines.append(entry)
     return "\n".join(lines)
 
 
@@ -1865,6 +2022,16 @@ def apply_candidate_operations(body: dict = Body(...)) -> dict[str, Any]:
             rev_row = qa_cur.fetchone()
             new_rev = int(rev_row["revision"]) if rev_row else 0
 
+        # Explicit commit to ensure persistence before returning connections to pool
+        try:
+            rag.commit()
+        except Exception:
+            pass
+        try:
+            qa.commit()
+        except Exception:
+            pass
+
         failed_count = sum(1 for r in results if r.get("status") == "error")
         return {
             "status": "ok" if failed_count == 0 else "partial",
@@ -2007,6 +2174,142 @@ CRITICAL: Respond with ONLY a single JSON object. No code fences, no explanation
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Revise LLM call failed: {type(e).__name__}: {e}")
+
+
+# ---------------------------------------------------------------------------
+# Single-candidate LLM suggestion (for unscored candidates)
+# ---------------------------------------------------------------------------
+
+@app.post("/policy/candidates/llm-suggest")
+def llm_suggest_candidate(body: dict = Body(...)) -> dict[str, Any]:
+    """
+    Get an LLM suggestion for a single candidate (typically unscored).
+    Returns one CandidateOperation without persisting verdict to DB.
+
+    Body: { normalized: str, ids?: string[] }
+
+    Same operation shape as triage/revise. Frontend can then Apply or Revise.
+    """
+    normalized = str(body.get("normalized", "")).strip()
+    if not normalized:
+        raise HTTPException(status_code=400, detail="'normalized' is required")
+
+    u = _urls()
+
+    # 1. Fetch candidate metadata from RAG DB (occurrences, confidence, type)
+    try:
+        rag = _conn(u.rag)
+        rag.autocommit = True
+        rcur = rag.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        nk = _normalize_phrase(normalized)
+        rcur.execute(
+            """
+            SELECT id::text, normalized, candidate_type, occurrences, confidence
+            FROM policy_lexicon_candidates
+            WHERE trim(lower(regexp_replace(normalized, E'\\s+', ' ', 'g'))) = %s
+              AND state = 'proposed'
+            ORDER BY occurrences DESC NULLS LAST
+            LIMIT 1
+            """,
+            (nk,),
+        )
+        row = rcur.fetchone()
+        rejected_text = _build_rejected_text(rag, limit=100)
+        rcur.close()
+        rag.close()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load candidate: {type(e).__name__}: {e}")
+
+    if not row:
+        raise HTTPException(status_code=404, detail=f"No proposed candidate found for phrase: {normalized}")
+
+    occ = int(row.get("occurrences", 0))
+    conf = float(row.get("confidence", 0.0))
+    ctype = str(row.get("candidate_type", "d") or "d")[:10]
+
+    # 2. Fetch lexicon from QA
+    try:
+        qa = _conn(u.qa)
+        qa.autocommit = True
+        lexicon_tree = _build_lexicon_tree_text(qa)
+        qa.close()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load lexicon: {type(e).__name__}: {e}")
+
+    # 3. Build single-candidate prompt
+    cand_line = f'- "{normalized}" (type={ctype}, occurrences={occ}, confidence={conf:.2f})'
+    prompt = f"""You are an expert healthcare policy taxonomy maintainer.
+
+Below is the current APPROVED lexicon tree for tagging healthcare policy documents:
+
+{lexicon_tree}
+
+Previously REJECTED candidates (do not suggest these again):
+{rejected_text}
+
+The following candidate phrase was extracted from document processing.
+Produce exactly ONE structured operation:
+
+{cand_line}
+
+1. **reject_candidate** — for junk, noise, too-generic phrases, partial sentences, conjunctions,
+   time references, copyright notices, or anything not a real domain concept.
+   Format: {{ "op": "reject_candidate", "normalized": "{normalized}", "reason": "<brief>", "confidence": 0.0-1.0 }}
+
+2. **add_alias** — the phrase is already covered by an existing tag. Add it as an alias.
+   Match to the MOST SPECIFIC existing tag, not a broad parent.
+   Format: {{ "op": "add_alias", "normalized": "{normalized}", "target_kind": "p|d|j", "target_code": "<existing.tag.code>", "reason": "<brief>", "confidence": 0.0-1.0 }}
+
+3. **create_tag** — a genuinely new domain concept worth adding to the taxonomy.
+   Format: {{ "op": "create_tag", "normalized": "{normalized}", "kind": "p|d|j", "code": "<new.tag.code>", "parent_code": "<parent>", "description": "<brief description>", "reason": "<brief>", "confidence": 0.0-1.0 }}
+
+Guidelines:
+- Be AGGRESSIVE about rejecting junk.
+- If a candidate is a near-duplicate of an existing tag, use add_alias not create_tag.
+- For add_alias, the target_code MUST be an existing tag from the lexicon tree above.
+- Keep reason fields SHORT (under 15 words).
+
+CRITICAL: Respond with ONLY a single JSON object. No code fences, no array, no explanation.
+"""
+
+    # 4. Call LLM
+    try:
+        import vertexai
+        from vertexai.generative_models import GenerativeModel
+
+        project = os.environ.get("VERTEX_PROJECT") or os.environ.get("VERTEX_PROJECT_ID") or ""
+        region = os.environ.get("VERTEX_REGION") or os.environ.get("VERTEX_LOCATION") or "us-central1"
+        model_name = os.environ.get("VERTEX_LLM_MODEL") or "gemini-2.0-flash"
+
+        if not project:
+            endpoint_id = os.environ.get("VERTEX_INDEX_ENDPOINT_ID") or ""
+            import re as _re
+            m = _re.search(r"projects/([^/]+)/", endpoint_id)
+            if m:
+                project = m.group(1)
+        if not project:
+            raise HTTPException(status_code=400, detail="VERTEX_PROJECT not configured.")
+
+        vertexai.init(project=project, location=region)
+        model_inst = GenerativeModel(model_name)
+        response = model_inst.generate_content(prompt)
+        raw_text = response.text.strip()
+
+        if raw_text.startswith("```"):
+            lines_raw = raw_text.split("\n")
+            raw_text = "\n".join(line for line in lines_raw if not line.strip().startswith("```"))
+
+        op = json.loads(raw_text)
+        if not isinstance(op, dict):
+            raise HTTPException(status_code=500, detail=f"LLM returned unexpected format: {raw_text[:300]}")
+
+        op["normalized"] = normalized
+        return {"status": "ok", "operation": op, "llm_model": model_name}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"LLM suggest failed: {type(e).__name__}: {e}")
 
 
 # ---------------------------------------------------------------------------
