@@ -43,9 +43,17 @@ class PooledConnection:
     """Thin wrapper: delegates to the real connection; close() returns it to the pool."""
 
     def __init__(self, real_conn: Any, pool: BlockingConnectionPool) -> None:
-        self._conn = real_conn
-        self._pool = pool
-        self._returned = False
+        object.__setattr__(self, "_conn", real_conn)
+        object.__setattr__(self, "_pool", pool)
+        object.__setattr__(self, "_returned", False)
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        if name in ("_conn", "_pool", "_returned"):
+            object.__setattr__(self, name, value)
+        elif name == "autocommit":
+            self._conn.autocommit = value
+        else:
+            setattr(self._conn, name, value)
 
     def close(self) -> None:
         if not self._returned:

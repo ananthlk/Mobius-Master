@@ -2,9 +2,10 @@ import { useState, useEffect, useCallback } from 'react'
 import type { TagEntry, TagKind } from '../types'
 import {
   fetchCandidates, bulkReview, runLlmTriage, purgeStale,
-  applyCandidateOperations, reviseCandidateOperation,
+  applyCandidateOperations,
   type CandidateOperation, type CandidateApplyResult,
 } from '../api'
+import { CandidateDecisionModal } from './CandidateDecisionModal'
 
 interface Props {
   tags: TagEntry[]
@@ -19,6 +20,7 @@ interface CandRow {
   total_occurrences: number
   doc_count: number
   avg_confidence: number
+  status?: string // 'proposed' | 'rejected' from API
   llm_verdict?: string
   llm_confidence?: number
   llm_reason?: string
@@ -37,6 +39,7 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect: _onTagSelect }: Pr
   const [verdictFilter, setVerdictFilter] = useState<string>('')
   const [minConfidence, setMinConfidence] = useState<number>(0)
   const [scoredOnly, setScoredOnly] = useState(false)
+  const [unactedOnly, setUnactedOnly] = useState(false)
   const [sortBy, setSortBy] = useState<string>('occurrences')
   const [triaging, setTriaging] = useState(false)
   const [purging, setPurging] = useState(false)
@@ -48,20 +51,15 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect: _onTagSelect }: Pr
   const [appliedOps, setAppliedOps] = useState<Map<string, CandidateApplyResult>>(new Map())
   const [, setApplyResults] = useState<CandidateApplyResult[]>([])
 
-  // -- Revise modal state --
-  const [reviseTarget, setReviseTarget] = useState<{ normalized: string; op: CandidateOperation } | null>(null)
-  const [reviseInstructions, setReviseInstructions] = useState('')
-  const [revising, setRevising] = useState(false)
-
-  // -- Legacy approve modal state --
-  const [approveModal, setApproveModal] = useState<{
+  // -- Unified decision modal state --
+  const [decisionModal, setDecisionModal] = useState<{
     phrases: string[]
-    kind: TagKind
-    tagCodeMap: Record<string, string>
+    initialOp: CandidateOperation | null
+    initialManualKind: TagKind
+    initialManualCode: string
+    initialApproveAsNew: boolean
+    initialTagCodeMap: Record<string, string>
   } | null>(null)
-  const [approveKind, setApproveKind] = useState<TagKind>('d')
-  const [approveTargetCode, setApproveTargetCode] = useState('')
-  const [approveAsNew, setApproveAsNew] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -70,6 +68,7 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect: _onTagSelect }: Pr
       setRows((res.rows || []).map(r => ({
         normalized: String(r.normalized || ''),
         ids: Array.isArray(r.ids) ? (r.ids as string[]).filter(Boolean) : [],
+        status: r.status ? String(r.status) : (statusFilter === 'rejected' ? 'rejected' : 'proposed'),
         candidate_type: String(r.candidate_type || r.kind || 'd'),
         total_occurrences: Number(r.total_occurrences || r.occurrences || 0),
         doc_count: Number(r.doc_count || 0),
@@ -298,30 +297,6 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect: _onTagSelect }: Pr
     }
   }
 
-  // -- Revise a single candidate operation --
-  const handleReviseSubmit = async () => {
-    if (!reviseTarget || !reviseInstructions.trim()) return
-    setRevising(true)
-    try {
-      const res = await reviseCandidateOperation(
-        reviseTarget.normalized,
-        reviseTarget.op,
-        reviseInstructions.trim(),
-      )
-      // Update the operation in our map
-      const newOps = new Map(operations)
-      newOps.set(reviseTarget.normalized.toLowerCase(), res.operation)
-      setOperations(newOps)
-      setReviseTarget({ normalized: reviseTarget.normalized, op: res.operation })
-      setReviseInstructions('')
-      setMessage(`Revised operation for "${reviseTarget.normalized}"`)
-    } catch (e) {
-      setMessage(`Revise failed: ${e}`)
-    } finally {
-      setRevising(false)
-    }
-  }
-
   // -- Purge stale --
   const handlePurgeStale = async () => {
     setPurging(true)
@@ -345,37 +320,38 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect: _onTagSelect }: Pr
     }
   }
 
-  // -- Legacy: open approve modal (for manual approve without LLM) --
-  const openApproveModal = (phrases: string[]) => {
+  // -- Open unified decision modal (LLM or Manual path) --
+  const openDecisionModal = (phrases: string[], mode: 'llm' | 'manual' = 'manual') => {
     if (phrases.length === 0) return
     const firstRow = rows.find(r => phrases.includes(r.normalized))
+    const opOrLegacy = firstRow ? getOpOrLegacy(firstRow) : undefined
+    const initialOp = mode === 'llm' && opOrLegacy ? opOrLegacy : opOrLegacy ?? null
     const sugKind = (firstRow?.llm_suggested_kind as TagKind) || 'd'
     const sugCode = firstRow?.llm_suggested_code || ''
+    const sugAsNew = firstRow?.llm_verdict === 'new_tag'
     const tagCodeMap: Record<string, string> = {}
     for (const p of phrases) {
       const r = rows.find(rr => rr.normalized === p)
       if (r?.llm_suggested_code) {
-        tagCodeMap[p.toLowerCase()] = `${r.llm_suggested_kind || 'd'}:${r.llm_suggested_code!}`
+        tagCodeMap[p.toLowerCase()] = `${r.llm_suggested_kind || 'd'}:${r.llm_suggested_code}`
       }
     }
-    setApproveKind(sugKind)
-    setApproveTargetCode(sugCode)
-    setApproveAsNew(firstRow?.llm_verdict === 'new_tag')
-    setApproveModal({ phrases, kind: sugKind, tagCodeMap })
+    setDecisionModal({
+      phrases,
+      initialOp,
+      initialManualKind: sugKind,
+      initialManualCode: sugCode,
+      initialApproveAsNew: sugAsNew,
+      initialTagCodeMap: tagCodeMap,
+    })
   }
 
-  // -- Execute approve (legacy modal) --
-  const executeApprove = async () => {
-    if (!approveModal) return
-    const { phrases, tagCodeMap } = approveModal
-    const finalMap: Record<string, string> = { ...tagCodeMap }
-    const targetWithKind = `${approveKind}:${approveTargetCode || approveModal.phrases[0].replace(/\s+/g, '_').toLowerCase()}`
-    for (const p of phrases) {
-      const key = p.toLowerCase()
-      if (!finalMap[key]) {
-        finalMap[key] = targetWithKind
-      }
-    }
+  const executeApprove = async (params: {
+    phrases: string[]
+    kind: TagKind
+    tagCodeMap: Record<string, string>
+  }) => {
+    const { phrases, kind, tagCodeMap } = params
     const ids = rows.filter(r => phrases.includes(r.normalized)).flatMap(r => r.ids ?? [])
     if (ids.length === 0) {
       setMessage('No candidate IDs for selected rows. Try refreshing the list.')
@@ -388,11 +364,11 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect: _onTagSelect }: Pr
         id_list: ids,
         state: 'approved',
         reviewer: 'lexicon-ui',
-        candidate_type_override: approveKind,
-        tag_code_map: finalMap,
+        candidate_type_override: kind,
+        tag_code_map: tagCodeMap,
       })
       setMessage(`${phrases.length} candidates approved`)
-      setApproveModal(null)
+      setDecisionModal(null)
       setSelected(prev => {
         const next = new Set(prev)
         phrases.forEach(p => next.delete(p))
@@ -408,26 +384,30 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect: _onTagSelect }: Pr
   }
 
   // -- Render helpers --
+  // LLM suggestion badges - prefixed to avoid confusion with user status (rejected)
   const opBadge = (op?: CandidateOperation) => {
-    if (!op) return <span className="op-badge op-unscored">?</span>
-    if (op.op === 'reject_candidate') return <span className="op-badge op-reject">REJECT</span>
-    if (op.op === 'add_alias') return (
-      <span className="op-badge op-alias" title={`Add alias to ${op.target_kind}.${op.target_code}`}>
-        ALIAS &rarr; {op.target_code?.replace(/_/g, ' ')}
-      </span>
-    )
-    if (op.op === 'create_tag') return (
-      <span className="op-badge op-new" title={`Create ${op.kind}.${op.code}`}>
-        NEW {op.kind?.toUpperCase()} &rarr; {op.code?.replace(/_/g, ' ')}
-      </span>
-    )
+    if (!op) return <span className="op-badge op-unscored">—</span>
+    if (op.op === 'reject_candidate')
+      return <span className="op-badge op-reject" title="LLM suggests reject">LLM: Reject</span>
+    if (op.op === 'add_alias')
+      return (
+        <span className="op-badge op-alias" title={`LLM suggests alias to ${op.target_kind}.${op.target_code}`}>
+          LLM: Alias → {op.target_code?.replace(/_/g, ' ')}
+        </span>
+      )
+    if (op.op === 'create_tag')
+      return (
+        <span className="op-badge op-new" title={`LLM suggests new tag ${op.kind}.${op.code}`}>
+          LLM: New → {op.code?.replace(/_/g, ' ')}
+        </span>
+      )
     return <span className="op-badge op-unscored">?</span>
   }
 
   const legacyVerdictBadge = (v?: string) => {
-    if (!v) return <span className="op-badge op-unscored">?</span>
+    if (!v) return <span className="op-badge op-unscored">—</span>
     const cls = v === 'new_tag' ? 'op-new' : v === 'alias' ? 'op-alias' : 'op-reject'
-    const label = v === 'new_tag' ? 'NEW' : v === 'alias' ? 'ALIAS' : 'REJ'
+    const label = v === 'new_tag' ? 'LLM: New' : v === 'alias' ? 'LLM: Alias' : 'LLM: Reject'
     return <span className={`op-badge ${cls}`}>{label}</span>
   }
 
@@ -475,11 +455,16 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect: _onTagSelect }: Pr
   const llmAliasCount = hasOps ? opCounts.alias : rows.filter(r => r.llm_verdict === 'alias').length
   const llmNewCount = hasOps ? opCounts.new_tag : rows.filter(r => r.llm_verdict === 'new_tag').length
 
-  // -- Client-side filtering (confidence slider, scored-only, verdict) --
+  // -- Client-side filtering (confidence slider, scored-only, verdict, unacted) --
   const filteredRows = rows.filter(r => {
     const op = getOp(r.normalized)
+    const applied = getApplied(r.normalized)
     const conf = op?.confidence ?? r.llm_confidence
     const hasScore = !!(op || r.llm_verdict)
+    const isUnacted = applied?.status !== 'ok'
+
+    // Unacted only (Proposed tab): hide rows already applied this session
+    if (statusFilter === 'proposed' && unactedOnly && !isUnacted) return false
 
     // Scored-only filter
     if (scoredOnly && !hasScore) return false
@@ -523,7 +508,7 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect: _onTagSelect }: Pr
         {statusFilter === 'proposed' && unscored > 0 && <span className="stat-chip warn">{unscored} unscored</span>}
         {statusFilter === 'proposed' && llmNewCount > 0 && <span className="stat-chip new">{llmNewCount} new tags</span>}
         {statusFilter === 'proposed' && llmAliasCount > 0 && <span className="stat-chip alias">{llmAliasCount} aliases</span>}
-        {statusFilter === 'proposed' && llmRejectCount > 0 && <span className="stat-chip rej">{llmRejectCount} rejects</span>}
+        {statusFilter === 'proposed' && llmRejectCount > 0 && <span className="stat-chip rej">{llmRejectCount} LLM reject</span>}
       </div>
 
       {/* Action bar row 1: LLM + maintenance (proposed view only) */}
@@ -544,9 +529,9 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect: _onTagSelect }: Pr
           <div className="filter-chips">
             {[
               { val: '', label: 'All', count: rows.length },
-              { val: 'new_tag', label: 'New Tag', count: llmNewCount },
-              { val: 'alias', label: 'Alias', count: llmAliasCount },
-              { val: 'reject', label: 'Reject', count: llmRejectCount },
+              { val: 'new_tag', label: 'LLM New', count: llmNewCount },
+              { val: 'alias', label: 'LLM Alias', count: llmAliasCount },
+              { val: 'reject', label: 'LLM Reject', count: llmRejectCount },
             ].map(v => (
               <button
                 key={v.val || 'all'}
@@ -566,6 +551,10 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect: _onTagSelect }: Pr
           <label className="scored-toggle">
             <input type="checkbox" checked={scoredOnly} onChange={e => setScoredOnly(e.target.checked)} />
             {' '}Scored only
+          </label>
+          <label className="scored-toggle">
+            <input type="checkbox" checked={unactedOnly} onChange={e => setUnactedOnly(e.target.checked)} />
+            {' '}Unacted only
           </label>
           <div className="confidence-slider">
             <span className="slider-label">Min confidence:</span>
@@ -620,8 +609,8 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect: _onTagSelect }: Pr
         <div className="bulk-bar">
           <span>{selected.size} selected</span>
           {statusFilter === 'rejected' ? (
-            <button className="btn sm success" onClick={() => handleBulkRestore(Array.from(selected))} disabled={busy}>
-              Restore to Proposed
+            <button className="btn sm success" onClick={() => handleBulkRestore(Array.from(selected))} disabled={busy} title="Bring back to Proposed for re-review">
+              Re-up (Bring back)
             </button>
           ) : (
             <>
@@ -630,7 +619,7 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect: _onTagSelect }: Pr
                   Apply Selected Ops
                 </button>
               )}
-              <button className="btn sm" onClick={() => openApproveModal(Array.from(selected))} disabled={busy}>
+              <button className="btn sm" onClick={() => openDecisionModal(Array.from(selected), 'manual')} disabled={busy}>
                 Manual Approve
               </button>
               <button className="btn sm danger" onClick={() => handleBulkReject(Array.from(selected))} disabled={busy}>
@@ -641,19 +630,19 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect: _onTagSelect }: Pr
                 const o = getOp(r.normalized)
                 return o ? o.op === 'create_tag' : r.llm_verdict === 'new_tag'
               })}>
-                Select New Tags
+                Select LLM New
               </button>
               <button className="btn sm" onClick={() => selectFiltered(r => {
                 const o = getOp(r.normalized)
                 return o ? o.op === 'add_alias' : r.llm_verdict === 'alias'
               })}>
-                Select Aliases
+                Select LLM Alias
               </button>
               <button className="btn sm" onClick={() => selectFiltered(r => {
                 const o = getOp(r.normalized)
                 return o ? o.op === 'reject_candidate' : r.llm_verdict === 'reject'
               })}>
-                Select Rejects
+                Select LLM Reject
               </button>
             </>
           )}
@@ -670,8 +659,9 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect: _onTagSelect }: Pr
               <th className="col-sel">
                 <input type="checkbox" onChange={e => e.target.checked ? setSelected(new Set(filteredRows.map(r => r.normalized))) : clearSelection()} checked={selected.size > 0 && filteredRows.every(r => selected.has(r.normalized))} />
               </th>
+              <th>Status</th>
               <th>Phrase</th>
-              <th>LLM Operation</th>
+              <th>LLM Suggestion</th>
               <th>Conf</th>
               <th>Reason</th>
               <th className="col-num">Hits</th>
@@ -680,19 +670,25 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect: _onTagSelect }: Pr
             </tr>
           </thead>
           <tbody>
-            {loading && <tr><td colSpan={8} className="center-text">Loading…</td></tr>}
-            {!loading && filteredRows.length === 0 && <tr><td colSpan={8} className="center-text muted">{rows.length > 0 ? 'No candidates match filters' : 'No candidates'}</td></tr>}
+            {loading && <tr><td colSpan={9} className="center-text">Loading…</td></tr>}
+            {!loading && filteredRows.length === 0 && <tr><td colSpan={9} className="center-text muted">{rows.length > 0 ? 'No candidates match filters' : 'No candidates'}</td></tr>}
             {filteredRows.map(r => {
               const op = getOp(r.normalized)
               const opOrLegacy = getOpOrLegacy(r)
               const applied = getApplied(r.normalized)
               const isDimmed = applied?.status === 'ok' || (!op && r.llm_verdict === 'reject')
               const conf = op?.confidence ?? r.llm_confidence
+              const rowStatus = statusFilter === 'rejected' ? 'Rejected' : (applied?.status === 'ok' ? 'Applied' : 'Pending')
 
               return (
                 <tr key={r.normalized} className={`${isDimmed ? 'dimmed' : ''} ${selected.has(r.normalized) ? 'row-selected' : ''} ${applied?.status === 'ok' ? 'row-applied' : ''}`}>
                   <td>
                     <input type="checkbox" checked={selected.has(r.normalized)} onChange={() => toggleSelect(r.normalized)} disabled={applied?.status === 'ok'} />
+                  </td>
+                  <td className="status-cell">
+                    <span className={`status-badge status-${rowStatus.toLowerCase()}`} title={statusFilter === 'rejected' ? 'User rejected — click Re-up to bring back' : applied?.status === 'ok' ? 'Applied this session' : 'Awaiting your action'}>
+                      {rowStatus}
+                    </span>
                   </td>
                   <td className="phrase-cell" title={r.normalized}>{r.normalized}</td>
                   <td className="op-cell">
@@ -716,26 +712,19 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect: _onTagSelect }: Pr
                   <td className="col-num">{r.doc_count}</td>
                   <td className="actions-cell">
                     {statusFilter === 'rejected' ? (
-                      <button className="btn xs success" onClick={() => handleBulkRestore([r.normalized])} disabled={busy} title="Restore to proposed">
-                        ↺
+                      <button className="btn xs success" onClick={() => handleBulkRestore([r.normalized])} disabled={busy} title="Re-up — bring back to Proposed">
+                        ↺ Re-up
                       </button>
                     ) : applied?.status === 'ok' ? (
                       <span className="applied-check">✓</span>
                     ) : (
                       <>
+                        <button className="btn xs" onClick={() => openDecisionModal([r.normalized], opOrLegacy ? 'llm' : 'manual')} disabled={busy} title="Review / Decide">
+                          ✎
+                        </button>
                         {op && (
                           <button className="btn xs success" onClick={() => handleApplySingle(op)} disabled={busy} title="Apply this operation">
                             ▶
-                          </button>
-                        )}
-                        {opOrLegacy && (
-                          <button className="btn xs" onClick={() => { setReviseTarget({ normalized: r.normalized, op: opOrLegacy }); setReviseInstructions('') }} disabled={busy} title="Revise with instructions">
-                            ✎
-                          </button>
-                        )}
-                        {!op && (
-                          <button className="btn xs success" onClick={() => openApproveModal([r.normalized])} disabled={busy} title="Manual approve">
-                            ✓
                           </button>
                         )}
                         <button className="btn xs danger" onClick={() => handleBulkReject([r.normalized])} disabled={busy} title="Reject">
@@ -751,142 +740,34 @@ export function CandidatesTab({ tags, onRefresh, onTagSelect: _onTagSelect }: Pr
         </table>
       </div>
 
-      {/* Revise Modal */}
-      {reviseTarget && (
-        <div className="modal-overlay" onClick={() => setReviseTarget(null)}>
-          <div className="modal revise-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Revise Operation</h3>
-              <button className="close-btn" onClick={() => setReviseTarget(null)}>✕</button>
-            </div>
-            <div className="modal-body">
-              <label className="field-label">Candidate Phrase</label>
-              <div className="revise-phrase">{reviseTarget.normalized}</div>
-
-              <label className="field-label">Current LLM Suggestion</label>
-              <div className="revise-current-op">
-                {opBadge(reviseTarget.op)}
-                <span className="revise-reason">{reviseTarget.op.reason || '—'}</span>
-              </div>
-              {reviseTarget.op.op === 'add_alias' && (
-                <div className="revise-detail">
-                  Target: <strong>{reviseTarget.op.target_kind}.{reviseTarget.op.target_code}</strong>
-                </div>
-              )}
-              {reviseTarget.op.op === 'create_tag' && (
-                <div className="revise-detail">
-                  New tag: <strong>{reviseTarget.op.kind}.{reviseTarget.op.code}</strong>
-                  {reviseTarget.op.parent_code && <span> (parent: {reviseTarget.op.parent_code})</span>}
-                  {reviseTarget.op.description && <span> — {reviseTarget.op.description}</span>}
-                </div>
-              )}
-
-              <label className="field-label">Your Instructions</label>
-              <textarea
-                className="revise-textarea"
-                rows={3}
-                placeholder="Tell the LLM what to change… e.g. 'This should be an alias of emergency_services instead' or 'Reject this, it is just noise'"
-                value={reviseInstructions}
-                onChange={e => setReviseInstructions(e.target.value)}
-              />
-            </div>
-            <div className="modal-footer">
-              <button className="btn" onClick={() => setReviseTarget(null)}>Cancel</button>
-              <button className="btn primary" onClick={handleReviseSubmit} disabled={revising || !reviseInstructions.trim()}>
-                {revising ? 'Revising…' : 'Revise with LLM'}
-              </button>
-              <button
-                className="btn success"
-                onClick={() => { handleApplySingle(reviseTarget.op); setReviseTarget(null) }}
-                disabled={busy}
-              >
-                Apply As-Is
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Legacy Approve Modal */}
-      {approveModal && (
-        <div className="modal-overlay" onClick={() => setApproveModal(null)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Approve {approveModal.phrases.length} candidate{approveModal.phrases.length > 1 ? 's' : ''}</h3>
-              <button className="close-btn" onClick={() => setApproveModal(null)}>✕</button>
-            </div>
-            <div className="modal-body">
-              <label className="field-label">Phrases</label>
-              <div className="phrase-chips">
-                {approveModal.phrases.slice(0, 20).map(p => (
-                  <span key={p} className="alias-chip">{p}</span>
-                ))}
-                {approveModal.phrases.length > 20 && (
-                  <span className="muted">…and {approveModal.phrases.length - 20} more</span>
-                )}
-              </div>
-
-              <label className="field-label">Tag type</label>
-              <div className="filter-chips">
-                {(['d', 'p', 'j'] as TagKind[]).map(k => (
-                  <button
-                    key={k}
-                    className={`chip ${approveKind === k ? 'active' : ''}`}
-                    onClick={() => setApproveKind(k)}
-                  >
-                    {k === 'd' ? 'Domain (D)' : k === 'p' ? 'Procedural (P)' : 'Jurisdiction (J)'}
-                  </button>
-                ))}
-              </div>
-
-              <label className="field-label">
-                <input type="checkbox" checked={approveAsNew} onChange={e => setApproveAsNew(e.target.checked)} />
-                {' '}Create as new tag (otherwise add as alias to existing tag)
-              </label>
-
-              {!approveAsNew && (
-                <>
-                  <label className="field-label">Map to existing tag</label>
-                  <select
-                    className="modal-select"
-                    value={approveTargetCode}
-                    onChange={e => setApproveTargetCode(e.target.value)}
-                  >
-                    <option value="">— Select a tag —</option>
-                    {tagOptions.filter(t => t.kind === approveKind).map(t => (
-                      <option key={`${t.kind}:${t.code}`} value={t.code}>
-                        {t.code.replace(/_/g, ' ')} {t.spec.description ? `— ${t.spec.description}` : ''}
-                      </option>
-                    ))}
-                  </select>
-                </>
-              )}
-
-              {approveAsNew && (
-                <>
-                  <label className="field-label">New tag code</label>
-                  <input
-                    className="modal-input"
-                    type="text"
-                    placeholder="e.g. health_care_services.chronic_pain"
-                    value={approveTargetCode}
-                    onChange={e => setApproveTargetCode(e.target.value)}
-                  />
-                </>
-              )}
-            </div>
-            <div className="modal-footer">
-              <button className="btn" onClick={() => setApproveModal(null)}>Cancel</button>
-              <button
-                className="btn success"
-                onClick={executeApprove}
-                disabled={busy || (!approveAsNew && !approveTargetCode)}
-              >
-                {busy ? 'Approving…' : `Approve ${approveModal.phrases.length}`}
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* Unified decision modal */}
+      {decisionModal && (
+        <CandidateDecisionModal
+          phrases={decisionModal.phrases}
+          initialOp={decisionModal.initialOp}
+          initialManualKind={decisionModal.initialManualKind}
+          initialManualCode={decisionModal.initialManualCode}
+          initialApproveAsNew={decisionModal.initialApproveAsNew}
+          initialTagCodeMap={decisionModal.initialTagCodeMap}
+          rows={rows}
+          tags={tagOptions}
+          opWithIds={opWithIds}
+          onApply={handleApplySingle}
+          onApprove={executeApprove}
+          onReject={handleBulkReject}
+          onClose={() => setDecisionModal(null)}
+          onMessage={setMessage}
+          onReviseSuccess={(revised) => {
+            const newOps = new Map(operations)
+            newOps.set(revised.normalized.toLowerCase(), revised)
+            setOperations(newOps)
+          }}
+          onSuggestionSuccess={(suggestion) => {
+            const newOps = new Map(operations)
+            newOps.set(suggestion.normalized.toLowerCase(), suggestion)
+            setOperations(newOps)
+          }}
+        />
       )}
     </div>
   )

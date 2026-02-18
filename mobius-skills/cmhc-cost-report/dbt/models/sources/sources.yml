@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: landing_cmhc
+    description: "BigQuery landing for CMHC HCRIS (RPT, NMRC, Alpha). Populated by app.normalize_load."
+    database: "{{ target.project }}"
+    schema: "{{ var('landing_dataset') }}"
+    tables:
+      - name: hcris_rpt
+        description: "One row per cost report filing. Index: report_record_key, provider_ccn, fiscal year, status."
+      - name: hcris_nmrc
+        description: "Numeric cells: report_record_key, worksheet, line, column, value."
+      - name: hcris_alpha
+        description: "Alphanumeric cells: report_record_key, worksheet, line, column, value."

@@ -1,0 +1,18 @@
+# Minimal dbt project for CMHC HCRIS mart (best report per CCN/fiscal year).
+# Run from mobius-skills/cmhc-cost-report/dbt with:
+#   BQ_PROJECT=... BQ_LANDING_DATASET=landing_cmhc_dev BQ_MART_DATASET=mobius_cmhc_dev dbt run
+
+name: cmhc_cost_report
+version: "1.0.0"
+profile: cmhc_cost_report
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+target-path: "target"
+clean-targets: ["target"]
+
+vars:
+  landing_dataset: "{{ env_var('BQ_LANDING_DATASET', 'landing_cmhc_dev') }}"
+
+models:
+  cmhc_cost_report:
+    +materialized: view

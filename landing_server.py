@@ -50,6 +50,7 @@ def _service_config() -> dict:
         "rag_frontend_url": _env_url("MOBIUS_RAG_FRONTEND_URL", "http://127.0.0.1:5173"),
         "dbt_url": _env_url("MOBIUS_DBT_URL", "http://127.0.0.1:6500"),
         "scraper_url": _env_url("MOBIUS_SCRAPER_URL", "http://127.0.0.1:8002"),
+        "email_url": _env_url("MOBIUS_EMAIL_URL", "http://127.0.0.1:8003"),
         # Lexicon UI is served statically by landing under /lexicon/
         "lexicon_url": _env_url("MOBIUS_LEXICON_URL", f"http://127.0.0.1:{PORT}/lexicon/"),
         # Retrieval Eval UI is served statically by landing under /retrieval-eval/
@@ -101,6 +102,7 @@ SERVICE_STOP = {
     "dbt": {"names": ["mobius-dbt"], "ports": [6500]},
     "chat-worker": {"names": ["mobius-chat-worker"], "ports": []},
     "scraper": {"names": ["mobius-scraper-api", "mobius-scraper-worker"], "ports": [8002]},
+    "email": {"names": ["mobius-email-api"], "ports": [8003]},
     "rag-chunking": {"names": ["mobius-rag-chunking-worker"], "ports": []},
     "rag-embedding": {"names": ["mobius-rag-embedding-worker"], "ports": []},
 }
@@ -117,7 +119,7 @@ def _start_commands(root: Path) -> dict:
     rag_cmds = [
         ("mobius-rag-backend", f"cd {r}/mobius-rag && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload"),
         ("mobius-rag-chunking-worker", f"cd {r}/mobius-rag && {venv} -m app.worker"),
-        ("mobius-rag-frontend", f"cd {r}/mobius-rag/frontend && VITE_API_BASE=http://localhost:8001 VITE_SCRAPER_API_BASE=http://localhost:8002 npm run dev"),
+        ("mobius-rag-frontend", f"cd {r}/mobius-rag/frontend && VITE_SCRAPER_API_BASE=http://localhost:8002 npm run dev"),
     ]
     if (root / "mobius-rag" / "app" / "embedding_worker.py").exists():
         rag_cmds.insert(2, ("mobius-rag-embedding-worker", f"cd {r}/mobius-rag && {venv} -m app.embedding_worker"))
@@ -146,6 +148,9 @@ def _start_commands(root: Path) -> dict:
         "scraper": [
             ("mobius-scraper-api", f"cd {r}/mobius-skills/web-scraper && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8002"),
             ("mobius-scraper-worker", f"cd {r}/mobius-skills/web-scraper && {venv} -m app.worker"),
+        ],
+        "email": [
+            ("mobius-email-api", f"cd {r}/mobius-skills/email && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8003"),
         ],
         "rag-chunking": [
             ("mobius-rag-chunking-worker", f"cd {r}/mobius-rag && {venv} -m app.worker"),

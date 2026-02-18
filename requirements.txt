@@ -26,6 +26,8 @@ greenlet>=3.0.0             # SQLAlchemy async support
 # =============================================================================
 google-cloud-aiplatform>=1.40.0   # Vertex AI (LLM, embeddings)
 google-cloud-storage>=2.14.0      # GCS buckets
+google-api-python-client>=2.0.0   # Google Drive API (mobius-rag)
+google-auth-oauthlib>=1.0.0       # OAuth for Drive (mobius-rag)
 google-cloud-bigquery>=3.0.0      # BigQuery (mobius-dbt)
 google-cloud-firestore>=2.14.0    # Firestore (mobius-os)
 

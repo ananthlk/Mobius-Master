@@ -1,0 +1,11 @@
+# CMHC Cost Report dbt profile. Set BQ_PROJECT, BQ_LANDING_DATASET, BQ_MART_DATASET (or BQ_DATASET for mart).
+cmhc_cost_report:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('BQ_PROJECT', 'mobiusos-new') }}"
+      dataset: "{{ env_var('BQ_MART_DATASET', env_var('BQ_DATASET', 'mobius_cmhc_dev')) }}"
+      threads: 2
+      timeout_seconds: 300

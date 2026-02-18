@@ -166,6 +166,8 @@ def update_candidate_state_by_ids(
 ) -> int:
     """
     Update policy_lexicon_candidates rows by ID.
+    When new_state is 'rejected', also clears llm_verdict to 'reject' and proposed_tag to NULL
+    so the stored data reflects the user's decision (no leftover "proposed" suggestion).
     Returns the number of rows updated.
     """
     if not ids:
@@ -177,19 +179,36 @@ def update_candidate_state_by_ids(
     notes = (reviewer_notes or "")[:500]
     ct_val = candidate_type if candidate_type in ("p", "d", "j") else None
     pt_val = (proposed_tag or "").strip() or None
+    st = (new_state or "").strip().lower()
 
-    rag_cur.execute(
-        """
-        UPDATE policy_lexicon_candidates
-        SET state = %s,
-            candidate_type = COALESCE(%s, candidate_type),
-            proposed_tag = COALESCE(%s, proposed_tag),
-            reviewer = %s,
-            reviewer_notes = %s
-        WHERE id::text = ANY(%s)
-        """,
-        (new_state, ct_val, pt_val, rev, notes, ids_clean),
-    )
+    if st == "rejected":
+        # Clear llm_verdict and proposed_tag so rejected rows don't show old LLM suggestion
+        rag_cur.execute(
+            """
+            UPDATE policy_lexicon_candidates
+            SET state = %s,
+                llm_verdict = 'reject',
+                proposed_tag = NULL,
+                candidate_type = COALESCE(%s, candidate_type),
+                reviewer = %s,
+                reviewer_notes = %s
+            WHERE id::text = ANY(%s)
+            """,
+            (new_state, ct_val, rev, notes, ids_clean),
+        )
+    else:
+        rag_cur.execute(
+            """
+            UPDATE policy_lexicon_candidates
+            SET state = %s,
+                candidate_type = COALESCE(%s, candidate_type),
+                proposed_tag = COALESCE(%s, proposed_tag),
+                reviewer = %s,
+                reviewer_notes = %s
+            WHERE id::text = ANY(%s)
+            """,
+            (new_state, ct_val, pt_val, rev, notes, ids_clean),
+        )
     return rag_cur.rowcount
 
 
@@ -206,6 +225,7 @@ def update_candidate_state_in_rag(
     """
     Update policy_lexicon_candidates rows matching normalized (case-insensitive).
     Only updates rows with state='proposed'.
+    When new_state is 'rejected', also clears llm_verdict to 'reject' and proposed_tag to NULL.
     Returns the number of rows updated.
     """
     nk = _normalize_phrase(normalized)
@@ -213,20 +233,35 @@ def update_candidate_state_in_rag(
     notes = (reviewer_notes or "")[:500]
     ct_val = candidate_type if candidate_type in ("p", "d", "j") else None
     pt_val = (proposed_tag or "").strip() or None
+    st = (new_state or "").strip().lower()
 
-    # Match all whitespace variants (e.g. "age of" and "age  of") via regexp_replace
-    rag_cur.execute(
-        """
-        UPDATE policy_lexicon_candidates
-        SET state = %s,
-            candidate_type = COALESCE(%s, candidate_type),
-            proposed_tag = COALESCE(%s, proposed_tag),
-            reviewer = %s,
-            reviewer_notes = %s
-        WHERE trim(lower(regexp_replace(normalized, E'\\s+', ' ', 'g'))) = %s AND state = 'proposed'
-        """,
-        (new_state, ct_val, pt_val, rev, notes, nk),
-    )
+    if st == "rejected":
+        rag_cur.execute(
+            """
+            UPDATE policy_lexicon_candidates
+            SET state = %s,
+                llm_verdict = 'reject',
+                proposed_tag = NULL,
+                candidate_type = COALESCE(%s, candidate_type),
+                reviewer = %s,
+                reviewer_notes = %s
+            WHERE trim(lower(regexp_replace(normalized, E'\\s+', ' ', 'g'))) = %s AND state = 'proposed'
+            """,
+            (new_state, ct_val, rev, notes, nk),
+        )
+    else:
+        rag_cur.execute(
+            """
+            UPDATE policy_lexicon_candidates
+            SET state = %s,
+                candidate_type = COALESCE(%s, candidate_type),
+                proposed_tag = COALESCE(%s, proposed_tag),
+                reviewer = %s,
+                reviewer_notes = %s
+            WHERE trim(lower(regexp_replace(normalized, E'\\s+', ' ', 'g'))) = %s AND state = 'proposed'
+            """,
+            (new_state, ct_val, pt_val, rev, notes, nk),
+        )
     rc = rag_cur.rowcount
     # Verify immediately in same connection (catches commit/DB mismatch issues)
     if rc > 0:

@@ -1,0 +1,6 @@
+# CMHC Cost Report skill: pipeline and query layer
+google-cloud-bigquery>=3.14.0
+google-cloud-storage>=2.14.0
+pandas>=2.0.0
+python-dotenv>=1.0.0
+httpx>=0.26.0

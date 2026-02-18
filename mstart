@@ -26,11 +26,13 @@ fi
 START_RAG_FRONTEND=true
 START_OS_EXTENSION=true
 START_LANDING=true
+RESTART_CLOUDSQL=false
 for arg in "$@"; do
   case "$arg" in
     --no-rag-frontend) START_RAG_FRONTEND=false ;;
     --no-os-extension) START_OS_EXTENSION=false ;;
     --no-landing) START_LANDING=false ;;
+    --restart-db) RESTART_CLOUDSQL=true ;;
   esac
 done
 
@@ -170,14 +172,33 @@ _to_psycopg_url() {
   printf "%s" "${url/postgresql+asyncpg:\/\//postgresql:\/\/}"
 }
 
+# --- Restart Cloud SQL to clear connections (optional, for "connection slots" errors) ---
+if [[ "$RESTART_CLOUDSQL" == "true" ]]; then
+  _log "Restarting Cloud SQL instance (clears all connections) ..."
+  CLOUDSQL_INST="${CLOUDSQL_INSTANCE:-mobius-platform-dev-db}"
+  CLOUDSQL_PROJ="${GCP_PROJECT:-mobius-os-dev}"
+  if command -v gcloud >/dev/null 2>&1; then
+    gcloud sql instances restart "$CLOUDSQL_INST" --project="$CLOUDSQL_PROJ" --quiet 2>/dev/null && _log "  Instance restarted. Waiting 35s ..." && sleep 35 || _log "  Restart failed or skipped"
+  else
+    _log "  gcloud not found; skip --restart-db"
+  fi
+fi
+
 # --- mobius-chat DB migrations (run before starting chat services) ---
 if [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
   _log "Running mobius-chat DB migrations ..."
+  # After killing processes, wait for DB connections to close, then try cleanup
+  sleep 3
+  if [[ -x "$VENV/bin/python3" ]] && [[ -f "$MOBIUS_ROOT/scripts/cleanup_db_connections.py" ]]; then
+    _log "Cleaning up idle DB connections ..."
+    "$VENV/bin/python3" "$MOBIUS_ROOT/scripts/cleanup_db_connections.py" 2>/dev/null || true
+  fi
   _load_env "$MOBIUS_ROOT/mobius-chat/.env"
   if (cd "$MOBIUS_ROOT/mobius-chat" && "$VENV/bin/python3" -m app.db.run_migrations 2>&1); then
     _log "Migrations OK"
   else
     _log "Migrations failed or skipped (check CHAT_RAG_DATABASE_URL in mobius-chat/.env)"
+    _log "  If you see 'connection slots' error, run: ./mstart --restart-db"
   fi
 fi
 
@@ -349,7 +370,8 @@ fi
 if [[ "$START_RAG_FRONTEND" == "true" ]] && [[ -d "$MOBIUS_ROOT/mobius-rag/frontend" ]]; then
   if command -v npm >/dev/null 2>&1; then
     _kill_port 5173
-    _start "mobius-rag-frontend" "cd $MOBIUS_ROOT/mobius-rag/frontend && VITE_API_BASE=http://localhost:8001 VITE_SCRAPER_API_BASE=http://localhost:8002 npm run dev"
+    # Use /api-rag proxy (no VITE_API_BASE) so requests are same-origin, avoiding CORS
+_start "mobius-rag-frontend" "cd $MOBIUS_ROOT/mobius-rag/frontend && VITE_SCRAPER_API_BASE=http://localhost:8002 npm run dev"
   else
     _log "Skip mobius-rag frontend (npm not found)"
   fi
