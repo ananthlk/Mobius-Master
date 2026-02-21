@@ -17,8 +17,8 @@ Terminology:
                   pharmacy             general
 
 Usage:
-  QA_DATABASE_URL='postgresql://postgres:MobiusDev123$@127.0.0.1:5432/mobius_qa' \
-  RAG_DATABASE_URL='postgresql://postgres:MobiusDev123$@127.0.0.1:5432/mobius_rag' \
+  QA_DATABASE_URL='postgresql://postgres:MobiusDev123$@34.135.72.145:5432/mobius_qa' \
+  RAG_DATABASE_URL='postgresql://postgres:MobiusDev123$@34.135.72.145:5432/mobius_rag' \
   python3 reload_clean_lexicon.py [--dry-run]
 """
 

@@ -56,6 +56,7 @@ def _service_config() -> dict:
         # Retrieval Eval UI is served statically by landing under /retrieval-eval/
         "retrieval_eval_url": _env_url("MOBIUS_RETRIEVAL_EVAL_URL", f"http://127.0.0.1:{PORT}/retrieval-eval/"),
         "retrieval_eval_api_url": _env_url("MOBIUS_RETRIEVAL_EVAL_API_URL", "http://127.0.0.1:8020"),
+        "rag_api_url": _env_url("RAG_API_URL", "http://127.0.0.1:8030"),
         "redis_host": os.getenv("MOBIUS_REDIS_HOST", "10.40.102.67").strip() or "10.40.102.67",
         "redis_port": int(os.getenv("MOBIUS_REDIS_PORT", "6379").strip() or "6379"),
     }
@@ -99,9 +100,11 @@ SERVICE_STOP = {
         ],
         "ports": [8001, 5173],
     },
+    "rag-api": {"names": ["mobius-rag-api"], "ports": [8030]},
     "dbt": {"names": ["mobius-dbt"], "ports": [6500]},
     "chat-worker": {"names": ["mobius-chat-worker"], "ports": []},
     "scraper": {"names": ["mobius-scraper-api", "mobius-scraper-worker"], "ports": [8002]},
+    "google-search": {"names": ["mobius-google-search-api"], "ports": [8004]},
     "email": {"names": ["mobius-email-api"], "ports": [8003]},
     "rag-chunking": {"names": ["mobius-rag-chunking-worker"], "ports": []},
     "rag-embedding": {"names": ["mobius-rag-embedding-worker"], "ports": []},
@@ -139,6 +142,9 @@ def _start_commands(root: Path) -> dict:
             ),
         ],
         "rag": rag_cmds,
+        "rag-api": [
+            ("mobius-rag-api", f"cd {r}/mobius-rag-api && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8030"),
+        ] if (root / "mobius-rag-api").exists() else [],
         "dbt": [
             ("mobius-dbt", f"cd {r}/mobius-dbt && {venv} -m uvicorn app.main:app --reload --host 0.0.0.0 --port 6500"),
         ],
@@ -148,6 +154,9 @@ def _start_commands(root: Path) -> dict:
         "scraper": [
             ("mobius-scraper-api", f"cd {r}/mobius-skills/web-scraper && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8002"),
             ("mobius-scraper-worker", f"cd {r}/mobius-skills/web-scraper && {venv} -m app.worker"),
+        ],
+        "google-search": [
+            ("mobius-google-search-api", f"cd {r}/mobius-skills/google-search && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8004"),
         ],
         "email": [
             ("mobius-email-api", f"cd {r}/mobius-skills/email && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8003"),

@@ -348,13 +348,18 @@ def main() -> int:
     )
     ap.add_argument("--sigmoid-k", type=float, default=1.0, help="fixed mode: k")
     ap.add_argument("--sigmoid-x0", type=float, default=0.0, help="fixed mode: x0")
+    ap.add_argument(
+        "--authority-level",
+        default="",
+        help="Override config: filter corpus by this document_authority_level (e.g. contract_source_of_truth)",
+    )
     args = ap.parse_args()
 
     cfg = load_yaml(Path(args.config))
     filters = (cfg.get("filters") or {}) if isinstance(cfg.get("filters"), dict) else {}
-    authority_level = filters.get("document_authority_level") or ""
+    authority_level = (args.authority_level or "").strip() or filters.get("document_authority_level") or ""
     if not authority_level:
-        raise SystemExit("config.filters.document_authority_level must be set")
+        raise SystemExit("config.filters.document_authority_level or --authority-level must be set")
 
     chat_db_url = os.getenv("CHAT_RAG_DATABASE_URL") or os.getenv("CHAT_DATABASE_URL")
     if not chat_db_url:

@@ -93,31 +93,6 @@ _start() {
   _log "  PID $pid"
 }
 
-# Ensure Cloud SQL Auth Proxy (or local Postgres) is available on 127.0.0.1:5432.
-_ensure_cloud_sql_proxy() {
-  # If something already listens on 5432 (local postgres or proxy), we're good.
-  if lsof -nP -iTCP:5432 -sTCP:LISTEN >/dev/null 2>&1; then
-    return
-  fi
-
-  # Best-effort default for dev if not set.
-  if [[ -z "${CLOUDSQL_CONNECTION_NAME:-}" ]]; then
-    CLOUDSQL_CONNECTION_NAME="mobius-os-dev:us-central1:mobius-platform-dev-db"
-    export CLOUDSQL_CONNECTION_NAME
-  fi
-
-  # If cloud-sql-proxy is available, start it.
-  if command -v cloud-sql-proxy >/dev/null 2>&1; then
-    _log "Starting Cloud SQL Auth Proxy on 127.0.0.1:5432 ..."
-    _start "mobius-cloud-sql-proxy" "cloud-sql-proxy \"${CLOUDSQL_CONNECTION_NAME}\" --address=127.0.0.1 --port=5432"
-    # Give it a moment to bind.
-    sleep 1
-  else
-    _log "WARNING: Nothing is listening on 127.0.0.1:5432 and cloud-sql-proxy is not installed."
-    _log "  Install: brew install cloud-sql-proxy"
-  fi
-}
-
 # Wait for Redis at REDIS_URL (used after starting tunnel). Up to 15s.
 _wait_redis() {
   sleep 2
@@ -134,6 +109,28 @@ import redis; redis.from_url(REDIS_URL, socket_connect_timeout=2).ping()
     sleep 1
   done
   _log "  Redis not reachable yet (tunnel may still be connecting)"
+}
+
+# Wait for Redis at REDIS_URL (from current env). Up to 30s. Used before mobius-chat worker.
+_wait_redis_for_chat() {
+  local url="${REDIS_URL:-}"
+  [[ -z "$url" ]] && return
+  if [[ ! -x "$VENV/bin/python3" ]]; then return; fi
+  local i
+  for (( i=0; i<30; i++ )); do
+    if "$VENV/bin/python3" -c "
+import os
+import redis
+url = os.environ.get('REDIS_URL', '')
+if url:
+    redis.from_url(url, decode_responses=True, socket_connect_timeout=3).ping()
+" 2>/dev/null; then
+      _log "  Redis reachable for chat worker"
+      return
+    fi
+    sleep 1
+  done
+  _log "  Redis not reachable (chat worker will retry on startup)"
 }
 
 # Load .env files for services that need env vars
@@ -153,7 +150,7 @@ _load_env() {
   fi
 }
 
-# Derive Postgres user/pass from a URL (best-effort; works for simple passwords).
+# Derive Postgres user/pass/host/port from a URL (best-effort).
 _pg_user_from_url() {
   local url="$1"
   if [[ "$url" =~ ^postgresql(\+asyncpg)?://([^:/]+):([^@]+)@ ]]; then
@@ -166,10 +163,21 @@ _pg_pass_from_url() {
     printf "%s" "${BASH_REMATCH[3]}"
   fi
 }
-_to_psycopg_url() {
+_pg_host_from_url() {
   local url="$1"
-  # Convert postgresql+asyncpg:// → postgresql:// for psycopg2
-  printf "%s" "${url/postgresql+asyncpg:\/\//postgresql:\/\/}"
+  if [[ "$url" =~ @([^:/]+)(:[0-9]+)?/ ]]; then
+    printf "%s" "${BASH_REMATCH[1]}"
+  else
+    printf "%s" "${POSTGRES_HOST:-34.135.72.145}"
+  fi
+}
+_pg_port_from_url() {
+  local url="$1"
+  if [[ "$url" =~ @[^:]+:([0-9]+)/ ]]; then
+    printf "%s" "${BASH_REMATCH[1]}"
+  else
+    printf "%s" "${POSTGRES_PORT:-5432}"
+  fi
 }
 
 # --- Restart Cloud SQL to clear connections (optional, for "connection slots" errors) ---
@@ -223,8 +231,9 @@ if [[ -f "$MOBIUS_ROOT/mobius-config/.env" ]]; then
   _load_env "$MOBIUS_ROOT/mobius-config/.env"
 fi
 
-# If DB access is via Cloud SQL proxy locally, ensure it's running early.
-_ensure_cloud_sql_proxy
+# PostgreSQL: All services connect directly to Cloud SQL (no local proxy).
+# QA_DATABASE_URL and RAG_DATABASE_URL are derived from DATABASE_URL/CHAT_RAG_DATABASE_URL
+# using the same host (e.g. 34.135.72.145). Set in mobius-config/.env or per-module .env.
 
 REDIS_URL="${REDIS_URL:-}"
 if [[ "$REDIS_URL" == *"127.0.0.1:6380"* ]] || [[ "$REDIS_URL" == *"localhost:6380"* ]]; then
@@ -244,15 +253,33 @@ if [[ "$REDIS_URL" == *"127.0.0.1:6380"* ]] || [[ "$REDIS_URL" == *"localhost:63
 fi
 _log "Note: Redis at ${REDIS_URL:-redis://10.40.102.67:6379/0}"
 
+# --- mobius-chat frontend build (ensures app.js is up to date) ---
+if [[ -d "$MOBIUS_ROOT/mobius-chat/frontend" ]] && [[ -f "$MOBIUS_ROOT/mobius-chat/frontend/package.json" ]]; then
+  if command -v npm >/dev/null 2>&1; then
+    _log "Building mobius-chat frontend ..."
+    (cd "$MOBIUS_ROOT/mobius-chat/frontend" && npm run build 2>&1) || _log "  Frontend build failed (run: cd mobius-chat/frontend && npm run build)"
+  fi
+fi
+
 # --- mobius-chat API (port 8000) ---
 if [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
+  _load_env "$MOBIUS_ROOT/mobius-skills/web-scraper/.env"
+  [[ -f "$MOBIUS_ROOT/mobius-config/.env" ]] && _load_env "$MOBIUS_ROOT/mobius-config/.env"
   _load_env "$MOBIUS_ROOT/mobius-chat/.env"
+  export QUEUE_TYPE="${QUEUE_TYPE:-redis}"
+  # Enable skills when services are started (override .env if not set)
+  [[ -z "${CHAT_SKILLS_GOOGLE_SEARCH_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/google-search" ]] && export CHAT_SKILLS_GOOGLE_SEARCH_URL="http://localhost:8004/search?"
+  [[ -z "${CHAT_SKILLS_WEB_SCRAPER_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/web-scraper" ]] && export CHAT_SKILLS_WEB_SCRAPER_URL="http://localhost:8002/scrape/review"
   _start "mobius-chat-api" "cd $MOBIUS_ROOT/mobius-chat && $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000"
 fi
 
-# --- mobius-chat worker ---
+# --- mobius-chat worker (Redis queue; always started) ---
 if [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
+  _load_env "$MOBIUS_ROOT/mobius-skills/web-scraper/.env"
+  [[ -f "$MOBIUS_ROOT/mobius-config/.env" ]] && _load_env "$MOBIUS_ROOT/mobius-config/.env"
   _load_env "$MOBIUS_ROOT/mobius-chat/.env"
+  export QUEUE_TYPE="${QUEUE_TYPE:-redis}"
+  _wait_redis_for_chat
   _start "mobius-chat-worker" "cd $MOBIUS_ROOT/mobius-chat && $VENV/bin/python3 -m app.worker"
 fi
 
@@ -275,31 +302,42 @@ if [[ -f "$MOBIUS_ROOT/mobius-rag/app/embedding_worker.py" ]]; then
   _start "mobius-rag-embedding-worker" "cd $MOBIUS_ROOT/mobius-rag && $VENV/bin/python3 -m app.embedding_worker"
 fi
 
+# --- mobius-rag-api (port 8030): POST /retrieve - Mobius or lazy RAG path ---
+# Load mobius-config first, mobius-chat last so CHAT_RAG_DATABASE_URL (BM25 corpus) wins.
+if [[ -d "$MOBIUS_ROOT/mobius-rag-api" ]]; then
+  _kill_port 8030
+  [[ -f "$MOBIUS_ROOT/mobius-config/.env" ]] && _load_env "$MOBIUS_ROOT/mobius-config/.env"
+  _load_env "$MOBIUS_ROOT/mobius-chat/.env"
+  _start "mobius-rag-api" "cd $MOBIUS_ROOT/mobius-rag-api && $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8030"
+fi
+
 # --- mobius-qa lexicon maintenance API (port 8010) ---
 # Serves the Lexicon UI data endpoints used by the static app under /lexicon/.
 if [[ -d "$MOBIUS_ROOT/mobius-qa/lexicon-maintenance" ]]; then
   _kill_port 8010
-  # Prefer explicit URLs if provided; else derive from RAG/chat creds and assume local Cloud SQL proxy on 127.0.0.1:5432.
   _load_env "$MOBIUS_ROOT/mobius-qa/lexicon-maintenance/.env"
   _load_env "$MOBIUS_ROOT/mobius-rag/.env"
   _load_env "$MOBIUS_ROOT/mobius-chat/.env"
 
+  # Derive QA/RAG URLs from cloud DATABASE_URL or CHAT_RAG_DATABASE_URL (same host).
   if [[ -z "${QA_DATABASE_URL:-}" ]]; then
-    # Derive credentials from DATABASE_URL or CHAT_RAG_DATABASE_URL, then point to mobius_qa on localhost.
-    local_src="${DATABASE_URL:-${CHAT_RAG_DATABASE_URL:-}}"
-    local_user="$(_pg_user_from_url "$local_src")"
-    local_pass="$(_pg_pass_from_url "$local_src")"
-    if [[ -n "$local_user" && -n "$local_pass" ]]; then
-      QA_DATABASE_URL="postgresql://${local_user}:${local_pass}@127.0.0.1:5432/mobius_qa?connect_timeout=5"
+    pg_src="${DATABASE_URL:-${CHAT_RAG_DATABASE_URL:-}}"
+    pg_user="$(_pg_user_from_url "$pg_src")"
+    pg_pass="$(_pg_pass_from_url "$pg_src")"
+    pg_host="$(_pg_host_from_url "$pg_src")"
+    pg_port="$(_pg_port_from_url "$pg_src")"
+    if [[ -n "$pg_user" && -n "$pg_pass" ]]; then
+      QA_DATABASE_URL="postgresql://${pg_user}:${pg_pass}@${pg_host}:${pg_port}/mobius_qa?connect_timeout=5"
     fi
   fi
   if [[ -z "${RAG_DATABASE_URL:-}" ]]; then
-    # Derive credentials from DATABASE_URL and force local DB name/host.
-    local_src="${DATABASE_URL:-${CHAT_RAG_DATABASE_URL:-}}"
-    local_user="$(_pg_user_from_url "$local_src")"
-    local_pass="$(_pg_pass_from_url "$local_src")"
-    if [[ -n "$local_user" && -n "$local_pass" ]]; then
-      RAG_DATABASE_URL="postgresql://${local_user}:${local_pass}@127.0.0.1:5432/mobius_rag?connect_timeout=5"
+    pg_src="${DATABASE_URL:-${CHAT_RAG_DATABASE_URL:-}}"
+    pg_user="$(_pg_user_from_url "$pg_src")"
+    pg_pass="$(_pg_pass_from_url "$pg_src")"
+    pg_host="$(_pg_host_from_url "$pg_src")"
+    pg_port="$(_pg_port_from_url "$pg_src")"
+    if [[ -n "$pg_user" && -n "$pg_pass" ]]; then
+      RAG_DATABASE_URL="postgresql://${pg_user}:${pg_pass}@${pg_host}:${pg_port}/mobius_rag?connect_timeout=5"
     fi
   fi
 
@@ -315,13 +353,15 @@ if [[ -d "$MOBIUS_ROOT/mobius-qa/retrieval-eval-studio" ]]; then
   _load_env "$MOBIUS_ROOT/mobius-chat/.env"
   _load_env "$MOBIUS_ROOT/mobius-rag/.env"
 
-  # Ensure QA_DATABASE_URL points to local Cloud SQL proxy (same pattern as lexicon API).
+  # Derive QA_DATABASE_URL from cloud DATABASE_URL/CHAT_RAG_DATABASE_URL (same host).
   if [[ -z "${QA_DATABASE_URL:-}" ]]; then
-    local_src="${DATABASE_URL:-${CHAT_RAG_DATABASE_URL:-}}"
-    local_user="$(_pg_user_from_url "$local_src")"
-    local_pass="$(_pg_pass_from_url "$local_src")"
-    if [[ -n "$local_user" && -n "$local_pass" ]]; then
-      QA_DATABASE_URL="postgresql://${local_user}:${local_pass}@127.0.0.1:5432/mobius_qa?connect_timeout=5"
+    pg_src="${DATABASE_URL:-${CHAT_RAG_DATABASE_URL:-}}"
+    pg_user="$(_pg_user_from_url "$pg_src")"
+    pg_pass="$(_pg_pass_from_url "$pg_src")"
+    pg_host="$(_pg_host_from_url "$pg_src")"
+    pg_port="$(_pg_port_from_url "$pg_src")"
+    if [[ -n "$pg_user" && -n "$pg_pass" ]]; then
+      QA_DATABASE_URL="postgresql://${pg_user}:${pg_pass}@${pg_host}:${pg_port}/mobius_qa?connect_timeout=5"
       export QA_DATABASE_URL
     fi
   fi
@@ -366,6 +406,23 @@ if [[ -d "$MOBIUS_ROOT/mobius-skills/web-scraper" ]]; then
   _start "mobius-scraper-worker" "cd $MOBIUS_ROOT/mobius-skills/web-scraper && $VENV/bin/python3 -m app.worker"
 fi
 
+# --- mobius-skills google-search API (port 8004) ---
+if [[ -d "$MOBIUS_ROOT/mobius-skills/google-search" ]]; then
+  _kill_port 8004
+  _load_env "$MOBIUS_ROOT/mobius-skills/google-search/.env"
+  _start "mobius-google-search-api" "cd $MOBIUS_ROOT/mobius-skills/google-search && $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8004"
+fi
+
+# --- mobius-skills-mcp (port 8006): MCP server exposing google_search, web_scrape_review ---
+if [[ -d "$MOBIUS_ROOT/mobius-skills-mcp" ]]; then
+  _kill_port 8006
+  _load_env "$MOBIUS_ROOT/mobius-chat/.env"
+  _load_env "$MOBIUS_ROOT/mobius-skills/web-scraper/.env"
+  export CHAT_SKILLS_GOOGLE_SEARCH_URL="${CHAT_SKILLS_GOOGLE_SEARCH_URL:-http://localhost:8004/search?}"
+  export CHAT_SKILLS_WEB_SCRAPER_URL="${CHAT_SKILLS_WEB_SCRAPER_URL:-http://localhost:8002/scrape/review}"
+  _start "mobius-skills-mcp" "cd $MOBIUS_ROOT/mobius-skills-mcp && $VENV/bin/python3 -m app"
+fi
+
 # --- mobius-rag frontend (port 5173) ---
 if [[ "$START_RAG_FRONTEND" == "true" ]] && [[ -d "$MOBIUS_ROOT/mobius-rag/frontend" ]]; then
   if command -v npm >/dev/null 2>&1; then
@@ -400,7 +457,9 @@ printf "  %-24s  %s\n" "mobius-os backend"    "http://localhost:5001"
 printf "  %-24s  %s\n" "mobius-chat"         "http://localhost:8000"
 printf "  %-24s  %s\n" "mobius-rag backend"  "http://localhost:8001"
 printf "  %-24s  %s\n" "mobius-scraper API"  "http://localhost:8002"
+printf "  %-24s  %s\n" "mobius-google-search" "http://localhost:8004"
 printf "  %-24s  %s\n" "mobius-rag frontend" "http://localhost:5173"
+printf "  %-24s  %s\n" "mobius-rag-api"         "http://localhost:8030"
 printf "  %-24s  %s\n" "mobius-qa lexicon API" "http://localhost:8010"
 printf "  %-24s  %s\n" "mobius-qa retrieval eval" "http://localhost:8020"
 if [[ "$START_LANDING" == "true" ]]; then

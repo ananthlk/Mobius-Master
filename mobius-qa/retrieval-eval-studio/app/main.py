@@ -73,18 +73,10 @@ def _env(key: str, default: str = "") -> str:
     return (os.getenv(key) or default).strip()
 
 
-def _is_local_host(host: str) -> bool:
-    h = (host or "").strip().lower()
-    return h in ("127.0.0.1", "localhost", "::1") or h.startswith("127.")
-
-
 def _build_pg_url(db: str) -> str:
     user = _env("POSTGRES_USER", "postgres") or "postgres"
     pwd = _env("POSTGRES_PASSWORD", "")
-    # Safety default: prefer localhost Cloud SQL proxy unless explicitly overridden via QA_DATABASE_URL.
-    # This avoids accidentally using a public POSTGRES_HOST from mobius-config/.env in dev.
-    raw_host = _env("POSTGRES_HOST", "127.0.0.1") or "127.0.0.1"
-    host = raw_host if _is_local_host(raw_host) else "127.0.0.1"
+    host = _env("POSTGRES_HOST", "34.135.72.145") or "34.135.72.145"
     port = _env("POSTGRES_PORT", "5432") or "5432"
     if pwd:
         return f"postgresql://{user}:{pwd}@{host}:{port}/{db}?connect_timeout=5"
