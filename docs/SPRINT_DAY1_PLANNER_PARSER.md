@@ -162,6 +162,10 @@ PYTHONPATH=mobius-chat python mobius-chat/scripts/test_chat_pipeline_comprehensi
 cd /Users/ananth/Mobius && PYTHONPATH=mobius-chat pytest mobius-chat/tests/test_doc_assembly.py mobius-chat/tests/test_refined_query.py mobius-chat/tests/test_short_term_memory.py mobius-chat/tests/test_parser.py mobius-chat/tests/test_mobius_parse.py -v --tb=short -q && PYTHONPATH=mobius-chat python mobius-chat/scripts/test_agent_routing.py
 ```
 
+### Parse testing cadence (2026-02-19+)
+
+**Run parser/planner tests after every few sprints.** As new capabilities get added, new docs ingested, and prompts evolve, the parse baseline drifts. Re-run `run_pipeline_stream.py`, `trace_icd_clarify.py`, and parser unit tests to verify decomposition and clarification behavior still match intent. See `scripts/run_pipeline_stream.py` for local verification without worker.
+
 ---
 
 ## Out of Scope (Day 1)
