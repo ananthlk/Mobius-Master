@@ -27,8 +27,8 @@ _run() {
 }
 
 # 1. Unit tests (fast)
-_run "Unit tests (doc_assembly, refined_query, short_term_memory, parser, mobius_parse)" \
-  "pytest mobius-chat/tests/test_doc_assembly.py mobius-chat/tests/test_refined_query.py mobius-chat/tests/test_short_term_memory.py mobius-chat/tests/test_parser.py mobius-chat/tests/test_mobius_parse.py -v --tb=short -q"
+_run "Unit tests (doc_assembly, refined_query, short_term_memory, parser, mobius_parse, intent_jurisdiction_continuity)" \
+  "pytest mobius-chat/tests/test_doc_assembly.py mobius-chat/tests/test_refined_query.py mobius-chat/tests/test_short_term_memory.py mobius-chat/tests/test_parser.py mobius-chat/tests/test_mobius_parse.py mobius-chat/tests/test_intent_jurisdiction_continuity.py -v --tb=short -q"
 
 # 2. Agent routing (LLM + blueprint) — skip with --unit
 if [[ "$1" != "--unit" ]]; then

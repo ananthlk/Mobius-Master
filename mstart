@@ -270,6 +270,8 @@ if [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
   # Enable skills when services are started (override .env if not set)
   [[ -z "${CHAT_SKILLS_GOOGLE_SEARCH_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/google-search" ]] && export CHAT_SKILLS_GOOGLE_SEARCH_URL="http://localhost:8004/search?"
   [[ -z "${CHAT_SKILLS_WEB_SCRAPER_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/web-scraper" ]] && export CHAT_SKILLS_WEB_SCRAPER_URL="http://localhost:8002/scrape/review"
+  # MCP: tool agent calls skills via MCP (mobius-skills-mcp on port 8006)
+  [[ -z "${MCP_SERVER_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills-mcp" ]] && export MCP_SERVER_URL="http://localhost:8006/mcp"
   _start "mobius-chat-api" "cd $MOBIUS_ROOT/mobius-chat && $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000"
 fi
 
@@ -279,6 +281,7 @@ if [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
   [[ -f "$MOBIUS_ROOT/mobius-config/.env" ]] && _load_env "$MOBIUS_ROOT/mobius-config/.env"
   _load_env "$MOBIUS_ROOT/mobius-chat/.env"
   export QUEUE_TYPE="${QUEUE_TYPE:-redis}"
+  [[ -z "${MCP_SERVER_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills-mcp" ]] && export MCP_SERVER_URL="http://localhost:8006/mcp"
   _wait_redis_for_chat
   _start "mobius-chat-worker" "cd $MOBIUS_ROOT/mobius-chat && $VENV/bin/python3 -m app.worker"
 fi
@@ -458,6 +461,7 @@ printf "  %-24s  %s\n" "mobius-chat"         "http://localhost:8000"
 printf "  %-24s  %s\n" "mobius-rag backend"  "http://localhost:8001"
 printf "  %-24s  %s\n" "mobius-scraper API"  "http://localhost:8002"
 printf "  %-24s  %s\n" "mobius-google-search" "http://localhost:8004"
+printf "  %-24s  %s\n" "mobius-skills-mcp" "http://localhost:8006/mcp"
 printf "  %-24s  %s\n" "mobius-rag frontend" "http://localhost:5173"
 printf "  %-24s  %s\n" "mobius-rag-api"         "http://localhost:8030"
 printf "  %-24s  %s\n" "mobius-qa lexicon API" "http://localhost:8010"

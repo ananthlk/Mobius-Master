@@ -185,6 +185,10 @@ The real test for the system is: **did it solve the user’s question?** Not “
 
 ---
 
+**→ Full design:** [RELENTLESS_CONTINUITY_PLAN.md](./RELENTLESS_CONTINUITY_PLAN.md) — data model, user-ask triggers, implementation phases.
+
+---
+
 ## Out of Scope (This Schematic)
 
 - **Day 2 routing** — "Search for X" → tool (blueprint pattern override)
