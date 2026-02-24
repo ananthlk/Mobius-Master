@@ -5,6 +5,7 @@
 #   ./scripts/run_regression_tests.sh           # unit + agent routing (fast)
 #   ./scripts/run_regression_tests.sh --full    # + comprehensive pipeline (slow)
 #   ./scripts/run_regression_tests.sh --unit    # unit tests only
+#   ./scripts/run_regression_tests.sh --foundation  # Day 5: pytest -m "not integration" (147 tests, no DB/MCP)
 #
 set -e
 MOBIUS_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -26,7 +27,16 @@ _run() {
   fi
 }
 
-# 1. Unit tests (fast)
+# 1. Unit / foundation tests
+if [[ "$1" == "--foundation" ]]; then
+  _run "Foundation (all non-integration tests, Day 5 gate)" \
+    "pytest mobius-chat/tests/ -v -m 'not integration' --tb=short -q"
+  echo ""
+  echo "=============================================="
+  if [[ $FAILED -eq 0 ]]; then echo "Regression suite: PASSED"; else echo "Regression suite: FAILED"; exit 1; fi
+  exit 0
+fi
+
 _run "Unit tests (doc_assembly, refined_query, short_term_memory, parser, mobius_parse, intent_jurisdiction_continuity)" \
   "pytest mobius-chat/tests/test_doc_assembly.py mobius-chat/tests/test_refined_query.py mobius-chat/tests/test_short_term_memory.py mobius-chat/tests/test_parser.py mobius-chat/tests/test_mobius_parse.py mobius-chat/tests/test_intent_jurisdiction_continuity.py -v --tb=short -q"
 
