@@ -486,7 +486,13 @@ if [[ -d "$MOBIUS_ROOT/mobius-skills/provider-roster-credentialing" ]]; then
   _start "mobius-provider-roster-api" "cd $MOBIUS_ROOT/mobius-skills/provider-roster-credentialing && PORT=8011 $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8011"
 fi
 
-# --- mobius-skills-mcp (port 8006): MCP server exposing google_search, web_scrape_review ---
+# --- mobius-skills healthcare (port 8007): NPI, ICD-10, CMS coverage — used by MCP healthcare_query ---
+if [[ -d "$MOBIUS_ROOT/mobius-skills/healthcare" ]]; then
+  _kill_port 8007
+  _start "mobius-healthcare-api" "cd $MOBIUS_ROOT/mobius-skills/healthcare && $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8007"
+fi
+
+# --- mobius-skills-mcp (port 8006): MCP server exposing google_search, web_scrape_review, search_org_names, healthcare_query ---
 if [[ -d "$MOBIUS_ROOT/mobius-skills-mcp" ]]; then
   _kill_port 8006
   _load_env "$MOBIUS_ROOT/mobius-chat/.env"
@@ -494,6 +500,7 @@ if [[ -d "$MOBIUS_ROOT/mobius-skills-mcp" ]]; then
   export CHAT_SKILLS_GOOGLE_SEARCH_URL="${CHAT_SKILLS_GOOGLE_SEARCH_URL:-http://localhost:8004/search?}"
   export CHAT_SKILLS_WEB_SCRAPER_URL="${CHAT_SKILLS_WEB_SCRAPER_URL:-http://localhost:8002/scrape/review}"
   export CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL="${CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL:-http://localhost:8011/report}"
+  export CHAT_SKILLS_HEALTHCARE_URL="${CHAT_SKILLS_HEALTHCARE_URL:-http://localhost:8007}"
   _start "mobius-skills-mcp" "cd $MOBIUS_ROOT/mobius-skills-mcp && $VENV/bin/python3 -m app"
 fi
 

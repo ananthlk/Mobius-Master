@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 GOOGLE_SEARCH_URL = os.environ.get("CHAT_SKILLS_GOOGLE_SEARCH_URL", "http://localhost:8004/search?")
 WEB_SCRAPER_URL = os.environ.get("CHAT_SKILLS_WEB_SCRAPER_URL", "http://localhost:8002/scrape/review")
 PROVIDER_ROSTER_CREDENTIALING_URL = os.environ.get("CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL", "http://localhost:8010/report")
+HEALTHCARE_URL = os.environ.get("CHAT_SKILLS_HEALTHCARE_URL", "http://localhost:8007")
 
 
 def _provider_roster_base_url() -> str:
@@ -257,6 +258,43 @@ def search_org_by_address(
     except Exception as e:
         logger.warning("search_org_by_address failed: %s", e)
         return f"Org address search failed: {e}"
+
+
+@mcp.tool()
+def healthcare_query(question: str) -> str:
+    """Answer healthcare questions using NPI lookup, ICD-10 codes, and CMS coverage (NCD/LCD). Use for NPI lookup by number, ICD-10 code meaning, or Medicare/Medicaid coverage questions.
+
+    Args:
+        question: The healthcare question (e.g. "What is NPI 1234567890?", "What does ICD-10 Z00.00 mean?", "Is code X covered by Medicare?").
+    """
+    if not question or not str(question).strip():
+        return "Error: question is required."
+    question = str(question).strip()
+    base = (HEALTHCARE_URL or "").strip().rstrip("/")
+    if not base:
+        return "Error: CHAT_SKILLS_HEALTHCARE_URL not configured."
+    url = f"{base}/healthcare/query"
+    try:
+        payload = json.dumps({"question": question}).encode("utf-8")
+        req = urllib.request.Request(
+            url,
+            data=payload,
+            headers={"Content-Type": "application/json", "Accept": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read().decode())
+        answer = data.get("answer", "")
+        if not answer:
+            return "Healthcare query returned no answer."
+        return answer
+    except urllib.error.HTTPError as e:
+        body = e.fp.read().decode()[:500] if e.fp else str(e)
+        logger.warning("healthcare_query HTTP %s %s", e.code, body)
+        return f"Healthcare query failed ({e.code}): {body}"
+    except Exception as e:
+        logger.warning("healthcare_query failed: %s", e)
+        return f"Healthcare query failed: {e}. Ensure mobius-healthcare API is running (port 8007) and CHAT_SKILLS_HEALTHCARE_URL is set."
 
 
 @mcp.tool()

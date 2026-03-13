@@ -32,7 +32,7 @@ def _simplify_result(d: dict[str, Any]) -> dict[str, Any]:
     """Extract key fields from NPPES result for display."""
     if not isinstance(d, dict):
         return {}
-    nums = (d.get("result_count") or 0, len((d.get("results") or []))
+    nums = (d.get("result_count") or 0, len(d.get("results") or []))
     results = d.get("results") or []
     simplified = []
     for r in results:
