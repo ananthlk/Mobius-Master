@@ -902,10 +902,17 @@ def build_report_context(step_outputs: list[dict[str, Any]]) -> dict[str, Any]:
             _row(r.get("npi"), r.get("provider_name"), r.get("base_revenue"), r.get("taxonomy_code"), r.get("zip5", ""))
             for r in flagged_rows
         ]
-        c_rows = [
-            _row(r.get("npi"), r.get("provider_name"), r.get("base_revenue"), r.get("taxonomy_code"), r.get("zip5", ""))
-            for r in missing_rows
-        ]
+        # Dedup C by NPI (org NPI can appear multiple times across taxonomy/location)
+        _by_npi: dict[str, dict[str, Any]] = {}
+        for r in missing_rows:
+            npi = str(r.get("npi") or "").strip().zfill(10)
+            rev = float(r.get("base_revenue") or 0)
+            if npi not in _by_npi:
+                _by_npi[npi] = _row(r.get("npi"), r.get("provider_name"), 0, r.get("taxonomy_code"), r.get("zip5", ""))
+            _by_npi[npi]["base_revenue"] = round(_by_npi[npi]["base_revenue"] + rev, 2)
+        c_rows = list(_by_npi.values())
+        c_count = len(c_rows)
+        provider_counts["C"] = c_count
         # Pipeline validation: no blank provider_name — fail before LLM
         for rows, label in ((a_rows, "A"), (b_rows, "B"), (c_rows, "C")):
             blank = [r for r in rows if not (r.get("provider_name") or "").strip()]
@@ -1021,7 +1028,7 @@ def build_report_context(step_outputs: list[dict[str, Any]]) -> dict[str, Any]:
         except Exception as e:
             logger.warning("Could not parse find_locations CSV: %s", e)
 
-    # Readiness score: A/(A+B+C)*100. MANDATORY computed field.
+    # Readiness score: 100 × A / (A+B+C) provider count. LOCKED — provider-count-based, not revenue/combo-based.
     a_cnt = provider_counts.get("A") or 0
     b_cnt = provider_counts.get("B") or 0
     c_cnt = provider_counts.get("C") or 0
@@ -1031,8 +1038,9 @@ def build_report_context(step_outputs: list[dict[str, Any]]) -> dict[str, Any]:
     ahca_docs = _load_ahca_docs(max_chars=80000)
     methodology = (
         "Revenue Waterfall: A=Projected revenue at current run rate (valid PML combos), B=At-risk (flagged), "
-        "C=Enrollment gap (missing PML), D=Taxonomy optimization, E=Org vs state rate gap. "
-        "Uses taxonomy_utilization_benchmarks and org benchmark. Outside-in analysis; we do not have internal org records."
+        "C=Enrollment gap (missing PML, deduped by NPI), D=Taxonomy optimization, E=Org vs state rate gap. "
+        "Uses taxonomy_utilization_benchmarks and org benchmark. Outside-in analysis; we do not have internal org records. "
+        "Readiness score (locked): 100 × A provider count / (A+B+C provider count); provider-count-based, not revenue-based."
     )
 
     # Build Section E rate gap table when E > 0 (HCPCS-level: DLC avg vs FL state avg)
