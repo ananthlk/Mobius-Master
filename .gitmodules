@@ -29,3 +29,27 @@
 [submodule "mobius-rag"]
 	path = mobius-rag
 	url = https://github.com/ananthlk/Mobius-RAG.git
+[submodule "mobius-design"]
+	path = mobius-design
+	url = https://github.com/ananthlk/mobius-design.git
+[submodule "mobius-document-viewer"]
+	path = mobius-document-viewer
+	url = https://github.com/ananthlk/mobius-document-viewer.git
+[submodule "mobius-qa"]
+	path = mobius-qa
+	url = https://github.com/ananthlk/mobius-qa.git
+[submodule "mobius-qa-modules"]
+	path = mobius-qa-modules
+	url = https://github.com/ananthlk/mobius-qa-modules.git
+[submodule "mobius-rag-api"]
+	path = mobius-rag-api
+	url = https://github.com/ananthlk/mobius-rag-api.git
+[submodule "mobius-retriever"]
+	path = mobius-retriever
+	url = https://github.com/ananthlk/mobius-retriever.git
+[submodule "mobius-skills"]
+	path = mobius-skills
+	url = https://github.com/ananthlk/mobius-skills.git
+[submodule "mobius-skills-mcp"]
+	path = mobius-skills-mcp
+	url = https://github.com/ananthlk/mobius-skills-mcp.git

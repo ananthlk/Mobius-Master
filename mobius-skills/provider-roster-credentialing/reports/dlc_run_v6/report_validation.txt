@@ -1,8 +1,0 @@
-VALIDATION REPORT
------------------
-Validation Status: FAIL
-
-Pre-validation (structural) — delivery blocked:
-1. Section E completeness FAIL: Waterfall E > $0 but Section E does not contain a complete rate gap table (HCPCS, DLC avg rate, FL state avg, gap/claim, volume, total gap) nor an explicit 'No rate gap analysis available' disclaimer. Add the table or the disclaimer.
-
-Do not deliver. Fix draft and re-run validation.

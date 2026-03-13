@@ -1,8 +1,0 @@
-VALIDATION REPORT
------------------
-Validation Status: COMPOSE_FIX
-
-Detected Issues (BLOCK or COMPOSE_FIX items only, numbered):
-1. CHECK 7: COMPOSE_FIX — All 69 providers in Section A, 2 providers in Section B, and 27 providers in Section C show identical amounts ($36,808.00). This is an org-level average, not a taxonomy-differentiated rate. The label 'benchmark avg ($X/yr for this taxonomy)' in the 'Benchmark Methodology Note' is factually incorrect if the same value appears for different taxonomies like 'Clinical Social Worker', 'Physician Assistant', and 'Case Manager/Care Coordinator'. Either apply taxonomy-specific rates or relabel as 'org benchmark avg.'
-2. CHECK 10: COMPOSE_FIX — Section A contains raw taxonomy codes (2084P0800X, 261Q00000X, 261QM0801X, 322D00000X, 323P00000X, 363LP0808X) in the "Service Type" column instead of plain-English labels.
-3. CHECK 12: COMPOSE_FIX — Org NPIs DAVID LAWRENCE MENTAL HEALTH CENTER INC, DAVID LAWRENCE CENTER, and DAVID LAWRENCE MENTAL HEALTH CENTER, INC appear in Section C alongside individual providers without a distinct sub-section or workflow distinction note. Org
