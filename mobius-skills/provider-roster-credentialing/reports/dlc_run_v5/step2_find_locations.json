@@ -1,0 +1,45 @@
+{
+  "locations": [
+    {
+      "location_id": "9dfc7345e098b14f",
+      "site_address_line_1": "6075 BATHEY LN",
+      "site_city": "NAPLES",
+      "site_state": "FL",
+      "site_zip5": "34116",
+      "site_source": "org_nppes",
+      "npi": "1811334402",
+      "name": "DAVID LAWRENCE CENTER"
+    },
+    {
+      "location_id": "64174fc20320546b",
+      "site_address_line_1": "2806 HORSESHOE DR S",
+      "site_city": "NAPLES",
+      "site_state": "FL",
+      "site_zip5": "34104",
+      "site_source": "org_nppes",
+      "npi": "1871163600",
+      "name": "DAVID LAWRENCE MENTAL HEALTH CENTER INC"
+    },
+    {
+      "location_id": "45c5b171932dd660",
+      "site_address_line_1": "5266 GOLDEN GATE PKWY",
+      "site_city": "NAPLES",
+      "site_state": "FL",
+      "site_zip5": "34116",
+      "site_source": "org_nppes",
+      "npi": "1033883731",
+      "name": "DAVID LAWRENCE CENTER"
+    },
+    {
+      "location_id": "c0b5974aca639ad9",
+      "site_address_line_1": "425 N 1ST ST",
+      "site_city": "IMMOKALEE",
+      "site_state": "FL",
+      "site_zip5": "34142",
+      "site_source": "org_nppes",
+      "npi": "1962072793",
+      "name": "DAVID LAWRENCE MENTAL HEALTH CENTER INC"
+    }
+  ],
+  "count": 4
+}

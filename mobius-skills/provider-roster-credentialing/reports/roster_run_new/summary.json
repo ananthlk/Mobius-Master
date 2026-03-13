@@ -1,0 +1,14 @@
+{
+  "org_npis_count": 7,
+  "locations_count": 16,
+  "providers_total": 954,
+  "providers_active": 0,
+  "active_roster_cutoff": null,
+  "services_count": 265,
+  "historic_claims": 168195,
+  "historic_paid": 9924457.45,
+  "historic_codes": 73,
+  "pml_valid": 251,
+  "pml_flagged": 20,
+  "pml_total": 271
+}

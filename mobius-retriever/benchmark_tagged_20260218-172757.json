@@ -1,0 +1,22 @@
+{
+  "timestamp": "20260218-172757",
+  "question": "What is Molina's prior auth for PT in Florida?",
+  "tags": {
+    "document_payer": "Molina",
+    "document_state": "FL"
+  },
+  "runs": 2,
+  "untagged": {
+    "mean_ms": 1003.7877289869357,
+    "min_ms": 846.8520829919726,
+    "max_ms": 1160.7233749818988,
+    "results": 10
+  },
+  "tagged": {
+    "mean_ms": 701.1989794846158,
+    "min_ms": 669.2131249874365,
+    "max_ms": 733.1848339817952,
+    "results": 10
+  },
+  "overlap_pct": 20.0
+}

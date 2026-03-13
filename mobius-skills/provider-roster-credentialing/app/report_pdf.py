@@ -82,5 +82,5 @@ def markdown_to_pdf(
         html.write_pdf(pdf_path, stylesheets=styles)
         return True
     except Exception as e:
-        logger.warning("PDF generation failed: %s", e)
+        logger.warning("PDF generation failed: %s", e, exc_info=True)
         return False

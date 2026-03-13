@@ -1,0 +1,22 @@
+{
+  "timestamp": "20260218-175706",
+  "question": "What is Sunshine Health's prior authorization requirement for physical therapy in Florida?",
+  "tags": {
+    "document_payer": "Sunshine Health",
+    "document_state": "FL"
+  },
+  "runs": 2,
+  "untagged": {
+    "mean_ms": 1106.3971669937018,
+    "min_ms": 922.0753340050578,
+    "max_ms": 1290.7189999823458,
+    "results": 10
+  },
+  "tagged": {
+    "mean_ms": 911.2527914985549,
+    "min_ms": 893.7406670011114,
+    "max_ms": 928.7649159959983,
+    "results": 10
+  },
+  "overlap_pct": 60.0
+}

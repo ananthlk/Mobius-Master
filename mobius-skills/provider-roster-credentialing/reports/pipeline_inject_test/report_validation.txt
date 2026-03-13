@@ -1,0 +1,39 @@
+VALIDATION REPORT
+-----------------
+Validation Status: COMPOSE_FIX
+
+CHECK 1: PASS
+CHECK 2: PASS
+CHECK 3: PASS
+CHECK 4: PASS
+CHECK 5: PASS
+CHECK 6: PASS
+CHECK 7: COMPOSE_FIX — All 69 providers show identical amounts ($36,808.00) in Section A, despite varying taxonomies. The label 'benchmark average for each provider's taxonomy' in the Benchmark Methodology Note is factually incorrect if the same value appears for different taxonomies. This is an org-level average, not a taxonomy-differentiated rate.
+CHECK 8: PASS
+CHECK 9: PASS
+CHECK 10: COMPOSE_FIX — Section A table's 'Service Type' column contains raw taxonomy codes instead of plain-English descriptions.
+CHECK 11: PASS
+CHECK 12: PASS
+CHECK 13: PASS
+CHECK 14: PASS
+CHECK 15: PASS
+CHECK 16: PASS
+CHECK 17: PASS
+CHECK 18: PASS
+CHECK 19: PASS
+CHECK 20: PASS
+CHECK 21: PASS
+CHECK 22: PASS
+CHECK 23: PASS
+CHECK 24: PASS
+
+Detected Issues (BLOCK or COMPOSE_FIX items only, numbered):
+1. CHECK 7: All 69 providers show identical amounts ($36,808.00) in Section A, despite varying taxonomies. The label 'benchmark average for each provider's taxonomy' in the Benchmark Methodology Note is factually incorrect if the same value appears for different taxonomies. This is an org-level average, not a taxonomy-differentiated rate.
+2. CHECK 10: Section A table's 'Service Type' column contains raw taxonomy codes (e.g., '2084P0800X', '363LP0808X', '261Q00000X', '261QM0801X', '322D00000X', '323P00000X') instead of plain-English descriptions.
+
+Warnings (WARN items, numbered):
+No warnings.
+
+Suggested Corrections (one per issue, specific):
+1. In Section A, either apply taxonomy-specific rates or relabel the revenue figures as 'org benchmark avg' or clarify that the amounts are uniform organizational averages, not taxonomy-specific.
+2. In Section A table, replace raw taxonomy codes in the 'Service Type' column with their corresponding plain-English labels.

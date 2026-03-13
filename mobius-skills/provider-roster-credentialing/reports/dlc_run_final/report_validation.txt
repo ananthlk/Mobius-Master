@@ -1,0 +1,27 @@
+VALIDATION REPORT
+-----------------
+Validation Status: WARNINGS
+
+CHECK 1: NPI traceability — PASS
+CHECK 2: Waterfall math — PASS
+CHECK 3: Section table totals and count×amount consistency — PASS
+CHECK 4: Section A completeness — PASS
+CHECK 5: Section E rate table math — N/A (no Section E table)
+CHECK 6: Chart vs text — N/A (no chart provided)
+CHECK 7: Uniform benchmark — PASS
+CHECK 8: Confidence label accuracy — PASS
+CHECK 9: Cross-section NPI check — PASS
+CHECK 10: Raw taxonomy codes in service type column — PASS
+CHECK 11: "To be defined" or placeholder text — WARN
+CHECK 12: Org NPI in provider tables — PASS
+CHECK 13: "$0 unlock" or zero-value opportunity claims — PASS
+CHECK 14: Per diem comparability flag — WARN
+CHECK 15: Benchmark state average consistency — N/A (first run)
+CHECK 16: Section E concentration risk — WARN
+CHECK 17: Operational vs investigative split — PASS
+CHECK 18: HCPCS format in Section E — N/A (no Section E table)
+CHECK 19: Section B/C/D table row count vs waterfall count — WARN
+CHECK 20: Section E completeness — no truncation — FAIL
+CHECK 21: Section D vs waterfall D consistency — PASS
+
+Detected Issues (FAIL items only, numbered):

@@ -1,0 +1,33 @@
+version: '1'
+description: BM25 raw score -> [0,1] sigmoid. No per-tag normalization; reranker handles tag boost.
+score_per_tag_normalization: false
+source_questions: eval_questions_calibration.yaml
+questions_run: 48
+provision_types:
+  paragraph:
+    k: 0.473813
+    x0: 10.0
+    low: 2.8773
+    high: 15.306
+  sentence:
+    k: 0.392331
+    x0: 10.0
+    low: 2.6224
+    high: 17.6324
+stats:
+  paragraph:
+    count: 2400
+    min: 2.2753
+    max: 34.7883
+    p5: 2.8773
+    p50: 6.5885
+    p95: 15.306
+  sentence:
+    count: 2400
+    min: 1.9591
+    max: 45.5093
+    p5: 2.6224
+    p50: 5.9156
+    p95: 17.6324
+abstention_cutoff_normalized: 0.2
+abstention_cutoff_raw: 12.0215

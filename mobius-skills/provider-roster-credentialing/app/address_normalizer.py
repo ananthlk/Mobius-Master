@@ -105,6 +105,14 @@ def extract_zip5(zip_val: str | None) -> str:
     return s[:5] if len(s) >= 5 else s
 
 
+def extract_zip9(zip_val: str | None) -> str:
+    """Extract first 9 digits when available. Use len: 5 digits = zip5, 9 digits = zip9 (same building)."""
+    if not zip_val:
+        return ""
+    s = re.sub(r"\D", "", str(zip_val))
+    return s[:9] if len(s) >= 9 else (s[:5] if len(s) >= 5 else s)
+
+
 def normalize_state(state: str | None) -> str:
     """Normalize state to 2-letter uppercase."""
     if not state:

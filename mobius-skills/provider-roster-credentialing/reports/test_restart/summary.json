@@ -1,0 +1,23 @@
+{
+  "benchmarks_status": "ok",
+  "org_npis_count": 7,
+  "locations_count": 4,
+  "providers_total": 103,
+  "providers_active": 98,
+  "active_roster_cutoff": 50,
+  "services_count": 36,
+  "historic_claims": 18654,
+  "historic_paid": 1220424.58,
+  "historic_codes": 10,
+  "pml_valid": 69,
+  "pml_flagged": 2,
+  "pml_total": 71,
+  "missing_pml_count": 27,
+  "missing_pml_enrollment": 27,
+  "guaranteed_revenue": 2539752.0,
+  "at_risk_revenue": 73616.0,
+  "missing_pml_revenue": 993816.0,
+  "taxonomy_optimization_opportunity": 57012.8,
+  "org_vs_state_opportunity": 2570640.94,
+  "total_opportunity": 3695085.74
+}

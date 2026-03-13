@@ -1,0 +1,7 @@
+level,label,amount,provider_count
+A,Guaranteed revenue,2539752.0,69
+B,At-risk revenue,73616.0,2
+C,Missing PML revenue,993816.0,27
+D,Taxonomy optimization opportunity,57012.8,
+E,Org vs state opportunity,2570640.94,
+Total,Total opportunity (B+C+D+E),3695085.74,

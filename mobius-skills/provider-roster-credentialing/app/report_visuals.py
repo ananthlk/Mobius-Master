@@ -78,7 +78,8 @@ def generate_charts(
     revenue_total = ex.get("revenue_at_risk_2024") or metrics.get("revenue_at_risk_2024") or 0
     high_conf_revenue = 0
     if revenue_by_confidence:
-        high_conf_revenue = float(revenue_by_confidence.get("high") or 0)
+        # High-confidence = perfect + good (score >= 70)
+        high_conf_revenue = float(revenue_by_confidence.get("perfect") or 0) + float(revenue_by_confidence.get("good") or 0)
     invalid_count = ex.get("invalid_combo_count") or metrics.get("invalid_combo_count") or 0
     ready_count = status_breakdown.get("Ready") or metrics.get("ready_combo_count") or 0
     npis_fail = ex.get("npis_at_least_one_fail") or metrics.get("npis_at_least_one_fail") or 0
@@ -88,15 +89,26 @@ def generate_charts(
     readiness_score = ex.get("readiness_score") or metrics.get("readiness_score")
     org_name = ex.get("org_name") or metrics.get("org_name") or "Organization"
 
+    wt = report.get("waterfall_totals") or metrics.get("waterfall_totals") or {}
+    has_waterfall = (
+        float(wt.get("guaranteed") or 0) + float(wt.get("at_risk") or 0) + float(wt.get("missing") or 0)
+        + float(wt.get("taxonomy_opt") or 0) + float(wt.get("rate_gap") or 0)
+    ) > 0
+
     available: dict[str, bool] = {
         "executive_dashboard": bool(invalid_count or revenue_total or readiness_score is not None),
         "revenue_by_status": bool(revenue_by_status),
         "readiness_breakdown": bool(status_breakdown and any(k != "Ready" for k in status_breakdown)),
         "confidence_breakdown": bool(confidence_breakdown and sum(confidence_breakdown.values()) > 0),
         "revenue_by_confidence": bool(revenue_by_confidence),
+        "revenue_waterfall": has_waterfall,
     }
 
-    to_generate = chart_ids if chart_ids else ["executive_dashboard"] + [k for k, v in available.items() if v and k != "executive_dashboard"]
+    to_generate = chart_ids if chart_ids else (
+        (["executive_dashboard"] if available.get("executive_dashboard") else [])
+        + (["revenue_waterfall"] if available.get("revenue_waterfall") else [])
+        + [k for k, v in available.items() if v and k not in ("executive_dashboard", "revenue_waterfall")]
+    )
     to_generate = [c for c in to_generate if available.get(c, False)]
 
     generated: list[dict[str, str]] = []
@@ -123,6 +135,17 @@ def generate_charts(
                 out = _chart_confidence_breakdown(confidence_breakdown, output_dir, prefix)
             elif chart_id == "revenue_by_confidence":
                 out = _chart_revenue_by_confidence(revenue_by_confidence, output_dir, prefix)
+            elif chart_id == "revenue_waterfall" and has_waterfall:
+                out = _chart_revenue_waterfall(
+                    float(wt.get("guaranteed") or 0),
+                    float(wt.get("at_risk") or 0),
+                    float(wt.get("missing") or 0),
+                    float(wt.get("taxonomy_opt") or 0),
+                    float(wt.get("rate_gap") or 0),
+                    org_name,
+                    output_dir,
+                    prefix,
+                )
             else:
                 continue
             if out:
@@ -302,6 +325,52 @@ def _chart_confidence_breakdown(
     return {"id": "confidence_breakdown", "filename": path.name, "title": "Invalid Combinations by Confidence Level"}
 
 
+def _chart_revenue_waterfall(
+    guaranteed: float,
+    at_risk: float,
+    missing: float,
+    taxonomy_opt: float,
+    rate_gap: float,
+    org_name: str,
+    output_dir: Path,
+    prefix: str,
+) -> dict[str, str] | None:
+    """Waterfall chart: A=Guaranteed, B=At-risk, C=Missing, D=Taxonomy opt, E=Rate gap."""
+    try:
+        import matplotlib.pyplot as plt
+        import numpy as np
+    except ImportError:
+        return None
+    vals = [guaranteed, at_risk, missing, taxonomy_opt, rate_gap]
+    labels = ["A. Projected rev", "B. At-risk", "C. Missing PML", "D. Taxonomy opt", "E. Rate gap"]
+    colors = [
+        CHART_PALETTE[1],  # success
+        CHART_PALETTE[2],  # warning
+        CHART_PALETTE[3],  # error
+        CHART_PALETTE[4],  # purple
+        CHART_PALETTE[5],  # cyan
+    ]
+    if sum(vals) == 0:
+        return None
+    fig, ax = plt.subplots(figsize=(10, 5))
+    x = np.arange(len(labels))
+    bars = ax.bar(x, [v / 1_000_000 for v in vals], color=colors[: len(labels)])
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels, rotation=15, ha="right")
+    ax.set_ylabel("Revenue ($M)")
+    ax.set_title(f"Revenue Waterfall — {org_name}")
+    for bar, val in zip(bars, vals):
+        if val > 0:
+            ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.02,
+                    _format_currency(val), ha="center", fontsize=9, color=MOBIUS_COLORS["text_primary"])
+    ax.set_ylim(0, max(vals) / 1_000_000 * 1.2 if max(vals) > 0 else 1)
+    fig.tight_layout()
+    path = output_dir / f"{prefix}_revenue_waterfall.png"
+    fig.savefig(path, dpi=120, bbox_inches="tight")
+    plt.close()
+    return {"id": "revenue_waterfall", "filename": path.name, "title": "Revenue Waterfall A–E"}
+
+
 def _chart_revenue_by_confidence(
     revenue_by_confidence: dict[str, float],
     output_dir: Path,
@@ -341,8 +410,9 @@ Available chart types (generate only these ids):
 - readiness_breakdown: Bar chart of invalid combinations by readiness status.
 - confidence_breakdown: Pie chart of invalid combos by confidence.
 - revenue_by_confidence: Bar chart of revenue by confidence level.
+- revenue_waterfall: Waterfall chart A–E (Projected rev, At-risk, Missing PML, Taxonomy opt, Rate gap). Use when waterfall_totals (guaranteed, at_risk, missing, taxonomy_opt, rate_gap) are provided.
 
-Return a JSON array with executive_dashboard FIRST when metrics exist, e.g. ["executive_dashboard", "revenue_by_status", "readiness_breakdown", "confidence_breakdown", "revenue_by_confidence"].
+Return a JSON array with executive_dashboard FIRST when metrics exist, then revenue_waterfall when waterfall_totals exist. Example: ["executive_dashboard", "revenue_waterfall", "revenue_by_status", "readiness_breakdown", "confidence_breakdown", "revenue_by_confidence"].
 Include 2-4 charts. Only include charts for which the snapshot has the required data.
 Output ONLY the JSON array, no other text."""
 
@@ -371,6 +441,7 @@ def get_chart_spec_from_llm(
         "readiness_status_breakdown": ex.get("readiness_status_breakdown") or metrics.get("readiness_status_breakdown"),
         "confidence_breakdown": ex.get("confidence_breakdown") or metrics.get("confidence_breakdown"),
         "revenue_at_risk_2024_by_confidence": ex.get("revenue_at_risk_2024_by_confidence") or metrics.get("revenue_at_risk_2024_by_confidence"),
+        "waterfall_totals": report.get("waterfall_totals") or metrics.get("waterfall_totals"),
     }
     data_str = json.dumps(subset, indent=2)
     user = f"Report snapshot (relevant fields):\n{data_str}\n\nWhich charts should we include? Return JSON array only."

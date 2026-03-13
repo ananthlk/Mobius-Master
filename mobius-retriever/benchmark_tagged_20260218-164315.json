@@ -1,0 +1,22 @@
+{
+  "timestamp": "20260218-164315",
+  "question": "What is Molina's prior authorization requirement for physical therapy in Florida?",
+  "tags": {
+    "document_payer": "Molina",
+    "document_state": "FL"
+  },
+  "runs": 2,
+  "untagged": {
+    "mean_ms": 1373.1267705152277,
+    "min_ms": 899.9115000187885,
+    "max_ms": 1846.3420410116669,
+    "results": 10
+  },
+  "tagged": {
+    "mean_ms": 715.2355625003111,
+    "min_ms": 711.9926250015851,
+    "max_ms": 718.478499999037,
+    "results": 10
+  },
+  "overlap_pct": 40.0
+}

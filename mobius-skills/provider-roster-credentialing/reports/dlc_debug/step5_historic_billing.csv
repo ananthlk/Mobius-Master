@@ -1,0 +1,11 @@
+hcpcs_code,description,entity_type,claim_count,total_paid,beneficiary_count
+H0040,"Assertive community treatment program, per diem",professional,11008,318844.3,386
+H2019,"Therapeutic behavioral services, per 15 minutes",professional,2904,361422.97,1351
+T1017,"Targeted case management, each 15 minutes",professional,1689,83933.25,359
+T1015,"Clinic visit/encounter, all-inclusive",professional,1676,118227.58,1278
+S9485,"Crisis intervention mental health services, per diem",professional,484,281712.25,122
+H0046,"Mental health services, not otherwise specified",professional,358,7378.19,334
+H0032,Mental health service plan development by non-physician,professional,274,23775.3,266
+H0031,"Mental health assessment, by non-physician",professional,106,5676.89,91
+H0035,"Mental health partial hospitalization, treatment, less than 24 hours",professional,93,18200.0,12
+99214,(description not available),professional,62,1253.85,50

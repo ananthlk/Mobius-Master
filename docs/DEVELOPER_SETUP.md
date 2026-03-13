@@ -2,6 +2,8 @@
 
 This guide covers everything needed to set up your local development environment for Mobius services.
 
+> **One environment:** For a single setup that includes Python venv, env vars, BigQuery datasets, and optional Medicaid NPI (B0–B6), use **[docs/ONE_ENVIRONMENT_SETUP.md](ONE_ENVIRONMENT_SETUP.md)** and run **`./scripts/setup_one_env.sh`** from the repo root.
+
 > **Important**: All development now uses shared **GCP Dev Cloud** resources. There is no local PostgreSQL, Redis, or BigQuery setup required.
 
 ---
@@ -161,6 +163,9 @@ The `.env.example` files are pre-configured for the dev cloud environment. You t
 | `DATABASE_URL` | `postgresql+asyncpg://...@34.135.72.145:5432/...` | Service database |
 | `REDIS_URL` | `redis://10.40.102.67:6379/0` | Redis for queuing |
 | `GCS_BUCKET` | `mobius-rag-uploads-dev` | Cloud Storage bucket |
+| `BQ_PROJECT` | `mobius-os-dev` | BigQuery project |
+| `BQ_MARTS_MEDICAID_DATASET` | `mobius_medicaid_npi_dev` | FL Medicaid NPI marts (B0–B6) |
+| `BQ_LANDING_MEDICAID_DATASET` | `landing_medicaid_npi_dev` | FL Medicaid landing (PML, DOGE, etc.) |
 | `VERTEX_PROJECT_ID` | `mobius-os-dev` | Vertex AI project |
 | `VERTEX_LOCATION` | `us-central1` | Vertex AI region |
 | `LLM_PROVIDER` | `vertex` | LLM provider (vertex/openai) |

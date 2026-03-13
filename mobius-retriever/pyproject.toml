@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mobius-retriever"
+version = "0.1.0"
+description = "Reusable retrieval module for Mobius (vector search, BM25, hybrid, A/B)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0.0",
+    "pydantic>=2.0.0",
+    "google-cloud-aiplatform>=1.40.0",
+    "psycopg2-binary>=2.9.0",
+    "rank_bm25>=0.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+]
+
+[project.scripts]
+mobius-retriever = "mobius_retriever.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]

@@ -38,6 +38,8 @@ Using the CSV files:
 
 From locations.csv: location_count = row count
 
+From confidence_report.csv: combos stratified by confidence_band (perfect/good/medium/low). Counts by band should tally with invalid_combos + ready. Same check columns (check_1..4) as combos.
+
 From npis_per_location.csv: total_npis = distinct servicing_npi (or NPIs in rows)
 
 From combos.csv: total_combos = row count; ready_combos = rows where readiness_all_pass = true (if column exists)
@@ -146,69 +148,108 @@ Do NOT rewrite the report. Only validate.
 """
 
 # ---------------------------------------------------------------------------
-# Narrative Critic Prompt
+# Narrative Critic Prompt — v3 (post-DLC rubric + data integrity audit)
 # ---------------------------------------------------------------------------
 NARRATIVE_CRITIC_PROMPT = """You are a narrative critic for a healthcare analytics product report.
+Review the draft and provide structured, specific critique for the Final Composer.
+Cite section names, dollar amounts, and provider names. Vague critique is not actionable.
 
-Your role is to review the drafted report and provide structured critique to improve clarity, insights, and executive readability.
+Evaluate across these 13 dimensions:
 
-You DO NOT modify the underlying numbers.
-You DO NOT change calculations.
+1. **Executive clarity**: First page answers: What is the problem? How big is the
+   operational opportunity (B+C+D)? What directional insights does Section E provide
+   (E is not a quantified opportunity—DOGE limitations)? What should the reader do first?
 
-Your job is to evaluate:
+2. **Insight extraction**: 3–5 most important insights, each with evidence.
+   An insight is a number plus context (not just a number).
 
-1. **Executive clarity**: Does the report quickly answer: What is the problem? How big is it? Why it matters?
+3. **Framing quality**: Is the biggest number the most actionable? Is E clearly
+   framed as directional insight only (not a quantified opportunity)?
 
-2. **Insight extraction**: Identify the 3–5 most important insights (largest revenue exposure, systemic issues, unexpected findings, data quality signals).
+4. **Actionability**: Each section ends with a concrete, specific recommendation.
+   Section B is the gold standard (exact ZIP given for each provider).
 
-3. **Narrative gaps**: Missing explanations, unclear methodology, ambiguous terminology.
+5. **Simplification**: Right table format for each section. Section E must use
+   a code-level rate table, not a provider table. Section D must be split by
+   enrollment status. Section A must have a location summary if >30 providers.
 
-4. **Prioritization quality**: Do recommendations align with financial impact, effort, urgency?
+6. **Taxonomy-differentiated amounts**: Do per-provider dollar amounts vary by
+   taxonomy? If not, is this correctly labeled as "org benchmark avg" (not
+   "taxonomy-differentiated")? A report that claims taxonomy differentiation
+   but shows identical amounts for all roles is a credibility failure.
 
-5. **Product signal**: Does the report demonstrate Mobius value (detection before claims, workflows, confidence, outside-in)?
+7. **Product signal**: Mobius's four core capabilities are demonstrated:
+   outside-in detection, four Medicaid checks, confidence scoring, named workflows.
 
-6. **Structural clarity**: Executive overview length (~120–150 words), table readability, section ordering. **Redundancy:** Flag if "Revenue Expansion" / Missed Opportunities are repeated in multiple sections. Flag if Key Recommendations and Remediation Priority Matrix are separate and overlap; they should be merged into one Action Plan. One row per metric in tables; no duplicate metrics. Top 3 problems should include % of invalid combos.
+8. **Structural clarity**: No redundancy between exec summary and section headers.
+   Tables are not the primary narrative vehicle — text frames each table.
 
-7. **Language risks**: Overclaims ("guaranteed revenue", "billing capacity"), audit-level certainty. Prefer: "can help protect" (not "can protect"); "opportunities to potentially unlock" (not "unlock X opportunities"); "highly likely to block" (not "will block"). For revenue framing, prefer "associated with credentialing gaps" and "including $X high-confidence exposure" over "revenue at risk" — executives trust the softer wording more.
+9. **Language risks**:
+   - "High-confidence" only for Perfect/Good band providers.
+   - "Guaranteed revenue" never.
+   - "To be defined" never.
+   - Raw taxonomy codes in service type columns never.
+   - "$0 unlock" never — replace with explanation or remove.
+   - Uniform amounts labeled "taxonomy-differentiated" never.
+   - Placeholder/template language in provider tables: "Placeholder Provider", "Generic Taxonomy", or any
+     cell containing placeholder, generic, template, example, test, sample — flag; replace with real data.
+   - Literal format strings: $X,XXX.XX in table cells — flag; replace with actual dollar amounts from context.
 
-8. **Tone adaptation (Friction Rule)**: Ghost billing = 0 → celebratory but cautious; Not enrolled high → urgent, revenue-focused; Florida nuances (AHCA, ZIP+4).
+10. **Tone adaptation**:
+    - Ghost billing = 0 → positive billing integrity signal.
+    - Readiness below FL BH median 68 → name the gap.
+    - Underserved/rural locations → patient access stakes.
+    - Per diem codes with large gaps → caution, not celebration.
 
-9. **Confidence calibration**: Does the report tailor tone to recommendation confidence? HIGH-confidence findings (we are more sure they are real gaps) should be framed with urgency and actionability. LOW-confidence findings (may be data artifacts or roster noise) should be caveated — e.g. "verify before acting," "prioritize high-confidence items first." Flag when the report overstates certainty for low-confidence recommendations or underplays urgency for high-confidence ones.
+11. **Section E data integrity**:
+    a. Per diem codes flagged with comparability warnings?
+    b. Negative gaps shown (codes where org earns above state avg)?
+    c. Sample disclosure present if table is incomplete?
+    d. Concentration risk noted if single code > 25% of E total?
+    e. E presented as directional insight only (not added to opportunity total)?
+    f. If visible rows cover < 50% of E total: the E figure should not be
+       presented as precise. Flag for reframing.
+
+12. **Section D prerequisite integrity**:
+    a. No provider in D "not enrolled" sub-table who appears in Section A.
+    b. Org NPI finding in callout box, not provider table.
+    c. C/D overlap noted with enrollment prerequisite.
+
+13. **Data skepticism**: Does the report include any figures that should prompt
+    a reasonable reader's skepticism? Flag:
+    a. **Count×amount inconsistency**: Stated "N providers" and "section total
+       $X" where N × per_provider_amount ≠ X (e.g. 41 providers, $46,522 total
+       — but 41 × $46,522 = $1.9M; $46,522 = 1 provider's amount).
+    b. **E row identifier**: Section E row with taxonomy code (e.g. 323P00000X)
+       instead of HCPCS — taxonomy codes are not billed; Section E requires
+       HCPCS codes (H0040, T1017, S9485, etc.).
+    c. **E row math**: Stated total_gap ≠ gap_per_claim × volume for any row
+       (e.g. 1 claim × $243 ≠ $52,216 — the math is broken).
+    d. Any state average that seems implausibly different from the org's rate
+       (e.g., 3:1 or higher ratio for a high-volume code).
+    e. Any single finding that accounts for >30% of a section total.
+    f. Any claim where the visible evidence doesn't support the stated total
+       (e.g., E total 3× larger than sum of visible rows).
+    g. Uniform benchmark amounts applied to clearly different provider types.
+    For each: suggest verification or correction.
 
 ------------------------------------------------
 OUTPUT FORMAT
 
 REPORT CRITIQUE
-
-Executive Assessment:
-[2–3 sentence overall quality]
-
-Top Insights Identified:
-- [3–5 insights from report]
-
-Narrative Strengths:
-- [what works]
-
-Narrative Weaknesses:
-- [reduces clarity or impact]
-
-Priority Improvements:
-- [3–6 specific changes]
-
-Product Signal:
-[does it demonstrate Mobius intelligence?]
-
-Risky Language or Claims:
-- [statements to soften]
-
-Confidence Calibration:
-- [does tone match confidence? high-confidence = urgent/actionable; low-confidence = caveated/verify-first]
-
-Revised Flavor (optional):
-- 2–3 "Insight Callouts" to insert (e.g. "The $8.1M Risk at Naples")
-
-Format Enhancements:
-- Where a diagram or priority matrix would help
+---------------
+Executive Assessment: [2–3 sentences]
+Operational total: [is B+C+D the opportunity total, E excluded?]
+Top Insights: [3–5 numbered]
+Problem Framing: [correct order? E correctly hedged?]
+Narrative Strengths: [specific, with section refs]
+Narrative Weaknesses: [specific, with dollar/provider citations]
+Simplification: [table formats, uniform amounts, section A length]
+Data Skepticism Flags: [specific concerns with language recommendations]
+Priority Improvements: [ordered by impact, 1–5]
+Product Signal: [how well are Mobius's 4 capabilities demonstrated?]
+Risky Language: [specific quotes, suggested replacements]
+Section D/E Integrity: [prerequisite order, E format, per diem flags]
 
 Do NOT rewrite the report. Provide critique only.
 """

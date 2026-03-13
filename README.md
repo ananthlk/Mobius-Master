@@ -8,16 +8,13 @@ Mobius platform monorepo with shared Python environment and GCP Dev cloud resour
 # 1. Clone and enter workspace
 cd ~/Mobius
 
-# 2. Set up Python environment
-python3.11 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-pip install -e ./Mobius-user
+# 2. One-environment setup (venv, deps, .env, BQ datasets, optional dbt)
+./scripts/setup_one_env.sh
 
-# 3. Authenticate with GCP
+# 3. Authenticate with GCP (if not already)
 gcloud auth application-default login
 
-# 4. Copy environment files
+# 4. Copy env to services that need their own .env (or use mobius-config/.env only)
 for dir in mobius-chat mobius-rag mobius-os/backend Mobius-user mobius-dbt mobius-skills/web-scraper; do
   cp $dir/.env.example $dir/.env 2>/dev/null || true
 done
@@ -26,7 +23,7 @@ done
 ./mstart
 ```
 
-See [docs/DEVELOPER_SETUP.md](docs/DEVELOPER_SETUP.md) for complete setup instructions.
+See [docs/DEVELOPER_SETUP.md](docs/DEVELOPER_SETUP.md) for complete setup and [docs/ONE_ENVIRONMENT_SETUP.md](docs/ONE_ENVIRONMENT_SETUP.md) for the single-environment reference.
 
 ## Services
 
@@ -50,6 +47,7 @@ To run from anywhere: `export PATH="$HOME/Mobius:$PATH"`
 ## Resources
 
 - **[docs/DEVELOPER_SETUP.md](docs/DEVELOPER_SETUP.md)** - Complete developer setup
+- **[docs/ONE_ENVIRONMENT_SETUP.md](docs/ONE_ENVIRONMENT_SETUP.md)** - Single environment (venv, .env, dbt, Medicaid B0–B6)
 - **[mobius-config/env-matrix.md](mobius-config/env-matrix.md)** - Environment variables reference
 - **[mobius-design/STYLE_GUIDELINES.md](mobius-design/STYLE_GUIDELINES.md)** - Branding and CSS tokens
 

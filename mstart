@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Start all Mobius backends, frontends, and workers using shared venv.
-# Usage: mstart [--no-rag-frontend] [--no-os-extension] [--no-landing]
+# Usage: mstart [--no-rag-frontend] [--no-os-extension] [--no-landing] [--skip-migrations]
 
 set -e
 SCRIPT="$0"
@@ -27,12 +27,14 @@ START_RAG_FRONTEND=true
 START_OS_EXTENSION=true
 START_LANDING=true
 RESTART_CLOUDSQL=false
+SKIP_MIGRATIONS=false
 for arg in "$@"; do
   case "$arg" in
     --no-rag-frontend) START_RAG_FRONTEND=false ;;
     --no-os-extension) START_OS_EXTENSION=false ;;
     --no-landing) START_LANDING=false ;;
     --restart-db) RESTART_CLOUDSQL=true ;;
+    --skip-migrations) SKIP_MIGRATIONS=true ;;
   esac
 done
 
@@ -63,8 +65,8 @@ if [[ -f "$PIDFILE" ]]; then
   if [[ "$START_LANDING" == "true" ]]; then
     rm -f "$PIDFILE"
   fi
-  echo "[mstart] Waiting for processes to exit ..."
-  sleep 2
+  echo "[mstart] Waiting for processes to exit (DB connections to close) ..."
+  sleep 8
 fi
 
 : > "$PIDFILE"
@@ -192,21 +194,77 @@ if [[ "$RESTART_CLOUDSQL" == "true" ]]; then
   fi
 fi
 
+# --- Cloud SQL Proxy (ensure DB reachable before migrations) ---
+_load_env "$MOBIUS_ROOT/mobius-chat/.env" 2>/dev/null || true
+CHAT_DB_URL="${CHAT_RAG_DATABASE_URL:-}"
+CLOUDSQL_CONN="${CLOUDSQL_CONNECTION_NAME:-mobius-os-dev:us-central1:mobius-platform-dev-db}"
+PROXY_PORT=5433
+NEED_PROXY=false
+if [[ "$CHAT_DB_URL" =~ 127\.0\.0\.1:$PROXY_PORT ]] || [[ "$CHAT_DB_URL" =~ 34\.135\.72\.145 ]]; then
+  NEED_PROXY=true
+fi
+if [[ "$NEED_PROXY" == "true" ]]; then
+  PROXY_BIN=""
+  for p in cloud-sql-proxy "$HOME/google-cloud-sdk/bin/cloud-sql-proxy" /opt/homebrew/bin/cloud-sql-proxy; do
+    if command -v "$p" >/dev/null 2>&1 || [[ -x "$p" ]] 2>/dev/null; then
+      PROXY_BIN="$p"
+      break
+    fi
+  done
+  if [[ -n "$PROXY_BIN" ]]; then
+    # Restart proxy before migrations to clear connection slots (stale connections from stopped services)
+    if nc -z 127.0.0.1 "$PROXY_PORT" 2>/dev/null; then
+      _log "Restarting Cloud SQL Proxy (clears connection slots) ..."
+      _kill_port "$PROXY_PORT"
+      sleep 8
+    fi
+    if ! nc -z 127.0.0.1 "$PROXY_PORT" 2>/dev/null; then
+      _log "Starting Cloud SQL Proxy (port $PROXY_PORT) ..."
+      "$PROXY_BIN" "$CLOUDSQL_CONN" --port "$PROXY_PORT" >> "$LOGDIR/cloud-sql-proxy.log" 2>&1 &
+      for (( _i=0; _i<15; _i++ )); do
+        if nc -z 127.0.0.1 "$PROXY_PORT" 2>/dev/null; then
+          _log "  Cloud SQL Proxy ready"
+          break
+        fi
+        sleep 1
+      done
+    fi
+    # Use 127.0.0.1:5433 for migrations when .env pointed to Cloud SQL
+    if [[ "$CHAT_DB_URL" =~ 34\.135\.72\.145 ]]; then
+      export CHAT_RAG_DATABASE_URL="${CHAT_DB_URL/34.135.72.145:5432/127.0.0.1:$PROXY_PORT}"
+    fi
+  fi
+fi
+
 # --- mobius-chat DB migrations (run before starting chat services) ---
-if [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
+if [[ "$SKIP_MIGRATIONS" == "true" ]]; then
+  _log "Skipping DB migrations (--skip-migrations)"
+elif [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
   _log "Running mobius-chat DB migrations ..."
-  # After killing processes, wait for DB connections to close, then try cleanup
   sleep 3
   if [[ -x "$VENV/bin/python3" ]] && [[ -f "$MOBIUS_ROOT/scripts/cleanup_db_connections.py" ]]; then
     _log "Cleaning up idle DB connections ..."
     "$VENV/bin/python3" "$MOBIUS_ROOT/scripts/cleanup_db_connections.py" 2>/dev/null || true
   fi
   _load_env "$MOBIUS_ROOT/mobius-chat/.env"
-  if (cd "$MOBIUS_ROOT/mobius-chat" && "$VENV/bin/python3" -m app.db.run_migrations 2>&1); then
-    _log "Migrations OK"
-  else
-    _log "Migrations failed or skipped (check CHAT_RAG_DATABASE_URL in mobius-chat/.env)"
-    _log "  If you see 'connection slots' error, run: ./mstart --restart-db"
+  if [[ "$NEED_PROXY" == "true" ]] && [[ "$CHAT_DB_URL" =~ 34\.135\.72\.145 ]]; then
+    export CHAT_RAG_DATABASE_URL="${CHAT_DB_URL/34.135.72.145:5432/127.0.0.1:$PROXY_PORT}"
+  fi
+  _migrations_ok=false
+  for _attempt in 1 2 3 4; do
+    if (cd "$MOBIUS_ROOT/mobius-chat" && "$VENV/bin/python3" -m app.db.run_migrations 2>&1); then
+      _migrations_ok=true
+      _log "Migrations OK"
+      break
+    fi
+    if [[ $_attempt -lt 4 ]]; then
+      _log "Migrations failed (attempt $_attempt), retrying in 30s ..."
+      sleep 30
+    fi
+  done
+  if [[ "$_migrations_ok" != "true" ]]; then
+    _log "Migrations failed (check CHAT_RAG_DATABASE_URL). Services will start anyway."
+    _log "  Connection slots? Use: mstart --skip-migrations  (then run migrations later when slots free)"
   fi
 fi
 
@@ -270,6 +328,7 @@ if [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
   # Enable skills when services are started (override .env if not set)
   [[ -z "${CHAT_SKILLS_GOOGLE_SEARCH_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/google-search" ]] && export CHAT_SKILLS_GOOGLE_SEARCH_URL="http://localhost:8004/search?"
   [[ -z "${CHAT_SKILLS_WEB_SCRAPER_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/web-scraper" ]] && export CHAT_SKILLS_WEB_SCRAPER_URL="http://localhost:8002/scrape/review"
+  [[ -z "${CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/provider-roster-credentialing" ]] && export CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL="http://localhost:8011/report"
   # MCP: tool agent calls skills via MCP (mobius-skills-mcp on port 8006)
   [[ -z "${MCP_SERVER_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills-mcp" ]] && export MCP_SERVER_URL="http://localhost:8006/mcp"
   _start "mobius-chat-api" "cd $MOBIUS_ROOT/mobius-chat && $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000"
@@ -416,6 +475,17 @@ if [[ -d "$MOBIUS_ROOT/mobius-skills/google-search" ]]; then
   _start "mobius-google-search-api" "cd $MOBIUS_ROOT/mobius-skills/google-search && $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8004"
 fi
 
+# --- provider-roster-credentialing API (port 8011): org search, find-locations, report ---
+if [[ -d "$MOBIUS_ROOT/mobius-skills/provider-roster-credentialing" ]]; then
+  _kill_port 8011
+  _load_env "$MOBIUS_ROOT/mobius-config/.env"
+  _load_env "$MOBIUS_ROOT/mobius-dbt/.env"
+  _load_env "$MOBIUS_ROOT/mobius-skills/provider-roster-credentialing/.env" 2>/dev/null || true
+  # Report LLM: prefer Gemini/Vertex when OPENAI_API_KEY not set
+  [[ -z "${OPENAI_API_KEY:-}" ]] && export REPORT_LLM_PROVIDER=gemini && export REPORT_LLM_MODEL="${REPORT_LLM_MODEL:-gemini-2.5-flash}"
+  _start "mobius-provider-roster-api" "cd $MOBIUS_ROOT/mobius-skills/provider-roster-credentialing && PORT=8011 $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8011"
+fi
+
 # --- mobius-skills-mcp (port 8006): MCP server exposing google_search, web_scrape_review ---
 if [[ -d "$MOBIUS_ROOT/mobius-skills-mcp" ]]; then
   _kill_port 8006
@@ -423,6 +493,7 @@ if [[ -d "$MOBIUS_ROOT/mobius-skills-mcp" ]]; then
   _load_env "$MOBIUS_ROOT/mobius-skills/web-scraper/.env"
   export CHAT_SKILLS_GOOGLE_SEARCH_URL="${CHAT_SKILLS_GOOGLE_SEARCH_URL:-http://localhost:8004/search?}"
   export CHAT_SKILLS_WEB_SCRAPER_URL="${CHAT_SKILLS_WEB_SCRAPER_URL:-http://localhost:8002/scrape/review}"
+  export CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL="${CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL:-http://localhost:8011/report}"
   _start "mobius-skills-mcp" "cd $MOBIUS_ROOT/mobius-skills-mcp && $VENV/bin/python3 -m app"
 fi
 
@@ -462,6 +533,7 @@ printf "  %-24s  %s\n" "mobius-rag backend"  "http://localhost:8001"
 printf "  %-24s  %s\n" "mobius-scraper API"  "http://localhost:8002"
 printf "  %-24s  %s\n" "mobius-google-search" "http://localhost:8004"
 printf "  %-24s  %s\n" "mobius-skills-mcp" "http://localhost:8006/mcp"
+printf "  %-24s  %s\n" "mobius-provider-roster" "http://localhost:8011"
 printf "  %-24s  %s\n" "mobius-rag frontend" "http://localhost:5173"
 printf "  %-24s  %s\n" "mobius-rag-api"         "http://localhost:8030"
 printf "  %-24s  %s\n" "mobius-qa lexicon API" "http://localhost:8010"

@@ -1,0 +1,165 @@
+{
+  "locations": [
+    {
+      "location_id": "9dfc7345e098b14f",
+      "site_address_line_1": "6075 BATHEY LN",
+      "site_city": "NAPLES",
+      "site_state": "FL",
+      "site_zip5": "34116",
+      "site_source": "org_nppes",
+      "npi": "1811334402",
+      "name": "DAVID LAWRENCE CENTER"
+    },
+    {
+      "location_id": "64174fc20320546b",
+      "site_address_line_1": "2806 HORSESHOE DR S",
+      "site_city": "NAPLES",
+      "site_state": "FL",
+      "site_zip5": "34104",
+      "site_source": "org_nppes",
+      "npi": "1871163600",
+      "name": "DAVID LAWRENCE MENTAL HEALTH CENTER INC"
+    },
+    {
+      "location_id": "c0b5974aca639ad9",
+      "site_address_line_1": "425 N 1ST ST",
+      "site_city": "IMMOKALEE",
+      "site_state": "FL",
+      "site_zip5": "34142",
+      "site_source": "org_nppes",
+      "npi": "1962072793",
+      "name": "DAVID LAWRENCE MENTAL HEALTH CENTER INC"
+    },
+    {
+      "location_id": "45c5b171932dd660",
+      "site_address_line_1": "5266 GOLDEN GATE PKWY",
+      "site_city": "NAPLES",
+      "site_state": "FL",
+      "site_zip5": "34116",
+      "site_source": "org_nppes",
+      "npi": "1033883731",
+      "name": "DAVID LAWRENCE CENTER"
+    },
+    {
+      "location_id": "2b79de56dd2ceabd",
+      "site_address_line_1": "228 PLAZA DR",
+      "site_city": "LEHIGH ACRES",
+      "site_state": "FL",
+      "site_zip5": "33936",
+      "site_source": "servicing_nppes",
+      "npi": "1912449695",
+      "name": "BELOT, MAX"
+    },
+    {
+      "location_id": "e12e151676290b6e",
+      "site_address_line_1": "7211 VANDERBILT BEACH RD STE 12",
+      "site_city": "NAPLES",
+      "site_state": "FL",
+      "site_zip5": "34119",
+      "site_source": "servicing_nppes",
+      "npi": "1689283384",
+      "name": "MOLINA REYNOSO, MIGUEL"
+    },
+    {
+      "location_id": "dd4dac9b23ed15b9",
+      "site_address_line_1": "1001 N MIAMI BEACH BLVD",
+      "site_city": "NORTH MIAMI BEACH",
+      "site_state": "FL",
+      "site_zip5": "33162",
+      "site_source": "servicing_nppes",
+      "npi": "1518690379",
+      "name": "ROSE, JENNIFER"
+    },
+    {
+      "location_id": "6200ca7d41c76eac",
+      "site_address_line_1": "6075 GOLDEN GATE PARKWAY",
+      "site_city": "NAPLES",
+      "site_state": "FL",
+      "site_zip5": "34116",
+      "site_source": "servicing_nppes",
+      "npi": "1871698654",
+      "name": "BUCKNER, KAREN"
+    },
+    {
+      "location_id": "10cf3c5adc357086",
+      "site_address_line_1": "239 AIRPORT RD S",
+      "site_city": "NAPLES",
+      "site_state": "FL",
+      "site_zip5": "34104",
+      "site_source": "servicing_nppes",
+      "npi": "1336282763",
+      "name": "BELLI, BEVERLY"
+    },
+    {
+      "location_id": "e2d378b54d91288c",
+      "site_address_line_1": "2180 W 1ST ST",
+      "site_city": "FORT MYERS",
+      "site_state": "FL",
+      "site_zip5": "33901",
+      "site_source": "servicing_nppes",
+      "npi": "1376684654",
+      "name": "CROWLEY MINELLA, FRANCES"
+    },
+    {
+      "location_id": "ba5951e5da706a4c",
+      "site_address_line_1": "3201 TAMIAMI TRL N FL 1",
+      "site_city": "NAPLES",
+      "site_state": "FL",
+      "site_zip5": "34103",
+      "site_source": "servicing_nppes",
+      "npi": "1811537632",
+      "name": "KAROS, TATUM"
+    },
+    {
+      "location_id": "e15dde93a207605e",
+      "site_address_line_1": "12512 BRUCE B DOWNS BLVD",
+      "site_city": "TAMPA",
+      "site_state": "FL",
+      "site_zip5": "33612",
+      "site_source": "servicing_nppes",
+      "npi": "1750314605",
+      "name": "COBB, RANDALL"
+    },
+    {
+      "location_id": "7e378800ba31fb50",
+      "site_address_line_1": "5471 W 10TH LN",
+      "site_city": "HIALEAH",
+      "site_state": "FL",
+      "site_zip5": "33012",
+      "site_source": "servicing_nppes",
+      "npi": "1366804072",
+      "name": "RODRIGUEZ MILIAN, KAREL"
+    },
+    {
+      "location_id": "53938a5b707ccf6d",
+      "site_address_line_1": "846 ANCHOR RODE DR",
+      "site_city": "NAPLES",
+      "site_state": "FL",
+      "site_zip5": "34103",
+      "site_source": "servicing_nppes",
+      "npi": "1780813287",
+      "name": "WILLIAMS, EMILY"
+    },
+    {
+      "location_id": "87231d750c2409ed",
+      "site_address_line_1": "7031 SW 62ND AVE",
+      "site_city": "SOUTH MIAMI",
+      "site_state": "FL",
+      "site_zip5": "33143",
+      "site_source": "servicing_pml",
+      "npi": "1366804072",
+      "name": ""
+    },
+    {
+      "location_id": "4b727ca773150b3a",
+      "site_address_line_1": "2237 TWELVE OAKS WAY",
+      "site_city": "WESLEY CHAPEL",
+      "site_state": "FL",
+      "site_zip5": "33544",
+      "site_source": "servicing_pml",
+      "npi": "1750314605",
+      "name": ""
+    }
+  ],
+  "count": 16
+}

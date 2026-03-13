@@ -1,0 +1,253 @@
+# Calibration eval questions for BM25 sigmoid config.
+# Used by collect_bm25_sigmoid_config.py to build score distribution.
+#
+# match_type:
+#   perfect_match - exact fact in one sentence (phone, date, number, policy name)
+#   conceptual   - summary/process questions (multi-sentence, softer match)
+#   out_of_manual - not in corpus (abstain probe)
+#
+# Run: python scripts/collect_bm25_sigmoid_config.py --questions eval_questions_calibration.yaml
+
+questions:
+  # --- PERFECT MATCH (exact facts) ---
+  - id: cal_pm_001
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What phone number do pharmacies call for Express Scripts help desk?
+
+  - id: cal_pm_002
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What is the Member Services phone number?
+
+  - id: cal_pm_003
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What is the TTY number for Member Services?
+
+  - id: cal_pm_004
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What are the weekend and after-hours on-call phone numbers?
+
+  - id: cal_pm_005
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What is the Provider Services phone number for authorization?
+
+  - id: cal_pm_006
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What is the 72-hour emergency medication supply policy?
+
+  - id: cal_pm_007
+    match_type: perfect_match
+    expect_in_manual: true
+    question: How many hours is the emergency medication supply?
+
+  - id: cal_pm_008
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What are the utilization management department hours?
+
+  - id: cal_pm_009
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What is the in-office waiting time limit for visits?
+
+  - id: cal_pm_010
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What is the Pre-Auth Check Tool used for?
+
+  - id: cal_pm_011
+    match_type: perfect_match
+    expect_in_manual: true
+    question: Call 711 for what purpose?
+
+  - id: cal_pm_012
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What is the Sunshine Health Member Services number?
+
+  - id: cal_pm_013
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What is the Express Scripts pharmacy help desk number?
+
+  - id: cal_pm_014
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What is the after-hours on-call number for all products?
+
+  - id: cal_pm_015
+    match_type: perfect_match
+    expect_in_manual: true
+    question: When is the utilization management department staffed?
+
+  - id: cal_pm_016
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What is the 72-Hour Emergency Supply Policy?
+
+  - id: cal_pm_017
+    match_type: perfect_match
+    expect_in_manual: true
+    question: Pharmacies may call the Express Scripts help desk at what number?
+
+  - id: cal_pm_018
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What number do providers call for authorization requests?
+
+  - id: cal_pm_019
+    match_type: perfect_match
+    expect_in_manual: true
+    question: How long can members wait for in-office visits?
+
+  - id: cal_pm_020
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What is the deadline for Medicaid fair hearings?
+
+  - id: cal_pm_021
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What is the Secure Provider Portal used for?
+
+  - id: cal_pm_022
+    match_type: perfect_match
+    expect_in_manual: true
+    question: Where do providers register for the Secure Provider Portal?
+
+  - id: cal_pm_023
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What is the process for claims reconsiderations and disputes?
+
+  - id: cal_pm_024
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What is the 1-844-477-8313 phone number for?
+
+  - id: cal_pm_025
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What is the 1-833-750-4392 phone number for?
+
+  - id: cal_pm_026
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What is the 1-866-796-0530 phone number?
+
+  - id: cal_pm_027
+    match_type: perfect_match
+    expect_in_manual: true
+    question: Does Florida law require a 72-hour emergency supply?
+
+  - id: cal_pm_028
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What is the AHCA preferred drug list?
+
+  - id: cal_pm_029
+    match_type: perfect_match
+    expect_in_manual: true
+    question: Is prior authorization required for physical therapy in Florida?
+
+  - id: cal_pm_030
+    match_type: perfect_match
+    expect_in_manual: true
+    question: What is the authorization requirement for physical therapy?
+
+  # --- CONCEPTUAL (summary/process) ---
+  - id: cal_c_001
+    match_type: conceptual
+    expect_in_manual: true
+    question: Summarize the key guidance in the provider manual section Medicaid in Florida.
+
+  - id: cal_c_002
+    match_type: conceptual
+    expect_in_manual: true
+    question: How can a provider determine whether a service requires prior authorization?
+
+  - id: cal_c_003
+    match_type: conceptual
+    expect_in_manual: true
+    question: Summarize the Secure Provider Portal registration process.
+
+  - id: cal_c_004
+    match_type: conceptual
+    expect_in_manual: true
+    question: What is the prior authorization requirement for physical therapy in Florida?
+
+  - id: cal_c_005
+    match_type: conceptual
+    expect_in_manual: true
+    question: How do providers submit claims and what information is required?
+
+  - id: cal_c_006
+    match_type: conceptual
+    expect_in_manual: true
+    question: What is the process for appealing a denied claim?
+
+  - id: cal_c_007
+    match_type: conceptual
+    expect_in_manual: true
+    question: What are the requirements for prior authorization of outpatient therapy?
+
+  - id: cal_c_008
+    match_type: conceptual
+    expect_in_manual: true
+    question: How does utilization management work for behavioral health?
+
+  - id: cal_c_009
+    match_type: conceptual
+    expect_in_manual: true
+    question: What documentation is required for prior authorization requests?
+
+  - id: cal_c_010
+    match_type: conceptual
+    expect_in_manual: true
+    question: What is the relationship between Sunshine Health and Express Scripts for pharmacy?
+
+  - id: cal_c_011
+    match_type: conceptual
+    expect_in_manual: true
+    question: How does the 72-hour emergency supply policy work?
+
+  - id: cal_c_012
+    match_type: conceptual
+    expect_in_manual: true
+    question: What are the key features of the Secure Provider Portal?
+
+  - id: cal_c_013
+    match_type: conceptual
+    expect_in_manual: true
+    question: What services require prior authorization?
+
+  - id: cal_c_014
+    match_type: conceptual
+    expect_in_manual: true
+    question: How do members contact Member Services?
+
+  - id: cal_c_015
+    match_type: conceptual
+    expect_in_manual: true
+    question: What is the Medicaid in Florida program structure?
+
+  # --- OUT OF MANUAL (abstain probes) ---
+  - id: cal_o_001
+    match_type: out_of_manual
+    expect_in_manual: false
+    question: What is the Medicare Part B prior authorization process in California?
+
+  - id: cal_o_002
+    match_type: out_of_manual
+    expect_in_manual: false
+    question: What are the prior authorization requirements for Anthem Blue Cross in Nevada?
+
+  - id: cal_o_003
+    match_type: out_of_manual
+    expect_in_manual: false
+    question: What is the Kaiser Permanente member services phone number in Texas?

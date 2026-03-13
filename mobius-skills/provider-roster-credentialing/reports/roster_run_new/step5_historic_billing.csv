@@ -1,0 +1,74 @@
+hcpcs_code,description,entity_type,claim_count,total_paid,beneficiary_count
+H0040,"Assertive community treatment program, per diem",professional,39920,1185554.35,1458
+H2019,"Therapeutic behavioral services, per 15 minutes",professional,27192,2393785.08,11411
+T1015,"Clinic visit/encounter, all-inclusive",professional,21061,1344486.85,18115
+H2017,"Psychosocial rehabilitation services, per 15 minutes",professional,14336,1800761.24,1130
+H0031,"Mental health assessment, by non-physician",professional,11374,444646.15,8520
+T1017,"Targeted case management, each 15 minutes",professional,10796,775045.21,2588
+H0032,Mental health service plan development by non-physician,professional,9509,643913.09,8947
+99232,(description not available),professional,5345,39651.84,933
+99214,(description not available),professional,3997,87768.91,3570
+99213,(description not available),professional,3025,36673.15,2526
+G2211,(description not available),professional,2102,48.75,1941
+99233,(description not available),professional,2081,24099.62,505
+11721,(description not available),professional,2070,4114.52,1458
+90833,(description not available),professional,1882,417.03,1717
+G0467,"Federally qualified health center (fqhc) visit, established patient; a medically-necessary, face-to-face encounter (one-on-one) between an established patient and a fqhc practitioner during which time one or more fqhc services are rendered and includes a typical bundle of medicare-covered services that would be furnished per diem to a patient receiving a fqhc visit",professional,1552,173.18,1319
+H2000,Comprehensive multidisciplinary evaluation,professional,1508,262862.51,1330
+S9485,"Crisis intervention mental health services, per diem",professional,968,563424.5,244
+H0046,"Mental health services, not otherwise specified",professional,716,14756.38,668
+99284,(description not available),professional,525,34751.43,506
+H2010,"Comprehensive medication services, per 15 minutes",professional,517,11450.83,468
+99222,(description not available),professional,489,10598.66,320
+90785,(description not available),professional,480,29.52,430
+99283,(description not available),professional,444,22699.05,435
+90837,(description not available),professional,433,31120.16,268
+99223,(description not available),professional,413,7545.09,268
+90792,(description not available),professional,374,2009.71,340
+D0150,(description not available),professional,335,3091.69,328
+99304,(description not available),professional,277,1747.13,195
+H0036,"Community psychiatric supportive treatment, face-to-face, per 15 minutes",professional,275,26314.84,36
+99204,(description not available),professional,272,25876.38,234
+D0210,(description not available),professional,252,5717.94,246
+H0049,Alcohol and/or drug screening,professional,243,2760.62,239
+99239,(description not available),professional,226,2264.74,145
+99211,(description not available),professional,211,0.0,211
+D0220,(description not available),professional,196,319.36,176
+99231,(description not available),professional,189,846.7,69
+H0035,"Mental health partial hospitalization, treatment, less than 24 hours",professional,186,36400.0,24
+99349,(description not available),professional,180,2812.66,103
+D2391,(description not available),professional,170,2836.08,142
+99443,(description not available),professional,169,21059.57,168
+G0511,(description not available),professional,168,0.0,138
+97156,(description not available),professional,159,17735.55,52
+99490,(description not available),professional,147,0.0,124
+99285,(description not available),professional,136,11820.38,128
+96156,(description not available),professional,119,1295.92,105
+70450,(description not available),professional,114,2466.34,112
+M1207,(description not available),professional,108,0.0,83
+99221,(description not available),professional,85,1524.59,56
+D0230,(description not available),professional,81,160.12,74
+D0330,(description not available),professional,76,1482.03,76
+D2392,(description not available),professional,76,2142.42,57
+99309,(description not available),professional,55,93.91,32
+99242,(description not available),professional,50,1129.06,36
+D1208,(description not available),professional,48,853.11,48
+D1330,(description not available),professional,48,113.39,48
+11056,(description not available),professional,46,29.9,31
+71045,(description not available),professional,44,180.78,41
+99238,(description not available),professional,42,325.22,26
+99212,(description not available),professional,41,409.91,27
+D0120,(description not available),professional,40,722.0,40
+77066,(description not available),professional,30,419.1,24
+1123F,(description not available),professional,24,0.0,15
+99484,(description not available),professional,24,70.24,24
+99344,(description not available),professional,21,4762.13,17
+74177,(description not available),professional,15,142.02,15
+99308,(description not available),professional,15,354.72,14
+1159F,(description not available),professional,14,0.0,14
+1160F,(description not available),professional,14,0.0,14
+D0140,(description not available),professional,14,71.18,13
+90791,(description not available),professional,13,1095.45,13
+D1110,(description not available),professional,13,305.31,13
+D7140,(description not available),professional,13,230.15,13
+D0274,(description not available),professional,12,88.0,12

@@ -66,11 +66,13 @@ def search_org_names(
     # 1. NPPES search (always; public dataset)
     nppes_rows = _search_nppes(bq_client, words, state_filter, limit, proj, entity_type_filter=entity_type_filter)
     for r in nppes_rows:
+        tax = str(r.get("taxonomy_code", "")).strip()
         out.append({
             "npi": str(r.get("npi", "")),
             "name": str(r.get("name", "")),
             "source": "nppes",
             "entity_type": str(r.get("entity_type", "unknown")),
+            "taxonomy_code": tax if tax else None,
         })
 
     # 2. PML search (optional; requires landing dataset)
@@ -87,6 +89,7 @@ def search_org_names(
                         "name": str(r.get("name", "")),
                         "source": "pml",
                         "entity_type": "unknown",
+                        "taxonomy_code": None,
                     })
         except Exception as e:
             logger.warning("PML org search skipped: %s", e)
@@ -452,16 +455,18 @@ def _search_nppes(
 
     like_clause = " AND ".join(like_parts)
 
+    tax_expr = "TRIM(CAST(COALESCE(n.healthcare_provider_taxonomy_code_1,'') AS STRING))"
     query = f"""
     WITH base AS (
       SELECT
         CAST(n.npi AS STRING) AS npi,
         TRIM({name_expr}) AS name_raw,
-        {entity_expr} AS entity_type
+        {entity_expr} AS entity_type,
+        {tax_expr} AS taxonomy_code
       FROM `bigquery-public-data.nppes.npi_raw` n
       WHERE ({state_cond}){entity_cond}
     )
-    SELECT base.npi, base.name_raw AS name, base.entity_type
+    SELECT base.npi, base.name_raw AS name, base.entity_type, base.taxonomy_code
     FROM base
     WHERE ({like_clause})
     ORDER BY base.entity_type, base.name_raw

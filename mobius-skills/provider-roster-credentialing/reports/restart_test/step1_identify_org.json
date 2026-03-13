@@ -1,0 +1,53 @@
+{
+  "results": [
+    {
+      "npi": "1811334402",
+      "name": "DAVID LAWRENCE CENTER",
+      "source": "nppes",
+      "entity_type": "organization",
+      "taxonomy_code": "323P00000X"
+    },
+    {
+      "npi": "1609113588",
+      "name": "DAVID LAWRENCE CENTER",
+      "source": "nppes",
+      "entity_type": "organization",
+      "taxonomy_code": "322D00000X"
+    },
+    {
+      "npi": "1033883731",
+      "name": "DAVID LAWRENCE CENTER",
+      "source": "nppes",
+      "entity_type": "organization",
+      "taxonomy_code": "261QM0801X"
+    },
+    {
+      "npi": "1962072793",
+      "name": "DAVID LAWRENCE MENTAL HEALTH CENTER INC",
+      "source": "nppes",
+      "entity_type": "organization",
+      "taxonomy_code": "261QC1500X"
+    },
+    {
+      "npi": "1982867255",
+      "name": "DAVID LAWRENCE MENTAL HEALTH CENTER INC",
+      "source": "nppes",
+      "entity_type": "organization",
+      "taxonomy_code": "261Q00000X"
+    },
+    {
+      "npi": "1871163600",
+      "name": "DAVID LAWRENCE MENTAL HEALTH CENTER INC",
+      "source": "nppes",
+      "entity_type": "organization",
+      "taxonomy_code": "261QC1500X"
+    },
+    {
+      "npi": "1801891940",
+      "name": "DAVID LAWRENCE MENTAL HEALTH CENTER, INC",
+      "source": "nppes",
+      "entity_type": "organization",
+      "taxonomy_code": "261QM0801X"
+    }
+  ]
+}

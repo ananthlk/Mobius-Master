@@ -1,0 +1,11 @@
+VALIDATION REPORT
+-----------------
+Validation Status: FAIL
+
+CHECK 1: NPI traceability — PASS
+CHECK 2: Waterfall math — FAIL — B+C+D+E ($3,812,791.88) does not equal Total ($3,812,801.88). Difference of $10.00 exceeds allowed $1 rounding.
+CHECK 3: Section table totals and count×amount consistency — FAIL — Section A sum ($2,539,752.00) does not match waterfall A ($2,539,752.00) due to mismatch in provider count (69 vs 69). Section A count (69) × amount ($36,808.00) = $2,539,752.00. This is consistent.
+CHECK 4: Section A completeness — PASS — Section A table sums to $2,539,752.00 and stated A total is $2,539,752.00.
+CHECK 5: Section E rate table math — FAIL — Section E states "No rate gap analysis available" and does not contain a rate table, despite the waterfall E total being $2,688,357.08.
+CHECK 6: Chart vs text — WARN — Waterfall chart is not provided, so chart bar labels cannot be verified against text totals.
+CHECK 7: Uniform benchmark —

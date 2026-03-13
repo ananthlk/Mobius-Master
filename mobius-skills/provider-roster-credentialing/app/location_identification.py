@@ -48,9 +48,11 @@ def _servicing_npis_from_doge(
     *,
     project: str,
     landing_dataset: str,
-    period_from: str = "202202",
+    period_from: str = "202407",
+    period_to: str = "202412",
 ) -> list[str]:
-    """Get distinct servicing_npi from DOGE where billing_npi IN org_npis."""
+    """Get distinct servicing_npi from DOGE where billing_npi IN org_npis.
+    Default 2024-07..2024-12 for more recent (valid) leads."""
     if not org_npis or not landing_dataset:
         return []
     # Normalize NPIs (10 digits, strip)
@@ -69,9 +71,13 @@ def _servicing_npis_from_doge(
       AND servicing_npi IS NOT NULL
       AND TRIM(CAST(servicing_npi AS STRING)) != ''
       AND SUBSTR(SAFE_CAST(period_month AS STRING), 1, 6) >= @period_from
+      AND SUBSTR(SAFE_CAST(period_month AS STRING), 1, 6) <= @period_to
     """
     try:
-        job_config = _job_config([("period_from", "STRING", period_from)])
+        job_config = _job_config([
+            ("period_from", "STRING", period_from),
+            ("period_to", "STRING", period_to),
+        ])
         rows = list(client.query(query, job_config=job_config).result())
         return [str(r.servicing_npi).strip() for r in rows if r.servicing_npi]
     except Exception as e:
