@@ -94,16 +94,16 @@ If current tables have no `state`/`product` columns:
 
 ---
 
-## Create and load tables (placeholder)
+## Create tables
 
-To create `stg_pml`, `stg_tml`, and `stg_ppl` with the unified schema and load minimal placeholder rows (so the pipeline can run before real PML/TML/PPL files exist):
+To create `stg_pml`, `stg_tml`, `stg_ppl`, and `stg_doge` in each env (dev/staging/prod):
 
 ```bash
 cd mobius-dbt
-BQ_PROJECT=mobius-os-dev BQ_LANDING_MEDICAID_DATASET=landing_medicaid_npi_dev uv run python scripts/create_and_load_pml_tml_ppl.py
+BQ_PROJECT=mobius-os-dev ./scripts/create_medicaid_tables.sh
 ```
 
-This creates the three tables and loads one placeholder PML row, several TML taxonomy codes, and leaves PPL empty. Replace with real data when available.
+Existing envs that did not have `stg_ppl` should run this once to add it. Then load data via the scripts below.
 
 ## Load all data (NPPES seed or CSV)
 
@@ -124,9 +124,23 @@ uv run python scripts/load_medicaid_landing.py --pml /path/to/pml.csv --tml /pat
 
 - **PML CSV:** must have `npi` (or `NPI`); other columns mapped by name (e.g. `provider_name`, `address_line_1`, `state`, `zip`, `taxonomy_code`, `contract_effective_date`, `contract_end_date`).
 - **TML CSV:** must have `taxonomy_code` and `taxonomy_description` (or `code` and `definition`).
-- **PPL CSV:** must have `npi`; optional `submitted_date`, `status`.
+- **PPL CSV:** must have `npi`; optional `submitted_date`, `status`. For FL prd19100 (Pending Provider List) format, use `scripts/cleanse_and_load_ppl_prd19100.py --source /path/to/prd19100.csv --load` to cleanse (Excel unquote, column map), backup current `stg_ppl`, and load.
 
 Set `BQ_PROJECT`, `BQ_LANDING_MEDICAID_DATASET`, and optionally `PROGRAM_STATE` / `PRODUCT` (defaults FL, medicaid).
+
+## Daily job (FL PML + PPL)
+
+To download (or use pre-downloaded files), cleanse, backup, and load PML and PPL, then run dbt:
+
+```bash
+cd mobius-dbt
+# Optional: download from portal (or place prw19000.csv / prd19100.csv in data/ and use --skip-download)
+./scripts/run_fl_medicaid_daily_load.sh
+# Or with pre-downloaded files only:
+./scripts/run_fl_medicaid_daily_load.sh --skip-download
+```
+
+Requires `BQ_PROJECT`, `BQ_LANDING_MEDICAID_DATASET`, `BQ_MARTS_MEDICAID_DATASET`. Optional `FL_MEDICAID_DATA_DIR` (default `mobius-dbt/data`). Download uses `scripts/download_ahca_medicaid.py`; PML load uses `cleanse_and_load_pml_prw19000.py`; PPL load uses `cleanse_and_load_ppl_prd19100.py`.
 
 ## GCS / load scripts
 

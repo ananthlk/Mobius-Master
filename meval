@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# Run the full Mobius chat eval suite (34 tests in eval_suite.yaml) with unbuffered output.
+# Same idea as mstart: run from repo root, shared .venv, mobius-chat on PYTHONPATH.
+#
+# Usage (from Mobius repo root):
+#   ./meval
+#   ./meval --dry-run
+#   ./meval --no-adjudicate
+#   ./meval --tests T01,T16
+#   MOBIUS_EVAL_MAX_WAIT_SEC=600 ./meval
+#
+# Logs: mobius-qa/mobius-chat-qa/reports/meval-stream-YYYYMMDD-HHMMSS.log
+# Report: mobius-qa/mobius-chat-qa/reports/eval-baseline-<unix_ts>.md (override with --report)
+
+set -euo pipefail
+
+SCRIPT="$0"
+while [ -L "$SCRIPT" ]; do
+  TARGET="$(readlink "$SCRIPT")"
+  [[ "$TARGET" == /* ]] && SCRIPT="$TARGET" || SCRIPT="$(dirname "$SCRIPT")/$TARGET"
+done
+MOBIUS_ROOT="$(cd "$(dirname "$SCRIPT")" && pwd)"
+cd "$MOBIUS_ROOT" || exit 1
+
+VENV="$MOBIUS_ROOT/.venv"
+EVAL_DIR="$MOBIUS_ROOT/mobius-qa/mobius-chat-qa"
+RUN_EVAL="$EVAL_DIR/run_eval.py"
+REPORTS="$EVAL_DIR/reports"
+mkdir -p "$REPORTS"
+
+if [[ ! -f "$RUN_EVAL" ]]; then
+  echo "[meval] ERROR: run_eval.py not found at $RUN_EVAL"
+  exit 1
+fi
+
+PY="${MOBIUS_EVAL_PYTHON:-}"
+if [[ -z "$PY" ]]; then
+  for try in "$VENV/bin/python" "$MOBIUS_ROOT/mobius-chat/.venv/bin/python" "$EVAL_DIR/.venv/bin/python"; do
+    if [[ -x "$try" ]]; then PY="$try"; break; fi
+  done
+fi
+[[ -n "$PY" ]] || PY="python3"
+
+if [[ ! -x "$VENV/bin/python" ]] && [[ "$PY" != "$VENV/bin/python" ]]; then
+  echo "[meval] WARN: Shared venv not found at $VENV — using $PY"
+  echo "  Prefer: cd $MOBIUS_ROOT && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt"
+fi
+
+# Env for API URL, DB, keys (same services as chat worker)
+[[ -f "$MOBIUS_ROOT/mobius-chat/.env" ]] && set -a && source "$MOBIUS_ROOT/mobius-chat/.env" && set +a || true
+[[ -f "$MOBIUS_ROOT/mobius-config/.env" ]] && set -a && source "$MOBIUS_ROOT/mobius-config/.env" && set +a || true
+
+export PYTHONPATH="$MOBIUS_ROOT/mobius-chat"
+export PYTHONUNBUFFERED=1
+
+LOG="$REPORTS/meval-stream-$(date +%Y%m%d-%H%M%S).log"
+echo "[meval] Mobius root: $MOBIUS_ROOT"
+echo "[meval] Python: $PY"
+echo "[meval] Suite: 34 tests (eval_suite.yaml) — pass --tests to run a subset"
+echo "[meval] Log: $LOG"
+echo "[meval] Extra args: $*"
+echo "----"
+
+# Default: full baseline sprint (all tests). Forward any CLI flags to run_eval.py.
+exec "$PY" -u "$RUN_EVAL" --sprint baseline "$@" 2>&1 | tee "$LOG"

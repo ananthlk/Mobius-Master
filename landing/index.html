@@ -191,12 +191,12 @@
       <span class="port">http://localhost:5173 — Docs (frontend + backend).</span>
       <p class="card-status-text" id="text-rag" aria-live="polite"></p>
     </a>
-    <a class="card" href="http://localhost:3999/lexicon/" target="_blank" rel="noopener" data-process-id="lexicon">
+    <a class="card" href="http://localhost:5174/lexicon/" target="_blank" rel="noopener" data-process-id="lexicon" id="card-lexicon">
       <div class="card-header">
         <h2>Lexicon</h2>
         <span class="status-dot unknown" role="status" aria-label="Lexicon: checking" id="dot-lexicon"></span>
       </div>
-      <span class="port">http://localhost:3999/lexicon/ — Lexicon maintenance UI (static).</span>
+      <span class="port" id="port-lexicon">http://localhost:5174/lexicon/ — Lexicon maintenance UI.</span>
       <p class="card-status-text" id="text-lexicon" aria-live="polite"></p>
     </a>
     <a class="card" href="http://localhost:3999/retrieval-eval/" target="_blank" rel="noopener" data-process-id="retrieval-eval">
@@ -337,6 +337,13 @@
       const dot = document.getElementById('dot-' + id);
       const text = document.getElementById('text-' + id);
       if (!dot || !text) return;
+      // Tie Lexicon card link to API url (Vite dev or landing static)
+      if (id === 'lexicon' && p.url) {
+        const card = document.getElementById('card-lexicon');
+        const portEl = document.getElementById('port-lexicon');
+        if (card) card.href = p.url;
+        if (portEl) portEl.textContent = p.url + ' — Lexicon maintenance UI.';
+      }
       const status = p.status || 'unknown';
       dot.className = 'status-dot ' + (status === 'up' ? 'up' : status === 'slow' ? 'slow' : status === 'degraded' ? 'degraded' : status === 'down' ? 'down' : 'unknown');
       let label = id + ': ' + status;

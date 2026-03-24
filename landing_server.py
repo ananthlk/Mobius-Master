@@ -51,8 +51,11 @@ def _service_config() -> dict:
         "dbt_url": _env_url("MOBIUS_DBT_URL", "http://127.0.0.1:6500"),
         "scraper_url": _env_url("MOBIUS_SCRAPER_URL", "http://127.0.0.1:8002"),
         "email_url": _env_url("MOBIUS_EMAIL_URL", "http://127.0.0.1:8003"),
-        # Lexicon UI is served statically by landing under /lexicon/
-        "lexicon_url": _env_url("MOBIUS_LEXICON_URL", f"http://127.0.0.1:{PORT}/lexicon/"),
+        # Lexicon UI: dev default is Vite app (frontend-v2) on 5174; prod/override uses landing static /lexicon/
+        "lexicon_url": _env_url(
+            "MOBIUS_LEXICON_URL",
+            "http://127.0.0.1:5174/lexicon/" if ENV != "prod" else f"http://127.0.0.1:{PORT}/lexicon/",
+        ),
         # Retrieval Eval UI is served statically by landing under /retrieval-eval/
         "retrieval_eval_url": _env_url("MOBIUS_RETRIEVAL_EVAL_URL", f"http://127.0.0.1:{PORT}/retrieval-eval/"),
         "retrieval_eval_api_url": _env_url("MOBIUS_RETRIEVAL_EVAL_API_URL", "http://127.0.0.1:8020"),

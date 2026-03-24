@@ -266,6 +266,20 @@ elif [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
     _log "Migrations failed (check CHAT_RAG_DATABASE_URL). Services will start anyway."
     _log "  Connection slots? Use: mstart --skip-migrations  (then run migrations later when slots free)"
   fi
+
+  # --- provider-roster-credentialing DB migrations (same DB as chat when CREDENTIALING_REPORT_DB_URL unset) ---
+  if [[ "$_migrations_ok" == "true" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/provider-roster-credentialing" ]]; then
+    CRED_URL="${CREDENTIALING_REPORT_DB_URL:-$CHAT_RAG_DATABASE_URL}"
+    if [[ -n "$CRED_URL" ]] && [[ -x "$VENV/bin/python3" ]] && [[ -f "$MOBIUS_ROOT/mobius-skills/provider-roster-credentialing/scripts/run_migrations.py" ]]; then
+      _log "Running provider-roster-credentialing DB migrations ..."
+      export CREDENTIALING_REPORT_DB_URL="${CREDENTIALING_REPORT_DB_URL:-$CHAT_RAG_DATABASE_URL}"
+      if (cd "$MOBIUS_ROOT/mobius-skills/provider-roster-credentialing" && "$VENV/bin/python3" scripts/run_migrations.py 2>&1); then
+        _log "  Credentialing migrations OK"
+      else
+        _log "  Credentialing migrations failed (non-fatal)"
+      fi
+    fi
+  fi
 fi
 
 # --- mobius-os backend (port 5001) ---
@@ -311,6 +325,22 @@ if [[ "$REDIS_URL" == *"127.0.0.1:6380"* ]] || [[ "$REDIS_URL" == *"localhost:63
 fi
 _log "Note: Redis at ${REDIS_URL:-redis://10.40.102.67:6379/0}"
 
+# Kill phantom mobius-chat workers (not in PIDFILE); avoid matching mobius-rag app.worker
+pkill -f "${MOBIUS_ROOT}/mobius-chat.*-m app\.worker" 2>/dev/null || true
+pkill -f "cd ${MOBIUS_ROOT}/mobius-chat.*app\.worker" 2>/dev/null || true
+sleep 1
+REDIS_REQUEST_KEY="${REDIS_REQUEST_KEY:-mobius:chat:requests}"
+if [[ -n "${REDIS_URL:-}" ]] && command -v redis-cli >/dev/null 2>&1; then
+  if redis-cli -u "$REDIS_URL" DEL "$REDIS_REQUEST_KEY" >/dev/null 2>&1; then
+    _log "Flushed Redis key $REDIS_REQUEST_KEY (chat request queue)"
+  else
+    _log "Redis queue flush skipped (redis-cli DEL failed or key missing)"
+  fi
+else
+  _log "Redis queue flush skipped (REDIS_URL or redis-cli unset)"
+fi
+_log "[mstart] Phantom workers cleared"
+
 # --- mobius-chat frontend build (ensures app.js is up to date) ---
 if [[ -d "$MOBIUS_ROOT/mobius-chat/frontend" ]] && [[ -f "$MOBIUS_ROOT/mobius-chat/frontend/package.json" ]]; then
   if command -v npm >/dev/null 2>&1; then
@@ -324,6 +354,8 @@ if [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
   _load_env "$MOBIUS_ROOT/mobius-skills/web-scraper/.env"
   [[ -f "$MOBIUS_ROOT/mobius-config/.env" ]] && _load_env "$MOBIUS_ROOT/mobius-config/.env"
   _load_env "$MOBIUS_ROOT/mobius-chat/.env"
+  # ReAct pipeline for chat API+worker — force on so MOBIUS_USE_REACT=0 in .env cannot disable it under mstart.
+  export MOBIUS_USE_REACT=1
   export QUEUE_TYPE="${QUEUE_TYPE:-redis}"
   # Enable skills when services are started (override .env if not set)
   [[ -z "${CHAT_SKILLS_GOOGLE_SEARCH_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/google-search" ]] && export CHAT_SKILLS_GOOGLE_SEARCH_URL="http://localhost:8004/search?"
@@ -331,7 +363,9 @@ if [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
   [[ -z "${CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/provider-roster-credentialing" ]] && export CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL="http://localhost:8011/report"
   # MCP: tool agent calls skills via MCP (mobius-skills-mcp on port 8006)
   [[ -z "${MCP_SERVER_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills-mcp" ]] && export MCP_SERVER_URL="http://localhost:8006/mcp"
-  _start "mobius-chat-api" "cd $MOBIUS_ROOT/mobius-chat && $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000"
+  # Shared secret for credentialing skill → chat POST /internal/skill-llm (ModelRouter + llm_calls)
+  export MOBIUS_SKILL_LLM_INTERNAL_KEY="${MOBIUS_SKILL_LLM_INTERNAL_KEY:-mobius-local-skill-llm-dev}"
+  _start "mobius-chat-api" "cd $MOBIUS_ROOT/mobius-chat && MOBIUS_USE_REACT=1 $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000"
 fi
 
 # --- mobius-chat worker (Redis queue; always started) ---
@@ -339,10 +373,11 @@ if [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
   _load_env "$MOBIUS_ROOT/mobius-skills/web-scraper/.env"
   [[ -f "$MOBIUS_ROOT/mobius-config/.env" ]] && _load_env "$MOBIUS_ROOT/mobius-config/.env"
   _load_env "$MOBIUS_ROOT/mobius-chat/.env"
+  export MOBIUS_USE_REACT=1
   export QUEUE_TYPE="${QUEUE_TYPE:-redis}"
   [[ -z "${MCP_SERVER_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills-mcp" ]] && export MCP_SERVER_URL="http://localhost:8006/mcp"
   _wait_redis_for_chat
-  _start "mobius-chat-worker" "cd $MOBIUS_ROOT/mobius-chat && $VENV/bin/python3 -m app.worker"
+  _start "mobius-chat-worker" "cd $MOBIUS_ROOT/mobius-chat && MOBIUS_USE_REACT=1 $VENV/bin/python3 -m app.worker"
 fi
 
 # --- mobius-rag backend (port 8001) ---
@@ -370,7 +405,7 @@ if [[ -d "$MOBIUS_ROOT/mobius-rag-api" ]]; then
   _kill_port 8030
   [[ -f "$MOBIUS_ROOT/mobius-config/.env" ]] && _load_env "$MOBIUS_ROOT/mobius-config/.env"
   _load_env "$MOBIUS_ROOT/mobius-chat/.env"
-  _start "mobius-rag-api" "cd $MOBIUS_ROOT/mobius-rag-api && $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8030"
+  _start "mobius-rag-api" "cd $MOBIUS_ROOT/mobius-rag-api && PYTHONPATH=$MOBIUS_ROOT/mobius-retriever/src $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8030"
 fi
 
 # --- mobius-qa lexicon maintenance API (port 8010) ---
@@ -483,6 +518,8 @@ if [[ -d "$MOBIUS_ROOT/mobius-skills/provider-roster-credentialing" ]]; then
   _load_env "$MOBIUS_ROOT/mobius-skills/provider-roster-credentialing/.env" 2>/dev/null || true
   # Report LLM: prefer Gemini/Vertex when OPENAI_API_KEY not set
   [[ -z "${OPENAI_API_KEY:-}" ]] && export REPORT_LLM_PROVIDER=gemini && export REPORT_LLM_MODEL="${REPORT_LLM_MODEL:-gemini-2.5-flash}"
+  export MOBIUS_SKILL_LLM_INTERNAL_KEY="${MOBIUS_SKILL_LLM_INTERNAL_KEY:-mobius-local-skill-llm-dev}"
+  export CREDENTIALING_LLM_ROUTER_URL="${CREDENTIALING_LLM_ROUTER_URL:-http://127.0.0.1:8000}"
   _start "mobius-provider-roster-api" "cd $MOBIUS_ROOT/mobius-skills/provider-roster-credentialing && PORT=8011 $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8011"
 fi
 
