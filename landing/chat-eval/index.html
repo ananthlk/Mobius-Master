@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobius — Chat eval (meval)</title>
+  <link rel="icon" type="image/svg+xml" href="../logo.svg" />
+  <link rel="stylesheet" href="../tokens-dark.css" />
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--mobius-bg-primary);
+      color: var(--mobius-text-primary);
+      margin: 0;
+      padding: 1.25rem 1.5rem 2rem;
+      line-height: 1.55;
+      max-width: 52rem;
+    }
+    .topbar {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0.75rem 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .topbar a.back { color: var(--mobius-accent); text-decoration: none; }
+    .topbar a.back:hover { text-decoration: underline; }
+    .topbar h1 { font-size: 1.35rem; margin: 0; font-weight: 600; }
+    .muted { color: var(--mobius-text-muted); font-size: 0.9rem; }
+    h2 { font-size: 1.05rem; margin: 1.35rem 0 0.5rem; font-weight: 600; }
+    ul { margin: 0.35rem 0 0; padding-left: 1.25rem; }
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+      font-size: 0.88em;
+      background: var(--mobius-bg-card);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 4px;
+    }
+    code { padding: 0.12rem 0.35rem; }
+    pre {
+      padding: 0.75rem 1rem;
+      overflow-x: auto;
+      margin: 0.5rem 0 0;
+    }
+    .note { font-size: 0.88rem; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="back" href="/">← Module Hub</a>
+    <h1>Chat eval (meval)</h1>
+    <span class="muted">End-to-end chat QA against the live Chat API</span>
+  </header>
+
+  <p class="muted">
+    This page is the hub entry point. Today, runs are started from the repo (script below).
+    Results can be written to Postgres when the DB URL is configured (not <code>--dry-run</code>).
+  </p>
+
+  <h2>Run the suite</h2>
+  <p>From the <strong>Mobius repo root</strong> (Chat API and worker should be up):</p>
+  <pre>./meval</pre>
+  <p class="muted note">The wrapper sets <code>PYTHONPATH</code>, loads <code>mobius-chat/.env</code>, and tees logs under <code>mobius-qa/mobius-chat-qa/reports/</code>.</p>
+
+  <h2>Suite &amp; questions</h2>
+  <ul>
+    <li>Canonical file: <code>mobius-qa/mobius-chat-qa/eval_suite.yaml</code> — edit in git to add, change, or retire cases.</li>
+    <li>Alternate file: <code>python mobius-qa/mobius-chat-qa/run_eval.py --suite /path/to/suite.yaml</code> (or pass the same flag through any wrapper you use).</li>
+    <li>Subset: <code>--tests T01,T23</code> (comma-separated IDs).</li>
+  </ul>
+
+  <h2>Analytics &amp; production</h2>
+  <ul>
+    <li>Schema: <code>mobius-chat/db/schema/021_eval_tables.sql</code> — tables <code>eval_runs</code>, <code>eval_results</code>.</li>
+    <li>Query those from your BI tool or add admin-only HTTP endpoints on Chat when you want a built-in dashboard.</li>
+    <li>For production, typical pattern is a scheduled job (or CI) that runs the same <code>run_eval.py</code> against the prod Chat base URL with secrets injected — not the dev-only Module Hub process.</li>
+  </ul>
+
+  <h2>Roadmap (if you want “click Run” here)</h2>
+  <p class="muted">
+    A “Run” button needs a small backend (async job, auth, timeouts) — comparable effort to wiring Retrieval Eval’s API.
+    Keeping questions in YAML + git is the lightest path; a full in-browser editor + versioned DB suites is a larger product slice.
+  </p>
+</body>
+</html>

@@ -207,6 +207,14 @@
       <span class="port">http://localhost:3999/retrieval-eval/ — Retrieval-only A/B (BM25 vs Vertex).</span>
       <p class="card-status-text" id="text-retrieval-eval" aria-live="polite"></p>
     </a>
+    <a class="card" href="http://localhost:3999/chat-eval/" target="_blank" rel="noopener" data-process-id="chat-eval" id="card-chat-eval">
+      <div class="card-header">
+        <h2>Chat eval</h2>
+        <span class="status-dot unknown" role="status" aria-label="Chat eval: checking" id="dot-chat-eval"></span>
+      </div>
+      <span class="port" id="port-chat-eval">http://localhost:3999/chat-eval/ — meval: end-to-end chat QA (run from repo).</span>
+      <p class="card-status-text" id="text-chat-eval" aria-live="polite"></p>
+    </a>
     <a class="card" href="http://localhost:6500" target="_blank" rel="noopener" data-process-id="dbt">
       <div class="card-header">
         <h2>DBT</h2>
@@ -343,6 +351,12 @@
         const portEl = document.getElementById('port-lexicon');
         if (card) card.href = p.url;
         if (portEl) portEl.textContent = p.url + ' — Lexicon maintenance UI.';
+      }
+      if (id === 'chat-eval' && p.url) {
+        const card = document.getElementById('card-chat-eval');
+        const portEl = document.getElementById('port-chat-eval');
+        if (card) card.href = p.url;
+        if (portEl) portEl.textContent = p.url + ' — meval: end-to-end chat QA (run from repo).';
       }
       const status = p.status || 'unknown';
       dot.className = 'status-dot ' + (status === 'up' ? 'up' : status === 'slow' ? 'slow' : status === 'degraded' ? 'degraded' : status === 'down' ? 'down' : 'unknown');

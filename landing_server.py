@@ -58,6 +58,8 @@ def _service_config() -> dict:
         ),
         # Retrieval Eval UI is served statically by landing under /retrieval-eval/
         "retrieval_eval_url": _env_url("MOBIUS_RETRIEVAL_EVAL_URL", f"http://127.0.0.1:{PORT}/retrieval-eval/"),
+        # Chat eval (meval) ops page under /chat-eval/ — same landing server
+        "chat_eval_url": _env_url("MOBIUS_CHAT_EVAL_URL", f"http://127.0.0.1:{PORT}/chat-eval/"),
         "retrieval_eval_api_url": _env_url("MOBIUS_RETRIEVAL_EVAL_API_URL", "http://127.0.0.1:8020"),
         "rag_api_url": _env_url("RAG_API_URL", "http://127.0.0.1:8030"),
         "redis_host": os.getenv("MOBIUS_REDIS_HOST", "10.40.102.67").strip() or "10.40.102.67",
@@ -361,6 +363,17 @@ def _get_status() -> dict:
         "status": "up" if lex_ok else "down",
         "ms": 0,
     })
+    try:
+        chat_eval_ok = (LANDING_DIR / "chat-eval" / "index.html").exists()
+    except Exception:
+        chat_eval_ok = False
+    processes.append({
+        "id": "chat-eval",
+        "name": "Chat eval",
+        "url": c.get("chat_eval_url"),
+        "status": "up" if chat_eval_ok else "down",
+        "ms": 0,
+    })
     # RAG (combined)
     processes.append(_probe_rag())
     # Reorder so key apps are grouped: os, chat, rag, lexicon, dbt
@@ -371,7 +384,8 @@ def _get_status() -> dict:
             "rag": 2,
             "lexicon": 3,
             "retrieval-eval": 4,
-            "dbt": 5,
+            "chat-eval": 5,
+            "dbt": 6,
         }.get(p["id"], 9)
     )
 
@@ -410,6 +424,7 @@ def _get_api_config() -> dict:
         {"id": "rag", "url": rag_link_url},
         {"id": "lexicon", "url": c["lexicon_url"]},
         {"id": "retrieval-eval", "url": c["retrieval_eval_url"]},
+        {"id": "chat-eval", "url": c["chat_eval_url"]},
         {"id": "dbt", "url": c["dbt_url"]},
     ]
     workers = [
