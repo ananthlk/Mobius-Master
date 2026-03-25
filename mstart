@@ -8,7 +8,8 @@ while [ -L "$SCRIPT" ]; do
   TARGET="$(readlink "$SCRIPT")"
   [[ "$TARGET" == /* ]] && SCRIPT="$TARGET" || SCRIPT="$(dirname "$SCRIPT")/$TARGET"
 done
-MOBIUS_ROOT="$(cd "$(dirname "$SCRIPT")" && pwd)"
+# pwd -P: canonical path (helps when $0 resolves with different casing than the real directory).
+MOBIUS_ROOT="$(cd "$(dirname "$SCRIPT")" && pwd -P 2>/dev/null || pwd)"
 cd "$MOBIUS_ROOT" || exit 1
 
 PIDFILE="$MOBIUS_ROOT/.mobius_start_all.pids"
@@ -72,6 +73,27 @@ fi
 : > "$PIDFILE"
 
 _log() { echo "[mstart] $*"; }
+
+# Terminate idle sessions on mobius_* DBs to free Cloud SQL connection slots before migrations.
+_cleanup_db_connections() {
+  if [[ ! -x "$VENV/bin/python3" ]] || [[ ! -f "$MOBIUS_ROOT/scripts/cleanup_db_connections.py" ]]; then
+    return 0
+  fi
+  _log "Cleaning up idle DB connections (mobius_chat / mobius_rag / mobius_qa) …"
+  if "$VENV/bin/python3" "$MOBIUS_ROOT/scripts/cleanup_db_connections.py" >> "$LOGDIR/cleanup_db_connections.log" 2>&1; then
+    _log "  Idle connection cleanup OK (log: $LOGDIR/cleanup_db_connections.log)"
+  else
+    _log "  Idle connection cleanup failed or could not connect — see $LOGDIR/cleanup_db_connections.log"
+    _log "  Waiting 5s and retrying cleanup once (remote clients may still be releasing slots) …"
+    sleep 5
+    if "$VENV/bin/python3" "$MOBIUS_ROOT/scripts/cleanup_db_connections.py" >> "$LOGDIR/cleanup_db_connections.log" 2>&1; then
+      _log "  Second cleanup attempt OK"
+    else
+      _log "  Second cleanup failed — DB may have zero free slots. Fix: stop other consumers, then mstart --restart-db (Cloud SQL restart)"
+      _log "  Tip: CHAT_RAG_DATABASE_ADMIN_URL in mobius-chat/.env (postgres user, .../postgres) if not set."
+    fi
+  fi
+}
 
 # Kill any process bound to port so services can bind to fixed ports.
 _kill_port() {
@@ -242,16 +264,28 @@ if [[ "$SKIP_MIGRATIONS" == "true" ]]; then
 elif [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
   _log "Running mobius-chat DB migrations ..."
   sleep 3
-  if [[ -x "$VENV/bin/python3" ]] && [[ -f "$MOBIUS_ROOT/scripts/cleanup_db_connections.py" ]]; then
-    _log "Cleaning up idle DB connections ..."
-    "$VENV/bin/python3" "$MOBIUS_ROOT/scripts/cleanup_db_connections.py" 2>/dev/null || true
-  fi
   _load_env "$MOBIUS_ROOT/mobius-chat/.env"
+  CHAT_DB_URL="${CHAT_RAG_DATABASE_URL:-$CHAT_DB_URL}"
   if [[ "$NEED_PROXY" == "true" ]] && [[ "$CHAT_DB_URL" =~ 34\.135\.72\.145 ]]; then
     export CHAT_RAG_DATABASE_URL="${CHAT_DB_URL/34.135.72.145:5432/127.0.0.1:$PROXY_PORT}"
   fi
+  # Same proxy rewrite for superuser cleanup URL when .env still points at Cloud SQL IP.
+  if [[ "$NEED_PROXY" == "true" ]] && [[ -n "${CHAT_RAG_DATABASE_ADMIN_URL:-}" ]]; then
+    if [[ "$CHAT_RAG_DATABASE_ADMIN_URL" =~ 34\.135\.72\.145 ]]; then
+      export CHAT_RAG_DATABASE_ADMIN_URL="${CHAT_RAG_DATABASE_ADMIN_URL/34.135.72.145:5432/127.0.0.1:$PROXY_PORT}"
+    fi
+  fi
+  if [[ -n "${CHAT_RAG_DATABASE_ADMIN_URL:-}" ]]; then
+    _log "CHAT_RAG_DATABASE_ADMIN_URL is set (superuser cleanup / migrations will use it)"
+  fi
+  _cleanup_db_connections
   _migrations_ok=false
   for _attempt in 1 2 3 4; do
+    if [[ $_attempt -gt 1 ]]; then
+      _log "Re-running idle connection cleanup before migration retry $_attempt …"
+      _cleanup_db_connections
+      sleep 2
+    fi
     if (cd "$MOBIUS_ROOT/mobius-chat" && "$VENV/bin/python3" -m app.db.run_migrations 2>&1); then
       _migrations_ok=true
       _log "Migrations OK"
@@ -264,7 +298,8 @@ elif [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
   done
   if [[ "$_migrations_ok" != "true" ]]; then
     _log "Migrations failed (check CHAT_RAG_DATABASE_URL). Services will start anyway."
-    _log "  Connection slots? Use: mstart --skip-migrations  (then run migrations later when slots free)"
+    _log "  Connection slots exhausted? Stop other DB clients, then: mstart --restart-db  (restarts Cloud SQL)"
+    _log "  Or: mstart --skip-migrations  and run migrations later when slots are free."
   fi
 
   # --- provider-roster-credentialing DB migrations (same DB as chat when CREDENTIALING_REPORT_DB_URL unset) ---
@@ -555,7 +590,13 @@ fi
 # --- Master landing (port 3999) ---
 if [[ "$START_LANDING" == "true" ]] && [[ -f "$MOBIUS_ROOT/landing_server.py" ]]; then
   _kill_port 3999
-  _start "mobius-landing" "cd $MOBIUS_ROOT && $VENV/bin/python3 landing_server.py"
+  # Absolute script path (no "cd … && python3 landing_server.py"): avoids failures when cwd or
+  # MOBIUS_ROOT casing differs from the real repo path on case-sensitive volumes.
+  if [[ ! -x "$VENV/bin/python3" ]]; then
+    _log "Skip mobius-landing: $VENV/bin/python3 not found"
+  else
+    _start "mobius-landing" "\"$VENV/bin/python3\" \"$MOBIUS_ROOT/landing_server.py\""
+  fi
 fi
 
 # Restore mobius-landing lines to PID file when we did --no-landing
