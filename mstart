@@ -303,7 +303,8 @@ elif [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
   fi
 
   # --- provider-roster-credentialing DB migrations (same DB as chat when CREDENTIALING_REPORT_DB_URL unset) ---
-  # Applies migrations/*.sql (e.g. roster_upload_members). mobius-chat/db/schema also applies 018_roster_upload_members.sql — both are idempotent.
+  # Skill-local SQL under migrations/ (report runs, uploads, etc.). mobius-chat/db/schema/*.sql is applied above
+  # in numeric order (includes 017_roster_review.sql, 018_credentialing_assertion.sql, …). All idempotent.
   if [[ "$_migrations_ok" == "true" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/provider-roster-credentialing" ]]; then
     CRED_URL="${CREDENTIALING_REPORT_DB_URL:-$CHAT_RAG_DATABASE_URL}"
     if [[ -n "$CRED_URL" ]] && [[ -x "$VENV/bin/python3" ]] && [[ -f "$MOBIUS_ROOT/mobius-skills/provider-roster-credentialing/scripts/run_migrations.py" ]]; then
