@@ -1,0 +1,381 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>FL CMHC Landscape v4</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+body{font-family:Inter,sans-serif;background:#0f172a;color:#e2e8f0;max-width:1100px;margin:0 auto;padding:40px 60px;line-height:1.75}
+h1{font-size:32px;color:#f1f5f9;border-bottom:2px solid #3b82f6;padding-bottom:16px;margin-bottom:32px}
+h2{font-size:24px;color:#f1f5f9;margin-top:48px;border-bottom:1px solid #334155;padding-bottom:8px}
+h3{font-size:18px;color:#94a3b8;margin-top:36px}
+p{font-size:15px;color:#cbd5e1;margin-bottom:16px}
+strong{color:#f1f5f9}
+ul,ol{margin:12px 0;padding-left:24px}
+li{font-size:15px;color:#cbd5e1;margin-bottom:10px}
+li strong{color:#f1f5f9}
+hr{border:none;border-top:1px solid #334155;margin:32px 0}
+table{border-collapse:collapse;width:100%;margin:20px 0;font-size:12px}
+th{background:#1e293b;color:#f1f5f9;padding:8px 10px;text-align:left;border:1px solid #334155;font-weight:600}
+td{padding:8px 10px;border:1px solid #334155;color:#cbd5e1;vertical-align:top}
+tr:nth-child(even){background:rgba(30,41,59,0.5)}
+em{color:#94a3b8}
+blockquote{border-left:3px solid #f59e0b;padding:12px 16px;margin:20px 0;background:rgba(245,158,11,0.08);border-radius:0 8px 8px 0}
+blockquote p{color:#fbbf24;margin:0}
+.hero{text-align:center;padding:48px 0 24px}
+.hero h1{border:none;font-size:36px;margin-bottom:8px}
+.hero .subtitle{font-size:18px;color:#94a3b8;margin-bottom:28px}
+.stat-row{display:flex;gap:20px;justify-content:center;margin:20px 0 32px}
+.stat-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:18px 24px;text-align:center;min-width:160px}
+.stat-card .number{font-size:28px;font-weight:700;color:#3b82f6}
+.stat-card .label{font-size:12px;color:#94a3b8;margin-top:4px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:24px 28px;margin:20px 0}
+.card h3{margin-top:0;color:#f1f5f9;font-size:16px}
+.signal-green{color:#22c55e}.signal-yellow{color:#f59e0b}.signal-red{color:#ef4444}
+
+/* Share bars */
+.stages{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin:20px 0}
+.stage-col .stage-header{text-align:center;margin-bottom:10px}
+.stage-header .name{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#64748b}
+.stage-header .desc{font-size:11px;color:#475569;margin-top:2px}
+.share-bar{position:relative;height:160px;border-radius:10px;overflow:hidden;border:1px solid #334155}
+.share-cmhc{background:#3b82f6;position:absolute;bottom:0;left:0;right:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.share-rest{background:#1e293b;position:absolute;top:0;left:0;right:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.share-pct{font-size:24px;font-weight:700;color:white}
+.share-label{font-size:10px;color:rgba(255,255,255,0.7);margin-top:2px}
+.share-rest .share-pct{color:#94a3b8;font-size:16px}
+.share-rest .share-label{color:#64748b}
+.rpb-compare{margin-top:10px;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:12px}
+.rpb-compare .title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:8px}
+.rpb-row{display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px}
+.rpb-row .who{color:#94a3b8}.rpb-row .val{font-weight:600}
+.rpb-row .val.cmhc{color:#3b82f6}.rpb-row .val.rest{color:#94a3b8}
+.rpb-gap{display:flex;justify-content:space-between;margin-top:6px;padding-top:6px;border-top:1px solid #334155;font-size:12px}
+.rpb-gap .label{color:#64748b}.rpb-gap .val{font-weight:700}
+.rpb-gap .val.neg{color:#ef4444}.rpb-gap .val.pos{color:#22c55e}
+
+/* Punchline */
+.punchline{margin-top:32px;display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch}
+.punch-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:24px 28px;text-align:center}
+.punch-card .amount{font-size:32px;font-weight:700}
+.punch-card .desc{font-size:13px;color:#94a3b8;margin-top:6px;line-height:1.5}
+.punch-card .subdesc{font-size:11px;color:#64748b;margin-top:8px;line-height:1.5}
+.punch-vs{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 20px}
+.punch-vs .ratio{font-size:44px;font-weight:700;color:#f59e0b}
+.punch-vs .times{font-size:13px;color:#94a3b8}
+
+.bottom-insight{background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:20px 28px;margin-top:28px;text-align:center}
+.bottom-insight p{margin:0;font-size:14px;color:#cbd5e1;line-height:1.7}
+</style>
+</head><body>
+
+<!-- ==================== HERO ==================== -->
+<div class="hero">
+<h1>Florida CMHC Landscape</h1>
+<p class="subtitle">The rate problem is real. The productivity burden is real. But the leakage problem dwarfs both.</p>
+<div class="stat-row">
+<div class="stat-card"><div class="number">$8.1M</div><div class="label">Lost to Rate Gaps</div></div>
+<div class="stat-card"><div class="number" style="color:#f59e0b">19x</div><div class="label">Leakage vs Rate Impact</div></div>
+<div class="stat-card"><div class="number">$157M</div><div class="label">Lost to Leakage</div></div>
+</div>
+<p style="font-size:13px;color:#64748b">86 CMHCs &middot; 20 service codes &middot; FL Medicaid FFS 2024 &middot; vs Rest of FL (excluding CMHCs)</p>
+</div>
+
+<hr />
+
+<!-- ==================== EXEC SUMMARY ==================== -->
+<h2>1. Executive Summary</h2>
+
+<p>Three forces shape CMHC financial performance in Florida Medicaid. All three are measurable. They are not equal in impact.</p>
+
+<ul>
+<li><strong>Problem A &mdash; The rate gap is real: $8.1M.</strong> On intake and high-acuity services, CMHCs earn less per beneficiary than the rest of the FL Medicaid market. Intake: $74.96 vs $88.18 per bene (-15%). High-acuity stabilization: $908 vs $1,217 per bene (-25.4%). On ongoing care, CMHCs actually earn <em>more</em> per beneficiary (+$43.78). The net rate loss across the sector's current patient volume is $8.1M.</li>
+
+<li><strong>Problem B &mdash; The clinician productivity burden is real.</strong> CMHC clinicians carry substantially smaller panels than the rest of the market on the highest-volume codes. H2019 (behavioral therapy): 123 benes/clinician vs 227 (-45.8%). 90837 (psychotherapy 60min): 26 vs 97.5 (-73.3%). H0040 (ACT): 345 vs 618 (-44.1%). At the same time, CMHC intake clinicians carry <em>larger</em> panels than the market &mdash; H0031: 115 vs 76.5 benes/clinician (+50.9%). The pattern: high throughput at the front door, lower capacity downstream. Whether this reflects acuity differences, staffing constraints, or model design, it compresses revenue per clinician on the services that generate recurring income.</li>
+
+<li><strong>Problem C &mdash; The leakage problem dwarfs both: $157M (upper bound).</strong> CMHCs handle 23.6% of all FL Medicaid BH intake. But the sector's share of beneficiaries drops to 14.4% for high-acuity stabilization and 5.0% for ongoing care. If CMHCs retained their intake-level market share through ongoing care, the sector would generate $183M in ongoing revenue instead of $38.6M. The leakage gap &mdash; up to $157M &mdash; is 19x the rate gap. <em>(Note: These are market share figures by service category, not tracked patient transitions. The true retention rate requires patient-level claims linkage. The $157M assumes full capacity to retain &mdash; actual recoverable leakage will be lower, but even a fraction is transformative.)</em></li>
+</ul>
+
+<p><strong>A surprising finding:</strong> In ongoing care, CMHCs actually earn <em>more</em> per beneficiary than the rest of the market &mdash; $133.69 vs $89.91 (+48.7%). When patients stay, CMHCs deliver more intensive, higher-value care per person. This may reflect a selection effect (only the highest-acuity patients remain), a different code mix (more H2019 therapy, less low-yield E/M), or genuinely more intensive engagement. Regardless, it means the sector doesn't have an ongoing care rate problem &mdash; it has an ongoing care volume problem.</p>
+
+<p><strong>The implication:</strong> Closing every rate gap would add $8.1M. Important, but incremental. Recovering even a fraction of the leakage &mdash; moving ongoing care share from 5% to 10% &mdash; would add approximately $38.6M at current per-beneficiary rates. The strategic question isn't just "how do we get paid more per visit?" but "how do we keep patients in care after the front door?"</p>
+
+<hr />
+
+<!-- ==================== PROBLEM A: RATES ==================== -->
+<h2>2. Problem A: The Rate Gap &mdash; $8.1M</h2>
+
+<p>The rate gap is concentrated in two segments of the care continuum. In the third &mdash; ongoing care &mdash; CMHCs actually outperform.</p>
+
+<h3>Rate per Claim: Sector Dashboard</h3>
+<table>
+<thead><tr><th>Code</th><th>Service</th><th style="text-align:center">CMHC P50</th><th style="text-align:center">Rest-of-FL P50</th><th style="text-align:center">Gap %</th><th style="text-align:center">Signal</th><th style="text-align:center">Units (CMHC/Rest)</th></tr></thead>
+<tbody>
+<tr><td>H2019</td><td>Behavioral Therapy</td><td style="text-align:center">$74.53</td><td style="text-align:center">$70.26</td><td style="text-align:center">+6.1%</td><td style="text-align:center">&#x1F7E2;</td><td style="text-align:center">3.4 / 3.2</td></tr>
+<tr><td>T1017</td><td>Targeted Case Management</td><td style="text-align:center">$49.58</td><td style="text-align:center">$63.45</td><td style="text-align:center">-21.9%</td><td style="text-align:center">&#x1F534;</td><td style="text-align:center">3.3 / 4.3</td></tr>
+<tr><td>H2017</td><td>Psychosocial Rehabilitation</td><td style="text-align:center">$123.82</td><td style="text-align:center">$120.28</td><td style="text-align:center">+2.9%</td><td style="text-align:center">&#x1F7E2;</td><td style="text-align:center">13.6 / 13.2</td></tr>
+<tr><td>T1015</td><td>Medication Management</td><td style="text-align:center">$65.02</td><td style="text-align:center">$70.86</td><td style="text-align:center">-8.2%</td><td style="text-align:center">&#x1F7E1;</td><td style="text-align:center">&mdash;</td></tr>
+<tr><td>H0040</td><td>Assertive Community Treatment</td><td style="text-align:center">$30.30</td><td style="text-align:center">$30.90</td><td style="text-align:center">-1.9%</td><td style="text-align:center">&#x1F7E1;</td><td style="text-align:center">&mdash;</td></tr>
+<tr><td>H0031</td><td>Mental Health Assessment</td><td style="text-align:center">$31.70</td><td style="text-align:center">$31.57</td><td style="text-align:center">+0.4%</td><td style="text-align:center">&#x1F7E2;</td><td style="text-align:center">&mdash;</td></tr>
+<tr><td>H0032</td><td>Treatment Plan Development</td><td style="text-align:center">$70.75</td><td style="text-align:center">$70.33</td><td style="text-align:center">+0.6%</td><td style="text-align:center">&#x1F7E2;</td><td style="text-align:center">&mdash;</td></tr>
+<tr><td>99214</td><td>Office Visit L4</td><td style="text-align:center">$51.68</td><td style="text-align:center">$42.68</td><td style="text-align:center">+21.1%</td><td style="text-align:center">&#x1F7E2;</td><td style="text-align:center">&mdash;</td></tr>
+<tr><td>99213</td><td>Office Visit L3</td><td style="text-align:center">$30.38</td><td style="text-align:center">$33.33</td><td style="text-align:center">-8.9%</td><td style="text-align:center">&#x1F7E1;</td><td style="text-align:center">&mdash;</td></tr>
+<tr><td>90837</td><td>Psychotherapy 60min</td><td style="text-align:center">$57.77</td><td style="text-align:center">$88.39</td><td style="text-align:center">-34.6%</td><td style="text-align:center">&#x1F534;</td><td style="text-align:center">&mdash;</td></tr>
+<tr><td>H2000</td><td>Psychiatric Evaluation</td><td style="text-align:center">$225.18</td><td style="text-align:center">$191.53</td><td style="text-align:center">+17.6%</td><td style="text-align:center">&#x1F7E2;</td><td style="text-align:center">&mdash;</td></tr>
+<tr><td>90833</td><td>Psychotherapy Add-on</td><td style="text-align:center">$38.49</td><td style="text-align:center">$30.60</td><td style="text-align:center">+25.8%</td><td style="text-align:center">&#x1F7E2;</td><td style="text-align:center">&mdash;</td></tr>
+</tbody>
+</table>
+<p style="font-size:12px;color:#64748b">Signal: &#x1F7E2; At or above Rest-of-FL | &#x1F7E1; Modest gap (&lt;10%) | &#x1F534; Meaningful gap (10%+). Codes with &lt;10 CMHC organizations omitted from this table (see deep dives for full coverage). 90837 (N=14) and H2000 (N=16) included but flagged for smaller sample.</p>
+
+<p><strong>The session-length question on T1017:</strong> CMHCs bill 3.3 units per claim vs 4.3 for Rest-of-FL &mdash; 23% shorter sessions. At $14.82 per unit, one additional unit per claim would add ~$14.82 to the per-claim average, accounting for roughly half the $13.87 gap. Is this deliberate efficiency or compressed service delivery?</p>
+
+<p><strong>Key rate investigation questions:</strong></p>
+<ul>
+<li>T1017 (-21.9%): Are case management sessions shorter by design, or are clinicians under time pressure? Compare your org's units/claim to the 4.3 market norm.</li>
+<li>90837 (-34.6%): Is 60-minute psychotherapy a deliberate service line, or incidental? Only 26 benes/clinician suggests it may not be a core offering.</li>
+<li>99214 vs 99213: CMHCs outperform on L4 (+21.1%) but underperform on L3 (-8.9%). Is there documentation that would support billing more visits at L4?</li>
+</ul>
+
+<hr />
+
+<!-- ==================== PROBLEM B: PRODUCTIVITY ==================== -->
+<h2>3. Problem B: The Clinician Productivity Burden</h2>
+
+<p>CMHC clinicians carry smaller panels than the rest of the market on most ongoing-care codes &mdash; but larger panels on intake.</p>
+
+<table>
+<thead><tr><th>Code</th><th>Service</th><th style="text-align:center">CMHC Panel</th><th style="text-align:center">Rest-of-FL Panel</th><th style="text-align:center">Gap</th><th>Interpretation</th></tr></thead>
+<tbody>
+<tr><td>H0031</td><td>MH Assessment</td><td style="text-align:center;color:#22c55e"><strong>115</strong></td><td style="text-align:center">76.5</td><td style="text-align:center;color:#22c55e">+50.9%</td><td>Front-door throughput: CMHCs assess 50% more patients per clinician</td></tr>
+<tr><td>H2019</td><td>Behavioral Therapy</td><td style="text-align:center;color:#ef4444"><strong>123</strong></td><td style="text-align:center">227</td><td style="text-align:center;color:#ef4444">-45.8%</td><td>Half the therapy panel of the market</td></tr>
+<tr><td>H2017</td><td>Psychosocial Rehab</td><td style="text-align:center;color:#ef4444"><strong>172</strong></td><td style="text-align:center">260</td><td style="text-align:center;color:#ef4444">-33.7%</td><td>Smaller PSR groups or shorter programs</td></tr>
+<tr><td>T1017</td><td>Case Management</td><td style="text-align:center;color:#22c55e"><strong>275</strong></td><td style="text-align:center">254</td><td style="text-align:center;color:#22c55e">+8.2%</td><td>Larger CM caseloads &mdash; possible burnout signal</td></tr>
+<tr><td>H0040</td><td>ACT (FACT)</td><td style="text-align:center;color:#ef4444"><strong>345</strong></td><td style="text-align:center">618</td><td style="text-align:center;color:#ef4444">-44.1%</td><td>Fidelity model limits panel size (by design)</td></tr>
+<tr><td>90837</td><td>Psychotherapy 60min</td><td style="text-align:center;color:#ef4444"><strong>26</strong></td><td style="text-align:center">97.5</td><td style="text-align:center;color:#ef4444">-73.3%</td><td>Minimal panel &mdash; likely not a core service</td></tr>
+<tr><td>99214</td><td>Office Visit L4</td><td style="text-align:center"><strong>99</strong></td><td style="text-align:center">100</td><td style="text-align:center">-1.3%</td><td>At parity</td></tr>
+<tr><td>T1015</td><td>Med Management</td><td style="text-align:center"><strong>224</strong></td><td style="text-align:center">229</td><td style="text-align:center">-2.2%</td><td>At parity</td></tr>
+</tbody>
+</table>
+
+<p><strong>The pattern:</strong> CMHC clinicians run high-throughput intake (50% more assessments per person) and high-caseload case management (+8.2%). But on the revenue-generating ongoing-care services &mdash; therapy, PSR, psychotherapy &mdash; panels are 34&ndash;73% smaller than the market.</p>
+
+<p><strong>What to investigate:</strong></p>
+<ul>
+<li><strong>Is the therapy panel gap a capacity issue or an acuity issue?</strong> If CMHC patients are higher-acuity and need more time per session, smaller panels may be clinically appropriate. If it reflects scheduling gaps, no-shows, or clinician turnover, it's addressable.</li>
+<li><strong>Is the large case management caseload sustainable?</strong> At 275 benes/clinician (+8.2% above market), CMHC case managers may be stretched thin &mdash; which could partly explain the shorter session lengths on T1017 (3.3 vs 4.3 units/claim).</li>
+<li><strong>Where are clinicians spending time that doesn't show up in claims?</strong> If CMHC clinicians carry smaller billable panels because of documentation burden, no-shows, or unfunded care coordination, the productivity gap is real but the fix isn't "see more patients" &mdash; it's reducing non-billable time.</li>
+</ul>
+
+<hr />
+
+<!-- ==================== PROBLEM C: LEAKAGE ==================== -->
+<h2>4. Problem C: The Leakage &mdash; $157M</h2>
+
+<p>This is the largest finding in the data. The CMHC sector's share of FL Medicaid BH beneficiaries drops nearly 5x from intake-category services to ongoing-care services.</p>
+
+<blockquote><p><strong>Important caveat:</strong> These percentages reflect the sector's share of beneficiaries <em>within each service category</em>, not tracked patient journeys. A patient receiving both intake (H0031) and therapy (H2019) at the same provider appears in both segments. The 23.6% &rarr; 5.0% drop is a market share fact &mdash; it shows the sector is disproportionately concentrated in intake and underrepresented in ongoing care &mdash; but the true patient retention rate requires beneficiary-level linkage across providers, which this dataset does not support.</p></blockquote>
+
+<!-- Share bars -->
+<div style="text-align:center;margin:24px 0 8px">
+<span style="font-size:42px;font-weight:700;background:linear-gradient(90deg,#3b82f6,#f59e0b 45%,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent">23.6% &nbsp;&rarr;&nbsp; 14.4% &nbsp;&rarr;&nbsp; 5.0%</span>
+<div style="font-size:13px;color:#94a3b8;margin-top:6px">CMHC share of FL Medicaid BH beneficiaries by care stage</div>
+</div>
+
+<div class="stages">
+<div class="stage-col">
+<div class="stage-header"><div class="name">Intake / Front Door</div><div class="desc">Assessment, eval, treatment plan</div></div>
+<div class="share-bar">
+<div class="share-rest" style="height:76.4%"><div class="share-pct">76.4%</div><div class="share-label">Rest of FL</div></div>
+<div class="share-cmhc" style="height:23.6%"><div class="share-pct">23.6%</div><div class="share-label">CMHC</div></div>
+</div>
+<div class="rpb-compare">
+<div class="title">Revenue per Beneficiary</div>
+<div class="rpb-row"><div class="who">CMHC</div><div class="val cmhc">$74.96</div></div>
+<div class="rpb-row"><div class="who">Rest of FL</div><div class="val rest">$88.18</div></div>
+<div class="rpb-gap"><div class="label">Rate gap</div><div class="val neg">-$13.22 (-15.0%)</div></div>
+</div>
+</div>
+<div class="stage-col">
+<div class="stage-header"><div class="name">High-Acuity / Stabilization</div><div class="desc">PSR, ACT, community support</div></div>
+<div class="share-bar">
+<div class="share-rest" style="height:85.6%"><div class="share-pct">85.6%</div><div class="share-label">Rest of FL</div></div>
+<div class="share-cmhc" style="height:14.4%"><div class="share-pct">14.4%</div><div class="share-label">CMHC</div></div>
+</div>
+<div class="rpb-compare">
+<div class="title">Revenue per Beneficiary</div>
+<div class="rpb-row"><div class="who">CMHC</div><div class="val cmhc">$908</div></div>
+<div class="rpb-row"><div class="who">Rest of FL</div><div class="val rest">$1,217</div></div>
+<div class="rpb-gap"><div class="label">Rate gap</div><div class="val neg">-$309 (-25.4%)</div></div>
+</div>
+</div>
+<div class="stage-col">
+<div class="stage-header"><div class="name">Ongoing / Stabilized Care</div><div class="desc">Therapy, case mgmt, med mgmt</div></div>
+<div class="share-bar">
+<div class="share-rest" style="height:95%"><div class="share-pct">95.0%</div><div class="share-label">Rest of FL</div></div>
+<div class="share-cmhc" style="height:5%"><div class="share-pct" style="font-size:16px">5.0%</div><div class="share-label">CMHC</div></div>
+</div>
+<div class="rpb-compare">
+<div class="title">Revenue per Beneficiary</div>
+<div class="rpb-row"><div class="who">CMHC</div><div class="val cmhc">$133.69</div></div>
+<div class="rpb-row"><div class="who">Rest of FL</div><div class="val rest">$89.91</div></div>
+<div class="rpb-gap"><div class="label">Rate gap</div><div class="val pos">+$43.78 (+48.7%)</div></div>
+</div>
+</div>
+</div>
+
+<!-- Scatter plot -->
+<div id="scatter_chart" style="margin:28px 0"></div>
+<script>
+var codes=[
+{code:"H2019",name:"Behavioral Therapy",gap:6.1,claims:230122,signal:"green"},
+{code:"T1017",name:"Targeted Case Mgmt",gap:-21.9,claims:196720,signal:"red"},
+{code:"H2017",name:"Psychosocial Rehab",gap:2.9,claims:160030,signal:"green"},
+{code:"T1015",name:"Medication Mgmt",gap:-8.2,claims:98946,signal:"yellow"},
+{code:"H0040",name:"ACT (FACT)",gap:-1.9,claims:84539,signal:"yellow"},
+{code:"H0031",name:"MH Assessment",gap:0.4,claims:50983,signal:"green"},
+{code:"H0032",name:"Treatment Plan",gap:0.6,claims:47113,signal:"green"},
+{code:"99214",name:"Office Visit L4",gap:21.1,claims:30949,signal:"green"},
+{code:"99213",name:"Office Visit L3",gap:-8.9,claims:22527,signal:"yellow"},
+{code:"90833",name:"Psychotherapy Add-on",gap:25.8,claims:13360,signal:"green"},
+{code:"90837",name:"Psychotherapy 60min",gap:-34.6,claims:9799,signal:"red"},
+{code:"H2000",name:"Psychiatric Eval",gap:17.6,claims:8965,signal:"green"},
+{code:"90792",name:"Diag Eval w/Med",gap:-27.3,claims:1643,signal:"red"},
+{code:"H0036",name:"Community Psych Spt",gap:-28.9,claims:1445,signal:"red"}
+];
+var colors=codes.map(c=>c.signal==="green"?"#22c55e":c.signal==="yellow"?"#f59e0b":"#ef4444");
+Plotly.newPlot('scatter_chart',[{
+x:codes.map(c=>c.gap),y:codes.map(c=>c.claims),
+text:codes.map(c=>c.code+" "+c.name),
+mode:'markers+text',textposition:'top center',
+textfont:{size:10,color:'#94a3b8',family:'Inter'},
+marker:{size:codes.map(c=>Math.max(12,Math.sqrt(c.claims/200))),color:colors,opacity:0.85,line:{width:1,color:'white'}},
+hovertemplate:'<b>%{text}</b><br>Gap: %{x:.1f}%<br>CMHC Claims: %{y:,}<extra></extra>',
+type:'scatter'
+}],{
+title:{text:'<b>Rate Gap vs Claims Volume</b>',font:{size:16,color:'#f1f5f9',family:'Inter'}},
+xaxis:{title:'Rate Gap % (CMHC vs Rest of FL)',zeroline:true,zerolinecolor:'#334155',gridcolor:'#1e293b',color:'#94a3b8',ticksuffix:'%'},
+yaxis:{title:'CMHC Claims Volume',gridcolor:'#1e293b',color:'#94a3b8',type:'log'},
+paper_bgcolor:'#0f172a',plot_bgcolor:'#0f172a',
+font:{family:'Inter',color:'#e2e8f0'},margin:{t:50,b:60,l:80,r:40},
+shapes:[{type:'line',x0:0,x1:0,y0:0,y1:1,yref:'paper',line:{color:'#f59e0b',width:1,dash:'dash'}}],
+width:1050,height:450
+},{responsive:true,displayModeBar:false});
+</script>
+
+<div class="card" style="border-left:3px solid #22c55e">
+<h3 style="color:#22c55e">The Surprising Finding: CMHCs Earn More Per Bene in Ongoing Care (+48.7%)</h3>
+<p style="font-size:13px;color:#94a3b8;line-height:1.7">In ongoing care &mdash; the segment where CMHCs have the smallest market share &mdash; the sector earns $133.69 per beneficiary vs $89.91 for Rest of FL. This is the report's most striking number. Three possible explanations:</p>
+<ul style="font-size:13px;color:#94a3b8">
+<li><strong>Selection effect:</strong> Only the highest-acuity patients remain at CMHCs for ongoing care, requiring more intensive (and higher-billed) services per person.</li>
+<li><strong>Code mix:</strong> CMHC ongoing care skews toward H2019 ($74.53/claim) and T1017 ($49.58/claim) rather than low-yield 99213 visits ($30.38). The rest of the market has 2.4M 99213 claims diluting their per-bene average.</li>
+<li><strong>Engagement depth:</strong> The patients who stay at CMHCs get more visits per person, generating higher per-bene revenue even if per-claim rates are similar.</li>
+</ul>
+<p style="font-size:13px;color:#94a3b8"><strong>The strategic implication:</strong> CMHCs are good at ongoing care when they have patients. The per-bene rate is not the problem &mdash; the volume is. This makes the leakage gap even more consequential: every retained patient generates above-market revenue.</p>
+</div>
+
+<!-- The punchline -->
+<div class="punchline">
+<div class="punch-card">
+<div class="amount" style="color:#ef4444">$8.1M</div>
+<div class="desc"><strong>Lost to the rate gap</strong></div>
+<div class="subdesc">CMHC earns less per bene in intake (-$13) and high-acuity (-$309). In ongoing care, CMHC earns <em>more</em> per bene (+$44). Net rate loss on current volume: $8.1M.</div>
+</div>
+<div class="punch-vs">
+<div class="ratio">19x</div>
+<div class="times">larger</div>
+</div>
+<div class="punch-card">
+<div class="amount" style="color:#f59e0b">$157M</div>
+<div class="desc"><strong>Lost to leakage</strong></div>
+<div class="subdesc">If CMHCs retained their 23.6% intake share through ongoing care (instead of 5.0%), the sector would serve 1.37M ongoing benes instead of 289K. At CMHC's own rates: $183M vs $38.6M.</div>
+</div>
+</div>
+
+<div class="bottom-insight">
+<p><strong>For every $1 lost to rates, $19 is lost to leakage.</strong> Closing every rate gap adds $8.1M. Moving ongoing care share from 5% to just 10% &mdash; still less than half the intake share &mdash; would add approximately $38.6M at current per-beneficiary rates. The rate problem is a billing optimization exercise. The leakage problem is a strategic transformation.</p>
+</div>
+
+<hr />
+
+<!-- ==================== QUESTIONS ==================== -->
+<h2>5. Questions for CMHC Leadership</h2>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0">
+<div class="card">
+<h3 style="color:#ef4444">A. The Rate Gaps</h3>
+<p style="font-size:13px;color:#94a3b8">T1017: Are your case management sessions shorter than 65 minutes by design? Compare your units/claim to the 4.3 market norm. If sessions are compressed by scheduling pressure, this is addressable.<br><br>90837: Is 60-minute psychotherapy a core service line, or incidental? If the panel is under 30, the rate gap matters less than the question of whether to offer the service at all.<br><br>99213 vs 99214: Review your E/M visit mix. A shift from L3 to L4 where documentation supports it changes the revenue picture.</p>
+</div>
+<div class="card">
+<h3 style="color:#f59e0b">B. Clinician Burden</h3>
+<p style="font-size:13px;color:#94a3b8">Therapy panels at CMHCs are 46% smaller than the market (123 vs 227 benes/clinician on H2019). Is this because CMHC patients are higher-acuity and need more time per session? Or because of scheduling gaps, no-shows, and unfunded care coordination?<br><br>Case management panels are 8% larger than market (275 vs 254). Combined with shorter sessions (3.3 vs 4.3 units), this may signal burnout or time compression.</p>
+</div>
+<div class="card">
+<h3 style="color:#3b82f6">C. The Leakage</h3>
+<p style="font-size:13px;color:#94a3b8">Map your own intake-to-ongoing-care conversion rate. How many patients assessed at your organization return for a first therapy or medication visit within 30 days? Within 90 days?<br><br>Where are they going? If patients leave because you don't offer medication management on-site, that's a service expansion question. If they leave because the wait for a first appointment is too long, that's a capacity question.</p>
+</div>
+<div class="card">
+<h3 style="color:#22c55e">D. The Opportunity</h3>
+<p style="font-size:13px;color:#94a3b8">Moving from 5% to 10% ongoing care market share &mdash; still less than half the sector's intake share &mdash; would roughly double CMHC ongoing revenue statewide.<br><br>The ongoing care per-bene rate is already strong ($133.69 vs $89.91 for Rest of FL). The sector doesn't need better rates on these services. It needs more patients staying.</p>
+</div>
+</div>
+
+<hr />
+
+<!-- ==================== DEEP DIVES ==================== -->
+<h2>6. Service Line Deep Dives</h2>
+
+<h3>6.1 H2019 &mdash; Behavioral Therapy Services</h3>
+<p><strong>Rate:</strong> CMHC P50 $74.53 vs Rest-of-FL $70.26 (+6.1%). Implied units: 3.4 vs 3.2 &mdash; session lengths comparable, rate advantage is real.</p>
+<p><strong>Panel:</strong> 123 vs 227 benes/clinician (-45.8%). <strong>Engagement:</strong> 2.04 vs 2.59 claims/bene (-21.2%). <strong>Revenue/bene:</strong> $137.38 vs $185.98 (-26.1%).</p>
+<p><strong>Question:</strong> The sector bills at a higher per-claim rate with comparable session length &mdash; why doesn't that translate to stronger revenue per patient? Fewer visits per patient and half the panel size erode the rate advantage. Is the smaller panel an acuity difference or a capacity constraint?</p>
+<hr />
+
+<h3>6.2 T1017 &mdash; Targeted Case Management</h3>
+<p><strong>Rate:</strong> CMHC P50 $49.58 vs Rest-of-FL $63.45 (-21.9%). Implied units: 3.3 vs 4.3 &mdash; CMHCs bill 23% shorter sessions.</p>
+<p><strong>Panel:</strong> 275 vs 254 benes/clinician (+8.2%). <strong>Engagement:</strong> 4.70 vs 5.63 claims/bene (-16.5%). <strong>Revenue/bene:</strong> $240.24 vs $370.51 (-35.2%).</p>
+<p><strong>Question:</strong> Larger caseloads + shorter sessions + fewer touches per patient = the operational signature of stretched case management. Is this the right workload, or are clinicians under capacity pressure?</p>
+<hr />
+
+<h3>6.3 H2017 &mdash; Psychosocial Rehabilitation</h3>
+<p><strong>Rate:</strong> CMHC P50 $123.82 vs Rest-of-FL $120.28 (+2.9%). Implied units: 13.6 vs 13.2 &mdash; nearly identical ~3.4 hour sessions.</p>
+<p><strong>Panel:</strong> 172.5 vs 260 (-33.7%). <strong>Engagement:</strong> 11.80 vs 11.64 (+1.4%). <strong>Revenue/bene:</strong> $1,342.29 vs $1,379.46 (-2.7%).</p>
+<p><strong>Question:</strong> Near parity on rate, engagement, and revenue per bene. This is the sector's strongest ongoing-care code. What makes PSR delivery work where other codes show gaps? Is it the group format, the staffing model, or the contract structure?</p>
+<hr />
+
+<h3>6.4 T1015 &mdash; Medication Management</h3>
+<p><strong>Rate:</strong> CMHC P50 $65.02 vs Rest-of-FL $70.86 (-8.2%). Published rate: $71.61/event. Per-event code &mdash; gap is purely contract/modifier.</p>
+<p><strong>Panel &amp; Engagement:</strong> At parity (~224 benes, ~1.1 claims/bene).</p>
+<p><strong>Question:</strong> Are CMHC contracts discounting T1015 below the fee schedule? And critically &mdash; given that CMHCs have only 1% market share in medication management, is the bigger question whether to expand this service line rather than optimize its rate?</p>
+<hr />
+
+<h3>6.5 H0040 &mdash; Assertive Community Treatment (FACT)</h3>
+<p><strong>Rate:</strong> CMHC P50 $30.30 vs Rest-of-FL $30.90 (-1.9%). Published rate: $31.55/diem. At parity.</p>
+<p><strong>Engagement:</strong> 23.60 vs 17.52 claims/bene (+34.7%). <strong>Revenue/bene:</strong> $721.37 vs $552.69 (+30.5%).</p>
+<p><strong>Question:</strong> FACT is a success story &mdash; highest engagement intensity in the dataset, highest revenue per bene among ongoing codes. Only 6 CMHCs bill it. Is this model scalable?</p>
+<hr />
+
+<h3>6.6 Assessment Codes (H0031, H0032, H2000)</h3>
+<p><strong>H0031:</strong> At parity (+0.4%), CMHC panel 50.9% larger than market. <strong>H0032:</strong> At parity (+0.6%). <strong>H2000:</strong> +17.6% above market, suggesting physician-led evaluations.</p>
+<p><strong>Question:</strong> Front-door rates are competitive. The sector does more intake per clinician than anyone. Is this sustainable, and how does it connect to the downstream leakage?</p>
+<hr />
+
+<h3>6.7 E/M and Psychotherapy Codes</h3>
+<p><strong>99214:</strong> +21.1% above market &mdash; the sector's strongest E/M code. <strong>90833 (add-on):</strong> +25.8% but applied to far fewer patients (43 vs 140 panel). <strong>90837 (60min):</strong> -34.6% &mdash; steepest gap, smallest panel (26 benes).</p>
+<p><strong>Question:</strong> Is 90833 underutilized? If prescribers conduct therapy components during medication visits, billing the add-on captures value already delivered. Is 90837 worth investing in or should the sector focus on H2019 where it has a rate advantage?</p>
+
+<hr />
+
+<!-- ==================== METHODOLOGY ==================== -->
+<h2>7. Methodology and Caveats</h2>
+<p><strong>Data source:</strong> Florida Medicaid Fee-for-Service claims (DOGE/Medicaid Provider Spending), 2024 calendar year. Managed care encounter data is not included.</p>
+<p><strong>Comparison group:</strong> "Rest of FL" = all non-CMHC providers billing these codes in FL Medicaid FFS. Includes FQHCs (PPS rates may elevate some medians), hospitals, private practices, and other provider types.</p>
+<p><strong>Three care segments:</strong> Intake (H0031, H0032, H2000, 90791, 90792), High-Acuity (H2017, H0040, H0036, H2010), Ongoing (H2019, T1017, T1015, 99213/14/15/12, 90832/33/34/37, H0004, H0048, T1007, 99203/04). Assignment is by HCPCS code, not by patient journey &mdash; the same patient may appear in multiple segments.</p>
+<p><strong>Market share calculation:</strong> CMHC beneficiaries as % of total beneficiaries in each segment. Beneficiary counts are not deduplicated across segments or across providers within a segment.</p>
+<p><strong>Rate gap calculation:</strong> (Rest-of-FL revenue per bene - CMHC revenue per bene) x CMHC beneficiary count, summed across segments where CMHC earns less. Ongoing care, where CMHC earns more per bene, is excluded from the rate loss total.</p>
+<p><strong>Leakage gap calculation:</strong> If CMHC held 23.6% (its intake share) of ongoing care beneficiaries instead of 5.0%, at CMHC's own per-bene rate. This is an upper bound &mdash; actual recoverable leakage depends on service capacity, patient preferences, and geographic access.</p>
+<p><strong>Median (P50) as benchmark:</strong> All per-claim comparisons use the median across organizations. Provider count (N) varies by code &mdash; small N (under 10) limits reliability.</p>
+<p><strong>What this report does not include:</strong> Individual organization positioning, trend data, MCO contract comparisons, quality/outcome measures, cost-to-deliver analysis, or geographic variation within Florida.</p>
+
+<hr />
+
+<p style="text-align:center;color:#94a3b8;font-style:italic;margin-top:40px">This report presents sector-level observations and investigation questions. It does not diagnose causes or prescribe actions. All numbers are from the canonical dataset and should be validated against source claims before operational decisions.</p>
+<p style="margin-top:60px;border-top:1px solid #334155;padding-top:24px;font-size:12px;color:#64748b;text-align:center">FL CMHC Landscape &middot; 2024 &middot; v4 (Three Problems: Rates + Productivity + Leakage)</p>
+
+</body></html>

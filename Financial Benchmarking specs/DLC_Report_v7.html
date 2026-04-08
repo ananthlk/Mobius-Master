@@ -1,0 +1,225 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>DLC Financial Benchmarking</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+body{font-family:Inter,sans-serif;background:#0f172a;color:#e2e8f0;max-width:1100px;margin:0 auto;padding:40px 60px;line-height:1.75}
+h1{font-size:32px;color:#f1f5f9;border-bottom:2px solid #3b82f6;padding-bottom:16px;margin-bottom:32px}
+h2{font-size:22px;color:#f1f5f9;margin-top:48px;border-bottom:1px solid #334155;padding-bottom:8px}
+h3{font-size:17px;color:#94a3b8;margin-top:32px}
+p{font-size:15px;color:#cbd5e1;margin-bottom:16px}
+strong{color:#f1f5f9}
+ul,ol{margin:12px 0;padding-left:24px}
+li{font-size:15px;color:#cbd5e1;margin-bottom:10px}
+li strong{color:#f1f5f9}
+hr{border:none;border-top:1px solid #334155;margin:32px 0}
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:12px}
+th{background:#1e293b;color:#f1f5f9;padding:8px 10px;text-align:left;border:1px solid #334155;font-weight:600}
+td{padding:8px 10px;border:1px solid #334155;color:#cbd5e1;vertical-align:top}
+tr:nth-child(even){background:rgba(30,41,59,0.5)}
+em{color:#94a3b8}
+blockquote{border-left:3px solid #f59e0b;padding:12px 16px;margin:20px 0;background:rgba(245,158,11,0.08);border-radius:0 8px 8px 0}
+blockquote p{color:#fbbf24;margin:0}
+.hero{text-align:center;padding:40px 0 20px}
+.hero h1{border:none;font-size:32px;margin-bottom:8px}
+.hero .subtitle{font-size:16px;color:#94a3b8;margin-bottom:24px}
+.stat-row{display:flex;gap:16px;justify-content:center;margin:16px 0 28px;flex-wrap:wrap}
+.stat-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px 22px;text-align:center;min-width:140px}
+.stat-card .number{font-size:24px;font-weight:700;color:#3b82f6}
+.stat-card .label{font-size:11px;color:#94a3b8;margin-top:4px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:22px 26px;margin:18px 0}
+.card h3{margin-top:0;color:#f1f5f9;font-size:15px}
+.badge{display:inline-block;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600}
+.badge-green{background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3)}
+.badge-yellow{background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3)}
+.badge-red{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3)}
+.badge-white{background:rgba(148,163,184,0.1);color:#94a3b8;border:1px solid rgba(148,163,184,0.2)}
+</style>
+</head><body>
+
+<!-- ==================== HERO ==================== -->
+<div class="hero">
+<h1>Financial Benchmarking Report</h1>
+<p class="subtitle">Your organization vs FL Medicaid peers &middot; Rates, Productivity, and Engagement</p>
+<div class="stat-row">
+<div class="stat-card"><div class="number">$1.22M</div><div class="label">Visible Medicaid Revenue</div></div>
+<div class="stat-card"><div class="number">18,654</div><div class="label">Total Claims</div></div>
+<div class="stat-card"><div class="number">7</div><div class="label">Active Service Lines</div></div>
+<div class="stat-card"><div class="number">CMHC</div><div class="label">Primary Classification</div></div>
+</div>
+<p style="font-size:12px;color:#64748b">FL Medicaid FFS 2024 &middot; DOGE public data &middot; Professional servicing NPIs only &middot; Compared against CMHC sector, All FL, and look-alike peers</p>
+</div>
+
+<hr />
+
+<!-- ==================== ORG PROFILE ==================== -->
+<h2>1. Organization Profile</h2>
+<p>Your organization is classified as a CMHC with Community BH taxonomy. The data shows residential treatment facility registration but no residential per-diem codes in claims &mdash; residential revenue is not captured here. Crisis stabilization (23.1% of visible revenue) and ACT (26.1%) are significant service lines alongside outpatient therapy (40.8%).</p>
+
+<table>
+<thead><tr><th>Service Line</th><th style="text-align:right">Revenue</th><th style="text-align:right">Share</th><th>Codes</th></tr></thead>
+<tbody>
+<tr><td>Outpatient Therapy</td><td style="text-align:right">$497,851</td><td style="text-align:right">40.8%</td><td>H2019, T1015, H0035</td></tr>
+<tr><td>Assertive Community Treatment</td><td style="text-align:right">$318,844</td><td style="text-align:right">26.1%</td><td>H0040</td></tr>
+<tr><td>Crisis Stabilization</td><td style="text-align:right">$281,712</td><td style="text-align:right">23.1%</td><td>S9485</td></tr>
+<tr><td>Case Management</td><td style="text-align:right">$83,933</td><td style="text-align:right">6.9%</td><td>T1017</td></tr>
+<tr><td>Assessment</td><td style="text-align:right">$29,452</td><td style="text-align:right">2.4%</td><td>H0031, H0032</td></tr>
+<tr><td>Psychosocial Rehabilitation</td><td style="text-align:right">$7,378</td><td style="text-align:right">0.6%</td><td>H0046</td></tr>
+<tr><td>Medication Management</td><td style="text-align:right">$1,254</td><td style="text-align:right">0.1%</td><td>99214</td></tr>
+</tbody>
+</table>
+
+<blockquote><p>This report covers FL Medicaid FFS claims only. MCO encounter data, commercial payers, grants, and other funding sources are not included. The $1.22M shown here represents a partial view of total organizational revenue.</p></blockquote>
+
+<hr />
+
+<!-- ==================== EXEC DASHBOARD ==================== -->
+<h2>2. Executive Dashboard</h2>
+
+<table>
+<thead><tr><th>Code</th><th>Service</th><th style="text-align:center">Your Rate</th><th style="text-align:center">CMHC P50</th><th style="text-align:center">Gap</th><th style="text-align:center">Signal</th><th style="text-align:center">Your Panel</th><th style="text-align:center">CMHC Panel</th><th style="text-align:center">Panel Gap</th></tr></thead>
+<tbody>
+<tr><td>H2019</td><td>Behavioral Therapy</td><td style="text-align:center"><strong>$143.65</strong></td><td style="text-align:center">$74.53</td><td style="text-align:center;color:#22c55e">+92.7%</td><td style="text-align:center"><span class="badge badge-green">On Track</span></td><td style="text-align:center">166.7</td><td style="text-align:center">123.0</td><td style="text-align:center;color:#22c55e">+35.5%</td></tr>
+<tr><td>T1017</td><td>Case Management</td><td style="text-align:center"><strong>$49.69</strong></td><td style="text-align:center">$49.58</td><td style="text-align:center">+0.2%</td><td style="text-align:center"><span class="badge badge-white">At Market</span></td><td style="text-align:center">179.5</td><td style="text-align:center">275.0</td><td style="text-align:center;color:#ef4444">-34.7%</td></tr>
+<tr><td>H0040</td><td>ACT (FACT)</td><td style="text-align:center"><strong>$28.97</strong></td><td style="text-align:center">$30.30</td><td style="text-align:center">-4.4%</td><td style="text-align:center"><span class="badge badge-white">At Market</span></td><td style="text-align:center">305.0</td><td style="text-align:center">345.5</td><td style="text-align:center">-11.7%</td></tr>
+<tr><td>T1015</td><td>Med Management</td><td style="text-align:center"><strong>$68.84</strong></td><td style="text-align:center">$65.02</td><td style="text-align:center;color:#22c55e">+5.9%</td><td style="text-align:center"><span class="badge badge-green">On Track</span></td><td style="text-align:center">230.0</td><td style="text-align:center">224.0</td><td style="text-align:center">+2.7%</td></tr>
+<tr><td>H0031</td><td>MH Assessment</td><td style="text-align:center"><strong>$57.85</strong></td><td style="text-align:center">$31.70</td><td style="text-align:center;color:#22c55e">+82.5%</td><td style="text-align:center"><span class="badge badge-green">On Track</span></td><td style="text-align:center">76.0</td><td style="text-align:center">115.4</td><td style="text-align:center;color:#ef4444">-34.2%</td></tr>
+<tr><td>H0032</td><td>Treatment Plan Dev</td><td style="text-align:center"><strong>$76.81</strong></td><td style="text-align:center">$70.75</td><td style="text-align:center;color:#22c55e">+8.6%</td><td style="text-align:center"><span class="badge badge-green">On Track</span></td><td style="text-align:center">33.0</td><td style="text-align:center">75.0</td><td style="text-align:center;color:#ef4444">-56.0%</td></tr>
+<tr><td>99214</td><td>Office Visit L4</td><td style="text-align:center"><strong>$15.77</strong></td><td style="text-align:center">$51.68</td><td style="text-align:center;color:#ef4444">-69.5%</td><td style="text-align:center"><span class="badge badge-red">Investigate</span></td><td style="text-align:center">37.0</td><td style="text-align:center">98.7</td><td style="text-align:center;color:#ef4444">-62.5%</td></tr>
+</tbody>
+</table>
+
+<hr />
+
+<!-- ==================== PROBLEM A: RATES ==================== -->
+<h2>3. Rates: Where You Stand</h2>
+
+<p>Your organization's rate picture is unusual &mdash; exceptional on some codes, deeply below market on others.</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0">
+<div class="card" style="border-top:3px solid #22c55e">
+<h3>Strength: H2019 at $143.65 (+92.7%)</h3>
+<p style="font-size:13px;color:#94a3b8">Your behavioral therapy rate is nearly double the CMHC sector median ($74.53) and double the All FL median ($71.43). The trend data shows this rate rose from $96.94 in 2019 to $143.65 in 2024, diverging upward from peers.</p>
+<p style="font-size:13px;color:#94a3b8"><strong>Investigation:</strong> What is driving this premium &mdash; session duration (more units per claim), favorable contract terms, or billing structure? Is this rate consistent across all payers, or specific to certain MCO contracts? Your billing team can examine average units per H2019 claim to determine if this reflects longer sessions or higher per-unit rates.</p>
+</div>
+<div class="card" style="border-top:3px solid #ef4444">
+<h3>Investigate: 99214 at $15.77 (-69.5%)</h3>
+<p style="font-size:13px;color:#94a3b8">Your Office Visit L4 rate of $15.77 is well below both the CMHC sector median ($51.68) and the published FSI rate ($53.43). With only 62 claims and a 37-bene panel, this is a small code for your organization.</p>
+<p style="font-size:13px;color:#94a3b8"><strong>Investigation:</strong> Are these claims being billed with an incorrect modifier or place-of-service code? A rate this far below the published fee schedule suggests a systematic billing issue rather than a contract rate problem. Review the claim adjudication detail on recent 99214 submissions.</p>
+</div>
+</div>
+
+<div class="card" style="border-top:3px solid #22c55e">
+<h3>Strength: H0031 at $57.85 (+82.5%)</h3>
+<p style="font-size:13px;color:#94a3b8">Your assessment rate is well above the CMHC sector median ($31.70). Both your org and the sector median sit below the published in-depth rate ($126.11/event with HO modifier) but above the limited assessment rate ($17.90). Your higher blended rate may indicate a greater proportion of in-depth (HO-modified) assessments.</p>
+</div>
+
+<hr />
+
+<!-- ==================== PROBLEM B: PRODUCTIVITY ==================== -->
+<h2>4. Productivity: Panel Size and Clinician Capacity</h2>
+
+<p>Your panel sizes show a split pattern: above-market panels on therapy and medication management, but significantly below-market on intake and treatment planning.</p>
+
+<table>
+<thead><tr><th>Code</th><th>Service</th><th style="text-align:center">Your Panel</th><th style="text-align:center">CMHC P50</th><th style="text-align:center">Gap</th><th>What It Means</th></tr></thead>
+<tbody>
+<tr><td>H2019</td><td>Behavioral Therapy</td><td style="text-align:center;color:#22c55e"><strong>166.7</strong></td><td style="text-align:center">123.0</td><td style="text-align:center;color:#22c55e">+35.5%</td><td>Above-market therapy panels. Your 3 therapy clinicians serve more patients than the sector norm.</td></tr>
+<tr><td>T1015</td><td>Med Management</td><td style="text-align:center;color:#22c55e"><strong>230.0</strong></td><td style="text-align:center">224.0</td><td style="text-align:center">+2.7%</td><td>At parity.</td></tr>
+<tr><td>T1017</td><td>Case Management</td><td style="text-align:center;color:#ef4444"><strong>179.5</strong></td><td style="text-align:center">275.0</td><td style="text-align:center;color:#ef4444">-34.7%</td><td>Smaller caseloads than the sector. Your 2 CM clinicians serve fewer patients per person.</td></tr>
+<tr><td>H0031</td><td>Assessment</td><td style="text-align:center;color:#ef4444"><strong>76.0</strong></td><td style="text-align:center">115.4</td><td style="text-align:center;color:#ef4444">-34.2%</td><td>Below-market intake throughput. Fewer assessments per clinician.</td></tr>
+<tr><td>H0032</td><td>Treatment Plan</td><td style="text-align:center;color:#ef4444"><strong>33.0</strong></td><td style="text-align:center">75.0</td><td style="text-align:center;color:#ef4444">-56.0%</td><td>Significantly below market. Roughly half the treatment plans per clinician.</td></tr>
+<tr><td>99214</td><td>Office Visit L4</td><td style="text-align:center;color:#ef4444"><strong>37.0</strong></td><td style="text-align:center">98.7</td><td style="text-align:center;color:#ef4444">-62.5%</td><td>Very small panel &mdash; consistent with 99214 being a minor service line.</td></tr>
+</tbody>
+</table>
+
+<p><strong>The pattern:</strong> Your therapy clinicians carry 35% more patients than the CMHC sector norm, but your intake clinicians carry 34% fewer. This suggests the organization may have a capacity bottleneck at the front door &mdash; fewer patients are being assessed than peer organizations would expect, but those who do get through receive above-average therapy access.</p>
+
+<p><strong>Questions for investigation:</strong></p>
+<ul>
+<li>Are your intake clinicians spending more time per assessment (explaining the higher per-assessment rate of $57.85 but lower throughput)?</li>
+<li>Is the intake-to-therapy handoff working efficiently, or are patients being lost between assessment and first therapy appointment?</li>
+<li>With only 2 case management clinicians carrying 179.5 benes each (vs sector norm of 275), is there capacity to absorb more CM patients, or are these clinicians already at their effective limit given the acuity of your population?</li>
+</ul>
+
+<hr />
+
+<!-- ==================== PROBLEM C: ENGAGEMENT ==================== -->
+<h2>5. Engagement: How Deeply Are Patients Served?</h2>
+
+<table>
+<thead><tr><th>Code</th><th>Service</th><th style="text-align:center">Your CPB</th><th style="text-align:center">CMHC P50</th><th style="text-align:center">Gap</th><th style="text-align:center">Your RPB</th><th style="text-align:center">CMHC P50</th><th style="text-align:center">Gap</th></tr></thead>
+<tbody>
+<tr><td>H2019</td><td>Behavioral Therapy</td><td style="text-align:center">2.51</td><td style="text-align:center">2.04</td><td style="text-align:center;color:#22c55e">+23.0%</td><td style="text-align:center">$360.27</td><td style="text-align:center">$137.38</td><td style="text-align:center;color:#22c55e">+162.2%</td></tr>
+<tr><td>T1017</td><td>Case Management</td><td style="text-align:center">4.70</td><td style="text-align:center">4.70</td><td style="text-align:center">=P50</td><td style="text-align:center">$233.80</td><td style="text-align:center">$240.24</td><td style="text-align:center">-2.7%</td></tr>
+<tr><td>H0031</td><td>Assessment</td><td style="text-align:center">1.86</td><td style="text-align:center">1.22</td><td style="text-align:center;color:#22c55e">+52.5%</td><td style="text-align:center">$73.86</td><td style="text-align:center">$45.73</td><td style="text-align:center;color:#22c55e">+61.5%</td></tr>
+</tbody>
+</table>
+
+<p><strong>H2019 revenue per beneficiary ($360.27) is 162% above the CMHC sector median ($137.38).</strong> This combines the rate premium (+92.7%), slightly larger panel (+35.5%), and more visits per patient (2.51 vs 2.04). On this single code, your organization extracts more than double the value per patient compared to the typical CMHC.</p>
+
+<p><strong>The engagement question:</strong> With only 500 beneficiaries receiving H2019 therapy, how many of your assessed patients (142 intake benes) are converting to ongoing therapy? If the conversion rate is strong, the organization is doing well at retaining patients. If many assessed patients never return for therapy, the organization may have the same leakage pattern the CMHC sector shows statewide.</p>
+
+<hr />
+
+<!-- ==================== SECTOR CONTEXT ==================== -->
+<h2>6. Sector Context: Where Your Organization Sits</h2>
+
+<p>Statewide, the CMHC sector handles 23.6% of FL Medicaid BH intake but only 5.0% of ongoing care beneficiaries. Your organization's revenue mix tells a different story:</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0">
+<div class="card">
+<h3>Your Mix vs Sector</h3>
+<table style="font-size:12px">
+<tr><td style="border:none;color:#94a3b8;padding:4px 8px">Intake (assessment, eval)</td><td style="border:none;color:#f1f5f9;padding:4px 8px;text-align:right">2.4% of revenue</td></tr>
+<tr><td style="border:none;color:#94a3b8;padding:4px 8px">High-acuity (ACT, crisis)</td><td style="border:none;color:#f1f5f9;padding:4px 8px;text-align:right">49.2% of revenue</td></tr>
+<tr><td style="border:none;color:#94a3b8;padding:4px 8px">Ongoing care (therapy, CM, med mgmt)</td><td style="border:none;color:#f1f5f9;padding:4px 8px;text-align:right">47.8% of revenue</td></tr>
+</table>
+</div>
+<div class="card">
+<h3>What This Means</h3>
+<p style="font-size:13px;color:#94a3b8">Your organization is heavily weighted toward high-acuity services (ACT + crisis = 49.2% of revenue). Compared to the sector, you have a smaller intake footprint and a larger share of intensive ongoing care. This is the opposite of the typical CMHC leakage pattern &mdash; you appear to retain (or attract) patients for ongoing high-intensity services rather than losing them after intake.</p>
+<p style="font-size:13px;color:#94a3b8">The risk is that this model depends on a small number of high-acuity programs (ACT, crisis). If those programs contract, the revenue base narrows significantly.</p>
+</div>
+</div>
+
+<hr />
+
+<!-- ==================== INVESTIGATION QUESTIONS ==================== -->
+<h2>7. Investigation Priorities</h2>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0">
+<div class="card" style="border-left:3px solid #ef4444">
+<h3>&#x1F534; Investigate: 99214 Billing</h3>
+<p style="font-size:13px;color:#94a3b8">A rate of $15.77 vs a published rate of $53.43 and a sector median of $51.68 is anomalous. With 62 claims, this could be a modifier, place-of-service, or claim-processing issue. Review adjudication detail.</p>
+</div>
+<div class="card" style="border-left:3px solid #f59e0b">
+<h3>&#x1F7E1; Monitor: H2019 Rate Outlier</h3>
+<p style="font-size:13px;color:#94a3b8">At $143.65 (+92.7% above CMHC P50), this rate is well outside the typical range. Ensure documentation supports the billing level and that this rate is sustainable across contract renegotiations.</p>
+</div>
+<div class="card" style="border-left:3px solid #f59e0b">
+<h3>&#x1F7E1; Monitor: Intake Throughput</h3>
+<p style="font-size:13px;color:#94a3b8">Assessment panels (76.0 vs 115.4 CMHC norm) and treatment plan panels (33.0 vs 75.0) are well below market. If intake is the bottleneck, expanding assessment capacity could feed more patients into your strong therapy pipeline.</p>
+</div>
+<div class="card" style="border-left:3px solid #22c55e">
+<h3>&#x1F7E2; Strength: Therapy Engagement</h3>
+<p style="font-size:13px;color:#94a3b8">H2019 at $360.27 revenue per bene (+162% above CMHC P50) with above-market panel sizes and engagement. This is your organization's competitive advantage. Protecting and expanding this service line should be a priority.</p>
+</div>
+</div>
+
+<hr />
+
+<!-- ==================== METHODOLOGY ==================== -->
+<h2>8. Methodology</h2>
+<p><strong>Data source:</strong> FL Medicaid FFS claims (DOGE/Medicaid Provider Spending), 2024. MCO encounter data not included.</p>
+<p><strong>Org identification:</strong> Claims matched by billing NPI to organizational entity via NPPES. Professional servicing NPIs only (entity_type_code = 1).</p>
+<p><strong>Peer groups:</strong> CMHC sector (86 orgs), All FL Medicaid, Similar Size, Similar Market, Same Classification, Look-alike peers (cosine similarity on service-line revenue mix).</p>
+<p><strong>Metrics:</strong> Payment per claim (rate), revenue per beneficiary (engagement), claims per beneficiary (visit frequency), beneficiaries per clinician (panel size/productivity).</p>
+<p><strong>Signals:</strong> <span class="badge badge-green">On Track</span> at or above CMHC P50 | <span class="badge badge-white">At Market</span> within 10% of P50 | <span class="badge badge-yellow">Monitor</span> 10-25% below | <span class="badge badge-red">Investigate</span> 25%+ below or anomalous</p>
+<p><strong>Limitations:</strong> This report shows FL Medicaid FFS only &mdash; a partial view. Organization-level conclusions should be validated against internal data, including MCO claims, grant-funded services, and cost-to-deliver analysis. Residential treatment revenue is not captured.</p>
+
+<hr />
+
+<p style="text-align:center;color:#94a3b8;font-style:italic;margin-top:40px">This report presents benchmarking observations and investigation questions specific to your organization. It does not diagnose causes or prescribe actions. All numbers are from the canonical dataset and should be validated against internal claims data before operational decisions.</p>
+<p style="margin-top:60px;border-top:1px solid #334155;padding-top:24px;font-size:12px;color:#64748b;text-align:center">Organizational Benchmarking &middot; 2024 &middot; v7 (Rate / Productivity / Engagement)</p>
+
+</body></html>

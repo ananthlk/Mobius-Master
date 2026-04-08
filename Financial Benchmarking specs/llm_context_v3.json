@@ -1,0 +1,1750 @@
+{
+  "org_profile": {
+    "org_name": "DAVID LAWRENCE MENTAL HEALTH CENTER, INC",
+    "city": "NAPLES",
+    "state": "FL",
+    "billing_npis": [
+      "1801891940"
+    ],
+    "all_taxonomies": [
+      "251S00000X",
+      "261QM0801X"
+    ],
+    "org_types": [
+      "COMMUNITY_BH",
+      "CMHC"
+    ],
+    "market_tiers": [
+      "sparse"
+    ],
+    "total_medicaid_revenue": 1220424.58,
+    "total_claims": 18654,
+    "service_line_breakdown": [
+      {
+        "service_line": "outpatient_therapy",
+        "display_name": "Outpatient Therapy",
+        "paid": 497850.55,
+        "share_pct": 40.8,
+        "claims": 4673,
+        "codes": [
+          "H2019",
+          "T1015",
+          "H0035"
+        ]
+      },
+      {
+        "service_line": "act",
+        "display_name": "Assertive Community Treatment",
+        "paid": 318844.3,
+        "share_pct": 26.1,
+        "claims": 11008,
+        "codes": [
+          "H0040"
+        ]
+      },
+      {
+        "service_line": "crisis",
+        "display_name": "Crisis Stabilization",
+        "paid": 281712.25,
+        "share_pct": 23.1,
+        "claims": 484,
+        "codes": [
+          "S9485"
+        ]
+      },
+      {
+        "service_line": "case_management",
+        "display_name": "Case Management",
+        "paid": 83933.25,
+        "share_pct": 6.9,
+        "claims": 1689,
+        "codes": [
+          "T1017"
+        ]
+      },
+      {
+        "service_line": "assessment",
+        "display_name": "Assessment",
+        "paid": 29452.19,
+        "share_pct": 2.4,
+        "claims": 380,
+        "codes": [
+          "H0032",
+          "H0031"
+        ]
+      },
+      {
+        "service_line": "psychosocial_rehab",
+        "display_name": "Psychosocial Rehabilitation",
+        "paid": 7378.19,
+        "share_pct": 0.6,
+        "claims": 358,
+        "codes": [
+          "H0046"
+        ]
+      },
+      {
+        "service_line": "medication_mgmt",
+        "display_name": "Medication Management",
+        "paid": 1253.85,
+        "share_pct": 0.1,
+        "claims": 62,
+        "codes": [
+          "99214"
+        ]
+      }
+    ],
+    "code_detail": [
+      {
+        "hcpcs_code": "H2019",
+        "service_line": "outpatient_therapy",
+        "claims": 2904,
+        "paid": 361422.97,
+        "share": 29.6
+      },
+      {
+        "hcpcs_code": "H0040",
+        "service_line": "act",
+        "claims": 11008,
+        "paid": 318844.3,
+        "share": 26.1
+      },
+      {
+        "hcpcs_code": "S9485",
+        "service_line": "crisis",
+        "claims": 484,
+        "paid": 281712.25,
+        "share": 23.1
+      },
+      {
+        "hcpcs_code": "T1015",
+        "service_line": "outpatient_therapy",
+        "claims": 1676,
+        "paid": 118227.58,
+        "share": 9.7
+      },
+      {
+        "hcpcs_code": "T1017",
+        "service_line": "case_management",
+        "claims": 1689,
+        "paid": 83933.25,
+        "share": 6.9
+      },
+      {
+        "hcpcs_code": "H0032",
+        "service_line": "assessment",
+        "claims": 274,
+        "paid": 23775.3,
+        "share": 1.9
+      },
+      {
+        "hcpcs_code": "H0035",
+        "service_line": "outpatient_therapy",
+        "claims": 93,
+        "paid": 18200.0,
+        "share": 1.5
+      },
+      {
+        "hcpcs_code": "H0046",
+        "service_line": "psychosocial_rehab",
+        "claims": 358,
+        "paid": 7378.19,
+        "share": 0.6
+      },
+      {
+        "hcpcs_code": "H0031",
+        "service_line": "assessment",
+        "claims": 106,
+        "paid": 5676.89,
+        "share": 0.5
+      },
+      {
+        "hcpcs_code": "99214",
+        "service_line": "medication_mgmt",
+        "claims": 62,
+        "paid": 1253.85,
+        "share": 0.1
+      }
+    ],
+    "dominant_service_line": "outpatient_therapy",
+    "top3_service_lines": [
+      "outpatient_therapy",
+      "act",
+      "crisis"
+    ],
+    "has_residential_taxonomy": true,
+    "has_residential_codes": false,
+    "has_crisis": true,
+    "has_act": true,
+    "data_coverage_notes": [
+      "Organization is registered as a residential treatment facility but no residential per-diem codes appear in the data. Residential revenue is not captured here.",
+      "Crisis stabilization represents 23.1% of visible revenue.",
+      "ACT represents 26.1% of visible revenue."
+    ],
+    "peer_recommendations": [
+      {
+        "peer_type": "primary",
+        "description": "Comprehensive BH systems with residential + outpatient",
+        "rationale": "Org operates residential treatment alongside outpatient. Pure outpatient CMHCs are not comparable.",
+        "filter_logic": "Orgs with taxonomy 251S or 322D that also bill outpatient codes"
+      },
+      {
+        "peer_type": "service_specific",
+        "description": "FACT programs statewide",
+        "rationale": "ACT is a specialized team-based service.",
+        "filter_logic": "Orgs billing H0040"
+      },
+      {
+        "peer_type": "service_specific",
+        "description": "Crisis stabilization units",
+        "rationale": "Crisis/Baker Act is a distinct service model.",
+        "filter_logic": "Orgs billing S9485"
+      },
+      {
+        "peer_type": "taxonomy_based",
+        "description": "COMMUNITY_BH peers",
+        "filter_logic": "by_org_type:COMMUNITY_BH"
+      },
+      {
+        "peer_type": "taxonomy_based",
+        "description": "CMHC peers",
+        "filter_logic": "by_org_type:CMHC"
+      }
+    ]
+  },
+  "look_alikes": [
+    {
+      "org_entity_id": "c91725f4b26015f29eece827e26ccd90",
+      "org_name": "BAYCARE BEHAVIORAL HEALTH INC.",
+      "org_type": "CMHC",
+      "market_tier": "sparse",
+      "total_revenue": 1816061.87,
+      "similarity": 0.8559,
+      "service_line_mix": {
+        "act": 18.3,
+        "assessment": 12.9,
+        "case_management": 18.0,
+        "outpatient_therapy": 50.5
+      }
+    },
+    {
+      "org_entity_id": "e92824c2e69ea1f269251cfd0f04e351",
+      "org_name": "BAYCARE BEHAVIORAL HEALTH INC.",
+      "org_type": "CMHC",
+      "market_tier": "sparse",
+      "total_revenue": 1007851.96,
+      "similarity": 0.8429,
+      "service_line_mix": {
+        "act": 18.3,
+        "assessment": 16.2,
+        "outpatient_therapy": 64.9
+      }
+    },
+    {
+      "org_entity_id": "bafd701324e73afadb4ed6ab9acd20e3",
+      "org_name": "CENTERSTONE OF FLORIDA, INC.",
+      "org_type": "COMMUNITY_BH",
+      "market_tier": "sparse",
+      "total_revenue": 1550739.45,
+      "similarity": 0.8372,
+      "service_line_mix": {
+        "act": 16.1,
+        "assessment": 15.0,
+        "case_management": 1.1,
+        "outpatient_therapy": 66.7
+      }
+    },
+    {
+      "org_entity_id": "6a610b82ffe1703cfdd1ba0fa9621efc",
+      "org_name": "NORTHSIDE BEHAVIORAL HEALTH CENTER, INC.",
+      "org_type": "CMHC",
+      "market_tier": "sparse",
+      "total_revenue": 1231926.31,
+      "similarity": 0.8357,
+      "service_line_mix": {
+        "act": 44.5,
+        "assessment": 15.1,
+        "case_management": 5.0,
+        "outpatient_therapy": 35.1
+      }
+    },
+    {
+      "org_entity_id": "28e7d08ee66e1497cf856241cfa78d9b",
+      "org_name": "NEW HORIZONS OF THE TREASURE COAST INC",
+      "org_type": "OTHER",
+      "market_tier": "moderate",
+      "total_revenue": 1671854.33,
+      "similarity": 0.7971,
+      "service_line_mix": {
+        "act": 35.0,
+        "assessment": 7.7,
+        "case_management": 21.1,
+        "outpatient_therapy": 26.5,
+        "psychosocial_rehab": 9.0
+      }
+    },
+    {
+      "org_entity_id": "a907d3755c9d2c6f37d609e389f36d86",
+      "org_name": "SMA HEALTHCARE INC",
+      "org_type": "CMHC",
+      "market_tier": "sparse",
+      "total_revenue": 1351150.22,
+      "similarity": 0.7827,
+      "service_line_mix": {
+        "act": 45.9,
+        "assessment": 5.0,
+        "case_management": 6.0,
+        "other": 5.6,
+        "outpatient_therapy": 25.9,
+        "psychosocial_rehab": 10.5
+      }
+    },
+    {
+      "org_entity_id": "4988eb996e6f75f1436f678e1898dade",
+      "org_name": "TYKES & TEENS, INC.",
+      "org_type": "SUD",
+      "market_tier": "sparse",
+      "total_revenue": 450177.24,
+      "similarity": 0.7651,
+      "service_line_mix": {
+        "assessment": 6.4,
+        "case_management": 12.5,
+        "outpatient_therapy": 81.1
+      }
+    },
+    {
+      "org_entity_id": "f7543c0b80b929ba593d53044a732d68",
+      "org_name": "DEVEREUX FOUNDATION",
+      "org_type": "COMMUNITY_BH",
+      "market_tier": "moderate",
+      "total_revenue": 1538965.9,
+      "similarity": 0.765,
+      "service_line_mix": {
+        "assessment": 10.6,
+        "case_management": 2.3,
+        "crisis": 1.8,
+        "outpatient_therapy": 82.3,
+        "psychosocial_rehab": 3.0
+      }
+    },
+    {
+      "org_entity_id": "1826c020d85fe4641761fc382b1e3438",
+      "org_name": "YOUTH & FAMILY BEHAVIORAL HEALTH CENTER, INC.",
+      "org_type": "COMMUNITY_BH",
+      "market_tier": "sparse",
+      "total_revenue": 923214.85,
+      "similarity": 0.7643,
+      "service_line_mix": {
+        "assessment": 8.6,
+        "case_management": 13.6,
+        "outpatient_therapy": 77.7
+      }
+    },
+    {
+      "org_entity_id": "0ee48f2cec5fc45dd63e961bf77bb996",
+      "org_name": "TURNING POINT MHC, LLC",
+      "org_type": "BH_SPECIALTY",
+      "market_tier": "moderate",
+      "total_revenue": 291565.48,
+      "similarity": 0.7639,
+      "service_line_mix": {
+        "case_management": 17.0,
+        "outpatient_therapy": 82.2
+      }
+    }
+  ],
+  "look_alike_benchmarks": {
+    "H2019": [
+      {
+        "org": "BAYCARE BEHAVIORAL HEALTH INC.",
+        "ppc": 72.73,
+        "rpb": 114.13,
+        "cpb": 1.57,
+        "bpc": 459.8,
+        "claims": 5772
+      },
+      {
+        "org": "TYKES & TEENS, INC.",
+        "ppc": 46.4,
+        "rpb": 126.42,
+        "cpb": 2.72,
+        "bpc": 528.8,
+        "claims": 5762
+      },
+      {
+        "org": "CENTERSTONE OF FLORIDA, INC.",
+        "ppc": 77.07,
+        "rpb": 163.92,
+        "cpb": 2.13,
+        "bpc": 419.8,
+        "claims": 5358
+      },
+      {
+        "org": "TURNING POINT MHC, LLC",
+        "ppc": 63.95,
+        "rpb": 229.26,
+        "cpb": 3.58,
+        "bpc": 244.5,
+        "claims": 3506
+      },
+      {
+        "org": "BAYCARE BEHAVIORAL HEALTH INC.",
+        "ppc": 95.75,
+        "rpb": 123.78,
+        "cpb": 1.29,
+        "bpc": 442.6,
+        "claims": 4005
+      },
+      {
+        "org": "DEVEREUX FOUNDATION",
+        "ppc": 73.96,
+        "rpb": 186.73,
+        "cpb": 2.52,
+        "bpc": 6133.0,
+        "claims": 15484
+      },
+      {
+        "org": "NEW HORIZONS OF THE TREASURE COAST INC",
+        "ppc": 68.34,
+        "rpb": 116.81,
+        "cpb": 1.71,
+        "bpc": 129.0,
+        "claims": 441
+      },
+      {
+        "org": "NORTHSIDE BEHAVIORAL HEALTH CENTER, INC.",
+        "ppc": 85.61,
+        "rpb": 113.14,
+        "cpb": 1.32,
+        "bpc": 1782.0,
+        "claims": 2355
+      },
+      {
+        "org": "YOUTH & FAMILY BEHAVIORAL HEALTH CENTER, INC.",
+        "ppc": 76.21,
+        "rpb": 209.41,
+        "cpb": 2.75,
+        "bpc": 1635.0,
+        "claims": 8985
+      },
+      {
+        "org": "SMA HEALTHCARE INC",
+        "ppc": 58.21,
+        "rpb": 130.42,
+        "cpb": 2.24,
+        "bpc": 399.0,
+        "claims": 1788
+      }
+    ],
+    "T1017": [
+      {
+        "org": "TYKES & TEENS, INC.",
+        "ppc": 53.76,
+        "rpb": 249.45,
+        "cpb": 4.64,
+        "bpc": 225.0,
+        "claims": 1044
+      },
+      {
+        "org": "CENTERSTONE OF FLORIDA, INC.",
+        "ppc": 49.48,
+        "rpb": 183.19,
+        "cpb": 3.7,
+        "bpc": 94.0,
+        "claims": 348
+      },
+      {
+        "org": "NEW HORIZONS OF THE TREASURE COAST INC",
+        "ppc": 44.29,
+        "rpb": 163.3,
+        "cpb": 3.69,
+        "bpc": 1080.5,
+        "claims": 7967
+      },
+      {
+        "org": "BAYCARE BEHAVIORAL HEALTH INC.",
+        "ppc": 49.65,
+        "rpb": 221.98,
+        "cpb": 4.47,
+        "bpc": 737.0,
+        "claims": 6590
+      },
+      {
+        "org": "NORTHSIDE BEHAVIORAL HEALTH CENTER, INC.",
+        "ppc": 58.96,
+        "rpb": 224.51,
+        "cpb": 3.81,
+        "bpc": 138.0,
+        "claims": 1051
+      },
+      {
+        "org": "BAYCARE BEHAVIORAL HEALTH INC.",
+        "ppc": 6.5,
+        "rpb": 24.89,
+        "cpb": 3.83,
+        "bpc": 64.0,
+        "claims": 245
+      },
+      {
+        "org": "TURNING POINT MHC, LLC",
+        "ppc": 73.26,
+        "rpb": 277.47,
+        "cpb": 3.79,
+        "bpc": 179.0,
+        "claims": 678
+      },
+      {
+        "org": "DEVEREUX FOUNDATION",
+        "ppc": 49.37,
+        "rpb": 225.48,
+        "cpb": 4.57,
+        "bpc": 157.0,
+        "claims": 717
+      },
+      {
+        "org": "YOUTH & FAMILY BEHAVIORAL HEALTH CENTER, INC.",
+        "ppc": 103.58,
+        "rpb": 325.45,
+        "cpb": 3.14,
+        "bpc": 387.0,
+        "claims": 1216
+      },
+      {
+        "org": "SMA HEALTHCARE INC",
+        "ppc": 16.92,
+        "rpb": 88.84,
+        "cpb": 5.25,
+        "bpc": 366.0,
+        "claims": 1922
+      }
+    ],
+    "T1015": [
+      {
+        "org": "NORTHSIDE BEHAVIORAL HEALTH CENTER, INC.",
+        "ppc": 65.15,
+        "rpb": 71.88,
+        "cpb": 1.1,
+        "bpc": 393.0,
+        "claims": 2168
+      },
+      {
+        "org": "TURNING POINT MHC, LLC",
+        "ppc": 49.57,
+        "rpb": 53.33,
+        "cpb": 1.08,
+        "bpc": 79.0,
+        "claims": 85
+      },
+      {
+        "org": "CENTERSTONE OF FLORIDA, INC.",
+        "ppc": 75.47,
+        "rpb": 81.37,
+        "cpb": 1.08,
+        "bpc": 681.1,
+        "claims": 5141
+      },
+      {
+        "org": "BAYCARE BEHAVIORAL HEALTH INC.",
+        "ppc": 55.7,
+        "rpb": 65.7,
+        "cpb": 1.18,
+        "bpc": 237.7,
+        "claims": 841
+      },
+      {
+        "org": "NEW HORIZONS OF THE TREASURE COAST INC",
+        "ppc": 46.03,
+        "rpb": 52.39,
+        "cpb": 1.14,
+        "bpc": 521.9,
+        "claims": 5347
+      },
+      {
+        "org": "TYKES & TEENS, INC.",
+        "ppc": 50.72,
+        "rpb": 71.06,
+        "cpb": 1.4,
+        "bpc": 414.0,
+        "claims": 580
+      },
+      {
+        "org": "YOUTH & FAMILY BEHAVIORAL HEALTH CENTER, INC.",
+        "ppc": 28.13,
+        "rpb": 32.82,
+        "cpb": 1.17,
+        "bpc": 24.0,
+        "claims": 28
+      },
+      {
+        "org": "BAYCARE BEHAVIORAL HEALTH INC.",
+        "ppc": 44.11,
+        "rpb": 56.41,
+        "cpb": 1.28,
+        "bpc": 202.7,
+        "claims": 1815
+      },
+      {
+        "org": "SMA HEALTHCARE INC",
+        "ppc": 26.69,
+        "rpb": 39.46,
+        "cpb": 1.48,
+        "bpc": 347.4,
+        "claims": 4622
+      },
+      {
+        "org": "DEVEREUX FOUNDATION",
+        "ppc": 73.27,
+        "rpb": 77.87,
+        "cpb": 1.06,
+        "bpc": 1561.0,
+        "claims": 1659
+      }
+    ],
+    "H0031": [
+      {
+        "org": "SMA HEALTHCARE INC",
+        "ppc": 18.76,
+        "rpb": 20.08,
+        "cpb": 1.07,
+        "bpc": 76.2,
+        "claims": 408
+      },
+      {
+        "org": "BAYCARE BEHAVIORAL HEALTH INC.",
+        "ppc": 35.75,
+        "rpb": 41.09,
+        "cpb": 1.15,
+        "bpc": 298.8,
+        "claims": 2061
+      },
+      {
+        "org": "BAYCARE BEHAVIORAL HEALTH INC.",
+        "ppc": 29.05,
+        "rpb": 36.72,
+        "cpb": 1.26,
+        "bpc": 454.0,
+        "claims": 2295
+      },
+      {
+        "org": "TYKES & TEENS, INC.",
+        "ppc": 18.43,
+        "rpb": 27.48,
+        "cpb": 1.49,
+        "bpc": 145.3,
+        "claims": 650
+      },
+      {
+        "org": "NORTHSIDE BEHAVIORAL HEALTH CENTER, INC.",
+        "ppc": 24.73,
+        "rpb": 30.09,
+        "cpb": 1.22,
+        "bpc": 922.0,
+        "claims": 2244
+      },
+      {
+        "org": "DEVEREUX FOUNDATION",
+        "ppc": 30.78,
+        "rpb": 37.21,
+        "cpb": 1.21,
+        "bpc": 1797.0,
+        "claims": 2172
+      },
+      {
+        "org": "YOUTH & FAMILY BEHAVIORAL HEALTH CENTER, INC.",
+        "ppc": 28.26,
+        "rpb": 39.99,
+        "cpb": 1.41,
+        "bpc": 682.0,
+        "claims": 965
+      },
+      {
+        "org": "CENTERSTONE OF FLORIDA, INC.",
+        "ppc": 34.81,
+        "rpb": 60.53,
+        "cpb": 1.74,
+        "bpc": 415.5,
+        "claims": 1445
+      }
+    ],
+    "H0032": [
+      {
+        "org": "SMA HEALTHCARE INC",
+        "ppc": 48.14,
+        "rpb": 51.26,
+        "cpb": 1.06,
+        "bpc": 94.7,
+        "claims": 706
+      },
+      {
+        "org": "NEW HORIZONS OF THE TREASURE COAST INC",
+        "ppc": 66.13,
+        "rpb": 67.44,
+        "cpb": 1.02,
+        "bpc": 109.7,
+        "claims": 671
+      },
+      {
+        "org": "CENTERSTONE OF FLORIDA, INC.",
+        "ppc": 86.52,
+        "rpb": 93.36,
+        "cpb": 1.08,
+        "bpc": 308.0,
+        "claims": 997
+      },
+      {
+        "org": "BAYCARE BEHAVIORAL HEALTH INC.",
+        "ppc": 67.7,
+        "rpb": 69.31,
+        "cpb": 1.02,
+        "bpc": 167.8,
+        "claims": 687
+      },
+      {
+        "org": "DEVEREUX FOUNDATION",
+        "ppc": 60.92,
+        "rpb": 61.48,
+        "cpb": 1.01,
+        "bpc": 1283.0,
+        "claims": 1295
+      },
+      {
+        "org": "NORTHSIDE BEHAVIORAL HEALTH CENTER, INC.",
+        "ppc": 76.09,
+        "rpb": 80.93,
+        "cpb": 1.06,
+        "bpc": 184.8,
+        "claims": 786
+      },
+      {
+        "org": "BAYCARE BEHAVIORAL HEALTH INC.",
+        "ppc": 76.27,
+        "rpb": 81.09,
+        "cpb": 1.06,
+        "bpc": 275.6,
+        "claims": 1465
+      },
+      {
+        "org": "TURNING POINT MHC, LLC",
+        "ppc": 44.04,
+        "rpb": 50.04,
+        "cpb": 1.14,
+        "bpc": 22.0,
+        "claims": 50
+      },
+      {
+        "org": "TYKES & TEENS, INC.",
+        "ppc": 44.88,
+        "rpb": 55.21,
+        "cpb": 1.23,
+        "bpc": 113.0,
+        "claims": 278
+      },
+      {
+        "org": "YOUTH & FAMILY BEHAVIORAL HEALTH CENTER, INC.",
+        "ppc": 69.99,
+        "rpb": 70.42,
+        "cpb": 1.01,
+        "bpc": 651.0,
+        "claims": 655
+      }
+    ],
+    "H0040": [
+      {
+        "org": "SMA HEALTHCARE INC",
+        "ppc": 29.33,
+        "rpb": 897.28,
+        "cpb": 30.6,
+        "bpc": 345.5,
+        "claims": 21143
+      },
+      {
+        "org": "CENTERSTONE OF FLORIDA, INC.",
+        "ppc": 31.52,
+        "rpb": 792.46,
+        "cpb": 25.14,
+        "bpc": 315.0,
+        "claims": 7919
+      },
+      {
+        "org": "NORTHSIDE BEHAVIORAL HEALTH CENTER, INC.",
+        "ppc": 30.6,
+        "rpb": 798.64,
+        "cpb": 26.1,
+        "bpc": 686.0,
+        "claims": 17904
+      },
+      {
+        "org": "BAYCARE BEHAVIORAL HEALTH INC.",
+        "ppc": 27.22,
+        "rpb": 600.02,
+        "cpb": 22.04,
+        "bpc": 277.5,
+        "claims": 12232
+      }
+    ],
+    "99214": [
+      {
+        "org": "SMA HEALTHCARE INC",
+        "ppc": 17.63,
+        "rpb": 19.23,
+        "cpb": 1.09,
+        "bpc": 37.4,
+        "claims": 204
+      },
+      {
+        "org": "BAYCARE BEHAVIORAL HEALTH INC.",
+        "ppc": 0.93,
+        "rpb": 1.0,
+        "cpb": 1.07,
+        "bpc": 28.5,
+        "claims": 61
+      },
+      {
+        "org": "BAYCARE BEHAVIORAL HEALTH INC.",
+        "ppc": 0.0,
+        "rpb": 0.0,
+        "cpb": 1.0,
+        "bpc": 12.5,
+        "claims": 25
+      },
+      {
+        "org": "NORTHSIDE BEHAVIORAL HEALTH CENTER, INC.",
+        "ppc": 13.47,
+        "rpb": 17.76,
+        "cpb": 1.32,
+        "bpc": 113.0,
+        "claims": 149
+      },
+      {
+        "org": "CENTERSTONE OF FLORIDA, INC.",
+        "ppc": 0.0,
+        "rpb": 0.0,
+        "cpb": 1.33,
+        "bpc": 12.0,
+        "claims": 16
+      },
+      {
+        "org": "NEW HORIZONS OF THE TREASURE COAST INC",
+        "ppc": 5.93,
+        "rpb": 6.3,
+        "cpb": 1.06,
+        "bpc": 16.0,
+        "claims": 17
+      }
+    ]
+  },
+  "dlc_radar": {
+    "H2019": {
+      "org": {
+        "payment_per_claim": 143.65,
+        "revenue_per_bene": 360.27,
+        "claims_per_bene": 2.51,
+        "bene_per_clinician": 166.7,
+        "claims": 1254,
+        "paid": 180132.85,
+        "beneficiaries": 500,
+        "svc_npis": 3
+      },
+      "axes": {
+        "all_fl:ALL": {
+          "org_count": 614,
+          "p25_payment_per_claim": 52.17,
+          "p50_payment_per_claim": 71.43,
+          "p75_payment_per_claim": 82.89,
+          "org_payment_per_claim": 143.65,
+          "position_payment_per_claim": "WELL ABOVE",
+          "p25_revenue_per_bene": 108.31,
+          "p50_revenue_per_bene": 180.81,
+          "p75_revenue_per_bene": 232.88,
+          "org_revenue_per_bene": 360.27,
+          "position_revenue_per_bene": "WELL ABOVE",
+          "p25_claims_per_bene": 1.78,
+          "p50_claims_per_bene": 2.51,
+          "p75_claims_per_bene": 3.22,
+          "org_claims_per_bene": 2.51,
+          "position_claims_per_bene": "\u2248 P50",
+          "p25_bene_per_clinician": 65.0,
+          "p50_bene_per_clinician": 211.0,
+          "p75_bene_per_clinician": 494.0,
+          "org_bene_per_clinician": 166.7,
+          "position_bene_per_clinician": "WELL BELOW"
+        },
+        "by_entity:organization": {
+          "org_count": 568,
+          "p25_payment_per_claim": 53.19,
+          "p50_payment_per_claim": 71.9,
+          "p75_payment_per_claim": 82.64,
+          "org_payment_per_claim": 143.65,
+          "position_payment_per_claim": "WELL ABOVE",
+          "p25_revenue_per_bene": 112.43,
+          "p50_revenue_per_bene": 182.49,
+          "p75_revenue_per_bene": 231.72,
+          "org_revenue_per_bene": 360.27,
+          "position_revenue_per_bene": "WELL ABOVE",
+          "p25_claims_per_bene": 1.76,
+          "p50_claims_per_bene": 2.51,
+          "p75_claims_per_bene": 3.2,
+          "org_claims_per_bene": 2.51,
+          "position_claims_per_bene": "\u2248 P50",
+          "p25_bene_per_clinician": 69.0,
+          "p50_bene_per_clinician": 218.0,
+          "p75_bene_per_clinician": 507.0,
+          "org_bene_per_clinician": 166.7,
+          "position_bene_per_clinician": "WELL BELOW"
+        },
+        "by_org_type:CMHC": {
+          "org_count": 86,
+          "p25_payment_per_claim": 57.03,
+          "p50_payment_per_claim": 74.53,
+          "p75_payment_per_claim": 85.38,
+          "org_payment_per_claim": 143.65,
+          "position_payment_per_claim": "WELL ABOVE",
+          "p25_revenue_per_bene": 81.72,
+          "p50_revenue_per_bene": 137.38,
+          "p75_revenue_per_bene": 213.06,
+          "org_revenue_per_bene": 360.27,
+          "position_revenue_per_bene": "WELL ABOVE",
+          "p25_claims_per_bene": 1.29,
+          "p50_claims_per_bene": 2.04,
+          "p75_claims_per_bene": 2.63,
+          "org_claims_per_bene": 2.51,
+          "position_claims_per_bene": "WELL ABOVE",
+          "p25_bene_per_clinician": 45.0,
+          "p50_bene_per_clinician": 123.0,
+          "p75_bene_per_clinician": 416.66,
+          "org_bene_per_clinician": 166.7,
+          "position_bene_per_clinician": "WELL ABOVE"
+        },
+        "by_size:medium": {
+          "org_count": 241,
+          "p25_payment_per_claim": 58.21,
+          "p50_payment_per_claim": 72.91,
+          "p75_payment_per_claim": 84.61,
+          "org_payment_per_claim": 143.65,
+          "position_payment_per_claim": "WELL ABOVE",
+          "p25_revenue_per_bene": 123.12,
+          "p50_revenue_per_bene": 188.08,
+          "p75_revenue_per_bene": 244.18,
+          "org_revenue_per_bene": 360.27,
+          "position_revenue_per_bene": "WELL ABOVE",
+          "p25_claims_per_bene": 1.94,
+          "p50_claims_per_bene": 2.57,
+          "p75_claims_per_bene": 3.36,
+          "org_claims_per_bene": 2.51,
+          "position_claims_per_bene": "\u2248 P50",
+          "p25_bene_per_clinician": 69.0,
+          "p50_bene_per_clinician": 147.0,
+          "p75_bene_per_clinician": 257.0,
+          "org_bene_per_clinician": 166.7,
+          "position_bene_per_clinician": "Above"
+        },
+        "by_market:sparse": {
+          "org_count": 189,
+          "p25_payment_per_claim": 48.99,
+          "p50_payment_per_claim": 68.4,
+          "p75_payment_per_claim": 81.71,
+          "org_payment_per_claim": 143.65,
+          "position_payment_per_claim": "WELL ABOVE",
+          "p25_revenue_per_bene": 79.95,
+          "p50_revenue_per_bene": 137.38,
+          "p75_revenue_per_bene": 205.23,
+          "org_revenue_per_bene": 360.27,
+          "position_revenue_per_bene": "WELL ABOVE",
+          "p25_claims_per_bene": 1.43,
+          "p50_claims_per_bene": 2.08,
+          "p75_claims_per_bene": 2.75,
+          "org_claims_per_bene": 2.51,
+          "position_claims_per_bene": "WELL ABOVE",
+          "p25_bene_per_clinician": 63.33,
+          "p50_bene_per_clinician": 208.0,
+          "p75_bene_per_clinician": 509.0,
+          "org_bene_per_clinician": 166.7,
+          "position_bene_per_clinician": "Below"
+        },
+        "by_taxonomy:261QM0801X": {
+          "org_count": 81,
+          "p25_payment_per_claim": 57.03,
+          "p50_payment_per_claim": 74.53,
+          "p75_payment_per_claim": 84.59,
+          "org_payment_per_claim": 143.65,
+          "position_payment_per_claim": "WELL ABOVE",
+          "p25_revenue_per_bene": 81.72,
+          "p50_revenue_per_bene": 141.29,
+          "p75_revenue_per_bene": 213.06,
+          "org_revenue_per_bene": 360.27,
+          "position_revenue_per_bene": "WELL ABOVE",
+          "p25_claims_per_bene": 1.27,
+          "p50_claims_per_bene": 2.04,
+          "p75_claims_per_bene": 2.63,
+          "org_claims_per_bene": 2.51,
+          "position_claims_per_bene": "WELL ABOVE",
+          "p25_bene_per_clinician": 44.0,
+          "p50_bene_per_clinician": 122.0,
+          "p75_bene_per_clinician": 442.57,
+          "org_bene_per_clinician": 166.7,
+          "position_bene_per_clinician": "WELL ABOVE"
+        }
+      }
+    },
+    "T1017": {
+      "org": {
+        "payment_per_claim": 49.69,
+        "revenue_per_bene": 233.8,
+        "claims_per_bene": 4.7,
+        "bene_per_clinician": 179.5,
+        "claims": 1689,
+        "paid": 83933.25,
+        "beneficiaries": 359,
+        "svc_npis": 2
+      },
+      "axes": {
+        "all_fl:ALL": {
+          "org_count": 288,
+          "p25_payment_per_claim": 43.79,
+          "p50_payment_per_claim": 62.2,
+          "p75_payment_per_claim": 77.58,
+          "org_payment_per_claim": 49.69,
+          "position_payment_per_claim": "WELL BELOW",
+          "p25_revenue_per_bene": 192.52,
+          "p50_revenue_per_bene": 361.14,
+          "p75_revenue_per_bene": 604.89,
+          "org_revenue_per_bene": 233.8,
+          "position_revenue_per_bene": "WELL BELOW",
+          "p25_claims_per_bene": 3.64,
+          "p50_claims_per_bene": 5.57,
+          "p75_claims_per_bene": 8.9,
+          "org_claims_per_bene": 4.7,
+          "position_claims_per_bene": "Below",
+          "p25_bene_per_clinician": 105.5,
+          "p50_bene_per_clinician": 258.0,
+          "p75_bene_per_clinician": 591.0,
+          "org_bene_per_clinician": 179.5,
+          "position_bene_per_clinician": "WELL BELOW"
+        },
+        "by_entity:organization": {
+          "org_count": 280,
+          "p25_payment_per_claim": 43.79,
+          "p50_payment_per_claim": 62.68,
+          "p75_payment_per_claim": 78.08,
+          "org_payment_per_claim": 49.69,
+          "position_payment_per_claim": "WELL BELOW",
+          "p25_revenue_per_bene": 193.95,
+          "p50_revenue_per_bene": 369.98,
+          "p75_revenue_per_bene": 609.1,
+          "org_revenue_per_bene": 233.8,
+          "position_revenue_per_bene": "WELL BELOW",
+          "p25_claims_per_bene": 3.69,
+          "p50_claims_per_bene": 5.57,
+          "p75_claims_per_bene": 8.91,
+          "org_claims_per_bene": 4.7,
+          "position_claims_per_bene": "Below",
+          "p25_bene_per_clinician": 105.5,
+          "p50_bene_per_clinician": 254.11,
+          "p75_bene_per_clinician": 591.0,
+          "org_bene_per_clinician": 179.5,
+          "position_bene_per_clinician": "WELL BELOW"
+        },
+        "by_org_type:CMHC": {
+          "org_count": 34,
+          "p25_payment_per_claim": 30.31,
+          "p50_payment_per_claim": 49.58,
+          "p75_payment_per_claim": 66.81,
+          "org_payment_per_claim": 49.69,
+          "position_payment_per_claim": "\u2248 P50",
+          "p25_revenue_per_bene": 150.88,
+          "p50_revenue_per_bene": 240.24,
+          "p75_revenue_per_bene": 466.61,
+          "org_revenue_per_bene": 233.8,
+          "position_revenue_per_bene": "\u2248 P50",
+          "p25_claims_per_bene": 3.95,
+          "p50_claims_per_bene": 4.7,
+          "p75_claims_per_bene": 8.59,
+          "org_claims_per_bene": 4.7,
+          "position_claims_per_bene": "\u2248 P50",
+          "p25_bene_per_clinician": 112.0,
+          "p50_bene_per_clinician": 275.0,
+          "p75_bene_per_clinician": 662.0,
+          "org_bene_per_clinician": 179.5,
+          "position_bene_per_clinician": "WELL BELOW"
+        },
+        "by_size:medium": {
+          "org_count": 126,
+          "p25_payment_per_claim": 39.48,
+          "p50_payment_per_claim": 57.14,
+          "p75_payment_per_claim": 74.14,
+          "org_payment_per_claim": 49.69,
+          "position_payment_per_claim": "Below",
+          "p25_revenue_per_bene": 158.93,
+          "p50_revenue_per_bene": 343.08,
+          "p75_revenue_per_bene": 620.44,
+          "org_revenue_per_bene": 233.8,
+          "position_revenue_per_bene": "WELL BELOW",
+          "p25_claims_per_bene": 3.76,
+          "p50_claims_per_bene": 5.95,
+          "p75_claims_per_bene": 8.91,
+          "org_claims_per_bene": 4.7,
+          "position_claims_per_bene": "WELL BELOW",
+          "p25_bene_per_clinician": 100.0,
+          "p50_bene_per_clinician": 186.3,
+          "p75_bene_per_clinician": 312.0,
+          "org_bene_per_clinician": 179.5,
+          "position_bene_per_clinician": "\u2248 P50"
+        },
+        "by_market:sparse": {
+          "org_count": 77,
+          "p25_payment_per_claim": 33.18,
+          "p50_payment_per_claim": 49.69,
+          "p75_payment_per_claim": 77.4,
+          "org_payment_per_claim": 49.69,
+          "position_payment_per_claim": "\u2248 P50",
+          "p25_revenue_per_bene": 119.97,
+          "p50_revenue_per_bene": 214.17,
+          "p75_revenue_per_bene": 333.02,
+          "org_revenue_per_bene": 233.8,
+          "position_revenue_per_bene": "Above",
+          "p25_claims_per_bene": 3.11,
+          "p50_claims_per_bene": 4.08,
+          "p75_claims_per_bene": 5.71,
+          "org_claims_per_bene": 4.7,
+          "position_claims_per_bene": "Above",
+          "p25_bene_per_clinician": 94.0,
+          "p50_bene_per_clinician": 252.0,
+          "p75_bene_per_clinician": 547.0,
+          "org_bene_per_clinician": 179.5,
+          "position_bene_per_clinician": "WELL BELOW"
+        },
+        "by_taxonomy:261QM0801X": {
+          "org_count": 24,
+          "p25_payment_per_claim": 30.31,
+          "p50_payment_per_claim": 49.69,
+          "p75_payment_per_claim": 64.93,
+          "org_payment_per_claim": 49.69,
+          "position_payment_per_claim": "\u2248 P50",
+          "p25_revenue_per_bene": 150.88,
+          "p50_revenue_per_bene": 233.8,
+          "p75_revenue_per_bene": 466.61,
+          "org_revenue_per_bene": 233.8,
+          "position_revenue_per_bene": "\u2248 P50",
+          "p25_claims_per_bene": 3.95,
+          "p50_claims_per_bene": 4.71,
+          "p75_claims_per_bene": 8.59,
+          "org_claims_per_bene": 4.7,
+          "position_claims_per_bene": "\u2248 P50",
+          "p25_bene_per_clinician": 90.0,
+          "p50_bene_per_clinician": 203.5,
+          "p75_bene_per_clinician": 652.0,
+          "org_bene_per_clinician": 179.5,
+          "position_bene_per_clinician": "Below"
+        }
+      }
+    },
+    "T1015": {
+      "org": {
+        "payment_per_claim": 68.84,
+        "revenue_per_bene": 86.5,
+        "claims_per_bene": 1.26,
+        "bene_per_clinician": 230.0,
+        "claims": 578,
+        "paid": 39790.18,
+        "beneficiaries": 460,
+        "svc_npis": 2
+      },
+      "axes": {
+        "all_fl:ALL": {
+          "org_count": 550,
+          "p25_payment_per_claim": 49.92,
+          "p50_payment_per_claim": 70.18,
+          "p75_payment_per_claim": 166.48,
+          "org_payment_per_claim": 68.84,
+          "position_payment_per_claim": "\u2248 P50",
+          "p25_revenue_per_bene": 62.9,
+          "p50_revenue_per_bene": 76.94,
+          "p75_revenue_per_bene": 190.49,
+          "org_revenue_per_bene": 86.5,
+          "position_revenue_per_bene": "Above",
+          "p25_claims_per_bene": 1.05,
+          "p50_claims_per_bene": 1.11,
+          "p75_claims_per_bene": 1.24,
+          "org_claims_per_bene": 1.26,
+          "position_claims_per_bene": "Above",
+          "p25_bene_per_clinician": 73.0,
+          "p50_bene_per_clinician": 227.0,
+          "p75_bene_per_clinician": 494.0,
+          "org_bene_per_clinician": 230.0,
+          "position_bene_per_clinician": "\u2248 P50"
+        },
+        "by_entity:organization": {
+          "org_count": 525,
+          "p25_payment_per_claim": 50.43,
+          "p50_payment_per_claim": 70.22,
+          "p75_payment_per_claim": 166.48,
+          "org_payment_per_claim": 68.84,
+          "position_payment_per_claim": "\u2248 P50",
+          "p25_revenue_per_bene": 63.02,
+          "p50_revenue_per_bene": 77.58,
+          "p75_revenue_per_bene": 190.49,
+          "org_revenue_per_bene": 86.5,
+          "position_revenue_per_bene": "Above",
+          "p25_claims_per_bene": 1.06,
+          "p50_claims_per_bene": 1.12,
+          "p75_claims_per_bene": 1.24,
+          "org_claims_per_bene": 1.26,
+          "position_claims_per_bene": "Above",
+          "p25_bene_per_clinician": 82.0,
+          "p50_bene_per_clinician": 231.0,
+          "p75_bene_per_clinician": 503.6,
+          "org_bene_per_clinician": 230.0,
+          "position_bene_per_clinician": "\u2248 P50"
+        },
+        "by_org_type:CMHC": {
+          "org_count": 53,
+          "p25_payment_per_claim": 47.47,
+          "p50_payment_per_claim": 65.02,
+          "p75_payment_per_claim": 71.61,
+          "org_payment_per_claim": 68.84,
+          "position_payment_per_claim": "Above",
+          "p25_revenue_per_bene": 61.4,
+          "p50_revenue_per_bene": 72.19,
+          "p75_revenue_per_bene": 80.55,
+          "org_revenue_per_bene": 86.5,
+          "position_revenue_per_bene": "Above",
+          "p25_claims_per_bene": 1.06,
+          "p50_claims_per_bene": 1.13,
+          "p75_claims_per_bene": 1.2,
+          "org_claims_per_bene": 1.26,
+          "position_claims_per_bene": "Above",
+          "p25_bene_per_clinician": 34.0,
+          "p50_bene_per_clinician": 224.0,
+          "p75_bene_per_clinician": 443.5,
+          "org_bene_per_clinician": 230.0,
+          "position_bene_per_clinician": "\u2248 P50"
+        },
+        "by_size:medium": {
+          "org_count": 149,
+          "p25_payment_per_claim": 41.98,
+          "p50_payment_per_claim": 60.04,
+          "p75_payment_per_claim": 74.42,
+          "org_payment_per_claim": 68.84,
+          "position_payment_per_claim": "Above",
+          "p25_revenue_per_bene": 53.98,
+          "p50_revenue_per_bene": 71.37,
+          "p75_revenue_per_bene": 86.57,
+          "org_revenue_per_bene": 86.5,
+          "position_revenue_per_bene": "WELL ABOVE",
+          "p25_claims_per_bene": 1.06,
+          "p50_claims_per_bene": 1.15,
+          "p75_claims_per_bene": 1.33,
+          "org_claims_per_bene": 1.26,
+          "position_claims_per_bene": "Above",
+          "p25_bene_per_clinician": 44.0,
+          "p50_bene_per_clinician": 143.0,
+          "p75_bene_per_clinician": 297.0,
+          "org_bene_per_clinician": 230.0,
+          "position_bene_per_clinician": "WELL ABOVE"
+        },
+        "by_market:sparse": {
+          "org_count": 265,
+          "p25_payment_per_claim": 57.02,
+          "p50_payment_per_claim": 87.12,
+          "p75_payment_per_claim": 183.62,
+          "org_payment_per_claim": 68.84,
+          "position_payment_per_claim": "WELL BELOW",
+          "p25_revenue_per_bene": 67.91,
+          "p50_revenue_per_bene": 105.05,
+          "p75_revenue_per_bene": 219.43,
+          "org_revenue_per_bene": 86.5,
+          "position_revenue_per_bene": "Below",
+          "p25_claims_per_bene": 1.05,
+          "p50_claims_per_bene": 1.11,
+          "p75_claims_per_bene": 1.23,
+          "org_claims_per_bene": 1.26,
+          "position_claims_per_bene": "Above",
+          "p25_bene_per_clinician": 65.0,
+          "p50_bene_per_clinician": 235.0,
+          "p75_bene_per_clinician": 508.54,
+          "org_bene_per_clinician": 230.0,
+          "position_bene_per_clinician": "\u2248 P50"
+        },
+        "by_taxonomy:261QM0801X": {
+          "org_count": 42,
+          "p25_payment_per_claim": 49.34,
+          "p50_payment_per_claim": 64.91,
+          "p75_payment_per_claim": 70.51,
+          "org_payment_per_claim": 68.84,
+          "position_payment_per_claim": "Above",
+          "p25_revenue_per_bene": 64.53,
+          "p50_revenue_per_bene": 71.88,
+          "p75_revenue_per_bene": 80.55,
+          "org_revenue_per_bene": 86.5,
+          "position_revenue_per_bene": "WELL ABOVE",
+          "p25_claims_per_bene": 1.08,
+          "p50_claims_per_bene": 1.13,
+          "p75_claims_per_bene": 1.2,
+          "org_claims_per_bene": 1.26,
+          "position_claims_per_bene": "Above",
+          "p25_bene_per_clinician": 31.0,
+          "p50_bene_per_clinician": 230.0,
+          "p75_bene_per_clinician": 521.0,
+          "org_bene_per_clinician": 230.0,
+          "position_bene_per_clinician": "\u2248 P50"
+        }
+      }
+    },
+    "H0031": {
+      "org": {
+        "payment_per_claim": 57.85,
+        "revenue_per_bene": 69.27,
+        "claims_per_bene": 1.2,
+        "bene_per_clinician": 76.0,
+        "claims": 91,
+        "paid": 5264.69,
+        "beneficiaries": 76,
+        "svc_npis": 1
+      },
+      "axes": {
+        "all_fl:ALL": {
+          "org_count": 383,
+          "p25_payment_per_claim": 24.41,
+          "p50_payment_per_claim": 31.59,
+          "p75_payment_per_claim": 49.55,
+          "org_payment_per_claim": 57.85,
+          "position_payment_per_claim": "WELL ABOVE",
+          "p25_revenue_per_bene": 35.06,
+          "p50_revenue_per_bene": 51.8,
+          "p75_revenue_per_bene": 71.25,
+          "org_revenue_per_bene": 69.27,
+          "position_revenue_per_bene": "WELL ABOVE",
+          "p25_claims_per_bene": 1.15,
+          "p50_claims_per_bene": 1.48,
+          "p75_claims_per_bene": 1.9,
+          "org_claims_per_bene": 1.2,
+          "position_claims_per_bene": "Below",
+          "p25_bene_per_clinician": 27.0,
+          "p50_bene_per_clinician": 83.0,
+          "p75_bene_per_clinician": 228.0,
+          "org_bene_per_clinician": 76.0,
+          "position_bene_per_clinician": "Below"
+        },
+        "by_entity:organization": {
+          "org_count": 366,
+          "p25_payment_per_claim": 24.41,
+          "p50_payment_per_claim": 31.36,
+          "p75_payment_per_claim": 49.46,
+          "org_payment_per_claim": 57.85,
+          "position_payment_per_claim": "WELL ABOVE",
+          "p25_revenue_per_bene": 35.07,
+          "p50_revenue_per_bene": 52.06,
+          "p75_revenue_per_bene": 70.35,
+          "org_revenue_per_bene": 69.27,
+          "position_revenue_per_bene": "WELL ABOVE",
+          "p25_claims_per_bene": 1.17,
+          "p50_claims_per_bene": 1.48,
+          "p75_claims_per_bene": 1.9,
+          "org_claims_per_bene": 1.2,
+          "position_claims_per_bene": "Below",
+          "p25_bene_per_clinician": 28.0,
+          "p50_bene_per_clinician": 92.0,
+          "p75_bene_per_clinician": 231.0,
+          "org_bene_per_clinician": 76.0,
+          "position_bene_per_clinician": "Below"
+        },
+        "by_org_type:CMHC": {
+          "org_count": 48,
+          "p25_payment_per_claim": 24.73,
+          "p50_payment_per_claim": 31.7,
+          "p75_payment_per_claim": 36.66,
+          "org_payment_per_claim": 57.85,
+          "position_payment_per_claim": "WELL ABOVE",
+          "p25_revenue_per_bene": 31.49,
+          "p50_revenue_per_bene": 45.73,
+          "p75_revenue_per_bene": 65.48,
+          "org_revenue_per_bene": 69.27,
+          "position_revenue_per_bene": "WELL ABOVE",
+          "p25_claims_per_bene": 1.09,
+          "p50_claims_per_bene": 1.22,
+          "p75_claims_per_bene": 1.7,
+          "org_claims_per_bene": 1.2,
+          "position_claims_per_bene": "\u2248 P50",
+          "p25_bene_per_clinician": 31.0,
+          "p50_bene_per_clinician": 115.42,
+          "p75_bene_per_clinician": 271.0,
+          "org_bene_per_clinician": 76.0,
+          "position_bene_per_clinician": "WELL BELOW"
+        },
+        "by_size:medium": {
+          "org_count": 142,
+          "p25_payment_per_claim": 21.24,
+          "p50_payment_per_claim": 29.81,
+          "p75_payment_per_claim": 51.55,
+          "org_payment_per_claim": 57.85,
+          "position_payment_per_claim": "WELL ABOVE",
+          "p25_revenue_per_bene": 29.93,
+          "p50_revenue_per_bene": 50.67,
+          "p75_revenue_per_bene": 69.71,
+          "org_revenue_per_bene": 69.27,
+          "position_revenue_per_bene": "WELL ABOVE",
+          "p25_claims_per_bene": 1.11,
+          "p50_claims_per_bene": 1.44,
+          "p75_claims_per_bene": 1.98,
+          "org_claims_per_bene": 1.2,
+          "position_claims_per_bene": "Below",
+          "p25_bene_per_clinician": 17.0,
+          "p50_bene_per_clinician": 31.0,
+          "p75_bene_per_clinician": 76.5,
+          "org_bene_per_clinician": 76.0,
+          "position_bene_per_clinician": "WELL ABOVE"
+        },
+        "by_market:sparse": {
+          "org_count": 108,
+          "p25_payment_per_claim": 21.62,
+          "p50_payment_per_claim": 31.7,
+          "p75_payment_per_claim": 54.8,
+          "org_payment_per_claim": 57.85,
+          "position_payment_per_claim": "WELL ABOVE",
+          "p25_revenue_per_bene": 27.19,
+          "p50_revenue_per_bene": 44.3,
+          "p75_revenue_per_bene": 69.71,
+          "org_revenue_per_bene": 69.27,
+          "position_revenue_per_bene": "WELL ABOVE",
+          "p25_claims_per_bene": 1.08,
+          "p50_claims_per_bene": 1.23,
+          "p75_claims_per_bene": 1.54,
+          "org_claims_per_bene": 1.2,
+          "position_claims_per_bene": "\u2248 P50",
+          "p25_bene_per_clinician": 30.0,
+          "p50_bene_per_clinician": 87.33,
+          "p75_bene_per_clinician": 225.75,
+          "org_bene_per_clinician": 76.0,
+          "position_bene_per_clinician": "Below"
+        },
+        "by_taxonomy:261QM0801X": {
+          "org_count": 42,
+          "p25_payment_per_claim": 27.65,
+          "p50_payment_per_claim": 32.02,
+          "p75_payment_per_claim": 42.58,
+          "org_payment_per_claim": 57.85,
+          "position_payment_per_claim": "WELL ABOVE",
+          "p25_revenue_per_bene": 36.72,
+          "p50_revenue_per_bene": 50.64,
+          "p75_revenue_per_bene": 68.84,
+          "org_revenue_per_bene": 69.27,
+          "position_revenue_per_bene": "WELL ABOVE",
+          "p25_claims_per_bene": 1.14,
+          "p50_claims_per_bene": 1.26,
+          "p75_claims_per_bene": 1.98,
+          "org_claims_per_bene": 1.2,
+          "position_claims_per_bene": "\u2248 P50",
+          "p25_bene_per_clinician": 41.0,
+          "p50_bene_per_clinician": 163.0,
+          "p75_bene_per_clinician": 316.5,
+          "org_bene_per_clinician": 76.0,
+          "position_bene_per_clinician": "WELL BELOW"
+        }
+      }
+    },
+    "H0032": {
+      "org": {
+        "payment_per_claim": 76.81,
+        "revenue_per_bene": 79.14,
+        "claims_per_bene": 1.03,
+        "bene_per_clinician": 33.0,
+        "claims": 68,
+        "paid": 5223.33,
+        "beneficiaries": 66,
+        "svc_npis": 2
+      },
+      "axes": {
+        "all_fl:ALL": {
+          "org_count": 390,
+          "p25_payment_per_claim": 57.24,
+          "p50_payment_per_claim": 70.33,
+          "p75_payment_per_claim": 83.0,
+          "org_payment_per_claim": 76.81,
+          "position_payment_per_claim": "Above",
+          "p25_revenue_per_bene": 64.04,
+          "p50_revenue_per_bene": 73.39,
+          "p75_revenue_per_bene": 88.64,
+          "org_revenue_per_bene": 79.14,
+          "position_revenue_per_bene": "Above",
+          "p25_claims_per_bene": 1.0,
+          "p50_claims_per_bene": 1.02,
+          "p75_claims_per_bene": 1.11,
+          "org_claims_per_bene": 1.03,
+          "position_claims_per_bene": "\u2248 P50",
+          "p25_bene_per_clinician": 29.0,
+          "p50_bene_per_clinician": 91.0,
+          "p75_bene_per_clinician": 220.0,
+          "org_bene_per_clinician": 33.0,
+          "position_bene_per_clinician": "WELL BELOW"
+        },
+        "by_entity:organization": {
+          "org_count": 375,
+          "p25_payment_per_claim": 57.12,
+          "p50_payment_per_claim": 70.41,
+          "p75_payment_per_claim": 82.83,
+          "org_payment_per_claim": 76.81,
+          "position_payment_per_claim": "Above",
+          "p25_revenue_per_bene": 64.04,
+          "p50_revenue_per_bene": 73.39,
+          "p75_revenue_per_bene": 88.09,
+          "org_revenue_per_bene": 79.14,
+          "position_revenue_per_bene": "Above",
+          "p25_claims_per_bene": 1.0,
+          "p50_claims_per_bene": 1.03,
+          "p75_claims_per_bene": 1.11,
+          "org_claims_per_bene": 1.03,
+          "position_claims_per_bene": "\u2248 P50",
+          "p25_bene_per_clinician": 30.0,
+          "p50_bene_per_clinician": 95.0,
+          "p75_bene_per_clinician": 222.25,
+          "org_bene_per_clinician": 33.0,
+          "position_bene_per_clinician": "WELL BELOW"
+        },
+        "by_org_type:CMHC": {
+          "org_count": 55,
+          "p25_payment_per_claim": 54.97,
+          "p50_payment_per_claim": 70.75,
+          "p75_payment_per_claim": 82.31,
+          "org_payment_per_claim": 76.81,
+          "position_payment_per_claim": "Above",
+          "p25_revenue_per_bene": 56.88,
+          "p50_revenue_per_bene": 72.49,
+          "p75_revenue_per_bene": 85.2,
+          "org_revenue_per_bene": 79.14,
+          "position_revenue_per_bene": "Above",
+          "p25_claims_per_bene": 1.01,
+          "p50_claims_per_bene": 1.03,
+          "p75_claims_per_bene": 1.08,
+          "org_claims_per_bene": 1.03,
+          "position_claims_per_bene": "\u2248 P50",
+          "p25_bene_per_clinician": 33.0,
+          "p50_bene_per_clinician": 75.0,
+          "p75_bene_per_clinician": 228.0,
+          "org_bene_per_clinician": 33.0,
+          "position_bene_per_clinician": "WELL BELOW"
+        },
+        "by_size:medium": {
+          "org_count": 149,
+          "p25_payment_per_claim": 56.52,
+          "p50_payment_per_claim": 71.87,
+          "p75_payment_per_claim": 89.52,
+          "org_payment_per_claim": 76.81,
+          "position_payment_per_claim": "Above",
+          "p25_revenue_per_bene": 59.84,
+          "p50_revenue_per_bene": 75.69,
+          "p75_revenue_per_bene": 93.39,
+          "org_revenue_per_bene": 79.14,
+          "position_revenue_per_bene": "\u2248 P50",
+          "p25_claims_per_bene": 1.0,
+          "p50_claims_per_bene": 1.02,
+          "p75_claims_per_bene": 1.14,
+          "org_claims_per_bene": 1.03,
+          "position_claims_per_bene": "\u2248 P50",
+          "p25_bene_per_clinician": 21.0,
+          "p50_bene_per_clinician": 37.0,
+          "p75_bene_per_clinician": 89.86,
+          "org_bene_per_clinician": 33.0,
+          "position_bene_per_clinician": "Below"
+        },
+        "by_market:sparse": {
+          "org_count": 103,
+          "p25_payment_per_claim": 56.78,
+          "p50_payment_per_claim": 68.13,
+          "p75_payment_per_claim": 76.14,
+          "org_payment_per_claim": 76.81,
+          "position_payment_per_claim": "Above",
+          "p25_revenue_per_bene": 62.91,
+          "p50_revenue_per_bene": 71.33,
+          "p75_revenue_per_bene": 79.9,
+          "org_revenue_per_bene": 79.14,
+          "position_revenue_per_bene": "Above",
+          "p25_claims_per_bene": 1.01,
+          "p50_claims_per_bene": 1.03,
+          "p75_claims_per_bene": 1.1,
+          "org_claims_per_bene": 1.03,
+          "position_claims_per_bene": "\u2248 P50",
+          "p25_bene_per_clinician": 33.0,
+          "p50_bene_per_clinician": 89.86,
+          "p75_bene_per_clinician": 232.0,
+          "org_bene_per_clinician": 33.0,
+          "position_bene_per_clinician": "WELL BELOW"
+        },
+        "by_taxonomy:261QM0801X": {
+          "org_count": 50,
+          "p25_payment_per_claim": 57.67,
+          "p50_payment_per_claim": 73.29,
+          "p75_payment_per_claim": 84.33,
+          "org_payment_per_claim": 76.81,
+          "position_payment_per_claim": "\u2248 P50",
+          "p25_revenue_per_bene": 67.29,
+          "p50_revenue_per_bene": 73.65,
+          "p75_revenue_per_bene": 88.64,
+          "org_revenue_per_bene": 79.14,
+          "position_revenue_per_bene": "Above",
+          "p25_claims_per_bene": 1.01,
+          "p50_claims_per_bene": 1.03,
+          "p75_claims_per_bene": 1.08,
+          "org_claims_per_bene": 1.03,
+          "position_claims_per_bene": "\u2248 P50",
+          "p25_bene_per_clinician": 33.0,
+          "p50_bene_per_clinician": 75.0,
+          "p75_bene_per_clinician": 255.0,
+          "org_bene_per_clinician": 33.0,
+          "position_bene_per_clinician": "WELL BELOW"
+        }
+      }
+    },
+    "99214": {
+      "org": {
+        "payment_per_claim": 15.77,
+        "revenue_per_bene": 19.18,
+        "claims_per_bene": 1.22,
+        "bene_per_clinician": 37.0,
+        "claims": 45,
+        "paid": 709.58,
+        "beneficiaries": 37,
+        "svc_npis": 1
+      },
+      "axes": {
+        "all_fl:ALL": {
+          "org_count": 4211,
+          "p25_payment_per_claim": 22.66,
+          "p50_payment_per_claim": 42.75,
+          "p75_payment_per_claim": 70.28,
+          "org_payment_per_claim": 15.77,
+          "position_payment_per_claim": "WELL BELOW",
+          "p25_revenue_per_bene": 27.59,
+          "p50_revenue_per_bene": 48.75,
+          "p75_revenue_per_bene": 78.52,
+          "org_revenue_per_bene": 19.18,
+          "position_revenue_per_bene": "WELL BELOW",
+          "p25_claims_per_bene": 1.05,
+          "p50_claims_per_bene": 1.11,
+          "p75_claims_per_bene": 1.21,
+          "org_claims_per_bene": 1.22,
+          "position_claims_per_bene": "Above",
+          "p25_bene_per_clinician": 34.67,
+          "p50_bene_per_clinician": 100.0,
+          "p75_bene_per_clinician": 233.0,
+          "org_bene_per_clinician": 37.0,
+          "position_bene_per_clinician": "WELL BELOW"
+        },
+        "by_entity:organization": {
+          "org_count": 3733,
+          "p25_payment_per_claim": 22.16,
+          "p50_payment_per_claim": 42.01,
+          "p75_payment_per_claim": 69.64,
+          "org_payment_per_claim": 15.77,
+          "position_payment_per_claim": "WELL BELOW",
+          "p25_revenue_per_bene": 27.09,
+          "p50_revenue_per_bene": 48.1,
+          "p75_revenue_per_bene": 77.67,
+          "org_revenue_per_bene": 19.18,
+          "position_revenue_per_bene": "WELL BELOW",
+          "p25_claims_per_bene": 1.05,
+          "p50_claims_per_bene": 1.11,
+          "p75_claims_per_bene": 1.21,
+          "org_claims_per_bene": 1.22,
+          "position_claims_per_bene": "Above",
+          "p25_bene_per_clinician": 35.75,
+          "p50_bene_per_clinician": 100.0,
+          "p75_bene_per_clinician": 230.0,
+          "org_bene_per_clinician": 37.0,
+          "position_bene_per_clinician": "WELL BELOW"
+        },
+        "by_org_type:CMHC": {
+          "org_count": 65,
+          "p25_payment_per_claim": 22.86,
+          "p50_payment_per_claim": 51.68,
+          "p75_payment_per_claim": 73.17,
+          "org_payment_per_claim": 15.77,
+          "position_payment_per_claim": "WELL BELOW",
+          "p25_revenue_per_bene": 24.03,
+          "p50_revenue_per_bene": 59.91,
+          "p75_revenue_per_bene": 75.35,
+          "org_revenue_per_bene": 19.18,
+          "position_revenue_per_bene": "WELL BELOW",
+          "p25_claims_per_bene": 1.05,
+          "p50_claims_per_bene": 1.09,
+          "p75_claims_per_bene": 1.18,
+          "org_claims_per_bene": 1.22,
+          "position_claims_per_bene": "Above",
+          "p25_bene_per_clinician": 23.0,
+          "p50_bene_per_clinician": 98.67,
+          "p75_bene_per_clinician": 182.5,
+          "org_bene_per_clinician": 37.0,
+          "position_bene_per_clinician": "WELL BELOW"
+        },
+        "by_size:medium": {
+          "org_count": 1643,
+          "p25_payment_per_claim": 22.65,
+          "p50_payment_per_claim": 42.68,
+          "p75_payment_per_claim": 69.78,
+          "org_payment_per_claim": 15.77,
+          "position_payment_per_claim": "WELL BELOW",
+          "p25_revenue_per_bene": 27.76,
+          "p50_revenue_per_bene": 48.94,
+          "p75_revenue_per_bene": 76.65,
+          "org_revenue_per_bene": 19.18,
+          "position_revenue_per_bene": "WELL BELOW",
+          "p25_claims_per_bene": 1.05,
+          "p50_claims_per_bene": 1.11,
+          "p75_claims_per_bene": 1.21,
+          "org_claims_per_bene": 1.22,
+          "position_claims_per_bene": "Above",
+          "p25_bene_per_clinician": 38.0,
+          "p50_bene_per_clinician": 94.0,
+          "p75_bene_per_clinician": 166.0,
+          "org_bene_per_clinician": 37.0,
+          "position_bene_per_clinician": "WELL BELOW"
+        },
+        "by_market:sparse": {
+          "org_count": 543,
+          "p25_payment_per_claim": 20.69,
+          "p50_payment_per_claim": 41.48,
+          "p75_payment_per_claim": 62.49,
+          "org_payment_per_claim": 15.77,
+          "position_payment_per_claim": "WELL BELOW",
+          "p25_revenue_per_bene": 25.27,
+          "p50_revenue_per_bene": 45.96,
+          "p75_revenue_per_bene": 67.56,
+          "org_revenue_per_bene": 19.18,
+          "position_revenue_per_bene": "WELL BELOW",
+          "p25_claims_per_bene": 1.05,
+          "p50_claims_per_bene": 1.11,
+          "p75_claims_per_bene": 1.2,
+          "org_claims_per_bene": 1.22,
+          "position_claims_per_bene": "Above",
+          "p25_bene_per_clinician": 36.83,
+          "p50_bene_per_clinician": 101.0,
+          "p75_bene_per_clinician": 216.0,
+          "org_bene_per_clinician": 37.0,
+          "position_bene_per_clinician": "WELL BELOW"
+        },
+        "by_taxonomy:261QM0801X": {
+          "org_count": 46,
+          "p25_payment_per_claim": 22.9,
+          "p50_payment_per_claim": 51.68,
+          "p75_payment_per_claim": 73.6,
+          "org_payment_per_claim": 15.77,
+          "position_payment_per_claim": "WELL BELOW",
+          "p25_revenue_per_bene": 25.37,
+          "p50_revenue_per_bene": 61.69,
+          "p75_revenue_per_bene": 79.54,
+          "org_revenue_per_bene": 19.18,
+          "position_revenue_per_bene": "WELL BELOW",
+          "p25_claims_per_bene": 1.06,
+          "p50_claims_per_bene": 1.09,
+          "p75_claims_per_bene": 1.17,
+          "org_claims_per_bene": 1.22,
+          "position_claims_per_bene": "Above",
+          "p25_bene_per_clinician": 37.0,
+          "p50_bene_per_clinician": 101.0,
+          "p75_bene_per_clinician": 216.0,
+          "org_bene_per_clinician": 37.0,
+          "position_bene_per_clinician": "WELL BELOW"
+        }
+      }
+    }
+  }
+}

@@ -398,6 +398,7 @@ if [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
   [[ -z "${CHAT_SKILLS_GOOGLE_SEARCH_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/google-search" ]] && export CHAT_SKILLS_GOOGLE_SEARCH_URL="http://localhost:8004/search?"
   [[ -z "${CHAT_SKILLS_WEB_SCRAPER_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/web-scraper" ]] && export CHAT_SKILLS_WEB_SCRAPER_URL="http://localhost:8002/scrape/review"
   [[ -z "${CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/provider-roster-credentialing" ]] && export CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL="http://localhost:8011/report"
+  [[ -z "${CHAT_SKILLS_TASK_MANAGER_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/task-manager" ]] && export CHAT_SKILLS_TASK_MANAGER_URL="http://localhost:8015"
   # MCP: tool agent calls skills via MCP (mobius-skills-mcp on port 8006)
   [[ -z "${MCP_SERVER_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills-mcp" ]] && export MCP_SERVER_URL="http://localhost:8006/mcp"
   # Shared secret for credentialing skill → chat POST /internal/skill-llm (ModelRouter + llm_calls)
@@ -557,7 +558,20 @@ if [[ -d "$MOBIUS_ROOT/mobius-skills/provider-roster-credentialing" ]]; then
   [[ -z "${OPENAI_API_KEY:-}" ]] && export REPORT_LLM_PROVIDER=gemini && export REPORT_LLM_MODEL="${REPORT_LLM_MODEL:-gemini-2.5-flash}"
   export MOBIUS_SKILL_LLM_INTERNAL_KEY="${MOBIUS_SKILL_LLM_INTERNAL_KEY:-mobius-local-skill-llm-dev}"
   export CREDENTIALING_LLM_ROUTER_URL="${CREDENTIALING_LLM_ROUTER_URL:-http://127.0.0.1:8000}"
+  # Always route through Cloud SQL proxy — re-export the proxy URL so the skill DB engine picks it up
+  export USE_CLOUD_SQL_PROXY=1
+  export CHAT_RAG_DATABASE_URL="postgresql://postgres:MobiusDev123%24@127.0.0.1:5433/mobius_chat"
   _start "mobius-provider-roster-api" "cd $MOBIUS_ROOT/mobius-skills/provider-roster-credentialing && PORT=8011 $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8011"
+fi
+
+# --- task-manager skill (port 8015): unified task CRUD for all modules ---
+if [[ -d "$MOBIUS_ROOT/mobius-skills/task-manager" ]]; then
+  _kill_port 8015
+  _load_env "$MOBIUS_ROOT/mobius-chat/.env"
+  # Reuse the same Postgres as credentialing (task-manager shares the DB)
+  export TASK_MANAGER_DB_URL="${TASK_MANAGER_DB_URL:-${CREDENTIALING_REPORT_DB_URL:-${CHAT_RAG_DATABASE_URL:-}}}"
+  export USE_CLOUD_SQL_PROXY=1
+  _start "mobius-task-manager" "cd $MOBIUS_ROOT/mobius-skills/task-manager && PORT=8015 $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8015"
 fi
 
 # --- mobius-skills healthcare (port 8007): NPI, ICD-10, CMS coverage — used by MCP healthcare_query ---
@@ -587,6 +601,13 @@ _start "mobius-rag-frontend" "cd $MOBIUS_ROOT/mobius-rag/frontend && VITE_SCRAPE
   else
     _log "Skip mobius-rag frontend (npm not found)"
   fi
+fi
+
+# --- Financial Strategy demo (port 8099) ---
+if [[ -f "$MOBIUS_ROOT/financial_strategy_demo.py" ]]; then
+  _kill_port 8099
+  _load_env "$MOBIUS_ROOT/mobius-chat/.env"
+  _start "financial-strategy" "cd $MOBIUS_ROOT && source $MOBIUS_ROOT/mobius-chat/.env && python3 financial_strategy_demo.py"
 fi
 
 # --- Master landing (port 3999) ---
@@ -621,10 +642,12 @@ printf "  %-24s  %s\n" "mobius-scraper API"  "http://localhost:8002"
 printf "  %-24s  %s\n" "mobius-google-search" "http://localhost:8004"
 printf "  %-24s  %s\n" "mobius-skills-mcp" "http://localhost:8006/mcp"
 printf "  %-24s  %s\n" "mobius-provider-roster" "http://localhost:8011"
+printf "  %-24s  %s\n" "mobius-task-manager"   "http://localhost:8015"
 printf "  %-24s  %s\n" "mobius-rag frontend" "http://localhost:5173"
 printf "  %-24s  %s\n" "mobius-rag-api"         "http://localhost:8030"
 printf "  %-24s  %s\n" "mobius-qa lexicon API" "http://localhost:8010"
 printf "  %-24s  %s\n" "mobius-qa retrieval eval" "http://localhost:8020"
+printf "  %-24s  %s\n" "financial-strategy"     "http://localhost:8099"
 if [[ "$START_LANDING" == "true" ]]; then
   printf "  %-24s  %s\n" "Master landing"     "http://localhost:3999"
 fi

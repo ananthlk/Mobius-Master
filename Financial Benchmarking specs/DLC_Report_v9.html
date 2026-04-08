@@ -1,0 +1,386 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>David Lawrence Center — Your Chapter (v10)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{font-family:Inter,sans-serif;background:#0f172a;color:#e2e8f0;max-width:1100px;margin:0 auto;padding:40px 60px;line-height:1.75}
+h1{font-size:32px;color:#f1f5f9;border-bottom:2px solid #3b82f6;padding-bottom:16px;margin-bottom:32px}
+h2{font-size:24px;color:#f1f5f9;margin-top:48px;border-bottom:1px solid #334155;padding-bottom:8px}
+h3{font-size:18px;color:#94a3b8;margin-top:32px}
+p{font-size:15px;color:#cbd5e1;margin-bottom:16px}
+strong{color:#f1f5f9}
+ul,ol{margin:12px 0;padding-left:24px}
+li{font-size:15px;color:#cbd5e1;margin-bottom:10px}
+li strong{color:#f1f5f9}
+hr{border:none;border-top:1px solid #334155;margin:32px 0}
+table{border-collapse:collapse;width:100%;margin:20px 0;font-size:12px}
+th{background:#1e293b;color:#f1f5f9;padding:8px 10px;text-align:left;border:1px solid #334155;font-weight:600}
+td{padding:8px 10px;border:1px solid #334155;color:#cbd5e1;vertical-align:top}
+tr:nth-child(even){background:rgba(30,41,59,0.5)}
+em{color:#94a3b8}
+blockquote{border-left:3px solid #f59e0b;padding:12px 16px;margin:20px 0;background:rgba(245,158,11,0.08);border-radius:0 8px 8px 0}
+blockquote p{color:#fbbf24;margin:0;font-size:14px;line-height:1.6}
+.hero{text-align:center;padding:48px 0 24px}
+.hero h1{border:none;font-size:34px;margin-bottom:8px}
+.hero .subtitle{font-size:16px;color:#94a3b8;margin-bottom:12px;line-height:1.6}
+.hero .context{font-size:13px;color:#64748b;margin-bottom:28px;line-height:1.5}
+.stat-row{display:flex;gap:16px;justify-content:center;margin:16px 0 28px;flex-wrap:wrap}
+.stat-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px 22px;text-align:center;min-width:140px}
+.stat-card .number{font-size:24px;font-weight:700;color:#3b82f6}
+.stat-card .label{font-size:11px;color:#94a3b8;margin-top:4px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:22px 26px;margin:18px 0}
+.card h3{margin-top:0;color:#f1f5f9;font-size:15px}
+.card p{font-size:13px;color:#94a3b8}
+.badge{display:inline-block;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600}
+.badge-green{background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3)}
+.badge-yellow{background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3)}
+.badge-red{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3)}
+.badge-white{background:rgba(148,163,184,0.1);color:#94a3b8;border:1px solid rgba(148,163,184,0.2)}
+.sector-ref{background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:20px 28px;margin:20px 0}
+.sector-ref p{margin:0;font-size:14px;color:#94a3b8;line-height:1.6}
+.sector-ref strong{color:#93c5fd}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:20px 0}
+.problem-header{display:flex;align-items:center;gap:14px;margin-bottom:4px}
+.problem-num{font-size:14px;font-weight:700;color:#3b82f6;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);border-radius:8px;padding:4px 12px;white-space:nowrap}
+.score-bar{height:8px;border-radius:4px;background:#1e293b;overflow:hidden;margin:8px 0 4px}
+.score-fill{height:100%;border-radius:4px}
+.insight-box{background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:20px 28px;margin:24px 0}
+.insight-box p{margin:0;font-size:14px;color:#cbd5e1;line-height:1.7}
+.cmhc-context{color:#64748b;font-size:11px}
+</style>
+</head><body>
+
+<!-- ==================== HERO ==================== -->
+<div class="hero">
+<h1>Your Chapter in the CMHC Landscape</h1>
+<p class="subtitle">The sector landscape identified three problems facing Florida's CMHCs.<br>Here's where your organization sits &mdash; benchmarked against best-in-class, not your sector.</p>
+<p class="context">You read the sector report: an $8.1M rate gap, a clinician productivity burden, and a $157M patient leakage problem that dwarfs both. This report maps those dynamics to your data. The comparison target is a single benchmark: <strong>Rest-of-FL P75 &mdash; what the top quartile of non-CMHC providers achieves. That is best-in-class. Are you there? Here's the gap.</strong></p>
+<div class="stat-row">
+<div class="stat-card"><div class="number">$1.22M</div><div class="label">Visible Medicaid Revenue</div></div>
+<div class="stat-card"><div class="number">18,654</div><div class="label">Total Claims</div></div>
+<div class="stat-card"><div class="number">7</div><div class="label">Active Service Lines</div></div>
+<div class="stat-card"><div class="number">CMHC</div><div class="label">Classification</div></div>
+</div>
+<p style="font-size:12px;color:#64748b">FL Medicaid FFS 2024 &middot; DOGE public data &middot; Professional servicing NPIs only &middot; This report covers one billing channel &mdash; not total operations</p>
+</div>
+
+<!-- ==================== SECTOR CONTEXT BRIDGE ==================== -->
+<div class="sector-ref">
+<p><strong>From the sector landscape:</strong> Florida's 86 CMHCs collectively face three structural challenges: (1) lower effective rates costing the sector $8.1M, (2) higher clinician burden per dollar earned, and (3) patient leakage from intake to ongoing care &mdash; a $157M gap that is 19x larger than the rate gap.</p>
+<p style="margin-top:12px"><strong>The benchmark:</strong> Rest-of-FL P75 is the standard for best-in-class. Not the CMHC median. Not the market average. The top quartile of non-CMHC providers &mdash; that's the transformation target. Every comparison in this report is against that single bar. <span style="color:#64748b;font-size:12px">Where the CMHC sector median appears, it is shown in small gray text for context &mdash; "your sector sits here" &mdash; but it is never the comparison number.</span></p>
+</div>
+
+<hr />
+
+<!-- ==================== YOUR REVENUE MIX ==================== -->
+<h2>Your Revenue Mix</h2>
+<p>Before diving into the three problems, here is how your Medicaid FFS revenue breaks down across the care continuum:</p>
+
+<table>
+<thead><tr><th>Service Line</th><th style="text-align:right">Revenue</th><th style="text-align:right">Share</th><th>Stage</th><th>Codes</th></tr></thead>
+<tbody>
+<tr><td>Outpatient Therapy</td><td style="text-align:right">$497,851</td><td style="text-align:right">40.8%</td><td><span class="badge badge-green">Ongoing</span></td><td>H2019, T1015, H0035</td></tr>
+<tr><td>Assertive Community Treatment</td><td style="text-align:right">$318,844</td><td style="text-align:right">26.1%</td><td><span class="badge badge-yellow">High-Acuity</span></td><td>H0040</td></tr>
+<tr><td>Crisis Stabilization</td><td style="text-align:right">$281,712</td><td style="text-align:right">23.1%</td><td><span class="badge badge-yellow">High-Acuity</span></td><td>S9485</td></tr>
+<tr><td>Case Management</td><td style="text-align:right">$83,933</td><td style="text-align:right">6.9%</td><td><span class="badge badge-green">Ongoing</span></td><td>T1017</td></tr>
+<tr><td>Assessment</td><td style="text-align:right">$29,452</td><td style="text-align:right">2.4%</td><td><span class="badge badge-white">Intake</span></td><td>H0031, H0032</td></tr>
+<tr><td>Psychosocial Rehabilitation</td><td style="text-align:right">$7,378</td><td style="text-align:right">0.6%</td><td><span class="badge badge-yellow">High-Acuity</span></td><td>H0046</td></tr>
+<tr><td>Medication Management</td><td style="text-align:right">$1,254</td><td style="text-align:right">0.1%</td><td><span class="badge badge-green">Ongoing</span></td><td>99214</td></tr>
+</tbody>
+</table>
+
+<blockquote><p>This report covers FL Medicaid FFS claims only. MCO encounter data, commercial payers, grants, and other funding sources are not included. Your organization is registered as a residential treatment facility, but no residential per-diem codes appear in this data. The $1.22M shown here is a partial view.</p></blockquote>
+
+<hr />
+
+<!-- ==================== PROBLEM 1: RATES ==================== -->
+<h2><div class="problem-header"><span class="problem-num">PROBLEM 1</span> Lower Effective Rates</div></h2>
+
+<div class="sector-ref">
+<p><strong>The sector picture:</strong> CMHCs collect less per claim than non-CMHC providers on most service codes. At intake, CMHCs earn $74.96 per beneficiary vs $88.18 for the rest of FL (-15%). In high-acuity services, the gap widens to -25.4%. The total sector rate gap: <strong>$8.1M</strong>.</p>
+<p style="margin-top:12px"><strong>The benchmark:</strong> Best-in-class is the Rest-of-FL P75 &mdash; what the top quartile of non-CMHC providers collects. Every rate below is measured against that single bar. <span style="color:#64748b;font-size:12px">CMHC P50 shown in gray for sector context only.</span></p>
+</div>
+
+<h3>Where you sit: Two codes above best-in-class, several below</h3>
+
+<p>Against the lagging CMHC sector, your rates looked favorable. Against best-in-class, the picture is mixed. You exceed the target on therapy and assessment &mdash; but fall short on case management, med management, office visits, and ACT.</p>
+
+<table>
+<thead><tr><th>Code</th><th>Service</th><th style="text-align:center">Your Rate</th><th style="text-align:center">Best-in-Class (P75)</th><th style="text-align:center;color:#64748b;font-size:11px">CMHC P50</th><th style="text-align:center">Gap to Best</th><th style="text-align:center">Trend</th></tr></thead>
+<tbody>
+<tr><td>H2019</td><td>Behavioral Therapy</td><td style="text-align:center"><strong>$143.65</strong></td><td style="text-align:center">$82.64</td><td style="text-align:center;color:#64748b;font-size:11px">$74.53</td><td style="text-align:center;color:#22c55e"><strong>+73.8%</strong></td><td style="text-align:center;color:#22c55e">&uarr; Pulling ahead</td></tr>
+<tr><td>H0031</td><td>MH Assessment</td><td style="text-align:center"><strong>$57.85</strong></td><td style="text-align:center">$50.77</td><td style="text-align:center;color:#64748b;font-size:11px">$31.70</td><td style="text-align:center;color:#22c55e"><strong>+13.9%</strong></td><td style="text-align:center;color:#22c55e">&uarr; Pulling ahead</td></tr>
+<tr><td>H0032</td><td>Treatment Plan Dev</td><td style="text-align:center"><strong>$76.81</strong></td><td style="text-align:center">$83.06</td><td style="text-align:center;color:#64748b;font-size:11px">$70.75</td><td style="text-align:center;color:#f59e0b">-7.5%</td><td style="text-align:center">&rarr; Converging</td></tr>
+<tr><td>H0040</td><td>ACT (FACT)</td><td style="text-align:center"><strong>$28.97</strong></td><td style="text-align:center">$31.38</td><td style="text-align:center;color:#64748b;font-size:11px">$30.30</td><td style="text-align:center;color:#f59e0b">-7.7%</td><td style="text-align:center">&rarr; Stable</td></tr>
+<tr><td>T1017</td><td>Case Management</td><td style="text-align:center"><strong>$49.69</strong></td><td style="text-align:center">$78.88</td><td style="text-align:center;color:#64748b;font-size:11px">$49.58</td><td style="text-align:center;color:#ef4444"><strong>-37.0%</strong></td><td style="text-align:center;color:#ef4444">&darr; Falling behind</td></tr>
+<tr><td>T1015</td><td>Med Management</td><td style="text-align:center"><strong>$68.84</strong></td><td style="text-align:center">$172.44*</td><td style="text-align:center;color:#64748b;font-size:11px">$65.02</td><td style="text-align:center;color:#f59e0b"><strong>-60.1%*</strong></td><td style="text-align:center">&rarr; Stable</td></tr>
+<tr style="background:rgba(239,68,68,0.08)"><td>99214</td><td>Office Visit L4</td><td style="text-align:center"><strong>$15.77</strong></td><td style="text-align:center">$70.28</td><td style="text-align:center;color:#64748b;font-size:11px">$51.68</td><td style="text-align:center;color:#ef4444"><strong>-77.6%</strong></td><td style="text-align:center;color:#22c55e">&uarr; Recovering</td></tr>
+</tbody>
+</table>
+
+<p style="font-size:11px;color:#64748b">* T1015 best-in-class ($172.44) is anomalously high &mdash; likely distorted by FQHCs billing at all-inclusive encounter rates. DLC at $68.84 is above the CMHC sector ($65.02). The gap shown is overstated; this code is flagged as a caveat, not a true shortfall.</p>
+
+<div class="grid-2">
+<div class="card" style="border-top:3px solid #22c55e">
+<h3>Strength: Above best-in-class</h3>
+<p><strong>H2019</strong> at $143.65 is <strong>+73.8% above</strong> best-in-class ($82.64) &mdash; exceptional by any benchmark. This rate has diverged upward since 2019 ($96.94 &rarr; $143.65), meaning you are pulling further ahead of even the top quartile each year.</p>
+<p><strong>H0031</strong> at $57.85 is <strong>+13.9% above</strong> best-in-class ($50.77). Your assessment rate exceeds what the top quartile of non-CMHC providers achieves.</p>
+<p><strong>Question:</strong> What drives the H2019 premium &mdash; longer session durations (more units per claim), favorable contract terms, or billing structure? Is it sustainable under contract renegotiations?</p>
+</div>
+<div class="card" style="border-top:3px solid #ef4444">
+<h3>Gap: Below best-in-class</h3>
+<p><strong>T1017</strong> at $49.69 is <strong>-37.0% below</strong> best-in-class ($78.88). You match the CMHC sector exactly ($49.58) &mdash; but the CMHC sector is itself far below the top quartile on this code. On case management, you are firmly inside the sector's rate trap. <span style="color:#64748b;font-size:11px">CMHC P50: $49.58</span></p>
+<p><strong>99214</strong> at $15.77 is <strong>-77.6% below</strong> best-in-class ($70.28). With only 45 claims, this is anomalous &mdash; likely a billing configuration issue rather than a contract issue. <span style="color:#64748b;font-size:11px">CMHC P50: $51.68</span></p>
+<p><strong>Question:</strong> For T1017, is the declining rate (from $59.69 in 2019) driven by denials, modifier issues, or contract erosion? For 99214, review adjudication detail on recent submissions.</p>
+</div>
+</div>
+
+<div class="grid-2">
+<div class="card" style="border-top:3px solid #f59e0b">
+<h3>Within striking distance: H0032 Treatment Plan (-7.5%)</h3>
+<p>At $76.81, you are <strong>7.5% below</strong> best-in-class ($83.06) but above your sector. <span style="color:#64748b;font-size:11px">CMHC P50: $70.75</span>. You are converging on the top quartile &mdash; a near-miss, not a structural gap.</p>
+</div>
+<div class="card" style="border-top:3px solid #f59e0b">
+<h3>Within striking distance: H0040 ACT (-7.7%)</h3>
+<p>At $28.97, you are <strong>7.7% below</strong> best-in-class ($31.38). The best-in-class range is narrow on this code, suggesting limited variation in the market. <span style="color:#64748b;font-size:11px">CMHC P50: $30.30</span></p>
+</div>
+</div>
+
+<div class="card" style="border-top:3px solid #f59e0b">
+<h3>Caveat: T1015 Med Management &mdash; distorted best-in-class benchmark</h3>
+<p>The best-in-class figure for T1015 ($172.44) is anomalously high &mdash; likely reflecting FQHCs that bill med management at all-inclusive encounter rates rather than fee-for-service rates. Your rate of $68.84 appears to be -60.1% below best-in-class, but the benchmark is distorted. You sit above your sector ($65.02). On this code, the gap is overstated &mdash; not a true shortfall. <span style="color:#64748b;font-size:11px">CMHC P50: $65.02</span></p>
+</div>
+
+<div class="insight-box">
+<p><strong>Your Problem 1 verdict: Mixed.</strong> Against best-in-class, DLC has <strong>two codes above target</strong> (H2019 at +73.8%, H0031 at +13.9%), <strong>two codes within striking distance</strong> (H0032 at -7.5%, H0040 at -7.7%), <strong>two codes with significant gaps</strong> (T1017 at -37.0%, 99214 at -77.6%), and <strong>one anomalous benchmark</strong> (T1015 at -60.1% but P75 distorted by FQHC rates). The therapy rate premium is exceptional and real. But on case management, you share the sector's structural disadvantage. On 99214, something is anomalous in billing.</p>
+</div>
+
+<hr />
+
+<!-- ==================== PROBLEM 2: PATIENT ENGAGEMENT ==================== -->
+<h2><div class="problem-header"><span class="problem-num">PROBLEM 2</span> Lack of Patient Engagement</div></h2>
+
+<div class="sector-ref">
+<p><strong>The sector picture:</strong> CMHCs assess 23.6% of FL Medicaid BH patients at intake, but retain only 5.0% through ongoing care. For every $1 the sector loses to rates, $19 is lost to patients who enter the front door and don't stay. The <strong>$157M leakage gap</strong> (upper bound) dwarfs the rate gap.</p>
+</div>
+
+<h3>Where you sit: Strong per-patient engagement, narrow front door</h3>
+
+<p>Your organization's engagement metrics tell a two-part story: patients who reach therapy get <em>deeply</em> served, but the pipeline feeding them is small. RPB comparisons below use the best available market benchmark.</p>
+
+<div class="grid-3">
+<div class="card" style="border-top:3px solid #22c55e;text-align:center">
+<h3>Therapy Revenue per Bene</h3>
+<p style="font-size:28px;font-weight:700;color:#22c55e;margin:12px 0">$360.27</p>
+<p style="font-size:12px">Best-in-Class: $185.98</p>
+<p style="font-size:20px;font-weight:600;color:#22c55e">+93.7%</p>
+<p style="font-size:11px;color:#64748b">H2019 &middot; 500 beneficiaries</p>
+</div>
+<div class="card" style="border-top:3px solid #ef4444;text-align:center">
+<h3>CM Revenue per Bene</h3>
+<p style="font-size:28px;font-weight:700;color:#ef4444;margin:12px 0">$233.80</p>
+<p style="font-size:12px">Best-in-Class: $370.51</p>
+<p style="font-size:20px;font-weight:600;color:#ef4444">-36.9%</p>
+<p style="font-size:11px;color:#64748b">T1017 &middot; 359 beneficiaries</p>
+</div>
+<div class="card" style="border-top:3px solid #22c55e;text-align:center">
+<h3>Assessment Revenue per Bene</h3>
+<p style="font-size:28px;font-weight:700;color:#22c55e;margin:12px 0">$69.27</p>
+<p style="font-size:12px">Best-in-Class: $52.38</p>
+<p style="font-size:20px;font-weight:600;color:#22c55e">+32.2%</p>
+<p style="font-size:11px;color:#64748b">H0031 &middot; 76 beneficiaries</p>
+</div>
+</div>
+
+<div class="card" style="border-top:3px solid #22c55e">
+<h3>T1015 Med Management RPB</h3>
+<p>Your med management RPB of <strong>$86.50</strong> is <strong>+10.6%</strong> above the market benchmark ($78.24), serving 460 beneficiaries. This is a modest but positive signal &mdash; your med management engagement is above the broader market.</p>
+</div>
+
+<h3>The engagement math</h3>
+
+<p>Your H2019 therapy line generates <strong>$360.27 per beneficiary</strong> &mdash; nearly double the best-in-class benchmark of $185.98 (+93.7%). This combines the rate premium (+73.8% above best-in-class) and more visits per patient. On this single code, your organization extracts nearly twice the value per patient compared to what even the top quartile achieves.</p>
+
+<p>On T1017 case management, the story reverses. Your RPB of $233.80 is <strong>-36.9% below</strong> the best-in-class benchmark of $370.51. The rate gap (-37.0% vs best-in-class) directly depresses per-beneficiary revenue. When CMHCs are paid less per claim, it takes more visits to generate the same revenue per patient &mdash; and at $49.69/claim, the math works against you.</p>
+
+<p>The sector's leakage story is about patients entering through intake and not staying for ongoing care. Your revenue mix suggests a <em>different</em> pattern:</p>
+
+<div class="grid-2">
+<div class="card">
+<h3>Your care continuum mix</h3>
+<table style="font-size:13px;margin:8px 0">
+<tr><td style="border:none;color:#94a3b8;padding:4px 8px">Intake (assessment, eval)</td><td style="border:none;color:#f1f5f9;padding:4px 8px;text-align:right"><strong>2.4%</strong> of revenue</td></tr>
+<tr><td style="border:none;color:#94a3b8;padding:4px 8px">High-acuity (ACT, crisis, PSR)</td><td style="border:none;color:#f1f5f9;padding:4px 8px;text-align:right"><strong>49.8%</strong> of revenue</td></tr>
+<tr><td style="border:none;color:#94a3b8;padding:4px 8px">Ongoing (therapy, CM, med mgmt)</td><td style="border:none;color:#f1f5f9;padding:4px 8px;text-align:right"><strong>47.8%</strong> of revenue</td></tr>
+</table>
+</div>
+<div class="card">
+<h3>What this means</h3>
+<p>Unlike the typical CMHC pattern (big intake funnel, small ongoing share), your organization has a <strong>tiny intake funnel</strong> and a <strong>large ongoing care base</strong>. Your 47.8% ongoing care revenue share is dramatically higher than the sector's 5.0% beneficiary share in ongoing care.</p>
+<p>The question this raises: <strong>Where are your ongoing-care patients coming from, if not your own intake?</strong></p>
+</div>
+</div>
+
+<h3>The beneficiary pipeline</h3>
+
+<table>
+<thead><tr><th>Stage</th><th>Code</th><th style="text-align:center">Unique Benes</th><th style="text-align:center">Revenue</th><th style="text-align:center">RPB</th><th style="text-align:center">Best-in-Class RPB</th><th>Signal</th></tr></thead>
+<tbody>
+<tr><td>Intake</td><td>H0031 + H0032</td><td style="text-align:center">142</td><td style="text-align:center">$29,452</td><td style="text-align:center">~$73</td><td style="text-align:center">$52.38</td><td style="color:#22c55e">Above best-in-class RPB; small front door (142 benes)</td></tr>
+<tr><td>Ongoing: Therapy</td><td>H2019</td><td style="text-align:center">500</td><td style="text-align:center">$180,133</td><td style="text-align:center">$360.27</td><td style="text-align:center">$185.98</td><td style="color:#22c55e">+93.7% above best-in-class &mdash; exceptional engagement</td></tr>
+<tr><td>Ongoing: CM</td><td>T1017</td><td style="text-align:center">359</td><td style="text-align:center">$83,933</td><td style="text-align:center">$233.80</td><td style="text-align:center">$370.51</td><td style="color:#ef4444">-36.9% below best-in-class &mdash; rate-depressed</td></tr>
+<tr><td>Ongoing: Med Mgmt</td><td>T1015</td><td style="text-align:center">460</td><td style="text-align:center">$39,790</td><td style="text-align:center">$86.50</td><td style="text-align:center">$78.24</td><td style="color:#22c55e">+10.6% above market benchmark</td></tr>
+<tr><td>High-Acuity: ACT</td><td>H0040</td><td style="text-align:center">305*</td><td style="text-align:center">$318,844</td><td style="text-align:center">$1,045</td><td style="text-align:center">&mdash;</td><td>Facility-level billing; different pipeline</td></tr>
+</tbody>
+</table>
+<p style="font-size:11px;color:#64748b">* H0040 beneficiary count estimated from claims/clinician data. Beneficiaries are not deduplicated across codes &mdash; the same patient may appear in multiple rows.</p>
+
+<blockquote><p>You have 500 therapy beneficiaries but only 142 intake beneficiaries. Either your patients are entering through a different door (crisis, ACT, direct referral) or they were assessed in prior years and remain in care. Both are positive engagement signals, but they also mean your visible intake pipeline cannot explain your therapy volume. Understanding this pathway is operationally important.</p></blockquote>
+
+<div class="insight-box">
+<p><strong>Your Problem 2 verdict: Opportunity.</strong> The sector loses patients between intake and ongoing care. Your organization appears to have the <em>opposite</em> pattern &mdash; more patients in ongoing care than in intake. Your per-patient engagement on therapy is exceptional: H2019 RPB of $360.27 is +93.7% above best-in-class. But T1017 RPB of $233.80 is -36.9% below the market, driven by the rate gap on that code. With only 142 assessed patients visible, the question is whether your front door is intentionally selective or an underutilized asset. If you could widen the intake funnel while maintaining this level of per-patient therapy engagement, the revenue opportunity is significant.</p>
+</div>
+
+<hr />
+
+<!-- ==================== PROBLEM 3: CHURN / BURNOUT ==================== -->
+<h2><div class="problem-header"><span class="problem-num">PROBLEM 3</span> Clinician Churn and Burnout</div></h2>
+
+<div class="sector-ref">
+<p><strong>The sector picture:</strong> CMHCs carry the sector's most complex patients at the lowest effective rates &mdash; a combination that compresses clinician productivity and contributes to burnout. When rates are lower, clinicians must see more patients to generate the same revenue. When patients are higher-acuity, each visit takes more clinical time. The result: burnout that drives churn, which further constrains capacity.</p>
+</div>
+
+<h3>Where you sit: Panels reframed against the broader market</h3>
+
+<p>Against the CMHC sector, your therapy panels looked high (+35.5%). Against the rest of the FL Medicaid market, they look <em>below capacity</em>. This is a key reframing &mdash; what seemed like heavy caseloads relative to the lagging sector is actually below what the broader market sustains.</p>
+
+<table>
+<thead><tr><th>Code</th><th>Service</th><th style="text-align:center">Your Panel</th><th style="text-align:center">Market Benchmark</th><th style="text-align:center;color:#64748b;font-size:11px">CMHC P50</th><th style="text-align:center">vs Benchmark</th><th style="text-align:center">Clinicians</th><th>Signal</th></tr></thead>
+<tbody>
+<tr><td>H2019</td><td>Behavioral Therapy</td><td style="text-align:center"><strong>166.7</strong></td><td style="text-align:center">227.0</td><td style="text-align:center;color:#64748b;font-size:11px">123.0</td><td style="text-align:center;color:#ef4444">-26.6%</td><td style="text-align:center">3</td><td><span class="badge badge-white">Below market</span></td></tr>
+<tr><td>T1015</td><td>Med Management</td><td style="text-align:center"><strong>230.0</strong></td><td style="text-align:center">229.0</td><td style="text-align:center;color:#64748b;font-size:11px">224.0</td><td style="text-align:center">+0.4%</td><td style="text-align:center">2</td><td><span class="badge badge-white">At market</span></td></tr>
+<tr><td>T1017</td><td>Case Management</td><td style="text-align:center"><strong>179.5</strong></td><td style="text-align:center">254.11</td><td style="text-align:center;color:#64748b;font-size:11px">275.0</td><td style="text-align:center;color:#ef4444">-29.4%</td><td style="text-align:center">2</td><td><span class="badge badge-white">Below market</span></td></tr>
+<tr><td>H0031</td><td>MH Assessment</td><td style="text-align:center"><strong>76.0</strong></td><td style="text-align:center">76.5</td><td style="text-align:center;color:#64748b;font-size:11px">115.4</td><td style="text-align:center">-0.7%</td><td style="text-align:center">1</td><td><span class="badge badge-white">At market</span></td></tr>
+<tr><td>H0032</td><td>Treatment Plan Dev</td><td style="text-align:center"><strong>33.0</strong></td><td style="text-align:center">98.0</td><td style="text-align:center;color:#64748b;font-size:11px">75.0</td><td style="text-align:center;color:#ef4444">-66.3%</td><td style="text-align:center">2</td><td><span class="badge badge-red">Bottleneck?</span></td></tr>
+</tbody>
+</table>
+
+<div class="grid-2">
+<div class="card" style="border-top:3px solid #3b82f6">
+<h3>The reframing: Therapy panels are below market capacity</h3>
+<p>Against the CMHC sector, your therapy panels of 166.7 looked +35.5% above the sector norm of 123.0. Against the broader market benchmark of 227.0, they are <strong>26.6% below</strong>. The non-CMHC market sustains larger therapy panels. This suggests your 3 therapists have room to absorb more patients relative to what the broader market supports &mdash; the concentration risk is lower than the CMHC-benchmarked view suggested. <span style="color:#64748b;font-size:11px">CMHC P50: 123.0</span></p>
+<p><strong>Question:</strong> Is the below-market panel size a function of the premium rate ($143.65 per claim) allowing fewer visits per patient to generate the same revenue? Or is there scheduling capacity that could absorb more beneficiaries?</p>
+</div>
+<div class="card" style="border-top:3px solid #ef4444">
+<h3>H0032 treatment plan: Potential bottleneck</h3>
+<p>Your treatment plan throughput of 33.0 benes/clinician is <strong>66.3% below</strong> the market benchmark of 98.0. Even the CMHC sector at 75.0 is more than double your throughput. With 2 clinicians producing 33 treatment plans each, this is the narrowest point in your pipeline. <span style="color:#64748b;font-size:11px">CMHC P50: 75.0</span></p>
+<p><strong>Question:</strong> Is this driven by more comprehensive treatment planning (which aligns with the higher $76.81 rate), or is there a process or access bottleneck limiting throughput?</p>
+</div>
+</div>
+
+<h3>The churn/burnout connection</h3>
+
+<p>Problem 3 is an <em>outcome</em> of Problems 1 and 2. Here's how the dynamics connect for your organization:</p>
+
+<div class="card">
+<table style="font-size:13px;margin:0">
+<thead><tr><th style="width:30%">Dynamic</th><th style="width:35%">Sector Pattern</th><th style="width:35%">Your Pattern</th></tr></thead>
+<tbody>
+<tr><td><strong>Low rates &rarr; more volume needed</strong></td><td>CMHCs compensate for low rates by pushing higher caseloads</td><td>Your therapy rate is +73.8% above best-in-class &mdash; this pressure is strongly <em>reduced</em> on your largest line</td></tr>
+<tr><td><strong>Low engagement &rarr; churn cycle</strong></td><td>Patients leave after intake, forcing constant new-patient acquisition</td><td>Your patients stay &mdash; 500 therapy benes vs 142 intake benes suggests retention, not churn</td></tr>
+<tr><td><strong>High caseload &rarr; burnout</strong></td><td>Clinicians carry unsustainable panels at compressed margins</td><td>Your therapy panels are 26.6% <em>below</em> the broader market. The "high load" vs CMHCs was a sector artifact.</td></tr>
+<tr><td><strong>Burnout &rarr; turnover</strong></td><td>Clinician departure triggers patient attrition and revenue loss</td><td>With below-market panels and above-best-in-class rates, burnout risk from caseload pressure appears <em>lower</em> than the CMHC-benchmarked view suggested</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="insight-box">
+<p><strong>Your Problem 3 verdict: Manageable.</strong> The reframing changes the narrative. Against the CMHC sector, your therapy panels appeared high (+35.5%) and concentrated in 3 clinicians, signaling burnout risk. Against the broader market, those same panels are 26.6% <em>below</em> what non-CMHC providers sustain. Your above-best-in-class therapy rate ($143.65 vs $82.64) means each clinician generates high revenue per patient without the volume pressure that drives burnout at lower-rate organizations. The remaining concern is <strong>H0032 treatment planning</strong> at 66.3% below market throughput &mdash; a potential pipeline bottleneck worth investigating. The broader burnout risk is lower than previously assessed.</p>
+</div>
+
+<hr />
+
+<!-- ==================== PUTTING IT TOGETHER ==================== -->
+<h2>Putting It Together: Your Organization's Position</h2>
+
+<p>When benchmarked against best-in-class instead of the lagging CMHC sector, DLC's position shifts from "favorable on most dimensions" to a more nuanced picture:</p>
+
+<div class="grid-3">
+<div class="card" style="text-align:center;border-top:3px solid #f59e0b">
+<h3 style="color:#f59e0b">Problem 1: Rates</h3>
+<p style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b">vs Best-in-Class (P75)</p>
+<p style="font-size:28px;font-weight:700;color:#f59e0b;margin:8px 0">Mixed</p>
+<p style="font-size:12px">2 codes above best-in-class (H2019 +73.8%, H0031 +13.9%). 2 within striking distance (H0032, H0040). 2 significant gaps (T1017 -37.0%, 99214 -77.6%). 1 anomalous (T1015).</p>
+</div>
+<div class="card" style="text-align:center;border-top:3px solid #f59e0b">
+<h3 style="color:#f59e0b">Problem 2: Engagement</h3>
+<p style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b">vs Best-in-Class</p>
+<p style="font-size:28px;font-weight:700;color:#f59e0b;margin:8px 0">Opportunity</p>
+<p style="font-size:12px">Therapy RPB +93.7% above best-in-class. But CM RPB -36.9% below. Intake funnel narrow: 142 assessed benes feed 500+ ongoing-care benes.</p>
+</div>
+<div class="card" style="text-align:center;border-top:3px solid #22c55e">
+<h3 style="color:#22c55e">Problem 3: Burnout</h3>
+<p style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b">vs Market Benchmark</p>
+<p style="font-size:28px;font-weight:700;color:#22c55e;margin:8px 0">Manageable</p>
+<p style="font-size:12px">Therapy panels 26.6% below market capacity. Above-best-in-class rates reduce volume pressure. H0032 bottleneck at -66.3% is the one concern.</p>
+</div>
+</div>
+
+<hr />
+
+<!-- ==================== INVESTIGATION PRIORITIES ==================== -->
+<h2>Investigation Priorities</h2>
+
+<div class="grid-2">
+<div class="card" style="border-left:3px solid #ef4444">
+<h3>1. T1017 Rate Trajectory</h3>
+<p>Case management rate declined from $59.69 (2019) to $49.69 (2024) while the market moved higher. At -37.0% below best-in-class ($78.88), this is your largest rate gap on a material code (6.9% of revenue). Investigate: denial rates, modifier optimization, contract renegotiation opportunities.</p>
+<p style="color:#64748b;font-size:11px">Impact: Moderate. Closing the gap to best-in-class would transform this service line.</p>
+</div>
+<div class="card" style="border-left:3px solid #ef4444">
+<h3>2. 99214 Billing Configuration</h3>
+<p>A rate of $15.77 vs $70.28 (best-in-class) is anomalous. With 45 claims, this is fixable. Review modifier usage, place-of-service codes, and claim adjudication detail. This is likely a billing issue, not a contract issue.</p>
+<p style="color:#64748b;font-size:11px">Impact: Small (0.1% of revenue) but signals possible systematic billing gaps on E&M codes.</p>
+</div>
+<div class="card" style="border-left:3px solid #f59e0b">
+<h3>3. Intake Pipeline &amp; H0032 Bottleneck</h3>
+<p>Your H0032 treatment plan throughput (33.0 benes/clinician) is 66.3% below the market benchmark of 98.0 &mdash; the most constrained point in your pipeline. With only 142 total intake benes feeding 500+ ongoing-care benes, understanding whether this is an intentional quality gate or an access bottleneck is critical.</p>
+<p style="color:#64748b;font-size:11px">Impact: High. Each additional therapy bene is worth $360 in RPB at current rates.</p>
+</div>
+<div class="card" style="border-left:3px solid #22c55e">
+<h3>4. H2019 Rate Premium &mdash; Protect</h3>
+<p>Your behavioral therapy rate of $143.65 is +73.8% above best-in-class &mdash; exceptional by any measure. This rate has risen from $96.94 in 2019 and diverged further from the market each year. Determine the driver (session duration, contract terms, billing structure) to ensure it is sustainable and not at risk from contract renegotiation.</p>
+<p style="color:#64748b;font-size:11px">Impact: Critical. H2019 is your largest service line at 40.8% of visible revenue. The premium is worth protecting.</p>
+</div>
+</div>
+
+<h3>What the H2019 Rate Premium Means</h3>
+
+<div class="card">
+<p>Your behavioral therapy rate of $143.65 is the largest positive outlier in this report &mdash; +73.8% above even the top quartile of non-CMHC providers ($82.64). This rate has risen from $96.94 in 2019 and diverged further from peers each year. Three possible explanations (not mutually exclusive):</p>
+<ol>
+<li><strong>Session duration:</strong> If your therapists bill more units per claim (longer sessions), the per-claim rate is naturally higher. Your billing team can verify by checking average units per H2019 line.</li>
+<li><strong>Contract terms:</strong> Favorable MCO rates specific to your organization or market area.</li>
+<li><strong>Billing structure:</strong> Different modifier usage or bundling patterns that result in higher per-claim payments.</li>
+</ol>
+<p>This rate is a <strong>competitive advantage</strong> worth protecting. Combined with your therapy RPB of $360.27 (+93.7% above best-in-class), the therapy line is the strongest dimension of your organization's financial profile.</p>
+</div>
+
+<hr />
+
+<!-- ==================== METHODOLOGY ==================== -->
+<h2>Methodology</h2>
+<p><strong>Data source:</strong> FL Medicaid FFS claims (DOGE/Medicaid Provider Spending), 2024. MCO encounter data not included.</p>
+<p><strong>Org identification:</strong> Claims matched by billing NPI to organizational entity via NPPES. Professional servicing NPIs only (entity_type_code = 1).</p>
+<p><strong>Benchmark philosophy:</strong> This report benchmarks against a single target: <strong>Rest-of-FL P75 &mdash; best-in-class</strong>. This is the top quartile of non-CMHC FL Medicaid providers. Every rate, RPB, and panel comparison in this report measures the gap to that bar. The CMHC sector median is shown in small gray text for context only &mdash; it is never the comparison number. The rationale: the industry landscape report demonstrated that the CMHC sector systematically underperforms the broader market. Benchmarking against the sector normalizes that underperformance.</p>
+<p><strong>Panel benchmarks:</strong> Panel size (beneficiaries per clinician) comparisons use the best available market benchmark from the industry landscape data. These reflect non-CMHC provider norms and are labeled "Market Benchmark" throughout.</p>
+<p><strong>Metrics:</strong> Payment per claim (rate), revenue per beneficiary (engagement depth), claims per beneficiary (visit frequency), beneficiaries per clinician (panel size / productivity).</p>
+<p><strong>T1015 P75 caveat:</strong> The Rest-of-FL P75 for T1015 ($172.44) is anomalously high, likely distorted by FQHCs billing at all-inclusive encounter rates. This code is flagged with a caveat throughout the report.</p>
+<p><strong>Sector context:</strong> Sector-level numbers ($8.1M rate gap, 23.6%&rarr;5.0% leakage, $157M upper-bound leakage gap) are from the FL CMHC Landscape Report v4, which benchmarks the full CMHC sector against all non-CMHC FL Medicaid providers.</p>
+<p><strong>Limitations:</strong> This report shows FL Medicaid FFS only &mdash; a partial view. Organization-level conclusions should be validated against internal data. Residential treatment revenue, facility-level crisis billing, and MCO encounter data are not captured. Beneficiary counts are not deduplicated across service codes.</p>
+
+<hr />
+
+<p style="text-align:center;color:#94a3b8;font-style:italic;margin-top:40px">This report maps your organization's position within the three structural challenges identified in the FL CMHC Landscape Report &mdash; benchmarked against best-in-class (Rest-of-FL P75), not against the lagging CMHC sector. It presents observations and investigation questions &mdash; it does not diagnose causes or prescribe actions. All numbers should be validated against internal claims data before operational decisions.</p>
+<p style="margin-top:60px;border-top:1px solid #334155;padding-top:24px;font-size:12px;color:#64748b;text-align:center">Organizational Benchmarking &middot; David Lawrence Center &middot; 2024 &middot; v10 (Best-in-Class Benchmark)</p>
+
+</body></html>

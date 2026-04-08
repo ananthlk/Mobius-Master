@@ -1,0 +1,2447 @@
+{
+  "report_type": "industry",
+  "sector": "CMHC",
+  "sector_label": "Community Mental Health Centers",
+  "state": "FL",
+  "period": "2024",
+  "title": "Florida Medicaid CMHC Landscape \u2014 Rate Benchmarking Report",
+  "subtitle": "How the CMHC sector compares to the broader Florida Medicaid market",
+  "sector_summary": {
+    "description": "This report benchmarks the Florida Community Mental Health Center (CMHC) sector against the broader Florida Medicaid market. It covers all CMHCs billing Medicaid fee-for-service claims through professional servicing clinicians during 2024.",
+    "total_cmhc_orgs": 86,
+    "key_finding": "The CMHC sector systematically collects less per claim than the broader Medicaid market on several key behavioral health codes, with gaps ranging from 7% to 20% below the All FL Medicaid median."
+  },
+  "report_tone_rule": "This report presents market-level observations. It does not diagnose causes or recommend actions for individual organizations.",
+  "codes": {
+    "90791": {
+      "name": "90791",
+      "service_line": "outpatient_therapy",
+      "all_fl": {
+        "org_count": 112,
+        "total_claims": 11078,
+        "p25_ppc": 27.79,
+        "p50_ppc": 91.88,
+        "p75_ppc": 123.31,
+        "p25_rpb": 29.76,
+        "p50_rpb": 101.67,
+        "p75_rpb": 126.26,
+        "p25_cpb": 1.0,
+        "p50_cpb": 1.07,
+        "p75_cpb": 1.25,
+        "p25_bpc": 14.0,
+        "p50_bpc": 30.0,
+        "p75_bpc": 79.0
+      },
+      "cmhc": {
+        "org_count": 6,
+        "total_claims": 333,
+        "p50_ppc": 105.3,
+        "p50_rpb": 105.3,
+        "p50_cpb": 1.02,
+        "p50_bpc": 31.0
+      },
+      "sector_gap_pct": 14.6,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 88.24,
+          "org_count": 59
+        },
+        "medium": {
+          "p50_ppc": 100.0,
+          "org_count": 45
+        },
+        "small": {
+          "p50_ppc": 39.41,
+          "org_count": 8
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 90.39,
+          "org_count": 54
+        },
+        "moderate": {
+          "p50_ppc": 55.86,
+          "org_count": 32
+        },
+        "sparse": {
+          "p50_ppc": 105.3,
+          "org_count": 26
+        }
+      }
+    },
+    "90792": {
+      "name": "90792",
+      "service_line": "outpatient_therapy",
+      "all_fl": {
+        "org_count": 135,
+        "total_claims": 19196,
+        "p25_ppc": 19.56,
+        "p50_ppc": 82.12,
+        "p75_ppc": 144.58,
+        "p25_rpb": 24.43,
+        "p50_rpb": 95.27,
+        "p75_rpb": 153.69,
+        "p25_cpb": 1.0,
+        "p50_cpb": 1.09,
+        "p75_cpb": 1.28,
+        "p25_bpc": 15.0,
+        "p50_bpc": 38.0,
+        "p75_bpc": 79.0
+      },
+      "cmhc": {
+        "org_count": 13,
+        "total_claims": 1643,
+        "p50_ppc": 59.68,
+        "p50_rpb": 83.12,
+        "p50_cpb": 1.08,
+        "p50_bpc": 45.0
+      },
+      "sector_gap_pct": -27.3,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 76.7,
+          "org_count": 73
+        },
+        "medium": {
+          "p50_ppc": 87.34,
+          "org_count": 53
+        },
+        "small": {
+          "p50_ppc": 63.3,
+          "org_count": 9
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 95.27,
+          "org_count": 62
+        },
+        "moderate": {
+          "p50_ppc": 57.75,
+          "org_count": 33
+        },
+        "sparse": {
+          "p50_ppc": 58.1,
+          "org_count": 40
+        }
+      }
+    },
+    "90832": {
+      "name": "90832",
+      "service_line": "outpatient_therapy",
+      "all_fl": {
+        "org_count": 86,
+        "total_claims": 106552,
+        "p25_ppc": 3.34,
+        "p50_ppc": 19.89,
+        "p75_ppc": 54.84,
+        "p25_rpb": 6.3,
+        "p50_rpb": 38.41,
+        "p75_rpb": 70.19,
+        "p25_cpb": 1.29,
+        "p50_cpb": 1.66,
+        "p75_cpb": 2.6,
+        "p25_bpc": 26.0,
+        "p50_bpc": 94.0,
+        "p75_bpc": 180.0
+      },
+      "cmhc": {
+        "org_count": 3,
+        "total_claims": 559,
+        "p50_ppc": 48.74,
+        "p50_rpb": 81.92,
+        "p50_cpb": 2.66,
+        "p50_bpc": 68.0
+      },
+      "sector_gap_pct": 145.0,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 42.73,
+          "org_count": 47
+        },
+        "medium": {
+          "p50_ppc": 15.18,
+          "org_count": 35
+        },
+        "small": {
+          "p50_ppc": 0.0,
+          "org_count": 4
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 8.52,
+          "org_count": 38
+        },
+        "moderate": {
+          "p50_ppc": 15.57,
+          "org_count": 22
+        },
+        "sparse": {
+          "p50_ppc": 43.81,
+          "org_count": 26
+        }
+      }
+    },
+    "90833": {
+      "name": "90833",
+      "service_line": "medication_mgmt",
+      "all_fl": {
+        "org_count": 140,
+        "total_claims": 56738,
+        "p25_ppc": 11.44,
+        "p50_ppc": 34.84,
+        "p75_ppc": 55.41,
+        "p25_rpb": 13.64,
+        "p50_rpb": 37.84,
+        "p75_rpb": 63.77,
+        "p25_cpb": 1.09,
+        "p50_cpb": 1.17,
+        "p75_cpb": 1.3,
+        "p25_bpc": 35.0,
+        "p50_bpc": 128.0,
+        "p75_bpc": 269.0
+      },
+      "cmhc": {
+        "org_count": 21,
+        "total_claims": 13360,
+        "p50_ppc": 38.49,
+        "p50_rpb": 44.5,
+        "p50_cpb": 1.1,
+        "p50_bpc": 43.0
+      },
+      "sector_gap_pct": 10.5,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 38.04,
+          "org_count": 65
+        },
+        "medium": {
+          "p50_ppc": 25.49,
+          "org_count": 60
+        },
+        "small": {
+          "p50_ppc": 38.26,
+          "org_count": 15
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 42.62,
+          "org_count": 68
+        },
+        "moderate": {
+          "p50_ppc": 14.05,
+          "org_count": 32
+        },
+        "sparse": {
+          "p50_ppc": 37.84,
+          "org_count": 40
+        }
+      }
+    },
+    "90834": {
+      "name": "Psychotherapy 45min",
+      "service_line": "outpatient_therapy",
+      "all_fl": {
+        "org_count": 93,
+        "total_claims": 22062,
+        "p25_ppc": 14.43,
+        "p50_ppc": 53.27,
+        "p75_ppc": 76.68,
+        "p25_rpb": 26.6,
+        "p50_rpb": 79.5,
+        "p75_rpb": 130.23,
+        "p25_cpb": 1.25,
+        "p50_cpb": 1.5,
+        "p75_cpb": 2.13,
+        "p25_bpc": 26.0,
+        "p50_bpc": 60.0,
+        "p75_bpc": 137.0
+      },
+      "cmhc": {
+        "org_count": 6,
+        "total_claims": 433,
+        "p50_ppc": 47.74,
+        "p50_rpb": 68.96,
+        "p50_cpb": 1.42,
+        "p50_bpc": 18.0
+      },
+      "sector_gap_pct": -10.4,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 50.32,
+          "org_count": 48
+        },
+        "medium": {
+          "p50_ppc": 57.94,
+          "org_count": 42
+        },
+        "small": {
+          "p50_ppc": 69.36,
+          "org_count": 3
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 52.84,
+          "org_count": 37
+        },
+        "moderate": {
+          "p50_ppc": 61.37,
+          "org_count": 26
+        },
+        "sparse": {
+          "p50_ppc": 48.45,
+          "org_count": 30
+        }
+      }
+    },
+    "90836": {
+      "name": "90836",
+      "service_line": "medication_mgmt",
+      "all_fl": {
+        "org_count": 17,
+        "total_claims": 3628,
+        "p25_ppc": 18.29,
+        "p50_ppc": 35.15,
+        "p75_ppc": 65.08,
+        "p25_rpb": 27.7,
+        "p50_rpb": 49.83,
+        "p75_rpb": 67.72,
+        "p25_cpb": 1.13,
+        "p50_cpb": 1.26,
+        "p75_cpb": 1.34,
+        "p25_bpc": 24.0,
+        "p50_bpc": 120.0,
+        "p75_bpc": 167.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 36.05,
+          "org_count": 12
+        },
+        "medium": {
+          "p50_ppc": 13.95,
+          "org_count": 4
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 36.05,
+          "org_count": 7
+        },
+        "moderate": {
+          "p50_ppc": 30.66,
+          "org_count": 5
+        },
+        "sparse": {
+          "p50_ppc": 52.88,
+          "org_count": 5
+        }
+      }
+    },
+    "90837": {
+      "name": "Psychotherapy 60min",
+      "service_line": "outpatient_therapy",
+      "all_fl": {
+        "org_count": 223,
+        "total_claims": 91879,
+        "p25_ppc": 40.23,
+        "p50_ppc": 85.97,
+        "p75_ppc": 105.4,
+        "p25_rpb": 79.94,
+        "p50_rpb": 161.13,
+        "p75_rpb": 219.47,
+        "p25_cpb": 1.6,
+        "p50_cpb": 2.03,
+        "p75_cpb": 2.64,
+        "p25_bpc": 27.0,
+        "p50_bpc": 95.0,
+        "p75_bpc": 187.0
+      },
+      "cmhc": {
+        "org_count": 27,
+        "total_claims": 9799,
+        "p50_ppc": 57.77,
+        "p50_rpb": 104.89,
+        "p50_cpb": 1.67,
+        "p50_bpc": 26.0
+      },
+      "sector_gap_pct": -32.8,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 72.12,
+          "org_count": 79
+        },
+        "medium": {
+          "p50_ppc": 89.8,
+          "org_count": 99
+        },
+        "small": {
+          "p50_ppc": 94.89,
+          "org_count": 45
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 89.8,
+          "org_count": 77
+        },
+        "moderate": {
+          "p50_ppc": 84.86,
+          "org_count": 84
+        },
+        "sparse": {
+          "p50_ppc": 79.39,
+          "org_count": 62
+        }
+      }
+    },
+    "90838": {
+      "name": "90838",
+      "service_line": "medication_mgmt",
+      "all_fl": {
+        "org_count": 7,
+        "total_claims": 3241,
+        "p25_ppc": 0.11,
+        "p50_ppc": 6.95,
+        "p75_ppc": 72.82,
+        "p25_rpb": 0.16,
+        "p50_rpb": 7.35,
+        "p75_rpb": 72.82,
+        "p25_cpb": 1.0,
+        "p50_cpb": 1.19,
+        "p75_cpb": 1.52,
+        "p25_bpc": 29.0,
+        "p50_bpc": 40.0,
+        "p75_bpc": 422.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 56.62,
+          "org_count": 3
+        },
+        "medium": {
+          "p50_ppc": 5.07,
+          "org_count": 3
+        }
+      },
+      "by_market": {
+        "moderate": {
+          "p50_ppc": 6.95,
+          "org_count": 3
+        },
+        "sparse": {
+          "p50_ppc": 0.11,
+          "org_count": 3
+        }
+      }
+    },
+    "90847": {
+      "name": "90847",
+      "service_line": "outpatient_therapy",
+      "all_fl": {
+        "org_count": 11,
+        "total_claims": 2676,
+        "p25_ppc": 39.93,
+        "p50_ppc": 74.72,
+        "p75_ppc": 104.47,
+        "p25_rpb": 75.01,
+        "p50_rpb": 133.09,
+        "p75_rpb": 186.8,
+        "p25_cpb": 1.24,
+        "p50_cpb": 1.81,
+        "p75_cpb": 2.49,
+        "p25_bpc": 12.0,
+        "p50_bpc": 83.0,
+        "p75_bpc": 196.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 69.24,
+          "org_count": 6
+        },
+        "medium": {
+          "p50_ppc": 88.3,
+          "org_count": 5
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 88.3,
+          "org_count": 5
+        },
+        "moderate": {
+          "p50_ppc": 0.0,
+          "org_count": 4
+        }
+      }
+    },
+    "90853": {
+      "name": "90853",
+      "service_line": "outpatient_therapy",
+      "all_fl": {
+        "org_count": 23,
+        "total_claims": 17950,
+        "p25_ppc": 0.64,
+        "p50_ppc": 13.59,
+        "p75_ppc": 29.33,
+        "p25_rpb": 5.69,
+        "p50_rpb": 32.19,
+        "p75_rpb": 109.56,
+        "p25_cpb": 2.25,
+        "p50_cpb": 2.9,
+        "p75_cpb": 6.67,
+        "p25_bpc": 17.0,
+        "p50_bpc": 118.0,
+        "p75_bpc": 205.5
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 13.59,
+          "org_count": 15
+        },
+        "medium": {
+          "p50_ppc": 10.85,
+          "org_count": 7
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 10.85,
+          "org_count": 11
+        },
+        "moderate": {
+          "p50_ppc": 6.97,
+          "org_count": 3
+        },
+        "sparse": {
+          "p50_ppc": 13.77,
+          "org_count": 9
+        }
+      }
+    },
+    "99202": {
+      "name": "99202",
+      "service_line": "medication_mgmt",
+      "all_fl": {
+        "org_count": 76,
+        "total_claims": 20735,
+        "p25_ppc": 29.26,
+        "p50_ppc": 48.51,
+        "p75_ppc": 66.82,
+        "p25_rpb": 31.22,
+        "p50_rpb": 51.94,
+        "p75_rpb": 72.38,
+        "p25_cpb": 1.0,
+        "p50_cpb": 1.02,
+        "p75_cpb": 1.08,
+        "p25_bpc": 14.0,
+        "p50_bpc": 27.0,
+        "p75_bpc": 60.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 51.27,
+          "org_count": 42
+        },
+        "medium": {
+          "p50_ppc": 42.5,
+          "org_count": 30
+        },
+        "small": {
+          "p50_ppc": 0.68,
+          "org_count": 4
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 48.1,
+          "org_count": 51
+        },
+        "moderate": {
+          "p50_ppc": 49.21,
+          "org_count": 13
+        },
+        "sparse": {
+          "p50_ppc": 45.28,
+          "org_count": 12
+        }
+      }
+    },
+    "99203": {
+      "name": "99203",
+      "service_line": "medication_mgmt",
+      "all_fl": {
+        "org_count": 657,
+        "total_claims": 111118,
+        "p25_ppc": 51.09,
+        "p50_ppc": 69.17,
+        "p75_ppc": 89.67,
+        "p25_rpb": 55.43,
+        "p50_rpb": 74.7,
+        "p75_rpb": 94.08,
+        "p25_cpb": 1.0,
+        "p50_cpb": 1.03,
+        "p75_cpb": 1.11,
+        "p25_bpc": 15.0,
+        "p50_bpc": 39.0,
+        "p75_bpc": 89.75
+      },
+      "cmhc": {
+        "org_count": 4,
+        "total_claims": 372,
+        "p50_ppc": 65.17,
+        "p50_rpb": 68.85,
+        "p50_cpb": 1.02,
+        "p50_bpc": 21.0
+      },
+      "sector_gap_pct": -5.8,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 68.42,
+          "org_count": 360
+        },
+        "medium": {
+          "p50_ppc": 74.32,
+          "org_count": 250
+        },
+        "small": {
+          "p50_ppc": 66.05,
+          "org_count": 47
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 68.51,
+          "org_count": 540
+        },
+        "moderate": {
+          "p50_ppc": 75.03,
+          "org_count": 47
+        },
+        "sparse": {
+          "p50_ppc": 69.25,
+          "org_count": 70
+        }
+      }
+    },
+    "99204": {
+      "name": "99204",
+      "service_line": "medication_mgmt",
+      "all_fl": {
+        "org_count": 908,
+        "total_claims": 129550,
+        "p25_ppc": 69.39,
+        "p50_ppc": 95.74,
+        "p75_ppc": 126.88,
+        "p25_rpb": 77.89,
+        "p50_rpb": 102.67,
+        "p75_rpb": 134.01,
+        "p25_cpb": 1.0,
+        "p50_cpb": 1.04,
+        "p75_cpb": 1.11,
+        "p25_bpc": 14.0,
+        "p50_bpc": 39.14,
+        "p75_bpc": 90.0
+      },
+      "cmhc": {
+        "org_count": 4,
+        "total_claims": 319,
+        "p50_ppc": 81.47,
+        "p50_rpb": 97.53,
+        "p50_cpb": 1.0,
+        "p50_bpc": 25.0
+      },
+      "sector_gap_pct": -14.9,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 95.15,
+          "org_count": 498
+        },
+        "medium": {
+          "p50_ppc": 97.63,
+          "org_count": 353
+        },
+        "small": {
+          "p50_ppc": 91.56,
+          "org_count": 57
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 95.87,
+          "org_count": 789
+        },
+        "moderate": {
+          "p50_ppc": 88.99,
+          "org_count": 58
+        },
+        "sparse": {
+          "p50_ppc": 93.92,
+          "org_count": 61
+        }
+      }
+    },
+    "99205": {
+      "name": "99205",
+      "service_line": "medication_mgmt",
+      "all_fl": {
+        "org_count": 129,
+        "total_claims": 12021,
+        "p25_ppc": 99.47,
+        "p50_ppc": 136.99,
+        "p75_ppc": 180.77,
+        "p25_rpb": 112.04,
+        "p50_rpb": 147.4,
+        "p75_rpb": 196.37,
+        "p25_cpb": 1.0,
+        "p50_cpb": 1.04,
+        "p75_cpb": 1.11,
+        "p25_bpc": 14.0,
+        "p50_bpc": 28.0,
+        "p75_bpc": 71.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 139.69,
+          "org_count": 68
+        },
+        "medium": {
+          "p50_ppc": 132.35,
+          "org_count": 54
+        },
+        "small": {
+          "p50_ppc": 114.58,
+          "org_count": 7
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 132.35,
+          "org_count": 112
+        },
+        "moderate": {
+          "p50_ppc": 141.97,
+          "org_count": 13
+        },
+        "sparse": {
+          "p50_ppc": 148.97,
+          "org_count": 4
+        }
+      }
+    },
+    "99212": {
+      "name": "99212",
+      "service_line": "medication_mgmt",
+      "all_fl": {
+        "org_count": 602,
+        "total_claims": 194051,
+        "p25_ppc": 14.23,
+        "p50_ppc": 26.52,
+        "p75_ppc": 42.56,
+        "p25_rpb": 17.18,
+        "p50_rpb": 28.85,
+        "p75_rpb": 45.88,
+        "p25_cpb": 1.02,
+        "p50_cpb": 1.07,
+        "p75_cpb": 1.16,
+        "p25_bpc": 25.0,
+        "p50_bpc": 60.0,
+        "p75_bpc": 169.75
+      },
+      "cmhc": {
+        "org_count": 6,
+        "total_claims": 669,
+        "p50_ppc": 20.67,
+        "p50_rpb": 25.33,
+        "p50_cpb": 1.06,
+        "p50_bpc": 40.0
+      },
+      "sector_gap_pct": -22.1,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 26.67,
+          "org_count": 452
+        },
+        "medium": {
+          "p50_ppc": 29.25,
+          "org_count": 123
+        },
+        "small": {
+          "p50_ppc": 19.35,
+          "org_count": 27
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 27.56,
+          "org_count": 378
+        },
+        "moderate": {
+          "p50_ppc": 26.42,
+          "org_count": 72
+        },
+        "sparse": {
+          "p50_ppc": 24.95,
+          "org_count": 152
+        }
+      }
+    },
+    "99213": {
+      "name": "Office Visit L3",
+      "service_line": "medication_mgmt",
+      "all_fl": {
+        "org_count": 3657,
+        "total_claims": 2445520,
+        "p25_ppc": 18.56,
+        "p50_ppc": 33.32,
+        "p75_ppc": 56.44,
+        "p25_rpb": 22.46,
+        "p50_rpb": 37.46,
+        "p75_rpb": 63.26,
+        "p25_cpb": 1.05,
+        "p50_cpb": 1.11,
+        "p75_cpb": 1.21,
+        "p25_bpc": 40.0,
+        "p50_bpc": 111.33,
+        "p75_bpc": 289.0
+      },
+      "cmhc": {
+        "org_count": 39,
+        "total_claims": 22527,
+        "p50_ppc": 30.38,
+        "p50_rpb": 34.0,
+        "p50_cpb": 1.09,
+        "p50_bpc": 94.5
+      },
+      "sector_gap_pct": -8.8,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 34.81,
+          "org_count": 2001
+        },
+        "medium": {
+          "p50_ppc": 32.99,
+          "org_count": 1259
+        },
+        "small": {
+          "p50_ppc": 24.97,
+          "org_count": 397
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 34.29,
+          "org_count": 2724
+        },
+        "moderate": {
+          "p50_ppc": 32.79,
+          "org_count": 353
+        },
+        "sparse": {
+          "p50_ppc": 30.78,
+          "org_count": 580
+        }
+      }
+    },
+    "99214": {
+      "name": "Office Visit L4",
+      "service_line": "medication_mgmt",
+      "all_fl": {
+        "org_count": 4211,
+        "total_claims": 1984123,
+        "p25_ppc": 22.73,
+        "p50_ppc": 42.75,
+        "p75_ppc": 70.28,
+        "p25_rpb": 27.58,
+        "p50_rpb": 48.71,
+        "p75_rpb": 78.52,
+        "p25_cpb": 1.05,
+        "p50_cpb": 1.11,
+        "p75_cpb": 1.21,
+        "p25_bpc": 35.0,
+        "p50_bpc": 100.0,
+        "p75_bpc": 233.0
+      },
+      "cmhc": {
+        "org_count": 65,
+        "total_claims": 30949,
+        "p50_ppc": 51.68,
+        "p50_rpb": 59.91,
+        "p50_cpb": 1.09,
+        "p50_bpc": 98.67
+      },
+      "sector_gap_pct": 20.9,
+      "published_rate": 53.43,
+      "published_unit": "per visit",
+      "published_note": "FSI rate. Facility: $50.77",
+      "by_size": {
+        "large": {
+          "p50_ppc": 47.98,
+          "org_count": 1972
+        },
+        "medium": {
+          "p50_ppc": 42.68,
+          "org_count": 1643
+        },
+        "small": {
+          "p50_ppc": 24.29,
+          "org_count": 596
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 43.32,
+          "org_count": 3281
+        },
+        "moderate": {
+          "p50_ppc": 43.64,
+          "org_count": 387
+        },
+        "sparse": {
+          "p50_ppc": 41.48,
+          "org_count": 543
+        }
+      }
+    },
+    "99215": {
+      "name": "99215",
+      "service_line": "medication_mgmt",
+      "all_fl": {
+        "org_count": 496,
+        "total_claims": 97440,
+        "p25_ppc": 45.26,
+        "p50_ppc": 81.01,
+        "p75_ppc": 122.71,
+        "p25_rpb": 52.28,
+        "p50_rpb": 92.36,
+        "p75_rpb": 135.42,
+        "p25_cpb": 1.03,
+        "p50_cpb": 1.08,
+        "p75_cpb": 1.2,
+        "p25_bpc": 17.0,
+        "p50_bpc": 44.0,
+        "p75_bpc": 106.0
+      },
+      "cmhc": {
+        "org_count": 7,
+        "total_claims": 1231,
+        "p50_ppc": 85.45,
+        "p50_rpb": 91.17,
+        "p50_cpb": 1.05,
+        "p50_bpc": 88.0
+      },
+      "sector_gap_pct": 5.5,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 81.06,
+          "org_count": 213
+        },
+        "medium": {
+          "p50_ppc": 89.18,
+          "org_count": 238
+        },
+        "small": {
+          "p50_ppc": 47.4,
+          "org_count": 45
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 81.16,
+          "org_count": 372
+        },
+        "moderate": {
+          "p50_ppc": 80.78,
+          "org_count": 61
+        },
+        "sparse": {
+          "p50_ppc": 79.97,
+          "org_count": 63
+        }
+      }
+    },
+    "H0001": {
+      "name": "H0001",
+      "service_line": "assessment",
+      "all_fl": {
+        "org_count": 26,
+        "total_claims": 8118,
+        "p25_ppc": 12.5,
+        "p50_ppc": 28.06,
+        "p75_ppc": 51.14,
+        "p25_rpb": 17.65,
+        "p50_rpb": 34.88,
+        "p75_rpb": 54.42,
+        "p25_cpb": 1.02,
+        "p50_cpb": 1.08,
+        "p75_cpb": 1.41,
+        "p25_bpc": 14.0,
+        "p50_bpc": 63.0,
+        "p75_bpc": 172.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 32.43,
+          "org_count": 20
+        },
+        "medium": {
+          "p50_ppc": 12.5,
+          "org_count": 6
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 12.5,
+          "org_count": 10
+        },
+        "moderate": {
+          "p50_ppc": 40.8,
+          "org_count": 7
+        },
+        "sparse": {
+          "p50_ppc": 42.96,
+          "org_count": 9
+        }
+      }
+    },
+    "H0004": {
+      "name": "H0004",
+      "service_line": "outpatient_therapy",
+      "all_fl": {
+        "org_count": 33,
+        "total_claims": 19026,
+        "p25_ppc": 7.14,
+        "p50_ppc": 36.89,
+        "p75_ppc": 90.27,
+        "p25_rpb": 7.69,
+        "p50_rpb": 54.53,
+        "p75_rpb": 120.37,
+        "p25_cpb": 1.24,
+        "p50_cpb": 1.34,
+        "p75_cpb": 1.78,
+        "p25_bpc": 30.0,
+        "p50_bpc": 96.33,
+        "p75_bpc": 239.6
+      },
+      "cmhc": {
+        "org_count": 4,
+        "total_claims": 1047,
+        "p50_ppc": 0.08,
+        "p50_rpb": 0.1,
+        "p50_cpb": 1.33,
+        "p50_bpc": 13.0
+      },
+      "sector_gap_pct": -99.8,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 36.89,
+          "org_count": 22
+        },
+        "medium": {
+          "p50_ppc": 15.08,
+          "org_count": 10
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 36.89,
+          "org_count": 6
+        },
+        "moderate": {
+          "p50_ppc": 15.08,
+          "org_count": 3
+        },
+        "sparse": {
+          "p50_ppc": 36.72,
+          "org_count": 24
+        }
+      }
+    },
+    "H0019": {
+      "name": "H0019",
+      "service_line": "residential",
+      "all_fl": {
+        "org_count": 4,
+        "total_claims": 11246,
+        "p25_ppc": 179.28,
+        "p50_ppc": 209.77,
+        "p75_ppc": 333.81,
+        "p25_rpb": 4583.22,
+        "p50_rpb": 4832.27,
+        "p75_rpb": 4945.71,
+        "p25_cpb": 6.01,
+        "p50_cpb": 14.48,
+        "p75_cpb": 26.38,
+        "p25_bpc": 42.0,
+        "p50_bpc": 68.0,
+        "p75_bpc": 218.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "medium": {
+          "p50_ppc": 209.77,
+          "org_count": 4
+        }
+      },
+      "by_market": {
+        "sparse": {
+          "p50_ppc": 333.81,
+          "org_count": 3
+        }
+      }
+    },
+    "H0020": {
+      "name": "Medication-Assisted Treatment",
+      "service_line": "medical_bh",
+      "all_fl": {
+        "org_count": 59,
+        "total_claims": 148977,
+        "p25_ppc": 53.06,
+        "p50_ppc": 63.18,
+        "p75_ppc": 66.45,
+        "p25_rpb": 136.16,
+        "p50_rpb": 185.43,
+        "p75_rpb": 229.82,
+        "p25_cpb": 2.47,
+        "p50_cpb": 3.04,
+        "p75_cpb": 3.71,
+        "p25_bpc": 59.0,
+        "p50_bpc": 211.5,
+        "p75_bpc": 620.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 64.11,
+          "org_count": 29
+        },
+        "medium": {
+          "p50_ppc": 61.95,
+          "org_count": 21
+        },
+        "small": {
+          "p50_ppc": 49.03,
+          "org_count": 9
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 61.95,
+          "org_count": 14
+        },
+        "moderate": {
+          "p50_ppc": 64.51,
+          "org_count": 17
+        },
+        "sparse": {
+          "p50_ppc": 63.5,
+          "org_count": 28
+        }
+      }
+    },
+    "H0023": {
+      "name": "H0023",
+      "service_line": "crisis",
+      "all_fl": {
+        "org_count": 3,
+        "total_claims": 6148,
+        "p25_ppc": 21.59,
+        "p50_ppc": 27.16,
+        "p75_ppc": 324.34,
+        "p25_rpb": 63.08,
+        "p50_rpb": 82.09,
+        "p75_rpb": 423.35,
+        "p25_cpb": 1.31,
+        "p50_cpb": 2.92,
+        "p75_cpb": 3.02,
+        "p25_bpc": 95.0,
+        "p50_bpc": 351.0,
+        "p75_bpc": 1699.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {},
+      "by_market": {}
+    },
+    "H0031": {
+      "name": "Mental Health Assessment",
+      "service_line": "assessment",
+      "all_fl": {
+        "org_count": 383,
+        "total_claims": 223488,
+        "p25_ppc": 24.41,
+        "p50_ppc": 31.59,
+        "p75_ppc": 49.55,
+        "p25_rpb": 35.06,
+        "p50_rpb": 51.8,
+        "p75_rpb": 71.25,
+        "p25_cpb": 1.15,
+        "p50_cpb": 1.48,
+        "p75_cpb": 1.9,
+        "p25_bpc": 27.0,
+        "p50_bpc": 83.0,
+        "p75_bpc": 228.0
+      },
+      "cmhc": {
+        "org_count": 48,
+        "total_claims": 50983,
+        "p50_ppc": 31.7,
+        "p50_rpb": 45.73,
+        "p50_cpb": 1.22,
+        "p50_bpc": 115.42
+      },
+      "sector_gap_pct": 0.3,
+      "published_rate": 126.11,
+      "published_unit": "per event",
+      "published_note": "In-depth assessment (HO modifier). Limited assessment: $17.90",
+      "by_size": {
+        "large": {
+          "p50_ppc": 32.1,
+          "org_count": 225
+        },
+        "medium": {
+          "p50_ppc": 29.81,
+          "org_count": 142
+        },
+        "small": {
+          "p50_ppc": 30.43,
+          "org_count": 16
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 30.38,
+          "org_count": 159
+        },
+        "moderate": {
+          "p50_ppc": 32.39,
+          "org_count": 116
+        },
+        "sparse": {
+          "p50_ppc": 31.7,
+          "org_count": 108
+        }
+      }
+    },
+    "H0032": {
+      "name": "Treatment Plan Development",
+      "service_line": "assessment",
+      "all_fl": {
+        "org_count": 390,
+        "total_claims": 182610,
+        "p25_ppc": 57.24,
+        "p50_ppc": 70.33,
+        "p75_ppc": 83.0,
+        "p25_rpb": 64.04,
+        "p50_rpb": 73.39,
+        "p75_rpb": 88.64,
+        "p25_cpb": 1.0,
+        "p50_cpb": 1.02,
+        "p75_cpb": 1.11,
+        "p25_bpc": 29.0,
+        "p50_bpc": 91.0,
+        "p75_bpc": 220.0
+      },
+      "cmhc": {
+        "org_count": 55,
+        "total_claims": 47113,
+        "p50_ppc": 70.75,
+        "p50_rpb": 72.49,
+        "p50_cpb": 1.03,
+        "p50_bpc": 75.0
+      },
+      "sector_gap_pct": 0.6,
+      "published_rate": 97.86,
+      "published_unit": "per event",
+      "published_note": "Treatment plan development. Review: $48.93",
+      "by_size": {
+        "large": {
+          "p50_ppc": 69.04,
+          "org_count": 225
+        },
+        "medium": {
+          "p50_ppc": 71.87,
+          "org_count": 149
+        },
+        "small": {
+          "p50_ppc": 68.13,
+          "org_count": 16
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 74.4,
+          "org_count": 169
+        },
+        "moderate": {
+          "p50_ppc": 68.2,
+          "org_count": 118
+        },
+        "sparse": {
+          "p50_ppc": 68.13,
+          "org_count": 103
+        }
+      }
+    },
+    "H0035": {
+      "name": "H0035",
+      "service_line": "outpatient_therapy",
+      "all_fl": {
+        "org_count": 8,
+        "total_claims": 11121,
+        "p25_ppc": 10.93,
+        "p50_ppc": 12.92,
+        "p75_ppc": 164.4,
+        "p25_rpb": 94.69,
+        "p50_rpb": 235.23,
+        "p75_rpb": 1297.63,
+        "p25_cpb": 7.89,
+        "p50_cpb": 9.46,
+        "p75_cpb": 15.25,
+        "p25_bpc": 90.0,
+        "p50_bpc": 118.0,
+        "p75_bpc": 136.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "medium": {
+          "p50_ppc": 12.78,
+          "org_count": 6
+        }
+      },
+      "by_market": {
+        "sparse": {
+          "p50_ppc": 113.79,
+          "org_count": 5
+        }
+      }
+    },
+    "H0036": {
+      "name": "H0036",
+      "service_line": "case_management",
+      "all_fl": {
+        "org_count": 9,
+        "total_claims": 2548,
+        "p25_ppc": 51.53,
+        "p50_ppc": 72.32,
+        "p75_ppc": 89.11,
+        "p25_rpb": 78.25,
+        "p50_rpb": 182.91,
+        "p75_rpb": 314.72,
+        "p25_cpb": 1.57,
+        "p50_cpb": 2.05,
+        "p75_cpb": 4.35,
+        "p25_bpc": 24.0,
+        "p50_bpc": 36.0,
+        "p75_bpc": 74.0
+      },
+      "cmhc": {
+        "org_count": 4,
+        "total_claims": 1445,
+        "p50_ppc": 52.17,
+        "p50_rpb": 78.25,
+        "p50_cpb": 1.5,
+        "p50_bpc": 36.0
+      },
+      "sector_gap_pct": -27.9,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "medium": {
+          "p50_ppc": 72.32,
+          "org_count": 7
+        }
+      },
+      "by_market": {
+        "moderate": {
+          "p50_ppc": 73.35,
+          "org_count": 3
+        },
+        "sparse": {
+          "p50_ppc": 72.32,
+          "org_count": 5
+        }
+      }
+    },
+    "H0038": {
+      "name": "H0038",
+      "service_line": "community_support",
+      "all_fl": {
+        "org_count": 10,
+        "total_claims": 5213,
+        "p25_ppc": 8.62,
+        "p50_ppc": 23.68,
+        "p75_ppc": 60.49,
+        "p25_rpb": 39.68,
+        "p50_rpb": 92.4,
+        "p75_rpb": 205.29,
+        "p25_cpb": 2.85,
+        "p50_cpb": 3.22,
+        "p75_cpb": 4.33,
+        "p25_bpc": 27.0,
+        "p50_bpc": 46.0,
+        "p75_bpc": 156.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 0.0,
+          "org_count": 4
+        },
+        "medium": {
+          "p50_ppc": 30.8,
+          "org_count": 6
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 0.0,
+          "org_count": 3
+        },
+        "moderate": {
+          "p50_ppc": 30.8,
+          "org_count": 4
+        },
+        "sparse": {
+          "p50_ppc": 60.49,
+          "org_count": 3
+        }
+      }
+    },
+    "H0040": {
+      "name": "Assertive Community Treatment",
+      "service_line": "act",
+      "all_fl": {
+        "org_count": 22,
+        "total_claims": 257658,
+        "p25_ppc": 30.18,
+        "p50_ppc": 30.78,
+        "p75_ppc": 31.38,
+        "p25_rpb": 535.42,
+        "p50_rpb": 643.55,
+        "p75_rpb": 792.46,
+        "p25_cpb": 17.06,
+        "p50_cpb": 21.32,
+        "p75_cpb": 25.14,
+        "p25_bpc": 345.5,
+        "p50_bpc": 546.0,
+        "p75_bpc": 681.0
+      },
+      "cmhc": {
+        "org_count": 6,
+        "total_claims": 84539,
+        "p50_ppc": 30.3,
+        "p50_rpb": 721.37,
+        "p50_cpb": 23.6,
+        "p50_bpc": 345.5
+      },
+      "sector_gap_pct": -1.6,
+      "published_rate": 31.55,
+      "published_unit": "per diem",
+      "published_note": "FACT per diem",
+      "by_size": {
+        "large": {
+          "p50_ppc": 30.78,
+          "org_count": 13
+        },
+        "medium": {
+          "p50_ppc": 30.86,
+          "org_count": 9
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 30.99,
+          "org_count": 4
+        },
+        "moderate": {
+          "p50_ppc": 30.78,
+          "org_count": 7
+        },
+        "sparse": {
+          "p50_ppc": 30.6,
+          "org_count": 11
+        }
+      }
+    },
+    "H0043": {
+      "name": "H0043",
+      "service_line": "case_management",
+      "all_fl": {
+        "org_count": 5,
+        "total_claims": 2810,
+        "p25_ppc": 91.11,
+        "p50_ppc": 96.97,
+        "p75_ppc": 98.02,
+        "p25_rpb": 289.73,
+        "p50_rpb": 335.7,
+        "p75_rpb": 410.82,
+        "p25_cpb": 3.18,
+        "p50_cpb": 4.01,
+        "p75_cpb": 4.19,
+        "p25_bpc": 89.0,
+        "p50_bpc": 161.0,
+        "p75_bpc": 168.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 98.02,
+          "org_count": 3
+        }
+      },
+      "by_market": {
+        "moderate": {
+          "p50_ppc": 96.97,
+          "org_count": 4
+        }
+      }
+    },
+    "H0046": {
+      "name": "H0046",
+      "service_line": "psychosocial_rehab",
+      "all_fl": {
+        "org_count": 18,
+        "total_claims": 16173,
+        "p25_ppc": 14.13,
+        "p50_ppc": 14.69,
+        "p75_ppc": 24.36,
+        "p25_rpb": 14.69,
+        "p50_rpb": 16.46,
+        "p75_rpb": 27.84,
+        "p25_cpb": 1.03,
+        "p50_cpb": 1.14,
+        "p75_cpb": 1.3,
+        "p25_bpc": 37.0,
+        "p50_bpc": 94.0,
+        "p75_bpc": 246.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 14.36,
+          "org_count": 11
+        },
+        "medium": {
+          "p50_ppc": 15.13,
+          "org_count": 5
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 14.36,
+          "org_count": 9
+        },
+        "sparse": {
+          "p50_ppc": 14.99,
+          "org_count": 8
+        }
+      }
+    },
+    "H0048": {
+      "name": "H0048",
+      "service_line": "medical_bh",
+      "all_fl": {
+        "org_count": 60,
+        "total_claims": 28874,
+        "p25_ppc": 8.52,
+        "p50_ppc": 9.27,
+        "p75_ppc": 9.9,
+        "p25_rpb": 9.78,
+        "p50_rpb": 10.46,
+        "p75_rpb": 11.22,
+        "p25_cpb": 1.06,
+        "p50_cpb": 1.12,
+        "p75_cpb": 1.17,
+        "p25_bpc": 69.0,
+        "p50_bpc": 145.0,
+        "p75_bpc": 349.0
+      },
+      "cmhc": {
+        "org_count": 6,
+        "total_claims": 3633,
+        "p50_ppc": 9.57,
+        "p50_rpb": 12.03,
+        "p50_cpb": 1.13,
+        "p50_bpc": 102.0
+      },
+      "sector_gap_pct": 3.2,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 9.32,
+          "org_count": 37
+        },
+        "medium": {
+          "p50_ppc": 9.26,
+          "org_count": 20
+        },
+        "small": {
+          "p50_ppc": 7.74,
+          "org_count": 3
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 9.21,
+          "org_count": 11
+        },
+        "moderate": {
+          "p50_ppc": 9.3,
+          "org_count": 18
+        },
+        "sparse": {
+          "p50_ppc": 9.27,
+          "org_count": 31
+        }
+      }
+    },
+    "H2000": {
+      "name": "Psychiatric Evaluation",
+      "service_line": "assessment",
+      "all_fl": {
+        "org_count": 144,
+        "total_claims": 39031,
+        "p25_ppc": 149.3,
+        "p50_ppc": 193.95,
+        "p75_ppc": 237.22,
+        "p25_rpb": 165.66,
+        "p50_rpb": 206.51,
+        "p75_rpb": 244.34,
+        "p25_cpb": 1.0,
+        "p50_cpb": 1.02,
+        "p75_cpb": 1.1,
+        "p25_bpc": 20.0,
+        "p50_bpc": 58.0,
+        "p75_bpc": 123.0
+      },
+      "cmhc": {
+        "org_count": 20,
+        "total_claims": 8502,
+        "p50_ppc": 225.18,
+        "p50_rpb": 231.46,
+        "p50_cpb": 1.04,
+        "p50_bpc": 56.67
+      },
+      "sector_gap_pct": 16.1,
+      "published_rate": 250.63,
+      "published_unit": "per eval",
+      "published_note": "Psychiatric evaluation (HP/physician). Non-physician: $179.02",
+      "by_size": {
+        "large": {
+          "p50_ppc": 191.53,
+          "org_count": 96
+        },
+        "medium": {
+          "p50_ppc": 210.0,
+          "org_count": 45
+        },
+        "small": {
+          "p50_ppc": 276.76,
+          "org_count": 3
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 186.94,
+          "org_count": 48
+        },
+        "moderate": {
+          "p50_ppc": 184.8,
+          "org_count": 50
+        },
+        "sparse": {
+          "p50_ppc": 211.09,
+          "org_count": 46
+        }
+      }
+    },
+    "H2010": {
+      "name": "Brief Individual Psychotherapy",
+      "service_line": "outpatient_therapy",
+      "all_fl": {
+        "org_count": 57,
+        "total_claims": 14480,
+        "p25_ppc": 14.35,
+        "p50_ppc": 20.48,
+        "p75_ppc": 27.18,
+        "p25_rpb": 14.91,
+        "p50_rpb": 24.47,
+        "p75_rpb": 28.25,
+        "p25_cpb": 1.0,
+        "p50_cpb": 1.02,
+        "p75_cpb": 1.14,
+        "p25_bpc": 16.0,
+        "p50_bpc": 54.6,
+        "p75_bpc": 216.0
+      },
+      "cmhc": {
+        "org_count": 8,
+        "total_claims": 5355,
+        "p50_ppc": 16.74,
+        "p50_rpb": 24.47,
+        "p50_cpb": 1.02,
+        "p50_bpc": 173.0
+      },
+      "sector_gap_pct": -18.3,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 22.15,
+          "org_count": 47
+        },
+        "medium": {
+          "p50_ppc": 15.41,
+          "org_count": 10
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 20.48,
+          "org_count": 16
+        },
+        "moderate": {
+          "p50_ppc": 22.15,
+          "org_count": 21
+        },
+        "sparse": {
+          "p50_ppc": 17.26,
+          "org_count": 20
+        }
+      }
+    },
+    "H2011": {
+      "name": "H2011",
+      "service_line": "crisis",
+      "all_fl": {
+        "org_count": 5,
+        "total_claims": 624,
+        "p25_ppc": 178.29,
+        "p50_ppc": 293.75,
+        "p75_ppc": 387.59,
+        "p25_rpb": 192.0,
+        "p50_rpb": 316.56,
+        "p75_rpb": 387.59,
+        "p25_cpb": 1.08,
+        "p50_cpb": 1.08,
+        "p75_cpb": 1.29,
+        "p25_bpc": 13.0,
+        "p50_bpc": 14.0,
+        "p75_bpc": 103.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {},
+      "by_market": {}
+    },
+    "H2012": {
+      "name": "BH Day Services",
+      "service_line": "outpatient_therapy",
+      "all_fl": {
+        "org_count": 11,
+        "total_claims": 10121,
+        "p25_ppc": 25.93,
+        "p50_ppc": 40.25,
+        "p75_ppc": 154.42,
+        "p25_rpb": 154.35,
+        "p50_rpb": 296.91,
+        "p75_rpb": 526.81,
+        "p25_cpb": 3.92,
+        "p50_cpb": 6.13,
+        "p75_cpb": 12.32,
+        "p25_bpc": 13.0,
+        "p50_bpc": 52.6,
+        "p75_bpc": 156.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 25.93,
+          "org_count": 3
+        },
+        "medium": {
+          "p50_ppc": 29.31,
+          "org_count": 4
+        },
+        "small": {
+          "p50_ppc": 154.42,
+          "org_count": 4
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 49.79,
+          "org_count": 7
+        }
+      }
+    },
+    "H2015": {
+      "name": "H2015",
+      "service_line": "community_support",
+      "all_fl": {
+        "org_count": 8,
+        "total_claims": 3074,
+        "p25_ppc": 0.0,
+        "p50_ppc": 88.42,
+        "p75_ppc": 160.04,
+        "p25_rpb": 0.0,
+        "p50_rpb": 244.91,
+        "p75_rpb": 430.93,
+        "p25_cpb": 1.53,
+        "p50_cpb": 2.34,
+        "p75_cpb": 3.17,
+        "p25_bpc": 31.0,
+        "p50_bpc": 54.0,
+        "p75_bpc": 100.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 180.06,
+          "org_count": 3
+        },
+        "medium": {
+          "p50_ppc": 45.27,
+          "org_count": 4
+        }
+      },
+      "by_market": {
+        "sparse": {
+          "p50_ppc": 45.27,
+          "org_count": 4
+        }
+      }
+    },
+    "H2017": {
+      "name": "Psychosocial Rehabilitation",
+      "service_line": "psychosocial_rehab",
+      "all_fl": {
+        "org_count": 285,
+        "total_claims": 1531546,
+        "p25_ppc": 93.36,
+        "p50_ppc": 120.93,
+        "p75_ppc": 135.19,
+        "p25_rpb": 769.52,
+        "p50_rpb": 1376.24,
+        "p75_rpb": 1726.16,
+        "p25_cpb": 8.79,
+        "p50_cpb": 11.65,
+        "p75_cpb": 13.42,
+        "p25_bpc": 111.0,
+        "p50_bpc": 242.0,
+        "p75_bpc": 438.0
+      },
+      "cmhc": {
+        "org_count": 39,
+        "total_claims": 160030,
+        "p50_ppc": 123.82,
+        "p50_rpb": 1342.29,
+        "p50_cpb": 11.8,
+        "p50_bpc": 172.5
+      },
+      "sector_gap_pct": 2.4,
+      "published_rate": 9.08,
+      "published_unit": "per 15min",
+      "published_note": "Psychosocial rehabilitation",
+      "by_size": {
+        "large": {
+          "p50_ppc": 115.81,
+          "org_count": 140
+        },
+        "medium": {
+          "p50_ppc": 124.7,
+          "org_count": 122
+        },
+        "small": {
+          "p50_ppc": 123.82,
+          "org_count": 23
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 126.65,
+          "org_count": 160
+        },
+        "moderate": {
+          "p50_ppc": 110.45,
+          "org_count": 78
+        },
+        "sparse": {
+          "p50_ppc": 94.02,
+          "org_count": 47
+        }
+      }
+    },
+    "H2019": {
+      "name": "Behavioral Therapy Services",
+      "service_line": "outpatient_therapy",
+      "all_fl": {
+        "org_count": 614,
+        "total_claims": 1685889,
+        "p25_ppc": 52.17,
+        "p50_ppc": 71.43,
+        "p75_ppc": 82.89,
+        "p25_rpb": 108.31,
+        "p50_rpb": 180.81,
+        "p75_rpb": 232.88,
+        "p25_cpb": 1.78,
+        "p50_cpb": 2.51,
+        "p75_cpb": 3.22,
+        "p25_bpc": 65.0,
+        "p50_bpc": 211.0,
+        "p75_bpc": 494.0
+      },
+      "cmhc": {
+        "org_count": 86,
+        "total_claims": 230122,
+        "p50_ppc": 74.53,
+        "p50_rpb": 137.38,
+        "p50_cpb": 2.04,
+        "p50_bpc": 123.0
+      },
+      "sector_gap_pct": 4.3,
+      "published_rate": 21.87,
+      "published_unit": "per 15min",
+      "published_note": "Individual/family therapy (HR modifier)",
+      "by_size": {
+        "large": {
+          "p50_ppc": 71.83,
+          "org_count": 288
+        },
+        "medium": {
+          "p50_ppc": 72.91,
+          "org_count": 241
+        },
+        "small": {
+          "p50_ppc": 68.41,
+          "org_count": 85
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 69.99,
+          "org_count": 234
+        },
+        "moderate": {
+          "p50_ppc": 73.31,
+          "org_count": 191
+        },
+        "sparse": {
+          "p50_ppc": 68.4,
+          "org_count": 189
+        }
+      }
+    },
+    "H2020": {
+      "name": "H2020",
+      "service_line": "bh_other",
+      "all_fl": {
+        "org_count": 16,
+        "total_claims": 54623,
+        "p25_ppc": 32.52,
+        "p50_ppc": 33.02,
+        "p75_ppc": 149.57,
+        "p25_rpb": 259.8,
+        "p50_rpb": 480.17,
+        "p75_rpb": 715.58,
+        "p25_cpb": 2.25,
+        "p50_cpb": 6.67,
+        "p75_cpb": 21.92,
+        "p25_bpc": 39.0,
+        "p50_bpc": 197.0,
+        "p75_bpc": 297.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 89.06,
+          "org_count": 8
+        },
+        "medium": {
+          "p50_ppc": 22.4,
+          "org_count": 4
+        },
+        "small": {
+          "p50_ppc": 32.52,
+          "org_count": 4
+        }
+      },
+      "by_market": {
+        "moderate": {
+          "p50_ppc": 32.69,
+          "org_count": 6
+        },
+        "sparse": {
+          "p50_ppc": 89.06,
+          "org_count": 8
+        }
+      }
+    },
+    "H2030": {
+      "name": "Clubhouse Services",
+      "service_line": "psychosocial_rehab",
+      "all_fl": {
+        "org_count": 10,
+        "total_claims": 14863,
+        "p25_ppc": 40.03,
+        "p50_ppc": 64.35,
+        "p75_ppc": 75.87,
+        "p25_rpb": 318.97,
+        "p50_rpb": 480.35,
+        "p75_rpb": 662.14,
+        "p25_cpb": 7.2,
+        "p50_cpb": 8.73,
+        "p75_cpb": 10.86,
+        "p25_bpc": 45.0,
+        "p50_bpc": 124.0,
+        "p75_bpc": 209.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 64.35,
+          "org_count": 9
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 64.35,
+          "org_count": 3
+        },
+        "moderate": {
+          "p50_ppc": 66.8,
+          "org_count": 5
+        }
+      }
+    },
+    "S9083": {
+      "name": "S9083",
+      "service_line": "crisis",
+      "all_fl": {
+        "org_count": 59,
+        "total_claims": 33033,
+        "p25_ppc": 70.0,
+        "p50_ppc": 112.64,
+        "p75_ppc": 143.3,
+        "p25_rpb": 80.17,
+        "p50_rpb": 122.5,
+        "p75_rpb": 144.4,
+        "p25_cpb": 1.01,
+        "p50_cpb": 1.03,
+        "p75_cpb": 1.07,
+        "p25_bpc": 33.0,
+        "p50_bpc": 89.0,
+        "p75_bpc": 259.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 93.8,
+          "org_count": 24
+        },
+        "medium": {
+          "p50_ppc": 128.96,
+          "org_count": 30
+        },
+        "small": {
+          "p50_ppc": 29.53,
+          "org_count": 5
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 112.64,
+          "org_count": 58
+        }
+      }
+    },
+    "T1007": {
+      "name": "T1007",
+      "service_line": "assessment",
+      "all_fl": {
+        "org_count": 37,
+        "total_claims": 4681,
+        "p25_ppc": 47.35,
+        "p50_ppc": 49.13,
+        "p75_ppc": 72.43,
+        "p25_rpb": 47.35,
+        "p50_rpb": 50.46,
+        "p75_rpb": 74.85,
+        "p25_cpb": 1.0,
+        "p50_cpb": 1.02,
+        "p75_cpb": 1.08,
+        "p25_bpc": 24.0,
+        "p50_bpc": 61.0,
+        "p75_bpc": 120.0
+      },
+      "cmhc": {
+        "org_count": 3,
+        "total_claims": 456,
+        "p50_ppc": 74.42,
+        "p50_rpb": 74.42,
+        "p50_cpb": 1.02,
+        "p50_bpc": 43.0
+      },
+      "sector_gap_pct": 51.5,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 53.96,
+          "org_count": 28
+        },
+        "medium": {
+          "p50_ppc": 46.89,
+          "org_count": 8
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 48.89,
+          "org_count": 8
+        },
+        "moderate": {
+          "p50_ppc": 49.07,
+          "org_count": 8
+        },
+        "sparse": {
+          "p50_ppc": 70.43,
+          "org_count": 21
+        }
+      }
+    },
+    "T1015": {
+      "name": "Medication Management",
+      "service_line": "outpatient_therapy",
+      "all_fl": {
+        "org_count": 550,
+        "total_claims": 554387,
+        "p25_ppc": 49.92,
+        "p50_ppc": 70.18,
+        "p75_ppc": 166.48,
+        "p25_rpb": 62.9,
+        "p50_rpb": 76.94,
+        "p75_rpb": 190.49,
+        "p25_cpb": 1.05,
+        "p50_cpb": 1.11,
+        "p75_cpb": 1.24,
+        "p25_bpc": 73.0,
+        "p50_bpc": 227.0,
+        "p75_bpc": 494.0
+      },
+      "cmhc": {
+        "org_count": 53,
+        "total_claims": 98946,
+        "p50_ppc": 65.02,
+        "p50_rpb": 72.19,
+        "p50_cpb": 1.13,
+        "p50_bpc": 224.0
+      },
+      "sector_gap_pct": -7.4,
+      "published_rate": 71.61,
+      "published_unit": "per event",
+      "published_note": "Medication management",
+      "by_size": {
+        "large": {
+          "p50_ppc": 73.63,
+          "org_count": 368
+        },
+        "medium": {
+          "p50_ppc": 60.04,
+          "org_count": 149
+        },
+        "small": {
+          "p50_ppc": 67.26,
+          "org_count": 33
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 68.48,
+          "org_count": 146
+        },
+        "moderate": {
+          "p50_ppc": 59.59,
+          "org_count": 139
+        },
+        "sparse": {
+          "p50_ppc": 87.12,
+          "org_count": 265
+        }
+      }
+    },
+    "T1016": {
+      "name": "T1016",
+      "service_line": "community_support",
+      "all_fl": {
+        "org_count": 8,
+        "total_claims": 5474,
+        "p25_ppc": 17.42,
+        "p50_ppc": 29.91,
+        "p75_ppc": 61.41,
+        "p25_rpb": 19.98,
+        "p50_rpb": 197.08,
+        "p75_rpb": 385.34,
+        "p25_cpb": 1.05,
+        "p50_cpb": 2.21,
+        "p75_cpb": 8.83,
+        "p25_bpc": 39.0,
+        "p50_bpc": 75.0,
+        "p75_bpc": 155.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "medium": {
+          "p50_ppc": 29.91,
+          "org_count": 6
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 20.26,
+          "org_count": 4
+        },
+        "sparse": {
+          "p50_ppc": 61.06,
+          "org_count": 3
+        }
+      }
+    },
+    "T1017": {
+      "name": "Targeted Case Management",
+      "service_line": "case_management",
+      "all_fl": {
+        "org_count": 288,
+        "total_claims": 1519443,
+        "p25_ppc": 43.79,
+        "p50_ppc": 62.2,
+        "p75_ppc": 77.58,
+        "p25_rpb": 192.52,
+        "p50_rpb": 361.14,
+        "p75_rpb": 604.89,
+        "p25_cpb": 3.64,
+        "p50_cpb": 5.57,
+        "p75_cpb": 8.9,
+        "p25_bpc": 105.5,
+        "p50_bpc": 258.0,
+        "p75_bpc": 591.0
+      },
+      "cmhc": {
+        "org_count": 34,
+        "total_claims": 196720,
+        "p50_ppc": 49.58,
+        "p50_rpb": 240.24,
+        "p50_cpb": 4.7,
+        "p50_bpc": 275.0
+      },
+      "sector_gap_pct": -20.3,
+      "published_rate": 14.82,
+      "published_unit": "per 15min",
+      "published_note": "Targeted case management",
+      "by_size": {
+        "large": {
+          "p50_ppc": 66.98,
+          "org_count": 143
+        },
+        "medium": {
+          "p50_ppc": 57.14,
+          "org_count": 126
+        },
+        "small": {
+          "p50_ppc": 62.2,
+          "org_count": 19
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 67.13,
+          "org_count": 127
+        },
+        "moderate": {
+          "p50_ppc": 59.28,
+          "org_count": 84
+        },
+        "sparse": {
+          "p50_ppc": 49.69,
+          "org_count": 77
+        }
+      }
+    },
+    "T1023": {
+      "name": "T1023",
+      "service_line": "medical_bh",
+      "all_fl": {
+        "org_count": 10,
+        "total_claims": 2699,
+        "p25_ppc": 40.95,
+        "p50_ppc": 43.72,
+        "p75_ppc": 97.1,
+        "p25_rpb": 41.6,
+        "p50_rpb": 43.72,
+        "p75_rpb": 104.57,
+        "p25_cpb": 1.0,
+        "p50_cpb": 1.03,
+        "p75_cpb": 1.1,
+        "p25_bpc": 35.5,
+        "p50_bpc": 45.0,
+        "p75_bpc": 154.0
+      },
+      "cmhc": null,
+      "sector_gap_pct": null,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "by_size": {
+        "large": {
+          "p50_ppc": 41.75,
+          "org_count": 8
+        }
+      },
+      "by_market": {
+        "dense": {
+          "p50_ppc": 41.75,
+          "org_count": 4
+        },
+        "moderate": {
+          "p50_ppc": 43.72,
+          "org_count": 4
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,395 @@
+# Florida CMHC Rate Landscape — Where Does the Sector Stand?
+
+**CMHC sector performance vs the rest of the Florida Medicaid market**
+
+Data source: FL Medicaid FFS claims, 2024 | 86 CMHCs benchmarked against Rest of FL Medicaid (all non-CMHC providers)
+
+---
+
+## 1. Executive Summary
+
+- **The CMHC sector collects rates at or above Rest-of-FL Medicaid on front-door services** (assessments, treatment planning, E/M visits) but falls significantly behind on the high-volume ongoing-care codes that drive the majority of revenue.
+- **Targeted Case Management (T1017) is the sector's largest rate gap**: CMHCs collect $49.58 per claim at the median vs $63.45 for Rest of FL — a 21.9% shortfall compounded by 23% shorter sessions (3.3 vs 4.3 implied units per claim).
+- **Psychotherapy 60min (90837) shows a 34.6% rate deficit** against Rest of FL, the steepest per-claim gap in the dataset, though on a smaller claims base.
+- **Psychosocial Rehabilitation (H2017) and Behavioral Therapy (H2019) — the two highest-volume therapy codes — are near parity on rate per claim**, with gaps of +2.9% and +6.1% respectively, but the sector lags on panel size and revenue per patient.
+- **The pattern is consistent**: CMHCs win the initial encounter but lose ground on sustained engagement, suggesting the gap is driven by utilization depth rather than contract rates alone.
+
+---
+
+## 2. The Big Picture: Front-Door Strength, Ongoing-Care Gap
+
+The data across 20 active service codes reveals a structural pattern in CMHC sector performance.
+
+**Where CMHCs match or exceed Rest of FL Medicaid:**
+
+Assessment and intake codes — H0031 (Mental Health Assessment, +0.4%), H0032 (Treatment Plan Development, +0.6%), H2000 (Psychiatric Evaluation, +17.6%), 99214 (Office Visit L4, +21.1%), and 90833 (Psychotherapy Add-on, +25.8%) — all show the CMHC sector collecting at or above the Rest-of-FL median on a per-claim basis. These are the codes that bring patients through the front door.
+
+**Where CMHCs fall behind:**
+
+The high-volume ongoing-care codes tell a different story. T1017 (Targeted Case Management) at -21.9%, 90837 (Psychotherapy 60min) at -34.6%, and H0036 (Community Psychiatric Support) at -28.9% all show meaningful per-claim deficits. These are the codes that sustain patients in treatment.
+
+**The session-length question — rate gap or duration gap?**
+
+For time-based codes billed in 15-minute increments, per-claim rates reflect two things: the per-unit reimbursement rate and the number of units (session length) billed per claim. The canonical data includes implied units per claim to separate these effects:
+
+| Code | Service | CMHC Units/Claim | Rest-of-FL Units/Claim | Difference |
+|------|---------|:-----------------:|:----------------------:|:----------:|
+| T1017 | Targeted Case Management | 3.3 | 4.3 | CMHCs bill 23% shorter |
+| H2019 | Behavioral Therapy | 3.4 | 3.2 | CMHCs bill 6% longer |
+| H2017 | Psychosocial Rehabilitation | 13.6 | 13.2 | Nearly identical |
+
+This distinction matters. T1017's -21.9% per-claim gap is partly a rate story and partly a session-length story — CMHCs are billing roughly one fewer 15-minute unit per encounter. Is this intentional efficiency in case management delivery, or compressed service under time pressure? The data raises the question but cannot answer it.
+
+For H2019 and H2017, session lengths are comparable or slightly longer at CMHCs, meaning the per-claim rate gaps (or advantages) on those codes are driven primarily by the contracted per-unit rate rather than session duration.
+
+---
+
+## 3. Sector Dashboard
+
+Codes sorted by CMHC claims volume. Only codes with active CMHC claims are shown.
+
+| Code | Service | CMHC P50 | Rest-of-FL P50 | Gap % | Signal | Units (CMHC / Rest-of-FL) |
+|------|---------|:--------:|:--------------:|:-----:|:------:|:-------------------------:|
+| H2019 | Behavioral Therapy | $74.53 | $70.26 | +6.1% | 🟢 | 3.4 / 3.2 |
+| T1017 | Targeted Case Management | $49.58 | $63.45 | -21.9% | 🔴 | 3.3 / 4.3 |
+| H2017 | Psychosocial Rehabilitation | $123.82 | $120.28 | +2.9% | 🟢 | 13.6 / 13.2 |
+| T1015 | Medication Management | $65.02 | $70.86 | -8.2% | 🟡 | — |
+| H0040 | Assertive Community Treatment | $30.30 | $30.90 | -1.9% | 🟡 | — |
+| H0031 | Mental Health Assessment | $31.70 | $31.57 | +0.4% | 🟢 | — |
+| H0032 | Treatment Plan Development | $70.75 | $70.33 | +0.6% | 🟢 | — |
+| 99214 | Office Visit L4 | $51.68 | $42.68 | +21.1% | 🟢 | — |
+| 99213 | Office Visit L3 | $30.38 | $33.33 | -8.9% | 🟡 | — |
+| 90833 | Psychotherapy Add-on 30min | $38.49 | $30.60 | +25.8% | 🟢 | — |
+| 90837 | Psychotherapy 60min | $57.77 | $88.39 | -34.6% | 🔴 | — |
+| H2000 | Psychiatric Evaluation | $225.18 | $191.53 | +17.6% | 🟢 | — |
+| H2010 | Brief Individual Psychotherapy | $16.74 | $20.48 | -18.3% | 🔴 | — |
+| H0048 | Alcohol/Drug Screening | $9.57 | $9.26 | +3.3% | 🟢 | — |
+| 90792 | Diagnostic Eval w/Med | $59.68 | $82.12 | -27.3% | 🔴 | — |
+| H0036 | Community Psychiatric Support | $52.17 | $73.35 | -28.9% | 🔴 | — |
+| 99215 | Office Visit L5 | $85.45 | $81.01 | +5.5% | 🟢 | — |
+| H0004 | Behavioral Health Counseling | $0.08 | $50.91 | -99.8% | 🔴 | — |
+| 99212 | Office Visit L2 | $20.67 | $26.52 | -22.1% | 🔴 | — |
+| 90832 | Psychotherapy 30min | $48.74 | $19.30 | +152.5% | 🟢 | — |
+| T1007 | SA Treatment Plan | $74.42 | $49.07 | +51.7% | 🟢 | — |
+| 90834 | Psychotherapy 45min | $47.74 | $53.27 | -10.4% | 🔴 | — |
+| 99203 | New Patient Visit L3 | $65.17 | $69.17 | -5.8% | 🟡 | — |
+| 90791 | Diagnostic Evaluation | $105.30 | $88.24 | +19.3% | 🟢 | — |
+| 99204 | New Patient Visit L4 | $81.47 | $95.74 | -14.9% | 🔴 | — |
+
+Signal key: 🟢 At or above Rest-of-FL median | 🟡 Modest gap (under 10%) | 🔴 Meaningful gap (10%+)
+
+---
+
+## 4. Service Line Deep Dives
+
+### 4.1 H2019 — Behavioral Therapy Services
+
+**Rate per Claim:** CMHC P50 $74.53 vs Rest-of-FL P50 $70.26 (+6.1%). The FL Medicaid published rate is $21.87 per 15min. The sector collects above the Rest-of-FL median here, one of the few high-volume codes where that is true.
+
+**Panel Size:** CMHC P50 123.0 beneficiaries per provider vs Rest-of-FL P50 227.0 (-45.8%). The sector carries significantly smaller caseloads on this code — roughly half the Rest-of-FL median.
+
+**Patient Engagement:** CMHC P50 2.04 claims per beneficiary vs Rest-of-FL P50 2.59 (-21.2%). Patients at CMHCs receive fewer behavioral therapy encounters than the Rest-of-FL norm.
+
+**Revenue per Patient:** CMHC P50 $137.38 vs Rest-of-FL P50 $185.98 (-26.1%). Despite the per-claim rate advantage, less frequent engagement means lower total revenue per patient.
+
+**Implied Units:** 3.4 units/claim (CMHC) vs 3.2 units/claim (Rest of FL). CMHCs bill slightly longer sessions on this code, confirming the per-claim rate advantage reflects a genuine rate and duration edge, not just session length. The +6.1% rate gap is real.
+
+**Key question:** The CMHC sector bills at a higher per-claim rate with comparable session length — why does that advantage not translate into stronger revenue per patient? The answer appears to be engagement depth: fewer claims per beneficiary and smaller panels erode the rate advantage before it reaches the revenue line.
+
+---
+
+### 4.2 T1017 — Targeted Case Management
+
+**Rate per Claim:** CMHC P50 $49.58 vs Rest-of-FL P50 $63.45 (-21.9%). The FL Medicaid published rate is $14.82 per 15min. This is the sector's highest-volume code with a red signal — 196,720 CMHC claims in the dataset.
+
+**Panel Size:** CMHC P50 275.0 beneficiaries per provider vs Rest-of-FL P50 254.11 (+8.2%). The sector actually carries larger caseloads than Rest of FL on case management, one of only a few codes where this holds.
+
+**Patient Engagement:** CMHC P50 4.70 claims per beneficiary vs Rest-of-FL P50 5.63 (-16.5%). Despite larger panels, the sector delivers fewer case management touches per patient.
+
+**Revenue per Patient:** CMHC P50 $240.24 vs Rest-of-FL P50 $370.51 (-35.2%). The combined effect of lower rates and lower engagement produces a substantial revenue-per-patient gap.
+
+**Implied Units:** 3.3 units/claim (CMHC) vs 4.3 units/claim (Rest of FL). The sector bills approximately 50 minutes of case management per encounter compared to roughly 65 minutes in the Rest-of-FL market. This 23% session-length gap accounts for a material portion of the per-claim rate difference. At $14.82 per unit, one additional unit per claim would add approximately $14.82 to the per-claim average — roughly half the $13.87 gap between CMHC and Rest-of-FL medians.
+
+**Key question:** The sector bills T1017 at shorter session lengths than the rest of the market. Is this a deliberate efficiency model — handling case management contacts in shorter, more frequent touches — or does it reflect operational constraints (staffing, scheduling pressure) that compress service delivery? The engagement data suggests it is not offset by higher frequency, since claims per beneficiary are also below the Rest-of-FL norm.
+
+---
+
+### 4.3 H2017 — Psychosocial Rehabilitation
+
+**Rate per Claim:** CMHC P50 $123.82 vs Rest-of-FL P50 $120.28 (+2.9%). The FL Medicaid published rate is $9.08 per 15min. The sector is near parity on per-claim rates for this high-volume rehab code (160,030 CMHC claims).
+
+**Panel Size:** CMHC P50 172.5 beneficiaries per provider vs Rest-of-FL P50 260.0 (-33.7%). The CMHC sector serves substantially fewer beneficiaries per provider on this code.
+
+**Patient Engagement:** CMHC P50 11.80 claims per beneficiary vs Rest-of-FL P50 11.64 (+1.4%). Engagement intensity is effectively identical — patients at CMHCs receive as many PSR sessions as those in the broader market.
+
+**Revenue per Patient:** CMHC P50 $1,342.29 vs Rest-of-FL P50 $1,379.46 (-2.7%). Near parity on all dimensions — this is one of the CMHC sector's strongest-performing codes.
+
+**Implied Units:** 13.6 units/claim (CMHC) vs 13.2 units/claim (Rest of FL). Sessions are approximately 3.4 hours at CMHCs and 3.3 hours in the broader market — virtually the same. The per-claim rate parity is genuine.
+
+**Key question:** H2017 demonstrates that the CMHC sector can match Rest-of-FL performance when the service model is aligned. What is different about the PSR delivery model that produces parity here when other ongoing-care codes show gaps? Is it the group-based format, the staffing model, or the contract structure?
+
+---
+
+### 4.4 T1015 — Medication Management
+
+**Rate per Claim:** CMHC P50 $65.02 vs Rest-of-FL P50 $70.86 (-8.2%). The FL Medicaid published rate is $71.61 per event. The sector median falls $5.84 below the Rest-of-FL median and $6.59 below the published rate.
+
+**Panel Size:** CMHC P50 224.0 beneficiaries per provider vs Rest-of-FL P50 229.0 (-2.2%). Panels are comparable.
+
+**Patient Engagement:** CMHC P50 1.13 claims per beneficiary vs Rest-of-FL P50 1.11 (+1.8%). Engagement is effectively identical.
+
+**Revenue per Patient:** CMHC P50 $72.19 vs Rest-of-FL P50 $78.24 (-7.7%). The revenue gap tracks the rate gap, since engagement and panel size are comparable.
+
+**Key question:** The CMHC median sits 8.2% below the Rest-of-FL median and 9.2% below the published rate. For a per-event code (not time-based), this gap is purely a contract rate or modifier issue. Are CMHC contracts discounting this code below the fee schedule, or is the sector's modifier mix compressing the blended rate?
+
+---
+
+### 4.5 H0040 — Assertive Community Treatment (FACT)
+
+**Rate per Claim:** CMHC P50 $30.30 vs Rest-of-FL P50 $30.90 (-1.9%). The FL Medicaid published rate is $31.55 per diem. The sector is within $0.60 of the Rest-of-FL median and $1.25 of the published per diem rate. Only 6 CMHCs bill this code.
+
+**Panel Size:** CMHC P50 345.5 beneficiaries per provider vs Rest-of-FL P50 618.0 (-44.1%). The sector serves roughly half the panel that Rest-of-FL FACT providers carry.
+
+**Patient Engagement:** CMHC P50 23.60 claims per beneficiary vs Rest-of-FL P50 17.52 (+34.7%). CMHCs deliver substantially more encounters per patient — the highest engagement intensity in the dataset.
+
+**Revenue per Patient:** CMHC P50 $721.37 vs Rest-of-FL P50 $552.69 (+30.5%). The engagement advantage overcomes the smaller panel, producing the strongest revenue-per-patient position among all codes.
+
+**Key question:** FACT is a high-fidelity model with prescribed contact intensity, which may explain why engagement is higher at CMHCs. The small provider count (6 CMHCs, 16 Rest-of-FL) limits generalization. Is the panel size difference a function of program maturity or team capacity?
+
+---
+
+### 4.6 H0031 — Mental Health Assessment
+
+**Rate per Claim:** CMHC P50 $31.70 vs Rest-of-FL P50 $31.57 (+0.4%). The FL Medicaid published rate is $126.11 per event (in-depth, HO modifier) and $17.90 (limited assessment). Both CMHC and Rest-of-FL medians sit far below the in-depth published rate, suggesting most billings use the limited assessment modifier or a blended rate.
+
+**Panel Size:** CMHC P50 115.42 beneficiaries per provider vs Rest-of-FL P50 76.50 (+50.9%). The sector assesses significantly more beneficiaries per provider — consistent with the front-door strength pattern.
+
+**Patient Engagement:** CMHC P50 1.22 claims per beneficiary vs Rest-of-FL P50 1.50 (-18.7%). The Rest-of-FL market bills more assessment encounters per patient.
+
+**Revenue per Patient:** CMHC P50 $45.73 vs Rest-of-FL P50 $52.38 (-12.7%). Lower engagement reduces per-patient revenue despite rate parity.
+
+**Key question:** The sector's per-claim rate matches Rest of FL, but both sit at roughly $31 against a published in-depth rate of $126.11. Is the market overwhelmingly billing limited assessments (H0031 without the HO modifier), or is managed care contract compression driving the blended rate this far below the fee schedule?
+
+---
+
+### 4.7 H0032 — Treatment Plan Development
+
+**Rate per Claim:** CMHC P50 $70.75 vs Rest-of-FL P50 $70.33 (+0.6%). The FL Medicaid published rate is $97.86 per event (development) and $48.93 (review). The sector median sits between the two published rates, consistent with a mix of new plans and reviews.
+
+**Panel Size:** CMHC P50 75.0 beneficiaries per provider vs Rest-of-FL P50 98.0 (-23.5%). The sector develops treatment plans for fewer beneficiaries per provider.
+
+**Patient Engagement:** CMHC P50 1.03 claims per beneficiary vs Rest-of-FL P50 1.02 (+1.0%). Nearly all patients receive exactly one treatment plan per period — expected for this code.
+
+**Revenue per Patient:** CMHC P50 $72.49 vs Rest-of-FL P50 $73.39 (-1.2%). Effectively at parity.
+
+**Key question:** Rate and revenue per patient are at parity — this code is functioning as expected. The smaller panel may simply reflect the CMHC sector's overall patient volume rather than a service delivery issue.
+
+---
+
+### 4.8 99214 — Office Visit Level 4
+
+**Rate per Claim:** CMHC P50 $51.68 vs Rest-of-FL P50 $42.68 (+21.1%). The FL Medicaid published rate is $53.43 (FSI) / $50.77 (facility). The sector collects close to the published FSI rate and well above the Rest-of-FL median.
+
+**Panel Size:** CMHC P50 98.67 beneficiaries per provider vs Rest-of-FL P50 100.0 (-1.3%). Comparable.
+
+**Patient Engagement:** CMHC P50 1.09 claims per beneficiary vs Rest-of-FL P50 1.11 (-1.8%). Comparable.
+
+**Revenue per Patient:** CMHC P50 $59.91 vs Rest-of-FL P50 $48.66 (+23.1%). The rate advantage flows through to revenue.
+
+**Key question:** This is the sector's strongest E/M code. The Rest-of-FL median for 99214 is $42.68 against a published rate of $53.43 — the broader market's compression is more severe than the CMHC sector's on this code. What drives the sector's relative strength here? Higher facility billing rates, cleaner modifier usage, or favorable contract terms?
+
+---
+
+### 4.9 99213 — Office Visit Level 3
+
+**Rate per Claim:** CMHC P50 $30.38 vs Rest-of-FL P50 $33.33 (-8.9%). A modest gap on the lower-acuity E/M code.
+
+**Panel Size:** CMHC P50 94.50 beneficiaries per provider vs Rest-of-FL P50 111.45 (-15.2%). Moderately smaller panels.
+
+**Patient Engagement:** CMHC P50 1.09 claims per beneficiary vs Rest-of-FL P50 1.11 (-1.8%). Comparable.
+
+**Revenue per Patient:** CMHC P50 $34.00 vs Rest-of-FL P50 $37.47 (-9.3%). The gap tracks the rate shortfall.
+
+**Key question:** The sector outperforms on 99214 but underperforms on 99213. Is there an upcoding opportunity — are some 99213 visits documented at a complexity level that would support 99214 billing?
+
+---
+
+### 4.10 90833 — Psychotherapy Add-on 30min
+
+**Rate per Claim:** CMHC P50 $38.49 vs Rest-of-FL P50 $30.60 (+25.8%). The sector collects meaningfully above the Rest-of-FL median on this add-on code (billed with E/M visits).
+
+**Panel Size:** CMHC P50 43.0 beneficiaries per provider vs Rest-of-FL P50 140.0 (-69.3%). The sector applies this add-on to far fewer patients.
+
+**Patient Engagement:** CMHC P50 1.10 claims per beneficiary vs Rest-of-FL P50 1.20 (-8.3%). Slightly lower.
+
+**Revenue per Patient:** CMHC P50 $44.50 vs Rest-of-FL P50 $37.06 (+20.1%). The rate advantage holds through to revenue per patient.
+
+**Key question:** The sector has a rate advantage on 90833 but applies it to very few patients. Is the add-on code underutilized at CMHCs? If psychiatrists or ARNPs are conducting medication visits with a therapy component, billing 90833 alongside the E/M code could capture value already being delivered.
+
+---
+
+### 4.11 90837 — Psychotherapy 60min
+
+**Rate per Claim:** CMHC P50 $57.77 vs Rest-of-FL P50 $88.39 (-34.6%). The steepest per-claim gap in the dataset, on 9,799 CMHC claims. The wide IQR (P25: $14.01, P75: $100.12) suggests high variability across CMHCs.
+
+**Panel Size:** CMHC P50 26.0 beneficiaries per provider vs Rest-of-FL P50 97.5 (-73.3%). The sector serves very few patients through traditional 60-minute psychotherapy.
+
+**Patient Engagement:** CMHC P50 1.67 claims per beneficiary vs Rest-of-FL P50 2.11 (-20.9%). Lower frequency as well.
+
+**Revenue per Patient:** CMHC P50 $104.89 vs Rest-of-FL P50 $166.73 (-37.1%). Rate, panel, and engagement gaps all compound.
+
+**Key question:** Is 60-minute psychotherapy a viable service line for the CMHC sector, or does the staffing and business model favor shorter-format therapy through H2019? The extremely small panel sizes suggest this code may be an incidental service rather than a deliberate offering at most CMHCs.
+
+---
+
+### 4.12 H2000 — Psychiatric Evaluation
+
+**Rate per Claim:** CMHC P50 $225.18 vs Rest-of-FL P50 $191.53 (+17.6%). The FL Medicaid published rate is $250.63 (physician/HP modifier) and $179.02 (non-physician). The sector median falls between the two, suggesting a physician-led evaluation model.
+
+**Panel Size:** CMHC P50 56.67 beneficiaries per provider vs Rest-of-FL P50 58.0 (-2.3%). Comparable.
+
+**Patient Engagement:** CMHC P50 1.04 claims per beneficiary vs Rest-of-FL P50 1.01 (+3.0%). Comparable — evaluations are typically one-time events.
+
+**Revenue per Patient:** CMHC P50 $231.46 vs Rest-of-FL P50 $204.60 (+13.1%). The rate advantage flows through.
+
+**Key question:** This is another front-door strength. The sector collects well above the non-physician published rate, suggesting psychiatrist-led evaluations. Is this sustainable given psychiatric workforce constraints, and could mid-level evaluations maintain quality while freeing physician capacity?
+
+---
+
+### 4.13 H2010 — Brief Individual Psychotherapy
+
+**Rate per Claim:** CMHC P50 $16.74 vs Rest-of-FL P50 $20.48 (-18.3%). A red signal on a smaller-volume code (5,355 CMHC claims from 8 providers).
+
+**Panel Size:** CMHC P50 173.0 beneficiaries per provider vs Rest-of-FL P50 47.0 (+268.1%). The sector serves dramatically more patients per provider — nearly 4x the Rest-of-FL level.
+
+**Patient Engagement:** CMHC P50 1.02 claims per beneficiary vs Rest-of-FL P50 1.01 (+1.0%). Essentially identical.
+
+**Revenue per Patient:** CMHC P50 $24.47 vs Rest-of-FL P50 $24.46 (0.0%). Revenue per patient is at exact parity despite the rate gap, because the CMHC sector's much larger panel compensates.
+
+**Key question:** The high panel size with identical revenue per patient is a distinctive pattern. Are the 8 CMHCs using this code doing so as a brief-intervention model for a large population, billing at a lower rate but serving many more individuals?
+
+---
+
+### 4.14 H0048 — Alcohol/Drug Screening Specimen Collection
+
+**Rate per Claim:** CMHC P50 $9.57 vs Rest-of-FL P50 $9.26 (+3.3%). At parity. Small code (6 CMHCs, 3,633 claims).
+
+**Panel Size:** CMHC P50 102.0 beneficiaries per provider vs Rest-of-FL P50 145.0 (-29.7%). Moderate panel gap.
+
+**Patient Engagement:** CMHC P50 1.13 claims per beneficiary vs Rest-of-FL P50 1.11 (+1.8%). Comparable.
+
+**Revenue per Patient:** CMHC P50 $12.03 vs Rest-of-FL P50 $10.46 (+15.0%). The small per-claim advantage and comparable engagement produce a healthy per-patient figure.
+
+**Key question:** This is a low-dollar ancillary code. The sector is performing adequately. The more relevant question is whether CMHCs that do not bill H0048 are conducting drug screens but failing to capture the billing.
+
+---
+
+### 4.15 90792 — Diagnostic Evaluation with Medical Services
+
+**Rate per Claim:** CMHC P50 $59.68 vs Rest-of-FL P50 $82.12 (-27.3%). A significant gap on this physician-level diagnostic code (1,643 CMHC claims from 13 providers). The wide IQR (P25: $19.90, P75: $137.17) indicates extreme within-sector variability.
+
+**Panel Size:** CMHC P50 45.0 beneficiaries per provider vs Rest-of-FL P50 38.0 (+18.4%). Slightly larger panels.
+
+**Patient Engagement:** CMHC P50 1.08 claims per beneficiary vs Rest-of-FL P50 1.09 (-0.9%). Comparable.
+
+**Revenue per Patient:** CMHC P50 $83.12 vs Rest-of-FL P50 $95.27 (-12.8%). The rate gap flows through.
+
+**Key question:** The extreme variability (P25 of $19.90 to P75 of $137.17) suggests some CMHCs may be under-billing this code or experiencing managed care contract compression that others have avoided. A within-sector analysis of 90792 could identify specific contract or modifier differences driving the wide spread.
+
+---
+
+### 4.16 H0036 — Community Psychiatric Support
+
+**Rate per Claim:** CMHC P50 $52.17 vs Rest-of-FL P50 $73.35 (-28.9%). A substantial gap, though the comparison base is very small (4 CMHCs, 5 Rest-of-FL providers, 1,445 CMHC claims).
+
+**Panel Size:** CMHC P50 36.0 beneficiaries per provider vs Rest-of-FL P50 28.0 (+28.6%). Slightly larger panels.
+
+**Patient Engagement:** CMHC P50 1.50 claims per beneficiary vs Rest-of-FL P50 2.05 (-26.8%). Lower frequency.
+
+**Revenue per Patient:** CMHC P50 $78.25 vs Rest-of-FL P50 $182.91 (-57.2%). The deepest revenue-per-patient gap in the dataset. Lower rates compounded by lower engagement.
+
+**Key question:** The very small provider counts make this comparison directionally interesting but statistically fragile. The -57.2% revenue-per-patient gap warrants investigation at the individual organization level rather than sector-level conclusions.
+
+---
+
+### 4.17 99215 — Office Visit Level 5
+
+**Rate per Claim:** CMHC P50 $85.45 vs Rest-of-FL P50 $81.01 (+5.5%). Above the Rest-of-FL median, though on small volume (7 CMHCs, 1,231 claims). The wide IQR (P25: $13.30, P75: $180.72) suggests wide variability.
+
+**Panel Size:** CMHC P50 88.0 beneficiaries per provider vs Rest-of-FL P50 43.0 (+104.7%). Substantially larger panels.
+
+**Patient Engagement:** CMHC P50 1.05 claims per beneficiary vs Rest-of-FL P50 1.08 (-2.8%). Comparable.
+
+**Revenue per Patient:** CMHC P50 $91.17 vs Rest-of-FL P50 $93.12 (-2.1%). Near parity.
+
+**Key question:** The sector serves large panels with a per-claim rate above the market norm. With only 7 CMHCs billing 99215, is this code available but underbilled at other CMHCs whose complex visits may be documented at 99214 instead?
+
+---
+
+### 4.18 H0004 — Behavioral Health Counseling
+
+**Rate per Claim:** CMHC P50 $0.08 vs Rest-of-FL P50 $50.91 (-99.8%). This anomalous figure (median of $0.08) on 1,047 claims from 4 CMHCs suggests denied or zero-paid claims dominating the distribution rather than a genuine rate.
+
+**Panel Size:** CMHC P50 13.0 beneficiaries per provider vs Rest-of-FL P50 103.0 (-87.4%). Minimal utilization.
+
+**Patient Engagement:** CMHC P50 1.33 claims per beneficiary vs Rest-of-FL P50 1.34 (-0.7%). Comparable where used.
+
+**Revenue per Patient:** CMHC P50 $0.10 vs Rest-of-FL P50 $59.58 (-99.8%). Effectively zero revenue.
+
+**Key question:** The near-zero median strongly suggests claim denials, zero-pay adjustments, or billing errors rather than intentionally low rates. The 4 CMHCs billing this code should audit their H0004 claim adjudication history.
+
+---
+
+### 4.19 99212 — Office Visit Level 2
+
+**Rate per Claim:** CMHC P50 $20.67 vs Rest-of-FL P50 $26.52 (-22.1%). A red signal, though on small volume (6 CMHCs, 669 claims).
+
+**Panel Size:** CMHC P50 40.0 beneficiaries per provider vs Rest-of-FL P50 60.0 (-33.3%). Smaller panels.
+
+**Patient Engagement:** CMHC P50 1.06 claims per beneficiary vs Rest-of-FL P50 1.07 (-0.9%). Comparable.
+
+**Revenue per Patient:** CMHC P50 $25.33 vs Rest-of-FL P50 $28.85 (-12.2%). Tracks the rate gap.
+
+**Key question:** At only 669 claims, this is a minor code for the CMHC sector. The gap may reflect the same contract or modifier issues that show up on 99213. A more productive question is whether these low-complexity visits are appropriately coded.
+
+---
+
+### 4.20 Lower-Volume Codes (under 600 claims)
+
+**90832 — Psychotherapy 30min:** CMHC P50 $48.74 vs Rest-of-FL P50 $19.30 (+152.5%). A striking advantage on very small volume (3 CMHCs, 559 claims). The Rest-of-FL P50 is unusually low, suggesting a different billing population rather than genuine CMHC outperformance.
+
+**T1007 — SA Treatment Plan:** CMHC P50 $74.42 vs Rest-of-FL P50 $49.07 (+51.7%). Strong per-claim rate from 3 CMHCs (456 claims). Small sample.
+
+**90834 — Psychotherapy 45min:** CMHC P50 $47.74 vs Rest-of-FL P50 $53.27 (-10.4%). A red signal, 6 CMHCs, 433 claims. Wide IQR.
+
+**99203 — New Patient Visit L3:** CMHC P50 $65.17 vs Rest-of-FL P50 $69.17 (-5.8%). Modest gap, 4 CMHCs, 372 claims.
+
+**90791 — Diagnostic Evaluation:** CMHC P50 $105.30 vs Rest-of-FL P50 $88.24 (+19.3%). Above market, 6 CMHCs, 333 claims.
+
+**99204 — New Patient Visit L4:** CMHC P50 $81.47 vs Rest-of-FL P50 $95.74 (-14.9%). Red signal, 4 CMHCs, 319 claims.
+
+These codes represent less than 1% of total CMHC claims. Performance on them is informative at the individual organization level but too sparse for sector-level conclusions.
+
+---
+
+## 5. Methodology and Caveats
+
+**Data source:** Florida Medicaid Fee-for-Service claims, 2024 calendar year. Managed care encounter data is not included; actual total Medicaid reimbursement (including MCO-contracted rates) may differ from the FFS patterns shown here.
+
+**Comparison group:** "Rest of FL Medicaid" includes all non-CMHC providers billing these codes in Florida Medicaid FFS. This encompasses FQHCs, hospitals, private practices, group practices, and other provider types. Each has different cost structures, payer mixes, and billing patterns. The comparison shows where the CMHC sector sits within the full market, not against a clinically identical peer group.
+
+**FQHC/RHC PPS note:** Federally Qualified Health Centers and Rural Health Clinics receive Prospective Payment System rates that may be significantly higher than fee-schedule rates. Their inclusion in the Rest-of-FL pool may elevate the comparison median for codes they bill heavily. This structural difference does not invalidate the comparison — it reflects the actual reimbursement environment CMHCs compete in — but it should be noted when interpreting specific code gaps.
+
+**Median (P50) as benchmark:** All comparisons use the median (50th percentile) across organizations, not the mean. This reduces the influence of outliers but may mask bimodal distributions where some organizations cluster at very different rate levels.
+
+**Per-claim rate caveat for time-based codes:** Per-claim rates for time-based codes (T1017, H2019, H2017) reflect both the per-unit reimbursement rate and session duration (units billed per claim). A lower per-claim rate may indicate a lower per-unit contract rate, shorter sessions, or both. This report includes implied units per claim to help distinguish these effects, but the implied-unit calculation assumes the published per-unit rate applies uniformly, which may not hold across all MCO contracts.
+
+**Modifier rollup:** H0031 and H0032 aggregate across modifiers (HO, HN, etc.). The blended rate reflects the modifier mix, not a single published rate. Organizations with different modifier distributions will have different blended rates even under the same fee schedule.
+
+**Provider count (N):** The N values represent the number of organizations billing each code, not the number of individual practitioners. Small N values (under 10) limit the reliability of percentile calculations.
+
+**What this report does not include:** Organization-level positioning, trend data (year-over-year changes), MCO-specific contract rate comparisons, quality or outcome measures, cost-to-deliver analysis, or geographic variation within Florida.
+
+---
+
+*This report presents sector-level observations and questions for investigation. It does not diagnose causes or prescribe actions. Numbers are drawn from the canonical dataset and should be validated against source claims before operational decisions.*

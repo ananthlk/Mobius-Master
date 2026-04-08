@@ -1,0 +1,3044 @@
+[
+  {
+    "fbha_name": "ACTS",
+    "fbha_city": "Tampa",
+    "status": "ok",
+    "npi_count": 10,
+    "npis": [
+      {
+        "npi": "1487904421",
+        "name": "ACTS",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1902142342",
+        "name": "ACTS",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1881038503",
+        "name": "ACTS OF KINDNESS INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1043835051",
+        "name": "ACTS OF LIVING",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1982373478",
+        "name": "ACTS OF VIRTUE",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1780137554",
+        "name": "ACTS ADULT CARE CENTER LLC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1902355241",
+        "name": "ACTS ADULT LIVING FACILITES LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1083958581",
+        "name": "ACTS COMMUNITY SIGNATURE SERVICES",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1477135820",
+        "name": "ACTS HOMEMAKER AND COMPANION SERVICES, LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1417292251",
+        "name": "ACTS RETIREMENT-LIFE COMMUNITIES",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Agape Network",
+    "fbha_city": "Miami",
+    "status": "ok",
+    "npi_count": 3,
+    "npis": [
+      {
+        "npi": "1235736760",
+        "name": "AGAPE NETWORK, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1326191156",
+        "name": "AGAPE NETWORK, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1982201133",
+        "name": "AGAPE NETWORK, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Alpert Jewish Services of Palm Beach",
+    "fbha_city": "West Palm Beach",
+    "status": "ok",
+    "npi_count": 2,
+    "registry_confidence": {
+      "sufficiently_clean": false,
+      "best_tier": "partial",
+      "best_score": 0.52,
+      "second_score": 0.1,
+      "margin": 0.42000000000000004,
+      "tier_ok": true,
+      "score_ok": false,
+      "margin_ok": true,
+      "min_best_score": 0.82,
+      "min_margin": 0.05,
+      "reason": "weak_or_ambiguous_match"
+    },
+    "npis": [
+      {
+        "npi": "1588974950",
+        "name": "ALPERT JEWISH FAMILY & CHILDREN SERVICES, INC",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.52,
+        "taxonomy_code": "101YM0800X"
+      },
+      {
+        "npi": "1841297926",
+        "name": "FERD AND GLADYS ALPERT JEWISH FAMILY & CHILDRENS SVC OF PLM BCH",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.1,
+        "taxonomy_code": "101YM0800X"
+      }
+    ]
+  },
+  {
+    "fbha_name": "Apalachee Center",
+    "fbha_city": "Tallahassee",
+    "status": "ok",
+    "npi_count": 10,
+    "npis": [
+      {
+        "npi": "1942306444",
+        "name": "APALACHEE CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1104926161",
+        "name": "APALACHEE CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1922104017",
+        "name": "APALACHEE CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1376649632",
+        "name": "APALACHEE CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1457457962",
+        "name": "APALACHEE CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1568569937",
+        "name": "APALACHEE CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1982701363",
+        "name": "APALACHEE CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1508962796",
+        "name": "APALACHEE CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1730289968",
+        "name": "APALACHEE CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1144431156",
+        "name": "APALACHEE CENTER INC",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Archways",
+    "fbha_city": "Ft. Lauderdale",
+    "status": "ok",
+    "npi_count": 2,
+    "npis": [
+      {
+        "npi": "1104004480",
+        "name": "ARCHWAYS",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1316982408",
+        "name": "ARCHWAYS, INC",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Aspire Health Partners",
+    "fbha_city": "Orlando",
+    "status": "ok",
+    "npi_count": 7,
+    "npis": [
+      {
+        "npi": "1669987533",
+        "name": "ASPIRE HEALTH PARTNERS",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1366813586",
+        "name": "ASPIRE HEALTH PARTNERS",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1659959393",
+        "name": "ASPIRE HEALTH PARTNERS, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1235730417",
+        "name": "ASPIRE HEALTH PARTNERS, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1821033903",
+        "name": "ASPIRE HEALTH PARTNERS, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1114088986",
+        "name": "ASPIRE HEALTH PARTNERS, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1982769188",
+        "name": "ASPIRE HEALTH PARTNERS, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Banyan Community Health",
+    "fbha_city": "Miami",
+    "status": "ok",
+    "npi_count": 10,
+    "npis": [
+      {
+        "npi": "1205243623",
+        "name": "BANYAN COMMUNITY HEALTH CENTER, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1538576459",
+        "name": "BANYAN COMMUNITY HEALTH CENTER, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1053728790",
+        "name": "BANYAN COMMUNITY HEALTH CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1932872637",
+        "name": "BANYAN COMMUNITY HEALTH CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1710360482",
+        "name": "BANYAN COMMUNITY HEALTH CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1598438277",
+        "name": "BANYAN COMMUNITY HEALTH CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1679246367",
+        "name": "BANYAN COMMUNITY HEALTH CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1972979631",
+        "name": "BANYAN COMMUNITY HEALTH CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1710394499",
+        "name": "BANYAN COMMUNITY HEALTH CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1205219003",
+        "name": "BANYAN COMMUNITY HEALTH CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "BayCare Behavioral Health",
+    "fbha_city": "New Port Richey",
+    "status": "ok",
+    "npi_count": 10,
+    "npis": [
+      {
+        "npi": "1467736785",
+        "name": "BAYCARE BEHAVIORAL HEALTH",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1922382241",
+        "name": "BAYCARE BEHAVIORAL HEALTH",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1316248891",
+        "name": "BAYCARE BEHAVIORAL HEALTH",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1629351911",
+        "name": "BAYCARE BEHAVIORAL HEALTH",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1306108253",
+        "name": "BAYCARE BEHAVIORAL HEALTH INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1952856858",
+        "name": "BAYCARE BEHAVIORAL HEALTH ASSOCIATES LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1245502152",
+        "name": "BAYCARE BEHAVIORAL HEALTH ASSOCIATES LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1306057187",
+        "name": "BAYCARE BEHAVIORAL HEALTH CENTERS, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1184835894",
+        "name": "BAYCARE BEHAVIORAL HEALTH CENTERS, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1417168204",
+        "name": "BAYCARE BEHAVIORAL HEALTH CENTERS,INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Better Way of Miami",
+    "fbha_city": "Miami",
+    "status": "ok",
+    "npi_count": 2,
+    "npis": [
+      {
+        "npi": "1558638023",
+        "name": "BETTER WAY OF MIAMI",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1740224146",
+        "name": "BETTER WAY OF MIAMI, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Boley Centers",
+    "fbha_city": "St. Petersburg",
+    "status": "ok",
+    "npi_count": 1,
+    "npis": [
+      {
+        "npi": "1194838839",
+        "name": "BOLEY CENTERS, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Brave Health",
+    "fbha_city": "Miami",
+    "status": "ok",
+    "npi_count": 3,
+    "npis": [
+      {
+        "npi": "1821588674",
+        "name": "BRAVE HEALTH INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1225669161",
+        "name": "BRAVE HEALTH MEDICAL GROUP PA",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1932584489",
+        "name": "BRAVED BEHAVIORAL HEALTH INSTITUTE INC",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Bridgeway Center",
+    "fbha_city": "Fort Walton Beach",
+    "status": "ok",
+    "npi_count": 10,
+    "npis": [
+      {
+        "npi": "1992971410",
+        "name": "BRIDGEWAY CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1568038222",
+        "name": "BRIDGEWAY CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1912119231",
+        "name": "BRIDGEWAY CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1578677076",
+        "name": "BRIDGEWAY CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1265553564",
+        "name": "BRIDGEWAY CENTER, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1316513088",
+        "name": "BRIDGEWAY CENTER, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1669121620",
+        "name": "BRIDGEWAY CENTER, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1952559148",
+        "name": "BRIDGEWAY CENTER, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1023687696",
+        "name": "BRIDGEWAY CENTER, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1174169080",
+        "name": "BRIDGEWAY CENTER, INC",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Bridges International",
+    "fbha_city": "Orlando",
+    "status": "ok",
+    "npi_count": 2,
+    "npis": [
+      {
+        "npi": "1144671280",
+        "name": "BRIDGES INTERNATIONAL",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1487172110",
+        "name": "BRIDGES INTERNATIONAL CENTERS FOR RECOVERY AND REENTRY, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Broward Addiction Recovery Center",
+    "fbha_city": "Fort Lauderdale",
+    "status": "ok",
+    "npi_count": 10,
+    "registry_confidence": {
+      "sufficiently_clean": false,
+      "best_tier": "fuzzy",
+      "best_score": 0.1,
+      "second_score": 0.0,
+      "margin": 0.1,
+      "tier_ok": false,
+      "score_ok": false,
+      "margin_ok": true,
+      "min_best_score": 0.82,
+      "min_margin": 0.05,
+      "reason": "weak_or_ambiguous_match"
+    },
+    "npis": [
+      {
+        "npi": "1891936050",
+        "name": "BARCE REHAB CENTER INC",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.1,
+        "taxonomy_code": "261QP2000X"
+      },
+      {
+        "npi": "1366798290",
+        "name": "BARC HOUSING INC.",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.0,
+        "taxonomy_code": "315P00000X"
+      },
+      {
+        "npi": "1043476203",
+        "name": "BARCELLA REHAB CORP",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.0,
+        "taxonomy_code": "261QP2000X"
+      },
+      {
+        "npi": "1720577711",
+        "name": "BARCHI-CHUNG APRN CONSULTANT INC.",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.0,
+        "taxonomy_code": "363LF0000X"
+      },
+      {
+        "npi": "1346324472",
+        "name": "BARCLAY PHARMACY INC",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.0,
+        "taxonomy_code": "332B00000X"
+      },
+      {
+        "npi": "1457402083",
+        "name": "BARCLAY PHARMACY INC.",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.0,
+        "taxonomy_code": "3336C0003X"
+      },
+      {
+        "npi": "1245050368",
+        "name": "BARCLAY'S APOTHECARY SHOPPE",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.0,
+        "taxonomy_code": "3336C0004X"
+      },
+      {
+        "npi": "1497197867",
+        "name": "BEHAVIOR ANALYSIS RESEARCH CLINIC (BARC)",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.0,
+        "taxonomy_code": "103K00000X"
+      },
+      {
+        "npi": "1023291002",
+        "name": "JORGE M BARCENAS MD PA",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.0,
+        "taxonomy_code": "207R00000X"
+      },
+      {
+        "npi": "1053668921",
+        "name": "LA BARC, LP",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.0,
+        "taxonomy_code": "310400000X"
+      }
+    ]
+  },
+  {
+    "fbha_name": "CDAC Behavioral Healthcare",
+    "fbha_city": "Pensacola",
+    "status": "ok",
+    "npi_count": 0,
+    "registry_confidence": {
+      "sufficiently_clean": false,
+      "reason": "no_candidates",
+      "best_tier": null,
+      "best_score": null,
+      "second_score": null,
+      "margin": null,
+      "tier_ok": false,
+      "score_ok": false,
+      "margin_ok": false,
+      "min_best_score": 0.82,
+      "min_margin": 0.05
+    },
+    "npis": []
+  },
+  {
+    "fbha_name": "Centerstone Florida",
+    "fbha_city": "Bradenton",
+    "status": "ok",
+    "npi_count": 5,
+    "npis": [
+      {
+        "npi": "1033789052",
+        "name": "CENTERSTONE OF FLORIDA, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1619548229",
+        "name": "CENTERSTONE OF FLORIDA, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1881263879",
+        "name": "CENTERSTONE OF FLORIDA, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1144251638",
+        "name": "CENTERSTONE OF FLORIDA, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1497324495",
+        "name": "CENTERSTONE OF FLORIDA, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Central Florida Treatment Center",
+    "fbha_city": "Orlando",
+    "status": "ok",
+    "npi_count": 3,
+    "registry_confidence": {
+      "sufficiently_clean": false,
+      "reason": "no_candidates",
+      "best_tier": null,
+      "best_score": null,
+      "second_score": null,
+      "margin": null,
+      "tier_ok": false,
+      "score_ok": false,
+      "margin_ok": false,
+      "min_best_score": 0.82,
+      "min_margin": 0.05
+    },
+    "npis": [
+      {
+        "npi": "1316795842",
+        "name": "METRO TREATMENT OF FLORIDA, LP",
+        "source": "nppes",
+        "city": "ORLANDO"
+      },
+      {
+        "npi": "1336000157",
+        "name": "METRO TREATMENT OF FLORIDA, LP",
+        "source": "nppes",
+        "city": "APOPKA"
+      },
+      {
+        "npi": "1962048173",
+        "name": "METRO TREATMENT OF FLORIDA, LP",
+        "source": "nppes",
+        "city": "ORLANDO"
+      }
+    ],
+    "note": "resolved_manually"
+  },
+  {
+    "fbha_name": "Charlotte Behavioral Health Care",
+    "fbha_city": "Punta Gorda",
+    "status": "ok",
+    "npi_count": 2,
+    "npis": [
+      {
+        "npi": "1760460653",
+        "name": "CHARLOTTE BEHAVIORAL HEALTH CARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1437536224",
+        "name": "CHARLOTTE BEHAVIORAL HEALTHCARE",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Child Guidance Center",
+    "fbha_city": "Jacksonville",
+    "status": "ok",
+    "npi_count": 9,
+    "npis": [
+      {
+        "npi": "1629646450",
+        "name": "CHILD GUIDANCE CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1508128943",
+        "name": "CHILD GUIDANCE CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1063279362",
+        "name": "CHILD GUIDANCE CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1437171410",
+        "name": "CHILD GUIDANCE CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1942465182",
+        "name": "CHILD GUIDANCE CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1144898974",
+        "name": "CHILD GUIDANCE CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1508434333",
+        "name": "CHILD GUIDANCE CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1912575655",
+        "name": "CHILD GUIDANCE CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1255675369",
+        "name": "ALACHUA ADULT, CHILD AND FAMILY GUIDANCE CENTER, INC",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Circles of Care",
+    "fbha_city": "Melbourne",
+    "status": "ok",
+    "npi_count": 10,
+    "npis": [
+      {
+        "npi": "1841330487",
+        "name": "CIRCLES OF CARE",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1124177951",
+        "name": "CIRCLES OF CARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1275616773",
+        "name": "CIRCLES OF CARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1336544741",
+        "name": "CIRCLES OF CARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1275682619",
+        "name": "CIRCLES OF CARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1215345954",
+        "name": "CIRCLES OF CARE, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1811907322",
+        "name": "CIRCLES OF CARE, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1518234830",
+        "name": "CIRCLES OF CARE, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1346336732",
+        "name": "CIRCLES OF CARE, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1689059719",
+        "name": "CIRCLES OF CARE, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Citrus Health Network",
+    "fbha_city": "Hialeah",
+    "status": "ok",
+    "npi_count": 10,
+    "npis": [
+      {
+        "npi": "1437368784",
+        "name": "CITRUS HEALTH NETWORK",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1417250002",
+        "name": "CITRUS HEALTH NETWORK",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1417508573",
+        "name": "CITRUS HEALTH NETWORK",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1669625307",
+        "name": "CITRUS HEALTH NETWORK",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1942506837",
+        "name": "CITRUS HEALTH NETWORK INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1205598554",
+        "name": "CITRUS HEALTH NETWORK INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1033412184",
+        "name": "CITRUS HEALTH NETWORK INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1821138819",
+        "name": "CITRUS HEALTH NETWORK INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1275647752",
+        "name": "CITRUS HEALTH NETWORK INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1245581917",
+        "name": "CITRUS HEALTH NETWORK INC",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Clay Behavioral Health Center",
+    "fbha_city": "Orange Park",
+    "status": "ok",
+    "npi_count": 9,
+    "npis": [
+      {
+        "npi": "1265518476",
+        "name": "CLAY BEHAVIORAL HEALTH CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1275619488",
+        "name": "CLAY BEHAVIORAL HEALTH CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1437230398",
+        "name": "CLAY BEHAVIORAL HEALTH CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1417520214",
+        "name": "CLAY BEHAVIORAL HEALTH CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1720089782",
+        "name": "CLAY BEHAVIORAL HEALTH CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1841934510",
+        "name": "CLAY BEHAVIORAL HEALTH CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1356142905",
+        "name": "CLAY BEHAVIORAL HEALTH CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1528709672",
+        "name": "CLAY BEHAVIORAL HEALTH CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1437890571",
+        "name": "CLAY BEHAVIORAL HEALTH CENTER, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Community Health of South Florida",
+    "fbha_city": "Miami",
+    "status": "ok",
+    "npi_count": 10,
+    "npis": [
+      {
+        "npi": "1851766265",
+        "name": "COMMUNITY HEALTH OF SOUTH FLORIDA INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1942822242",
+        "name": "COMMUNITY HEALTH OF SOUTH FLORIDA INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1982906442",
+        "name": "COMMUNITY HEALTH OF SOUTH FLORIDA INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1164685673",
+        "name": "COMMUNITY HEALTH OF SOUTH FLORIDA INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1457725475",
+        "name": "COMMUNITY HEALTH OF SOUTH FLORIDA INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1477004745",
+        "name": "COMMUNITY HEALTH OF SOUTH FLORIDA INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1013382423",
+        "name": "COMMUNITY HEALTH OF SOUTH FLORIDA INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1306211719",
+        "name": "COMMUNITY HEALTH OF SOUTH FLORIDA INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1144890013",
+        "name": "COMMUNITY HEALTH OF SOUTH FLORIDA INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1356701437",
+        "name": "COMMUNITY HEALTH OF SOUTH FLORIDA INC",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Community Assisted and Supported Living",
+    "fbha_city": "Sarasota",
+    "status": "ok",
+    "npi_count": 3,
+    "npis": [
+      {
+        "npi": "1902112659",
+        "name": "COMMUNITY ASSISTED AND SUPPORTED LIVING, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1740031533",
+        "name": "COMMUNITY ASSISTED AND SUPPORTED LIVING, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1982862686",
+        "name": "COMMUNITY ASSISTED AND SUPPORTED LIVING, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "David Lawrence Centers",
+    "fbha_city": "Naples",
+    "status": "ok",
+    "npi_count": 7,
+    "registry_confidence": {
+      "sufficiently_clean": false,
+      "best_tier": "partial",
+      "best_score": 0.56,
+      "second_score": 0.56,
+      "margin": 0.0,
+      "tier_ok": true,
+      "score_ok": false,
+      "margin_ok": false,
+      "min_best_score": 0.82,
+      "min_margin": 0.05,
+      "reason": "weak_or_ambiguous_match"
+    },
+    "npis": [
+      {
+        "npi": "1033883731",
+        "name": "DAVID LAWRENCE CENTER",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.56,
+        "taxonomy_code": "261QM0801X"
+      },
+      {
+        "npi": "1609113588",
+        "name": "DAVID LAWRENCE CENTER",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.56,
+        "taxonomy_code": "322D00000X"
+      },
+      {
+        "npi": "1811334402",
+        "name": "DAVID LAWRENCE CENTER",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.56,
+        "taxonomy_code": "323P00000X"
+      },
+      {
+        "npi": "1962072793",
+        "name": "DAVID LAWRENCE MENTAL HEALTH CENTER INC",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.1,
+        "taxonomy_code": "261QC1500X"
+      },
+      {
+        "npi": "1982867255",
+        "name": "DAVID LAWRENCE MENTAL HEALTH CENTER INC",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.1,
+        "taxonomy_code": "261Q00000X"
+      },
+      {
+        "npi": "1871163600",
+        "name": "DAVID LAWRENCE MENTAL HEALTH CENTER INC",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.1,
+        "taxonomy_code": "261QC1500X"
+      },
+      {
+        "npi": "1801891940",
+        "name": "DAVID LAWRENCE MENTAL HEALTH CENTER, INC",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.1,
+        "taxonomy_code": "261QM0801X"
+      }
+    ]
+  },
+  {
+    "fbha_name": "Devereux",
+    "fbha_city": "Orlando",
+    "status": "ok",
+    "npi_count": 17,
+    "npis": [
+      {
+        "npi": "1326301706",
+        "name": "DEVEREUX",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1922415074",
+        "name": "DEVEREUX",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1053735266",
+        "name": "DEVEREUX",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1780931659",
+        "name": "DEVEREUX",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1962835686",
+        "name": "DEVEREUX",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1912040403",
+        "name": "DEVEREUX",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1306195185",
+        "name": "DEVEREUX",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1174945877",
+        "name": "DEVEREUX FLORIDA",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1720648322",
+        "name": "DEVEREUX FLORIDA",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1306186077",
+        "name": "DEVEREUX FLORIDA",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1154660165",
+        "name": "DEVEREUX FLORIDA",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1366704074",
+        "name": "DEVEREUX FLORIDA",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1306904636",
+        "name": "DEVEREUX FOUNDATION",
+        "source": "billing_npi_profiles",
+        "taxonomy_code": "261QC1500X"
+      },
+      {
+        "npi": "1437813656",
+        "name": "DEVEREUX FOUNDATION",
+        "source": "billing_npi_profiles",
+        "taxonomy_code": "261QC1500X"
+      },
+      {
+        "npi": "1942369277",
+        "name": "THE DEVEREUX FOUNDATION",
+        "source": "billing_npi_profiles",
+        "taxonomy_code": "261QC1500X"
+      },
+      {
+        "npi": "1609946524",
+        "name": "DEVEREUX FOUNDATION",
+        "source": "billing_npi_profiles",
+        "taxonomy_code": "251B00000X"
+      },
+      {
+        "npi": "1316601537",
+        "name": "THE DEVEREUX FOUNDATION",
+        "source": "billing_npi_profiles",
+        "taxonomy_code": "261QC1500X"
+      }
+    ]
+  },
+  {
+    "fbha_name": "Directions for Living",
+    "fbha_city": "Clearwater",
+    "status": "ok",
+    "npi_count": 1,
+    "registry_confidence": {
+      "sufficiently_clean": false,
+      "reason": "no_candidates",
+      "best_tier": null,
+      "best_score": null,
+      "second_score": null,
+      "margin": null,
+      "tier_ok": false,
+      "score_ok": false,
+      "margin_ok": false,
+      "min_best_score": 0.82,
+      "min_margin": 0.05
+    },
+    "npis": [
+      {
+        "npi": "1134122377",
+        "name": "DIRECTIONS FOR MENTAL HEALTH INC",
+        "source": "nppes",
+        "city": "CLEARWATER"
+      }
+    ],
+    "note": "resolved_manually"
+  },
+  {
+    "fbha_name": "DISC Village",
+    "fbha_city": "Tallahassee",
+    "status": "ok",
+    "npi_count": 12,
+    "npis": [
+      {
+        "npi": "1902369895",
+        "name": "DISC VILLAGE, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1376613463",
+        "name": "DISC VILLAGE, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1255672192",
+        "name": "DISC VILLAGE, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1851854954",
+        "name": "DISC VILLAGE, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1245571181",
+        "name": "DISC VILLAGE, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1164953782",
+        "name": "DISC VILLAGE, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1760722771",
+        "name": "DISC VILLAGE, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1275096166",
+        "name": "DISC VILLAGE, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1912077017",
+        "name": "DISC VILLAGE, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1548971997",
+        "name": "DISC VILLAGE, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1457377376",
+        "name": "DISC VILLAGE",
+        "source": "billing_npi_profiles",
+        "taxonomy_code": "324500000X"
+      },
+      {
+        "npi": "1487619391",
+        "name": "DISC VILLAGE",
+        "source": "billing_npi_profiles",
+        "taxonomy_code": "324500000X"
+      }
+    ]
+  },
+  {
+    "fbha_name": "Douglas Gardens Community Mental Health Center",
+    "fbha_city": "Miami Beach",
+    "status": "ok",
+    "npi_count": 2,
+    "npis": [
+      {
+        "npi": "1962574723",
+        "name": "DOUGLAS GARDENS COMMUNITY MENTAL HEALTH CENTER PHARMACY",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1114991544",
+        "name": "DOUGLAS GARDENS COMMUNITY MENTAL HEALTH CENTER OF MIAMI BEACH, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Drug Abuse Foundation of Palm Beach Co.",
+    "fbha_city": "Delray Beach",
+    "status": "ok",
+    "npi_count": 1,
+    "npis": [
+      {
+        "npi": "1851557193",
+        "name": "DRUG ABUSE FOUNDATION OF PALM BEACH COUNTY, INC",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Drug Abuse Treatment Association",
+    "fbha_city": "Jupiter",
+    "status": "ok",
+    "npi_count": 2,
+    "npis": [
+      {
+        "npi": "1689794380",
+        "name": "DRUG ABUSE TREATMENT ASSOCIATION, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1306966015",
+        "name": "DRUG ABUSE TREATMENT ASSOCIATION, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Eleos Wellness & Support",
+    "fbha_city": "Pinellas Park",
+    "status": "ok",
+    "npi_count": 3,
+    "registry_confidence": {
+      "sufficiently_clean": false,
+      "best_tier": "fuzzy",
+      "best_score": 0.1,
+      "second_score": 0.1,
+      "margin": 0.0,
+      "tier_ok": false,
+      "score_ok": false,
+      "margin_ok": false,
+      "min_best_score": 0.82,
+      "min_margin": 0.05,
+      "reason": "weak_or_ambiguous_match"
+    },
+    "npis": [
+      {
+        "npi": "1235301755",
+        "name": "ELEOS - THE CARE NETWORK INC",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.1,
+        "taxonomy_code": "332B00000X"
+      },
+      {
+        "npi": "1336206424",
+        "name": "ELEOS CARE INC",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.1,
+        "taxonomy_code": "251C00000X"
+      },
+      {
+        "npi": "1760981070",
+        "name": "ELEOS SERVICES LLC",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.1,
+        "taxonomy_code": "251E00000X"
+      }
+    ]
+  },
+  {
+    "fbha_name": "EPIC Behavioral Healthcare",
+    "fbha_city": "St. Augustine",
+    "status": "ok",
+    "npi_count": 5,
+    "registry_confidence": {
+      "sufficiently_clean": false,
+      "best_tier": "fuzzy",
+      "best_score": 0.1,
+      "second_score": 0.1,
+      "margin": 0.0,
+      "tier_ok": false,
+      "score_ok": false,
+      "margin_ok": false,
+      "min_best_score": 0.82,
+      "min_margin": 0.05,
+      "reason": "weak_or_ambiguous_match"
+    },
+    "npis": [
+      {
+        "npi": "1740673417",
+        "name": "EPIC COMMUNITY SERVICES INC",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.1,
+        "taxonomy_code": "101YA0400X"
+      },
+      {
+        "npi": "1831279280",
+        "name": "EPIC COMMUNITY SERVICES, INC",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.1,
+        "taxonomy_code": "251S00000X"
+      },
+      {
+        "npi": "1104579424",
+        "name": "EPIC COMMUNITY SERVICES, INC.",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.1,
+        "taxonomy_code": "251S00000X"
+      },
+      {
+        "npi": "1972256204",
+        "name": "EPIC COMMUNITY SERVICES, INC.",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.1,
+        "taxonomy_code": "251S00000X"
+      },
+      {
+        "npi": "1619620036",
+        "name": "EPIC COMMUNITY SERVICES, INC.",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.1,
+        "taxonomy_code": "251S00000X"
+      }
+    ]
+  },
+  {
+    "fbha_name": "Fellowship House",
+    "fbha_city": "South Miami",
+    "status": "ok",
+    "npi_count": 0,
+    "registry_confidence": {
+      "sufficiently_clean": false,
+      "reason": "no_candidates",
+      "best_tier": null,
+      "best_score": null,
+      "second_score": null,
+      "margin": null,
+      "tier_ok": false,
+      "score_ok": false,
+      "margin_ok": false,
+      "min_best_score": 0.82,
+      "min_margin": 0.05
+    },
+    "npis": []
+  },
+  {
+    "fbha_name": "Florida Palms Academy",
+    "fbha_city": "Sunrise",
+    "status": "ok",
+    "npi_count": 1,
+    "npis": [
+      {
+        "npi": "1104268085",
+        "name": "FLORIDA PALMS ACADEMY,INC",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Gateway Community Services",
+    "fbha_city": "Jacksonville",
+    "status": "ok",
+    "npi_count": 6,
+    "npis": [
+      {
+        "npi": "1760218564",
+        "name": "GATEWAY COMMUNITY SERVICES CORP",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1578383030",
+        "name": "GATEWAY COMMUNITY SERVICES CORP",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1124783477",
+        "name": "GATEWAY COMMUNITY SERVICES, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1356305338",
+        "name": "GATEWAY COMMUNITY SERVICES, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1538820444",
+        "name": "GATEWAY COMMUNITY SERVICES, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1235901141",
+        "name": "GATEWAY COMMUNITY SERVICES, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Hanley Foundation",
+    "fbha_city": "West Palm Beach",
+    "status": "ok",
+    "npi_count": 1,
+    "npis": [
+      {
+        "npi": "1699171488",
+        "name": "HANLEY CENTER FOUNDATION, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Henderson Behavioral Health",
+    "fbha_city": "Lauderdale Lakes",
+    "status": "ok",
+    "npi_count": 5,
+    "npis": [
+      {
+        "npi": "1043880156",
+        "name": "HENDERSON BEHAVIORAL HEALTH, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1851961791",
+        "name": "HENDERSON BEHAVIORAL HEALTH, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1962074005",
+        "name": "HENDERSON BEHAVIORAL HEALTH, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1972533271",
+        "name": "HENDERSON BEHAVIORAL HEALTH, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1497337570",
+        "name": "HENDERSON BEHAVIORAL HEALTH, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "House Next Door",
+    "fbha_city": "DeLand",
+    "status": "ok",
+    "npi_count": 2,
+    "npis": [
+      {
+        "npi": "1952798332",
+        "name": "THE HOUSE NEXT DOOR",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1326075300",
+        "name": "THE HOUSE NEXT DOOR, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "House of Hope",
+    "fbha_city": "Ft. Lauderdale",
+    "status": "ok",
+    "npi_count": 8,
+    "npis": [
+      {
+        "npi": "1083758353",
+        "name": "HOUSE OF HOPE, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1689430753",
+        "name": "DELL HOUSE OF HOPE LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1568287225",
+        "name": "LIGHTHOUSE OF HOPE, LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1164138376",
+        "name": "CARRENO BEHAVIORAL SERVICES LLC HOUSE OF HOPE",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1255003869",
+        "name": "THE HOPE HOUSE INC OF LOVE",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1144748856",
+        "name": "THE HOPE HOUSE OF LOVE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1427492396",
+        "name": "HOPE CLUBHOUSE OF SOUTHWEST FLORIDA, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1215730197",
+        "name": "THE LIGHTHOUSE GROUP BEACON OF HOPE INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Ibis Healthcare",
+    "fbha_city": "Tampa",
+    "status": "ok",
+    "npi_count": 6,
+    "npis": [
+      {
+        "npi": "1265383004",
+        "name": "IBIS HEALTHCARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1932759149",
+        "name": "IBIS HEALTHCARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1346224011",
+        "name": "IBIS HEALTHCARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1437009388",
+        "name": "IBIS HEALTHCARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1578395893",
+        "name": "IBIS HEALTHCARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1619645785",
+        "name": "IBIS HEALTHCARE INC",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "IMPOWER",
+    "fbha_city": "Longwood",
+    "status": "ok",
+    "npi_count": 5,
+    "npis": [
+      {
+        "npi": "1578965604",
+        "name": "IMPOWER",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1326472135",
+        "name": "IMPOWER",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1669047734",
+        "name": "IMPOWER, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1255005161",
+        "name": "IMPOWER, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1104910868",
+        "name": "IMPOWER, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Lakeview Center",
+    "fbha_city": "Pensacola",
+    "status": "ok",
+    "npi_count": 10,
+    "npis": [
+      {
+        "npi": "1508532813",
+        "name": "LAKEVIEW CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1629741756",
+        "name": "LAKEVIEW CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1265499453",
+        "name": "LAKEVIEW CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1619640745",
+        "name": "LAKEVIEW CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1417623729",
+        "name": "LAKEVIEW CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1952075954",
+        "name": "LAKEVIEW CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1528734894",
+        "name": "LAKEVIEW CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1831760800",
+        "name": "LAKEVIEW CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1922696046",
+        "name": "LAKEVIEW CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1588337646",
+        "name": "LAKEVIEW CENTER INC",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Life Management Center of Northwest Florida",
+    "fbha_city": "Panama City",
+    "status": "ok",
+    "npi_count": 4,
+    "npis": [
+      {
+        "npi": "1710912886",
+        "name": "LIFE MANAGEMENT CENTER OF NORTHWEST FLORIDA INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1659301877",
+        "name": "LIFE MANAGEMENT CENTER OF NORTHWEST FLORIDA INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1003022369",
+        "name": "LIFE MANAGEMENT CENTER OF NORTHWEST FLORIDA INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1942235320",
+        "name": "LIFE MANAGEMENT CENTER OF NORTHWEST FLORIDA INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "LifeStream Behavioral Center",
+    "fbha_city": "Leesburg",
+    "status": "ok",
+    "npi_count": 2,
+    "npis": [
+      {
+        "npi": "1659613776",
+        "name": "LIFESTREAM BEHAVIORAL CENTER INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1902802002",
+        "name": "LIFESTREAM BEHAVIORAL CENTER INC",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Lightshare Behavioral Wellness & Recovery",
+    "fbha_city": "Sarasota",
+    "status": "ok",
+    "npi_count": 9,
+    "registry_confidence": {
+      "sufficiently_clean": false,
+      "best_tier": "exact",
+      "best_score": 1.0,
+      "second_score": 1.0,
+      "margin": 0.0,
+      "tier_ok": true,
+      "score_ok": true,
+      "margin_ok": false,
+      "min_best_score": 0.82,
+      "min_margin": 0.05,
+      "reason": "weak_or_ambiguous_match"
+    },
+    "npis": [
+      {
+        "npi": "1881264901",
+        "name": "LIGHTSHARE BEHAVIORAL WELLNESS AND RECOVERY",
+        "source": "nppes",
+        "city": "",
+        "match_score": 1.0,
+        "taxonomy_code": "251S00000X"
+      },
+      {
+        "npi": "1578551198",
+        "name": "LIGHTSHARE BEHAVIORAL WELLNESS AND RECOVERY",
+        "source": "nppes",
+        "city": "",
+        "match_score": 1.0,
+        "taxonomy_code": "251S00000X"
+      },
+      {
+        "npi": "1093488827",
+        "name": "LIGHTSHARE BEHAVIORAL WELLNESS AND RECOVERY",
+        "source": "nppes",
+        "city": "",
+        "match_score": 1.0,
+        "taxonomy_code": "251S00000X"
+      },
+      {
+        "npi": "1942566674",
+        "name": "LIGHTSHARE BEHAVIORAL WELLNESS AND RECOVERY",
+        "source": "nppes",
+        "city": "",
+        "match_score": 1.0,
+        "taxonomy_code": "251S00000X"
+      },
+      {
+        "npi": "1710557830",
+        "name": "LIGHTSHARE BEHAVIORAL WELLNESS AND RECOVERY",
+        "source": "nppes",
+        "city": "",
+        "match_score": 1.0,
+        "taxonomy_code": "251S00000X"
+      },
+      {
+        "npi": "1912577024",
+        "name": "LIGHTSHARE BEHAVIORAL WELLNESS AND RECOVERY",
+        "source": "nppes",
+        "city": "",
+        "match_score": 1.0,
+        "taxonomy_code": "251B00000X"
+      },
+      {
+        "npi": "1922678036",
+        "name": "LIGHTSHARE BEHAVIORAL WELLNESS AND RECOVERY",
+        "source": "nppes",
+        "city": "",
+        "match_score": 1.0,
+        "taxonomy_code": "251S00000X"
+      },
+      {
+        "npi": "1285204396",
+        "name": "LIGHTSHARE BEHAVIORAL WELLNESS AND RECOVERY",
+        "source": "nppes",
+        "city": "",
+        "match_score": 1.0,
+        "taxonomy_code": "284300000X"
+      },
+      {
+        "npi": "1598726648",
+        "name": "COASTAL BEHAVIORAL HEALTHCARE, INC.",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.1,
+        "taxonomy_code": "251B00000X"
+      }
+    ]
+  },
+  {
+    "fbha_name": "Meridian Healthcare",
+    "fbha_city": "Gainesville",
+    "status": "ok",
+    "npi_count": 15,
+    "npis": [
+      {
+        "npi": "1134396476",
+        "name": "MERIDIAN BEHAVIORAL HEALTHCARE",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1306013644",
+        "name": "MERIDIAN BEHAVIORAL HEALTHCARE",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1275700601",
+        "name": "MERIDIAN BEHAVIORAL HEALTHCARE",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1982871307",
+        "name": "MERIDIAN BEHAVIORAL HEALTHCARE",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1073780318",
+        "name": "MERIDIAN BEHAVIORAL HEALTHCARE",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1144497488",
+        "name": "MERIDIAN BEHAVIORAL HEALTHCARE",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1417124751",
+        "name": "MERIDIAN BEHAVIORAL HEALTHCARE",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1982871224",
+        "name": "MERIDIAN BEHAVIORAL HEALTHCARE",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1952712978",
+        "name": "MERIDIAN BEHAVIORAL HEALTHCARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1083026470",
+        "name": "MERIDIAN BEHAVIORAL HEALTHCARE INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1689846859",
+        "name": "MERIDIAN BEHAVIORAL HEALTHCARE OF LAKE CITY",
+        "source": "billing_npi_profiles",
+        "taxonomy_code": "261QM0801X"
+      },
+      {
+        "npi": "1225205644",
+        "name": "MERIDIAN BEHAVIORAL HEALTHCARE",
+        "source": "billing_npi_profiles",
+        "taxonomy_code": "261QM0801X"
+      },
+      {
+        "npi": "1265954358",
+        "name": "MERIDIAN BEHAVIORAL HEALTHCARE",
+        "source": "billing_npi_profiles",
+        "taxonomy_code": "251B00000X"
+      },
+      {
+        "npi": "1558538942",
+        "name": "MERIDIAN BEHAVIORAL HEALTHCARE",
+        "source": "billing_npi_profiles",
+        "taxonomy_code": "261QM0801X"
+      },
+      {
+        "npi": "1134287154",
+        "name": "MERIDIAN BEHAVIORAL HEALTHCARE",
+        "source": "billing_npi_profiles",
+        "taxonomy_code": "261QM0801X"
+      }
+    ]
+  },
+  {
+    "fbha_name": "New Horizons Community Mental Health Center",
+    "fbha_city": "Miami",
+    "status": "ok",
+    "npi_count": 4,
+    "npis": [
+      {
+        "npi": "1639392681",
+        "name": "NEW HORIZONS COMMUNITY MENTAL HEALTH CENTER",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1306483441",
+        "name": "NEW HORIZONS COMMUNITY MENTAL HEALTH CENTER, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1952360620",
+        "name": "NEW HORIZONS COMMUNITY MENTAL HEALTH CENTER, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1245457688",
+        "name": "NEW HORIZONS COMMUNITY MENTAL HEALTH",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "New Horizons of the Treasure Coast and Okeechobee",
+    "fbha_city": "Fort Pierce",
+    "status": "ok",
+    "npi_count": 10,
+    "npis": [
+      {
+        "npi": "1679818736",
+        "name": "NEW HORIZONS OF OKEECHOBEE AND THE TREASURE COAST",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1154439958",
+        "name": "NEW HORIZONS OF THE TREASURE COAST INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1184396723",
+        "name": "NEW HORIZONS OF THE TREASURE COAST, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1477223865",
+        "name": "NEW HORIZONS OF THE TREASURE COAST, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1598435976",
+        "name": "NEW HORIZONS OF THE TREASURE COAST, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1629740253",
+        "name": "NEW HORIZONS OF THE TREASURE COAST, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1457793721",
+        "name": "NEW HORIZONS OF THE TREASURE COAST, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1942972583",
+        "name": "NEW HORIZONS OF THE TREASURE COAST, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1972273357",
+        "name": "NEW HORIZONS OF THE TREASURE COAST, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1447922075",
+        "name": "NEW HORIZONS OF THE TREASURE COAST, INC",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Operation PAR",
+    "fbha_city": "Pinellas Park",
+    "status": "ok",
+    "npi_count": 15,
+    "npis": [
+      {
+        "npi": "1396014171",
+        "name": "1550 JESS PARRISH COURT OPERATIONS LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1083983720",
+        "name": "3001 PALM COAST PARKWAY OPERATIONS LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1376812016",
+        "name": "626 NORTH TYNDALL PARKWAY OPERATIONS LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1922430107",
+        "name": "EC TIMBERLIN PARC OPERATIONS LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1992317291",
+        "name": "HERITAGE PARK OPERATIONS LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1184082828",
+        "name": "LAKE PARK OPERATIONS, LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1336162395",
+        "name": "LAKE PARKER FACILITY OPERATIONS LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1659048353",
+        "name": "LAKE PARKER SNF OPERATIONS LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1235844713",
+        "name": "MEADOWPARK OPERATIONS, LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1982319240",
+        "name": "OAKPARK OPERATIONS, LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1134287469",
+        "name": "OPERATION PAR",
+        "source": "billing_npi_profiles",
+        "taxonomy_code": "251S00000X"
+      },
+      {
+        "npi": "1154481745",
+        "name": "OPERATION PAR",
+        "source": "billing_npi_profiles",
+        "taxonomy_code": "251S00000X"
+      },
+      {
+        "npi": "1972661411",
+        "name": "OPERATION PAR",
+        "source": "billing_npi_profiles",
+        "taxonomy_code": "251S00000X"
+      },
+      {
+        "npi": "1669465639",
+        "name": "OPERATION PAR",
+        "source": "billing_npi_profiles",
+        "taxonomy_code": "251S00000X"
+      },
+      {
+        "npi": "1184782633",
+        "name": "OPERATION PAR",
+        "source": "billing_npi_profiles",
+        "taxonomy_code": "251S00000X"
+      }
+    ]
+  },
+  {
+    "fbha_name": "Park Place Behavioral Health Care",
+    "fbha_city": "Kissimmee",
+    "status": "ok",
+    "npi_count": 2,
+    "registry_confidence": {
+      "sufficiently_clean": false,
+      "reason": "no_candidates",
+      "best_tier": null,
+      "best_score": null,
+      "second_score": null,
+      "margin": null,
+      "tier_ok": false,
+      "score_ok": false,
+      "margin_ok": false,
+      "min_best_score": 0.82,
+      "min_margin": 0.05
+    },
+    "npis": [
+      {
+        "npi": "1336583574",
+        "name": "OSCEOLA MENTAL HEALTH INC.",
+        "source": "nppes",
+        "city": "KISSIMMEE"
+      },
+      {
+        "npi": "1346287240",
+        "name": "OSCEOLA MENTAL HEALTH INC",
+        "source": "nppes",
+        "city": "KISSIMMEE"
+      }
+    ],
+    "note": "resolved_manually"
+  },
+  {
+    "fbha_name": "Passageway Residence of Dade County, Inc.",
+    "fbha_city": "Miami",
+    "status": "ok",
+    "npi_count": 1,
+    "npis": [
+      {
+        "npi": "1922163856",
+        "name": "PASSAGEWAY RESIDENCE OF DADE COUNTY, INC",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Peace River Center for Personal Development",
+    "fbha_city": "Bartow",
+    "status": "ok",
+    "npi_count": 10,
+    "npis": [
+      {
+        "npi": "1235887126",
+        "name": "PEACE RIVER CENTER FOR PERSONAL DEVELOPMENT INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1538802939",
+        "name": "PEACE RIVER CENTER FOR PERSONAL DEVELOPMENT INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1790431146",
+        "name": "PEACE RIVER CENTER FOR PERSONAL DEVELOPMENT INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1184370504",
+        "name": "PEACE RIVER CENTER FOR PERSONAL DEVELOPMENT INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1285380642",
+        "name": "PEACE RIVER CENTER FOR PERSONAL DEVELOPMENT INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1558122580",
+        "name": "PEACE RIVER CENTER FOR PERSONAL DEVELOPMENT INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1174279582",
+        "name": "PEACE RIVER CENTER FOR PERSONAL DEVELOPMENT INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1174305635",
+        "name": "PEACE RIVER CENTER FOR PERSONAL DEVELOPMENT INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1790430452",
+        "name": "PEACE RIVER CENTER FOR PERSONAL DEVELOPMENT INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1114673589",
+        "name": "PEACE RIVER CENTER FOR PERSONAL DEVELOPMENT INC",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Phoenix House Florida",
+    "fbha_city": "Brandon",
+    "status": "ok",
+    "npi_count": 1,
+    "npis": [
+      {
+        "npi": "1477949303",
+        "name": "PHOENIX PROGRAMS OF FLORIDA, INC. DBA PHOENIX HOUSES OF FLORIDA, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Recovery Connections of Central Florida",
+    "fbha_city": "Orlando",
+    "status": "ok",
+    "npi_count": 1,
+    "npis": [
+      {
+        "npi": "1285599878",
+        "name": "RECOVERY CONNECTIONS OF CENTRAL FLORIDA INC",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "SalusCare",
+    "fbha_city": "Fort Myers",
+    "status": "ok",
+    "npi_count": 1,
+    "npis": [
+      {
+        "npi": "1972557197",
+        "name": "SALUSCARE, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "SMA Healthcare",
+    "fbha_city": "Daytona Beach",
+    "status": "ok",
+    "npi_count": 10,
+    "npis": [
+      {
+        "npi": "1699573543",
+        "name": "SMA HEALTHCARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1154526556",
+        "name": "SMA HEALTHCARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1598433534",
+        "name": "SMA HEALTHCARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1215735162",
+        "name": "SMA HEALTHCARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1194397422",
+        "name": "SMA HEALTHCARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1740853514",
+        "name": "SMA HEALTHCARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1598431512",
+        "name": "SMA HEALTHCARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1871269894",
+        "name": "SMA HEALTHCARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1164094405",
+        "name": "SMA HEALTHCARE INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1861858441",
+        "name": "ROSMAN WHOLE PERSONHEALTHCARE, LLC",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "St. Augustine Youth Services",
+    "fbha_city": "St. Augustine",
+    "status": "ok",
+    "npi_count": 1,
+    "npis": [
+      {
+        "npi": "1023417045",
+        "name": "IEST. AUGUSTINE YOUTH SERVICES",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Starting Point Behavioral Healthcare",
+    "fbha_city": "Yulee",
+    "status": "ok",
+    "npi_count": 4,
+    "registry_confidence": {
+      "sufficiently_clean": false,
+      "reason": "no_candidates",
+      "best_tier": null,
+      "best_score": null,
+      "second_score": null,
+      "margin": null,
+      "tier_ok": false,
+      "score_ok": false,
+      "margin_ok": false,
+      "min_best_score": 0.82,
+      "min_margin": 0.05
+    },
+    "npis": [
+      {
+        "npi": "1558325050",
+        "name": "NASSAU COUNTY MENTAL HEALTH ALCOHOL & DRUG ABUSE COUNCIL INC",
+        "source": "nppes",
+        "city": "YULEE"
+      },
+      {
+        "npi": "1194470567",
+        "name": "NASSAU COUNTY MENTAL HEALTH ALCOHOL & DRUG ABUSE",
+        "source": "nppes",
+        "city": "FERNANDINA BEACH"
+      },
+      {
+        "npi": "1124494638",
+        "name": "NASSAU COUNTY MENTAL HEALTH ALCOHOL & DRUG ABUSE COUNCIL INC",
+        "source": "nppes",
+        "city": "HILLIARD"
+      },
+      {
+        "npi": "1669196382",
+        "name": "NASSAU COUNTY MENTAL HEALTH ALCOHOL & DRUG ABUSE COUNCIL INC",
+        "source": "nppes",
+        "city": "FERNANDINA BEACH"
+      }
+    ],
+    "note": "resolved_manually"
+  },
+  {
+    "fbha_name": "STEPS",
+    "fbha_city": "Orlando",
+    "status": "ok",
+    "npi_count": 13,
+    "npis": [
+      {
+        "npi": "1346725835",
+        "name": "ANGELS STEPS, LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1891576443",
+        "name": "AUTISM STEPS LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1508395898",
+        "name": "3STEPS 2SKINNY INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1619662004",
+        "name": "ABC LITTLE STEPS LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1770136244",
+        "name": "ALL STEPS COUNT LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1902395122",
+        "name": "ANGELIC STEPS THERAPY LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1245119593",
+        "name": "BABY STEPS FLORIDA, LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1669081634",
+        "name": "LITTLE STEPS FLORIDA LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1811684962",
+        "name": "ABA GOLDEN STEPS FL LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1760169353",
+        "name": "ANGEL STEPS HOME HEALTH CARE",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1649914029",
+        "name": "ANGEL STEPS HOME HEALTH CARE SERVICES, LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1477384592",
+        "name": "BABY STEPS BEHAVIORAL SERVICES LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1922633791",
+        "name": "MAGICAL STEPS ABA FL",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Suncoast Center",
+    "fbha_city": "St. Petersburg",
+    "status": "ok",
+    "npi_count": 12,
+    "npis": [
+      {
+        "npi": "1427107705",
+        "name": "SUNCOAST CENTER",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1598057523",
+        "name": "SUNCOAST CENTER ENTERPRISES, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1174719819",
+        "name": "SUNCOAST CENTER FOR COMMUNITY MENTAL HEALTH",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1386847820",
+        "name": "SUNCOAST CENTER FOR COMMUNITY MENTAL HEALTH",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1942496930",
+        "name": "SUNCOAST CENTER FOR COMMUNITY MENTAL HEALTH",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1609020015",
+        "name": "SUNCOAST CENTER FOR COMMUNITY MENTAL HEALTH",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1508052259",
+        "name": "SUNCOAST CENTER FOR COMMUNITY MENTAL HEALTH",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1104428812",
+        "name": "MPP INFUSION CENTER OF SUNCOAST LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1033734793",
+        "name": "NAPLES SUNCOAST SURGERY CENTER, LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1871680090",
+        "name": "SUNCOAST ALLERGY & ASTHMA CENTER",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1316347263",
+        "name": "SUNCOAST MEDICAL CENTERS OF SW FL LLC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1801463658",
+        "name": "SUNCOAST MENTAL HEALTH CENTER",
+        "source": "billing_npi_profiles",
+        "taxonomy_code": "261QM0801X"
+      }
+    ]
+  },
+  {
+    "fbha_name": "Tampa General Behavioral Health Hospital",
+    "fbha_city": "Tampa",
+    "status": "ok",
+    "npi_count": 5,
+    "registry_confidence": {
+      "sufficiently_clean": false,
+      "best_tier": "partial",
+      "best_score": 0.61,
+      "second_score": 0.61,
+      "margin": 0.0,
+      "tier_ok": true,
+      "score_ok": false,
+      "margin_ok": false,
+      "min_best_score": 0.82,
+      "min_margin": 0.05,
+      "reason": "weak_or_ambiguous_match"
+    },
+    "npis": [
+      {
+        "npi": "1609271667",
+        "name": "TAMPA GENERAL HOSPITAL",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.61,
+        "taxonomy_code": "282N00000X"
+      },
+      {
+        "npi": "1124558929",
+        "name": "TAMPA GENERAL HOSPITAL",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.61,
+        "taxonomy_code": "282N00000X"
+      },
+      {
+        "npi": "1407637531",
+        "name": "TAMPA GENERAL HOSPITAL CITRUS LLC",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.56,
+        "taxonomy_code": "163WW0000X"
+      },
+      {
+        "npi": "1063294197",
+        "name": "TAMPA GENERAL HOSPITAL HERNANDO LLC",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.56,
+        "taxonomy_code": "261QM1300X"
+      },
+      {
+        "npi": "1275305013",
+        "name": "TAMPA GENERAL HOSPITAL HERNANDO, LLC",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.56,
+        "taxonomy_code": "282N00000X"
+      }
+    ]
+  },
+  {
+    "fbha_name": "The Henry and Rilla White Foundation",
+    "fbha_city": "Tallahassee",
+    "status": "ok",
+    "npi_count": 4,
+    "registry_confidence": {
+      "sufficiently_clean": false,
+      "best_tier": "partial",
+      "best_score": 0.76,
+      "second_score": 0.76,
+      "margin": 0.0,
+      "tier_ok": true,
+      "score_ok": false,
+      "margin_ok": false,
+      "min_best_score": 0.82,
+      "min_margin": 0.05,
+      "reason": "weak_or_ambiguous_match"
+    },
+    "npis": [
+      {
+        "npi": "1740672518",
+        "name": "HENRY AND RILLA WHITE YOUTH FOUNDATION INC.",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.76,
+        "taxonomy_code": "251S00000X"
+      },
+      {
+        "npi": "1336562677",
+        "name": "HENRY AND RILLA WHITE YOUTH FOUNDATION, INC.",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.76,
+        "taxonomy_code": "251B00000X"
+      },
+      {
+        "npi": "1427725969",
+        "name": "HENRY AND RILLA WHITE YOUTH FOUNDATION, INC.",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.76,
+        "taxonomy_code": "104100000X"
+      },
+      {
+        "npi": "1952303737",
+        "name": "THE HENRY & RILLA WHITE YOUTH FOUNDATION INC",
+        "source": "nppes",
+        "city": "",
+        "match_score": 0.76,
+        "taxonomy_code": "251B00000X"
+      }
+    ]
+  },
+  {
+    "fbha_name": "The Transition House",
+    "fbha_city": "St. Cloud",
+    "status": "ok",
+    "npi_count": 3,
+    "npis": [
+      {
+        "npi": "1326713306",
+        "name": "THE TRANSITION HOUSE, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1942364062",
+        "name": "THE TRANSITION HOUSE, INC.",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1083382774",
+        "name": "THE TRANSITION HOUSE, INC.",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  },
+  {
+    "fbha_name": "Tri-County Human Services",
+    "fbha_city": "Lakeland",
+    "status": "ok",
+    "npi_count": 1,
+    "registry_confidence": {
+      "sufficiently_clean": true,
+      "best_tier": "exact",
+      "best_score": 1.0,
+      "second_score": 0.0,
+      "margin": 1.0,
+      "tier_ok": true,
+      "score_ok": true,
+      "margin_ok": true,
+      "min_best_score": 0.82,
+      "min_margin": 0.05
+    },
+    "npis": [
+      {
+        "npi": "1164485074",
+        "name": "TRI COUNTY HUMAN SERVICES, INC.",
+        "source": "nppes",
+        "city": "",
+        "match_score": 1.0,
+        "taxonomy_code": "261QP2300X"
+      }
+    ]
+  },
+  {
+    "fbha_name": "WestCare Florida",
+    "fbha_city": "Pembroke Pines",
+    "status": "ok",
+    "npi_count": 6,
+    "npis": [
+      {
+        "npi": "1699372490",
+        "name": "WESTCARE GULFCOAST FLORIDA INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1063201077",
+        "name": "WESTCARE GULFCOAST FLORIDA, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1689463697",
+        "name": "WESTCARE GULFCOAST FLORIDA, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1124161062",
+        "name": "WESTCARE GULFCOAST FLORIDA, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1841089851",
+        "name": "WESTCARE GULFCOAST FLORIDA, INC",
+        "source": "nppes",
+        "city": ""
+      },
+      {
+        "npi": "1972191641",
+        "name": "WESTCARE GULFCOAST FLORIDA, INC",
+        "source": "nppes",
+        "city": ""
+      }
+    ]
+  }
+]
