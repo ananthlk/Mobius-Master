@@ -101,6 +101,17 @@
     .section-heading { font-size: 1rem; margin: 1.5rem 0 0.5rem 0; }
     .section-desc { color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem; }
     .worker-card { cursor: default; }
+    .summary-bar {
+      display: flex; gap: 1rem; align-items: center; margin-bottom: 0.5rem;
+      padding: 0.6rem 1rem; border-radius: 6px;
+      background: var(--card); border: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.9rem;
+    }
+    .summary-bar .count { font-weight: 600; }
+    .summary-bar .count.up { color: #22c55e; }
+    .summary-bar .count.down { color: #ef4444; }
+    .summary-bar .count.total { color: var(--muted); }
+    .summary-bar .sep { color: rgba(255,255,255,0.15); }
     .worker-card .port a { color: var(--accent); text-decoration: none; }
     .worker-card .port a:hover { text-decoration: underline; }
     .card-actions { position: relative; flex-shrink: 0; }
@@ -141,6 +152,7 @@
     </div>
   </header>
   <p class="subtitle">Use the menu to Stop all or Start all. Landing stays on 3999.</p>
+  <div class="summary-bar" id="summary-bar"></div>
   <p class="status-footer" id="status-footer">Status: loading…</p>
 
   <h2 class="section-heading">Processes</h2>
@@ -230,6 +242,235 @@
       <span class="port">http://localhost:6500 — Job UI (run on demand).</span>
       <p class="card-status-text" id="text-dbt" aria-live="polite"></p>
     </a>
+    <a class="card" href="http://localhost:3999/org-profile.html" target="_blank" rel="noopener" data-process-id="org-profile">
+      <div class="card-header">
+        <h2>Org Profiles</h2>
+        <span class="status-dot unknown" role="status" aria-label="Org Profiles: checking" id="dot-org-profile"></span>
+      </div>
+      <span class="port">http://localhost:3999/org-profile.html — Org identity, NPIs, skills, locations, audit log.</span>
+      <p class="card-status-text" id="text-org-profile" aria-live="polite"></p>
+    </a>
+    <a class="card" href="http://localhost:8000/org-story" target="_blank" rel="noopener" data-process-id="org-story">
+      <div class="card-header">
+        <h2>Org Story</h2>
+        <span class="status-dot unknown" role="status" aria-label="Org Story: checking" id="dot-org-story"></span>
+      </div>
+      <span class="port">http://localhost:8000/org-story — Revenue decomposition, Laspeyres, market leakage.</span>
+      <p class="card-status-text" id="text-org-story" aria-live="polite"></p>
+    </a>
+    <a class="card" href="http://localhost:8000/financial-strategy" target="_blank" rel="noopener" data-process-id="financial-strategy">
+      <div class="card-header">
+        <h2>Financial Strategy</h2>
+        <span class="status-dot unknown" role="status" aria-label="Financial Strategy: checking" id="dot-financial-strategy"></span>
+      </div>
+      <span class="port">http://localhost:8000/financial-strategy — Org benchmarking, rate analysis, industry landscape.</span>
+      <p class="card-status-text" id="text-financial-strategy" aria-live="polite"></p>
+    </a>
+    <a class="card" href="http://localhost:8099" target="_blank" rel="noopener" data-process-id="financial-strategy-demo">
+      <div class="card-header">
+        <h2>Financial Strategy Demo</h2>
+        <span class="status-dot unknown" role="status" aria-label="Financial Strategy Demo: checking" id="dot-financial-strategy-demo"></span>
+        <div class="card-actions" onclick="event.preventDefault(); event.stopPropagation();">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">&#8942;</button>
+          <div class="dropdown">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port">http://localhost:8099 — Standalone demo with persistence.</span>
+      <p class="card-status-text" id="text-financial-strategy-demo" aria-live="polite"></p>
+    </a>
+  </div>
+
+  <h2 class="section-heading">Skill Servers</h2>
+  <p class="section-desc">Backend skill services called by Chat via MCP or direct HTTP.</p>
+  <div class="cards" id="skill-cards">
+    <div class="card worker-card" data-skill-id="google-search">
+      <div class="card-header">
+        <h2>Google Search</h2>
+        <span class="status-dot unknown" role="status" id="dot-google-search"></span>
+        <div class="card-actions">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">&#8942;</button>
+          <div class="dropdown">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port"><a href="http://localhost:8004" target="_blank" rel="noopener">:8004</a></span>
+      <p class="card-status-text" id="text-google-search" aria-live="polite"></p>
+    </div>
+    <div class="card worker-card" data-skill-id="healthcare">
+      <div class="card-header">
+        <h2>Healthcare</h2>
+        <span class="status-dot unknown" role="status" id="dot-healthcare"></span>
+        <div class="card-actions">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">&#8942;</button>
+          <div class="dropdown">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port"><a href="http://localhost:8007" target="_blank" rel="noopener">:8007</a> — NPI, ICD-10, CMS coverage</span>
+      <p class="card-status-text" id="text-healthcare" aria-live="polite"></p>
+    </div>
+    <div class="card worker-card" data-skill-id="scraper-api">
+      <div class="card-header">
+        <h2>Web Scraper</h2>
+        <span class="status-dot unknown" role="status" id="dot-scraper-api"></span>
+        <div class="card-actions">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">&#8942;</button>
+          <div class="dropdown">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port"><a href="http://localhost:8002" target="_blank" rel="noopener">:8002</a> — Scrape from URL for RAG</span>
+      <p class="card-status-text" id="text-scraper-api" aria-live="polite"></p>
+    </div>
+    <div class="card worker-card" data-skill-id="email">
+      <div class="card-header">
+        <h2>Email</h2>
+        <span class="status-dot unknown" role="status" id="dot-email"></span>
+        <div class="card-actions">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">&#8942;</button>
+          <div class="dropdown">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port"><a href="http://localhost:8003" target="_blank" rel="noopener">:8003</a></span>
+      <p class="card-status-text" id="text-email" aria-live="polite"></p>
+    </div>
+    <div class="card worker-card" data-skill-id="credentialing">
+      <div class="card-header">
+        <h2>Credentialing</h2>
+        <span class="status-dot unknown" role="status" id="dot-credentialing"></span>
+        <div class="card-actions">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">&#8942;</button>
+          <div class="dropdown">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port"><a href="http://localhost:8011" target="_blank" rel="noopener">:8011</a> — Provider roster, benchmarking, org profiles</span>
+      <p class="card-status-text" id="text-credentialing" aria-live="polite"></p>
+    </div>
+    <div class="card worker-card" data-skill-id="task-manager">
+      <div class="card-header">
+        <h2>Task Manager</h2>
+        <span class="status-dot unknown" role="status" id="dot-task-manager"></span>
+        <div class="card-actions">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">&#8942;</button>
+          <div class="dropdown">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port"><a href="http://localhost:8015" target="_blank" rel="noopener">:8015</a></span>
+      <p class="card-status-text" id="text-task-manager" aria-live="polite"></p>
+    </div>
+    <div class="card worker-card" data-skill-id="doc-reader">
+      <div class="card-header">
+        <h2>Doc Reader</h2>
+        <span class="status-dot unknown" role="status" id="dot-doc-reader"></span>
+        <div class="card-actions">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">&#8942;</button>
+          <div class="dropdown">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port"><a href="http://localhost:8018" target="_blank" rel="noopener">:8018</a></span>
+      <p class="card-status-text" id="text-doc-reader" aria-live="polite"></p>
+    </div>
+    <div class="card worker-card" data-skill-id="instant-rag">
+      <div class="card-header">
+        <h2>Instant RAG</h2>
+        <span class="status-dot unknown" role="status" id="dot-instant-rag"></span>
+        <div class="card-actions">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">&#8942;</button>
+          <div class="dropdown">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port"><a href="http://localhost:8040" target="_blank" rel="noopener">:8040</a></span>
+      <p class="card-status-text" id="text-instant-rag" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <h2 class="section-heading">Infrastructure</h2>
+  <p class="section-desc">Internal APIs, MCP, and data services. Not user-facing.</p>
+  <div class="cards" id="infra-cards">
+    <div class="card worker-card" data-infra-id="mcp-server">
+      <div class="card-header">
+        <h2>MCP Server</h2>
+        <span class="status-dot unknown" role="status" id="dot-mcp-server"></span>
+        <div class="card-actions">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">&#8942;</button>
+          <div class="dropdown">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port"><a href="http://localhost:8006" target="_blank" rel="noopener">:8006</a> — Skill tool router</span>
+      <p class="card-status-text" id="text-mcp-server" aria-live="polite"></p>
+    </div>
+    <div class="card worker-card" data-infra-id="db-agent">
+      <div class="card-header">
+        <h2>DB Agent</h2>
+        <span class="status-dot unknown" role="status" id="dot-db-agent"></span>
+        <div class="card-actions">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">&#8942;</button>
+          <div class="dropdown">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port"><a href="http://localhost:8008" target="_blank" rel="noopener">:8008</a></span>
+      <p class="card-status-text" id="text-db-agent" aria-live="polite"></p>
+    </div>
+    <div class="card worker-card" data-infra-id="rag-api">
+      <div class="card-header">
+        <h2>RAG API</h2>
+        <span class="status-dot unknown" role="status" id="dot-rag-api"></span>
+        <div class="card-actions">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">&#8942;</button>
+          <div class="dropdown">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port"><a href="http://localhost:8030" target="_blank" rel="noopener">:8030</a> — Retrieval endpoint</span>
+      <p class="card-status-text" id="text-rag-api" aria-live="polite"></p>
+    </div>
+    <div class="card worker-card" data-infra-id="lexicon-api">
+      <div class="card-header">
+        <h2>Lexicon API</h2>
+        <span class="status-dot unknown" role="status" id="dot-lexicon-api"></span>
+        <div class="card-actions">
+          <button type="button" class="kebab-btn" aria-label="Actions" aria-haspopup="true" title="Stop or restart">&#8942;</button>
+          <div class="dropdown">
+            <button type="button" class="stop">Stop</button>
+            <button type="button" class="restart">Restart</button>
+          </div>
+        </div>
+      </div>
+      <span class="port"><a href="http://localhost:8010" target="_blank" rel="noopener">:8010</a> — Lexicon data API</span>
+      <p class="card-status-text" id="text-lexicon-api" aria-live="polite"></p>
+    </div>
   </div>
 
   <h2 class="section-heading">Workers</h2>
@@ -385,16 +626,45 @@
       dot.title = label;
     }
 
+    function setServiceDot(s) {
+      var dot = document.getElementById('dot-' + s.id);
+      var text = document.getElementById('text-' + s.id);
+      if (!dot) return;
+      var status = s.status || 'unknown';
+      dot.className = 'status-dot ' + (status === 'up' ? 'up' : status === 'slow' ? 'slow' : status === 'down' ? 'down' : 'unknown');
+      var label = s.id + ': ' + status;
+      if (s.ms != null && status !== 'down') label += ' (' + s.ms + 'ms)';
+      dot.setAttribute('aria-label', label);
+      dot.title = label;
+      if (text) {
+        if (status === 'up' && s.ms != null) text.textContent = s.ms + 'ms';
+        else if (status === 'slow') text.textContent = (s.ms != null ? s.ms + 'ms ' : '') + '(slow)';
+        else if (status === 'down') text.textContent = 'down';
+        else text.textContent = '';
+      }
+    }
+
+    function updateSummaryBar(summary) {
+      var bar = document.getElementById('summary-bar');
+      if (!bar || !summary) return;
+      bar.innerHTML = '<span class="count up">' + summary.up + ' up</span>' +
+        '<span class="sep">|</span>' +
+        '<span class="count down">' + summary.down + ' down</span>' +
+        '<span class="sep">|</span>' +
+        '<span class="count total">' + summary.total + ' total HTTP services</span>';
+    }
+
     async function refreshStatus() {
-      const footer = document.getElementById('status-footer');
+      var footer = document.getElementById('status-footer');
       try {
-        const res = await fetch('/api/status');
-        const data = await res.json().catch(() => ({}));
-        const processes = data.processes || [];
-        const workers = data.workers || [];
-        processes.forEach(setProcessCard);
-        workers.forEach(setWorkerRow);
-        const updatedAt = data.updated_at ? new Date(data.updated_at).toLocaleTimeString() : '';
+        var res = await fetch('/api/status');
+        var data = await res.json().catch(function () { return {}; });
+        (data.processes || []).forEach(setProcessCard);
+        (data.skills || []).forEach(setServiceDot);
+        (data.infra || []).forEach(setServiceDot);
+        (data.workers || []).forEach(setWorkerRow);
+        updateSummaryBar(data.summary);
+        var updatedAt = data.updated_at ? new Date(data.updated_at).toLocaleTimeString() : '';
         footer.textContent = 'Status: last updated ' + (updatedAt || 'just now') + '. Auto-refresh every 15s.';
       } catch (e) {
         footer.textContent = 'Status: error — ' + e.message;
@@ -422,7 +692,7 @@
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
         var card = this.closest('.card');
-        var id = card.dataset.processId || card.dataset.workerId;
+        var id = card.dataset.processId || card.dataset.workerId || card.dataset.skillId || card.dataset.infraId;
         if (!id) return;
         this.closest('.dropdown').classList.remove('open');
         fetch('/api/service/stop', {
@@ -445,7 +715,7 @@
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
         var card = this.closest('.card');
-        var id = card.dataset.processId || card.dataset.workerId;
+        var id = card.dataset.processId || card.dataset.workerId || card.dataset.skillId || card.dataset.infraId;
         if (!id) return;
         this.closest('.dropdown').classList.remove('open');
         var footer = document.getElementById('status-footer');

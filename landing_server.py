@@ -62,6 +62,19 @@ def _service_config() -> dict:
         "chat_eval_url": _env_url("MOBIUS_CHAT_EVAL_URL", f"http://127.0.0.1:{PORT}/chat-eval/"),
         "retrieval_eval_api_url": _env_url("MOBIUS_RETRIEVAL_EVAL_API_URL", "http://127.0.0.1:8020"),
         "rag_api_url": _env_url("RAG_API_URL", "http://127.0.0.1:8030"),
+        # Skill servers
+        "google_search_url": _env_url("MOBIUS_GOOGLE_SEARCH_URL", "http://127.0.0.1:8004"),
+        "healthcare_url": _env_url("MOBIUS_HEALTHCARE_URL", "http://127.0.0.1:8007"),
+        "credentialing_url": _env_url("MOBIUS_CREDENTIALING_URL", "http://127.0.0.1:8011"),
+        "task_manager_url": _env_url("MOBIUS_TASK_MANAGER_URL", "http://127.0.0.1:8015"),
+        "doc_reader_url": _env_url("MOBIUS_DOC_READER_URL", "http://127.0.0.1:8018"),
+        "instant_rag_url": _env_url("MOBIUS_INSTANT_RAG_URL", "http://127.0.0.1:8040"),
+        "financial_strategy_demo_url": _env_url("MOBIUS_FINANCIAL_STRATEGY_DEMO_URL", "http://127.0.0.1:8099"),
+        # Infrastructure services
+        "mcp_server_url": _env_url("MCP_SERVER_URL", "http://127.0.0.1:8006"),
+        "db_agent_url": _env_url("MOBIUS_DB_AGENT_URL", "http://127.0.0.1:8008"),
+        "lexicon_api_url": _env_url("MOBIUS_LEXICON_API_URL", "http://127.0.0.1:8010"),
+        # Redis
         "redis_host": os.getenv("MOBIUS_REDIS_HOST", "10.40.102.67").strip() or "10.40.102.67",
         "redis_port": int(os.getenv("MOBIUS_REDIS_PORT", "6379").strip() or "6379"),
     }
@@ -74,6 +87,36 @@ def _get_process_probes() -> list:
         ("chat", "Chat", c["chat_url"], c["chat_url"], "/health"),
         ("retrieval-eval", "Retrieval Eval", c["retrieval_eval_url"], c["retrieval_eval_api_url"], "/health"),
         ("dbt", "DBT", c["dbt_url"], c["dbt_url"], "/config"),
+        ("org-profile", "Org Profiles", f"http://127.0.0.1:{PORT}/org-profile.html", None, None),
+        ("org-story", "Org Story", c["chat_url"] + "/org-story", c["chat_url"], "/org-story"),
+        ("financial-strategy", "Financial Strategy", c["chat_url"] + "/financial-strategy", c["chat_url"], "/financial-strategy"),
+        ("financial-strategy-demo", "Financial Strategy Demo", c["financial_strategy_demo_url"], c["financial_strategy_demo_url"], "/health"),
+    ]
+
+
+def _get_skill_probes() -> list:
+    """Skill server probes: (id, name, link_url, probe_url, path)."""
+    c = _service_config()
+    return [
+        ("google-search", "Google Search", c["google_search_url"], c["google_search_url"], "/health"),
+        ("healthcare", "Healthcare", c["healthcare_url"], c["healthcare_url"], "/health"),
+        ("scraper-api", "Web Scraper", c["scraper_url"], c["scraper_url"], "/health"),
+        ("email", "Email", c["email_url"], c["email_url"], "/health"),
+        ("credentialing", "Credentialing", c["credentialing_url"], c["credentialing_url"], "/health"),
+        ("task-manager", "Task Manager", c["task_manager_url"], c["task_manager_url"], "/health"),
+        ("doc-reader", "Doc Reader", c["doc_reader_url"], c["doc_reader_url"], "/health"),
+        ("instant-rag", "Instant RAG", c["instant_rag_url"], c["instant_rag_url"], "/health"),
+    ]
+
+
+def _get_infra_probes() -> list:
+    """Infrastructure service probes: (id, name, link_url, probe_url, path)."""
+    c = _service_config()
+    return [
+        ("mcp-server", "MCP Server", c["mcp_server_url"], c["mcp_server_url"], "/health"),
+        ("db-agent", "DB Agent", c["db_agent_url"], c["db_agent_url"], "/health"),
+        ("rag-api", "RAG API", c["rag_api_url"], c["rag_api_url"], "/health"),
+        ("lexicon-api", "Lexicon API", c["lexicon_api_url"], c["lexicon_api_url"], "/health"),
     ]
 
 
@@ -113,6 +156,18 @@ SERVICE_STOP = {
     "email": {"names": ["mobius-email-api"], "ports": [8003]},
     "rag-chunking": {"names": ["mobius-rag-chunking-worker"], "ports": []},
     "rag-embedding": {"names": ["mobius-rag-embedding-worker"], "ports": []},
+    "financial-strategy-demo": {"names": ["financial-strategy-demo"], "ports": [8099]},
+    # Skill servers
+    "scraper-api": {"names": ["mobius-scraper-api", "mobius-scraper-worker"], "ports": [8002]},
+    "healthcare": {"names": ["mobius-healthcare"], "ports": [8007]},
+    "credentialing": {"names": ["mobius-provider-roster-credentialing"], "ports": [8011]},
+    "task-manager": {"names": ["mobius-task-manager"], "ports": [8015]},
+    "doc-reader": {"names": ["mobius-doc-reader"], "ports": [8018]},
+    "instant-rag": {"names": ["mobius-instant-rag"], "ports": [8040]},
+    # Infrastructure
+    "mcp-server": {"names": ["mobius-skills-mcp"], "ports": [8006]},
+    "db-agent": {"names": ["mobius-db-agent"], "ports": [8008]},
+    "lexicon-api": {"names": ["mobius-qa-lexicon"], "ports": [8010]},
 }
 
 # Log file names we are allowed to stream (no path traversal).
@@ -174,6 +229,39 @@ def _start_commands(root: Path) -> dict:
             if (root / "mobius-rag" / "app" / "embedding_worker.py").exists()
             else []
         ),
+        "financial-strategy-demo": [
+            ("financial-strategy-demo", f"cd {r} && source {r}/mobius-chat/.env && {venv} financial_strategy_demo.py"),
+        ],
+        # Skill servers
+        "scraper-api": [
+            ("mobius-scraper-api", f"cd {r}/mobius-skills/web-scraper && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8002"),
+            ("mobius-scraper-worker", f"cd {r}/mobius-skills/web-scraper && {venv} -m app.worker"),
+        ],
+        "healthcare": [
+            ("mobius-healthcare", f"cd {r}/mobius-skills/healthcare && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8007"),
+        ],
+        "credentialing": [
+            ("mobius-provider-roster-credentialing", f"cd {r}/mobius-skills/provider-roster-credentialing && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8011"),
+        ],
+        "task-manager": [
+            ("mobius-task-manager", f"cd {r}/mobius-skills/task-manager && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8015"),
+        ],
+        "doc-reader": [
+            ("mobius-doc-reader", f"cd {r}/mobius-skills/doc-reader && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8018"),
+        ],
+        "instant-rag": [
+            ("mobius-instant-rag", f"cd {r}/mobius-skills/instant-rag && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8040"),
+        ],
+        # Infrastructure
+        "mcp-server": [
+            ("mobius-skills-mcp", f"cd {r}/mobius-skills-mcp && {venv} -m app"),
+        ],
+        "db-agent": [
+            ("mobius-db-agent", f"cd {r}/mobius-db-agent && {venv} -m app"),
+        ],
+        "lexicon-api": [
+            ("mobius-qa-lexicon", f"cd {r}/mobius-qa/lexicon-maintenance && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8010"),
+        ],
     }
 
 RAG_BACKEND_PATH = "/health"
@@ -339,16 +427,15 @@ def _probe_rag() -> dict:
 
 def _get_status() -> dict:
     processes = []
-    # OS, Chat, DBT
+    # OS, Chat, DBT, Financial Strategy, etc.
     for pid, name, link_url, probe_url, path in _get_process_probes():
-        status, ms = _probe_one(probe_url, path)
-        processes.append({
-            "id": pid,
-            "name": name,
-            "url": link_url,
-            "status": status,
-            "ms": ms,
-        })
+        if probe_url is None or path is None:
+            # Static file served by landing itself — check file existence instead.
+            static_ok = (LANDING_DIR / (pid + ".html")).exists()
+            processes.append({"id": pid, "name": name, "url": link_url, "status": "up" if static_ok else "down", "ms": 0})
+        else:
+            status, ms = _probe_one(probe_url, path)
+            processes.append({"id": pid, "name": name, "url": link_url, "status": status, "ms": ms})
     # Lexicon (static): don't self-probe via HTTP (landing is single-threaded).
     # Instead, mark up if the built dist index exists.
     try:
@@ -389,6 +476,18 @@ def _get_status() -> dict:
         }.get(p["id"], 9)
     )
 
+    # Skill servers
+    skills = []
+    for sid, sname, link_url, probe_url, path in _get_skill_probes():
+        status, ms = _probe_one(probe_url, path)
+        skills.append({"id": sid, "name": sname, "url": link_url, "status": status, "ms": ms})
+
+    # Infrastructure services
+    infra = []
+    for iid, iname, link_url, probe_url, path in _get_infra_probes():
+        status, ms = _probe_one(probe_url, path)
+        infra.append({"id": iid, "name": iname, "url": link_url, "status": status, "ms": ms})
+
     workers = []
     for wid, name, base_url, path, note in _get_worker_probes():
         if base_url is None or path is None:
@@ -406,10 +505,19 @@ def _get_status() -> dict:
 
     redis_status = _redis_status()
 
+    # Summary counts
+    all_http = processes + skills + infra
+    up_count = sum(1 for s in all_http if s.get("status") in ("up", "slow"))
+    down_count = sum(1 for s in all_http if s.get("status") == "down")
+    total_count = len(all_http)
+
     return {
         "processes": processes,
+        "skills": skills,
+        "infra": infra,
         "workers": workers,
         "redis": redis_status,
+        "summary": {"up": up_count, "down": down_count, "total": total_count},
         "updated_at": datetime.now(timezone.utc).isoformat(),
     }
 
@@ -426,6 +534,24 @@ def _get_api_config() -> dict:
         {"id": "retrieval-eval", "url": c["retrieval_eval_url"]},
         {"id": "chat-eval", "url": c["chat_eval_url"]},
         {"id": "dbt", "url": c["dbt_url"]},
+        {"id": "financial-strategy", "url": c["chat_url"] + "/financial-strategy"},
+        {"id": "financial-strategy-demo", "url": c["financial_strategy_demo_url"]},
+    ]
+    skills = [
+        {"id": "google-search", "url": c["google_search_url"]},
+        {"id": "healthcare", "url": c["healthcare_url"]},
+        {"id": "scraper-api", "url": c["scraper_url"]},
+        {"id": "email", "url": c["email_url"]},
+        {"id": "credentialing", "url": c["credentialing_url"]},
+        {"id": "task-manager", "url": c["task_manager_url"]},
+        {"id": "doc-reader", "url": c["doc_reader_url"]},
+        {"id": "instant-rag", "url": c["instant_rag_url"]},
+    ]
+    infra = [
+        {"id": "mcp-server", "url": c["mcp_server_url"]},
+        {"id": "db-agent", "url": c["db_agent_url"]},
+        {"id": "rag-api", "url": c["rag_api_url"]},
+        {"id": "lexicon-api", "url": c["lexicon_api_url"]},
     ]
     workers = [
         {"id": "chat-worker", "url": None},
@@ -438,6 +564,8 @@ def _get_api_config() -> dict:
     redis_start_enabled = ENV != "prod"
     return {
         "processes": processes,
+        "skills": skills,
+        "infra": infra,
         "workers": workers,
         "controls_enabled": controls_enabled,
         "logs_enabled": logs_enabled,
