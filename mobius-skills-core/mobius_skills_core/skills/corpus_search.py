@@ -117,6 +117,16 @@ class CorpusFilters:
 _CHROMA_CACHE: dict[str, Any] = {}
 
 
+def _reset_chroma_cache() -> None:
+    """Testing hook — clear the Chroma collection cache.
+
+    Production callers never need this. Tests that mock ``chromadb.PersistentClient``
+    call this between test methods so a stale mock from a previous
+    test doesn't leak across assertions.
+    """
+    _CHROMA_CACHE.clear()
+
+
 # ── Chroma backend ──
 
 
