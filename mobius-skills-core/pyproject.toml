@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mobius-skills-core"
+version = "0.1.0"
+description = "Shared skill implementations for Mobius. One implementation per capability (google search, web scrape, corpus search, etc.); consumers (mobius-chat, mobius-skills-mcp) import the same function and wrap it for their surface."
+requires-python = ">=3.11"
+dependencies = [
+    # Keep runtime deps minimal. Each skill declares what it needs.
+    # External integrations (Chroma, Vertex, provider HTTP) are installed
+    # by consumers, not by this package, so services that only need a
+    # subset of skills aren't forced to pull in everything.
+]
+
+[project.optional-dependencies]
+# Extras match skill families. Consumers install only what they use.
+#   pip install mobius-skills-core[retrieval]   -> pulls Chroma + Postgres deps
+#   pip install mobius-skills-core[web]         -> pulls httpx / requests
+retrieval = [
+    "psycopg2-binary>=2.9",
+    "chromadb>=0.4",
+]
+web = [
+    # google_search + web_scrape both use stdlib urllib.request today
+    # so no extra runtime dep is required. Listed here as an anchor so
+    # future upgrades to httpx land in one place.
+]
+dev = [
+    "pytest>=8",
+    "pytest-cov>=5",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mobius_skills_core*"]
