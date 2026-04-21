@@ -72,14 +72,30 @@ _STEP_ID = "corpus_search"
 
 @dataclass
 class ChromaConfig:
-    """Chroma local backend configuration.
+    """Chroma backend configuration.
 
-    ``persist_dir`` is the filesystem path where the persisted client
-    stores its index. ``collection`` is the collection name (matches
-    how the sync job writes — default ``published_rag`` in mobius-chat).
+    Two mutually-exclusive modes:
+
+    * **Local persist mode** — set ``persist_dir`` to a filesystem
+      path. Uses ``chromadb.PersistentClient``. Historical default
+      when everyone ran Chroma in-process on a dev box.
+
+    * **HTTP server mode** — set ``host`` (+ optional ``port``,
+      ``ssl``, ``auth_token``). Uses ``chromadb.HttpClient`` to talk
+      to a shared Chroma server (e.g. the GCE e2-micro beta deploy
+      at ``34.170.243.161:8000``). Preferred when dev + prod should
+      see the same index.
+
+    Callers pass whichever fields their deploy uses; the skill picks
+    the right client. ``collection`` applies to both modes.
     """
-    persist_dir: str
+    persist_dir: str = ""
     collection: str = "published_rag"
+    # HTTP-mode fields (all optional; ignored when persist_dir is set).
+    host: str = ""
+    port: int = 8000
+    ssl: bool = False
+    auth_token: str = ""
 
 
 @dataclass
@@ -131,11 +147,26 @@ def _reset_chroma_cache() -> None:
 
 
 def _get_chroma_collection(cfg: ChromaConfig):
-    key = f"{cfg.persist_dir}::{cfg.collection}"
+    # Cache key includes mode discriminator so a dev box that switches
+    # between persist_dir and host gets a fresh client per mode.
+    key = (
+        f"http::{cfg.host}:{cfg.port}::{cfg.collection}"
+        if cfg.host else
+        f"local::{cfg.persist_dir}::{cfg.collection}"
+    )
     if key in _CHROMA_CACHE:
         return _CHROMA_CACHE[key]
     import chromadb  # type: ignore[import-untyped]
-    client = chromadb.PersistentClient(path=cfg.persist_dir)
+    if cfg.host:
+        headers = {"X-Chroma-Token": cfg.auth_token} if cfg.auth_token else None
+        client = chromadb.HttpClient(
+            host=cfg.host,
+            port=cfg.port,
+            ssl=cfg.ssl,
+            headers=headers,
+        )
+    else:
+        client = chromadb.PersistentClient(path=cfg.persist_dir)
     collection = client.get_or_create_collection(
         name=cfg.collection,
         metadata={"hnsw:space": "cosine"},
