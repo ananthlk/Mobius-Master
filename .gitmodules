@@ -53,3 +53,6 @@
 [submodule "mobius-skills-mcp"]
 	path = mobius-skills-mcp
 	url = https://github.com/ananthlk/mobius-skills-mcp.git
+[submodule "mobius-story-ui"]
+	path = mobius-story-ui
+	url = https://github.com/ananthlk/mobius-story-ui.git
