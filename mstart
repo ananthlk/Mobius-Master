@@ -574,6 +574,13 @@ if [[ -d "$MOBIUS_ROOT/mobius-skills/provider-roster-credentialing" ]]; then
   # provider_skill is now embedded in mobius-chat (in-process, port 8000) — no separate process needed
 fi
 
+# --- email skill (port 8013): system email via mobiushealthai@gmail.com (Gmail API/SMTP) + LLM craft ---
+if [[ -d "$MOBIUS_ROOT/mobius-skills/email" ]]; then
+  _kill_port 8013
+  _load_env "$MOBIUS_ROOT/mobius-skills/email/.env"
+  _start "mobius-email" "cd $MOBIUS_ROOT/mobius-skills/email && PORT=8013 $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8013"
+fi
+
 # --- task-manager skill (port 8015): unified task CRUD for all modules ---
 if [[ -d "$MOBIUS_ROOT/mobius-skills/task-manager" ]]; then
   _kill_port 8015
