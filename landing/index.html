@@ -100,6 +100,60 @@
     .status-footer { font-size: 0.85rem; color: var(--muted); margin-bottom: 1rem; }
     .section-heading { font-size: 1rem; margin: 1.5rem 0 0.5rem 0; }
     .section-desc { color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem; }
+
+    /* ── Alpha release banner ── */
+    .release-banner {
+      margin: 2rem 0 1rem;
+      background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(37,99,235,0.10));
+      border: 1px solid rgba(124,58,237,0.3);
+      border-radius: 12px;
+      padding: 1.5rem 1.75rem;
+    }
+    .release-banner-header {
+      display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;
+    }
+    .release-tag {
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      border-radius: 999px;
+      padding: 3px 12px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .release-banner-header h3 {
+      margin: 0; font-size: 0.95rem; font-weight: 600; color: #e2e8f0;
+    }
+    .release-banner-header .release-date {
+      margin-left: auto; font-size: 0.78rem; color: var(--muted);
+    }
+    .release-thank-you {
+      font-size: 0.88rem; color: #a78bfa; margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+    .release-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 0.5rem 1rem;
+      list-style: none;
+      padding: 0; margin: 0;
+    }
+    .release-features li {
+      font-size: 0.83rem; color: #cbd5e1;
+      display: flex; align-items: flex-start; gap: 0.5rem; line-height: 1.4;
+    }
+    .release-features li::before {
+      content: "✦"; color: #7c3aed; flex-shrink: 0; font-size: 0.7rem; margin-top: 2px;
+    }
+    .release-known-issues {
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.8rem; color: var(--muted); line-height: 1.5;
+    }
+    .release-known-issues strong { color: #f59e0b; }
     .worker-card { cursor: default; }
     .summary-bar {
       display: flex; gap: 1rem; align-items: center; margin-bottom: 0.5rem;
@@ -535,6 +589,43 @@
   </div>
 
   <p class="subtitle">mobius-user is a library (auth); no standalone server. mobius-config holds shared env.</p>
+
+  <!-- ── Alpha Release Notes ── -->
+  <div class="release-banner">
+    <div class="release-banner-header">
+      <span class="release-tag">🚀 Alpha</span>
+      <h3>What's new in Alpha</h3>
+      <span class="release-date">2026-05-06</span>
+    </div>
+
+    <p class="release-thank-you">
+      🙏 Thank you for being one of our early testers. You're helping shape Mobius at its most formative stage —
+      your questions, feedback, and patience mean everything to us. This is a working system, not a demo.
+      Please push it hard.
+    </p>
+
+    <ul class="release-features">
+      <li>Sign-in required — no more guest access; your history is yours alone</li>
+      <li>Google sign-in supported alongside email + password</li>
+      <li>Your preferences personalise every answer (tone, role, experience level)</li>
+      <li>Sidebar shows your name and recent conversations — not everyone's</li>
+      <li>Financial benchmarking against FL Medicaid HCPCS peers</li>
+      <li>Provider roster upload, reconciliation &amp; org profiles</li>
+      <li>Instant document Q&amp;A — upload a file, ask questions</li>
+      <li>Org story — competitive intelligence for CMHCs</li>
+      <li>Appeals agent — Sunshine Health rule pack seeded</li>
+      <li>Admin query dashboard — latency, cost, feedback at a glance</li>
+      <li>Thread history — pick up a conversation where you left off</li>
+      <li>1,410 automated tests passing across all services</li>
+    </ul>
+
+    <div class="release-known-issues">
+      <strong>Known limitations in Alpha:</strong>
+      Legacy conversations (before sign-in was required) won't appear in your history.
+      Some skill responses may be slow on first invocation while models warm up.
+      Feedback (👍 👎) on answers is collected but not yet shown back to you — coming in Beta.
+    </div>
+  </div>
 
   <p class="footer">Use the menu to Stop all or Start all. Landing stays on 3999. From repo root: <code>./mstop</code> stops everything including landing.</p>
 
