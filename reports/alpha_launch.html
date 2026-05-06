@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🎉 Mobius Alpha Launch</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: #0a0a14;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── Confetti ── */
+  canvas#confetti {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Card ── */
+  .card {
+    position: relative;
+    z-index: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    padding: 56px 64px;
+    max-width: 780px;
+    width: 90%;
+    text-align: center;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 80px rgba(139,92,246,0.15);
+  }
+
+  .tag {
+    display: inline-block;
+    background: linear-gradient(135deg, #7c3aed, #2563eb);
+    border-radius: 999px;
+    padding: 6px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  h1 {
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    font-weight: 800;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #a78bfa, #60a5fa, #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+
+  .subtitle {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 48px;
+    line-height: 1.6;
+  }
+
+  /* ── Stats grid ── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .stat {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 20px 16px;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #a78bfa, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+
+  /* ── What shipped ── */
+  .shipped {
+    text-align: left;
+    margin-bottom: 40px;
+  }
+
+  .shipped h2 {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 16px;
+  }
+
+  .shipped ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  @media (max-width: 560px) {
+    .shipped ul { grid-template-columns: 1fr; }
+    .card { padding: 36px 24px; }
+  }
+
+  .shipped li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.4;
+  }
+
+  .shipped li::before {
+    content: "✦";
+    color: #7c3aed;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── Repos ── */
+  .repos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 40px;
+  }
+
+  .repo-chip {
+    background: rgba(124,58,237,0.15);
+    border: 1px solid rgba(124,58,237,0.3);
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 0.78rem;
+    color: #a78bfa;
+    font-family: "SF Mono", "Fira Code", monospace;
+  }
+
+  /* ── Footer line ── */
+  .footer {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.25);
+    border-top: 1px solid rgba(255,255,255,0.07);
+    padding-top: 24px;
+    margin-top: 8px;
+  }
+
+  .footer strong { color: rgba(255,255,255,0.4); }
+
+  /* ── Pulse animation on tag ── */
+  @keyframes pulse-border {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(124,58,237,0.4); }
+    50%       { box-shadow: 0 0 0 8px rgba(124,58,237,0); }
+  }
+  .tag { animation: pulse-border 2s ease-in-out infinite; }
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+
+<div class="card">
+  <div class="tag">🚀 Alpha Launch — 2026-05-06</div>
+
+  <h1>Mobius is Alive.</h1>
+
+  <p class="subtitle">
+    Administrative intelligence for community mental health centers.<br />
+    From zero to alpha — shipped, tested, tagged, and deployed.
+  </p>
+
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-number">21</span>
+      <span class="stat-label">Repos</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number">1,410</span>
+      <span class="stat-label">Tests Passing</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number">0</span>
+      <span class="stat-label">New Failures</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number">∞</span>
+      <span class="stat-label">CMHCs to Help</span>
+    </div>
+  </div>
+
+  <div class="shipped">
+    <h2>What shipped in Alpha</h2>
+    <ul>
+      <li>Hard auth gate — no chat without sign-in</li>
+      <li>Google sign-in + welcome email</li>
+      <li>Personalization — profile drives every response</li>
+      <li>Sidebar name fallback chain (no more "Guest")</li>
+      <li>Financial benchmarking skill (FL Medicaid)</li>
+      <li>Provider roster + credentialing skill</li>
+      <li>Instant RAG — ephemeral document Q&amp;A</li>
+      <li>Corpus search with 120s timeout + auto mode</li>
+      <li>Vibe skill — tone &amp; context generation</li>
+      <li>Appeals agent — Sunshine Health rule pack</li>
+      <li>Org story intelligence</li>
+      <li>Shared envelope contracts (mobius-contracts)</li>
+      <li>dbt CI — expensive models excluded from CI</li>
+      <li>pgvector latency benchmarks</li>
+      <li>Full observability: turns, LLM calls, retrieval, eval</li>
+      <li>Preferences modal + onboarding nudge</li>
+    </ul>
+  </div>
+
+  <div class="repos">
+    <span class="repo-chip">mobius-chat</span>
+    <span class="repo-chip">Mobius-user</span>
+    <span class="repo-chip">mobius-auth</span>
+    <span class="repo-chip">mobius-rag</span>
+    <span class="repo-chip">mobius-skills</span>
+    <span class="repo-chip">mobius-story-ui</span>
+    <span class="repo-chip">mobius-vibe</span>
+    <span class="repo-chip">mobius-contracts</span>
+    <span class="repo-chip">mobius-appeals-agent</span>
+    <span class="repo-chip">mobius-dbt</span>
+    <span class="repo-chip">mobius-os</span>
+    <span class="repo-chip">+ 10 more</span>
+  </div>
+
+  <div class="footer">
+    Tagged <strong>alpha</strong> across all repos &nbsp;·&nbsp;
+    <strong>beta</strong> branch is open &nbsp;·&nbsp;
+    Built for the people keeping mental health accessible.
+  </div>
+</div>
+
+<script>
+// Confetti
+const canvas = document.getElementById("confetti");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener("resize", () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+const COLORS = ["#a78bfa","#60a5fa","#34d399","#f472b6","#fbbf24","#f87171","#818cf8"];
+const pieces = Array.from({ length: 160 }, () => ({
+  x: Math.random() * canvas.width,
+  y: Math.random() * -canvas.height,
+  r: Math.random() * 7 + 3,
+  color: COLORS[Math.floor(Math.random() * COLORS.length)],
+  speed: Math.random() * 2.5 + 1,
+  swing: Math.random() * 2 - 1,
+  angle: Math.random() * Math.PI * 2,
+  spin: (Math.random() - 0.5) * 0.15,
+  shape: Math.random() > 0.5 ? "rect" : "circle",
+  w: Math.random() * 10 + 4,
+  h: Math.random() * 5 + 3,
+}));
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (const p of pieces) {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.angle);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = 0.85;
+    if (p.shape === "circle") {
+      ctx.beginPath();
+      ctx.arc(0, 0, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+    }
+    ctx.restore();
+    p.y += p.speed;
+    p.x += Math.sin(p.y / 30) * p.swing;
+    p.angle += p.spin;
+    if (p.y > canvas.height + 20) {
+      p.y = -20;
+      p.x = Math.random() * canvas.width;
+    }
+  }
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>
