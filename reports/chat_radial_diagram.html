@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mobius — Chat Radial Data Model</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    margin: 0; padding: 0;
+    background: #fafafa;
+    color: #222;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    padding: 12px 20px;
+    background: white;
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    z-index: 10;
+  }
+  h1 { margin: 0 0 8px 0; font-weight: 600; font-size: 18px; }
+  .legend {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    font-size: 12px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid #999; }
+  .controls {
+    position: absolute; top: 90px; right: 20px;
+    background: white; border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    padding: 6px; display: flex; gap: 4px;
+    z-index: 20;
+  }
+  .controls button {
+    padding: 6px 10px; font-size: 14px;
+    border: 1px solid #ccc; background: white;
+    border-radius: 4px; cursor: pointer; min-width: 32px;
+  }
+  .controls button:hover { background: #eef; }
+  .hint {
+    position: absolute; bottom: 12px; left: 20px;
+    background: rgba(0,0,0,0.7); color: white;
+    padding: 6px 12px; border-radius: 4px;
+    font-size: 12px; z-index: 20;
+  }
+  #diagram-container {
+    flex: 1;
+    position: relative;
+    background: #fff;
+    overflow: hidden;
+  }
+  #diagram-container svg {
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+  }
+  #diagram-container svg:active { cursor: grabbing; }
+  /* Tooltip */
+  #tooltip {
+    position: fixed;
+    background: #1f2937;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 360px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    pointer-events: none;
+    z-index: 100;
+    display: none;
+  }
+  #tooltip strong { color: #fbbf24; display: block; margin-bottom: 4px; font-size: 14px; }
+  #tooltip code { background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+  #tooltip .severity-warn { color: #fb923c; font-weight: 600; }
+  #tooltip .severity-broken { color: #f87171; font-weight: 600; }
+  #tooltip .severity-clean { color: #34d399; font-weight: 600; }
+  /* highlight node on hover */
+  .node-hover rect, .node-hover polygon, .node-hover circle, .node-hover ellipse {
+    stroke-width: 4px !important;
+    filter: drop-shadow(0 0 6px rgba(0,102,204,0.5));
+  }
+  /* Mermaid initially hidden so we can swap */
+  .mermaid { display: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>💬 Mobius — Chat → Skills Radial &nbsp;<span style="color:#888;font-weight:400;font-size:13px">hover any node for details · scroll to zoom · drag to pan</span></h1>
+  <div class="legend">
+    <div class="legend-item"><span class="swatch" style="background:#cce5ff;border-color:#0066cc"></span>Chat (hub)</div>
+    <div class="legend-item"><span class="swatch" style="background:#e8f5e8;border-color:#2d7a2d"></span>Skill subgraph</div>
+    <div class="legend-item"><span class="swatch" style="background:#ffe5cc;border-color:#cc6600"></span>Soft drift / no FK</div>
+    <div class="legend-item"><span class="swatch" style="background:#ffdddd;border-color:#cc0000"></span>Hard breakage</div>
+    <div class="legend-item"><span class="swatch" style="background:#f0f0f0;border-color:#666;border-style:dashed"></span>External source</div>
+  </div>
+</header>
+
+<div class="controls">
+  <button id="zoom-in" title="Zoom in">+</button>
+  <button id="zoom-out" title="Zoom out">−</button>
+  <button id="reset" title="Reset view">⟲</button>
+  <button id="fit" title="Fit to screen">⤢</button>
+</div>
+
+<div id="diagram-container"></div>
+<div id="tooltip"></div>
+<div class="hint">💡 Tip: scroll to zoom · click-drag to pan · hover for tooltips</div>
+
+<pre class="mermaid" id="mermaid-source">
+flowchart TB
+    subgraph CORE["💬 CHAT — interface core"]
+        direction TB
+        CT["chat_turns<br/>correlation_id PK"]
+        CTM["chat_turn_messages<br/>thread_id FK ✓"]
+        CTH["chat_threads<br/>thread_id PK"]
+        CST["chat_state<br/>thread_id FK ✓"]
+        CF["chat_feedback<br/>⚠️ no FK"]
+        CSF["chat_source_feedback<br/>⚠️ no FK"]
+        LC["llm_calls<br/>⚠️ no FK"]
+        LCV["llm_config_versions<br/>config_sha ⚠️"]
+        PHI["phi_audit_log<br/>🔴 HIPAA orphan risk"]
+    end
+
+    subgraph SK_RAG["📚 RAG SKILL"]
+        PRM["published_rag_metadata<br/>🔴 no last_synced_at"]
+        LEX["policy_lexicon_entries<br/>document_tags<br/>policy_line_tags"]
+        VEC[("Vertex / Chroma<br/>vector store")]
+        RAG_DB[("RAG Postgres<br/>documents, chunks,<br/>policy_lines, embeddings")]
+    end
+
+    subgraph SK_EMAIL["✉️ EMAIL SKILL"]
+        EM["email_messages"]
+        EA["email_audit"]
+        ES["email_suppressions"]
+    end
+
+    subgraph SK_ROSTER["📋 ROSTER SKILL"]
+        PR["provider_roster<br/>⚠️ servicing NPI"]
+        RE["roster_events<br/>append-only"]
+        RUM["roster_upload_members<br/>🔴 orphan, drop"]
+    end
+
+    subgraph SK_CRED["🔧 CREDENTIALING SKILL"]
+        OPRO["org_profile<br/>⚠️ no UNIQUE on org_slug"]
+        OLOC["org_locations"]
+        NPS["provider_nppes_snapshot"]
+        PPS["provider_pml_snapshot"]
+        PCC["provider_compliance_check"]
+    end
+
+    subgraph SK_STRAT["📊 STRATEGY SKILL"]
+        BNM["bq_org_npi_map<br/>⚠️ billing NPI only"]
+        BKV["bq_org_kpis_v2"]
+        BHK["bq_org_hcpcs_kpis_v2<br/>🔴 period grain conflict"]
+        BSL["bq_org_service_line_profile_v2"]
+        BEP["bq_entity_panel_commitment"]
+    end
+
+    subgraph EXT["🌐 EXTERNAL"]
+        DOGE[("DOGE 100M+")]
+        NPPES[("NPPES 8M")]
+        PML[("PML / AHCA")]
+        DRIVE[("Google Drive")]
+    end
+
+    CT --> PRM
+    PRM -.- RAG_DB
+    LEX -.- RAG_DB
+    CT --> VEC
+    DRIVE --> RAG_DB
+
+    CT --> EM
+    EM --> EA
+    ES -.-> EM
+
+    CT --> PR
+    PR --> RE
+    PR -.- BNM
+
+    CT --> OPRO
+    OPRO --> OLOC
+    PR --> NPS
+    PR --> PPS
+    NPS --> PCC
+    PPS --> PCC
+    NPS -.-> NPPES
+    PPS -.-> PML
+
+    CT --> BNM
+    CT --> BKV
+    CT --> BHK
+    BNM -.- DOGE
+    BKV -.- DOGE
+    BHK -.- DOGE
+    BSL -.- DOGE
+    BEP -.- DOGE
+
+    CT --- CTM
+    CT --- CF
+    CT --- CSF
+    CT --- LC
+    CT --- LCV
+    CT --- PHI
+    CTH --> CTM
+    CTH --> CST
+
+    classDef hub fill:#cce5ff,stroke:#0066cc,stroke-width:3px,color:#000
+    classDef skill fill:#e8f5e8,stroke:#2d7a2d,color:#000
+    classDef warn fill:#ffe5cc,stroke:#cc6600,stroke-width:2px,color:#000
+    classDef ext fill:#f0f0f0,stroke:#666,stroke-dasharray:3 3,color:#000
+    classDef broken fill:#ffdddd,stroke:#cc0000,stroke-width:2px,color:#000
+
+    class CT,CTM,CTH,CST hub
+    class CF,CSF,LC,LCV,RUM,OPRO,BNM,BHK,PR warn
+    class PHI,PRM broken
+</pre>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+<script>
+// Tooltips per node ID — keyed to the Mermaid node IDs in the source above
+const TOOLTIPS = {
+  CT: { sev: 'clean', title: 'chat_turns', body: 'PK: <code>correlation_id</code> (TEXT)<br>One row per user request. Stores question, answer, sources, model, config_sha, agent_cards.<br><br>Hub of every chat conversation. Children: feedback, llm_calls, phi_audit_log — all reference correlation_id.' },
+  CTM: { sev: 'clean', title: 'chat_turn_messages', body: 'FK: <code>thread_id → chat_threads</code> with ON DELETE CASCADE ✓<br>Per-message transcript. <span class="severity-clean">Reference quality.</span>' },
+  CTH: { sev: 'clean', title: 'chat_threads', body: 'PK: <code>thread_id</code> (UUID)<br>Session metadata. Properly enforced as parent of chat_turn_messages and chat_state.' },
+  CST: { sev: 'clean', title: 'chat_state', body: 'PK + FK: <code>thread_id → chat_threads</code> with ON DELETE CASCADE ✓<br>Per-thread JSON state with optimistic version lock.' },
+  CF: { sev: 'warn', title: 'chat_feedback', body: '<span class="severity-warn">⚠️ correlation_id has no FK to chat_turns — convention only.</span><br>Thumbs up/down per turn. Orphan risk if a turn is deleted.<br><br><strong>Fix:</strong> add FK with ON DELETE CASCADE.' },
+  CSF: { sev: 'warn', title: 'chat_source_feedback', body: '<span class="severity-warn">⚠️ correlation_id has no FK.</span><br>Per-source rating per turn — primary reranker training signal.<br><br><strong>Critical because:</strong> not yet replicated to BQ either (chat contract gap).' },
+  LC: { sev: 'warn', title: 'llm_calls', body: '<span class="severity-warn">⚠️ correlation_id has no FK.</span><br>One row per LLM call. <strong>N:1 grain</strong> — multiple calls per turn (router, retry, A/B). Already replicated to BQ landing_llm.' },
+  LCV: { sev: 'warn', title: 'llm_config_versions', body: '<span class="severity-warn">⚠️ chat_turns.config_sha has no FK to this table.</span><br>Prompt + model version snapshots — audit/compliance source.<br><br>Defined only in app ORM; no DDL migration. Schema drift risk.' },
+  PHI: { sev: 'broken', title: 'phi_audit_log', body: '<span class="severity-broken">🔴 HIPAA-relevant; correlation_id has no FK.</span><br>Audit events are legally required evidence.<br><br><strong>Top priority fix:</strong> add FK with ON DELETE SET NULL (preserve audit even if turn is purged).' },
+  PRM: { sev: 'broken', title: 'published_rag_metadata', body: '<span class="severity-broken">🔴 cross-DB replica with no last_synced_at column.</span><br>Replicated from RAG <code>rag_published_embeddings</code> via manual <code>sync_mart_to_chat.py</code> — no schedule.<br><br>Stale references to deleted/unpublished RAG docs are possible.<br><br><strong>Fix:</strong> add last_synced_at + freshness view + cron the sync script.' },
+  LEX: { sev: 'warn', title: 'policy_lexicon (3 tables)', body: 'Replicated from RAG via <code>sync_rag_lexicon_to_chat.py</code>.<br><br>Includes <code>policy_lexicon_entries</code>, <code>document_tags</code>, <code>policy_line_tags</code>.<br><br><span class="severity-warn">⚠️ no SLA / freshness threshold</span> — if sync fails, chat reranker silently uses stale tags.' },
+  VEC: { sev: 'clean', title: 'Vertex / Chroma', body: 'External vector store — embeddings live here, not in chat Postgres.<br><br>Recently switched to pgvector parity (per your sign-off). Phantom-free, latency parity confirmed.' },
+  RAG_DB: { sev: 'clean', title: 'RAG Postgres (mobius_rag)', body: '37 tables, ~3M rows, ~880 MB.<br>Owns documents, hierarchical_chunks, policy_lines, embeddings.<br><br>See RAG sync contract for backup tiers (daily B1 / weekly B2 / never).' },
+  EM: { sev: 'clean', title: 'email_messages', body: 'Email skill persistence — to_addrs, subject, body, status, provider_message_id.<br><br>Added 2026-04-25. <strong>No BQ landing yet</strong> (chat contract gap).' },
+  EA: { sev: 'clean', title: 'email_audit', body: 'Per-email audit log: action, payload, ts. Compliance value.' },
+  ES: { sev: 'clean', title: 'email_suppressions', body: 'Suppression list (email PK, reason, added_by). Checked before any send.' },
+  PR: { sev: 'warn', title: 'provider_roster', body: '<span class="severity-warn">⚠️ Grain mismatch with bq_org_npi_map.</span><br>Stores <strong>servicing NPIs</strong> (employment master, user-uploaded).<br><code>bq_org_npi_map</code> stores <strong>billing NPIs</strong> (claims-derived). Orthogonal sets.<br><br><strong>Fix:</strong> DBT reconciliation model showing rostered ∪ billing per org.' },
+  RE: { sev: 'clean', title: 'roster_events', body: 'Append-only audit trail of roster changes. Compliance evidence.<br><br>Linked via <code>upload_id</code> to provider_roster — audit pointer, not FK.<br><br><strong>No BQ landing yet</strong> — gap to close for roster funnel analytics.' },
+  RUM: { sev: 'broken', title: 'roster_upload_members', body: '<span class="severity-broken">🔴 ORPHANED.</span> Old pipeline artifact in chat DB, superseded by <code>provider_roster</code>.<br><br><strong>Fix:</strong> drop migration.' },
+  OPRO: { sev: 'warn', title: 'org_profile', body: '<span class="severity-warn">⚠️ no UNIQUE constraint on org_slug.</span><br>provider_roster.org_slug REFERENCES org_profile(org_slug) but parent has no UNIQUE — case/format drift possible.<br><br><strong>Fix:</strong> add UNIQUE + document slugify rule.<br><br>Also: <code>confirmed_npis</code> JSONB column is redundant with org_npi view; deprecate.' },
+  OLOC: { sev: 'clean', title: 'org_locations', body: 'Practice site registry; confirmed in Step 2 of credentialing flow.<br><br>~3–10 rows per org.' },
+  NPS: { sev: 'warn', title: 'provider_nppes_snapshot', body: 'Point-in-time NPPES state per (org, NPI).<br><br><span class="severity-warn">⚠️ Overwrites on every run — no time-series.</span> For trending, use BQ landing.<br><br><strong>Cost:</strong> 0.15s × concurrency-10 per NPI. <strong>No staleness gate</strong> — re-validates on every upload.' },
+  PPS: { sev: 'warn', title: 'provider_pml_snapshot', body: 'Point-in-time PML enrollment per (org, NPI).<br><br>Same overwrite + cost issues as NPPES snapshot. ~28s for 52 providers.' },
+  PCC: { sev: 'clean', title: 'provider_compliance_check', body: 'Cross-check result: termed-but-still-active. Derived from NPPES + PML snapshots.<br><br><strong>No cron</strong> — only computed on manual POST.' },
+  BNM: { sev: 'warn', title: 'bq_org_npi_map (+ org_npi VIEW)', body: '<span class="severity-warn">⚠️ Billing NPIs only.</span> Replicated from BQ via <code>027_bq_mart_sync.py</code>, annual full-reload.<br><br>5,607 rows. <code>org_npi</code> is the read-side view used by gap_check().' },
+  BKV: { sev: 'clean', title: 'bq_org_kpis_v2', body: '5,050 rows. Org × year financials.<br><br><strong>Source of truth for org KPIs</strong> — but utilization_benchmarks.py also computes these from live DOGE scans (double-compute conflict).' },
+  BHK: { sev: 'broken', title: 'bq_org_hcpcs_kpis_v2', body: '<span class="severity-broken">🔴 HCPCS period grain conflict.</span><br>Mart is <code>period_year</code> (annual). <code>utilization_benchmarks.py</code> scans <code>stg_doge</code> at <code>period_month</code>.<br><br>Mid-year YTD queries joined to this annual mart <strong>double-count H1</strong>.<br><br><strong>Fix:</strong> pick one grain. Drop month logic OR add monthly grain to the mart.' },
+  BSL: { sev: 'clean', title: 'bq_org_service_line_profile_v2', body: '21,113 rows. Org × service line × year.' },
+  BEP: { sev: 'clean', title: 'bq_entity_panel_commitment', body: '48 rows. Entity × year panel churn index.' },
+  DOGE: { sev: 'clean', title: 'DOGE Medicaid claims', body: '50–100M+ raw claim rows in BQ.<br><br><strong>Never sync to Postgres.</strong> Pre-aggregate in BQ marts; query mart, not raw.' },
+  NPPES: { sev: 'clean', title: 'NPPES (CMS)', body: '~8M rows. National provider registry.<br><br>Live API call per NPI during validation. Subset cached in <code>bq_org_npi_map</code>.' },
+  PML: { sev: 'clean', title: 'PML / AHCA / DLC', body: 'FL Medicaid managed care + state license boards.<br><br>Refresh via <code>POST /medicaid/refresh/stream</code> — no cron, sentinel file gates rerun.' },
+  DRIVE: { sev: 'clean', title: 'Google Drive', body: 'Source for policy documents.<br>OAuth tokens stored in <code>drive_connections</code> (RAG DB) — flagged for Secret Manager migration.' },
+};
+
+// Init Mermaid then transform
+mermaid.initialize({ startOnLoad: false, theme: 'default', flowchart: { curve: 'basis', padding: 20 }, securityLevel: 'loose' });
+
+(async () => {
+  const src = document.getElementById('mermaid-source').textContent;
+  const { svg } = await mermaid.render('mmd-graph', src);
+  const container = document.getElementById('diagram-container');
+  container.innerHTML = svg;
+
+  const svgEl = container.querySelector('svg');
+  svgEl.setAttribute('width', '100%');
+  svgEl.setAttribute('height', '100%');
+  svgEl.style.maxWidth = 'none';
+  svgEl.style.maxHeight = 'none';
+
+  // Hook up tooltips
+  const tooltip = document.getElementById('tooltip');
+  const allNodes = svgEl.querySelectorAll('g.node');
+  allNodes.forEach(node => {
+    const id = node.id.replace(/^flowchart-/, '').replace(/-\d+$/, '');
+    const data = TOOLTIPS[id];
+    if (!data) return;
+    node.style.cursor = 'help';
+    node.addEventListener('mouseenter', () => {
+      node.classList.add('node-hover');
+      tooltip.innerHTML = `<strong>${data.title}</strong>${data.body}`;
+      tooltip.style.display = 'block';
+    });
+    node.addEventListener('mousemove', (e) => {
+      const x = Math.min(e.clientX + 16, window.innerWidth - 380);
+      const y = Math.min(e.clientY + 16, window.innerHeight - 200);
+      tooltip.style.left = x + 'px';
+      tooltip.style.top = y + 'px';
+    });
+    node.addEventListener('mouseleave', () => {
+      node.classList.remove('node-hover');
+      tooltip.style.display = 'none';
+    });
+  });
+
+  // Pan/zoom
+  const panZoom = svgPanZoom(svgEl, {
+    zoomEnabled: true,
+    controlIconsEnabled: false,
+    fit: true,
+    center: true,
+    minZoom: 0.3,
+    maxZoom: 8,
+    zoomScaleSensitivity: 0.4,
+  });
+
+  document.getElementById('zoom-in').onclick = () => panZoom.zoomIn();
+  document.getElementById('zoom-out').onclick = () => panZoom.zoomOut();
+  document.getElementById('reset').onclick = () => { panZoom.resetZoom(); panZoom.center(); };
+  document.getElementById('fit').onclick = () => { panZoom.fit(); panZoom.center(); };
+
+  window.addEventListener('resize', () => { panZoom.resize(); panZoom.fit(); panZoom.center(); });
+})();
+</script>
+</body>
+</html>
