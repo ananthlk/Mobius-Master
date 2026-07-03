@@ -64,7 +64,7 @@ The lexicon lives in three databases and propagates in one direction — **QA is
 
 1. **QA DB** — curators author edits here (source of truth for authoring).
 2. **RAG DB** — `POST /policy/lexicon/publish` syncs QA → RAG (vendored into the service image, single-transaction).
-3. **Chat DB** — `POST /policy/lexicon/push-to-chat` syncs RAG → Chat. A recent **`lexicon_only: true`** body flag syncs meta + entries only, skipping the memory-heavy `document_tags` / `policy_line_tags` copies — this is how chat's query-tagger gets fresh aliases without OOM.
+3. **Chat DB** — `POST /policy/lexicon/push-to-chat` syncs RAG → Chat. A recent **`lexicon_only: true`** body flag syncs meta + entries only, skipping the memory-heavy `document_tags` / `policy_line_tags` copies — this is how chat's query-tagger gets fresh aliases without OOM. (The push-to-chat service was bumped 1Gi→2Gi to handle the full sync; the full document_tags/policy_line_tags copy still needs streaming to avoid OOM — planned.)
 - `GET /policy/lexicon/sync-status` compares qa/rag/chat revisions + entry counts and reports `behind_by` / `in_sync`.
 - **Live state (2026-07-03):** rev **1050 / 1,939 entries** (QA == RAG, in sync); Chat was stale at rev 268 and was synced to 1050 today (the query-tagger picks it up within its 5-min cache TTL).
 

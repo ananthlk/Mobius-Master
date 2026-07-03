@@ -50,11 +50,12 @@ never an exception that reaches the user's turn. See failure semantics below.
 categories are unchanged — `docs_gap` is filed *programmatically*, never guessed
 by the LLM). Routing:
 
-| category | routed_to |
-|---|---|
-| `docs_gap` | `docs_backlog` |
-| `feature_request` | `product_backlog` |
-| `coverage_gap` | `corpus_backlog` |
+| category | routed_to | filed by |
+|---|---|---|
+| `docs_gap` | `docs_backlog` | product-awareness on a `product_help_search` miss (demand) |
+| `doc_stale` | `docs_refresh` | a module agent / git hook when a user-facing change ships (supply) |
+| `feature_request` | `product_backlog` | product-awareness on a `status=planned` hit |
+| `coverage_gap` | `corpus_backlog` | classifier / user-voiced |
 
 No migration was needed: `routed_to`/`category` are unconstrained `TEXT`;
 `area_tags` is shipped `JSONB`. (`docs_backlog` view added in migration 038.)
@@ -84,13 +85,18 @@ Returns `feedback_id` on success, `None` in dev when the DB is unreachable.
 **One row per miss** — no dedup at write time, full verbatim retained (verbatims
 are the doc source + eval bank; a lossy dedup key would destroy them).
 
-**`trigger` provenance (verified 2026-07-02).** `trigger` has **no CHECK
-constraint** — the `-- inline|periodic|on_demand` in migration 037 is a doc
-comment, not enforced. Recommended value for machine-harvested gaps:
-`trigger="auto_harvest"` — so user-voiced feedback (`inline`/`on_demand`/`periodic`)
-and auto-harvested gaps are cleanly separable without parsing `summary` text.
-`trigger="inline"` also works (back-compat) but conflates the two. Nothing
-downstream reads `trigger` as an enum, so this is a one-word, zero-migration change.
+**`trigger` provenance — 3 tiers (verified 2026-07-02).** `trigger` has **no CHECK
+constraint** (the `-- inline|periodic|on_demand` in migration 037 is a doc comment).
+Nothing downstream reads it as an enum, so it's the clean provenance dimension:
+
+| tier | trigger values | meaning |
+|---|---|---|
+| user-voiced | `inline` · `on_demand` · `periodic` | a human gave feedback |
+| user-activity-harvested | `auto_harvest` | a user asked, `product_help_search` missed → `docs_gap`/`feature_request` |
+| builder-filed | `agent_signal` | a module agent / git hook filed → `doc_stale` |
+
+So `WHERE trigger='agent_signal'` = all supply-side signals, `'auto_harvest'` =
+demand-side harvest, the rest = real user voice — separable without parsing text.
 
 ### `docs_backlog` view (the read-path)
 ```
@@ -112,6 +118,54 @@ shape (`module | demand_hits | distinct_users | first_seen | last_seen | sample_
 A `status=planned` hit lands here, not in `docs_backlog` — it's capability demand,
 not doc debt.
 
+### Supply side — `doc_stale` → `docs_refresh_backlog` (migration 040)
+The mirror of `docs_gap`. `docs_gap` = "a user asked and we had no doc" (demand);
+`doc_stale` = "a builder changed something and the doc is now behind" (supply).
+A module agent (or git hook) files it:
+
+```python
+store.insert_open_feedback(
+    trigger="agent_signal",           # builder-filed provenance tier
+    category="doc_stale",
+    area_tags=[module_slug],
+    verbatim="what changed",          # e.g. "renamed sidebar Threads→Conversations"
+    summary="doc behind: …",
+    routed_to=store.route_for("doc_stale"),   # -> "docs_refresh"
+    user_id=source_id,                # the SOURCE (agent name / git hook id)
+)
+```
+
+**Two filing paths — pick by where you live:**
+- **Chat-side code** (e.g. `product_help_search`, running in the chat container) → call
+  `store.insert_open_feedback(...)` in-process, as above.
+- **External agents** (other sessions / worktrees that CANNOT import `app.storage`) →
+  HTTP `POST /chat/product-feedback` (unauth, returns `feedback_id`). Body:
+  ```json
+  {"verbatim": "what changed", "category": "doc_stale", "trigger": "agent_signal",
+   "area_tags": ["<slug>"], "summary": "doc behind: …", "source": "agent:<name>"}
+  ```
+  `routed_to` is computed server-side from `category` (→ `docs_refresh`); `category`
+  is accepted because it's in `ROUTING`. **Provenance (resolved 2026-07-02):** pass a
+  `source` field (agent name / git-hook id) — it becomes the row's `user_id`, and any
+  agent-filed write (`source` set **or** `trigger="agent_signal"`) **skips both the
+  user funnel event (`log_event`) and the cadence advance (`mark_captured`)** — an
+  agent isn't part of the human prompt→capture funnel and must not reset anyone's
+  periodic-ask counters. The durable `product_feedback` row is still written, so
+  external-agent signals attribute cleanly in `docs_refresh_backlog` (via
+  `distinct_sources`) and never pollute user analytics. No need to prefix `verbatim`.
+
+View `docs_refresh_backlog`: `module | stale_hits | distinct_sources | first_seen
+| last_seen | sample_verbatims` (`distinct_sources` = distinct `user_id`, since
+these are agent-filed). The weekly sweep drains it — refresh the doc, re-embed,
+then close the signals through the encapsulated helper (never UPDATE the table
+directly):
+
+```python
+store.close_signals(category="doc_stale", module="chat")   # -> rows drained
+```
+Closed rows drop out of the view. `close_signals` is fail-closed in prod, returns
+`0` in dev on DB-down.
+
 ### Failure semantics
 `insert_open_feedback` is fail-closed in hosted envs (`CHAT_ENV=staging|prod` →
 raises `ProductFeedbackError`) and degrades to a log + `None` in dev. Because gap
@@ -128,6 +182,7 @@ fail-closed raise is for *user-visible* feedback writes, not best-effort harvest
 | `lexicon` | product-docs/lexicon.md | in-scope |
 | `skills` | product-docs/skills.md | in-scope |
 | `strategy` | product-docs/story-ui-and-landing.md | in-scope |
+| `eval` | product-docs/eval.md | in-scope |
 | `os` | product-docs/mobius-os.md | pending |
 | `credentialing` | product-docs/credentialing-and-roster.md | pending |
 | `roster` | product-docs/credentialing-and-roster.md | pending |
