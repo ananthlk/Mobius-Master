@@ -45,7 +45,12 @@ Per assistant message:
 - **New chat** (`#btnNewChat`).
 - **Recent searches** — last ~20 threads (`GET /chat/history/recent`), collapsible; clicking reopens the thread.
 - **Most helpful searches** — populated from thumbs-up feedback; refreshes after each "up".
-- **Operations Suite** — tiles linking to **Strategy**, **Credentialing**, **Roster**; an **Appeals Agent demo** tile; and "Learn more about chat skills" → the Skills modal.
+- **Operations Suite** — open-in-tab product tiles (distinct from the auto-invoked chat skills; 2026-04-29 layout):
+  - **Strategy** — "Benchmarking + KPIs" — **live** (opens the market-intelligence deck).
+  - **Public Library** — "Shared corpus — payer manuals, regs, public sources" — **live** (opens the RAG corpus UI; renamed from "Library" to make room for Vault).
+  - **Roster** — "Provider directory + credentialing" — **coming soon** (Credentialing was folded into Roster — same backing service; separate tiles confused users).
+  - **Vault** — "Your org, personal & patient documents (private namespaces)" — **coming soon** (next-sprint; per-org/user/patient isolated corpora behind a separate agent).
+  Opening a Mobius-owned tile forwards your access token in the URL fragment (`#t=…`) so the tool signs you in without a second login. Plus an **Appeals Agent demo** tile and "Learn more about chat skills" → the Skills modal.
 - **User / account area** — "Signed in as {name}"; click opens the auth modal.
 - **Onboarding nudge** (`#onboardingNudge`) — "⚙ Set up your profile" when not yet onboarded; opens Preferences.
 - **Collapse** — a chevron collapses the sidebar to an icon rail (Recent 🔍, Most Helpful ⭐, Skills ⊞ with badges).
@@ -108,6 +113,7 @@ Present in the surface but **not** wired for end users:
 - **⋯ → "Upload file"** — hidden in the live bundle (the paperclip is the shipped composer upload path).
 - **Product-feedback capture card** — the `product_feedback` skill persists feedback and returns `extra.capture_card`, but the frontend has **no code to render it yet** (the editable confirmation UI is unbuilt).
 - **Microsoft OAuth / Enterprise SSO** — **not implemented**: no Microsoft/SSO code is present in the frontend at all (earlier docs called these "coming soon" — they are not even rendered).
+- **Operations Suite: Vault + Roster tiles** — render but are **coming soon**: **Vault** = private per-org/user/patient document namespaces (next sprint, separate agent + isolation boundary); **Roster** tile's click is disabled. (The **Strategy** and **Public Library** tiles are live.)
 
 ## Doc-readiness notes
 - **Primary audience tag:** user (with distinct provider-ops, admin, and developer surfaces).
