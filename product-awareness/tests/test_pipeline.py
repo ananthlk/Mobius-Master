@@ -54,7 +54,13 @@ def test_feature_request_on_planned_hit():
 def test_docs_gap_below_threshold():
     r = _engine([_hit("chat", "Capabilities", "current", 0.05)]).search("q")
     assert r.outcome == "docs_gap" and r.gap["category"] == "docs_gap"
-    assert r.gap["module"] == "chat"          # best-guess area_tag from closest hit
+    # no explicit module filter → don't guess from a below-τ hit (would pollute the backlog)
+    assert r.gap["module"] == "unknown"
+
+
+def test_docs_gap_uses_explicit_module_filter():
+    r = _engine([]).search("q", module="rag")
+    assert r.outcome == "docs_gap" and r.gap["module"] == "rag"
 
 
 def test_docs_gap_on_empty():

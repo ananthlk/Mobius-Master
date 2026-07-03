@@ -60,8 +60,11 @@ class ProductHelp:
 
         # --- MISS: nothing relevant -> docs_gap ---
         if not hits or s_top < self.tau_gap:
-            # best-guess module for the area_tag (closest below-threshold hit, else unknown)
-            guess = module or (hits[0]["metadata"]["module"] if hits else "unknown")
+            # On a true miss we don't reliably know the intended module — a below-threshold
+            # chunk's module is a bad guess that pollutes the backlog ranking (e.g. odd
+            # "operations_suite" buckets). Attribute to the explicit filter if the caller
+            # set one, else "unknown" — the verbatim is what a human triages anyway.
+            guess = module or "unknown"
             return SearchResult(
                 outcome="docs_gap", query=query, s_top=s_top, tau_gap=self.tau_gap,
                 module=guess, text="I don't have documentation on that yet.",
