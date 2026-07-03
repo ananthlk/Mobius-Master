@@ -58,6 +58,16 @@ Entry point: `POST /policy/candidates/process-document` in `mobius-qa/lexicon-ma
 - `policy_lexicon_candidate_catalog` — durable per-phrase decisions; `normalized_key`, `proposed_tag_key`, `UNIQUE(candidate_type, normalized_key, proposed_tag_key)` (`add_policy_lexicon_candidate_catalog.py`).
 - `document_tags` — gains `lexicon_revision BIGINT` + `tagged_at TIMESTAMP` (`add_document_tags_lexicon_revision.py`).
 
+### Propagation (three DBs: QA → RAG → Chat)
+
+The lexicon lives in three databases and propagates in one direction — **QA is authored, RAG is the published canonical, Chat is a synced read replica** used at query time to tag the user's question:
+
+1. **QA DB** — curators author edits here (source of truth for authoring).
+2. **RAG DB** — `POST /policy/lexicon/publish` syncs QA → RAG (vendored into the service image, single-transaction).
+3. **Chat DB** — `POST /policy/lexicon/push-to-chat` syncs RAG → Chat. A recent **`lexicon_only: true`** body flag syncs meta + entries only, skipping the memory-heavy `document_tags` / `policy_line_tags` copies — this is how chat's query-tagger gets fresh aliases without OOM.
+- `GET /policy/lexicon/sync-status` compares qa/rag/chat revisions + entry counts and reports `behind_by` / `in_sync`.
+- **Live state (2026-07-03):** rev **1050 / 1,939 entries** (QA == RAG, in sync); Chat was stale at rev 268 and was synced to 1050 today (the query-tagger picks it up within its 5-min cache TTL).
+
 ## Navigation & Access
 
 ### Endpoints
@@ -78,7 +88,12 @@ Tag changes are **live**: retrieval reads `document_tags` via a `LEFT JOIN` at q
 
 ### Curator UI
 
-`mobius-qa/lexicon-maintenance/frontend-v2/` is a Vite/React app (`<title>Mobius QA — Lexicon Maintenance</title>`) served alongside the FastAPI service. It is the curator surface for reviewing candidates and approving them into the vocabulary. [UNVERIFIED: exact screens/workflows in the UI were not inspected at the component level.]
+`mobius-qa/lexicon-maintenance/frontend-v2/` is a Vite/React app served alongside the FastAPI service. What a curator can do today (all live):
+- **TreeBrowser / TagOverviewTab / TagDrawer** — browse the p/d/j tag tree and view/edit a tag's spec (`strong_phrases` / `aliases` / `refuted_words`).
+- **CandidatesTab + CandidateDecisionModal + PipelineView** — the review queue, with full **accept / reject / revise** parity and **multi-select bulk** actions, plus a catalogue/funnel view with date/state filters and drill-down.
+- **AddSubtagDocumentModal / AddSubtagManualModal** — add a subtag from a document occurrence or by hand.
+- **HealthTab** — run lexicon **health analyze** + **fix preview/apply** (`/policy/lexicon/health/*`).
+- **Auth** — mobius-os platform JWT + an HttpOnly session cookie (the admin key is no longer stored in the browser — recent security change).
 
 ## Integrations
 
@@ -92,10 +107,15 @@ Tag changes are **live**: retrieval reads `document_tags` via a `LEFT JOIN` at q
 - **Primary audience tag:** dev
 - **Solid (grounded in code):** the 3-stage pipeline and its rules/gate; `policy_lexicon_repo` functions; the schema/migrations; retag endpoints and stale/untagged buckets; the live `document_tags` join; query expansion + `classify_query` coverage logic; retag-vs-republish distinction.
 - **Corrections vs. the brief:** the `p` kind is used in code as payer/prescriptive **and process** (`process_tags` in `LexiconExpansion`). "231 tags" appears only as a docstring example in `corpus_search_lexicon.py`; the live count is data-dependent, not a code constant. `mobius-config/lexicons/` **exists but is empty** and is referenced nowhere in `mobius-rag` or `lexicon-maintenance` code — config lexicons are not wired.
-- **Ambiguous / gaps a human must fill:**
-  - Exact curator UI workflow in `frontend-v2` (not inspected).
-  - Whether `bump_revision` is called automatically on approval or is a manual/curator step [UNVERIFIED: no caller of `bump_revision` traced in this pass].
-  - Concrete deployment URLs / auth for the lexicon-maintenance service (`LEXICON_MAINTENANCE_URL`, `ADMIN_API_KEY`) are env-driven and not documented here.
+- **Resolved 2026-07-03 (from the Lexicon agent's inventory):**
+  - Curator UI screens are now documented (TreeBrowser/TagDrawer, CandidatesTab + bulk decisions, AddSubtag modals, HealthTab) — no longer unverified.
+  - `bump_revision` **is** called from RAG on approve/publish (`main.py:7608, 7821`) — not a manual-only step.
+  - Auth for the curator UI is mobius-os platform JWT + HttpOnly session cookie (admin key no longer browser-stored).
+- **Owner caveats (carry forward):**
+  - **p/d kind meanings** — `j`=jurisdiction is certain; `p`=process and `d`=domain/document-type are ~80% confidence (inferred from usage, no definitions doc). Worth a one-line confirmation from whoever owns `policy_path_b`.
+  - The Stage-3 **confidence gate τ≈0.75** is from prior notes, not re-pinned to the exact code constant this pass — treat as approximate.
+  - "Only-stale" retag currently misses some report-counted stale docs (a definition mismatch) — minor open bug.
+- **Recent changes a 07-01 snapshot missed** (fold-ins above): the RAG→Chat `push-to-chat` sync + `lexicon_only` flag; the per-doc `process-document` pipeline triggered on Path-B finalise; the `common_word_single` deterministic rule; drain parallelism (hash-partitioned workers, batch 90→35); the curator-UI auth overhaul; health analyze/fix; and perf indexes on `state='proposed'`.
 
 ## Not yet available (planned)
 

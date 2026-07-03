@@ -1,94 +1,112 @@
 # Skills
-> The library of capabilities Mobius Chat can invoke on your behalf — from corpus search and NPI lookup to provider-roster credentialing reports and web scraping.
+> The tools the chat agent can call — corpus search, document handling, healthcare lookups, the FL-Medicaid market-data analytics suite, and utility skills — plus the framework that registers them.
 
 ## Purpose
-The Skills system is the set of concrete capabilities that Mobius Chat can call to answer a question or complete a task. When you ask something in chat, a planner decides which skill(s) to run — search the curated policy corpus, look up a provider by NPI, generate a credentialing report, scrape a web page, draft an email — and folds the results back into its answer. Each skill is a named, self-describing unit: the planner sees a one-line description of what it does and picks the right one for your request.
+"Skills" are the tools Mobius Chat's ReAct planner can invoke to answer a question. They come from two sources: **chat builtins** (registered in-process) and **MCP tools** (auto-discovered at boot from a remote MCP server). The planner reads a single **tool manifest** each turn and picks the tool whose capabilities fit the question.
 
-Three modules make this work. **`mobius-skills`** holds the standalone skill *services* — the FastAPI apps that do the heavy lifting (healthcare lookups, org intelligence, provider-roster credentialing, document reading, instant-RAG, appeals, email, web search/scrape, task manager, vibe). **`mobius-skills-core`** is the shared *implementation library*: one canonical Python function per capability (google search, web scrape, healthcare query, corpus search, lazy/thread retrieval, document-upload info) so the same code powers both chat and external clients without drifting. **`mobius-skills-mcp`** is the *MCP transport*: it wraps those capabilities as MCP tools reachable by any MCP client (Claude Desktop, other Mobius modules, external agents). Chat itself imports the fast-path skills directly (in-process, no network hop) via its own registry, and can additionally auto-register any tool the MCP server exposes.
+A user never names a skill — they ask a question and the planner routes it. This doc is the catalog of what the agent *can actually do today*, which is not the same as "what code exists": a tool is only usable if it's in the live manifest (see reachability below).
 
 ## Audience
-- **End users** — people working in Mobius Chat who trigger skills through natural-language requests (e.g. "get the NPI for David Lawrence Center", "run a credentialing report for Aspire", "what does ICD-10 F32.1 mean?"). Users generally don't invoke skills by name; the planner selects them.
-- **Developers** — engineers who build new skills. They add one implementation to `mobius-skills-core` (or a standalone service in `mobius-skills`), then choose a *surface*: direct-import into chat, expose as an MCP tool, or both.
+- **End users** — indirectly; skills are what make chat able to answer market-data, policy, NPI, and document questions.
+- **Developers** — who build skills (builtins or MCP tools) and wire the MCP server.
 
-## Capabilities
+## Reachability (read this first)
+What the agent can call = **chat builtins** + **the tools the *wired* MCP server exposes**. The wired server is set by `CHAT_SKILLS_MCP_URL` and its tools register at boot. Consequences:
+- The live dev manifest has **43 tools**: ~16 builtins + the ~27-tool FL-Medicaid analytics/org suite from the wired MCP.
+- **Email, appeals, and other `mobius-skills-mcp` tools are NOT in the wired MCP in dev** — so the agent *cannot* call them. If a user types "email this to X," the agent correctly says it has no email capability. (Email is still usable via the Email button — see *Email* below — because that's a direct proxy, not an agent tool.)
+- "Code exists" ≠ "reachable." This doc marks each tool's tier.
 
-### Available skills (user-facing)
-These are the capabilities the chat planner can pick. The authoritative set is the **13 registered `SkillSpec` builtins** (`mobius-chat/app/skills/registry.py` + `app/skills/builtin/*`). Two entries below (`search_uploaded_document`, `healthcare_npi_lookup`) are **router-owned synthetic entries**, not registered skills — they are marked inline and are not independently user-invokable. Names in `code` are the canonical skill IDs.
+## Catalog — chat builtins (in-process, always reachable)
+| tool | what it does |
+|---|---|
+| `search_corpus` | Hybrid BM25 + pgvector corpus search — the single entry point for curated-corpus retrieval (the agent auto-selects the internal strategy; callers omit `mode`). |
+| `fetch_document` | Resolve a corpus document by name / filename / policy ID and return a download link (the file, not the answer). |
+| `healthcare_query` | Healthcare code lookup — ICD-10-CM code meanings, etc. |
+| `healthcare_npi_lookup` | NPPES registry lookup for a given 10-digit NPI. |
+| `document_upload_skill` | How to attach a file to the thread for downstream Q&A. |
+| `list_thread_document_uploads` | List documents already attached to the thread. |
+| `search_uploaded_document` | Instant-RAG — search *inside* a user-uploaded document on the thread. |
+| `google_search` | Web search — last-resort external lookup. |
+| `web_scrape` | Read the web from a seed URL (quick / medium / detailed). |
+| `ingest_url` | Fetch a single URL and add it to the indexed corpus now. |
+| `lookup_authoritative_sources` | Search Mobius's curated registry of authoritative URLs for a payer/state/topic. |
+| `transform_previous_answer` | Reshape the previous answer into a new artifact — no retrieval. |
+| `vibe` | A short, work-adjacent line (toast / empathy / dry observation). |
+| `product_feedback` | Capture open product feedback + CSAT/CES/NPS surveys. |
+| `product_help_search` | Answer "how do I use Mobius?" from the product docs (this doc's own skill). |
+| `refuse` | Hard stop — no content returned (router-owned). |
 
-The 13 registered builtins are: `search_corpus`, `fetch_document`, `document_upload_skill`, `list_thread_document_uploads`, `healthcare_query`, `google_search`, `web_scrape`, `list_tasks`, `create_task`, `resolve_task`, `transform_previous_answer`, `cached_answer_lookup`, and `vibe`.
+## Catalog — FL Medicaid BH market-data analytics suite (MCP, wired in dev)
+These query BigQuery directly and return verified numbers — used (not `search_corpus`) for any quantitative FL-Medicaid behavioral-health market question. This suite is the **largest capability in the manifest** and was previously undocumented.
 
-**Knowledge & documents**
-- `search_corpus` — Search Mobius's curated authoritative knowledge base (provider manuals, payer/Medicaid policies) with hybrid BM25 + vector retrieval; the default for policy/billing questions.
-- `fetch_document` — Resolve a corpus document by name/filename/policy ID and return a clickable download link when you want the file itself, not the answer in it.
-- `document_upload_skill` — Explains how to attach a PDF/DOCX/CSV/XLSX to the current chat thread (UI steps + upload endpoint) so it becomes searchable.
-- `list_thread_document_uploads` — List the documents already attached to the current thread (filename, org, rows, upload time).
-- `search_uploaded_document` — Search inside the documents you uploaded on this thread. **(Router-owned, not a registered `SkillSpec`.** Confirmed: appended synthetically by `skills_catalog()` and dispatched in the react-loop router, not the registry. Appears in the tool-settings UI but is not an independently registered chat skill.)
+**Market totals & trends**
+- `get_market_size` — total market: benes, claims, paid, KPI averages.
+- `get_market_timeseries` / `get_market_share_timeseries` — year-by-year market totals / an org's share (2019–2024).
+- `get_market_decomposition` — how revenue/volume splits across service lines.
+- `get_market_retention` — beneficiary retention (panel hold year-over-year).
+- `get_msa_map` — all MSA (zip3) market areas with org counts and market tier.
 
-**Healthcare & provider registry**
-- `healthcare_query` — Look up ICD-10-CM code meanings, CPT/HCPCS wording, Medicare/Medicaid coverage summaries (NCD/LCD), and NPI-by-number facts.
-- `healthcare_npi_lookup` — Look up a provider by NPI number from the NPPES registry. **(Router-owned, not a registered `SkillSpec`.** Confirmed: synthetic entry in `skills_catalog()`. NPI-by-name/number lookups are actually served by `healthcare_query` (builtin) and the MCP `org_npi_lookup` / `search_org_names` tools.)
+**Orgs & profiles**
+- `search_orgs` — find an org by name → slug, bene counts, metadata.
+- `get_org_universe` — canonical list of FL Medicaid BH orgs with metadata.
+- `get_org_profile` — full financial + clinical profile for a named org.
+- `get_org_service_line_profile` — per-service-line revenue/volume/KPIs for an org.
+- `get_org_type_stats` — aggregate KPIs for an org *type* in a year.
+- `get_org_leakage` — patient-leakage analysis for a CMHC.
+- `lookup_npi` — resolve an NPI/org → identity (name, entity type, taxonomy, address).
 
-**Web**
-- `google_search` — Search the web for current information; used as a last-resort external lookup after corpus and curated sources come up empty. Auto-scrapes the top result.
-- `web_scrape` — Read a web page or crawl a site section from a seed URL (quick single page / medium tree crawl / detailed deep crawl with linked-document downloads).
+**Benchmarks & positioning**
+- `get_top_orgs` — rank orgs by a volume metric.
+- `get_org_benchmark` — an org's percentile positioning vs a peer group on all KPIs.
+- `get_benchmark_dimensions` — P25/P50/P75 peer distributions for all KPIs across a dimension.
+- `get_churn_benchmark` — clinician retention/churn benchmarks.
 
-**Tasks**
-- `list_tasks` — List tasks from the unified task manager (open follow-ups, blockers, info cards), filterable by org, module, status, assignee, NPI, run, severity, etc.
-- `create_task` — Create a new task / action item / follow-up for an org so the assistant can track it.
-- `resolve_task` — Mark a task resolved. (Confirmed registered in `app/skills/builtin/tasks.py`, alongside `list_tasks` and `create_task`.)
+**Rates**
+- `get_published_rates` — the official FL AHCA Medicaid fee schedule (ceiling rate) per HCPCS.
+- `get_rate_benchmarks` — actual-paid HCPCS rate benchmarks (P25/P50/P75/P90) by provider type.
+- `get_rate_trends` — monthly P50 rate trend for HCPCS by peer group.
+- `get_org_rate_gap` — an org's realized rates vs market benchmarks.
 
-**Conversation utilities**
-- `transform_previous_answer` — Reshape the previous assistant answer into a new artifact (appeal letter, email, memo, shorter/plain-English version) with no new retrieval — the prior turn is the source.
-- `cached_answer_lookup` — Semantic lookup against prior completed turns so a recent good answer can finalize the turn without fresh retrieval.
-- `vibe` — Emit a short, dry, work-adjacent one-liner (toast, empathy, gratitude, data joke) when the message is casual and not a substantive question.
+**Service lines & opportunity**
+- `get_service_mix` — an entity's service-line revenue mix.
+- `get_service_line_opportunity` — revenue-opportunity sizing (current vs potential).
+- `get_service_line_code_map` — HCPCS → service-line / AHCA category mapping.
 
-**Additional capabilities available over MCP (`mobius-skills-mcp`)** — reachable by external MCP clients, and auto-registerable into chat via the MCP adapter. Beyond the chat builtins above, the MCP server also exposes:
-- `search_org_names` — Search NPPES + Florida PML for an organization/provider by name (copilot registry-only or agentic web-assisted), ranked by match confidence, returning NPI.
-- `search_org_by_address` — Same registry search but by street address.
-- `org_npi_lookup` — Enriched NPI lookup for an org (registry + optional web enrichment / name-variant expansion in agentic mode).
-- `find_org_locations` — Discover all practice locations for a billing organization (credentialing Step 2) from NPPES + PML + DOGE billing→servicing links.
-- `find_associated_providers_at_locations` — Build the operational provider roster per site for a billing org (credentialing Step 4).
-- `provider_roster_credentialing_report` — Generate the Provider Roster / Credentialing (Medicaid readiness) report for an org: executive summary, invalid combos, ghost billing.
-- `corpus_search` — Heavyweight filtered vector search of the approved corpus (citation-quality).
-- `lazy_corpus_search` — Fast vector-only scan of the approved corpus (capture-first).
-- `thread_corpus_search` — Vector-only search inside a single user-uploaded document.
-- `profile_org` / `get_org_report` — Org Intelligence: profile an organization and render/fetch its report.
-- `email_send` / `email_craft_send` / `email_prepare` / `email_status` / `email_suppress` — Email skill: draft, send, check status, and manage suppression. (Confirmed: all five are `@mcp.tool()` functions on the primary MCP server.)
-- `appeals_lookup_rules` / `appeals_get_playbook` / `appeals_validate_claim` / `appeals_assemble_letter` (Appeals Agent) — denial-appeals rules, payor playbooks, claim validation, and full appeal-letter assembly. (Confirmed: a **separate** FastMCP server at `mobius-skills/appeals-agent/api/mcp_server.py` exposing four `@mcp.tool()`s — the draft previously omitted `appeals_assemble_letter`. These are **not** on the primary `mobius-skills-mcp` server and are **not wired into chat by default**: chat only picks them up if the operator lists the appeals server URL in the `EXTRA_MCP_URLS` env var, which the MCP adapter fans out to at registration time.)
+**Entrants & meta**
+- `get_entrant_analysis` — new-entrant displacement (who captured CMHC share).
+- `get_fact_pack` — the full fact-pack behind the market-narrative story deck.
+- `get_valid_filters` — valid filter values for the dataset in a given year.
 
-**Standalone skill services in `mobius-skills` without a distinct chat registration** — `doc-reader`, `instant-rag`, `cmhc-cost-report`, `fl-medicaid-npi`, and `org-intelligence` run as their own FastAPI services (the full set under `mobius-skills/` also includes `email`, `google-search`, `web-scraper`, `provider-roster-credentialing`, `task-manager`, `healthcare`, `vibe`, `chat-document-upload`). Surfacing (verified against `mobius-skills-mcp/app/server.py`):
-  - `org-intelligence` **is** surfaced to chat as the MCP tools `profile_org` / `get_org_report`.
-  - `instant-rag` retrieval is reached indirectly: uploaded-document search runs against Chroma metadata flagged `instant_rag=true` (see `thread_corpus_search` and the `document_upload` MCP tool); there is no standalone `instant_rag` MCP tool.
-  - `doc-reader`, `cmhc-cost-report`, and `fl-medicaid-npi` have **no** distinct MCP tool on the primary server and are **not** independently user-invokable chat skills; they are internal/back-end services consumed by other skills or run out-of-band. [UNVERIFIED: exact upstream caller of each was not traced end-to-end.]
+## Task management
+Chat can create and track operational tasks (credentialing follow-ups, roster gaps, etc.) via three skills added 2026-07-02 (chat commit `624f74f`), backed by the **mobius-task-manager** Cloud Run service (shared `mobius_chat` DB):
+- `list_tasks` — "show open tasks", "what's pending for Acme". Filters: org, module, status, assignee, npi, run_id, severity, type, workflow.
+- `create_task` — "log a follow-up for provider X". Requires org + text; optional severity/module/provider/npi/assignee.
+- `resolve_task` — "mark task `abcd1234` resolved" (full or 8-char UUID; optional note).
 
-**Ghost / router-owned skills** — `skills_catalog()` defines a `_ROUTER_OWNED` list of four names but appends each only if it is *not* already registered. `search_corpus` **is** a real builtin, so it is skipped; the three actually appended as synthetic (router-owned, non-`SkillSpec`) entries are `search_uploaded_document`, `healthcare_npi_lookup`, and `refuse` (a hard-stop PHI/clinical guardrail). These appear in the tool-settings UI so they can be blocked, but they dispatch in the react-loop router, not the registry — they are not independently user-invokable skills. See Doc-readiness notes.
+They render an inline `task_list` UI block. **Reachability caveat:** these three were *not* present in the live deployed manifest at last pull (2026-07-03) — so they may be pending deploy or pending the manifest hand-list; verify before telling users chat can manage tasks.
 
-### Framework capabilities
-- **Declarative registration.** Each skill is a `SkillSpec` (name, description, handler, `inputs_schema`, category, planner visibility, mode support) registered at import time in `mobius-chat/app/skills/registry.py`. The `name` is a single source of truth: it's what the planner emits, what `dispatch()` looks up, and what the planner manifest prints — no drift.
-- **Uniform envelope.** Every skill handler returns a typed `SkillEnvelope` (text, `SourceRef` citations, retrieval signal, usage, extras). In-process vs. remote is invisible to the dispatcher.
-- **Computed planner manifest.** `manifest_text()` renders the registered skills into the prose the planner LLM reads, so a newly registered skill is automatically visible to the planner (no hand-maintained list).
-- **Two surfaces, one implementation.** `mobius-skills-core` holds one function per capability; chat direct-imports the hot-path ones and `mobius-skills-mcp` wraps the same functions as MCP tools. Fix a bug once, both surfaces get it.
-- **MCP auto-registration.** `register_mcp_skills()` (`mcp_adapter.py`) turns a remote MCP server's `list_tools` response into `SkillSpec`s, so any MCP tool becomes a dispatchable chat skill. Builtins win on name collisions; registration is best-effort (never crashes chat startup).
-- **Per-user tool policy.** Skills carry a `category` (corpus, healthcare, npi, web, analytics, documents, tasks, utility, general) so the tool-settings UI can enable/disable whole themes.
+**Task shape (corrections to earlier docs):** `severity` is **5 lowercase values** — `critical | warning | info | low | none` (not the 4-value "Critical/Warning/Info/Low"); `status` is **6** — `open | in_progress | resolved | dismissed | running | failed`.
 
-## Navigation & Access
-Users trigger skills with **natural language in chat** — you describe what you want and the planner selects the skill(s); there is no requirement to name a skill. Explicit steering is possible (e.g. asking to "search the web" biases toward `google_search`), and the tool-settings UI lets users enable/disable skill categories. Programmatic/`answer_tool` callers can force a specific skill via `tool_hint_override`. External MCP clients (e.g. Claude Desktop, Cursor) reach the same capabilities by pointing at the `mobius-skills-mcp` server (default `http://localhost:8006/mcp`).
+**Where tasks surface:** the chat `task_list` block; the `/chat/tasks/*` REST proxy + CSV export; the pipeline task queue and roster open-tasks; credentialing report step-cards; satellite-service lifecycle events; and chat-turn → task promotion (`MOBIUS_TASK_MANAGER_PROMOTION`, flipped on 2026-07-02). Not yet: `get_task`/`patch_task`/`dismiss_task` chat skills (v2); appeals-agent case tasks (partial).
 
-## Key User Workflows
-- **To look up a provider / get an NPI:** ask "what's the NPI for David Lawrence Center?" → the planner runs `org_npi_lookup` / `search_org_names` (NPPES + Florida PML), returns confidence-ranked matches with NPIs; provide an address to disambiguate via `search_org_by_address`.
-- **To get a credentialing / Medicaid-readiness report:** ask "run a credentialing report for Aspire" → `provider_roster_credentialing_report` returns an executive summary (locations, NPIs, invalid combos, ghost billing) after resolving locations (Step 2) and the per-site provider roster (Step 4).
-- **To answer a policy or billing question from authoritative sources:** ask a payer/Medicaid question → `search_corpus` (hybrid BM25 + vector) returns cited passages; if the corpus is thin, chat falls back to curated URLs then `google_search` + `web_scrape`. To pull the underlying file, `fetch_document` returns a download link.
+## Framework (how skills register)
+- **Builtins** — a `SkillSpec` registered at import via `register()` in `app/skills/registry.py`, imported by an **explicit** `_load_builtins()` list. To be visible to the planner it must *also* be named in the **hand-list** `curated_blocks` in `tool_manifest.py` (registered + `visible_to_planner=True` is not enough — the manifest is an explicit list).
+- **MCP tools** — auto-discovered at boot from `CHAT_SKILLS_MCP_URL` and appended to the manifest under "Auto-discovered tools (from MCP)."
+- **LLM stages** — a skill whose handler calls the LLM must add its stage to `_SKILL_LLM_ALLOWED_STAGES` in `main.py` (pure-retrieval skills like `search_corpus` / `product_help_search` don't).
+- **Router-owned synthetic entries** — `skills_catalog()` appends a few non-`SkillSpec` names (`search_uploaded_document`, `healthcare_npi_lookup`, `refuse`) that route to real handlers; they aren't independently user-invokable skills.
 
-## Integrations
-- **Chat → skills:** the chat planner dispatches by name through the registry (`dispatch(SkillCall)` → handler → `SkillEnvelope`). Builtin handlers run in-process; MCP-backed handlers forward via `call_mcp_tool`.
-- **MCP transport:** `mobius-skills-mcp` (FastMCP, port 8006) exposes **21** tools; a separate FastMCP server under `mobius-skills/appeals-agent` exposes **4** appeals tools (opt-in via `EXTRA_MCP_URLS`). These call the standalone skill services in `mobius-skills` (provider-roster-credentialing, healthcare, org-intelligence, email, etc.) and the shared `mobius-skills-core` functions over HTTP/in-process.
-- **Skills → RAG / retriever:** corpus skills (`corpus_search`, `lazy_corpus_search`, `thread_corpus_search`) embed the query and run filtered vector search over the published corpus (Chroma) with Postgres metadata hydration; the chat `search_corpus` builtin runs the fuller hybrid pipeline. Web skills call the `google-search` (8004) and `web-scraper` (8002) services.
+## Email (built + deployed, but agentic email is NOT wired)
+The **email service** (`mobius-email`, Cloud Run) is live and full-featured — a send chokepoint with validation, a suppression list, Redis rate limits, idempotency (required `idempotency_key`), an audit log, and a Gmail provider (SES stubbed). Two ways it surfaces:
+- **Email-a-thread (LIVE)** — the **Email button** on each assistant message opens a two-step dialog (recipient + scope + summary/full → preview → send) via the direct proxy `POST /chat/thread/{id}/email`. Supports LLM-summary or full-transcript, confirm-before-send, and idempotent replay. This is a proxy, **not** an agent tool, so it works regardless of MCP.
+- **Agentic email (NOT wired in dev)** — the MCP tools `email_send`, `email_craft_send`, `email_prepare`, `email_status`, `email_suppress` exist in `mobius-skills-mcp`, but that server isn't the wired MCP, so the planner has no email tool. "Email X to Y" in chat → the agent says it can't.
+- **Operational gotcha:** the Gmail OAuth token uses a testing-mode consent screen and **expires ~7 days**; rotate via `scripts/oauth_bootstrap.py` → `gcloud secrets versions add mobius-email-gmail-token` → bounce the revision. Publishing the consent screen removes this cap.
+
+## Not yet available / not reachable in dev
+- **Agentic email / appeals / extra `mobius-skills-mcp` tools** — code exists but not in the wired MCP (dev), so the agent can't call them. Reachable only when that MCP server is deployed and wired (or via `EXTRA_MCP_URLS`).
+- **Skill-invocation analytics** — there is still **no `skill_invocations` table**; skill usage isn't recorded per-call, so skills are invisible to analytics. (Confirmed gap.)
 
 ## Doc-readiness notes
-- **Primary audience tag:** mixed (end users trigger skills; developers build them).
-- **Solid:** the chat-side registry (`mobius-chat/app/skills/registry.py` + `builtin/*`) is authoritative and gives exact skill names + descriptions. The MCP tool list (`mobius-skills-mcp/app/server.py`) and the core library layout (`mobius-skills-core/README.md`) are clear. Registered chat builtins counted: **13** `SkillSpec`s (`search_corpus`, `fetch_document`, `document_upload_skill`, `list_thread_document_uploads`, `healthcare_query`, `google_search`, `web_scrape`, `list_tasks`, `create_task`, `resolve_task`, `transform_previous_answer`, `cached_answer_lookup`, `vibe` — verified by 13 `register(...)` calls across `builtin/*.py`). MCP tools on the primary server (`mobius-skills-mcp/app/server.py`): **21** (verified by 21 `@mcp.tool()` decorators).
-- **Ambiguous / gaps:**
-  - **Ghost / router-owned skills (confirmed in code):** `skills_catalog()`'s `_ROUTER_OWNED` list names `search_corpus`, `search_uploaded_document`, `healthcare_npi_lookup`, and `refuse`, but each is appended only if not already registered. `search_corpus` **is** a real builtin and is skipped, so exactly **three** synthetic entries are actually added: `search_uploaded_document`, `healthcare_npi_lookup`, and `refuse`. They dispatch in the react-loop router, so they show in the UI/manifest but are not in the registry and are not independently user-invokable. `lookup_authoritative_sources` and `ingest_url` are **confirmed not registered** anywhere — they appear only as prose references inside the `google_search` / `transform_previous_answer` skill descriptions, not as `SkillSpec`s or `@mcp.tool()`s.
-  - **Analytics/market-data skills** (`get_top_orgs`, `get_org_profile`, `get_rate_benchmarks`, financial benchmarking) are **not implemented as skills**. Confirmed: these names appear only as *illustrative examples in code comments/docstrings* — the category-inference comment in `mcp_adapter.py` (line ~126) and the `analytics` category description in `registry.py` (line ~232). They are not registered `SkillSpec`s, and there are no matching `@mcp.tool()`s on the primary MCP server. Treat them as **planned / not yet available** — the `analytics` tool category exists so that if such MCP tools are later added they auto-group in the UI.
-  - **Standalone services** (`doc-reader`, `instant-rag`, `cmhc-cost-report`, `fl-medicaid-npi`, `org-intelligence`, `appeals-agent`) exist under `mobius-skills` but most lack READMEs. Surfacing was traced far enough to say: `org-intelligence` → MCP `profile_org`/`get_org_report`; `appeals-agent` → separate MCP server, opt-in via `EXTRA_MCP_URLS`; `doc-reader`/`cmhc-cost-report`/`fl-medicaid-npi` → no distinct MCP tool, internal only. [UNVERIFIED: the exact internal caller of the non-surfaced services.]
-  - **Analytics blind spot (confirmed):** there is **no** `skill_invocations` table in `mobius-chat` — a repo-wide grep for `skill_invocation` in `mobius-chat/` returns nothing (models or migrations). Per-skill usage is therefore not persisted to a dedicated table, confirming the memory note that skill invocations are largely invisible to analytics.
+- **Primary audience tag:** mixed (users benefit; devs build).
+- **Source:** rebuilt 2026-07-03 from the **live deployed tool manifest** (`/chat/skills-manifest`, 43 tools) + the Email agent's inventory, superseding the 07-01 "13 builtins / 21 MCP" snapshot — which missed the entire market-data analytics suite and mis-stated reachability.
+- **Reachability is env-specific:** `CHAT_SKILLS_MCP_URL` differs by environment/worktree; this catalog reflects dev. Re-pull the live manifest when documenting another env.
+- **For the loop:** the Appeals agent's inventory (appeals_* tools, rules schema) is pending; per-tool parameter detail for the analytics suite lives in the manifest's auto-discovered section. Residual gaps → `docs_gap`.
