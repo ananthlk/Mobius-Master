@@ -1,0 +1,100 @@
+# Story UI & Landing
+> The narrative/presentation surface that tells the FL Medicaid behavioral-health market story (Story UI) and the internal Module Hub that routes an operator to every running Mobius service (Landing).
+
+## Purpose
+
+**mobius-story-ui** is a self-contained web app (FastAPI static-file server + streaming chat proxy) that presents Mobius's market-intelligence findings as a navigable **story deck** and a set of related product screens. The centerpiece is `story.html` — a 31-slide, act-structured narrative ("The Market Built Around Them") that walks a viewer through the Florida CMHC / behavioral-health market analysis (intro + Acts I–V: the evidence, the operational review, churn, opportunity, approach). It is **not** a Storybook or generic component library. Alongside the deck it serves several standalone product pages under a "Providr" credentialing brand (provider hub, roster upload, verification run/report/progress) and analytics pages (org profile, market displacement). The server's only backend job is to serve these static pages and transparently proxy chat (SSE streaming) and skills calls to the live Mobius services so slides can drill into data via chat. A `SLIDE_MODULE_SPEC.md` describes a **planned (not-yet-shipped)** refactor from the `story.html` monolith into per-slide modules (`public/slides/{act}-{slug}/`) with manifests, narratives, and per-slide chat context.
+
+> **Deck serving (verified):** In production the deck is served **entirely from the `story.html` monolith**. The `public/slides/` module directory exists and is authored ahead of the migration, but the modular loader (`/slides/_shared/loader.js`) is a **preview-only pilot**: `story.html` imports it lazily and swaps inline slides for modules **only when the URL contains `?preview-module=<slug>`** — the code comment states "no production behavior change unless the query param is present." `SLIDE_MODULE_SPEC.md` §10 is a "Monolith → Module Migration Plan" for "when the story is locked," confirming target-state, not shipped-state.
+
+The **landing** surface is a different thing entirely: it is an internal **Module Hub / launcher dashboard**, not a public marketing site. `landing_server.py` (repo root, stdlib-only HTTP server) serves `landing/index.html` — a "Mobius – Module Hub" page that lists every Mobius process, skill server, infrastructure service, and worker as a clickable card with its localhost URL and live status, plus Start-all / Stop-all controls. It also statically hosts a few ops UIs (retrieval-eval, chat-eval, lexicon) and analytics pages (org-profile). An **Alpha release-notes banner** (dated 2026-05-06) with a tester thank-you and a "what's new / known limitations" list lives at the bottom of `landing/index.html`. A separate one-off **alpha launch celebration page** lives at `reports/alpha_launch.html` (a milestone artifact, not part of the landing app).
+
+## Audience
+
+- **Story UI (`story.html` deck):** external / stakeholder-facing — analysts, prospects, and BHPF/CMHC decision-makers being walked through the market analysis; presenter-driven.
+- **Story UI (Providr credentialing + analytics pages):** operational users at a provider org uploading rosters and reviewing credentialing verification.
+- **Landing / Module Hub:** internal developers and operators running the Mobius stack locally (dev, port 3999) or in a shared env (prod bind). This is a control panel, not an end-customer surface.
+
+## Capabilities
+
+### mobius-story-ui
+- Full-screen, keyboard-navigable **story deck** (`story.html`) organized into Acts/Chapters with a breadcrumb, live/fallback data badges, and a slide counter (31 slides).
+- Per-slide **chat drill-down**: slides declare data blocks and `chat_scope`; the deck posts active-slide context to chat so a viewer can ask questions about the numbers on screen (real-time SSE token streaming via the proxy).
+- **Live + static data blocks**: charts pull from skill endpoints at slide-mount time (`live`/`hybrid`) or from baked JSON snapshots in `public/data/` (`static`), degrading gracefully to static values if a skill endpoint is unreachable.
+- **Providr credentialing pages**: provider hub (`index.html`), roster upload (`upload.html`), verification run + progress + report (`run.html`, `progress.html`, `report.html`), roster view (`roster.html`).
+- **Analytics/story pages**: org profile (`org.html`), market displacement (`displacement.html`), acts preview (`acts_preview.html`), plus assorted mockups/report pages.
+- **Modular slide spec** (planned — not shipped): per-slide `manifest.json` / `slide.html/css/js` (mount/unmount) / `narrative.md` / `system_prompt.md`, intended to load from a `briefing.modules` Postgres table. The loader exists but runs only behind the `?preview-module=<slug>` query param; production still renders the monolith and slides fall back to their baked static data.
+
+### landing (Module Hub)
+- **Service directory** grouped into Processes, Skill Servers, Infrastructure, and Workers — each a card with name, description, localhost URL, and a **live status** indicator (polled via `/api/status`).
+- **Quick links** on cards (e.g. Chat card → Pipeline, Provider Hub; Credentialing → Org / Roster / Pipeline).
+- **Start-all / Stop-all** controls (hamburger menu → `/api/start-all`, `/api/stop-all`) driving the repo's `mstart` / stop scripts.
+- **Config + status APIs**: `GET /api/config`, `GET /api/status`, plus per-service stop/restart and Redis start; log tail/stream endpoints.
+- Statically hosts **ops UIs**: retrieval-eval (`/retrieval-eval/`), chat-eval (`/chat-eval/`), lexicon (Vite build), and org-profile.
+- **Alpha release-notes banner** with tester thank-you, feature list, and known-limitations block.
+
+## Navigation & Access
+
+**mobius-story-ui** (FastAPI, default port `8020`; deployed to Cloud Run as service `mobius-story-ui` on `mobius-os-dev`):
+- `/` → redirect to `/story.html` (the deck is the default landing view). The handler uses FastAPI `RedirectResponse` with no explicit status, so the redirect is **307**, not 302.
+- `/story.html` — the market-story deck.
+- `/index.html` — Providr Provider Credential Hub. `/upload.html`, `/run.html`, `/progress.html`, `/report.html`, `/roster.html` — credentialing flow.
+- `/org.html`, `/displacement.html`, `/acts_preview.html` — analytics/story pages.
+- `/health` — service health JSON.
+- `/proxy/chat/{path}` and `/proxy/skills/{path}` — transparent proxies to `CHAT_API_URL` (default the Cloud Run chat service `https://mobius-chat-ortabkknqa-uc.a.run.app`) and `SKILLS_API_URL` (default `http://localhost:8011`, the credentialing/roster skill server); any path containing `stream` is forwarded as true SSE, everything else is buffered.
+
+> **Deploy target (verified):** Cloud Run service `mobius-story-ui` on GCP project `mobius-os-dev`, region `us-central1` (image `us-central1-docker.pkg.dev/mobius-os-dev/mobius-story-ui/story-ui`). [UNVERIFIED: public-exposure / auth model of the Cloud Run service — the FastAPI app sets `allow_origins=["*"]` and has no auth middleware, but ingress/IAM gating is configured at the Cloud Run service level and is not visible in this repo.]
+
+**landing** (`landing_server.py`, stdlib HTTP server):
+- Dev: binds `127.0.0.1:3999`; prod (`ENV=prod`): binds `0.0.0.0:$PORT` (default 8080).
+- `/` or `/index.html` — the Module Hub page.
+- `/retrieval-eval/`, `/chat-eval/`, `/lexicon/`, `/org-profile.html` — hosted sub-surfaces. Only `/lexicon/*` is routed to a separate Vite `dist` dir with SPA `index.html` fallback for nested routes; the others are plain static files under `landing/`. In dev the Lexicon card actually links to the standalone Vite app on `:5174`, not the landing-hosted `/lexicon/` build.
+- `POST /api/start-all`, `POST /api/stop-all`, per-service stop/restart, `GET /api/status`, `GET /api/config`, log tail/stream, Redis start.
+- Reached from the repo root via `mstart` (starts the stack incl. landing) / `./mstop`.
+
+## Key User Workflows
+
+1. **Present the market story.** Open the story-ui root → redirected to `/story.html` → navigate Act-by-Act. On any data slide, the presenter/viewer opens chat and asks about an on-screen number; the deck has already pushed slide context, so chat answers with the slide's sourced data (streamed live through the proxy).
+2. **Run a provider credentialing check (Providr).** From the Provider Credential Hub (`/index.html`) pick an org → upload/view a roster (`upload.html` / `roster.html`) → launch a run → watch `progress.html` → read the `report.html` verification result.
+
+   **Service hand-off (verified from the page source):** the credentialing pages talk to two different backends, hard-coded to localhost in the current build:
+   - **Roster data** comes from the credentialing/roster **skill server on `:8011`** — `roster.html` fetches `http://localhost:8011/roster/truth/{org}`.
+   - **Run state** lives on the **chat service on `:8000`** — `run.html` / `progress.html` / `report.html` poll `http://localhost:8000/chat/credentialing-runs/{run_id}` and post validations to `.../{run_id}/validate`.
+   - The hub and the run pages **link out** to the Pipeline UI at `http://localhost:8000/pipeline` ("Open in Pipeline →"); the run itself is owned by the chat service, not a separate "Pipeline" service.
+   - `upload.html`, `progress.html`, and `report.html` also call same-origin (`window.location.origin`) endpoints on the story-ui server, which proxies them onward.
+
+   > Note: these localhost URLs are baked into the page JS, so this credentialing flow is wired for the **local dev stack**, not the deployed Cloud Run story-ui. Treat the credentialing pages as **dev/demo, not production-wired** on the hosted deck.
+3. **Launch the local stack (developer).** Run `mstart` → open the Module Hub at `http://127.0.0.1:3999` → see which services are up (green/red status) → click a card to open a service, or use Stop-all / Start-all from the hamburger menu.
+4. **Open an ops/eval tool.** From the Module Hub, click into retrieval-eval, chat-eval, lexicon, or org-profile — all served under the landing origin.
+
+## Integrations
+
+- **Story UI → chat/skills:** the story-ui server proxies to `mobius-chat` (`CHAT_API_URL`, default the Cloud Run chat service) for streaming Q&A and to a skills API (`SKILLS_API_URL`, default `http://localhost:8011` — the credentialing/roster skill server) for live slide data. Credentialing pages talk to the roster skill server on `:8011` (roster truth data) and the chat service on `:8000` (run state, `/chat/credentialing-runs/*`), and link out to the Pipeline UI at `:8000/pipeline`.
+- **Slide data:** static snapshots baked into `public/data/` (fact-packs, widgets, benchmarks); live blocks hit skill endpoints (e.g. `/analytics/cfo-admin-benchmarks`) via the skills proxy. The modular spec **intends** to route slide modules through a `briefing.modules` Postgres table via a `/proxy/skills/briefing/modules/{id}` route. **This path is not live:** the `briefing.modules` table exists (credentialing migration `028_briefing_modules.sql`) but the `/briefing/*` skill endpoints are not implemented, and the only module that references the fetch (`admin-s5/slide.js`) is annotated "When briefing.modules table is live, swap the live fetch URL." Modules therefore load from baked static JSON, not the briefing API.
+- **Landing routes users to** every Mobius module by URL: OS (`:5001`), Chat (`:8000`, incl. Pipeline, org-story, financial-strategy), RAG (`:5173`), Lexicon (`:5174`/static), DBT (`:6500`), skill servers (Google Search `:8004`, Healthcare `:8007`, Web Scraper `:8002`, Email `:8003`, Credentialing `:8011`, Task Manager `:8015`, Doc Reader `:8018`, Instant RAG `:8040`), infra (MCP `:8006`, DB Agent `:8008`, RAG API `:8030`, Lexicon API `:8010`), and workers. It does not embed these modules — it links out to them and reports their status.
+
+## Not yet available (planned)
+
+These are described in the code/spec but are **not shipped**; do not present them as working features:
+
+- **Per-slide module deck.** The monolith→module refactor (`SLIDE_MODULE_SPEC.md`, `public/slides/`) is authored but not wired into production. The modular loader runs only behind `?preview-module=<slug>`; the normal deck is the `story.html` monolith.
+- **`briefing.modules` live slide data.** The `/proxy/skills/briefing/modules/{id}` route and `/briefing/*` skill endpoints are not implemented (only the Postgres table from migration `028_briefing_modules.sql` exists). Slide modules fall back to baked static JSON.
+- **Production-wired credentialing flow.** The Providr credentialing pages hard-code `localhost:8000` / `localhost:8011`, so the roster/run flow works against the local dev stack only, not the hosted Cloud Run story-ui.
+
+## Doc-readiness notes
+
+- **Primary audience tag:** mixed. Story UI is user-facing (external stakeholders + provider-org operators); Landing is dev/operator-facing. If this doc must be split by audience, Story UI → user docs, Landing → internal/ops docs.
+- **What's solid:** the two surfaces are clearly distinct and grounded in code — story-ui's server routes/proxies (`server/main.py`), the deck structure and 31-slide list (`story.html` `SLIDES`), the Providr page set, and landing's Module Hub cards, APIs, and Alpha banner dated 2026-05-06 (`landing/index.html`, `landing_server.py`). URLs, ports, and the Cloud Run deploy target (`mobius-story-ui` on `mobius-os-dev`, `us-central1`) are confirmed from source. The slide-module refactor is spec'd but planned, not shipped (see "Not yet available").
+- **Resolved during verification:**
+  - **Monolith vs. modular:** the deck ships as the `story.html` monolith; the `public/slides/` modular loader is a `?preview-module=` pilot and the `briefing.modules` loader path is not live (table exists, endpoints do not). Documented above.
+  - **Credentialing hand-off:** roster data → `:8011` skill server; run state → `:8000` chat service (`/chat/credentialing-runs/*`); Pipeline UI is a link-out to `:8000/pipeline`. Localhost-baked, so dev/demo-wired. Documented above.
+
+- **Internal cleanup item (not user-facing):** the credentialing/org/roster pages are **duplicated three ways** and should be de-duplicated by the team:
+  1. `mobius-story-ui/public/` (`index.html`, `roster.html`, `org.html`, `upload.html`, `run.html`, `progress.html`, `report.html`, `displacement.html`, and even `story.html`),
+  2. `landing/` (`credentialing-home.html`, `roster.html`, `org-profile.html`, `roster-preview.html`, `roster-workflow.html`), and
+  3. the `:8011` credentialing skill server's own `static/` dir, mounted at `/roster-ui/` (a near-identical copy of the story-ui set, incl. `story.html`).
+  `org.html` even branches on `window.location.port === '8011'` so the same file works whether served by story-ui or the skill server — evidence the copies are meant to be interchangeable. This is real drift/duplication to consolidate, not a documented product feature.
+
+- **Still open (a human must fill):**
+  - Public-exposure / auth model of the Cloud Run `mobius-story-ui` service (the FastAPI app is `allow_origins=["*"]` with no auth middleware; gating, if any, is at the Cloud Run ingress/IAM level and not in this repo).
+  - `reports/alpha_launch.html` is a standalone celebration artifact, referenced nowhere in either app — not a product surface; document only as a milestone artifact, if at all.
