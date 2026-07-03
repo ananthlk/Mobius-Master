@@ -11,6 +11,7 @@ Run:  PYTHONPATH=. uvicorn product_awareness.service:app --port 8070
 from __future__ import annotations
 
 import json
+import os
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -121,3 +122,63 @@ def doc(req: DocRequest) -> dict:
     if result is None:
         raise HTTPException(status_code=404, detail=f"no product doc for {req.document_id!r}")
     return result
+
+
+def _chat_db_conn():
+    """Connect to the mobius_chat DB (same Cloud SQL instance/creds as pgvector, different
+    dbname) to READ the feedback agent's backlog views. Read-only consumer per the contract."""
+    import psycopg2
+
+    return psycopg2.connect(
+        dbname=os.environ.get("PRODUCT_DOCS_CHAT_DB_NAME", "mobius_chat"),
+        user=os.environ.get("PRODUCT_DOCS_DB_USER", "postgres"),
+        password=os.environ.get("PRODUCT_DOCS_DB_PASSWORD", ""),
+        host=os.environ.get("PRODUCT_DOCS_DB_HOST",
+                            "/cloudsql/mobius-os-dev:us-central1:mobius-platform-dev-db"),
+    )
+
+
+def _view_counts(cur, view: str, count_col: str) -> dict:
+    """{module: count} from a feedback backlog view; {} if the view is absent."""
+    try:
+        cur.execute(f"SELECT module, {count_col} FROM {view}")  # noqa: S608 (fixed view/col names)
+        return {r[0]: int(r[1]) for r in cur.fetchall() if r[0]}
+    except Exception:
+        return {}
+
+
+@app.get("/backlog")
+def backlog() -> dict:
+    """Doc-loop health, per module: demand (docs_gap), supply (doc_stale), and
+    capability demand (feature_request). Makes the freshness loop observable."""
+    if not os.environ.get("PRODUCT_DOCS_DB_PASSWORD"):
+        return {"available": False, "reason": "no chat-DB creds (local/dev)"}
+    try:
+        conn = _chat_db_conn()
+    except Exception as e:
+        return {"available": False, "reason": f"chat DB unreachable: {e}"}
+    try:
+        with conn, conn.cursor() as cur:
+            gap = _view_counts(cur, "docs_backlog", "gap_hits")          # demand
+            stale = _view_counts(cur, "docs_refresh_backlog", "stale_hits")  # supply
+            demand = _view_counts(cur, "capability_demand", "demand_hits")   # planned-feature demand
+    finally:
+        conn.close()
+    modules = sorted(set(gap) | set(stale) | set(demand))
+    rows = [{
+        "module": m,
+        "docs_gap": gap.get(m, 0),
+        "doc_stale": stale.get(m, 0),
+        "feature_request": demand.get(m, 0),
+        "total": gap.get(m, 0) + stale.get(m, 0) + demand.get(m, 0),
+    } for m in modules]
+    rows.sort(key=lambda r: -r["total"])
+    return {
+        "available": True,
+        "modules": rows,
+        "totals": {"docs_gap": sum(gap.values()), "doc_stale": sum(stale.values()),
+                   "feature_request": sum(demand.values())},
+        "legend": {"docs_gap": "user asked, no doc (demand)",
+                   "doc_stale": "builder changed something (supply)",
+                   "feature_request": "user asked for a planned feature"},
+    }
