@@ -45,15 +45,19 @@ Per assistant message:
 - **New chat** (`#btnNewChat`).
 - **Recent searches** — last ~20 threads (`GET /chat/history/recent`), collapsible; clicking reopens the thread.
 - **Most helpful searches** — populated from thumbs-up feedback; refreshes after each "up".
-- **Operations Suite** — open-in-tab product tiles (distinct from the auto-invoked chat skills; 2026-04-29 layout):
-  - **Strategy** — "Benchmarking + KPIs" — **live** (opens the market-intelligence deck).
-  - **Public Library** — "Shared corpus — payer manuals, regs, public sources" — **live** (opens the RAG corpus UI; renamed from "Library" to make room for Vault).
-  - **Roster** — "Provider directory + credentialing" — **coming soon** (Credentialing was folded into Roster — same backing service; separate tiles confused users).
-  - **Vault** — "Your org, personal & patient documents (private namespaces)" — **coming soon** (next-sprint; per-org/user/patient isolated corpora behind a separate agent).
-  Opening a Mobius-owned tile forwards your access token in the URL fragment (`#t=…`) so the tool signs you in without a second login. Plus an **Appeals Agent demo** tile and "Learn more about chat skills" → the Skills modal.
+- **Operations Suite** — open-in-tab product tiles (Strategy, Public Library, Roster, Vault) + an Appeals Agent demo tile + "Learn more about chat skills". Detailed in the **Operations Suite** section below.
 - **User / account area** — "Signed in as {name}"; click opens the auth modal.
 - **Onboarding nudge** (`#onboardingNudge`) — "⚙ Set up your profile" when not yet onboarded; opens Preferences.
 - **Collapse** — a chevron collapses the sidebar to an icon rail (Recent 🔍, Most Helpful ⭐, Skills ⊞ with badges).
+
+## Operations Suite (open-in-tab products)
+The sidebar's Operations Suite holds **open-in-tab product tiles** — distinct from the auto-invoked chat skills. Clicking a tile opens that product in a new tab; a Mobius-owned tile forwards your access token in the URL fragment (`#t=…`) so it signs you in without a second login. Current tiles (2026-04-29 layout):
+- **Strategy** — "Benchmarking + KPIs" — **live**. Opens the market-intelligence / benchmarking deck.
+- **Public Library** — "Shared corpus — payer manuals, regs, public sources" — **live**. Opens the shared RAG corpus UI (the public, non-private knowledge base). Renamed from "Library" to make room for Vault.
+- **Roster** — "Provider directory + credentialing" — **coming soon**. Credentialing was folded into Roster (same backing service; two tiles confused users), and the tile's click is currently disabled.
+- **Vault** — "Your org, personal & patient documents (private namespaces)" — **coming soon**. The private counterpart to the Public Library: per-org / per-user / per-patient isolated document namespaces behind a separate agent + isolation boundary (next sprint).
+
+Also here: an **Appeals Agent demo** tile (external prototype) and a "Learn more about chat skills" link that opens the Skills modal.
 
 ## Config drawer (hamburger ☰)
 - **Config version** — short SHA from `/chat/config`.
