@@ -115,7 +115,7 @@ Present in the surface but **not** wired for end users:
 - **"Queue for batch processing"** on large uploads — a **disabled** "coming soon" stub (the large-file dialog's "Upload now" is live).
 - **⋯ → "Add link"** — disabled "coming soon".
 - **⋯ → "Upload file"** — hidden in the live bundle (the paperclip is the shipped composer upload path).
-- **Product-feedback capture card** — the `product_feedback` skill persists feedback and returns `extra.capture_card`, but the frontend has **no code to render it yet** (the editable confirmation UI is unbuilt).
+- *(Resolved 2026-07-03 — the product-feedback **capture card** + **feedback nudge chips** now render in the frontend; this was previously listed here as unbuilt. It's live.)*
 - **Microsoft OAuth / Enterprise SSO** — **not implemented**: no Microsoft/SSO code is present in the frontend at all (earlier docs called these "coming soon" — they are not even rendered).
 - **Operations Suite: Vault + Roster tiles** — render but are **coming soon**: **Vault** = private per-org/user/patient document namespaces (next sprint, separate agent + isolation boundary); **Roster** tile's click is disabled. (The **Strategy** and **Public Library** tiles are live.)
 

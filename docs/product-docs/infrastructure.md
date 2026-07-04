@@ -13,8 +13,10 @@ Mobius is a multi-repo system: each product surface (chat, RAG, OS, credentialin
   - Canonical logo assets (`assets/logo.svg`, `logo-dark.svg`) for light/dark backgrounds.
   - CSS custom-property token files: `tokens.css` (light) + `tokens-dark.css` (dark overrides via `.dark` / `[data-theme="dark"]`).
   - Programmatic logo spec (`logo-spec.ts` / `logo-spec.json`) — path + colors for JS/TS-drawn logos (e.g. browser extension).
-  - `STYLE_GUIDELINES.md` — logo-usage and token rules written for both humans and agents.
-- **Consumed by:** Every Mobius frontend (chat UI, story-UI, OS, landing pages, document viewer) that imports tokens or references the logo.
+  - `BRANDING.md` — the canonical **Mobius Brand & UI Guidelines v1** (effective 2026-07-03), governance owner Ananth. Every module MUST: import `tokens.css` (never fork/redefine a `--mobius-*` token), use `var(--mobius-font-sans|mono)` (no font literals) and `var(--mobius-text-*)` (no raw px), carry the Mobius mark in the main header, and resolve compat aliases (`--surface`/`--border`/`--text-primary`) to `var(--mobius-*)`.
+  - **Semantic accents** (chosen by meaning, not style): `--mobius-accent` #3B82F6 = action/links/focus · `--mobius-indigo` #5B5EF4 = runs/pipeline · `--mobius-violet` #7C3AED = credentialing/policy · `--mobius-emerald` #10B981 = roster/ops. **Banned as accent:** #1A73E8 (Google blue), #58A6FF (GitHub blue).
+  - **Enforcement:** a shared `mobius-design/tests/` audit (8 checks incl. no-font-literals + no-raw-px) — a red audit **blocks merge**. New colour/size/component goes through `BRANDING.md` via PR first, never inlined.
+- **Consumed by:** Every Mobius frontend (chat UI, story-UI, OS, landing pages, document viewer) that imports tokens or references the logo. The v1 audit gates their merges.
 - **Audience tag:** dev
 
 ### mobius-config
