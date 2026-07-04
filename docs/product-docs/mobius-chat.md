@@ -91,7 +91,7 @@ Opened via "Open document" on a source card (`#doc-reader-panel`, restored 2026-
 - **Chat status banner** — transient ("Document ready", etc.), auto-hides ~20s.
 - **Upload restore banner** — "Recent uploads from your other chats"; per-row "Attach" links an existing upload to this thread (no re-upload).
 - **Roster upload receipt** — TurboTax-style progress (storage → database → warehouse) with a conditional NPI-reconciliation link.
-- **Answer components** — a live **Thinking block** (phase dots, auto-collapse); an **Answer card** with a type badge (FACTUAL / CANONICAL / BLENDED) and a confidence badge (Approved Authoritative / Caution / Informational Only / No Sources), follow-up + suggested-action chips; **Clarification chips** (selections merge into the next send); a collapsible **Sources** citer; admin-only **LLM-performance**, **Adjudicator scorecard**, and **Retrieval-trace** panels; a **Credentialing Copilot** panel; and a **Task-list** envelope (severity chips, resolve, Export CSV).
+- **Answer components** — a live **Thinking block** (phase dots, auto-collapse); an **Answer card** with a type badge (FACTUAL / CANONICAL / BLENDED) and a confidence badge (Approved Authoritative / Caution / Informational Only / No Sources), follow-up + suggested-action chips; **Clarification chips** (selections merge into the next send); a collapsible **Sources** citer; admin-only **LLM-performance**, **Adjudicator scorecard**, and **Retrieval-trace** panels; a **Credentialing Copilot** panel; a **Task-list** envelope (severity chips, resolve, Export CSV); and the **product-feedback capture card** + **feedback nudge chips** (the editable "share feedback" card and the low-weight prompts — live as of 2026-07-03).
 
 ## Credentialing pipeline (`/pipeline`)
 - Start a credentialing **run** for an organization; choose **🧭 Copilot** (step-by-step, default) or **⚡ Autopilot** (full pipeline), then "Start Pipeline →".
@@ -115,7 +115,6 @@ Present in the surface but **not** wired for end users:
 - **"Queue for batch processing"** on large uploads — a **disabled** "coming soon" stub (the large-file dialog's "Upload now" is live).
 - **⋯ → "Add link"** — disabled "coming soon".
 - **⋯ → "Upload file"** — hidden in the live bundle (the paperclip is the shipped composer upload path).
-- *(Resolved 2026-07-03 — the product-feedback **capture card** + **feedback nudge chips** now render in the frontend; this was previously listed here as unbuilt. It's live.)*
 - **Microsoft OAuth / Enterprise SSO** — **not implemented**: no Microsoft/SSO code is present in the frontend at all (earlier docs called these "coming soon" — they are not even rendered).
 - **Operations Suite: Vault + Roster tiles** — render but are **coming soon**: **Vault** = private per-org/user/patient document namespaces (next sprint, separate agent + isolation boundary); **Roster** tile's click is disabled. (The **Strategy** and **Public Library** tiles are live.)
 
