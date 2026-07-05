@@ -89,7 +89,7 @@ They render an inline `task_list` UI block. **Reachability caveat:** these three
 
 **Task shape (corrections to earlier docs):** `severity` is **5 lowercase values** — `critical | warning | info | low | none` (not the 4-value "Critical/Warning/Info/Low"); `status` is **6** — `open | in_progress | resolved | dismissed | running | failed`.
 
-**Where tasks surface:** the chat `task_list` block; the `/chat/tasks/*` REST proxy + CSV export; the pipeline task queue and roster open-tasks; credentialing report step-cards; satellite-service lifecycle events; and chat-turn → task promotion (`MOBIUS_TASK_MANAGER_PROMOTION`, flipped on 2026-07-02). Not yet: `get_task`/`patch_task`/`dismiss_task` chat skills (v2); appeals-agent case tasks (partial).
+**Where tasks surface:** the chat `task_list` block; the `/chat/tasks/*` REST proxy + CSV export (the task-manager `/tasks` endpoint accepts `?source_module=X` as an alias for `?module=X`, matching the DB column); the pipeline task queue and roster open-tasks; credentialing report step-cards; satellite-service lifecycle events; and chat-turn → task promotion (`MOBIUS_TASK_MANAGER_PROMOTION`, flipped on 2026-07-02). Not yet: `get_task`/`patch_task`/`dismiss_task` chat skills (v2); appeals-agent case tasks (partial).
 
 ## Framework (how skills register)
 - **Builtins** — a `SkillSpec` registered at import via `register()` in `app/skills/registry.py`, imported by an **explicit** `_load_builtins()` list. To be visible to the planner it must *also* be named in the **hand-list** `curated_blocks` in `tool_manifest.py` (registered + `visible_to_planner=True` is not enough — the manifest is an explicit list).
