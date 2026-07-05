@@ -16,7 +16,7 @@ Developers / RAG engineers tuning retrieval, routing, the lexicon, or the corpus
 - **Metrics (5-axis)** — computed in `app/routers/eval.py::_summarize_cells`: answer_rate, **recall** (facts found in chunks), **precision** (indexed: cited / min(n_chunks, n_facts), a true [0,1]), latency, cost, plus contradiction-per-cell. **Weighted composite = 0.45·recall + 0.30·precision + 0.25·speed** (speed = 1/(1+lat_s)).
 - **Storage** — Postgres `rag_eval_runs` (one row per run + `config_dump.fingerprint`) and `rag_eval_results` (one row per cell with the full retrieval trace).
 - **Read APIs** — `GET /api/eval/runs/{id}/calibration_summary`, `/api/eval/timeline`, `/api/eval/compare?a&b`, `/api/eval/drift`.
-- **UI** — a "Run Calibration" button + summary panel (`EvalTab.tsx`); the timeline/compare UI is planned.
+- **UI** — `EvalTab.tsx`: a "Run Calibration" button + summary panel, and (shipped 2026-07-04) the **observability dashboard** — run timeline, A/B compare, drift view, and a per-strategy trend dropdown. New banks added alongside: Sunshine + authority-inheritance query banks.
 
 ## Current baseline (source of truth)
 - **Authoritative: run `2ecb72ab`** (v2.1 canonical-blend + retrieval fixes; 21/22 queries; judge **locked to gemini-2.5-pro**; fact-checker recall):
@@ -30,7 +30,7 @@ Developers / RAG engineers tuning retrieval, routing, the lexicon, or the corpus
 - **Forced-strategy calibration** — force each of a/b/c/d per query to measure its true performance. **oracle** = per-query max over the forced arms; **router** = the bandit/prior choice; **headroom** = oracle − router. This is the correct method (not the oracle-path shortcut).
 - **Adjudicator locked** — the judge silently scored 0 for a period due to 5 stacked bugs + a `max_tokens` truncation (all fixed). It's now **locked to a single model (gemini-2.5-pro)** so deltas reflect real lift, not judge variance.
 - **Fact-check F1 (honesty-weighted)** — F1 = recall × accuracy: full credit for honest abstention, credit for grounded facts, penalty for contradictions/hallucinations. Historical arm ranking d > b > a > c; answer-accuracy ceiling ~0.31.
-- **Lift vs Drift (eval observability)** — every run stamps a version **fingerprint** {priors_version, lexicon_revision, agent_revision, corpus_snapshot_at, judge_model, bank_hash} captured *inside* `run_calibration` (invocation-agnostic). **Lift** = metric moved **and** fingerprint changed → attribute to the changed dim. **Drift** = metric moved **and** fingerprint unchanged → alert. **`fingerprint_stable`** flags runs whose cells straddled a deploy (mixed-build confound → excluded from attribution). Spec: `eval/calibration/EVAL_OBSERVABILITY_SPEC.md`. (σ-band + UI planned.)
+- **Lift vs Drift (eval observability)** — every run stamps a version **fingerprint** {priors_version, lexicon_revision, agent_revision, corpus_snapshot_at, judge_model, bank_hash} captured *inside* `run_calibration` (invocation-agnostic). **Lift** = metric moved **and** fingerprint changed → attribute to the changed dim. **Drift** = metric moved **and** fingerprint unchanged → alert. **`fingerprint_stable`** flags runs whose cells straddled a deploy (mixed-build confound → excluded from attribution). Spec: `eval/calibration/EVAL_OBSERVABILITY_SPEC.md`. (UI **shipped** 2026-07-04 — timeline / A-B compare / drift in EvalTab; the σ noise-floor band is still pending ~5 same-config runs.)
 
 ## Recent changes (~last 2 weeks)
 - Fixed the 5-bug adjudicator → the judge scores real verdicts again; locked it to gemini-2.5-pro.

@@ -12,7 +12,7 @@ A user never names a skill — they ask a question and the planner routes it. Th
 
 ## Reachability (read this first)
 What the agent can call = **chat builtins** + **the tools the *wired* MCP server exposes**. The wired server is set by `CHAT_SKILLS_MCP_URL` and its tools register at boot. Consequences:
-- The live dev manifest has **43 tools**: ~16 builtins + the ~27-tool FL-Medicaid analytics/org suite from the wired MCP.
+- The live dev manifest has **45 tools** (re-verified 2026-07-05): ~18 builtins (incl. the new `payor_lookup` / `payor_readiness` pair) + the ~27-tool FL-Medicaid analytics/org suite from the wired MCP.
 - **Email, appeals, and other `mobius-skills-mcp` tools are NOT in the wired MCP in dev** — so the agent *cannot* call them. If a user types "email this to X," the agent correctly says it has no email capability. (Email is still usable via the Email button — see *Email* below — because that's a direct proxy, not an agent tool.)
 - "Code exists" ≠ "reachable." This doc marks each tool's tier.
 
@@ -34,6 +34,8 @@ What the agent can call = **chat builtins** + **the tools the *wired* MCP server
 | `vibe` | A short, work-adjacent line (toast / empathy / dry observation). |
 | `product_feedback` | Capture open product feedback + CSAT/CES/NPS surveys. |
 | `product_help_search` | Answer "how do I use Mobius?" from the product docs (this doc's own skill). |
+| `payor_lookup` | Authoritative operational fact for a payor from the **payor registry** — the source of truth for contact/access facts the corpus can't reliably ground: provider-services phone, appeals/claims fax, EDI payer ID, portal/login/eligibility/prior-auth URLs, mailing addresses, timely filing. Preferred over `search_corpus` for these; `field` accepts natural aliases (phone, appeals fax, edi, portal…). *(new 2026-07-04)* |
+| `payor_readiness` | Payor readiness scorecard — how much of a payor's required docs are ingested, known coverage, grounded-doc counts, and gaps. *(new 2026-07-04)* |
 | `refuse` | Hard stop — no content returned (router-owned). |
 
 ## Catalog — FL Medicaid BH market-data analytics suite (MCP, wired in dev)
@@ -107,6 +109,6 @@ The **email service** (`mobius-email`, Cloud Run) is live and full-featured — 
 
 ## Doc-readiness notes
 - **Primary audience tag:** mixed (users benefit; devs build).
-- **Source:** rebuilt 2026-07-03 from the **live deployed tool manifest** (`/chat/skills-manifest`, 43 tools) + the Email agent's inventory, superseding the 07-01 "13 builtins / 21 MCP" snapshot — which missed the entire market-data analytics suite and mis-stated reachability.
+- **Source:** rebuilt 2026-07-03 from the **live deployed tool manifest** (`/chat/skills-manifest`) + the Email agent's inventory, superseding the 07-01 "13 builtins / 21 MCP" snapshot — which missed the entire market-data analytics suite and mis-stated reachability. Re-verified 2026-07-05 (45 tools; payor pair added; task skills still not in the manifest).
 - **Reachability is env-specific:** `CHAT_SKILLS_MCP_URL` differs by environment/worktree; this catalog reflects dev. Re-pull the live manifest when documenting another env.
 - **For the loop:** the Appeals agent's inventory (appeals_* tools, rules schema) is pending; per-tool parameter detail for the analytics suite lives in the manifest's auto-discovered section. Residual gaps → `docs_gap`.

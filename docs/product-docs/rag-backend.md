@@ -83,9 +83,17 @@ Corpus source of truth for live search (populated on user Publish): the `mobius-
 - **External fallback** — strategy (d) can call a Google search service (`CHAT_SKILLS_GOOGLE_SEARCH_URL`) and web scrape; disabled by default in the retriever pipeline (`apply_google=False`) since the chat React tool loop invokes Google explicitly when needed.
 - **Eval** — `mobius-rag/eval`, `mobius-retriever` CLI/eval-questions YAML, and rag-api all share the same pipeline so measured quality reflects production behavior.
 
+## Recent changes (2026-07-04 — from commit history; targeted sweep additions)
+
+Retrieval behavior for **payer queries** improved in three ways:
+- **Authority-inheritance union** — FL Medicaid MCO payer queries now union in documents inherited from the payer's parent authority (state Medicaid program docs count for the MCO), instead of matching only payer-tagged docs.
+- **Fail-fast bypass for j-tag-only queries** — a query that matches only jurisdiction tags (e.g. just a payer name) no longer trips the fail-fast gate; it proceeds to corpus search.
+- **Contact-class query detection** — queries asking for contact/access facts (phone, fax, EDI, portal) are detected as a class; in chat these now prefer the **payor registry** (`payor_lookup` skill) over corpus search, since the corpus can't reliably ground such facts.
+Also: an admin `/admin/drive/relink` endpoint backfills `authority_level` + doc links on Drive-ingested documents, and the eval observability dashboard shipped in the Repository UI's EvalTab (see the eval doc).
+
 ## Doc-readiness notes
 
-- **Primary audience tag:** dev (mostly). User-facing surface is indirect (chat answers, Repository UI).
+- **Primary audience tag:** dev (mostly). User-facing surface is indirect (chat answers, Repository UI). **Note:** this doc is still the 07-01 baseline + targeted sweep additions; a full current inventory from the RAG owner-agent is pending.
 - **Solid / grounded in code:**
   - Three-module division of labor (heavy service / retrieval library / thin HTTP wrapper).
   - The retrieve → merge → rerank → assemble pipeline and its signals (score, tag match, authority level).

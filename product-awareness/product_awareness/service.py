@@ -147,6 +147,19 @@ def _view_counts(cur, view: str, count_col: str) -> dict:
         return {}
 
 
+def _view_verbatims(cur, view: str) -> dict:
+    """{module: [sample verbatims]} — so the sweep can see WHAT changed, not just counts."""
+    try:
+        cur.execute(f"SELECT module, sample_verbatims FROM {view}")  # noqa: S608
+        out = {}
+        for module, samples in cur.fetchall():
+            if module and samples:
+                out[module] = list(samples)[:10]
+        return out
+    except Exception:
+        return {}
+
+
 @app.get("/backlog")
 def backlog() -> dict:
     """Doc-loop health, per module: demand (docs_gap), supply (doc_stale), and
@@ -162,6 +175,8 @@ def backlog() -> dict:
             gap = _view_counts(cur, "docs_backlog", "gap_hits")          # demand
             stale = _view_counts(cur, "docs_refresh_backlog", "stale_hits")  # supply
             demand = _view_counts(cur, "capability_demand", "demand_hits")   # planned-feature demand
+            stale_v = _view_verbatims(cur, "docs_refresh_backlog")
+            gap_v = _view_verbatims(cur, "docs_backlog")
     finally:
         conn.close()
     modules = sorted(set(gap) | set(stale) | set(demand))
@@ -171,6 +186,8 @@ def backlog() -> dict:
         "doc_stale": stale.get(m, 0),
         "feature_request": demand.get(m, 0),
         "total": gap.get(m, 0) + stale.get(m, 0) + demand.get(m, 0),
+        "doc_stale_verbatims": stale_v.get(m, []),
+        "docs_gap_verbatims": gap_v.get(m, []),
     } for m in modules]
     rows.sort(key=lambda r: -r["total"])
     return {
