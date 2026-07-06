@@ -319,6 +319,17 @@ elif [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
   fi
 fi
 
+# --- mobius-db-agent (port 8008): centralised DB access MCP server ---
+if [[ -d "$MOBIUS_ROOT/mobius-db-agent" ]]; then
+  _kill_port 8008
+  _load_env "$MOBIUS_ROOT/mobius-chat/.env"
+  [[ -f "$MOBIUS_ROOT/mobius-config/.env" ]] && _load_env "$MOBIUS_ROOT/mobius-config/.env"
+  export DB_AGENT_PORT=8008
+  export DB_AGENT_ALLOW_ADMIN=1
+  export DB_AGENT_MCP_URL="http://localhost:8008/mcp"
+  _start "mobius-db-agent" "cd $MOBIUS_ROOT/mobius-db-agent && $VENV/bin/python3 -m app"
+fi
+
 # --- mobius-os backend (port 5001) ---
 if [[ -d "$MOBIUS_ROOT/mobius-os/backend" ]]; then
   _load_env "$MOBIUS_ROOT/mobius-os/backend/.env"
@@ -619,6 +630,7 @@ printf "  %-24s  %s\n" "mobius-chat"         "http://localhost:8000"
 printf "  %-24s  %s\n" "mobius-rag backend"  "http://localhost:8001"
 printf "  %-24s  %s\n" "mobius-scraper API"  "http://localhost:8002"
 printf "  %-24s  %s\n" "mobius-google-search" "http://localhost:8004"
+printf "  %-24s  %s\n" "mobius-db-agent"   "http://localhost:8008/mcp"
 printf "  %-24s  %s\n" "mobius-skills-mcp" "http://localhost:8006/mcp"
 printf "  %-24s  %s\n" "mobius-provider-roster" "http://localhost:8011"
 printf "  %-24s  %s\n" "mobius-rag frontend" "http://localhost:5173"
