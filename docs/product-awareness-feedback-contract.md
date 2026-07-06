@@ -166,6 +166,17 @@ store.close_signals(category="doc_stale", module="chat")   # -> rows drained
 Closed rows drop out of the view. `close_signals` is fail-closed in prod, returns
 `0` in dev on DB-down.
 
+**External sweeps (can't import `app.storage`) drain over HTTP** —
+`POST /chat/product-feedback/close-signals` (unauth, same pattern as filing):
+```json
+{"category":"doc_stale","module":"chat","before":"<iso-ts>"}  // → {"drained": N}
+```
+Narrow by design: `category` must be a **sweepable** signal (`docs_gap` | `doc_stale`
+— never user feedback like `bug`), `module` is **required** (a sweep only closes
+what it processed), and optional `before` closes only signals created at/before that
+timestamp (so mid-sweep arrivals survive to next week). The full sweep loop over
+HTTP: read `/backlog` → refresh + re-embed doc → `POST /close-signals`.
+
 ### Failure semantics
 `insert_open_feedback` is fail-closed in hosted envs (`CHAT_ENV=staging|prod` →
 raises `ProductFeedbackError`) and degrades to a log + `None` in dev. Because gap
