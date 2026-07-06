@@ -169,3 +169,41 @@ So: **reserve the right amount once (formula), then dynamically scale how many c
 - **Chat:** Horizontal scale of chat app instances; each instance has a fixed pool. Total pool across instances ≥ peak N_chat × R_chat. Actual connections in use track concurrent chat users.
 
 Ensure: `max_connections` ≥ UI_slots + D_chunk + D_embed + Chat_slots + HEADROOM, with D_chunk and D_embed as the **max** you'll ever run. Then scale up/down within those caps.
+
+---
+
+## Google Cloud SQL (Postgres): raising `max_connections`
+
+When you see `remaining connection slots are reserved for non-replication superuser connections` or `too many clients`, the instance’s **`max_connections`** is too low for how many clients (mstart stack, other laptops, CI, BI tools) are open at once.
+
+### 1. See current usage
+
+In **GCP Console → SQL → your instance → Monitoring**, use **Peak connections** / connection-by-status charts. That tells you whether you’re constantly at the ceiling.
+
+### 2. Raise the `max_connections` flag
+
+**Console:** SQL instance → **Edit** → **Flags** → add or change **`max_connections`** (e.g. **200** or **300** for shared dev). Apply; instance may restart briefly.
+
+**CLI (dev instance names used in this repo):**
+
+```bash
+# Defaults from mstart / mobius-config examples — override if your instance differs.
+export GCP_PROJECT="${GCP_PROJECT:-mobius-os-dev}"
+export CLOUDSQL_INSTANCE="${CLOUDSQL_INSTANCE:-mobius-platform-dev-db}"
+
+gcloud sql instances patch "$CLOUDSQL_INSTANCE" \
+  --project="$GCP_PROJECT" \
+  --database-flags=max_connections=200
+```
+
+GCP caps the **allowed** value from **`max_connections`** based on **machine type (RAM)**. If `patch` rejects the value, either pick a lower number or **upgrade the instance tier**, then retry.
+
+### 3. Still not enough?
+
+- **Reduce consumers:** Fewer parallel Mobius services hitting the same DB, lower per-process pool sizes (`MOBIUS_PG_POOL_MAX_SIZE`, worker concurrency), stop duplicate `mstart` / stray proxies.
+- **Pooler (PgBouncer / Cloud SQL Auth Proxy patterns):** Many app connections → fewer server sessions (see table earlier in this doc).
+- **Restart to clear leaks:** `mstart --restart-db` restarts the instance and drops all sessions (dev escape hatch).
+
+### 4. Local docker Postgres (not Cloud SQL)
+
+`mobius-chat/docker-compose.yml` documents overriding **`max_connections=200`** for the bundled Postgres image when you use that stack locally.

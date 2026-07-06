@@ -1,0 +1,27 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --file=${_DOCKERFILE}
+      - --tag=${_IMAGE}
+      - --cache-from=${_IMAGE_BASE}:latest
+      - .
+  - name: gcr.io/cloud-builders/docker
+    args: [push, "${_IMAGE}"]
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - tag
+      - ${_IMAGE}
+      - ${_IMAGE_BASE}:latest
+  - name: gcr.io/cloud-builders/docker
+    args: [push, "${_IMAGE_BASE}:latest"]
+
+images:
+  - ${_IMAGE}
+  - ${_IMAGE_BASE}:latest
+
+options:
+  machineType: E2_HIGHCPU_8
+  logging: CLOUD_LOGGING_ONLY
+
+timeout: 1200s

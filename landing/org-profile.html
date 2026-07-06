@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Org Profiles — Mobius</title>
+  <link rel="stylesheet" href="mobius-tokens.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--mobius-font-system); background: var(--mobius-bg-primary); color: var(--mobius-text-primary); height: 100vh; display: flex; flex-direction: column; overflow: hidden; line-height: 1.5; }
+
+    /* ── Shared components ── */
+    .btn { display: inline-flex; align-items: center; gap: 0.3rem; font-family: inherit; font-size: 0.8rem; font-weight: 500; padding: 0.36rem 0.75rem; border-radius: 6px; border: 1px solid transparent; cursor: pointer; white-space: nowrap; line-height: 1; transition: all 0.12s; }
+    .btn-primary   { background: var(--mobius-accent); color: #fff; border-color: var(--mobius-accent); }
+    .btn-primary:hover { background: var(--mobius-accent-hover); }
+    .btn-secondary { background: #fff; color: var(--mobius-text-primary); border-color: var(--mobius-border-medium); }
+    .btn-secondary:hover { background: var(--mobius-bg-tertiary); }
+    .btn-ghost     { background: none; color: var(--mobius-text-secondary); border-color: transparent; }
+    .btn-ghost:hover { background: var(--mobius-bg-tertiary); }
+    .btn-danger    { background: #fff; color: var(--mobius-error); border-color: #fca5a5; }
+    .btn-danger:hover { background: #fff1f2; }
+    .btn-sm { font-size: 0.72rem; padding: 0.22rem 0.55rem; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .badge { display: inline-flex; align-items: center; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 0.1rem 0.38rem; border-radius: 99px; white-space: nowrap; }
+    .b-fresh  { background: #dcfce7; color: #15803d; }
+    .b-stale  { background: #fef9c3; color: #92400e; }
+    .b-new    { background: #dbeafe; color: #1d4ed8; }
+    .b-on     { background: #dcfce7; color: #15803d; }
+    .b-off    { background: #f1f5f9; color: #64748b; }
+    .b-muted  { background: #f1f5f9; color: #64748b; }
+
+    /* ── Header ── */
+    .header { display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 1.25rem; border-bottom: 1px solid var(--mobius-border); background: #fff; flex-shrink: 0; }
+    .h-back  { font-size: 0.78rem; color: var(--mobius-text-muted); text-decoration: none; padding: 0.15rem 0.4rem; border-radius: 5px; }
+    .h-back:hover { background: var(--mobius-bg-tertiary); }
+    .h-brand { font-size: 0.85rem; font-weight: 700; }
+    .h-sep   { color: var(--mobius-border-medium); }
+    .h-title { font-size: 0.85rem; color: var(--mobius-text-secondary); }
+    .h-spacer { flex: 1; }
+    .h-meta  { font-size: 0.72rem; color: var(--mobius-text-muted); }
+
+    /* ── Workspace ── */
+    .workspace { display: flex; flex: 1; overflow: hidden; }
+
+    /* ── Master list ── */
+    .master-list { width: 280px; min-width: 280px; flex-shrink: 0; border-right: 1px solid var(--mobius-border); display: flex; flex-direction: column; overflow: hidden; background: #fff; }
+    .master-toolbar { padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--mobius-border); flex-shrink: 0; display: flex; flex-direction: column; gap: 0.45rem; }
+    .master-search { font-family: inherit; font-size: 0.78rem; background: var(--mobius-bg-secondary); border: 1px solid var(--mobius-border-medium); border-radius: 6px; padding: 0.3rem 0.65rem; outline: none; width: 100%; transition: border-color 0.1s; }
+    .master-search:focus { border-color: var(--mobius-accent); background: #fff; }
+    .master-scroll { flex: 1; overflow-y: auto; scrollbar-width: thin; }
+    .master-scroll::-webkit-scrollbar { width: 5px; }
+    .master-scroll::-webkit-scrollbar-thumb { background: var(--mobius-border-medium); border-radius: 99px; }
+
+    .org-row { display: flex; align-items: center; gap: 0.55rem; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--mobius-border); cursor: pointer; transition: background 0.1s; border-left: 3px solid transparent; }
+    .org-row:hover { background: var(--mobius-bg-tertiary); }
+    .org-row.active { background: #eff6ff; border-left-color: var(--mobius-accent); }
+    .org-row.hidden { display: none; }
+
+    .or-avatar { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.82rem; font-weight: 700; flex-shrink: 0; background: #dbeafe; color: #1d4ed8; }
+    .or-avatar.stale { background: #fef9c3; color: #92400e; }
+    .or-info { flex: 1; min-width: 0; }
+    .or-name { font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .or-slug { font-size: 0.67rem; color: var(--mobius-text-muted); font-family: var(--mobius-font-mono); }
+    .master-empty { padding: 2rem 0.85rem; text-align: center; color: var(--mobius-text-muted); font-size: 0.8rem; display: none; }
+
+    /* ── Detail pane ── */
+    .detail-pane { flex: 1; overflow-y: auto; background: var(--mobius-bg-primary); scrollbar-width: thin; display: flex; flex-direction: column; }
+    .detail-pane::-webkit-scrollbar { width: 6px; }
+    .detail-pane::-webkit-scrollbar-thumb { background: var(--mobius-border-medium); border-radius: 99px; }
+
+    .detail-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; color: var(--mobius-text-muted); gap: 0.5rem; }
+    .detail-empty-icon { font-size: 2rem; opacity: 0.2; }
+    .detail-empty-text { font-size: 0.85rem; }
+
+    .detail-inner { padding: 1.25rem 1.5rem; }
+
+    /* Hero card */
+    .detail-hero { background: #fff; border: 1px solid var(--mobius-border); border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+    .dh-top { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 0.75rem; }
+    .dh-avatar { width: 52px; height: 52px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; flex-shrink: 0; background: #dbeafe; color: #1d4ed8; }
+    .dh-avatar.stale { background: #fef9c3; color: #92400e; }
+    .dh-info { flex: 1; min-width: 0; }
+    .dh-name  { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.18rem; }
+    .dh-slug  { font-family: var(--mobius-font-mono); font-size: 0.72rem; color: var(--mobius-text-muted); margin-bottom: 0.35rem; }
+    .dh-meta  { font-size: 0.75rem; color: var(--mobius-text-muted); display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; }
+    .dh-actions { display: flex; gap: 0.4rem; flex-shrink: 0; align-items: flex-start; }
+
+    .freshness-bar { display: flex; align-items: center; gap: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--mobius-border); margin-top: 0.25rem; }
+    .fb-label { font-size: 0.7rem; color: var(--mobius-text-muted); }
+    .fb-track { flex: 1; height: 5px; background: var(--mobius-bg-tertiary); border-radius: 99px; overflow: hidden; }
+    .fb-fill  { height: 100%; border-radius: 99px; background: #22c55e; transition: width 0.4s; }
+    .fb-fill.warn { background: #eab308; }
+    .fb-fill.stale { background: #ef4444; }
+    .fb-age   { font-size: 0.7rem; color: var(--mobius-text-muted); white-space: nowrap; }
+
+    /* Tab nav */
+    .detail-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--mobius-border); background: #fff; padding: 0 1.5rem; flex-shrink: 0; }
+    .d-tab { font-size: 0.78rem; font-weight: 500; padding: 0.55rem 0.9rem; border: none; background: none; color: var(--mobius-text-secondary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; font-family: inherit; white-space: nowrap; display: flex; align-items: center; gap: 0.3rem; }
+    .d-tab.active { color: var(--mobius-accent); border-bottom-color: var(--mobius-accent); font-weight: 600; }
+    .d-tab-count { font-size: 0.6rem; font-weight: 700; background: var(--mobius-bg-tertiary); border-radius: 99px; padding: 0.05rem 0.38rem; color: var(--mobius-text-muted); }
+    .d-tab.active .d-tab-count { background: #dbeafe; color: #1d4ed8; }
+
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* Section card */
+    .card { background: #fff; border: 1px solid var(--mobius-border); border-radius: 8px; padding: 0.9rem 1.1rem; margin-bottom: 0.75rem; }
+    .card-head { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--mobius-text-muted); margin-bottom: 0.65rem; display: flex; align-items: center; justify-content: space-between; }
+
+    /* Field grid */
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem 1.5rem; }
+    .field { display: flex; flex-direction: column; gap: 0.05rem; }
+    .f-label { font-size: 0.62rem; color: var(--mobius-text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+    .f-value { font-size: 0.82rem; font-weight: 500; }
+    .f-value.mono { font-family: var(--mobius-font-mono); font-size: 0.76rem; }
+    .f-value.muted { color: var(--mobius-text-muted); }
+
+    /* NPI rows */
+    .npi-row { display: flex; align-items: center; gap: 0.65rem; padding: 0.5rem 0; border-bottom: 1px solid var(--mobius-border); font-size: 0.78rem; }
+    .npi-row:last-child { border-bottom: none; }
+    .npi-code { font-family: var(--mobius-font-mono); font-size: 0.75rem; font-weight: 600; color: var(--mobius-text-primary); }
+    .npi-name { flex: 1; color: var(--mobius-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .npi-tax  { font-size: 0.67rem; background: #f1f5f9; border: 1px solid var(--mobius-border); border-radius: 4px; padding: 0.1rem 0.35rem; color: var(--mobius-text-muted); font-family: var(--mobius-font-mono); }
+    .npi-source { font-size: 0.67rem; color: var(--mobius-text-muted); }
+    .npi-tombstone { text-decoration: line-through; opacity: 0.5; }
+
+    /* Skills grid */
+    .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; }
+    .skill-card { border: 1px solid var(--mobius-border); border-radius: 7px; padding: 0.7rem 0.85rem; display: flex; flex-direction: column; gap: 0.3rem; }
+    .skill-card.enabled  { border-color: #bbf7d0; background: #f0fdf4; }
+    .skill-card.disabled { background: var(--mobius-bg-secondary); }
+    .sk-name  { font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; }
+    .sk-meta  { font-size: 0.68rem; color: var(--mobius-text-muted); }
+    .sk-notes { font-size: 0.68rem; color: var(--mobius-text-secondary); font-style: italic; }
+    .sk-toggle { font-size: 0.68rem; padding: 0.15rem 0.5rem; }
+
+    /* Location rows */
+    .loc-row { display: flex; align-items: flex-start; gap: 0.65rem; padding: 0.6rem 0; border-bottom: 1px solid var(--mobius-border); font-size: 0.78rem; }
+    .loc-row:last-child { border-bottom: none; }
+    .loc-icon { width: 28px; height: 28px; border-radius: 6px; background: var(--mobius-bg-tertiary); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0; margin-top: 0.05rem; }
+    .loc-info { flex: 1; min-width: 0; }
+    .loc-addr { font-weight: 500; }
+    .loc-city { font-size: 0.72rem; color: var(--mobius-text-muted); }
+    .loc-id   { font-family: var(--mobius-font-mono); font-size: 0.65rem; color: var(--mobius-text-muted); margin-top: 0.1rem; }
+    .loc-primary { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; background: #dbeafe; color: #1d4ed8; padding: 0.1rem 0.35rem; border-radius: 4px; flex-shrink: 0; }
+    .loc-inactive { opacity: 0.45; }
+
+    /* History log */
+    .log-row { display: flex; align-items: flex-start; gap: 0.65rem; padding: 0.55rem 0; border-bottom: 1px solid var(--mobius-border); font-size: 0.75rem; }
+    .log-row:last-child { border-bottom: none; }
+    .log-dot  { width: 8px; height: 8px; border-radius: 50%; background: var(--mobius-border-medium); flex-shrink: 0; margin-top: 0.3rem; }
+    .log-dot.identity { background: #3b82f6; }
+    .log-dot.location { background: #8b5cf6; }
+    .log-dot.skill    { background: #10b981; }
+    .log-dot.name     { background: #f59e0b; }
+    .log-time { color: var(--mobius-text-muted); min-width: 120px; flex-shrink: 0; }
+    .log-msg  { flex: 1; color: var(--mobius-text-secondary); }
+    .log-who  { color: var(--mobius-text-muted); font-size: 0.68rem; white-space: nowrap; }
+
+    /* Alias chips */
+    .alias-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.4rem; }
+    .alias-chip { font-size: 0.72rem; background: #f1f5f9; border: 1px solid var(--mobius-border-medium); border-radius: 99px; padding: 0.15rem 0.55rem; color: var(--mobius-text-secondary); }
+
+    /* Toast */
+    .toast-wrap { position: fixed; bottom: 1.25rem; right: 1.25rem; z-index: 999; display: flex; flex-direction: column; gap: 0.4rem; pointer-events: none; }
+    .toast { font-size: 0.78rem; padding: 0.55rem 0.9rem; border-radius: 7px; background: #1e293b; color: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.18); opacity: 0; transform: translateY(6px); transition: all 0.2s; pointer-events: auto; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { background: #166534; }
+    .toast.error   { background: #991b1b; }
+
+    /* Modal */
+    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 100; display: none; align-items: center; justify-content: center; }
+    .modal-bg.open { display: flex; }
+    .modal { background: #fff; border-radius: 10px; padding: 1.5rem; width: 420px; max-width: 95vw; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
+    .modal-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.75rem; }
+    .modal-body  { margin-bottom: 1.1rem; }
+    .modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
+    .form-row { margin-bottom: 0.75rem; }
+    .form-label { font-size: 0.72rem; font-weight: 600; color: var(--mobius-text-secondary); margin-bottom: 0.3rem; display: block; }
+    .form-input { font-family: inherit; font-size: 0.82rem; width: 100%; border: 1px solid var(--mobius-border-medium); border-radius: 6px; padding: 0.42rem 0.65rem; outline: none; transition: border-color 0.1s; }
+    .form-input:focus { border-color: var(--mobius-accent); }
+    .form-hint { font-size: 0.68rem; color: var(--mobius-text-muted); margin-top: 0.2rem; }
+
+    /* Loading spinner */
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty-section { padding: 1.5rem; text-align: center; color: var(--mobius-text-muted); font-size: 0.8rem; }
+
+    /* ── From Runs sync panel ── */
+    .run-sync-banner { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.65rem; font-size: 0.78rem; }
+    .rsb-icon { font-size: 1rem; flex-shrink: 0; }
+    .rsb-text { flex: 1; color: var(--mobius-text-secondary); }
+    .rsb-text strong { color: var(--mobius-text-primary); }
+    .sync-section-head { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--mobius-text-muted); margin: 0.85rem 0 0.4rem; display: flex; align-items: center; justify-content: space-between; }
+    .sync-row { display: flex; align-items: center; gap: 0.65rem; padding: 0.45rem 0.55rem; border-radius: 6px; font-size: 0.78rem; border: 1px solid var(--mobius-border); margin-bottom: 0.3rem; background: #fff; transition: background 0.1s; }
+    .sync-row:hover { background: var(--mobius-bg-tertiary); }
+    .sync-row input[type=checkbox] { accent-color: var(--mobius-accent); width: 14px; height: 14px; flex-shrink: 0; cursor: pointer; }
+    .sync-row.already-in { background: #f0fdf4; border-color: #bbf7d0; }
+    .sync-row.already-in .sync-code { color: #15803d; }
+    .sync-code { font-family: var(--mobius-font-mono); font-size: 0.75rem; font-weight: 600; flex-shrink: 0; }
+    .sync-name { flex: 1; color: var(--mobius-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sync-src  { font-size: 0.67rem; color: var(--mobius-text-muted); flex-shrink: 0; }
+    .sync-already { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: #15803d; flex-shrink: 0; }
+    .sync-actions { display: flex; gap: 0.5rem; margin-top: 0.85rem; padding-top: 0.75rem; border-top: 1px solid var(--mobius-border); }
+    .run-select-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.65rem; font-size: 0.75rem; color: var(--mobius-text-muted); }
+    .run-select-row select { font-family: inherit; font-size: 0.75rem; border: 1px solid var(--mobius-border-medium); border-radius: 5px; padding: 0.2rem 0.45rem; background: #fff; outline: none; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <a href="credentialing-home.html" class="h-back">← Credentialing</a>
+  <span class="h-sep">/</span>
+  <span class="h-brand">Mobius</span>
+  <span class="h-sep">/</span>
+  <span class="h-title">Org Profiles</span>
+  <span class="h-spacer"></span>
+  <span class="h-meta" id="org-count-meta"></span>
+  <button class="btn btn-primary btn-sm" onclick="openNewOrgModal()">+ New Org</button>
+</header>
+
+<!-- Workspace -->
+<div class="workspace">
+
+  <!-- Master list -->
+  <aside class="master-list">
+    <div class="master-toolbar">
+      <input class="master-search" id="org-search" placeholder="Search orgs…" oninput="filterOrgs()" />
+    </div>
+    <div class="master-scroll" id="org-list">
+      <div class="master-empty" id="org-list-empty">No orgs found</div>
+    </div>
+  </aside>
+
+  <!-- Detail pane -->
+  <main class="detail-pane" id="detail-pane">
+    <div class="detail-empty" id="detail-empty">
+      <div class="detail-empty-icon">🏢</div>
+      <div class="detail-empty-text">Select an org to view its profile</div>
+    </div>
+
+    <!-- Tabs (hidden until org selected) -->
+    <div id="detail-tabs-bar" style="display:none;">
+      <nav class="detail-tabs">
+        <button class="d-tab active" onclick="switchTab('identity')">Identity</button>
+        <button class="d-tab" onclick="switchTab('locations')">Locations <span class="d-tab-count" id="tab-count-loc">0</span></button>
+        <button class="d-tab" onclick="switchTab('skills')">Skills</button>
+        <button class="d-tab" onclick="switchTab('history')">History <span class="d-tab-count" id="tab-count-hist">0</span></button>
+        <button class="d-tab" onclick="switchTab('runs')">From Runs <span class="d-tab-count" id="tab-count-runs">…</span></button>
+      </nav>
+    </div>
+
+    <div class="detail-inner" id="detail-inner" style="display:none;">
+
+      <!-- Hero -->
+      <div class="detail-hero" id="hero-card"></div>
+
+      <!-- Identity tab -->
+      <div class="tab-pane active" id="tab-identity"></div>
+
+      <!-- Locations tab -->
+      <div class="tab-pane" id="tab-locations"></div>
+
+      <!-- Skills tab -->
+      <div class="tab-pane" id="tab-skills"></div>
+
+      <!-- History tab -->
+      <div class="tab-pane" id="tab-history"></div>
+
+      <!-- From Runs tab -->
+      <div class="tab-pane" id="tab-runs"></div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Toast container -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- Rename modal -->
+<div class="modal-bg" id="rename-modal">
+  <div class="modal">
+    <div class="modal-title">Rename Organisation</div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label class="form-label">New canonical name</label>
+        <input class="form-input" id="rename-input" placeholder="Full legal name…" />
+        <div class="form-hint">Current name will be added to aliases.</div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('rename-modal')">Cancel</button>
+      <button class="btn btn-primary" id="rename-save-btn" onclick="saveRename()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- New org modal -->
+<div class="modal-bg" id="new-org-modal">
+  <div class="modal">
+    <div class="modal-title">Register New Organisation</div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label class="form-label">Organisation name</label>
+        <input class="form-input" id="new-org-name" placeholder="e.g. Henderson Behavioral Health" />
+      </div>
+      <div class="form-row">
+        <label class="form-label">Primary NPI (optional)</label>
+        <input class="form-input" id="new-org-npi" placeholder="10-digit NPI" maxlength="10" />
+        <div class="form-hint">You can add more NPIs after creating the profile.</div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('new-org-modal')">Cancel</button>
+      <button class="btn btn-primary" id="new-org-save-btn" onclick="saveNewOrg()">Create Profile</button>
+    </div>
+  </div>
+</div>
+
+<!-- Skill notes modal -->
+<div class="modal-bg" id="skill-modal">
+  <div class="modal">
+    <div class="modal-title" id="skill-modal-title">Toggle Skill</div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label class="form-label">Notes (optional)</label>
+        <input class="form-input" id="skill-notes-input" placeholder="Reason for change…" />
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('skill-modal')">Cancel</button>
+      <button class="btn btn-primary" id="skill-confirm-btn" onclick="confirmSkillToggle()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:8003';
+
+const SKILL_LABELS = {
+  reporting:             'Reporting',
+  financial_benchmarks:  'Financial Benchmarks',
+  operational_benchmarks:'Operational Benchmarks',
+  credentialing:         'Credentialing',
+  chat:                  'Mobius Chat',
+  medicaid_refresh:      'Medicaid Refresh',
+};
+
+let _allOrgs = [];
+let _currentSlug = null;
+let _currentProfile = null;
+let _pendingSkill = null;   // {skill, enabled}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+
+async function init() {
+  await loadOrgs();
+  // Select org from URL hash
+  const hash = location.hash.replace('#', '');
+  if (hash && _allOrgs.find(o => o.org_slug === hash)) {
+    selectOrg(hash);
+  }
+}
+
+// ── Org list ─────────────────────────────────────────────────────────────────
+
+async function loadOrgs() {
+  try {
+    const data = await apiFetch('/org/');
+    _allOrgs = (data.orgs || []).sort((a, b) => a.org_name.localeCompare(b.org_name));
+    renderOrgList();
+  } catch(e) {
+    toast('Could not load orgs: ' + e.message, 'error');
+  }
+}
+
+function renderOrgList() {
+  const list = document.getElementById('org-list');
+  const empty = document.getElementById('org-list-empty');
+  document.getElementById('org-count-meta').textContent = `${_allOrgs.length} org${_allOrgs.length !== 1 ? 's' : ''}`;
+
+  // Remove existing rows
+  list.querySelectorAll('.org-row').forEach(el => el.remove());
+
+  _allOrgs.forEach(org => {
+    const isStale = org.is_stale;
+    const initials = orgInitials(org.org_name);
+    const row = document.createElement('div');
+    row.className = 'org-row' + (org.org_slug === _currentSlug ? ' active' : '');
+    row.dataset.slug = org.org_slug;
+    row.dataset.name = org.org_name.toLowerCase();
+    row.innerHTML = `
+      <div class="or-avatar${isStale ? ' stale' : ''}">${initials}</div>
+      <div class="or-info">
+        <div class="or-name">${esc(org.org_name)}</div>
+        <div class="or-slug">${esc(org.org_slug)}</div>
+      </div>
+      ${isStale ? '<span class="badge b-stale">Stale</span>' : ''}
+    `;
+    row.onclick = () => selectOrg(org.org_slug);
+    list.insertBefore(row, empty);
+  });
+
+  empty.style.display = _allOrgs.length === 0 ? 'block' : 'none';
+}
+
+function filterOrgs() {
+  const q = document.getElementById('org-search').value.toLowerCase().trim();
+  document.querySelectorAll('.org-row').forEach(row => {
+    const match = !q || row.dataset.name.includes(q);
+    row.classList.toggle('hidden', !match);
+  });
+}
+
+// ── Org detail ────────────────────────────────────────────────────────────────
+
+async function selectOrg(slug) {
+  _currentSlug = slug;
+  location.hash = slug;
+
+  // Mark active in list
+  document.querySelectorAll('.org-row').forEach(r => r.classList.toggle('active', r.dataset.slug === slug));
+
+  document.getElementById('detail-empty').style.display = 'none';
+  document.getElementById('detail-tabs-bar').style.display = 'block';
+  document.getElementById('detail-inner').style.display = 'block';
+  document.getElementById('hero-card').innerHTML = '<div style="text-align:center;padding:1rem;color:var(--mobius-text-muted)"><span class="spinner"></span></div>';
+
+  try {
+    const profile = await apiFetch(`/org/${slug}`);
+    _currentProfile = profile;
+    renderDetail(profile);
+  } catch(e) {
+    toast('Failed to load org: ' + e.message, 'error');
+  }
+}
+
+function renderDetail(p) {
+  renderHero(p);
+  renderIdentityTab(p);
+  renderLocationsTab(p);
+  renderSkillsTab(p);
+  renderHistoryTab(p);
+
+  // Update tab counts
+  const activeLocs = (p.locations || []).filter(l => l.is_active !== false).length;
+  const histLen = (p.change_log || []).length;
+  document.getElementById('tab-count-loc').textContent = activeLocs;
+  document.getElementById('tab-count-hist').textContent = histLen;
+}
+
+function renderHero(p) {
+  const isStale = p.is_stale;
+  const ageDays = p.last_refreshed_at ? daysSince(p.last_refreshed_at) : null;
+  const interval = p.refresh_interval_days || 180;
+  const pct = ageDays !== null ? Math.min(100, Math.round((ageDays / interval) * 100)) : 0;
+  const fillClass = pct >= 100 ? 'stale' : pct >= 75 ? 'warn' : '';
+
+  document.getElementById('hero-card').innerHTML = `
+    <div class="dh-top">
+      <div class="dh-avatar${isStale ? ' stale' : ''}">${orgInitials(p.org_name)}</div>
+      <div class="dh-info">
+        <div class="dh-name">${esc(p.org_name)}</div>
+        <div class="dh-slug">${esc(p.org_slug)}</div>
+        <div class="dh-meta">
+          <span>${(p.confirmed_npis || []).filter(n => !n.tombstoned).length} NPI${(p.confirmed_npis||[]).filter(n=>!n.tombstoned).length!==1?'s':''}</span>
+          <span>·</span>
+          <span>${(p.locations || []).filter(l => l.is_active !== false).length} location${(p.locations||[]).filter(l=>l.is_active!==false).length!==1?'s':''}</span>
+          <span>·</span>
+          <span>${Object.values(p.active_skills || {}).filter(s => s.enabled).length} skill${Object.values(p.active_skills||{}).filter(s=>s.enabled).length!==1?'s':''} active</span>
+          ${isStale ? '<span class="badge b-stale">Stale</span>' : '<span class="badge b-fresh">Fresh</span>'}
+        </div>
+      </div>
+      <div class="dh-actions">
+        <button class="btn btn-secondary btn-sm" onclick="openRenameModal()">Rename</button>
+        <button class="btn btn-ghost btn-sm" onclick="refreshOrg()">↻ Refresh</button>
+      </div>
+    </div>
+    ${ageDays !== null ? `
+    <div class="freshness-bar">
+      <span class="fb-label">Freshness</span>
+      <div class="fb-track"><div class="fb-fill ${fillClass}" style="width:${pct}%"></div></div>
+      <span class="fb-age">${ageDays === 0 ? 'today' : ageDays + 'd ago'} / ${interval}d cycle</span>
+    </div>` : ''}
+  `;
+}
+
+function renderIdentityTab(p) {
+  const npis = (p.confirmed_npis || []);
+  const aliases = (p.org_name_aliases || []);
+
+  const npiRows = npis.length === 0
+    ? '<div class="empty-section">No NPIs confirmed yet</div>'
+    : npis.map(n => `
+        <div class="npi-row${n.tombstoned ? ' npi-tombstone' : ''}">
+          <span class="npi-code">${esc(n.npi)}</span>
+          <span class="npi-name" title="${esc(n.name)}">${esc(n.name || '—')}</span>
+          ${n.taxonomy_code ? `<span class="npi-tax">${esc(n.taxonomy_code)}</span>` : ''}
+          <span class="npi-source">${esc(n.source || '')}</span>
+          ${n.tombstoned ? '<span class="badge b-muted">Removed</span>' : ''}
+        </div>`).join('');
+
+  document.getElementById('tab-identity').innerHTML = `
+    <div class="card">
+      <div class="card-head">Identity</div>
+      <div class="field-grid">
+        <div class="field">
+          <span class="f-label">Canonical Name</span>
+          <span class="f-value">${esc(p.org_name)}</span>
+        </div>
+        <div class="field">
+          <span class="f-label">Slug</span>
+          <span class="f-value mono">${esc(p.org_slug)}</span>
+        </div>
+        <div class="field">
+          <span class="f-label">Last Refreshed</span>
+          <span class="f-value">${p.last_refreshed_at ? fmtDate(p.last_refreshed_at) : '—'}</span>
+        </div>
+        <div class="field">
+          <span class="f-label">Refresh Cycle</span>
+          <span class="f-value">${p.refresh_interval_days || 180} days</span>
+        </div>
+      </div>
+      ${aliases.length > 0 ? `
+        <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--mobius-border)">
+          <div class="f-label" style="margin-bottom:0.3rem">Known aliases</div>
+          <div class="alias-chips">${aliases.map(a => `<span class="alias-chip">${esc(a)}</span>`).join('')}</div>
+        </div>` : ''}
+    </div>
+    <div class="card">
+      <div class="card-head">Confirmed NPIs</div>
+      ${npiRows}
+    </div>
+  `;
+}
+
+function renderLocationsTab(p) {
+  const locs = (p.locations || []);
+  const active = locs.filter(l => l.is_active !== false);
+  const inactive = locs.filter(l => l.is_active === false);
+
+  const renderLoc = l => `
+    <div class="loc-row${l.is_active === false ? ' loc-inactive' : ''}">
+      <div class="loc-icon">📍</div>
+      <div class="loc-info">
+        <div class="loc-addr">${esc(l.address_line1 || '—')}</div>
+        <div class="loc-city">${[l.city, l.state_cd, l.zip].filter(Boolean).join(', ') || '—'}</div>
+        <div class="loc-id">${esc(l.location_id)}</div>
+      </div>
+      ${l.is_primary ? '<span class="loc-primary">Primary</span>' : ''}
+      ${l.is_active === false ? '<span class="badge b-muted">Inactive</span>' : ''}
+    </div>`;
+
+  document.getElementById('tab-locations').innerHTML = `
+    <div class="card">
+      <div class="card-head">Active Locations <span style="font-weight:400;text-transform:none;letter-spacing:0">(${active.length})</span></div>
+      ${active.length === 0 ? '<div class="empty-section">No active locations. These are confirmed in step 2 of a credentialing run.</div>' : active.map(renderLoc).join('')}
+    </div>
+    ${inactive.length > 0 ? `
+    <div class="card">
+      <div class="card-head">Inactive / Removed <span style="font-weight:400;text-transform:none;letter-spacing:0">(${inactive.length})</span></div>
+      ${inactive.map(renderLoc).join('')}
+    </div>` : ''}
+  `;
+}
+
+function renderSkillsTab(p) {
+  const skills = p.active_skills || {};
+  const allSkillKeys = [...new Set([...Object.keys(SKILL_LABELS), ...Object.keys(skills)])];
+
+  const cards = allSkillKeys.map(key => {
+    const s = skills[key] || { enabled: false };
+    const label = SKILL_LABELS[key] || key;
+    const toggleLabel = s.enabled ? 'Disable' : 'Enable';
+    const toggleClass = s.enabled ? 'btn-danger' : 'btn-primary';
+    return `
+      <div class="skill-card ${s.enabled ? 'enabled' : 'disabled'}">
+        <div class="sk-name">
+          <span>${esc(label)}</span>
+          <span class="badge ${s.enabled ? 'b-on' : 'b-off'}">${s.enabled ? 'On' : 'Off'}</span>
+        </div>
+        ${s.activated_at ? `<div class="sk-meta">${s.enabled ? 'Since' : 'Last active'}: ${fmtDate(s.activated_at)}</div>` : ''}
+        ${s.notes ? `<div class="sk-notes">${esc(s.notes)}</div>` : ''}
+        <button class="btn ${toggleClass} btn-sm sk-toggle" onclick="promptSkillToggle('${key}', ${!s.enabled})">${toggleLabel}</button>
+      </div>`;
+  }).join('');
+
+  document.getElementById('tab-skills').innerHTML = `
+    <div class="card">
+      <div class="card-head">Skill Access</div>
+      <div class="skills-grid">${cards}</div>
+    </div>
+  `;
+}
+
+function renderHistoryTab(p) {
+  const log = [...(p.change_log || [])].reverse();
+
+  const typeClass = type => {
+    if (type.includes('identity') || type.includes('npi')) return 'identity';
+    if (type.includes('location')) return 'location';
+    if (type.includes('skill')) return 'skill';
+    if (type.includes('name')) return 'name';
+    return '';
+  };
+
+  const rows = log.length === 0
+    ? '<div class="empty-section">No history yet</div>'
+    : log.map(e => `
+        <div class="log-row">
+          <div class="log-dot ${typeClass(e.type || '')}"></div>
+          <span class="log-time">${e.ts ? fmtDate(e.ts) : '—'}</span>
+          <span class="log-msg">${esc(e.msg || e.type || '—')}</span>
+          <span class="log-who">${esc(e.by || '')}</span>
+        </div>`).join('');
+
+  document.getElementById('tab-history').innerHTML = `
+    <div class="card">
+      <div class="card-head">Change Log</div>
+      ${rows}
+    </div>
+  `;
+}
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+
+function switchTab(name) {
+  document.querySelectorAll('.d-tab').forEach((t, i) => {
+    const names = ['identity', 'locations', 'skills', 'history', 'runs'];
+    t.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.tab-pane').forEach(p => {
+    p.classList.toggle('active', p.id === 'tab-' + name);
+  });
+  if (name === 'runs' && _currentSlug && !document.getElementById('tab-runs').dataset.loaded) {
+    loadRunData();
+  }
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+
+function openRenameModal() {
+  if (!_currentProfile) return;
+  document.getElementById('rename-input').value = _currentProfile.org_name;
+  openModal('rename-modal');
+  setTimeout(() => document.getElementById('rename-input').select(), 50);
+}
+
+async function saveRename() {
+  const newName = document.getElementById('rename-input').value.trim();
+  if (!newName || newName === _currentProfile.org_name) { closeModal('rename-modal'); return; }
+
+  const btn = document.getElementById('rename-save-btn');
+  setLoading(btn, true);
+  try {
+    await apiFetch(`/org/${_currentSlug}/name`, 'PUT', { new_name: newName, changed_by: 'user' });
+    closeModal('rename-modal');
+    toast('Name updated', 'success');
+    await refreshOrgData();
+  } catch(e) {
+    toast('Rename failed: ' + e.message, 'error');
+  } finally {
+    setLoading(btn, false);
+  }
+}
+
+function promptSkillToggle(skill, enable) {
+  _pendingSkill = { skill, enabled: enable };
+  document.getElementById('skill-modal-title').textContent = `${enable ? 'Enable' : 'Disable'} ${SKILL_LABELS[skill] || skill}`;
+  document.getElementById('skill-notes-input').value = '';
+  openModal('skill-modal');
+}
+
+async function confirmSkillToggle() {
+  if (!_pendingSkill) return;
+  const { skill, enabled } = _pendingSkill;
+  const notes = document.getElementById('skill-notes-input').value.trim();
+
+  const btn = document.getElementById('skill-confirm-btn');
+  setLoading(btn, true);
+  try {
+    await apiFetch(`/org/${_currentSlug}/skills/${skill}`, 'PUT', { enabled, notes, changed_by: 'user' });
+    closeModal('skill-modal');
+    toast(`${SKILL_LABELS[skill] || skill} ${enabled ? 'enabled' : 'disabled'}`, 'success');
+    await refreshOrgData();
+  } catch(e) {
+    toast('Skill update failed: ' + e.message, 'error');
+  } finally {
+    setLoading(btn, false);
+    _pendingSkill = null;
+  }
+}
+
+async function refreshOrg() {
+  await refreshOrgData();
+  toast('Profile refreshed', 'success');
+}
+
+async function refreshOrgData() {
+  if (!_currentSlug) return;
+  const profile = await apiFetch(`/org/${_currentSlug}`);
+  _currentProfile = profile;
+  renderDetail(profile);
+  // Update list entry (staleness may have changed)
+  await loadOrgs();
+}
+
+function openNewOrgModal() {
+  document.getElementById('new-org-name').value = '';
+  document.getElementById('new-org-npi').value = '';
+  openModal('new-org-modal');
+  setTimeout(() => document.getElementById('new-org-name').focus(), 50);
+}
+
+async function saveNewOrg() {
+  const name = document.getElementById('new-org-name').value.trim();
+  if (!name) { toast('Name is required', 'error'); return; }
+  const npi = document.getElementById('new-org-npi').value.trim();
+
+  const btn = document.getElementById('new-org-save-btn');
+  setLoading(btn, true);
+  try {
+    const body = {
+      org_name: name,
+      confirmed_npis: npi ? [{ npi, name, entity_type: '', source: 'manual' }] : [],
+      confirmed_by: 'user',
+    };
+    const result = await apiFetch('/org/upsert', 'POST', body);
+    closeModal('new-org-modal');
+    toast('Org profile created', 'success');
+    await loadOrgs();
+    selectOrg(result.org_slug);
+  } catch(e) {
+    toast('Create failed: ' + e.message, 'error');
+  } finally {
+    setLoading(btn, false);
+  }
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+async function apiFetch(path, method = 'GET', body = null) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API + path, opts);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function setLoading(btn, loading) {
+  btn.disabled = loading;
+  btn.dataset.orig = btn.dataset.orig || btn.innerHTML;
+  btn.innerHTML = loading ? '<span class="spinner"></span>' : btn.dataset.orig;
+}
+
+function toast(msg, type = '') {
+  const wrap = document.getElementById('toast-wrap');
+  const el = document.createElement('div');
+  el.className = 'toast' + (type ? ' ' + type : '');
+  el.textContent = msg;
+  wrap.appendChild(el);
+  requestAnimationFrame(() => { requestAnimationFrame(() => { el.classList.add('show'); }); });
+  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 250); }, 3000);
+}
+
+function orgInitials(name) {
+  return name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch { return iso; }
+}
+
+function daysSince(iso) {
+  try {
+    const ms = Date.now() - new Date(iso).getTime();
+    return Math.max(0, Math.floor(ms / 86400000));
+  } catch { return 0; }
+}
+
+// ── From Runs ─────────────────────────────────────────────────────────────────
+
+let _runData = null;
+
+async function loadRunData() {
+  const tab = document.getElementById('tab-runs');
+  tab.innerHTML = '<div class="empty-section"><span class="spinner"></span></div>';
+  try {
+    _runData = await apiFetch(`/org/${_currentSlug}/run-data`);
+    renderRunsTab(_runData);
+    tab.dataset.loaded = '1';
+    const count = (_runData.npis || []).length + (_runData.locations || []).length;
+    document.getElementById('tab-count-runs').textContent = count;
+  } catch(e) {
+    tab.innerHTML = `<div class="empty-section">Could not load run data: ${esc(e.message)}</div>`;
+  }
+}
+
+function renderRunsTab(data) {
+  const tab = document.getElementById('tab-runs');
+  const runs = data.runs || [];
+  const npis = data.npis || [];
+  const locs = data.locations || [];
+  const latestRun = data.latest_run;
+
+  if (!latestRun) {
+    tab.innerHTML = '<div class="card"><div class="empty-section">No credentialing runs found for this org.<br>Run a credentialing workflow first to see step 1 &amp; 2 data here.</div></div>';
+    return;
+  }
+
+  // Which NPIs/locations are already in the profile?
+  const confirmedNpis = new Set((_currentProfile.confirmed_npis || []).map(n => n.npi));
+  const confirmedLocs = new Set((_currentProfile.locations || []).filter(l => l.is_active !== false).map(l => l.location_id));
+
+  const newNpis = npis.filter(n => !confirmedNpis.has(n.npi));
+  const newLocs  = locs.filter(l => !confirmedLocs.has(l.location_id));
+
+  const runOptions = runs.map(r =>
+    `<option value="${esc(r.run_id)}"${r.run_id === latestRun.run_id ? ' selected' : ''}>${esc(r.run_id.slice(0,8))}… — ${esc(r.phase || 'completed')} (${fmtDate(r.created_at)})</option>`
+  ).join('');
+
+  const npiRows = npis.length === 0 ? '<div class="empty-section">No NPIs in run</div>' : npis.map(n => {
+    const already = confirmedNpis.has(n.npi);
+    return `<div class="sync-row${already ? ' already-in' : ''}">
+      <input type="checkbox" class="sync-npi-cb" value="${esc(n.npi)}" ${already ? 'disabled checked' : 'checked'} />
+      <span class="sync-code">${esc(n.npi)}</span>
+      <span class="sync-name">${esc(n.name || '—')}</span>
+      <span class="sync-src">${esc(n.source || '')}</span>
+      ${already ? '<span class="sync-already">✓ In profile</span>' : ''}
+    </div>`;
+  }).join('');
+
+  const locRows = locs.length === 0 ? '<div class="empty-section">No locations in run</div>' : locs.map(l => {
+    const already = confirmedLocs.has(l.location_id);
+    const addr = [l.address_line1, l.city, l.state_cd, l.zip].filter(Boolean).join(', ');
+    return `<div class="sync-row${already ? ' already-in' : ''}">
+      <input type="checkbox" class="sync-loc-cb" value="${esc(l.location_id)}" ${already ? 'disabled checked' : 'checked'} />
+      <span class="sync-code" style="min-width:80px;font-size:0.65rem">${esc(l.location_id.slice(0,12))}</span>
+      <span class="sync-name">${esc(addr || '—')}</span>
+      ${already ? '<span class="sync-already">✓ In profile</span>' : ''}
+    </div>`;
+  }).join('');
+
+  tab.innerHTML = `
+    <div class="card">
+      <div class="run-sync-banner">
+        <span class="rsb-icon">🔗</span>
+        <span class="rsb-text">
+          <strong>${newNpis.length} new NPI${newNpis.length !== 1 ? 's' : ''}</strong> and
+          <strong>${newLocs.length} new location${newLocs.length !== 1 ? 's' : ''}</strong>
+          found in the latest credentialing run — not yet in this org profile.
+          Select what to confirm.
+        </span>
+      </div>
+
+      <div class="run-select-row">
+        <span>Run:</span>
+        <select id="run-select" onchange="switchRunData(this.value)">${runOptions}</select>
+        <span style="margin-left:auto;font-size:0.68rem;">${npis.length} NPI${npis.length!==1?'s':''} · ${locs.length} location${locs.length!==1?'s':''} found</span>
+      </div>
+
+      <div class="sync-section-head">
+        Step 1 — Org NPIs
+        <button class="btn btn-ghost btn-sm" onclick="toggleAllCheckboxes('.sync-npi-cb')">Toggle all</button>
+      </div>
+      ${npiRows}
+
+      <div class="sync-section-head" style="margin-top:1rem;">
+        Step 2 — Practice Locations
+        <button class="btn btn-ghost btn-sm" onclick="toggleAllCheckboxes('.sync-loc-cb')">Toggle all</button>
+      </div>
+      ${locRows}
+
+      <div class="sync-actions">
+        <button class="btn btn-primary" id="confirm-run-btn" onclick="confirmFromRun()">
+          Confirm selected to profile
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="loadRunData()">↻ Reload</button>
+      </div>
+    </div>
+  `;
+}
+
+async function switchRunData(runId) {
+  // Re-fetch run-data — for now just reload (could add ?run_id= param later)
+  await loadRunData();
+}
+
+function toggleAllCheckboxes(selector) {
+  const boxes = document.querySelectorAll(selector + ':not(:disabled)');
+  const anyUnchecked = [...boxes].some(b => !b.checked);
+  boxes.forEach(b => b.checked = anyUnchecked);
+}
+
+async function confirmFromRun() {
+  const btn = document.getElementById('confirm-run-btn');
+  if (!btn) return;
+
+  // Gather selected NPIs
+  const selectedNpis = [...document.querySelectorAll('.sync-npi-cb:not(:disabled):checked')].map(cb => {
+    const npi = cb.value;
+    const found = (_runData.npis || []).find(n => n.npi === npi);
+    return { npi, name: found?.name || '', source: found?.source || 'credentialing_run', entity_type: found?.entity_type || '', taxonomy_code: found?.taxonomy_code || '' };
+  });
+
+  // Gather selected locations
+  const selectedLocs = [...document.querySelectorAll('.sync-loc-cb:not(:disabled):checked')].map(cb => {
+    const locId = cb.value;
+    const found = (_runData.locations || []).find(l => l.location_id === locId);
+    return { location_id: locId, address_line1: found?.address_line1 || '', city: found?.city || '', state_cd: found?.state_cd || '', zip: found?.zip || '', source: 'credentialing_run', is_primary: false };
+  });
+
+  if (selectedNpis.length === 0 && selectedLocs.length === 0) {
+    toast('Nothing selected', ''); return;
+  }
+
+  setLoading(btn, true);
+  let errors = [];
+
+  try {
+    if (selectedNpis.length > 0) {
+      // PUT /{slug}/npis — merges into existing profile by slug, never removes
+      await apiFetch(`/org/${_currentSlug}/npis`, 'PUT', {
+        org_name: _currentProfile.org_name,
+        confirmed_npis: selectedNpis,
+        run_id: _runData.latest_run?.run_id,
+        confirmed_by: 'user',
+      });
+    }
+
+    if (selectedLocs.length > 0) {
+      const existing = (_currentProfile.locations || []).filter(l => l.is_active !== false);
+      const allLocs = [...existing, ...selectedLocs.filter(l => !existing.find(e => e.location_id === l.location_id))];
+      await apiFetch(`/org/${_currentSlug}/locations`, 'POST', {
+        locations: allLocs,
+        run_id: _runData.latest_run?.run_id,
+        deactivate_missing: false,
+      });
+    }
+
+    toast(`Confirmed: ${selectedNpis.length} NPI${selectedNpis.length !== 1 ? 's' : ''}, ${selectedLocs.length} location${selectedLocs.length !== 1 ? 's' : ''}`, 'success');
+    await refreshOrgData();
+    // Reload runs tab
+    document.getElementById('tab-runs').dataset.loaded = '';
+    await loadRunData();
+  } catch(e) {
+    toast('Confirm failed: ' + e.message, 'error');
+  } finally {
+    setLoading(btn, false);
+  }
+}
+
+// Close modals on background click
+document.querySelectorAll('.modal-bg').forEach(bg => {
+  bg.addEventListener('click', e => { if (e.target === bg) bg.classList.remove('open'); });
+});
+
+init();
+</script>
+</body>
+</html>

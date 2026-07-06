@@ -1,0 +1,9 @@
+# Uploaded to Cloud Build. Keep product_awareness/, requirements.txt, Dockerfile,
+# and corpus/chunks (the pre-chunked manuals the ingest job embeds).
+.git/
+__pycache__/
+*.pyc
+.pytest_cache/
+tests/
+corpus/index/
+README.md

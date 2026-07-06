@@ -11,6 +11,9 @@
 #
 # Logs: mobius-qa/mobius-chat-qa/reports/meval-stream-YYYYMMDD-HHMMSS.log
 # Report: mobius-qa/mobius-chat-qa/reports/eval-baseline-<unix_ts>.md (override with --report)
+#
+# Credentialing (T23+): eval_suite T23 sends credentialing_options like the UI envelope confirm
+# (see eval_suite.yaml). Ensure provider-roster-credentialing on 8011 + MOBIUS_SKILL_LLM_INTERNAL_KEY match mstart.
 
 set -euo pipefail
 

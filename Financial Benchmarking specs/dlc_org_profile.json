@@ -1,0 +1,213 @@
+{
+  "org_name": "DAVID LAWRENCE MENTAL HEALTH CENTER, INC",
+  "city": "NAPLES",
+  "state": "FL",
+  "billing_npis": [
+    "1801891940"
+  ],
+  "all_taxonomies": [
+    "251S00000X",
+    "261QM0801X"
+  ],
+  "org_types": [
+    "CMHC",
+    "COMMUNITY_BH"
+  ],
+  "market_tiers": [
+    "sparse"
+  ],
+  "total_medicaid_revenue": 1220424.58,
+  "total_claims": 18654,
+  "service_line_breakdown": [
+    {
+      "service_line": "outpatient_therapy",
+      "display_name": "Outpatient Therapy",
+      "paid": 497850.55,
+      "share_pct": 40.8,
+      "claims": 4673,
+      "codes": [
+        "H2019",
+        "T1015",
+        "H0035"
+      ]
+    },
+    {
+      "service_line": "act",
+      "display_name": "Assertive Community Treatment",
+      "paid": 318844.3,
+      "share_pct": 26.1,
+      "claims": 11008,
+      "codes": [
+        "H0040"
+      ]
+    },
+    {
+      "service_line": "crisis",
+      "display_name": "Crisis Stabilization",
+      "paid": 281712.25,
+      "share_pct": 23.1,
+      "claims": 484,
+      "codes": [
+        "S9485"
+      ]
+    },
+    {
+      "service_line": "case_management",
+      "display_name": "Case Management",
+      "paid": 83933.25,
+      "share_pct": 6.9,
+      "claims": 1689,
+      "codes": [
+        "T1017"
+      ]
+    },
+    {
+      "service_line": "assessment",
+      "display_name": "Assessment",
+      "paid": 29452.19,
+      "share_pct": 2.4,
+      "claims": 380,
+      "codes": [
+        "H0032",
+        "H0031"
+      ]
+    },
+    {
+      "service_line": "psychosocial_rehab",
+      "display_name": "Psychosocial Rehabilitation",
+      "paid": 7378.19,
+      "share_pct": 0.6,
+      "claims": 358,
+      "codes": [
+        "H0046"
+      ]
+    },
+    {
+      "service_line": "medication_mgmt",
+      "display_name": "Medication Management",
+      "paid": 1253.85,
+      "share_pct": 0.1,
+      "claims": 62,
+      "codes": [
+        "99214"
+      ]
+    }
+  ],
+  "code_detail": [
+    {
+      "hcpcs_code": "H2019",
+      "service_line": "outpatient_therapy",
+      "claims": 2904,
+      "paid": 361422.97,
+      "share": 29.6
+    },
+    {
+      "hcpcs_code": "H0040",
+      "service_line": "act",
+      "claims": 11008,
+      "paid": 318844.3,
+      "share": 26.1
+    },
+    {
+      "hcpcs_code": "S9485",
+      "service_line": "crisis",
+      "claims": 484,
+      "paid": 281712.25,
+      "share": 23.1
+    },
+    {
+      "hcpcs_code": "T1015",
+      "service_line": "outpatient_therapy",
+      "claims": 1676,
+      "paid": 118227.58,
+      "share": 9.7
+    },
+    {
+      "hcpcs_code": "T1017",
+      "service_line": "case_management",
+      "claims": 1689,
+      "paid": 83933.25,
+      "share": 6.9
+    },
+    {
+      "hcpcs_code": "H0032",
+      "service_line": "assessment",
+      "claims": 274,
+      "paid": 23775.3,
+      "share": 1.9
+    },
+    {
+      "hcpcs_code": "H0035",
+      "service_line": "outpatient_therapy",
+      "claims": 93,
+      "paid": 18200.0,
+      "share": 1.5
+    },
+    {
+      "hcpcs_code": "H0046",
+      "service_line": "psychosocial_rehab",
+      "claims": 358,
+      "paid": 7378.19,
+      "share": 0.6
+    },
+    {
+      "hcpcs_code": "H0031",
+      "service_line": "assessment",
+      "claims": 106,
+      "paid": 5676.89,
+      "share": 0.5
+    },
+    {
+      "hcpcs_code": "99214",
+      "service_line": "medication_mgmt",
+      "claims": 62,
+      "paid": 1253.85,
+      "share": 0.1
+    }
+  ],
+  "dominant_service_line": "outpatient_therapy",
+  "top3_service_lines": [
+    "outpatient_therapy",
+    "act",
+    "crisis"
+  ],
+  "has_residential_taxonomy": true,
+  "has_residential_codes": false,
+  "has_crisis": true,
+  "has_act": true,
+  "data_coverage_notes": [
+    "Organization is registered as a residential treatment facility but no residential per-diem codes appear in the data. Residential revenue is not captured here.",
+    "Crisis stabilization represents 23.1% of visible revenue.",
+    "ACT represents 26.1% of visible revenue."
+  ],
+  "peer_recommendations": [
+    {
+      "peer_type": "primary",
+      "description": "Comprehensive BH systems with residential + outpatient",
+      "rationale": "Org operates residential treatment alongside outpatient. Pure outpatient CMHCs are not comparable.",
+      "filter_logic": "Orgs with taxonomy 251S or 322D that also bill outpatient codes"
+    },
+    {
+      "peer_type": "service_specific",
+      "description": "FACT programs statewide",
+      "rationale": "ACT is a specialized team-based service.",
+      "filter_logic": "Orgs billing H0040"
+    },
+    {
+      "peer_type": "service_specific",
+      "description": "Crisis stabilization units",
+      "rationale": "Crisis/Baker Act is a distinct service model.",
+      "filter_logic": "Orgs billing S9485"
+    },
+    {
+      "peer_type": "taxonomy_based",
+      "description": "CMHC peers",
+      "filter_logic": "by_org_type:CMHC"
+    },
+    {
+      "peer_type": "taxonomy_based",
+      "description": "COMMUNITY_BH peers",
+      "filter_logic": "by_org_type:COMMUNITY_BH"
+    }
+  ]
+}

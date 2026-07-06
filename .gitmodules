@@ -53,3 +53,15 @@
 [submodule "mobius-skills-mcp"]
 	path = mobius-skills-mcp
 	url = https://github.com/ananthlk/mobius-skills-mcp.git
+[submodule "mobius-db-agent"]
+	path = mobius-db-agent
+	url = https://github.com/ananthlk/mobius-db-agent.git
+[submodule "mobius-story-ui"]
+	path = mobius-story-ui
+	url = https://github.com/ananthlk/mobius-story-ui.git
+[submodule "mobius-payor"]
+	path = mobius-payor
+	url = https://github.com/ananthlk/mobius-payor.git
+[submodule "mobius-contracts"]
+	path = mobius-contracts
+	url = https://github.com/ananthlk/mobius-contracts.git
