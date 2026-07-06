@@ -1,0 +1,318 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "mobius-chat-api",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-chat",
+      "port": 8000,
+      "autoPort": false
+    },
+    {
+      "name": "mobius-chat-worker",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "app.worker"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-chat",
+      "port": null
+    },
+    {
+      "name": "mobius-rag-backend",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8001",
+        "--reload"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-rag",
+      "port": 8001
+    },
+    {
+      "name": "mobius-rag-chunking-worker",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "app.worker"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-rag",
+      "port": null
+    },
+    {
+      "name": "mobius-rag-embedding-worker",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "app.embedding_worker"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-rag",
+      "port": null
+    },
+    {
+      "name": "mobius-rag-frontend",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": [
+        "-c",
+        "RAG_PROXY_TARGET=https://mobius-rag-1032922478554.us-central1.run.app npm run dev"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-rag/frontend",
+      "port": 5173
+    },
+    {
+      "name": "mobius-rag-api",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8030"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-rag-api",
+      "port": 8030
+    },
+    {
+      "name": "mobius-web-scraper",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8002"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-skills/web-scraper",
+      "port": 8002
+    },
+    {
+      "name": "mobius-scraper-worker",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "app.worker"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-skills/web-scraper",
+      "port": null
+    },
+    {
+      "name": "mobius-google-search",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8004"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-skills/google-search",
+      "port": 8004
+    },
+    {
+      "name": "mobius-healthcare",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8007"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-skills/healthcare",
+      "port": 8007
+    },
+    {
+      "name": "mobius-skills-mcp",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "app"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-skills-mcp",
+      "port": 8006
+    },
+    {
+      "name": "mobius-provider-roster-credentialing",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8011"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-skills/provider-roster-credentialing",
+      "port": 8011
+    },
+    {
+      "name": "mobius-task-manager",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8015"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-skills/task-manager",
+      "port": 8015
+    },
+    {
+      "name": "mobius-qa-lexicon",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8010"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-qa/lexicon-maintenance",
+      "port": 8010
+    },
+    {
+      "name": "mobius-qa-retrieval-eval-studio",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8020"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-qa/retrieval-eval-studio",
+      "port": 8020
+    },
+    {
+      "name": "mobius-os-backend",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "server.py"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-os/backend",
+      "port": 5001
+    },
+    {
+      "name": "lexicon-ui",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-qa/lexicon-maintenance/frontend-v2",
+      "port": 5174
+    },
+    {
+      "name": "financial-strategy-demo",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "financial_strategy_demo.py"
+      ],
+      "cwd": "/Users/ananth/Mobius/.claude/worktrees/naughty-einstein",
+      "port": 8099
+    },
+    {
+      "name": "mobius-landing",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "landing_server.py"
+      ],
+      "cwd": "/Users/ananth/Mobius",
+      "port": 3999
+    },
+    {
+      "name": "mobius-db-agent",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "app"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-db-agent",
+      "port": 8008
+    },
+    {
+      "name": "mobius-instant-rag",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8040",
+        "--reload"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-skills/instant-rag",
+      "port": 8040
+    },
+    {
+      "name": "mobius-doc-reader",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8018",
+        "--reload"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-skills/doc-reader",
+      "port": 8018
+    },
+    {
+      "name": "story-ui",
+      "runtimeExecutable": "/Users/ananth/Mobius/.venv/bin/python3",
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "server.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8020"
+      ],
+      "cwd": "/Users/ananth/Mobius/mobius-story-ui",
+      "port": 8020
+    },
+    {
+      "name": "lexicon-local-test",
+      "runtimeExecutable": "/tmp/run_lexicon_local.sh",
+      "runtimeArgs": [],
+      "cwd": "/Users/ananth/Mobius/mobius-qa/lexicon-maintenance",
+      "port": 8010
+    }
+  ]
+}
