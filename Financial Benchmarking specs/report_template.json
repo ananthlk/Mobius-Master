@@ -1,0 +1,153 @@
+{
+  "_instructions": "Fill every field marked WRITE with 1-3 sentences of plain English. DO NOT compute numbers — copy them from canonical_input.json exactly. Fields marked COPY contain pre-written text — copy verbatim. Fields marked FIXED are structural — do not modify.",
+
+  "title": "Financial Rate Benchmarking Report",
+  "subtitle_COPY": "Florida Medicaid · Fee-for-Service Claims · 2024 Analysis Period",
+
+  "executive_summary": {
+    "_instructions": "3-5 bullets. Each bullet is ONE sentence. Lead with the finding, not the methodology. Prioritize by revenue impact. Reference specific dollar amounts from canonical_input.",
+    "bullets": [
+      "WRITE: Bullet 1 — the single most important finding (likely H2019 rate outlier)",
+      "WRITE: Bullet 2 — the biggest concern (likely T1017 trend or caseload pattern)",
+      "WRITE: Bullet 3 — this data covers only professional FFS Medicaid claims ($1.2M) which is a small portion of total operations; ACT and crisis are visible but lack peers",
+      "WRITE: Bullet 4 — one strength worth protecting",
+      "WRITE: Bullet 5 (optional) — one additional finding"
+    ]
+  },
+
+  "section_1_about": {
+    "org_profile_WRITE": "WRITE: 2-3 sentences describing what kind of org this is (comprehensive BH system, sparse market, residential taxonomy). Use service_line_breakdown for revenue shares.",
+    "data_scope_COPY": "COPY verbatim from canonical_input.data_scope_statement",
+    "scope_visible_COPY": "COPY verbatim from canonical_input.scope_what_is_visible",
+    "scope_not_visible_COPY": "COPY verbatim from canonical_input.scope_what_is_not_visible",
+    "claim_count_note_COPY": "COPY from canonical_input.claim_count_note",
+    "four_metrics": {
+      "rate_per_claim_FIXED": "What Medicaid pays your organization, on average, each time you submit a claim for a given service. This is your price signal.",
+      "patients_per_clinician_FIXED": "How many unique patients each of your billing clinicians serves. This is your caseload signal.",
+      "visits_per_patient_FIXED": "How many claims are generated per unique patient. This is your treatment engagement signal.",
+      "revenue_per_patient_FIXED": "Total Medicaid payment received per unique patient for a given service. This is your combined economic signal."
+    },
+    "peer_groups_WRITE": "WRITE: 2-3 sentences explaining look-alike peers (primary, n=X, similarity range) and the 5 secondary groups. Use canonical_input.look_alike_count and look_alike_similarity_range.",
+    "how_to_read_FIXED": "In each chart, the diamond marks your organization's value. The blue line marks the peer median. The purple line marks the look-alike peer median. The gray band spans P25 to P75.",
+    "badge_legend_FIXED": {
+      "Strong": "Above market median, holding steady or pulling ahead",
+      "At_Market": "Near the median, stable position",
+      "Watch": "Above median but converging toward it, or below median but recovering",
+      "Concern": "Below the median on most peer comparisons"
+    },
+    "key_limitation_FIXED": "Rate per claim measures what your organization is paid per claim submission, not per 15-minute unit of service. Organizations that bill longer sessions will show higher per-claim amounts."
+  },
+
+  "section_2_dashboard": {
+    "coverage_note_WRITE": "WRITE: 1 sentence noting that ACT (26.1%) and crisis (23.1%) have limited or no peer benchmark data.",
+    "rows_COPY": "COPY dashboard_rows from canonical_input — one row per code with: code, name, service_line, revenue_share, badge_rate, badge_productivity, badge_utilization, badge_revenue, trend_arrow, trend_label",
+    "_badge_overrides": {
+      "_instructions": "Apply Watch badge where rubric requires: position ≈P50 + trend Converging, or position Below + trend Recovering",
+      "H0032_rate": "Watch (Above but Converging)",
+      "99214_rate": "Watch (WELL BELOW but Recovering)"
+    },
+    "h0040_row_COPY": "COPY from canonical_input.h0040_summary: code H0040, ACT, rate_per_claim, claims, share_pct. Badges: Limited data.",
+    "s9485_row_COPY": "COPY from canonical_input.s9485_summary: code S9485, Crisis, rate_per_claim, claims, share_pct. Badges: No peer data."
+  },
+
+  "section_3_deep_dives": {
+    "_instructions": "One entry per code. Each has a fixed structure. The WRITE fields are where you add prose.",
+    "codes": {
+      "H2019": {
+        "heading_FIXED": "Behavioral Therapy Services (H2019)",
+        "service_line_FIXED": "Outpatient Therapy",
+        "chart_placeholder_FIXED": "[CHART:peer_H2019] [CHART:trend_H2019]",
+        "rate_WRITE": "WRITE: 1 sentence. Badge from dashboard. Cite payment_per_claim, look_alike_p50_ppc (n=look_alike_n), and one peer p50_ppc with n.",
+        "productivity_WRITE": "WRITE: 1 sentence. Badge. Cite bene_per_clinician vs peer p50_bpc.",
+        "utilization_WRITE": "WRITE: 1 sentence. Badge. Cite claims_per_bene vs peer p50_cpb.",
+        "revenue_WRITE": "WRITE: 1 sentence. Badge. Cite revenue_per_bene vs look_alike_p50_rpb and peer p50_rpb.",
+        "trend_COPY": "COPY from canonical_input.codes.H2019.trend_description",
+        "revenue_impact_COPY": "COPY: $87,391 annual rate advantage vs look-alike peers (from canonical_input.codes.H2019.revenue_impact_vs_lookalike)",
+        "key_question_WRITE": "WRITE: 1 sentence framing what to investigate. Question not conclusion.",
+        "caveat_WRITE": "WRITE: 1 sentence on the per-claim vs per-unit limitation for this code."
+      },
+      "T1015": {
+        "heading_FIXED": "Medication Management (T1015)",
+        "service_line_FIXED": "Outpatient Therapy",
+        "chart_placeholder_FIXED": "[CHART:peer_T1015] [CHART:trend_T1015]",
+        "rate_WRITE": "WRITE: 1 sentence with badge, payment_per_claim, look_alike_p50_ppc, peer p50_ppc.",
+        "productivity_WRITE": "WRITE: 1 sentence.",
+        "utilization_WRITE": "WRITE: 1 sentence.",
+        "revenue_WRITE": "WRITE: 1 sentence.",
+        "trend_COPY": "COPY from canonical_input.codes.T1015.trend_description",
+        "revenue_impact_COPY": "COPY: $10,473 (from canonical_input.codes.T1015.revenue_impact_vs_lookalike)",
+        "key_question_WRITE": "WRITE: 1 sentence.",
+        "caveat_WRITE": "WRITE: 1 sentence."
+      },
+      "T1017": {
+        "heading_FIXED": "Targeted Case Management (T1017)",
+        "service_line_FIXED": "Case Management",
+        "chart_placeholder_FIXED": "[CHART:peer_T1017] [CHART:trend_T1017]",
+        "rate_WRITE": "WRITE: 1 sentence.",
+        "productivity_WRITE": "WRITE: 1 sentence. This is the key concern — cite 179.5 vs 275.0.",
+        "utilization_WRITE": "WRITE: 1 sentence.",
+        "revenue_WRITE": "WRITE: 1 sentence.",
+        "trend_COPY": "COPY from canonical_input.codes.T1017.trend_description",
+        "revenue_impact_COPY": "COPY: $68 (minimal — rate is at look-alike median)",
+        "key_question_WRITE": "WRITE: 1 sentence focusing on the caseload decline, not the rate.",
+        "caveat_WRITE": "WRITE: 1 sentence."
+      },
+      "H0031": {
+        "heading_FIXED": "Mental Health Assessment (H0031)",
+        "service_line_FIXED": "Assessment",
+        "chart_placeholder_FIXED": "[CHART:peer_H0031] [CHART:trend_H0031]",
+        "rate_WRITE": "WRITE: 1 sentence.",
+        "productivity_WRITE": "WRITE: 1 sentence.",
+        "utilization_WRITE": "WRITE: 1 sentence.",
+        "revenue_WRITE": "WRITE: 1 sentence.",
+        "trend_COPY": "COPY from canonical_input.codes.H0031.trend_description",
+        "revenue_impact_COPY": "COPY: $2,621",
+        "key_question_WRITE": "WRITE: 1 sentence.",
+        "caveat_WRITE": "WRITE: 1 sentence. Note volume caution (91 claims) and modifier rollup."
+      },
+      "H0032": {
+        "heading_FIXED": "Treatment Plan Development (H0032)",
+        "service_line_FIXED": "Assessment",
+        "chart_placeholder_FIXED": "[CHART:peer_H0032] [CHART:trend_H0032]",
+        "rate_WRITE": "WRITE: 1 sentence. Badge is WATCH (Above but Converging).",
+        "productivity_WRITE": "WRITE: 1 sentence.",
+        "utilization_WRITE": "WRITE: 1 sentence.",
+        "revenue_WRITE": "WRITE: 1 sentence.",
+        "trend_COPY": "COPY from canonical_input.codes.H0032.trend_description",
+        "revenue_impact_COPY": "COPY: $619",
+        "key_question_WRITE": "WRITE: 1 sentence about the converging trend.",
+        "caveat_WRITE": "WRITE: 1 sentence. Note volume caution (68 claims) and modifier rollup."
+      },
+      "99214": {
+        "heading_FIXED": "Office Visit Level 4 (99214)",
+        "service_line_FIXED": "E&M Office Visits",
+        "chart_placeholder_FIXED": "[CHART:peer_99214] [CHART:trend_99214]",
+        "rate_WRITE": "WRITE: 1 sentence. Badge is WATCH (WELL BELOW but Recovering).",
+        "productivity_WRITE": "WRITE: 1 sentence.",
+        "utilization_WRITE": "WRITE: 1 sentence.",
+        "revenue_WRITE": "WRITE: 1 sentence.",
+        "trend_COPY": "COPY from canonical_input.codes.99214.trend_description",
+        "revenue_impact_COPY": "COPY: $103",
+        "key_question_WRITE": "WRITE: 1 sentence about whether this is a new service or established.",
+        "caveat_WRITE": "WRITE: 1 sentence. Note volume caution (45 claims)."
+      }
+    },
+    "h0040_section_WRITE": "WRITE: 3-4 sentences about ACT (H0040). Cite h0040_summary rate_per_claim, claims, share_pct. Note limited peer data (4 look-alikes bill this code).",
+    "s9485_section_WRITE": "WRITE: 3-4 sentences about crisis stabilization (S9485). Cite s9485_summary. Include crisis_note from canonical_input explaining why no peers available."
+  },
+
+  "section_4_cross_cutting": {
+    "_instructions": "3 observations that connect patterns across codes.",
+    "caseload_pattern_WRITE": "WRITE: 2-3 sentences connecting the low bene_per_clinician across T1017 (179.5 vs 275.0), H0031 (76.0 vs 115.42), H0032 (33.0 vs 75.0). Suggest possible root causes.",
+    "rate_outlier_WRITE": "WRITE: 2 sentences noting H2019 is 2x peers while T1015 and T1017 are at market — the premium is code-specific, not organization-wide.",
+    "revenue_concentration_WRITE": "WRITE: 2 sentences noting top 3 service lines (outpatient 40.8%, ACT 26.1%, crisis 23.1%) = 90% of visible revenue, and 49.2% (ACT+crisis) has limited benchmarking."
+  },
+
+  "section_5_caveats": {
+    "peer_methodology_note_COPY": "COPY from canonical_input.peer_methodology_note",
+    "per_claim_vs_per_unit_FIXED": "All rate-per-claim figures represent the average payment per claim submission. For time-based codes, a single claim may encompass multiple 15-minute units.",
+    "modifier_rollup_FIXED": "Assessment codes (H0031, H0032) combine all modifier variations into a single per-code figure.",
+    "residential_gap_WRITE": "WRITE: 1 sentence noting residential per-diem codes are absent.",
+    "volume_limitations_WRITE": "WRITE: 1 sentence noting which codes have fewer than 100 claims."
+  }
+}
