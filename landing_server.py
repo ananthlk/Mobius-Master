@@ -88,9 +88,7 @@ def _get_process_probes() -> list:
         ("retrieval-eval", "Retrieval Eval", c["retrieval_eval_url"], c["retrieval_eval_api_url"], "/health"),
         ("dbt", "DBT", c["dbt_url"], c["dbt_url"], "/config"),
         ("org-profile", "Org Profiles", f"http://127.0.0.1:{PORT}/org-profile.html", None, None),
-        ("org-story", "Org Story", c["chat_url"] + "/org-story", c["chat_url"], "/org-story"),
-        ("financial-strategy", "Financial Strategy", c["chat_url"] + "/financial-strategy", c["chat_url"], "/financial-strategy"),
-        ("financial-strategy-demo", "Financial Strategy Demo", c["financial_strategy_demo_url"], c["financial_strategy_demo_url"], "/health"),
+        ("financial-strategy", "Financial Strategy", c["credentialing_url"] + "/roster-ui/strategy.html", c["credentialing_url"], "/health"),
     ]
 
 
@@ -534,8 +532,7 @@ def _get_api_config() -> dict:
         {"id": "retrieval-eval", "url": c["retrieval_eval_url"]},
         {"id": "chat-eval", "url": c["chat_eval_url"]},
         {"id": "dbt", "url": c["dbt_url"]},
-        {"id": "financial-strategy", "url": c["chat_url"] + "/financial-strategy"},
-        {"id": "financial-strategy-demo", "url": c["financial_strategy_demo_url"]},
+        {"id": "financial-strategy", "url": c["credentialing_url"] + "/roster-ui/strategy.html"},
     ]
     skills = [
         {"id": "google-search", "url": c["google_search_url"]},
