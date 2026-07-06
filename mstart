@@ -397,7 +397,7 @@ if [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
   # Enable skills when services are started (override .env if not set)
   [[ -z "${CHAT_SKILLS_GOOGLE_SEARCH_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/google-search" ]] && export CHAT_SKILLS_GOOGLE_SEARCH_URL="http://localhost:8004/search?"
   [[ -z "${CHAT_SKILLS_WEB_SCRAPER_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/web-scraper" ]] && export CHAT_SKILLS_WEB_SCRAPER_URL="http://localhost:8002/scrape/review"
-  [[ -z "${CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/provider-roster-credentialing" ]] && export CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL="http://localhost:8000/report"
+  [[ -z "${CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/provider-roster-credentialing" ]] && export CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL="http://localhost:8011/report"
   [[ -z "${CHAT_SKILLS_TASK_MANAGER_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/task-manager" ]] && export CHAT_SKILLS_TASK_MANAGER_URL="http://localhost:8015"
   # Instant-RAG skill for file uploads (port 8040). _handle_instant_rag_upload in chat main.py
   # falls back to this URL when INSTANT_RAG_URL is unset.
@@ -571,7 +571,7 @@ if [[ -d "$MOBIUS_ROOT/mobius-skills/provider-roster-credentialing" ]]; then
   # Always route through Cloud SQL proxy — re-export the proxy URL so the skill DB engine picks it up
   export USE_CLOUD_SQL_PROXY=1
   export CHAT_RAG_DATABASE_URL="postgresql://postgres:MobiusDev123%24@127.0.0.1:5433/mobius_chat"
-  # provider_skill is now embedded in mobius-chat (in-process, port 8000) — no separate process needed
+  _start "mobius-provider-roster-api" "cd $MOBIUS_ROOT/mobius-skills/provider-roster-credentialing && PORT=8011 $VENV/bin/python3 -m uvicorn provider_skill.main:app --host 0.0.0.0 --port 8011"
 fi
 
 # --- email skill (port 8013): system email via mobiushealthai@gmail.com (Gmail API/SMTP) + LLM craft ---
@@ -625,7 +625,7 @@ if [[ -d "$MOBIUS_ROOT/mobius-skills-mcp" ]]; then
   _load_env "$MOBIUS_ROOT/mobius-skills/web-scraper/.env"
   export CHAT_SKILLS_GOOGLE_SEARCH_URL="${CHAT_SKILLS_GOOGLE_SEARCH_URL:-http://localhost:8004/search?}"
   export CHAT_SKILLS_WEB_SCRAPER_URL="${CHAT_SKILLS_WEB_SCRAPER_URL:-http://localhost:8002/scrape/review}"
-  export CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL="${CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL:-http://localhost:8000/report}"
+  export CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL="${CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL:-http://localhost:8011/report}"
   export CHAT_SKILLS_HEALTHCARE_URL="${CHAT_SKILLS_HEALTHCARE_URL:-http://localhost:8007}"
   _start "mobius-skills-mcp" "cd $MOBIUS_ROOT/mobius-skills-mcp && $VENV/bin/python3 -m app"
 fi
@@ -679,7 +679,7 @@ printf "  %-24s  %s\n" "mobius-rag backend"  "http://localhost:8001"
 printf "  %-24s  %s\n" "mobius-scraper API"  "http://localhost:8002"
 printf "  %-24s  %s\n" "mobius-google-search" "http://localhost:8004"
 printf "  %-24s  %s\n" "mobius-skills-mcp" "http://localhost:8006/mcp"
-printf "  %-24s  %s\n" "provider-skill (embedded)" "http://localhost:8000/roster-ui/upload.html"
+printf "  %-24s  %s\n" "provider-skill"        "http://localhost:8011/roster-ui/"
 printf "  %-24s  %s\n" "mobius-task-manager"   "http://localhost:8015"
 printf "  %-24s  %s\n" "mobius-instant-rag"    "http://localhost:8040"
 printf "  %-24s  %s\n" "mobius-rag frontend" "http://localhost:5173"
