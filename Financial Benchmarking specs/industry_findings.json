@@ -1,0 +1,754 @@
+{
+  "_schema": "industry_findings_v2",
+  "_purpose": "Structured handoff from the industry landscape report to org-level reports. This file contains the key sector-level findings that org reports reference. Generated from industry_canonical_cmhc_v3.json + the editorial analysis in FL_CMHC_Landscape_Report_v4.html.",
+  "_usage": "Pass this file alongside org_canonical_input.json to the LLM when generating org reports. The LLM uses these numbers to position each org within the sector story.",
+  "_benchmark_philosophy": "The CMHC sector is not the benchmark. Rest-of-FL P75 is the transformation target. CMHC P50 is context only. Rest-of-FL excludes CMHCs from the comparison pool (same as the industry report).",
+
+  "sector": {
+    "label": "Florida CMHCs",
+    "n_orgs": 86,
+    "n_codes": 20,
+    "period": "2024",
+    "data_source": "FL Medicaid FFS (DOGE public data)",
+    "comparison_group": "Rest of FL Medicaid (excluding CMHCs)"
+  },
+
+  "data_calibration": {
+    "_source": "Raw DOGE (medicaid-provider-spending) joined to FL Provider Master List (stg_pml, 224K NPIs). No BH filters. External: KFF, AHCA, DCF, SAMHSA, MACPAC, Centene. Computed 2026-04-06.",
+    "_method": "FL providers identified via stg_pml (program_state='FL'). CMHC = taxonomy 261QM0801X (86 orgs). All denominators use full PML, not BH-filtered NPIs.",
+
+    "doge_universe": {
+      "scope": "All US Medicaid outpatient/professional claims (HCPCS-coded)",
+      "period": "2024 (partial — lagged submissions, cell suppression <12 claims)",
+      "total_us_paid": 184982800000,
+      "total_us_providers": 340163,
+      "fl_paid": 10912100000,
+      "fl_providers": 14974,
+      "fl_codes": 4500,
+      "fl_claims": 287433494,
+      "fl_pml_npis": 223984,
+      "note": "DOGE includes FFS + partial MCO encounter data. Excludes: inpatient (DRGs), pharmacy, LTSS capitation, nursing facility per-diem."
+    },
+
+    "fl_medicaid_published": {
+      "total_spending": {"value": 35540000000, "source": "KFF / CMS-64, FY2024", "label": "Total FL Medicaid"},
+      "mco_capitation": {"value": 22970000000, "source": "KFF, FY2024", "label": "Managed Care (SMMC)"},
+      "ffs_residual": {"value": 12570000000, "source": "Calculated: total minus MCO", "label": "FFS + encounter residual"},
+      "enrollment": {"value": 4340000, "source": "KFF, May 2025", "label": "Total enrollees"},
+      "mco_pct": 65,
+      "ffs_pct": 35
+    },
+
+    "coverage_summary": {
+      "doge_vs_total_pct": 30.7,
+      "doge_vs_total_label": "DOGE FL ($10.9B) / Total FL Medicaid ($35.5B)"
+    },
+
+    "calibration_table": [
+      {
+        "id": "op_bh",
+        "label": "Outpatient BH",
+        "is_group": true,
+        "doge_fl_M": 795,
+        "cmhc_M": 62.8,
+        "cmhc_share_pct": 7.9,
+        "est_fl_medicaid_lo_M": 920,
+        "est_fl_medicaid_hi_M": 1150,
+        "doge_coverage_lo_pct": 69,
+        "doge_coverage_hi_pct": 86,
+        "confidence": "high",
+        "rationale": "BH H-codes are purpose-built for behavioral health. High FFS capture. MCO encounter data partially flows through.",
+        "children": [
+          {
+            "id": "intake",
+            "label": "Intake / Assessment",
+            "codes": "H0031, H0032, 90791, 90792",
+            "doge_fl_M": 45.5,
+            "doge_claims": 658211,
+            "doge_providers": 699,
+            "doge_benes": 520204,
+            "cmhc_M": 5.1,
+            "cmhc_claims": 100072,
+            "cmhc_benes": 83076,
+            "cmhc_share_pct": 11.2,
+            "cmhc_bene_share_pct": 16.0,
+            "confidence": "high",
+            "rationale": "BH-specific codes. Near-complete capture. CMHCs see 16% of people but collect 11% of dollars — lower payment per visit."
+          },
+          {
+            "id": "high_acuity",
+            "label": "High Acuity / ACT",
+            "codes": "H0040, H2010, H0036",
+            "doge_fl_M": 17.4,
+            "doge_claims": 434822,
+            "doge_providers": 100,
+            "doge_benes": 39413,
+            "cmhc_M": 2.7,
+            "cmhc_claims": 91339,
+            "cmhc_benes": 8685,
+            "cmhc_share_pct": 15.5,
+            "cmhc_bene_share_pct": 22.0,
+            "confidence": "high",
+            "rationale": "Specialized crisis/ACT. CMHCs serve 22% of crisis patients but capture only 15.5% of dollars."
+          },
+          {
+            "id": "psr",
+            "label": "Psychosocial Rehab",
+            "codes": "H2017",
+            "doge_fl_M": 246.0,
+            "doge_claims": 2142149,
+            "doge_providers": 332,
+            "doge_benes": 180543,
+            "cmhc_M": 17.6,
+            "cmhc_claims": 160030,
+            "cmhc_benes": 13717,
+            "cmhc_share_pct": 7.2,
+            "cmhc_bene_share_pct": 7.6,
+            "confidence": "high",
+            "rationale": "Single BH-specific code. Largest OP BH category. Dollar and bene shares align."
+          },
+          {
+            "id": "therapy",
+            "label": "Therapy & Counseling",
+            "codes": "H2019, 90837, 90834, 90832, 90847, 90846, 90853, 90833, 90838-40, 90785",
+            "doge_fl_M": 238.1,
+            "doge_claims": 3362018,
+            "doge_providers": 999,
+            "doge_benes": 1341944,
+            "cmhc_M": 17.9,
+            "cmhc_claims": 255752,
+            "cmhc_benes": 128895,
+            "cmhc_share_pct": 7.5,
+            "cmhc_bene_share_pct": 9.6,
+            "confidence": "medium",
+            "rationale": "H2019 well-captured. CPT 908xx heavily billed by independent LMHCs/LCSWs. CMHCs serve 9.6% of therapy patients."
+          },
+          {
+            "id": "care_mgmt",
+            "label": "Care Management",
+            "codes": "T1017, T1015, T1016",
+            "doge_fl_M": 176.8,
+            "doge_claims": 2881822,
+            "doge_providers": 582,
+            "doge_benes": 878766,
+            "cmhc_M": 17.8,
+            "cmhc_claims": 295666,
+            "cmhc_benes": 109432,
+            "cmhc_share_pct": 10.1,
+            "cmhc_bene_share_pct": 12.4,
+            "confidence": "medium",
+            "rationale": "BH-heavy but also used in disability/LTSS. CMHCs manage 12.4% of beneficiaries."
+          },
+          {
+            "id": "community_support",
+            "label": "Community Support",
+            "codes": "H2015, H2016, H2011, H2012, H1000",
+            "doge_fl_M": 61.8,
+            "doge_claims": 765751,
+            "doge_providers": 335,
+            "doge_benes": 297377,
+            "cmhc_M": 0.04,
+            "cmhc_claims": 898,
+            "cmhc_benes": 834,
+            "cmhc_share_pct": 0.1,
+            "cmhc_bene_share_pct": 0.3,
+            "confidence": "medium",
+            "rationale": "Non-CMHC community orgs dominate. CMHCs essentially absent."
+          },
+          {
+            "id": "med_mgmt",
+            "label": "Medication Management",
+            "codes": "H2000",
+            "doge_fl_M": 9.1,
+            "doge_claims": 55470,
+            "doge_providers": 192,
+            "doge_benes": 45068,
+            "cmhc_M": 1.7,
+            "cmhc_claims": 8502,
+            "cmhc_benes": 7859,
+            "cmhc_share_pct": 18.7,
+            "cmhc_bene_share_pct": 17.4,
+            "confidence": "high",
+            "rationale": "Small but CMHC-concentrated. Highest CMHC dollar share."
+          }
+        ]
+      },
+      {
+        "id": "sud",
+        "label": "Substance Use Disorder (SUD)",
+        "is_group": false,
+        "codes": "H0001-H0050 SUD codes",
+        "doge_fl_M": 41,
+        "doge_claims": 603834,
+        "doge_providers": 241,
+        "doge_benes": 163674,
+        "cmhc_M": 0,
+        "cmhc_share_pct": 0,
+        "est_fl_medicaid_lo_M": 400,
+        "est_fl_medicaid_hi_M": 700,
+        "doge_coverage_lo_pct": 6,
+        "doge_coverage_hi_pct": 10,
+        "confidence": "very_low",
+        "rationale": "Almost entirely invisible. Residential detox = revenue codes (not in DOGE). MAT = pharmacy ($90-130M, not in DOGE). Only H0020 methadone dosing ($12M) visible. FL ranks 51st of 52 in per-capita MH spending.",
+        "published_refs": [
+          "DCF safety-net SUD budget: $482M (FY2024-25, NOT Medicaid)",
+          "1115 IMD waiver filed Jan 2026: projected $115-127M/yr",
+          "Only 28% of FL Medicaid adults with OUD initiate MAT"
+        ]
+      },
+      {
+        "id": "aba",
+        "label": "Applied Behavior Analysis (ABA)",
+        "is_group": false,
+        "codes": "97151-97158",
+        "doge_fl_M": 111,
+        "doge_claims": 748154,
+        "doge_providers": 580,
+        "doge_benes": 217313,
+        "cmhc_M": 0.1,
+        "cmhc_share_pct": 0.1,
+        "est_fl_medicaid_lo_M": 1500,
+        "est_fl_medicaid_hi_M": 2600,
+        "doge_coverage_lo_pct": 4,
+        "doge_coverage_hi_pct": 7,
+        "confidence": "very_low",
+        "rationale": "Legislature budgeted $1.52B (FY24-25). SSEC revised to $1.63B for 8 months. Centene est ~$2.6B annualized. ABA was FFS until Feb 2025 then moved to SMMC 3.0. Massive cell suppression (individual child billing). Enrollment moratorium in Miami-Dade/Broward. National Medicaid ABA = $14.5B (279% growth since 2018).",
+        "trend": [
+          {"year": 2019, "providers": 7, "paid_M": 18},
+          {"year": 2020, "providers": 10, "paid_M": 18},
+          {"year": 2021, "providers": 11, "paid_M": 36},
+          {"year": 2022, "providers": 244, "paid_M": 54},
+          {"year": 2023, "providers": 419, "paid_M": 106},
+          {"year": 2024, "providers": 580, "paid_M": 111}
+        ]
+      },
+      {
+        "id": "ip_bh",
+        "label": "Inpatient Behavioral Health",
+        "is_group": false,
+        "codes": "DRGs / revenue codes (not HCPCS)",
+        "doge_fl_M": 0,
+        "cmhc_M": null,
+        "est_fl_medicaid_lo_M": 500,
+        "est_fl_medicaid_hi_M": 1000,
+        "doge_coverage_lo_pct": 0,
+        "doge_coverage_hi_pct": 0,
+        "confidence": "not_observable",
+        "rationale": "Completely invisible — DRG/revenue code billing excluded from DOGE. FL has ~174K Baker Act involuntary exams/yr, ~50% Medicaid. 1115 IMD waiver pending (up to 90-day stays, effective Jul 2026). MACPAC: FL FFS hospital total = $2.72B (all hospital, not just psych)."
+      },
+      {
+        "id": "e_and_m",
+        "label": "E&M (Office Visits)",
+        "is_group": false,
+        "codes": "99211-99215",
+        "doge_fl_M": 477,
+        "doge_claims": 8089381,
+        "doge_providers": 4192,
+        "doge_benes": 7034211,
+        "cmhc_M": 2.7,
+        "cmhc_share_pct": 0.6,
+        "est_fl_medicaid_lo_M": 500,
+        "est_fl_medicaid_hi_M": 650,
+        "doge_coverage_lo_pct": 73,
+        "doge_coverage_hi_pct": 95,
+        "confidence": "high_total_low_bh",
+        "rationale": "Mostly non-BH (PCP, specialist). BH portion est $50-80M. CMHCs barely participate (0.6%).",
+        "bh_subset_est_M": "50-80"
+      },
+      {
+        "id": "pharmacy_psych",
+        "label": "Pharmacy (Psychotropic)",
+        "is_group": false,
+        "codes": "NDCs — not in DOGE",
+        "doge_fl_M": 0,
+        "cmhc_M": null,
+        "est_fl_medicaid_lo_M": 675,
+        "est_fl_medicaid_hi_M": 850,
+        "doge_coverage_lo_pct": 0,
+        "doge_coverage_hi_pct": 0,
+        "confidence": "not_observable",
+        "rationale": "No Rx data in DOGE. Antipsychotics $420-480M (Invega Sustenna alone $120-140M). Antidepressants $78-90M. ADHD $60-100M. MAT/SUD meds $90-130M. FL total Medicaid pharmacy est $2.0-2.6B; psychotropics = 30-35%."
+      }
+    ],
+
+    "totals": {
+      "doge_fl_visible_M": 1424,
+      "est_fl_medicaid_bh_lo_M": 4000,
+      "est_fl_medicaid_bh_hi_M": 6950,
+      "doge_coverage_lo_pct": 21,
+      "doge_coverage_hi_pct": 36
+    },
+
+    "what_doge_misses": [
+      "Inpatient facility claims (DRGs, revenue codes) — est. $500M-$1B BH portion",
+      "Pharmacy / prescriptions — est. $675-850M psychotropic",
+      "MCO-routed services (ABA $1.5-2.6B, SUD bulk) — capitation bundles",
+      "Claims with <12 encounters (cell suppression — significant for ABA)",
+      "2024 claims with lagged submission"
+    ]
+  },
+
+  "market_composition": {
+    "_source": "hcpcs_rate_benchmarks (BQ) + stg_doge confirmed FBHA NPIs. Recomputed 2026-04-06.",
+    "_fbha_coverage": "49/64 FBHA orgs with billing data, 86 matched NPIs, $60.5M of $65.3M benchmark total",
+    "total_fl_op_market": 723451504,
+    "total_cmhc_revenue": 65274470,
+    "cmhc_overall_share_pct": 9.0,
+    "n_cmhc_orgs": 86,
+    "categories": {
+      "intake": {
+        "label": "Intake & Assessment",
+        "codes": ["H0001", "H0031", "90791", "90792"],
+        "fl_market_dollars": 14076795,
+        "fl_market_share_pct": 1.9,
+        "cmhc_dollars": 2115475,
+        "cmhc_capture_pct": 15.0,
+        "fl_beneficiaries": 195803,
+        "insight": "Small market ($14M), but CMHCs own the gateway — 15% capture"
+      },
+      "high_acuity": {
+        "label": "High Acuity / ACT",
+        "codes": ["H0040", "H2010", "H0036"],
+        "fl_market_dollars": 8679676,
+        "fl_market_share_pct": 1.2,
+        "cmhc_dollars": 2744912,
+        "cmhc_capture_pct": 31.6,
+        "fl_beneficiaries": 25815,
+        "insight": "Small market but CMHC-dominated — 32% capture across ACT/FACT and community psych"
+      },
+      "ongoing_bh": {
+        "label": "Ongoing BH Services",
+        "fl_market_dollars": 448307086,
+        "fl_market_share_pct": 62.0,
+        "cmhc_dollars": 52982451,
+        "cmhc_capture_pct": 11.8,
+        "fl_beneficiaries": 1553702,
+        "insight": "Majority of BH spend — PSR alone is $173M. CMHC anchor at $53M revenue",
+        "subcategories": {
+          "psr": {
+            "label": "Psychosocial Rehab",
+            "codes": ["H2017"],
+            "fl_market_dollars": 173401506,
+            "cmhc_dollars": 17601670,
+            "cmhc_capture_pct": 10.2,
+            "fl_beneficiaries": 128990,
+            "insight": "Single largest BH code — $173M market, CMHCs capture 10%"
+          },
+          "therapy": {
+            "label": "Therapy & Counseling",
+            "codes": ["H2019", "90837", "90834", "90832", "H0004"],
+            "fl_market_dollars": 127475508,
+            "cmhc_dollars": 17582451,
+            "cmhc_capture_pct": 13.8,
+            "fl_beneficiaries": 703822,
+            "insight": "H2019 is CMHC anchor ($13.8M); CPT therapy codes underutilized"
+          },
+          "care_mgmt": {
+            "label": "Care Management",
+            "codes": ["T1017", "T1015", "T1016"],
+            "fl_market_dollars": 147430071,
+            "cmhc_dollars": 17798330,
+            "cmhc_capture_pct": 12.1,
+            "fl_beneficiaries": 720890,
+            "insight": "T1017+T1015 drive $18M — second largest CMHC revenue category"
+          }
+        }
+      },
+      "eval_mgmt": {
+        "label": "E&M (Eval & Mgmt)",
+        "codes": ["99213", "99214", "99215", "99212", "99211"],
+        "fl_market_dollars": 233235804,
+        "fl_market_share_pct": 32.2,
+        "cmhc_dollars": 2730666,
+        "cmhc_capture_pct": 1.2,
+        "fl_beneficiaries": 4087357,
+        "insight": "Largest overall market ($233M) but CMHCs barely participate — 1% capture"
+      },
+      "med_mgmt": {
+        "label": "Medication Mgmt",
+        "codes": ["H2000", "H2022", "H0032"],
+        "fl_market_dollars": 19152143,
+        "fl_market_share_pct": 2.6,
+        "cmhc_dollars": 4700966,
+        "cmhc_capture_pct": 24.5,
+        "fl_beneficiaries": 193466,
+        "insight": "CMHCs punch above weight — 25% capture in a $19M market"
+      }
+    }
+  },
+
+  "three_problems": {
+    "problem_1_rates": {
+      "label": "Lower Effective Rates",
+      "sector_gap_dollars": 8100000,
+      "sector_gap_display": "$8.1M",
+      "description": "CMHCs collect less per beneficiary than non-CMHC providers on intake and high-acuity services. The net rate loss across the sector's current patient volume is $8.1M.",
+      "by_stage": {
+        "intake": {
+          "cmhc_rpb": 74.96,
+          "rest_rpb": 88.18,
+          "gap_pct": -15.0,
+          "direction": "CMHC earns less"
+        },
+        "high_acuity": {
+          "cmhc_rpb": 908,
+          "rest_rpb": 1217,
+          "gap_pct": -25.4,
+          "direction": "CMHC earns less"
+        },
+        "ongoing": {
+          "cmhc_rpb": 133.69,
+          "rest_rpb": 89.91,
+          "gap_pct": 48.7,
+          "direction": "CMHC earns MORE",
+          "note": "Surprising finding — CMHCs earn more per bene in ongoing care. May reflect selection effect, code mix, or engagement depth."
+        }
+      },
+      "key_rate_gaps": [
+        {"code": "T1017", "cmhc_p50": 49.58, "rest_p50": 63.45, "gap_pct": -21.9, "signal": "red"},
+        {"code": "90837", "cmhc_p50": 57.77, "rest_p50": 88.39, "gap_pct": -34.6, "signal": "red"},
+        {"code": "T1015", "cmhc_p50": 65.02, "rest_p50": 70.86, "gap_pct": -8.2, "signal": "yellow"},
+        {"code": "99213", "cmhc_p50": 30.38, "rest_p50": 33.33, "gap_pct": -8.9, "signal": "yellow"}
+      ],
+      "key_rate_strengths": [
+        {"code": "H2019", "cmhc_p50": 74.53, "rest_p50": 70.26, "gap_pct": 6.1, "signal": "green"},
+        {"code": "99214", "cmhc_p50": 51.68, "rest_p50": 42.68, "gap_pct": 21.1, "signal": "green"},
+        {"code": "H2000", "cmhc_p50": 225.18, "rest_p50": 191.53, "gap_pct": 17.6, "signal": "green"},
+        {"code": "90833", "cmhc_p50": 38.49, "rest_p50": 30.60, "gap_pct": 25.8, "signal": "green"}
+      ],
+      "sector_context_for_org": "Performing 'at the CMHC median' may still represent underperformance relative to the broader market. The aspirational benchmark is closing the gap to the All FL Medicaid median."
+    },
+
+    "problem_2_engagement": {
+      "label": "Lack of Patient Engagement (Leakage)",
+      "sector_gap_dollars": 14264000,
+      "sector_gap_display": "$14.3M",
+      "ratio_to_rate_gap": 1.8,
+      "ratio_display": "1.8x",
+      "description": "CMHCs capture 15% of FL Medicaid BH intake but only 11.8% of ongoing care. The leakage gap is smaller than initially estimated (~$14M) but compounds with rate gaps. High acuity capture (32%) shows CMHCs are the crisis backbone — the question is whether patients stay after stabilization.",
+      "market_share_by_category": {
+        "intake": {"cmhc_pct": 15.0},
+        "high_acuity": {"cmhc_pct": 31.6},
+        "ongoing_bh": {"cmhc_pct": 11.8},
+        "eval_mgmt": {"cmhc_pct": 1.2},
+        "med_mgmt": {"cmhc_pct": 24.5}
+      },
+      "leakage_math": {
+        "current_ongoing_revenue": 52982451,
+        "if_retained_intake_share": 67246000,
+        "leakage_gap": 14264000,
+        "note": "Intake capture (15%) vs ongoing capture (11.8%) — gap is smaller than previously estimated but still meaningful at $14M."
+      },
+      "surprising_finding": {
+        "cmhc_ongoing_rpb": 133.69,
+        "rest_ongoing_rpb": 89.91,
+        "advantage_pct": 48.7,
+        "implication": "The sector doesn't have an ongoing care rate problem — it has an ongoing care volume problem. When patients stay, CMHCs deliver more intensive, higher-value care."
+      },
+      "sector_context_for_org": "CMHCs already retain better than previously estimated (11.8% vs 15% intake share). But the real leakage signal is in high acuity: CMHCs handle 32% of crisis/ACT but only 12% of ongoing BH. The question is post-crisis retention — do patients step down to ongoing CMHC care or leave the system?"
+    },
+
+    "problem_3_burnout": {
+      "label": "Caseload Imbalance & Clinician Burnout",
+      "framing": "outcome",
+      "description": "An outcome of Problems 1 and 2. Lower rates force higher volume. Lower engagement means constant new-patient acquisition. Both compress clinician capacity and create a lopsided caseload — intake clinicians are overloaded while ongoing care clinicians are underutilized.",
+      "caseload_kpi": {
+        "headline": "Intake clinicians carry 50% more patients than industry. Ongoing care clinicians serve 46% fewer.",
+        "intake_overload": {
+          "code": "H0031",
+          "label": "Intake Assessment",
+          "cmhc_panel": 115,
+          "industry_panel": 76.5,
+          "gap_pct": 50.9,
+          "signal": "red",
+          "interpretation": "CMHC intake clinicians process 50% more patients than the market — constant new-patient churn from leakage forces this throughput"
+        },
+        "ongoing_underload": {
+          "code": "H2019",
+          "label": "Individual Therapy",
+          "cmhc_panel": 123,
+          "industry_panel": 227,
+          "gap_pct": -45.8,
+          "signal": "yellow",
+          "interpretation": "Therapy panels are half the market size — patients leave before building sustained caseloads"
+        },
+        "care_mgmt_load": {
+          "code": "T1017",
+          "label": "Care Management",
+          "cmhc_panel": 275,
+          "industry_panel": 254,
+          "gap_pct": 8.2,
+          "signal": "yellow",
+          "interpretation": "Already at industry level, but these clinicians carry the coordination burden for the entire patient flow"
+        },
+        "imbalance_ratio": 3.3,
+        "imbalance_label": "3.3x more intake volume per clinician than therapy volume",
+        "imbalance_note": "In a balanced system, intake and therapy panels would grow proportionally. The 3.3x ratio shows the front door is overwhelmed while the back door leaks."
+      },
+      "panel_gaps": [
+        {"code": "H2019", "cmhc_panel": 123, "rest_panel": 227, "gap_pct": -45.8, "note": "Half the therapy panel of the market", "stage": "ongoing"},
+        {"code": "H0040", "cmhc_panel": 345, "rest_panel": 618, "gap_pct": -44.1, "note": "Fidelity model limits panel size", "stage": "high_acuity"},
+        {"code": "H2017", "cmhc_panel": 172, "rest_panel": 260, "gap_pct": -33.7, "note": "Smaller PSR groups", "stage": "high_acuity"},
+        {"code": "90837", "cmhc_panel": 26, "rest_panel": 97.5, "gap_pct": -73.3, "note": "Minimal panel — likely not core", "stage": "ongoing"},
+        {"code": "H0031", "cmhc_panel": 115, "rest_panel": 76.5, "gap_pct": 50.9, "note": "High intake throughput", "stage": "intake"},
+        {"code": "T1017", "cmhc_panel": 275, "rest_panel": 254, "gap_pct": 8.2, "note": "Large CM caseloads — burnout signal", "stage": "ongoing"}
+      ],
+      "burnout_cycle": [
+        "Low rates → clinicians must see more patients to generate revenue",
+        "Low engagement → patients leave, forcing constant new-patient acquisition",
+        "High intake throughput → front-door clinicians stretched thin",
+        "Burnout → turnover → capacity loss → revenue loss"
+      ],
+      "sector_context_for_org": "Each org feels this cycle differently based on their rate position (Problem 1) and engagement pattern (Problem 2). Orgs with above-market rates have a buffer. Orgs with strong retention have less churn pressure."
+    },
+
+    "problem_4_it_spend": {
+      "label": "High Spend on IT",
+      "status": "deferred",
+      "note": "To be analyzed in a future iteration. Placeholder for IT spend analysis."
+    }
+  },
+
+  "five_category_classification": {
+    "intake": {
+      "label": "Intake / Assessment",
+      "short": "Intake",
+      "codes": ["H0031", "H0032", "H2000", "90791", "90792"],
+      "cmhc_market_share_pct": 15.0,
+      "sector_rpb": 74.96,
+      "rest_rpb": 88.18,
+      "color": "blue"
+    },
+    "high_acuity": {
+      "label": "High-Acuity / Stabilization",
+      "short": "High Acuity",
+      "codes": ["H0036", "H0040", "H2010"],
+      "cmhc_market_share_pct": 31.6,
+      "sector_rpb": 908,
+      "rest_rpb": 1217,
+      "color": "yellow"
+    },
+    "ongoing_bh": {
+      "label": "Ongoing BH Outpatient",
+      "short": "Ongoing BH",
+      "codes": ["H2017", "H2019", "T1017", "T1015", "T1016", "90832", "90834", "90837", "H0004", "H0048", "T1007"],
+      "cmhc_market_share_pct": 11.8,
+      "sector_rpb": 133.69,
+      "rest_rpb": 89.91,
+      "color": "green"
+    },
+    "eval_mgmt": {
+      "label": "Evaluation & Management",
+      "short": "E&M",
+      "codes": ["99202", "99203", "99204", "99205", "99212", "99213", "99214", "99215"],
+      "cmhc_market_share_pct": 1.2,
+      "sector_rpb": 48.66,
+      "rest_rpb": 42.68,
+      "color": "purple"
+    },
+    "med_mgmt": {
+      "label": "Medication Management",
+      "short": "Med Mgmt",
+      "codes": ["T1015", "90863", "90833", "90836", "90838", "M0064"],
+      "cmhc_market_share_pct": 24.5,
+      "sector_rpb": 78.24,
+      "rest_rpb": 70.86,
+      "color": "red"
+    }
+  },
+
+  "rest_of_fl_benchmarks": {
+    "_note": "Rest-of-FL excludes CMHCs. P75 is the transformation target. These are the numbers org reports benchmark against.",
+    "H2019": {"rest_p50_ppc": 70.26, "rest_p75_ppc": 82.64, "rest_p50_rpb": 185.98, "rest_p50_bpc": 227.0, "cmhc_p50_ppc": 74.53, "rest_n": 528},
+    "T1017": {"rest_p50_ppc": 63.45, "rest_p75_ppc": 78.88, "rest_p50_rpb": 370.51, "rest_p50_bpc": 254.11, "cmhc_p50_ppc": 49.58, "rest_n": 254},
+    "H2017": {"rest_p50_ppc": 120.28, "rest_p75_ppc": 134.97, "rest_p50_rpb": 1379.46, "rest_p50_bpc": 260.0, "cmhc_p50_ppc": 123.82, "rest_n": 246},
+    "T1015": {"rest_p50_ppc": 70.86, "rest_p75_ppc": 172.44, "rest_p50_rpb": 78.24, "rest_p50_bpc": 229.0, "cmhc_p50_ppc": 65.02, "rest_n": 497},
+    "H0040": {"rest_p50_ppc": 30.90, "rest_p75_ppc": 31.38, "rest_p50_rpb": 552.69, "rest_p50_bpc": 618.0, "cmhc_p50_ppc": 30.30, "rest_n": 16},
+    "H0031": {"rest_p50_ppc": 31.57, "rest_p75_ppc": 50.77, "rest_p50_rpb": 52.38, "rest_p50_bpc": 76.5, "cmhc_p50_ppc": 31.70, "rest_n": 335},
+    "H0032": {"rest_p50_ppc": 70.33, "rest_p75_ppc": 83.06, "rest_p50_rpb": 73.39, "rest_p50_bpc": 98.0, "cmhc_p50_ppc": 70.75, "rest_n": 335},
+    "99214": {"rest_p50_ppc": 42.68, "rest_p75_ppc": 70.28, "rest_p50_rpb": 48.66, "rest_p50_bpc": 100.0, "cmhc_p50_ppc": 51.68, "rest_n": 4146},
+    "99213": {"rest_p50_ppc": 33.33, "rest_p75_ppc": 56.56, "rest_p50_rpb": 37.47, "rest_p50_bpc": 111.45, "cmhc_p50_ppc": 30.38, "rest_n": 3618},
+    "99212": {"rest_p50_ppc": 26.52, "rest_p75_ppc": 42.04, "rest_p50_rpb": 28.85, "rest_p50_bpc": 60.0, "cmhc_p50_ppc": 20.67, "rest_n": 596},
+    "H2000": {"rest_p50_ppc": 191.53, "rest_p75_ppc": 234.22, "rest_p50_rpb": 210.47, "rest_p50_bpc": 38.0, "cmhc_p50_ppc": 225.18, "rest_n": 124}
+  },
+
+  "published_rate_comparison": {
+    "_note": "Compares CMHC effective rates (P50 payment-per-claim) against FL Medicaid published fee schedule rates (AHCA Rule 59G-4.002). Gap shows how much CMHCs collect vs what the state officially pays.",
+    "codes": {
+      "H2019": {"published_rate": 21.87, "unit": "per 15min", "cmhc_p50_ppc": 74.53, "all_fl_p50_ppc": 70.26, "ratio_to_published": 3.41, "cmhc_claim_share_pct": 13.6, "note": "Individual/family therapy — bundled claim, not comparable to per-unit published rate"},
+      "H2017": {"published_rate": 9.08, "unit": "per 15min", "cmhc_p50_ppc": 123.82, "all_fl_p50_ppc": 120.28, "ratio_to_published": 13.64, "cmhc_claim_share_pct": 10.4, "note": "Psychosocial rehab — bundled claim, not comparable to per-unit published rate"},
+      "T1017": {"published_rate": 14.82, "unit": "per 15min", "cmhc_p50_ppc": 49.58, "all_fl_p50_ppc": 63.45, "ratio_to_published": 3.34, "cmhc_claim_share_pct": 12.9, "note": "Care management — bundled claim; CMHCs below market on effective rate"},
+      "T1015": {"published_rate": 71.61, "unit": "per event", "cmhc_p50_ppc": 65.02, "all_fl_p50_ppc": 70.86, "ratio_to_published": 0.91, "cmhc_claim_share_pct": 17.8, "note": "Med mgmt — CMHCs collect LESS than published rate"},
+      "H0031": {"published_rate": 17.90, "published_rate_high": 126.11, "published_range": "$17.90 – $126.11", "unit": "per event", "cmhc_p50_ppc": 31.70, "all_fl_p50_ppc": 31.57, "cmhc_claim_share_pct": 22.8, "note": "Tiered by modifier: limited $17.90, bio-psychosocial $57.28, in-depth new $126.11"},
+      "H0032": {"published_rate": 48.93, "published_rate_high": 97.86, "published_range": "$48.93 – $97.86", "unit": "per event", "cmhc_p50_ppc": 70.75, "all_fl_p50_ppc": 70.33, "cmhc_claim_share_pct": 25.8, "note": "Tiered: plan review $48.93 (TS), plan development $97.86"},
+      "H0040": {"published_rate": 31.55, "unit": "per diem", "cmhc_p50_ppc": 30.30, "all_fl_p50_ppc": 30.90, "ratio_to_published": 0.96, "cmhc_claim_share_pct": 32.8, "note": "FACT per diem — near published rate"},
+      "H2000": {"published_rate": 31.00, "published_rate_high": 250.63, "published_range": "$31 – $250.63", "unit": "per eval", "cmhc_p50_ppc": 225.18, "all_fl_p50_ppc": 191.53, "cmhc_claim_share_pct": 21.8, "note": "Tiered: records review ~$31, physician eval (HP) $250.63"},
+      "99214": {"published_rate": 53.43, "unit": "per visit", "cmhc_p50_ppc": 51.68, "all_fl_p50_ppc": 42.68, "cmhc_claim_share_pct": 1.6, "note": "E&M Estab Pt Lv4 — near published rate, CMHCs outperform market"},
+      "90791": {"published_rate": 131.67, "unit": "per eval", "cmhc_p50_ppc": 105.30, "all_fl_p50_ppc": 91.88, "cmhc_claim_share_pct": 3.0, "note": "Psychiatric diagnostic eval — CMHCs above market but below published"},
+      "90792": {"published_rate": 170.67, "unit": "per eval", "cmhc_p50_ppc": 59.68, "all_fl_p50_ppc": 82.12, "cmhc_claim_share_pct": 8.6, "note": "Psychiatric eval w/ med — CMHCs well below market and published"},
+      "H0036": {"published_rate": 9.26, "unit": "per 15min", "cmhc_p50_ppc": 52.17, "all_fl_p50_ppc": 72.32, "cmhc_claim_share_pct": 56.7, "note": "Community psych support — CMHCs dominate claims but collect 28% less than market"},
+      "H2010": {"published_rate": 4.96, "unit": "per 15min", "cmhc_p50_ppc": 16.74, "all_fl_p50_ppc": 20.48, "cmhc_claim_share_pct": 37.0, "note": "Comprehensive med services — bundled claim, CMHCs below market"},
+      "90832": {"published_rate": 42.14, "unit": "per session", "cmhc_p50_ppc": 48.74, "all_fl_p50_ppc": 19.89, "cmhc_claim_share_pct": 0.5, "note": "Psychotherapy 30 min — CMHCs above market but negligible volume"},
+      "90834": {"published_rate": 56.47, "unit": "per session", "cmhc_p50_ppc": 47.74, "all_fl_p50_ppc": 53.27, "cmhc_claim_share_pct": 2.0, "note": "Psychotherapy 45 min — CMHCs below both published and market"},
+      "90837": {"published_rate": 84.32, "unit": "per session", "cmhc_p50_ppc": 57.77, "all_fl_p50_ppc": 85.97, "cmhc_claim_share_pct": 10.7, "note": "Psychotherapy 60 min — CMHCs 33% below market, significant volume"},
+      "H0004": {"published_rate": 9.26, "unit": "per 15min", "cmhc_p50_ppc": 0.08, "all_fl_p50_ppc": 36.89, "cmhc_claim_share_pct": 5.5, "note": "BH counseling — CMHCs effectively not collecting on this code"},
+      "H0048": {"published_rate": 10.93, "unit": "per event", "cmhc_p50_ppc": 9.57, "all_fl_p50_ppc": 9.27, "cmhc_claim_share_pct": 12.6, "note": "Alcohol/drug screening — all providers near published rate"},
+      "T1007": {"published_rate": 48.93, "unit": "per event", "cmhc_p50_ppc": 74.42, "all_fl_p50_ppc": 49.13, "cmhc_claim_share_pct": 9.7, "note": "Treatment plan review — CMHCs well above market and published"},
+      "99202": {"published_rate": 47.30, "unit": "per visit", "cmhc_p50_ppc": null, "all_fl_p50_ppc": 48.51, "cmhc_claim_share_pct": 0.0, "note": "E&M New Pt Lv2 — CMHCs do not bill this code"},
+      "99203": {"published_rate": 71.78, "unit": "per visit", "cmhc_p50_ppc": 65.17, "all_fl_p50_ppc": 69.17, "cmhc_claim_share_pct": 0.3, "note": "E&M New Pt Lv3 — negligible CMHC volume"},
+      "99204": {"published_rate": 107.37, "unit": "per visit", "cmhc_p50_ppc": 81.47, "all_fl_p50_ppc": 95.74, "cmhc_claim_share_pct": 0.2, "note": "E&M New Pt Lv4 — negligible CMHC volume"},
+      "99205": {"published_rate": 135.98, "unit": "per visit", "cmhc_p50_ppc": null, "all_fl_p50_ppc": 136.99, "cmhc_claim_share_pct": 0.0, "note": "E&M New Pt Lv5 — CMHCs do not bill this code"},
+      "99212": {"published_rate": 27.28, "unit": "per visit", "cmhc_p50_ppc": 20.67, "all_fl_p50_ppc": 26.52, "cmhc_claim_share_pct": 0.3, "note": "E&M Estab Pt Lv2 — CMHCs 24% below published"},
+      "99213": {"published_rate": 46.57, "unit": "per visit", "cmhc_p50_ppc": 30.38, "all_fl_p50_ppc": 33.32, "cmhc_claim_share_pct": 0.9, "note": "E&M Estab Pt Lv3 — CMHCs 35% below published"},
+      "99215": {"published_rate": 94.15, "unit": "per visit", "cmhc_p50_ppc": 85.45, "all_fl_p50_ppc": 81.01, "cmhc_claim_share_pct": 1.3, "note": "E&M Estab Pt Lv5 — CMHCs above market, near published"},
+      "90833": {"published_rate": 27.56, "unit": "per add-on", "cmhc_p50_ppc": 38.49, "all_fl_p50_ppc": 34.84, "cmhc_claim_share_pct": 23.5, "note": "Psychotherapy add-on 30 min — CMHCs above both market and published"},
+      "90836": {"published_rate": 39.47, "unit": "per add-on", "cmhc_p50_ppc": null, "all_fl_p50_ppc": 35.15, "cmhc_claim_share_pct": 0.0, "note": "Psychotherapy add-on 45 min — CMHCs do not bill this code"},
+      "90838": {"published_rate": 57.80, "unit": "per add-on", "cmhc_p50_ppc": null, "all_fl_p50_ppc": 6.95, "cmhc_claim_share_pct": 0.0, "note": "Psychotherapy add-on 60 min — CMHCs do not bill this code"}
+    },
+    "key_findings": [
+      "Time-based codes (H2019, H2017, T1017) have per-15min published rates but are billed as bundled claims — direct ratio comparison is not meaningful",
+      "Event-based codes (T1015, H0031, H0032, H2000) can be compared directly: effective rates are AT or BELOW published — these are the true rate pressure points",
+      "H0031 (intake assessment) collects only 25% of published rate — most CMHCs bill the 'limited' version ($17.90) rather than the 'in-depth' ($126.11)",
+      "T1015 (med mgmt) is the only high-volume code where CMHCs collect less than the published rate — a direct margin squeeze"
+    ]
+  },
+
+  "fqhc_comparison": {
+    "_note": "CMHC vs FQHC comparison across rates, leakage proxy, and productivity. FQHCs are federally funded primary care + BH sites operating under PPS — different funding model but competing for the same Medicaid BH patients.",
+    "rates": {
+      "H2019": {"cmhc_p50": 74.53, "fqhc_p50": 43.94, "cmhc_advantage_pct": 69.6, "signal": "green", "note": "CMHCs collect 70% more per therapy claim"},
+      "T1015": {"cmhc_p50": 65.02, "fqhc_p50": 177.24, "cmhc_advantage_pct": -63.3, "signal": "red", "note": "FQHCs collect 2.7x more — PPS encounter rate vs fee-for-service"},
+      "99214": {"cmhc_p50": 51.68, "fqhc_p50": 35.96, "cmhc_advantage_pct": 43.7, "signal": "green", "note": "CMHCs higher on E&M visits"},
+      "H0031": {"cmhc_p50": 31.70, "fqhc_p50": 26.29, "cmhc_advantage_pct": 20.6, "signal": "green", "note": "CMHCs slightly higher on intake"},
+      "H2017": {"cmhc_p50": 123.82, "fqhc_p50": 99.68, "cmhc_advantage_pct": 24.2, "signal": "green", "note": "CMHCs higher on PSR"},
+      "T1017": {"cmhc_p50": 49.58, "fqhc_p50": null, "cmhc_advantage_pct": null, "signal": "neutral", "note": "FQHCs do not typically bill care management"}
+    },
+    "productivity": {
+      "H2019": {"cmhc_bpc": 123, "fqhc_bpc": 87, "cmhc_advantage_pct": 41.4, "note": "CMHC therapists serve larger panels"},
+      "T1015": {"cmhc_bpc": 229, "fqhc_bpc": 156, "cmhc_advantage_pct": 46.8, "note": "CMHCs handle more med mgmt patients per clinician"},
+      "99214": {"cmhc_bpc": 100, "fqhc_bpc": 142, "cmhc_advantage_pct": -29.6, "note": "FQHCs handle more E&M visits — primary care model"}
+    },
+    "key_findings": [
+      "CMHCs outperform FQHCs on BH-specific codes (therapy, PSR, intake) — their core competency",
+      "FQHCs dominate on medication management (T1015) due to PPS encounter-rate advantage — 2.7x higher effective rate",
+      "FQHCs do not compete in care management (T1017) — this is a CMHC-specific service line",
+      "CMHCs run leaner panels on E&M (100 vs 142 benes/clinician) but higher panels on therapy — reflects specialization"
+    ],
+    "strategic_implication": "CMHCs should not try to out-FQHC the FQHCs on med mgmt. Their advantage is in BH-specific services where they collect 20-70% more per claim. The strategy is to deepen engagement in these services, not diversify into PPS-advantaged territory."
+  },
+
+  "market_archetype_comparison": {
+    "_note": "Comparison across FL market density tiers: dense (Miami-Dade, Broward, Palm Beach, Hillsborough, Orange, Duval), moderate (mid-size metros), sparse (rural). Market tier drives patient access, competition, and payer mix.",
+    "rates_ppc": {
+      "H2019": {"dense": 69.99, "moderate": 73.31, "sparse": 68.40, "spread_pct": 7.2, "pattern": "Moderate leads"},
+      "T1017": {"dense": 67.13, "moderate": 59.28, "sparse": 49.69, "spread_pct": 35.1, "pattern": "Dense dominates — rural 26% lower"},
+      "H2017": {"dense": 126.65, "moderate": 110.45, "sparse": 94.02, "spread_pct": 34.7, "pattern": "Dense dominates — rural 26% lower"},
+      "T1015": {"dense": 72.98, "moderate": 63.47, "sparse": 58.12, "spread_pct": 25.5, "pattern": "Dense leads"},
+      "H0031": {"dense": 33.21, "moderate": 30.88, "sparse": 28.45, "spread_pct": 16.7, "pattern": "Dense leads"},
+      "99214": {"dense": 48.52, "moderate": 53.18, "sparse": 45.31, "spread_pct": 17.4, "pattern": "Moderate leads"}
+    },
+    "productivity_bpc": {
+      "H2019": {"dense": 198, "moderate": 245, "sparse": 210, "pattern": "Moderate highest panels"},
+      "T1017": {"dense": 285, "moderate": 240, "sparse": 195, "pattern": "Dense highest — rural 32% fewer"},
+      "H2017": {"dense": 280, "moderate": 250, "sparse": 185, "pattern": "Dense highest — rural low supply"}
+    },
+    "key_findings": [
+      "Care management (T1017) shows the largest market-tier gap: dense-market providers collect 35% more per claim than sparse",
+      "Therapy rates (H2019) are surprisingly stable across markets — only 7% spread",
+      "Rural CMHCs face a double squeeze: lower rates AND smaller panels, especially in PSR and care management",
+      "E&M rates (99214) are highest in moderate markets — likely less price competition than dense metros"
+    ],
+    "archetypes": {
+      "dense": {
+        "label": "Dense Metro",
+        "examples": "Miami-Dade, Broward, Hillsborough, Orange",
+        "profile": "Higher rates, larger panels, more competition. Rate advantage from payer mix and negotiating leverage.",
+        "risk": "Leakage — patients have many provider options and churn easily"
+      },
+      "moderate": {
+        "label": "Mid-Size Metro",
+        "examples": "Volusia, Brevard, Polk, Lee",
+        "profile": "Balanced rates, highest therapy panels. Sweet spot of patient access without extreme competition.",
+        "risk": "Capacity — growing demand may outpace clinician supply"
+      },
+      "sparse": {
+        "label": "Rural / Sparse",
+        "examples": "Rural counties, panhandle, interior",
+        "profile": "Lowest rates, smallest panels. Often the only BH provider in the area — monopoly position but thin margins.",
+        "risk": "Sustainability — low rates + small panels make it hard to recruit and retain clinicians"
+      }
+    }
+  },
+
+  "hero_stats": {
+    "rate_gap": {"value": "$8.1M", "label": "Lost to Rate Gaps"},
+    "leakage_gap": {"value": "$14.3M", "label": "Lost to Post-Crisis Leakage"},
+    "ratio": {"value": "1.8x", "label": "Leakage vs Rate Impact"},
+    "caseload_imbalance": {"value": "3.3x", "label": "Intake-to-Therapy Caseload Ratio"}
+  },
+
+  "headline": "The rate problem is real. The productivity burden is real. Post-crisis retention is the hidden lever.",
+
+  "service_line_coverage": {
+    "_note": "How many of the 86 FL CMHCs bill each code (2024). Source: hcpcs_rate_benchmarks, dimension=by_org_type, value=CMHC. Coverage % = org_count / 86. Codes with low coverage represent supply gaps — CMHCs don't offer the service, so patients go elsewhere.",
+    "total_cmhcs": 86,
+    "codes": {
+      "H2019": {"org_count": 86, "pct": 100.0, "total_claims": 230122, "label": "Individual therapy"},
+      "99214": {"org_count": 65, "pct": 75.6, "total_claims": 30949, "label": "E&M Level 4"},
+      "H0032": {"org_count": 55, "pct": 64.0, "total_claims": 47113, "label": "Plan development"},
+      "T1015": {"org_count": 53, "pct": 61.6, "total_claims": 98946, "label": "Medication management"},
+      "H0031": {"org_count": 48, "pct": 55.8, "total_claims": 50983, "label": "Intake assessment"},
+      "H2017": {"org_count": 39, "pct": 45.3, "total_claims": 160030, "label": "Psychosocial rehab"},
+      "99213": {"org_count": 39, "pct": 45.3, "total_claims": 22527, "label": "E&M Level 3"},
+      "T1017": {"org_count": 34, "pct": 39.5, "total_claims": 196720, "label": "Care management"},
+      "90837": {"org_count": 27, "pct": 31.4, "total_claims": 9799, "label": "Psychotherapy 60min"},
+      "90833": {"org_count": 21, "pct": 24.4, "total_claims": 13360, "label": "Psychotherapy add-on"},
+      "H2000": {"org_count": 20, "pct": 23.3, "total_claims": 8502, "label": "Comprehensive eval"},
+      "90792": {"org_count": 13, "pct": 15.1, "total_claims": 1643, "label": "Psychiatric eval"},
+      "H2010": {"org_count": 8, "pct": 9.3, "total_claims": 5355, "label": "Comp med services"},
+      "99215": {"org_count": 7, "pct": 8.1, "total_claims": 1231, "label": "E&M Level 5"},
+      "H0048": {"org_count": 6, "pct": 7.0, "total_claims": 3633, "label": "Alcohol/drug screening"},
+      "H0040": {"org_count": 6, "pct": 7.0, "total_claims": 84539, "label": "FACT/ACT"},
+      "99212": {"org_count": 6, "pct": 7.0, "total_claims": 669, "label": "E&M Level 2"},
+      "90834": {"org_count": 6, "pct": 7.0, "total_claims": 433, "label": "Psychotherapy 45min"},
+      "90791": {"org_count": 6, "pct": 7.0, "total_claims": 333, "label": "Psych diagnostic eval"},
+      "H0036": {"org_count": 4, "pct": 4.7, "total_claims": 1445, "label": "Community psych support"},
+      "H0004": {"org_count": 4, "pct": 4.7, "total_claims": 1047, "label": "BH counseling"},
+      "99204": {"org_count": 4, "pct": 4.7, "total_claims": 319, "label": "E&M New Pt Level 4"},
+      "99203": {"org_count": 4, "pct": 4.7, "total_claims": 372, "label": "E&M New Pt Level 3"},
+      "T1007": {"org_count": 3, "pct": 3.5, "total_claims": 456, "label": "Treatment plan review"},
+      "90832": {"org_count": 3, "pct": 3.5, "total_claims": 559, "label": "Psychotherapy 30min"}
+    },
+    "by_category": {
+      "intake": {"codes_offered_by_majority": ["H0031", "H0032"], "avg_coverage_pct": 33.6, "supply_gap_codes": ["H2000", "90791", "90792"], "note": "Only 56% of CMHCs bill intake assessment (H0031); eval codes have very low penetration"},
+      "high_acuity": {"codes_offered_by_majority": [], "avg_coverage_pct": 16.6, "supply_gap_codes": ["H0036", "H2010", "H0040"], "note": "No high-acuity code is offered by a majority of CMHCs. H2017 (PSR) at 45% is the highest. ACT/FACT only 7%."},
+      "ongoing_bh": {"codes_offered_by_majority": ["H2019"], "avg_coverage_pct": 27.5, "supply_gap_codes": ["90832", "90834", "90837", "H0004", "H0048", "T1007"], "note": "H2019 is universal (100%). But T1017 (care mgmt) only 40%. CPT psychotherapy codes (90832-90837) are offered by <31%."},
+      "eval_mgmt": {"codes_offered_by_majority": ["99214"], "avg_coverage_pct": 28.2, "supply_gap_codes": ["99212", "99215", "99203", "99204"], "note": "99214 at 76% is the anchor. Most other E&M codes under 10%."},
+      "med_mgmt": {"codes_offered_by_majority": ["T1015"], "avg_coverage_pct": 36.0, "supply_gap_codes": ["90833"], "note": "T1015 at 62% is reasonable. But 90833 (add-on psychotherapy during med visit) only 24%."}
+    },
+    "key_findings": [
+      "Only 1 code (H2019) is billed by ALL 86 CMHCs — the sector has extremely narrow service offerings",
+      "High-acuity services have the lowest coverage: no code is offered by even half of CMHCs",
+      "Care management (T1017) — a $12.1M revenue line — is offered by only 34 of 86 CMHCs (40%)",
+      "CPT psychotherapy codes (90832-90837) are offered by <31% of CMHCs, explaining low ongoing BH market share",
+      "The leakage story is partly a SUPPLY story: patients can't stay for services that aren't offered"
+    ]
+  },
+
+  "market_share_trends": {
+    "_source": "hcpcs_rate_trends (BQ), CMHC vs all_fl by category. Recomputed 2026-04-06.",
+    "_note": "CMHC market share (%) of BH-provider-filtered FL market by service category, annual.",
+    "2019": {"intake": 12.3, "high_acuity": 12.1, "ongoing_bh": 9.1, "med_mgmt": 14.5, "total": 9.5},
+    "2020": {"intake": 12.4, "high_acuity": 7.9, "ongoing_bh": 10.3, "med_mgmt": 13.5, "total": 10.4},
+    "2021": {"intake": 12.2, "high_acuity": 12.2, "ongoing_bh": 11.6, "med_mgmt": 12.0, "total": 11.6},
+    "2022": {"intake": 10.9, "high_acuity": 12.0, "ongoing_bh": 9.9, "med_mgmt": 11.9, "total": 10.1},
+    "2023": {"intake": 11.6, "high_acuity": 23.7, "ongoing_bh": 11.5, "med_mgmt": 17.8, "total": 12.2},
+    "2024": {"intake": 14.9, "high_acuity": 30.8, "ongoing_bh": 11.8, "med_mgmt": 24.5, "total": 12.7}
+  },
+
+  "caveats": {
+    "beneficiary_deduplication": "Market share percentages reflect the sector's share of beneficiaries within each service category, not tracked patient journeys. The true retention rate requires beneficiary-level linkage.",
+    "leakage_upper_bound": "The $14.3M leakage estimate compares intake capture (15%) to ongoing capture (11.8%). True retention requires beneficiary-level linkage.",
+    "ongoing_rpb_advantage": "The +48.7% ongoing RPB advantage may reflect selection effect, code mix, or engagement depth — not necessarily better reimbursement terms."
+  }
+}

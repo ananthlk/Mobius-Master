@@ -1,0 +1,1595 @@
+{
+  "org_profile": {
+    "org_type": "CMHC",
+    "market_tier": "sparse",
+    "billing_taxonomy": "261QM0801X",
+    "size_band": "medium",
+    "billing_entity": "organization"
+  },
+  "codes": {
+    "H2019": {
+      "name": "Behavioral Therapy Services",
+      "service_line": "Outpatient Therapy",
+      "org_actuals_2024": {
+        "payment_per_claim": 143.65,
+        "revenue_per_bene": 360.27,
+        "claims_per_bene": 2.51,
+        "bene_per_clinician": 166.7,
+        "claims": 1254,
+        "paid": 180132.85,
+        "beneficiaries": 500,
+        "svc_npis": 3
+      },
+      "peer_comparison": {
+        "All FL Medicaid Orgs": {
+          "n_orgs": 614,
+          "rate_per_claim": {
+            "p25": 52.17,
+            "p50": 71.43,
+            "p75": 82.89,
+            "org": 143.65,
+            "position": "WELL ABOVE"
+          },
+          "revenue_per_patient": {
+            "p25": 108.31,
+            "p50": 180.81,
+            "p75": 232.88,
+            "org": 360.27,
+            "position": "WELL ABOVE"
+          },
+          "visits_per_patient": {
+            "p25": 1.78,
+            "p50": 2.51,
+            "p75": 3.22,
+            "org": 2.51,
+            "position": "\u2248 P50"
+          },
+          "patients_per_clinician": {
+            "p25": 65.0,
+            "p50": 211.0,
+            "p75": 494.0,
+            "org": 166.7,
+            "position": "WELL BELOW"
+          }
+        },
+        "by_entity:organization": {
+          "n_orgs": 568,
+          "rate_per_claim": {
+            "p25": 53.19,
+            "p50": 71.9,
+            "p75": 82.64,
+            "org": 143.65,
+            "position": "WELL ABOVE"
+          },
+          "revenue_per_patient": {
+            "p25": 112.43,
+            "p50": 182.49,
+            "p75": 231.72,
+            "org": 360.27,
+            "position": "WELL ABOVE"
+          },
+          "visits_per_patient": {
+            "p25": 1.76,
+            "p50": 2.51,
+            "p75": 3.2,
+            "org": 2.51,
+            "position": "\u2248 P50"
+          },
+          "patients_per_clinician": {
+            "p25": 69.0,
+            "p50": 218.0,
+            "p75": 507.0,
+            "org": 166.7,
+            "position": "WELL BELOW"
+          }
+        },
+        "Similar CMHCs": {
+          "n_orgs": 86,
+          "rate_per_claim": {
+            "p25": 57.03,
+            "p50": 74.53,
+            "p75": 85.38,
+            "org": 143.65,
+            "position": "WELL ABOVE"
+          },
+          "revenue_per_patient": {
+            "p25": 81.72,
+            "p50": 137.38,
+            "p75": 213.06,
+            "org": 360.27,
+            "position": "WELL ABOVE"
+          },
+          "visits_per_patient": {
+            "p25": 1.29,
+            "p50": 2.04,
+            "p75": 2.63,
+            "org": 2.51,
+            "position": "WELL ABOVE"
+          },
+          "patients_per_clinician": {
+            "p25": 45.0,
+            "p50": 123.0,
+            "p75": 416.66,
+            "org": 166.7,
+            "position": "WELL ABOVE"
+          }
+        },
+        "Similar Size Orgs": {
+          "n_orgs": 241,
+          "rate_per_claim": {
+            "p25": 58.21,
+            "p50": 72.91,
+            "p75": 84.61,
+            "org": 143.65,
+            "position": "WELL ABOVE"
+          },
+          "revenue_per_patient": {
+            "p25": 123.12,
+            "p50": 188.08,
+            "p75": 244.18,
+            "org": 360.27,
+            "position": "WELL ABOVE"
+          },
+          "visits_per_patient": {
+            "p25": 1.94,
+            "p50": 2.57,
+            "p75": 3.36,
+            "org": 2.51,
+            "position": "\u2248 P50"
+          },
+          "patients_per_clinician": {
+            "p25": 69.0,
+            "p50": 147.0,
+            "p75": 257.0,
+            "org": 166.7,
+            "position": "Above"
+          }
+        },
+        "Similar Market": {
+          "n_orgs": 189,
+          "rate_per_claim": {
+            "p25": 48.99,
+            "p50": 68.4,
+            "p75": 81.71,
+            "org": 143.65,
+            "position": "WELL ABOVE"
+          },
+          "revenue_per_patient": {
+            "p25": 79.95,
+            "p50": 137.38,
+            "p75": 205.23,
+            "org": 360.27,
+            "position": "WELL ABOVE"
+          },
+          "visits_per_patient": {
+            "p25": 1.43,
+            "p50": 2.08,
+            "p75": 2.75,
+            "org": 2.51,
+            "position": "WELL ABOVE"
+          },
+          "patients_per_clinician": {
+            "p25": 63.33,
+            "p50": 208.0,
+            "p75": 509.0,
+            "org": 166.7,
+            "position": "Below"
+          }
+        },
+        "Same Classification": {
+          "n_orgs": 81,
+          "rate_per_claim": {
+            "p25": 57.03,
+            "p50": 74.53,
+            "p75": 84.59,
+            "org": 143.65,
+            "position": "WELL ABOVE"
+          },
+          "revenue_per_patient": {
+            "p25": 81.72,
+            "p50": 141.29,
+            "p75": 213.06,
+            "org": 360.27,
+            "position": "WELL ABOVE"
+          },
+          "visits_per_patient": {
+            "p25": 1.27,
+            "p50": 2.04,
+            "p75": 2.63,
+            "org": 2.51,
+            "position": "WELL ABOVE"
+          },
+          "patients_per_clinician": {
+            "p25": 44.0,
+            "p50": 122.0,
+            "p75": 442.57,
+            "org": 166.7,
+            "position": "WELL ABOVE"
+          }
+        }
+      },
+      "trend": {
+        "annual": {
+          "2019": {
+            "ppc": 96.94,
+            "rpb": 186.57,
+            "cpb": 1.92,
+            "bpc": 458.6
+          },
+          "2020": {
+            "ppc": 89.65,
+            "rpb": 199.3,
+            "cpb": 2.22,
+            "bpc": 446.7
+          },
+          "2021": {
+            "ppc": 102.26,
+            "rpb": 211.15,
+            "cpb": 2.06,
+            "bpc": 389.2
+          },
+          "2022": {
+            "ppc": 108.04,
+            "rpb": 237.53,
+            "cpb": 2.2,
+            "bpc": 371.8
+          },
+          "2023": {
+            "ppc": 117.98,
+            "rpb": 248.74,
+            "cpb": 2.11,
+            "bpc": 388.0
+          },
+          "2024": {
+            "ppc": 143.65,
+            "rpb": 360.27,
+            "cpb": 2.51,
+            "bpc": 166.7
+          }
+        },
+        "year_range": [
+          "2019",
+          "2024"
+        ],
+        "signals": {
+          "All FL Medicaid Orgs": {
+            "rate_signal": "Diverging UP",
+            "revenue_signal": "Diverging UP"
+          },
+          "Similar CMHCs": {
+            "rate_signal": "Diverging UP",
+            "revenue_signal": "Diverging UP"
+          },
+          "Similar Size Orgs": {
+            "rate_signal": "Diverging UP",
+            "revenue_signal": "Diverging UP"
+          },
+          "Similar Market": {
+            "rate_signal": "Diverging UP",
+            "revenue_signal": "Diverging UP"
+          }
+        }
+      }
+    },
+    "T1017": {
+      "name": "Targeted Case Management",
+      "service_line": "Case Management",
+      "org_actuals_2024": {
+        "payment_per_claim": 49.69,
+        "revenue_per_bene": 233.8,
+        "claims_per_bene": 4.7,
+        "bene_per_clinician": 179.5,
+        "claims": 1689,
+        "paid": 83933.25,
+        "beneficiaries": 359,
+        "svc_npis": 2
+      },
+      "peer_comparison": {
+        "All FL Medicaid Orgs": {
+          "n_orgs": 288,
+          "rate_per_claim": {
+            "p25": 43.79,
+            "p50": 62.2,
+            "p75": 77.58,
+            "org": 49.69,
+            "position": "WELL BELOW"
+          },
+          "revenue_per_patient": {
+            "p25": 192.52,
+            "p50": 361.14,
+            "p75": 604.89,
+            "org": 233.8,
+            "position": "WELL BELOW"
+          },
+          "visits_per_patient": {
+            "p25": 3.64,
+            "p50": 5.57,
+            "p75": 8.9,
+            "org": 4.7,
+            "position": "Below"
+          },
+          "patients_per_clinician": {
+            "p25": 105.5,
+            "p50": 258.0,
+            "p75": 591.0,
+            "org": 179.5,
+            "position": "WELL BELOW"
+          }
+        },
+        "by_entity:organization": {
+          "n_orgs": 280,
+          "rate_per_claim": {
+            "p25": 43.79,
+            "p50": 62.68,
+            "p75": 78.08,
+            "org": 49.69,
+            "position": "WELL BELOW"
+          },
+          "revenue_per_patient": {
+            "p25": 193.95,
+            "p50": 369.98,
+            "p75": 609.1,
+            "org": 233.8,
+            "position": "WELL BELOW"
+          },
+          "visits_per_patient": {
+            "p25": 3.69,
+            "p50": 5.57,
+            "p75": 8.91,
+            "org": 4.7,
+            "position": "Below"
+          },
+          "patients_per_clinician": {
+            "p25": 105.5,
+            "p50": 254.11,
+            "p75": 591.0,
+            "org": 179.5,
+            "position": "WELL BELOW"
+          }
+        },
+        "Similar CMHCs": {
+          "n_orgs": 34,
+          "rate_per_claim": {
+            "p25": 30.31,
+            "p50": 49.58,
+            "p75": 66.81,
+            "org": 49.69,
+            "position": "\u2248 P50"
+          },
+          "revenue_per_patient": {
+            "p25": 150.88,
+            "p50": 240.24,
+            "p75": 466.61,
+            "org": 233.8,
+            "position": "\u2248 P50"
+          },
+          "visits_per_patient": {
+            "p25": 3.95,
+            "p50": 4.7,
+            "p75": 8.59,
+            "org": 4.7,
+            "position": "\u2248 P50"
+          },
+          "patients_per_clinician": {
+            "p25": 112.0,
+            "p50": 275.0,
+            "p75": 662.0,
+            "org": 179.5,
+            "position": "WELL BELOW"
+          }
+        },
+        "Similar Size Orgs": {
+          "n_orgs": 126,
+          "rate_per_claim": {
+            "p25": 39.48,
+            "p50": 57.14,
+            "p75": 74.14,
+            "org": 49.69,
+            "position": "Below"
+          },
+          "revenue_per_patient": {
+            "p25": 158.93,
+            "p50": 343.08,
+            "p75": 620.44,
+            "org": 233.8,
+            "position": "WELL BELOW"
+          },
+          "visits_per_patient": {
+            "p25": 3.76,
+            "p50": 5.95,
+            "p75": 8.91,
+            "org": 4.7,
+            "position": "WELL BELOW"
+          },
+          "patients_per_clinician": {
+            "p25": 100.0,
+            "p50": 186.3,
+            "p75": 312.0,
+            "org": 179.5,
+            "position": "\u2248 P50"
+          }
+        },
+        "Similar Market": {
+          "n_orgs": 77,
+          "rate_per_claim": {
+            "p25": 33.18,
+            "p50": 49.69,
+            "p75": 77.4,
+            "org": 49.69,
+            "position": "\u2248 P50"
+          },
+          "revenue_per_patient": {
+            "p25": 119.97,
+            "p50": 214.17,
+            "p75": 333.02,
+            "org": 233.8,
+            "position": "Above"
+          },
+          "visits_per_patient": {
+            "p25": 3.11,
+            "p50": 4.08,
+            "p75": 5.71,
+            "org": 4.7,
+            "position": "Above"
+          },
+          "patients_per_clinician": {
+            "p25": 94.0,
+            "p50": 252.0,
+            "p75": 547.0,
+            "org": 179.5,
+            "position": "WELL BELOW"
+          }
+        },
+        "Same Classification": {
+          "n_orgs": 24,
+          "rate_per_claim": {
+            "p25": 30.31,
+            "p50": 49.69,
+            "p75": 64.93,
+            "org": 49.69,
+            "position": "\u2248 P50"
+          },
+          "revenue_per_patient": {
+            "p25": 150.88,
+            "p50": 233.8,
+            "p75": 466.61,
+            "org": 233.8,
+            "position": "\u2248 P50"
+          },
+          "visits_per_patient": {
+            "p25": 3.95,
+            "p50": 4.71,
+            "p75": 8.59,
+            "org": 4.7,
+            "position": "\u2248 P50"
+          },
+          "patients_per_clinician": {
+            "p25": 90.0,
+            "p50": 203.5,
+            "p75": 652.0,
+            "org": 179.5,
+            "position": "Below"
+          }
+        }
+      },
+      "trend": {
+        "annual": {
+          "2019": {
+            "ppc": 59.69,
+            "rpb": 303.85,
+            "cpb": 5.09,
+            "bpc": 528.0
+          },
+          "2020": {
+            "ppc": 45.89,
+            "rpb": 228.29,
+            "cpb": 4.98,
+            "bpc": 601.0
+          },
+          "2021": {
+            "ppc": 54.22,
+            "rpb": 226.01,
+            "cpb": 4.17,
+            "bpc": 504.0
+          },
+          "2022": {
+            "ppc": 58.01,
+            "rpb": 268.83,
+            "cpb": 4.63,
+            "bpc": 270.5
+          },
+          "2023": {
+            "ppc": 60.31,
+            "rpb": 254.68,
+            "cpb": 4.22,
+            "bpc": 238.0
+          },
+          "2024": {
+            "ppc": 49.69,
+            "rpb": 233.8,
+            "cpb": 4.7,
+            "bpc": 179.5
+          }
+        },
+        "year_range": [
+          "2019",
+          "2024"
+        ],
+        "signals": {
+          "All FL Medicaid Orgs": {
+            "rate_signal": "Diverging DOWN",
+            "revenue_signal": "Diverging DOWN"
+          },
+          "Similar CMHCs": {
+            "rate_signal": "Diverging DOWN",
+            "revenue_signal": "Diverging DOWN"
+          },
+          "Similar Size Orgs": {
+            "rate_signal": "Diverging DOWN",
+            "revenue_signal": "Diverging DOWN"
+          },
+          "Similar Market": {
+            "rate_signal": "Diverging DOWN",
+            "revenue_signal": "Converging"
+          }
+        }
+      }
+    },
+    "T1015": {
+      "name": "Medication Management",
+      "service_line": "Outpatient Therapy",
+      "org_actuals_2024": {
+        "payment_per_claim": 68.84,
+        "revenue_per_bene": 86.5,
+        "claims_per_bene": 1.26,
+        "bene_per_clinician": 230.0,
+        "claims": 578,
+        "paid": 39790.18,
+        "beneficiaries": 460,
+        "svc_npis": 2
+      },
+      "peer_comparison": {
+        "All FL Medicaid Orgs": {
+          "n_orgs": 550,
+          "rate_per_claim": {
+            "p25": 49.92,
+            "p50": 70.18,
+            "p75": 166.48,
+            "org": 68.84,
+            "position": "\u2248 P50"
+          },
+          "revenue_per_patient": {
+            "p25": 62.9,
+            "p50": 76.94,
+            "p75": 190.49,
+            "org": 86.5,
+            "position": "Above"
+          },
+          "visits_per_patient": {
+            "p25": 1.05,
+            "p50": 1.11,
+            "p75": 1.24,
+            "org": 1.26,
+            "position": "Above"
+          },
+          "patients_per_clinician": {
+            "p25": 73.0,
+            "p50": 227.0,
+            "p75": 494.0,
+            "org": 230.0,
+            "position": "\u2248 P50"
+          }
+        },
+        "by_entity:organization": {
+          "n_orgs": 525,
+          "rate_per_claim": {
+            "p25": 50.43,
+            "p50": 70.22,
+            "p75": 166.48,
+            "org": 68.84,
+            "position": "\u2248 P50"
+          },
+          "revenue_per_patient": {
+            "p25": 63.02,
+            "p50": 77.58,
+            "p75": 190.49,
+            "org": 86.5,
+            "position": "Above"
+          },
+          "visits_per_patient": {
+            "p25": 1.06,
+            "p50": 1.12,
+            "p75": 1.24,
+            "org": 1.26,
+            "position": "Above"
+          },
+          "patients_per_clinician": {
+            "p25": 82.0,
+            "p50": 231.0,
+            "p75": 503.6,
+            "org": 230.0,
+            "position": "\u2248 P50"
+          }
+        },
+        "Similar CMHCs": {
+          "n_orgs": 53,
+          "rate_per_claim": {
+            "p25": 47.47,
+            "p50": 65.02,
+            "p75": 71.61,
+            "org": 68.84,
+            "position": "Above"
+          },
+          "revenue_per_patient": {
+            "p25": 61.4,
+            "p50": 72.19,
+            "p75": 80.55,
+            "org": 86.5,
+            "position": "Above"
+          },
+          "visits_per_patient": {
+            "p25": 1.06,
+            "p50": 1.13,
+            "p75": 1.2,
+            "org": 1.26,
+            "position": "Above"
+          },
+          "patients_per_clinician": {
+            "p25": 34.0,
+            "p50": 224.0,
+            "p75": 443.5,
+            "org": 230.0,
+            "position": "\u2248 P50"
+          }
+        },
+        "Similar Size Orgs": {
+          "n_orgs": 149,
+          "rate_per_claim": {
+            "p25": 41.98,
+            "p50": 60.04,
+            "p75": 74.42,
+            "org": 68.84,
+            "position": "Above"
+          },
+          "revenue_per_patient": {
+            "p25": 53.98,
+            "p50": 71.37,
+            "p75": 86.57,
+            "org": 86.5,
+            "position": "WELL ABOVE"
+          },
+          "visits_per_patient": {
+            "p25": 1.06,
+            "p50": 1.15,
+            "p75": 1.33,
+            "org": 1.26,
+            "position": "Above"
+          },
+          "patients_per_clinician": {
+            "p25": 44.0,
+            "p50": 143.0,
+            "p75": 297.0,
+            "org": 230.0,
+            "position": "WELL ABOVE"
+          }
+        },
+        "Similar Market": {
+          "n_orgs": 265,
+          "rate_per_claim": {
+            "p25": 57.02,
+            "p50": 87.12,
+            "p75": 183.62,
+            "org": 68.84,
+            "position": "WELL BELOW"
+          },
+          "revenue_per_patient": {
+            "p25": 67.91,
+            "p50": 105.05,
+            "p75": 219.43,
+            "org": 86.5,
+            "position": "Below"
+          },
+          "visits_per_patient": {
+            "p25": 1.05,
+            "p50": 1.11,
+            "p75": 1.23,
+            "org": 1.26,
+            "position": "Above"
+          },
+          "patients_per_clinician": {
+            "p25": 65.0,
+            "p50": 235.0,
+            "p75": 508.54,
+            "org": 230.0,
+            "position": "\u2248 P50"
+          }
+        },
+        "Same Classification": {
+          "n_orgs": 42,
+          "rate_per_claim": {
+            "p25": 49.34,
+            "p50": 64.91,
+            "p75": 70.51,
+            "org": 68.84,
+            "position": "Above"
+          },
+          "revenue_per_patient": {
+            "p25": 64.53,
+            "p50": 71.88,
+            "p75": 80.55,
+            "org": 86.5,
+            "position": "WELL ABOVE"
+          },
+          "visits_per_patient": {
+            "p25": 1.08,
+            "p50": 1.13,
+            "p75": 1.2,
+            "org": 1.26,
+            "position": "Above"
+          },
+          "patients_per_clinician": {
+            "p25": 31.0,
+            "p50": 230.0,
+            "p75": 521.0,
+            "org": 230.0,
+            "position": "\u2248 P50"
+          }
+        }
+      },
+      "trend": {
+        "annual": {
+          "2019": {
+            "ppc": 55.98,
+            "rpb": 104.83,
+            "cpb": 1.87,
+            "bpc": 491.4
+          },
+          "2020": {
+            "ppc": 63.86,
+            "rpb": 85.46,
+            "cpb": 1.34,
+            "bpc": 362.7
+          },
+          "2021": {
+            "ppc": 79.9,
+            "rpb": 91.89,
+            "cpb": 1.15,
+            "bpc": 360.8
+          },
+          "2022": {
+            "ppc": 53.79,
+            "rpb": 82.86,
+            "cpb": 1.54,
+            "bpc": 324.2
+          },
+          "2023": {
+            "ppc": 58.8,
+            "rpb": 89.97,
+            "cpb": 1.53,
+            "bpc": 360.3
+          },
+          "2024": {
+            "ppc": 68.84,
+            "rpb": 86.5,
+            "cpb": 1.26,
+            "bpc": 230.0
+          }
+        },
+        "year_range": [
+          "2019",
+          "2024"
+        ],
+        "signals": {
+          "All FL Medicaid Orgs": {
+            "rate_signal": "Stable",
+            "revenue_signal": "Converging"
+          },
+          "Similar CMHCs": {
+            "rate_signal": "Diverging UP",
+            "revenue_signal": "Converging"
+          },
+          "Similar Size Orgs": {
+            "rate_signal": "Diverging UP",
+            "revenue_signal": "Converging"
+          },
+          "Similar Market": {
+            "rate_signal": "Diverging DOWN",
+            "revenue_signal": "Diverging DOWN"
+          }
+        }
+      }
+    },
+    "H0031": {
+      "name": "Mental Health Assessment",
+      "service_line": "Assessment",
+      "org_actuals_2024": {
+        "payment_per_claim": 57.85,
+        "revenue_per_bene": 69.27,
+        "claims_per_bene": 1.2,
+        "bene_per_clinician": 76.0,
+        "claims": 91,
+        "paid": 5264.69,
+        "beneficiaries": 76,
+        "svc_npis": 1
+      },
+      "peer_comparison": {
+        "All FL Medicaid Orgs": {
+          "n_orgs": 383,
+          "rate_per_claim": {
+            "p25": 24.41,
+            "p50": 31.59,
+            "p75": 49.55,
+            "org": 57.85,
+            "position": "WELL ABOVE"
+          },
+          "revenue_per_patient": {
+            "p25": 35.06,
+            "p50": 51.8,
+            "p75": 71.25,
+            "org": 69.27,
+            "position": "WELL ABOVE"
+          },
+          "visits_per_patient": {
+            "p25": 1.15,
+            "p50": 1.48,
+            "p75": 1.9,
+            "org": 1.2,
+            "position": "Below"
+          },
+          "patients_per_clinician": {
+            "p25": 27.0,
+            "p50": 83.0,
+            "p75": 228.0,
+            "org": 76.0,
+            "position": "Below"
+          }
+        },
+        "by_entity:organization": {
+          "n_orgs": 366,
+          "rate_per_claim": {
+            "p25": 24.41,
+            "p50": 31.36,
+            "p75": 49.46,
+            "org": 57.85,
+            "position": "WELL ABOVE"
+          },
+          "revenue_per_patient": {
+            "p25": 35.07,
+            "p50": 52.06,
+            "p75": 70.35,
+            "org": 69.27,
+            "position": "WELL ABOVE"
+          },
+          "visits_per_patient": {
+            "p25": 1.17,
+            "p50": 1.48,
+            "p75": 1.9,
+            "org": 1.2,
+            "position": "Below"
+          },
+          "patients_per_clinician": {
+            "p25": 28.0,
+            "p50": 92.0,
+            "p75": 231.0,
+            "org": 76.0,
+            "position": "Below"
+          }
+        },
+        "Similar CMHCs": {
+          "n_orgs": 48,
+          "rate_per_claim": {
+            "p25": 24.73,
+            "p50": 31.7,
+            "p75": 36.66,
+            "org": 57.85,
+            "position": "WELL ABOVE"
+          },
+          "revenue_per_patient": {
+            "p25": 31.49,
+            "p50": 45.73,
+            "p75": 65.48,
+            "org": 69.27,
+            "position": "WELL ABOVE"
+          },
+          "visits_per_patient": {
+            "p25": 1.09,
+            "p50": 1.22,
+            "p75": 1.7,
+            "org": 1.2,
+            "position": "\u2248 P50"
+          },
+          "patients_per_clinician": {
+            "p25": 31.0,
+            "p50": 115.42,
+            "p75": 271.0,
+            "org": 76.0,
+            "position": "WELL BELOW"
+          }
+        },
+        "Similar Size Orgs": {
+          "n_orgs": 142,
+          "rate_per_claim": {
+            "p25": 21.24,
+            "p50": 29.81,
+            "p75": 51.55,
+            "org": 57.85,
+            "position": "WELL ABOVE"
+          },
+          "revenue_per_patient": {
+            "p25": 29.93,
+            "p50": 50.67,
+            "p75": 69.71,
+            "org": 69.27,
+            "position": "WELL ABOVE"
+          },
+          "visits_per_patient": {
+            "p25": 1.11,
+            "p50": 1.44,
+            "p75": 1.98,
+            "org": 1.2,
+            "position": "Below"
+          },
+          "patients_per_clinician": {
+            "p25": 17.0,
+            "p50": 31.0,
+            "p75": 76.5,
+            "org": 76.0,
+            "position": "WELL ABOVE"
+          }
+        },
+        "Similar Market": {
+          "n_orgs": 108,
+          "rate_per_claim": {
+            "p25": 21.62,
+            "p50": 31.7,
+            "p75": 54.8,
+            "org": 57.85,
+            "position": "WELL ABOVE"
+          },
+          "revenue_per_patient": {
+            "p25": 27.19,
+            "p50": 44.3,
+            "p75": 69.71,
+            "org": 69.27,
+            "position": "WELL ABOVE"
+          },
+          "visits_per_patient": {
+            "p25": 1.08,
+            "p50": 1.23,
+            "p75": 1.54,
+            "org": 1.2,
+            "position": "\u2248 P50"
+          },
+          "patients_per_clinician": {
+            "p25": 30.0,
+            "p50": 87.33,
+            "p75": 225.75,
+            "org": 76.0,
+            "position": "Below"
+          }
+        },
+        "Same Classification": {
+          "n_orgs": 42,
+          "rate_per_claim": {
+            "p25": 27.65,
+            "p50": 32.02,
+            "p75": 42.58,
+            "org": 57.85,
+            "position": "WELL ABOVE"
+          },
+          "revenue_per_patient": {
+            "p25": 36.72,
+            "p50": 50.64,
+            "p75": 68.84,
+            "org": 69.27,
+            "position": "WELL ABOVE"
+          },
+          "visits_per_patient": {
+            "p25": 1.14,
+            "p50": 1.26,
+            "p75": 1.98,
+            "org": 1.2,
+            "position": "\u2248 P50"
+          },
+          "patients_per_clinician": {
+            "p25": 41.0,
+            "p50": 163.0,
+            "p75": 316.5,
+            "org": 76.0,
+            "position": "WELL BELOW"
+          }
+        }
+      },
+      "trend": {
+        "annual": {
+          "2019": {
+            "ppc": 45.43,
+            "rpb": 63.87,
+            "cpb": 1.41,
+            "bpc": 177.7
+          },
+          "2020": {
+            "ppc": 31.19,
+            "rpb": 36.1,
+            "cpb": 1.16,
+            "bpc": 162.4
+          },
+          "2021": {
+            "ppc": 30.89,
+            "rpb": 35.52,
+            "cpb": 1.15,
+            "bpc": 156.2
+          },
+          "2022": {
+            "ppc": 41.51,
+            "rpb": 57.74,
+            "cpb": 1.39,
+            "bpc": 248.0
+          },
+          "2023": {
+            "ppc": 44.25,
+            "rpb": 66.64,
+            "cpb": 1.51,
+            "bpc": 83.7
+          },
+          "2024": {
+            "ppc": 57.85,
+            "rpb": 69.27,
+            "cpb": 1.2,
+            "bpc": 76.0
+          }
+        },
+        "year_range": [
+          "2019",
+          "2024"
+        ],
+        "signals": {
+          "All FL Medicaid Orgs": {
+            "rate_signal": "Diverging UP",
+            "revenue_signal": "Diverging UP"
+          },
+          "Similar CMHCs": {
+            "rate_signal": "Diverging UP",
+            "revenue_signal": "Diverging UP"
+          },
+          "Similar Size Orgs": {
+            "rate_signal": "Diverging UP",
+            "revenue_signal": "Diverging UP"
+          },
+          "Similar Market": {
+            "rate_signal": "Diverging UP",
+            "revenue_signal": "Diverging UP"
+          }
+        }
+      }
+    },
+    "H0032": {
+      "name": "Treatment Plan Development",
+      "service_line": "Assessment",
+      "org_actuals_2024": {
+        "payment_per_claim": 76.81,
+        "revenue_per_bene": 79.14,
+        "claims_per_bene": 1.03,
+        "bene_per_clinician": 33.0,
+        "claims": 68,
+        "paid": 5223.33,
+        "beneficiaries": 66,
+        "svc_npis": 2
+      },
+      "peer_comparison": {
+        "All FL Medicaid Orgs": {
+          "n_orgs": 390,
+          "rate_per_claim": {
+            "p25": 57.24,
+            "p50": 70.33,
+            "p75": 83.0,
+            "org": 76.81,
+            "position": "Above"
+          },
+          "revenue_per_patient": {
+            "p25": 64.04,
+            "p50": 73.39,
+            "p75": 88.64,
+            "org": 79.14,
+            "position": "Above"
+          },
+          "visits_per_patient": {
+            "p25": 1.0,
+            "p50": 1.02,
+            "p75": 1.11,
+            "org": 1.03,
+            "position": "\u2248 P50"
+          },
+          "patients_per_clinician": {
+            "p25": 29.0,
+            "p50": 91.0,
+            "p75": 220.0,
+            "org": 33.0,
+            "position": "WELL BELOW"
+          }
+        },
+        "by_entity:organization": {
+          "n_orgs": 375,
+          "rate_per_claim": {
+            "p25": 57.12,
+            "p50": 70.41,
+            "p75": 82.83,
+            "org": 76.81,
+            "position": "Above"
+          },
+          "revenue_per_patient": {
+            "p25": 64.04,
+            "p50": 73.39,
+            "p75": 88.09,
+            "org": 79.14,
+            "position": "Above"
+          },
+          "visits_per_patient": {
+            "p25": 1.0,
+            "p50": 1.03,
+            "p75": 1.11,
+            "org": 1.03,
+            "position": "\u2248 P50"
+          },
+          "patients_per_clinician": {
+            "p25": 30.0,
+            "p50": 95.0,
+            "p75": 222.25,
+            "org": 33.0,
+            "position": "WELL BELOW"
+          }
+        },
+        "Similar CMHCs": {
+          "n_orgs": 55,
+          "rate_per_claim": {
+            "p25": 54.97,
+            "p50": 70.75,
+            "p75": 82.31,
+            "org": 76.81,
+            "position": "Above"
+          },
+          "revenue_per_patient": {
+            "p25": 56.88,
+            "p50": 72.49,
+            "p75": 85.2,
+            "org": 79.14,
+            "position": "Above"
+          },
+          "visits_per_patient": {
+            "p25": 1.01,
+            "p50": 1.03,
+            "p75": 1.08,
+            "org": 1.03,
+            "position": "\u2248 P50"
+          },
+          "patients_per_clinician": {
+            "p25": 33.0,
+            "p50": 75.0,
+            "p75": 228.0,
+            "org": 33.0,
+            "position": "WELL BELOW"
+          }
+        },
+        "Similar Size Orgs": {
+          "n_orgs": 149,
+          "rate_per_claim": {
+            "p25": 56.52,
+            "p50": 71.87,
+            "p75": 89.52,
+            "org": 76.81,
+            "position": "Above"
+          },
+          "revenue_per_patient": {
+            "p25": 59.84,
+            "p50": 75.69,
+            "p75": 93.39,
+            "org": 79.14,
+            "position": "\u2248 P50"
+          },
+          "visits_per_patient": {
+            "p25": 1.0,
+            "p50": 1.02,
+            "p75": 1.14,
+            "org": 1.03,
+            "position": "\u2248 P50"
+          },
+          "patients_per_clinician": {
+            "p25": 21.0,
+            "p50": 37.0,
+            "p75": 89.86,
+            "org": 33.0,
+            "position": "Below"
+          }
+        },
+        "Similar Market": {
+          "n_orgs": 103,
+          "rate_per_claim": {
+            "p25": 56.78,
+            "p50": 68.13,
+            "p75": 76.14,
+            "org": 76.81,
+            "position": "Above"
+          },
+          "revenue_per_patient": {
+            "p25": 62.91,
+            "p50": 71.33,
+            "p75": 79.9,
+            "org": 79.14,
+            "position": "Above"
+          },
+          "visits_per_patient": {
+            "p25": 1.01,
+            "p50": 1.03,
+            "p75": 1.1,
+            "org": 1.03,
+            "position": "\u2248 P50"
+          },
+          "patients_per_clinician": {
+            "p25": 33.0,
+            "p50": 89.86,
+            "p75": 232.0,
+            "org": 33.0,
+            "position": "WELL BELOW"
+          }
+        },
+        "Same Classification": {
+          "n_orgs": 50,
+          "rate_per_claim": {
+            "p25": 57.67,
+            "p50": 73.29,
+            "p75": 84.33,
+            "org": 76.81,
+            "position": "\u2248 P50"
+          },
+          "revenue_per_patient": {
+            "p25": 67.29,
+            "p50": 73.65,
+            "p75": 88.64,
+            "org": 79.14,
+            "position": "Above"
+          },
+          "visits_per_patient": {
+            "p25": 1.01,
+            "p50": 1.03,
+            "p75": 1.08,
+            "org": 1.03,
+            "position": "\u2248 P50"
+          },
+          "patients_per_clinician": {
+            "p25": 33.0,
+            "p50": 75.0,
+            "p75": 255.0,
+            "org": 33.0,
+            "position": "WELL BELOW"
+          }
+        }
+      },
+      "trend": {
+        "annual": {
+          "2019": {
+            "ppc": 92.19,
+            "rpb": 96.31,
+            "cpb": 1.04,
+            "bpc": 207.6
+          },
+          "2020": {
+            "ppc": 113.19,
+            "rpb": 120.78,
+            "cpb": 1.07,
+            "bpc": 167.8
+          },
+          "2021": {
+            "ppc": 86.23,
+            "rpb": 88.57,
+            "cpb": 1.03,
+            "bpc": 91.8
+          },
+          "2022": {
+            "ppc": 90.5,
+            "rpb": 93.28,
+            "cpb": 1.03,
+            "bpc": 105.8
+          },
+          "2023": {
+            "ppc": 69.29,
+            "rpb": 71.1,
+            "cpb": 1.03,
+            "bpc": 102.0
+          },
+          "2024": {
+            "ppc": 76.81,
+            "rpb": 79.14,
+            "cpb": 1.03,
+            "bpc": 33.0
+          }
+        },
+        "year_range": [
+          "2019",
+          "2024"
+        ],
+        "signals": {
+          "All FL Medicaid Orgs": {
+            "rate_signal": "Converging",
+            "revenue_signal": "Converging"
+          },
+          "Similar CMHCs": {
+            "rate_signal": "Converging",
+            "revenue_signal": "Converging"
+          },
+          "Similar Size Orgs": {
+            "rate_signal": "Converging",
+            "revenue_signal": "Converging"
+          },
+          "Similar Market": {
+            "rate_signal": "Converging",
+            "revenue_signal": "Converging"
+          }
+        }
+      }
+    },
+    "99214": {
+      "name": "Office Visit (Level 4)",
+      "service_line": "Medication Management",
+      "org_actuals_2024": {
+        "payment_per_claim": 15.77,
+        "revenue_per_bene": 19.18,
+        "claims_per_bene": 1.22,
+        "bene_per_clinician": 37.0,
+        "claims": 45,
+        "paid": 709.58,
+        "beneficiaries": 37,
+        "svc_npis": 1
+      },
+      "peer_comparison": {
+        "All FL Medicaid Orgs": {
+          "n_orgs": 4211,
+          "rate_per_claim": {
+            "p25": 22.66,
+            "p50": 42.75,
+            "p75": 70.28,
+            "org": 15.77,
+            "position": "WELL BELOW"
+          },
+          "revenue_per_patient": {
+            "p25": 27.59,
+            "p50": 48.75,
+            "p75": 78.52,
+            "org": 19.18,
+            "position": "WELL BELOW"
+          },
+          "visits_per_patient": {
+            "p25": 1.05,
+            "p50": 1.11,
+            "p75": 1.21,
+            "org": 1.22,
+            "position": "Above"
+          },
+          "patients_per_clinician": {
+            "p25": 34.67,
+            "p50": 100.0,
+            "p75": 233.0,
+            "org": 37.0,
+            "position": "WELL BELOW"
+          }
+        },
+        "by_entity:organization": {
+          "n_orgs": 3733,
+          "rate_per_claim": {
+            "p25": 22.16,
+            "p50": 42.01,
+            "p75": 69.64,
+            "org": 15.77,
+            "position": "WELL BELOW"
+          },
+          "revenue_per_patient": {
+            "p25": 27.09,
+            "p50": 48.1,
+            "p75": 77.67,
+            "org": 19.18,
+            "position": "WELL BELOW"
+          },
+          "visits_per_patient": {
+            "p25": 1.05,
+            "p50": 1.11,
+            "p75": 1.21,
+            "org": 1.22,
+            "position": "Above"
+          },
+          "patients_per_clinician": {
+            "p25": 35.75,
+            "p50": 100.0,
+            "p75": 230.0,
+            "org": 37.0,
+            "position": "WELL BELOW"
+          }
+        },
+        "Similar CMHCs": {
+          "n_orgs": 65,
+          "rate_per_claim": {
+            "p25": 22.86,
+            "p50": 51.68,
+            "p75": 73.17,
+            "org": 15.77,
+            "position": "WELL BELOW"
+          },
+          "revenue_per_patient": {
+            "p25": 24.03,
+            "p50": 59.91,
+            "p75": 75.35,
+            "org": 19.18,
+            "position": "WELL BELOW"
+          },
+          "visits_per_patient": {
+            "p25": 1.05,
+            "p50": 1.09,
+            "p75": 1.18,
+            "org": 1.22,
+            "position": "Above"
+          },
+          "patients_per_clinician": {
+            "p25": 23.0,
+            "p50": 98.67,
+            "p75": 182.5,
+            "org": 37.0,
+            "position": "WELL BELOW"
+          }
+        },
+        "Similar Size Orgs": {
+          "n_orgs": 1643,
+          "rate_per_claim": {
+            "p25": 22.65,
+            "p50": 42.68,
+            "p75": 69.78,
+            "org": 15.77,
+            "position": "WELL BELOW"
+          },
+          "revenue_per_patient": {
+            "p25": 27.76,
+            "p50": 48.94,
+            "p75": 76.65,
+            "org": 19.18,
+            "position": "WELL BELOW"
+          },
+          "visits_per_patient": {
+            "p25": 1.05,
+            "p50": 1.11,
+            "p75": 1.21,
+            "org": 1.22,
+            "position": "Above"
+          },
+          "patients_per_clinician": {
+            "p25": 38.0,
+            "p50": 94.0,
+            "p75": 166.0,
+            "org": 37.0,
+            "position": "WELL BELOW"
+          }
+        },
+        "Similar Market": {
+          "n_orgs": 543,
+          "rate_per_claim": {
+            "p25": 20.69,
+            "p50": 41.48,
+            "p75": 62.49,
+            "org": 15.77,
+            "position": "WELL BELOW"
+          },
+          "revenue_per_patient": {
+            "p25": 25.27,
+            "p50": 45.96,
+            "p75": 67.56,
+            "org": 19.18,
+            "position": "WELL BELOW"
+          },
+          "visits_per_patient": {
+            "p25": 1.05,
+            "p50": 1.11,
+            "p75": 1.2,
+            "org": 1.22,
+            "position": "Above"
+          },
+          "patients_per_clinician": {
+            "p25": 36.83,
+            "p50": 101.0,
+            "p75": 216.0,
+            "org": 37.0,
+            "position": "WELL BELOW"
+          }
+        },
+        "Same Classification": {
+          "n_orgs": 46,
+          "rate_per_claim": {
+            "p25": 22.9,
+            "p50": 51.68,
+            "p75": 73.6,
+            "org": 15.77,
+            "position": "WELL BELOW"
+          },
+          "revenue_per_patient": {
+            "p25": 25.37,
+            "p50": 61.69,
+            "p75": 79.54,
+            "org": 19.18,
+            "position": "WELL BELOW"
+          },
+          "visits_per_patient": {
+            "p25": 1.06,
+            "p50": 1.09,
+            "p75": 1.17,
+            "org": 1.22,
+            "position": "Above"
+          },
+          "patients_per_clinician": {
+            "p25": 37.0,
+            "p50": 101.0,
+            "p75": 216.0,
+            "org": 37.0,
+            "position": "WELL BELOW"
+          }
+        }
+      },
+      "trend": {
+        "annual": {
+          "2019": {
+            "ppc": 0.0,
+            "rpb": 0.0,
+            "cpb": 1.17,
+            "bpc": 12.0
+          },
+          "2020": {
+            "ppc": 0.0,
+            "rpb": 0.0,
+            "cpb": 1.43,
+            "bpc": 97.0
+          },
+          "2021": {
+            "ppc": 3.31,
+            "rpb": 4.57,
+            "cpb": 1.38,
+            "bpc": 89.0
+          },
+          "2022": {
+            "ppc": 9.48,
+            "rpb": 14.46,
+            "cpb": 1.52,
+            "bpc": 40.0
+          },
+          "2023": {
+            "ppc": 4.17,
+            "rpb": 5.05,
+            "cpb": 1.21,
+            "bpc": 71.0
+          },
+          "2024": {
+            "ppc": 15.77,
+            "rpb": 19.18,
+            "cpb": 1.22,
+            "bpc": 37.0
+          }
+        },
+        "year_range": [
+          "2019",
+          "2024"
+        ],
+        "signals": {
+          "All FL Medicaid Orgs": {
+            "rate_signal": "Recovering",
+            "revenue_signal": "Recovering"
+          },
+          "Similar CMHCs": {
+            "rate_signal": "Recovering",
+            "revenue_signal": "Recovering"
+          },
+          "Similar Size Orgs": {
+            "rate_signal": "Stable",
+            "revenue_signal": "Recovering"
+          },
+          "Similar Market": {
+            "rate_signal": "Recovering",
+            "revenue_signal": "Recovering"
+          }
+        }
+      }
+    }
+  }
+}

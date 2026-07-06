@@ -1,0 +1,810 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>FL CMHC Landscape Report v2</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><style>body{font-family:Inter,sans-serif;background:#0f172a;color:#e2e8f0;max-width:1100px;margin:0 auto;padding:40px 60px;line-height:1.75}h1{font-size:32px;color:#f1f5f9;border-bottom:2px solid #3b82f6;padding-bottom:16px;margin-bottom:32px}h2{font-size:24px;color:#f1f5f9;margin-top:48px;border-bottom:1px solid #334155;padding-bottom:8px}h3{font-size:18px;color:#94a3b8;margin-top:36px}h4{font-size:16px;color:#94a3b8;margin-top:28px}p{font-size:15px;color:#cbd5e1;margin-bottom:16px}strong{color:#f1f5f9}ul,ol{margin:12px 0;padding-left:24px}li{font-size:15px;color:#cbd5e1;margin-bottom:10px}li strong{color:#f1f5f9}hr{border:none;border-top:1px solid #334155;margin:32px 0}table{border-collapse:collapse;width:100%;margin:20px 0;font-size:12px}th{background:#1e293b;color:#f1f5f9;padding:8px 10px;text-align:left;border:1px solid #334155;font-weight:600}td{padding:8px 10px;border:1px solid #334155;color:#cbd5e1;vertical-align:top}tr:nth-child(even){background:rgba(30,41,59,0.5)}em{color:#94a3b8}blockquote{border-left:3px solid #f59e0b;padding:12px 16px;margin:20px 0;background:rgba(245,158,11,0.08);border-radius:0 8px 8px 0}blockquote p{color:#fbbf24;margin:0}</style></head><body><h1>Florida Medicaid CMHC Sector Landscape -- Rate &amp; Operational Benchmarking Report (v2)</h1>
+<p><strong>Sector:</strong> Community Mental Health Centers (CMHCs) | <strong>State:</strong> Florida | <strong>Period:</strong> 2024
+<strong>Scope:</strong> 86 CMHCs billing Medicaid fee-for-service claims through professional servicing clinicians</p>
+<hr />
+<h2>Executive Summary</h2>
+<ul>
+<li>The CMHC sector's two largest revenue streams -- Behavioral Therapy (H2019, 230K claims) and Targeted Case Management (T1017, 197K claims) -- show divergent rate positioning: H2019 collects slightly above the All FL median (+4.3%) while T1017 falls 20.3% below it, making case management the sector's single largest rate-gap exposure.</li>
+<li>On workforce productivity, CMHC clinicians carry median panels of 123 patients (H2019) and 275 patients (T1017), but only 26 patients for 60-minute psychotherapy (90837), suggesting heavy concentration of therapy caseloads on a small number of clinicians while case managers and PSR staff carry broad panels.</li>
+<li>Patient engagement (visits per patient) in the CMHC sector trails the All FL median on psychotherapy codes -- 1.67 visits per patient on 90837 vs. 2.03 statewide -- raising a question about whether patients are completing treatment episodes or disengaging after initial sessions.</li>
+<li>Revenue per patient on the sector's highest-volume codes ranges from $72.19 (T1015 medication management) to $1,342.29 (H2017 psychosocial rehabilitation), with PSR and ACT driving the highest per-patient yield due to session frequency, not rate.</li>
+<li>Where published rates exist, the gap from published to All FL paid is substantial (e.g., H0031 assessment: published $126.11 vs. All FL paid $31.59), confirming that the structural compression facing the entire market dwarfs the CMHC-specific gap on most codes.</li>
+</ul>
+<hr />
+<h2>Section 1: About This Report</h2>
+<h3>What this report covers</h3>
+<p>This report benchmarks the Florida Community Mental Health Center (CMHC) sector against the broader Florida Medicaid market across 25 HCPCS codes where CMHCs have billing activity. It uses 2024 Medicaid fee-for-service claims data for all organizations billing through professional servicing clinicians.</p>
+<p>The CMHC sector includes 86 organizations. The All FL Medicaid comparison group includes all provider types billing each code -- ranging from solo practitioners to hospital-based programs and FQHCs. This breadth is intentional: the All FL median represents the market rate a CMHC competes against, not a peer group of similar organizations.</p>
+<h3>Four KPIs</h3>
+<p>Every code in this report is evaluated on four operational metrics:</p>
+<table>
+<thead>
+<tr>
+<th>KPI</th>
+<th>Field</th>
+<th>What it measures</th>
+<th>Operational question</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Rate per Claim</strong></td>
+<td>p50_ppc</td>
+<td>Median dollars collected per claim at the org level</td>
+<td>Is the sector paid at market? Where are the gaps?</td>
+</tr>
+<tr>
+<td><strong>Patients per Clinician (Panel Size)</strong></td>
+<td>p50_bpc</td>
+<td>Median unique patients per billing clinician</td>
+<td>Is the workforce carrying enough patients? Productivity signal.</td>
+</tr>
+<tr>
+<td><strong>Visits per Patient (Engagement)</strong></td>
+<td>p50_cpb</td>
+<td>Median claims per unique patient</td>
+<td>Are patients staying engaged? Retention / no-show signal.</td>
+</tr>
+<tr>
+<td><strong>Revenue per Patient</strong></td>
+<td>p50_rpb</td>
+<td>Median total revenue per unique patient</td>
+<td>What is the yield per patient? Acquisition efficiency signal.</td>
+</tr>
+</tbody>
+</table>
+<h3>Three-layer rate context</h3>
+<p>When published fee schedule rates are available, this report frames rates in three layers:</p>
+<ol>
+<li><strong>FL Medicaid Published Rate</strong> -- What AHCA's fee schedule says Medicaid will pay. This is the ceiling. No organization routinely collects this amount.</li>
+<li><strong>All FL Medicaid Median Paid Rate</strong> -- What the industry actually collects at the median. This reflects compression from MCO contracts, FFS/managed care mix, modifier patterns, and billing practices. The gap from published to All FL paid is structural -- it affects everyone.</li>
+<li><strong>CMHC Sector Median Paid Rate</strong> -- What CMHCs specifically collect. The gap from All FL to CMHC is sector-specific and potentially addressable through contract negotiation, billing optimization, or session structure changes.</li>
+</ol>
+<h3>How to read this report</h3>
+<p>This report presents market-level observations. It does not diagnose causes or recommend actions for individual organizations. Where a gap is identified, the report poses a question rather than a conclusion. For example, a rate below market may reflect structurally undervalued contracts, shorter session durations, modifier patterns, or payer mix -- the data alone cannot distinguish these causes without org-level investigation.</p>
+<hr />
+<h2>Section 2: Sector Dashboard</h2>
+<p>Codes sorted by CMHC total claims (largest revenue streams first). Gap signal: green = at or above All FL; yellow = slightly below (-1% to -10%); red = significantly below (worse than -10%).</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Service Line</th>
+<th>CMHC Orgs</th>
+<th>CMHC Claims</th>
+<th>Rate/Claim (CMHC)</th>
+<th>Rate/Claim (All FL)</th>
+<th>Gap</th>
+<th>Patients/Clinician (CMHC)</th>
+<th>Patients/Clinician (All FL)</th>
+<th>Visits/Patient (CMHC)</th>
+<th>Visits/Patient (All FL)</th>
+<th>Rev/Patient (CMHC)</th>
+<th>Rev/Patient (All FL)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H2019</td>
+<td>Outpatient Therapy</td>
+<td>86</td>
+<td>230,122</td>
+<td>$74.53</td>
+<td>$71.43</td>
+<td>+4.3%</td>
+<td>123.0</td>
+<td>211.0</td>
+<td>2.04</td>
+<td>2.51</td>
+<td>$137.38</td>
+<td>$180.81</td>
+</tr>
+<tr>
+<td>T1017</td>
+<td>Case Management</td>
+<td>34</td>
+<td>196,720</td>
+<td>$49.58</td>
+<td>$62.20</td>
+<td>-20.3%</td>
+<td>275.0</td>
+<td>258.0</td>
+<td>4.70</td>
+<td>5.57</td>
+<td>$240.24</td>
+<td>$361.14</td>
+</tr>
+<tr>
+<td>H2017</td>
+<td>Psychosocial Rehab</td>
+<td>39</td>
+<td>160,030</td>
+<td>$123.82</td>
+<td>$120.93</td>
+<td>+2.4%</td>
+<td>172.5</td>
+<td>242.0</td>
+<td>11.80</td>
+<td>11.65</td>
+<td>$1,342.29</td>
+<td>$1,376.24</td>
+</tr>
+<tr>
+<td>T1015</td>
+<td>Medication Mgmt</td>
+<td>53</td>
+<td>98,946</td>
+<td>$65.02</td>
+<td>$70.18</td>
+<td>-7.4%</td>
+<td>224.0</td>
+<td>227.0</td>
+<td>1.13</td>
+<td>1.11</td>
+<td>$72.19</td>
+<td>$76.94</td>
+</tr>
+<tr>
+<td>H0040</td>
+<td>ACT</td>
+<td>6</td>
+<td>84,539</td>
+<td>$30.30</td>
+<td>$30.78</td>
+<td>-1.6%</td>
+<td>345.5</td>
+<td>546.0</td>
+<td>23.60</td>
+<td>21.32</td>
+<td>$721.37</td>
+<td>$643.55</td>
+</tr>
+<tr>
+<td>H0031</td>
+<td>Assessment</td>
+<td>48</td>
+<td>50,983</td>
+<td>$31.70</td>
+<td>$31.59</td>
+<td>+0.3%</td>
+<td>115.42</td>
+<td>83.0</td>
+<td>1.22</td>
+<td>1.48</td>
+<td>$45.73</td>
+<td>$51.80</td>
+</tr>
+<tr>
+<td>H0032</td>
+<td>Assessment</td>
+<td>55</td>
+<td>47,113</td>
+<td>$70.75</td>
+<td>$70.33</td>
+<td>+0.6%</td>
+<td>75.0</td>
+<td>91.0</td>
+<td>1.03</td>
+<td>1.02</td>
+<td>$72.49</td>
+<td>$73.39</td>
+</tr>
+<tr>
+<td>99214</td>
+<td>Medication Mgmt</td>
+<td>65</td>
+<td>30,949</td>
+<td>$51.68</td>
+<td>$42.75</td>
+<td>+20.9%</td>
+<td>98.67</td>
+<td>100.0</td>
+<td>1.09</td>
+<td>1.11</td>
+<td>$59.91</td>
+<td>$48.71</td>
+</tr>
+<tr>
+<td>99213</td>
+<td>Medication Mgmt</td>
+<td>39</td>
+<td>22,527</td>
+<td>$30.38</td>
+<td>$33.32</td>
+<td>-8.8%</td>
+<td>94.5</td>
+<td>111.33</td>
+<td>1.09</td>
+<td>1.11</td>
+<td>$34.00</td>
+<td>$37.46</td>
+</tr>
+<tr>
+<td>90833</td>
+<td>Medication Mgmt</td>
+<td>21</td>
+<td>13,360</td>
+<td>$38.49</td>
+<td>$34.84</td>
+<td>+10.5%</td>
+<td>43.0</td>
+<td>128.0</td>
+<td>1.10</td>
+<td>1.17</td>
+<td>$44.50</td>
+<td>$37.84</td>
+</tr>
+<tr>
+<td>90837</td>
+<td>Outpatient Therapy</td>
+<td>27</td>
+<td>9,799</td>
+<td>$57.77</td>
+<td>$85.97</td>
+<td>-32.8%</td>
+<td>26.0</td>
+<td>95.0</td>
+<td>1.67</td>
+<td>2.03</td>
+<td>$104.89</td>
+<td>$161.13</td>
+</tr>
+<tr>
+<td>H2000</td>
+<td>Assessment</td>
+<td>20</td>
+<td>8,502</td>
+<td>$225.18</td>
+<td>$193.95</td>
+<td>+16.1%</td>
+<td>56.67</td>
+<td>58.0</td>
+<td>1.04</td>
+<td>1.02</td>
+<td>$231.46</td>
+<td>$206.51</td>
+</tr>
+<tr>
+<td>H2010</td>
+<td>Outpatient Therapy</td>
+<td>8</td>
+<td>5,355</td>
+<td>$16.74</td>
+<td>$20.48</td>
+<td>-18.3%</td>
+<td>173.0</td>
+<td>54.6</td>
+<td>1.02</td>
+<td>1.02</td>
+<td>$24.47</td>
+<td>$24.47</td>
+</tr>
+<tr>
+<td>H0048</td>
+<td>Medical BH</td>
+<td>6</td>
+<td>3,633</td>
+<td>$9.57</td>
+<td>$9.27</td>
+<td>+3.2%</td>
+<td>102.0</td>
+<td>145.0</td>
+<td>1.13</td>
+<td>1.12</td>
+<td>$12.03</td>
+<td>$10.46</td>
+</tr>
+<tr>
+<td>90792</td>
+<td>Outpatient Therapy</td>
+<td>13</td>
+<td>1,643</td>
+<td>$59.68</td>
+<td>$82.12</td>
+<td>-27.3%</td>
+<td>45.0</td>
+<td>38.0</td>
+<td>1.08</td>
+<td>1.09</td>
+<td>$83.12</td>
+<td>$95.27</td>
+</tr>
+<tr>
+<td>H0036</td>
+<td>Case Management</td>
+<td>4</td>
+<td>1,445</td>
+<td>$52.17</td>
+<td>$72.32</td>
+<td>-27.9%</td>
+<td>36.0</td>
+<td>36.0</td>
+<td>1.50</td>
+<td>2.05</td>
+<td>$78.25</td>
+<td>$182.91</td>
+</tr>
+<tr>
+<td>99215</td>
+<td>Medication Mgmt</td>
+<td>7</td>
+<td>1,231</td>
+<td>$85.45</td>
+<td>$81.01</td>
+<td>+5.5%</td>
+<td>88.0</td>
+<td>44.0</td>
+<td>1.05</td>
+<td>1.08</td>
+<td>$91.17</td>
+<td>$92.36</td>
+</tr>
+<tr>
+<td>H0004</td>
+<td>Outpatient Therapy</td>
+<td>4</td>
+<td>1,047</td>
+<td>$0.08</td>
+<td>$36.89</td>
+<td>-99.8%</td>
+<td>13.0</td>
+<td>96.33</td>
+<td>1.33</td>
+<td>1.34</td>
+<td>$0.10</td>
+<td>$54.53</td>
+</tr>
+<tr>
+<td>99212</td>
+<td>Medication Mgmt</td>
+<td>6</td>
+<td>669</td>
+<td>$20.67</td>
+<td>$26.52</td>
+<td>-22.1%</td>
+<td>40.0</td>
+<td>60.0</td>
+<td>1.06</td>
+<td>1.07</td>
+<td>$25.33</td>
+<td>$28.85</td>
+</tr>
+<tr>
+<td>90832</td>
+<td>Outpatient Therapy</td>
+<td>3</td>
+<td>559</td>
+<td>$48.74</td>
+<td>$19.89</td>
+<td>+145.0%</td>
+<td>68.0</td>
+<td>94.0</td>
+<td>2.66</td>
+<td>1.66</td>
+<td>$81.92</td>
+<td>$38.41</td>
+</tr>
+<tr>
+<td>T1007</td>
+<td>Assessment</td>
+<td>3</td>
+<td>456</td>
+<td>$74.42</td>
+<td>$49.13</td>
+<td>+51.5%</td>
+<td>43.0</td>
+<td>61.0</td>
+<td>1.02</td>
+<td>1.02</td>
+<td>$74.42</td>
+<td>$50.46</td>
+</tr>
+<tr>
+<td>90834</td>
+<td>Outpatient Therapy</td>
+<td>6</td>
+<td>433</td>
+<td>$47.74</td>
+<td>$53.27</td>
+<td>-10.4%</td>
+<td>18.0</td>
+<td>60.0</td>
+<td>1.42</td>
+<td>1.50</td>
+<td>$68.96</td>
+<td>$79.50</td>
+</tr>
+<tr>
+<td>99203</td>
+<td>Medication Mgmt</td>
+<td>4</td>
+<td>372</td>
+<td>$65.17</td>
+<td>$69.17</td>
+<td>-5.8%</td>
+<td>21.0</td>
+<td>39.0</td>
+<td>1.02</td>
+<td>1.03</td>
+<td>$68.85</td>
+<td>$74.70</td>
+</tr>
+<tr>
+<td>90791</td>
+<td>Outpatient Therapy</td>
+<td>6</td>
+<td>333</td>
+<td>$105.30</td>
+<td>$91.88</td>
+<td>+14.6%</td>
+<td>31.0</td>
+<td>30.0</td>
+<td>1.02</td>
+<td>1.07</td>
+<td>$105.30</td>
+<td>$101.67</td>
+</tr>
+<tr>
+<td>99204</td>
+<td>Medication Mgmt</td>
+<td>4</td>
+<td>319</td>
+<td>$81.47</td>
+<td>$95.74</td>
+<td>-14.9%</td>
+<td>25.0</td>
+<td>39.14</td>
+<td>1.00</td>
+<td>1.04</td>
+<td>$97.53</td>
+<td>$102.67</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Dashboard reading guide:</strong> The gap column reflects rate per claim only. A green signal on rate does not mean the code is performing well on all dimensions -- check panel size, engagement, and revenue per patient for the full picture.</p>
+<hr />
+<h2>Section 3: Service Line Deep Dives</h2>
+<h3>3A. Outpatient Therapy</h3>
+<p>This is the CMHC sector's core clinical service. It spans traditional psychotherapy (CPT 90837, 90834, 90832, 90791), behavioral therapy (H2019), and specialized modalities (H2010, H0004).</p>
+<hr />
+<p><strong>H2019 -- Behavioral Therapy Services</strong> (230,122 CMHC claims | 86 orgs)
+Published rate: $21.87 per 15min | Time-based code</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC median $74.53 vs. All FL $71.43 (+4.3%). The sector collects slightly above the statewide median on this code. With a published rate of $21.87 per 15-minute unit and typical sessions spanning multiple units, the per-claim rate reflects both the unit rate and session length. The All FL median itself sits well above the published single-unit rate, confirming that multi-unit billing is standard.</li>
+<li><strong>Panel Size:</strong> CMHC median 123 patients per clinician vs. All FL 211. CMHC clinicians carry substantially smaller panels on this code. Is the CMHC workforce underutilized on behavioral therapy, or are CMHCs distributing this work across more clinicians?</li>
+<li><strong>Engagement:</strong> CMHC median 2.04 visits per patient vs. All FL 2.51. CMHC patients complete fewer visits. Are treatment models intentionally shorter, or are patients disengaging before completing a full course?</li>
+<li><strong>Revenue per Patient:</strong> CMHC $137.38 vs. All FL $180.81. Lower engagement drives lower per-patient yield even though the per-claim rate is competitive. The revenue gap is an engagement problem, not a rate problem.</li>
+<li><strong>Market variation:</strong> Dense markets $69.99, moderate $73.31, sparse $68.40 (All FL). Rates are relatively stable across market types.</li>
+</ul>
+<p><em>Key question: H2019 is a rate success story for CMHCs, but the engagement and panel size gaps suggest the sector may not be maximizing throughput on its best-reimbursed therapy code.</em></p>
+<hr />
+<p><strong>90837 -- Psychotherapy 60min</strong> (9,799 CMHC claims | 27 orgs)</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC median $57.77 vs. All FL $85.97 (-32.8%). This is the sector's deepest rate gap on a high-profile therapy code. The $28.20 per-claim deficit across nearly 10,000 claims represents significant revenue exposure.</li>
+<li><strong>Panel Size:</strong> CMHC median 26 patients per clinician vs. All FL 95. CMHC clinicians billing 60-minute psychotherapy carry very small panels, suggesting either part-time therapy staffing or heavy concentration of therapy caseloads on a few clinicians.</li>
+<li><strong>Engagement:</strong> CMHC median 1.67 visits per patient vs. All FL 2.03. Patients are not returning for follow-up therapy sessions at market rates. Are CMHC patients disengaging faster, or are treatment models intentionally shorter?</li>
+<li><strong>Revenue per Patient:</strong> CMHC $104.89 vs. All FL $161.13 (-34.9%). The combined effect of lower rates and lower engagement produces a revenue-per-patient figure that is roughly one-third below the market.</li>
+<li><strong>Size variation:</strong> Large orgs $72.12, medium $89.80, small $94.89 (All FL). Smaller organizations actually collect more per claim on this code, suggesting that large-org MCO contracts may drive the CMHC sector's compression.</li>
+</ul>
+<p><em>Key question: Are CMHC contracts structurally undervalued on 60-minute psychotherapy, or is the sector billing shorter actual session times that reduce the effective per-claim collection?</em></p>
+<hr />
+<p><strong>90834 -- Psychotherapy 45min</strong> (433 CMHC claims | 6 orgs)</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC median $47.74 vs. All FL $53.27 (-10.4%). A modest gap, but the very low claim volume (433 claims from only 6 orgs) suggests this code is rarely used in the CMHC sector.</li>
+<li><strong>Panel Size:</strong> CMHC median 18 patients per clinician vs. All FL 60. Extremely small panels reinforce that this code is a marginal part of CMHC operations.</li>
+<li><strong>Engagement:</strong> CMHC 1.42 vs. All FL 1.50. Slightly lower engagement, consistent with the pattern on other therapy codes.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $68.96 vs. All FL $79.50. Lower across both rate and engagement dimensions.</li>
+</ul>
+<p><em>Key question: With only 433 claims across 6 orgs, is 45-minute psychotherapy a code the CMHC sector has intentionally moved away from, or one it should consider expanding?</em></p>
+<hr />
+<p><strong>90832 -- Psychotherapy 30min</strong> (559 CMHC claims | 3 orgs)</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC median $48.74 vs. All FL $19.89 (+145.0%). The 3 CMHC orgs billing this code collect far above the market median. However, the All FL median is depressed by a wide distribution (p25 = $3.34, p75 = $54.84), and only 3 CMHC orgs bill this code.</li>
+<li><strong>Panel Size:</strong> CMHC 68 vs. All FL 94. Smaller panels, but only 3 orgs.</li>
+<li><strong>Engagement:</strong> CMHC 2.66 vs. All FL 1.66. Substantially higher engagement. CMHC patients on this code return more frequently.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $81.92 vs. All FL $38.41. The combination of higher rate and higher engagement produces strong per-patient yield.</li>
+</ul>
+<p><em>Key question: This apparent outperformance is driven by only 3 organizations. Is there a billing pattern (e.g., consistent modifier use, specific payer contracts) that explains the divergence, or is this an artifact of small sample size?</em></p>
+<hr />
+<p><strong>90791 -- Diagnostic Psychiatric Evaluation</strong> (333 CMHC claims | 6 orgs)</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $105.30 vs. All FL $91.88 (+14.6%). CMHCs collect above market on this intake code, though volume is very low.</li>
+<li><strong>Panel Size:</strong> CMHC 31 vs. All FL 30. Comparable.</li>
+<li><strong>Engagement:</strong> CMHC 1.02 vs. All FL 1.07. Near-identical -- this is typically a one-time evaluation.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $105.30 vs. All FL $101.67. Slightly above market.</li>
+</ul>
+<p><em>Key question: At 333 claims across 6 orgs, are CMHCs routing most intake evaluations to a different code (H2000, H0031)?</em></p>
+<hr />
+<p><strong>90792 -- Psychiatric Evaluation (Medical)</strong> (1,643 CMHC claims | 13 orgs)</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $59.68 vs. All FL $82.12 (-27.3%). A significant gap on the physician-level psychiatric evaluation. The All FL distribution is wide (p25 = $19.56, p75 = $144.58), but the CMHC median falls well below the market center.</li>
+<li><strong>Panel Size:</strong> CMHC 45 vs. All FL 38. CMHC psychiatrists evaluating more patients than market median.</li>
+<li><strong>Engagement:</strong> CMHC 1.08 vs. All FL 1.09. Essentially identical -- this is a one-time or infrequent code.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $83.12 vs. All FL $95.27. The rate gap flows directly to revenue per patient since engagement is comparable.</li>
+</ul>
+<p><em>Key question: Are CMHC psychiatric evaluations being reimbursed at a lower contracted rate, or are modifiers or place-of-service codes reducing the effective payment?</em></p>
+<hr />
+<p><strong>H2010 -- Brief Individual Psychotherapy</strong> (5,355 CMHC claims | 8 orgs)</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $16.74 vs. All FL $20.48 (-18.3%). A meaningful gap on a CMHC-relevant therapy code.</li>
+<li><strong>Panel Size:</strong> CMHC 173 vs. All FL 54.6. CMHC clinicians carry dramatically larger panels on this code, more than 3x the market. This is a high-volume, brief-contact model.</li>
+<li><strong>Engagement:</strong> CMHC 1.02 vs. All FL 1.02. Identical -- this is primarily a single-visit service.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $24.47 vs. All FL $24.47. Identical revenue per patient despite the rate gap, because engagement is the same.</li>
+</ul>
+<p><em>Key question: The rate gap on H2010 does not translate to a revenue-per-patient gap because engagement is identical. Is the lower per-claim rate offset by the much larger panel size (173 vs. 55), producing equivalent or greater total clinician-level revenue?</em></p>
+<hr />
+<p><strong>H0004 -- Behavioral Health Counseling</strong> (1,047 CMHC claims | 4 orgs)</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $0.08 vs. All FL $36.89 (-99.8%). This is an extreme outlier. A $0.08 median rate per claim effectively means this code is being billed at zero reimbursement for most CMHC claims. This almost certainly reflects a data or billing anomaly rather than a true rate.</li>
+<li><strong>Panel Size:</strong> CMHC 13 vs. All FL 96.33. Very small panels.</li>
+<li><strong>Engagement:</strong> CMHC 1.33 vs. All FL 1.34. Comparable.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $0.10 vs. All FL $54.53. Effectively zero.</li>
+</ul>
+<p><em>Key question: The $0.08 median rate strongly suggests denied claims, bundled billing, or a coding error. Organizations billing H0004 should audit claim-level payment data before drawing any reimbursement conclusions.</em></p>
+<hr />
+<h3>3B. Case Management</h3>
+<hr />
+<p><strong>T1017 -- Targeted Case Management</strong> (196,720 CMHC claims | 34 orgs)
+Published rate: $14.82 per 15min | Time-based code</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $49.58 vs. All FL $62.20 (-20.3%). This is the sector's largest revenue-gap exposure by volume. With nearly 200,000 claims, even a modest per-claim gap produces substantial aggregate revenue impact. The published rate of $14.82 per 15-minute unit means the typical claim spans multiple units; the All FL median of $62.20 per claim implies roughly 4 units per claim at the market level.</li>
+<li><strong>Panel Size:</strong> CMHC 275 vs. All FL 258. CMHC case managers carry slightly larger panels than the market, suggesting the workforce is not underutilized.</li>
+<li><strong>Engagement:</strong> CMHC 4.70 vs. All FL 5.57. CMHC patients receive fewer case management contacts per patient. Are CMHC patients disengaging from case management, or are treatment models intentionally delivering fewer but longer contacts?</li>
+<li><strong>Revenue per Patient:</strong> CMHC $240.24 vs. All FL $361.14 (-33.5%). The combination of lower rate and lower engagement produces a per-patient yield that is one-third below market. This is the sector's most consequential revenue gap.</li>
+<li><strong>Size variation:</strong> Large orgs $66.98, medium $57.14, small $62.20 (All FL). Larger organizations collect more per claim, suggesting scale-dependent contract leverage.</li>
+</ul>
+<p><em>Key question: T1017 is a time-based code. The 20.3% per-claim gap may reflect shorter session durations (fewer 15-minute units per encounter) rather than a lower per-unit rate. Both explanations are operationally significant but require different interventions -- contract negotiation vs. service delivery restructuring.</em></p>
+<hr />
+<p><strong>H0036 -- Community-Based Case Management</strong> (1,445 CMHC claims | 4 orgs)</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $52.17 vs. All FL $72.32 (-27.9%). A significant gap, though only 4 CMHC orgs bill this code.</li>
+<li><strong>Panel Size:</strong> CMHC 36 vs. All FL 36. Identical.</li>
+<li><strong>Engagement:</strong> CMHC 1.50 vs. All FL 2.05. Notably lower engagement. CMHC patients receive fewer contacts.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $78.25 vs. All FL $182.91 (-57.2%). The combined rate and engagement gap produces a dramatic per-patient revenue deficit.</li>
+</ul>
+<p><em>Key question: With only 4 CMHC orgs billing 1,445 claims, is this a niche code for the sector? The engagement gap (1.50 vs. 2.05) suggests patients may be transitioning out of this service more quickly in CMHC settings.</em></p>
+<hr />
+<h3>3C. Psychosocial Rehabilitation</h3>
+<hr />
+<p><strong>H2017 -- Psychosocial Rehabilitation</strong> (160,030 CMHC claims | 39 orgs)
+Published rate: $9.08 per 15min | Time-based code</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $123.82 vs. All FL $120.93 (+2.4%). The sector is at market on its third-largest revenue stream. The published rate of $9.08 per 15-minute unit, combined with a median per-claim rate above $120, implies typical sessions of 13+ units (over 3 hours).</li>
+<li><strong>Panel Size:</strong> CMHC 172.5 vs. All FL 242. CMHC clinicians carry smaller PSR panels. Is the CMHC workforce at capacity, or are programs serving fewer patients per staff member than the market?</li>
+<li><strong>Engagement:</strong> CMHC 11.80 vs. All FL 11.65. Essentially identical. PSR patients in the CMHC sector attend at market frequency.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $1,342.29 vs. All FL $1,376.24. Nearly identical. This is the sector's highest per-patient yield code, driven by the high visit frequency inherent in PSR programming.</li>
+<li><strong>Market variation:</strong> Dense $126.65, moderate $110.45, sparse $94.02 (All FL). Dense markets collect more, likely reflecting longer program days or more units per session.</li>
+</ul>
+<p><em>Key question: H2017 is operationally healthy on rate, engagement, and revenue per patient. The panel size gap (172.5 vs. 242) is the one area worth investigating -- is it a staffing constraint, a program design choice, or a reporting artifact?</em></p>
+<hr />
+<h3>3D. Assertive Community Treatment</h3>
+<hr />
+<p><strong>H0040 -- Assertive Community Treatment (FACT)</strong> (84,539 CMHC claims | 6 orgs)
+Published rate: $31.55 per diem</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $30.30 vs. All FL $30.78 (-1.6%). Essentially at market. The published rate of $31.55 per diem means the All FL median collects 97.6% of the published rate -- ACT is one of the least-compressed codes in the dataset.</li>
+<li><strong>Panel Size:</strong> CMHC 345.5 vs. All FL 546. CMHC ACT teams serve smaller caseloads. Given that ACT is a team-based model with mandated staff-to-patient ratios, this may reflect smaller team sizes rather than underutilization.</li>
+<li><strong>Engagement:</strong> CMHC 23.60 vs. All FL 21.32. CMHC patients receive slightly more contacts per patient, consistent with intensive wraparound models.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $721.37 vs. All FL $643.55 (+12.1%). Higher engagement at a comparable rate produces above-market per-patient revenue.</li>
+</ul>
+<p><em>Key question: H0040 is a strong performer for CMHCs on rate, engagement, and revenue per patient. The smaller panel size (345.5 vs. 546) is the operational question -- is it a function of team size, program maturity, or catchment area constraints?</em></p>
+<hr />
+<h3>3E. Assessment &amp; Intake</h3>
+<hr />
+<p><strong>H0031 -- Mental Health Assessment</strong> (50,983 CMHC claims | 48 orgs)
+Published rate: $126.11 per event (in-depth, HO modifier) | Limited assessment: $17.90</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $31.70 vs. All FL $31.59 (+0.3%). At market. However, the published in-depth rate of $126.11 means the entire market collects only 25% of the fee schedule rate. This massive structural compression affects everyone equally.</li>
+<li><strong>Panel Size:</strong> CMHC 115.42 vs. All FL 83. CMHC assessors evaluate more patients per clinician than the market. Higher throughput on an assessment code may reflect the sector's role as a community entry point.</li>
+<li><strong>Engagement:</strong> CMHC 1.22 vs. All FL 1.48. Fewer repeat assessments. This may be operationally appropriate -- fewer re-assessments could indicate efficient intake processes.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $45.73 vs. All FL $51.80. Slightly lower, driven by the engagement difference.</li>
+</ul>
+<p><em>Key question: The gap between published rate ($126.11) and actual paid ($31.70) is extraordinary. Is the market predominantly billing the limited assessment ($17.90 published) rather than the in-depth assessment, or are MCO contracts compressing the in-depth rate to this level?</em></p>
+<hr />
+<p><strong>H0032 -- Treatment Plan Development</strong> (47,113 CMHC claims | 55 orgs)
+Published rate: $97.86 per event | Review: $48.93</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $70.75 vs. All FL $70.33 (+0.6%). At market. The published rate of $97.86 means the market collects approximately 72% of the fee schedule -- moderate structural compression.</li>
+<li><strong>Panel Size:</strong> CMHC 75 vs. All FL 91. Slightly smaller panels.</li>
+<li><strong>Engagement:</strong> CMHC 1.03 vs. All FL 1.02. Nearly identical -- treatment plans are typically developed once per episode.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $72.49 vs. All FL $73.39. Essentially identical.</li>
+</ul>
+<p><em>Key question: H0032 is one of the sector's healthiest codes across all four KPIs. The 28% gap to published rate ($97.86) is structural and industry-wide. Is the mix of initial plans vs. reviews ($48.93) driving the compression?</em></p>
+<hr />
+<p><strong>H2000 -- Psychiatric Evaluation</strong> (8,502 CMHC claims | 20 orgs)
+Published rate: $250.63 per eval (physician) | Non-physician: $179.02</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $225.18 vs. All FL $193.95 (+16.1%). CMHCs collect well above the statewide median on psychiatric evaluations. The published physician rate of $250.63 means CMHCs collect 89.8% of the fee schedule -- far less compression than on most codes.</li>
+<li><strong>Panel Size:</strong> CMHC 56.67 vs. All FL 58. Comparable.</li>
+<li><strong>Engagement:</strong> CMHC 1.04 vs. All FL 1.02. Nearly identical -- this is a one-time evaluation.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $231.46 vs. All FL $206.51 (+12.1%). Above market.</li>
+</ul>
+<p><em>Key question: This is a strong-performing code. Are CMHCs billing a higher share of physician-level (HP modifier) evaluations, which would explain the above-market rate?</em></p>
+<hr />
+<p><strong>T1007 -- Assessment/Treatment Plan</strong> (456 CMHC claims | 3 orgs)</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $74.42 vs. All FL $49.13 (+51.5%). Well above market, but only 3 CMHC orgs.</li>
+<li><strong>Panel Size:</strong> CMHC 43 vs. All FL 61. Smaller panels.</li>
+<li><strong>Engagement:</strong> CMHC 1.02 vs. All FL 1.02. Identical.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $74.42 vs. All FL $50.46. Above market.</li>
+</ul>
+<p><em>Key question: With only 3 CMHC orgs and 456 claims, this is a low-volume code. The above-market rate may reflect specific organizational billing practices rather than a sector-wide pattern.</em></p>
+<hr />
+<h3>3F. Medication Management (E/M Codes)</h3>
+<hr />
+<p><strong>99214 -- Office Visit Level 4</strong> (30,949 CMHC claims | 65 orgs)
+Published rate: $53.43 per visit (FSI) | Facility: $50.77</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $51.68 vs. All FL $42.75 (+20.9%). CMHCs collect well above the market median. With the published FSI rate at $53.43, CMHCs collect 96.7% of the fee schedule -- nearly no compression. The All FL median of $42.75 suggests the broader market is more compressed, possibly due to facility-rate billing or payer mix.</li>
+<li><strong>Panel Size:</strong> CMHC 98.67 vs. All FL 100. Essentially identical.</li>
+<li><strong>Engagement:</strong> CMHC 1.09 vs. All FL 1.11. Essentially identical.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $59.91 vs. All FL $48.71 (+23.0%). Above market on per-patient yield, driven entirely by the rate advantage.</li>
+</ul>
+<p><em>Key question: This is the sector's strongest E/M code. Are CMHCs consistently billing FSI (professional) rates rather than facility rates, giving them an edge over hospital-based competitors?</em></p>
+<hr />
+<p><strong>99213 -- Office Visit Level 3</strong> (22,527 CMHC claims | 39 orgs)</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $30.38 vs. All FL $33.32 (-8.8%). A moderate gap on the most commonly billed E/M code in the market (2.4M All FL claims).</li>
+<li><strong>Panel Size:</strong> CMHC 94.5 vs. All FL 111.33. Slightly smaller panels.</li>
+<li><strong>Engagement:</strong> CMHC 1.09 vs. All FL 1.11. Comparable.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $34.00 vs. All FL $37.46 (-9.2%). The gap flows primarily from rate.</li>
+</ul>
+<p><em>Key question: Are CMHC prescribers downgrading visits that could be billed as 99214 to 99213? The 99214 rate is above market while 99213 is below, suggesting potential upcoding opportunity or documentation improvement.</em></p>
+<hr />
+<p><strong>90833 -- Psychotherapy Add-On (with E/M)</strong> (13,360 CMHC claims | 21 orgs)</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $38.49 vs. All FL $34.84 (+10.5%). Above market. This add-on code is billed alongside an E/M visit and reflects the psychotherapy component of a medication management appointment.</li>
+<li><strong>Panel Size:</strong> CMHC 43 vs. All FL 128. CMHC clinicians carry dramatically smaller panels on this code. Are fewer CMHC prescribers billing the psychotherapy add-on, concentrating this billing among a small number of clinicians?</li>
+<li><strong>Engagement:</strong> CMHC 1.10 vs. All FL 1.17. Slightly lower.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $44.50 vs. All FL $37.84 (+17.6%). Above market per-patient yield despite smaller panels.</li>
+</ul>
+<p><em>Key question: The panel size gap (43 vs. 128) is striking. Are most CMHC prescribers not billing 90833 at all, leaving revenue on the table by not documenting the psychotherapy component of medication management visits?</em></p>
+<hr />
+<p><strong>99215 -- Office Visit Level 5</strong> (1,231 CMHC claims | 7 orgs)</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $85.45 vs. All FL $81.01 (+5.5%). Above market.</li>
+<li><strong>Panel Size:</strong> CMHC 88 vs. All FL 44. CMHC clinicians carry double the market panel size on this high-complexity code.</li>
+<li><strong>Engagement:</strong> CMHC 1.05 vs. All FL 1.08. Comparable.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $91.17 vs. All FL $92.36. At market.</li>
+</ul>
+<p><em>Key question: The large panel size (88 vs. 44) on a high-complexity visit code is unusual. Are CMHC prescribers serving a disproportionately complex patient population that warrants Level 5 billing?</em></p>
+<hr />
+<p><strong>99212 -- Office Visit Level 2</strong> (669 CMHC claims | 6 orgs)</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $20.67 vs. All FL $26.52 (-22.1%). A significant gap, though volume is low.</li>
+<li><strong>Panel Size:</strong> CMHC 40 vs. All FL 60. Smaller panels.</li>
+<li><strong>Engagement:</strong> CMHC 1.06 vs. All FL 1.07. Identical.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $25.33 vs. All FL $28.85. Below market.</li>
+</ul>
+<p><em>Key question: At only 669 claims, this is a low-volume code for CMHCs. The 22.1% rate gap may reflect payer mix or site-of-service coding rather than a systemic contract issue.</em></p>
+<hr />
+<p><strong>99203 -- New Patient Visit Level 3</strong> (372 CMHC claims | 4 orgs)</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $65.17 vs. All FL $69.17 (-5.8%). Slightly below market.</li>
+<li><strong>Panel Size:</strong> CMHC 21 vs. All FL 39. Smaller panels on new patient visits.</li>
+<li><strong>Engagement:</strong> CMHC 1.02 vs. All FL 1.03. Identical -- new patient visits are by definition single-encounter.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $68.85 vs. All FL $74.70. Slightly below.</li>
+</ul>
+<p><em>Key question: With only 4 CMHC orgs billing 372 claims, new patient E/M visits are a marginal part of CMHC billing. Are most new patients routed through H0031/H0032/H2000 assessment codes instead?</em></p>
+<hr />
+<p><strong>99204 -- New Patient Visit Level 4</strong> (319 CMHC claims | 4 orgs)</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $81.47 vs. All FL $95.74 (-14.9%). Below market on the more complex new patient visit.</li>
+<li><strong>Panel Size:</strong> CMHC 25 vs. All FL 39.14. Smaller panels.</li>
+<li><strong>Engagement:</strong> CMHC 1.00 vs. All FL 1.04. Identical.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $97.53 vs. All FL $102.67. Slightly below.</li>
+</ul>
+<p><em>Key question: The 14.9% rate gap on 99204 across only 4 orgs may reflect contracted rates with specific MCOs rather than a sector-wide pattern.</em></p>
+<hr />
+<h3>3G. Medication Management (HCPCS)</h3>
+<hr />
+<p><strong>T1015 -- Medication Management</strong> (98,946 CMHC claims | 53 orgs)
+Published rate: $71.61 per event</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $65.02 vs. All FL $70.18 (-7.4%). A moderate gap on a high-volume code. The published rate of $71.61 means the All FL median collects 98% of the fee schedule -- very little structural compression. The CMHC sector collects 90.8% of published.</li>
+<li><strong>Panel Size:</strong> CMHC 224 vs. All FL 227. Essentially identical. The workforce is carrying comparable caseloads.</li>
+<li><strong>Engagement:</strong> CMHC 1.13 vs. All FL 1.11. Essentially identical.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $72.19 vs. All FL $76.94 (-6.2%). The modest rate gap flows through to a proportional revenue-per-patient gap.</li>
+<li><strong>Market variation:</strong> Dense $68.48, moderate $59.59, sparse $87.12 (All FL). Sparse markets collect substantially more, possibly reflecting different MCO contract structures in rural areas.</li>
+</ul>
+<p><em>Key question: T1015 has minimal structural compression (published $71.61 vs. All FL $70.18), so the CMHC gap of $5.16 per claim is almost entirely sector-specific. Is this addressable through contract renegotiation?</em></p>
+<hr />
+<h3>3H. Medical Behavioral Health</h3>
+<hr />
+<p><strong>H0048 -- Alcohol/Drug Screening</strong> (3,633 CMHC claims | 6 orgs)</p>
+<ul>
+<li><strong>Rate per Claim:</strong> CMHC $9.57 vs. All FL $9.27 (+3.2%). At market.</li>
+<li><strong>Panel Size:</strong> CMHC 102 vs. All FL 145. Smaller panels.</li>
+<li><strong>Engagement:</strong> CMHC 1.13 vs. All FL 1.12. Identical.</li>
+<li><strong>Revenue per Patient:</strong> CMHC $12.03 vs. All FL $10.46 (+15.0%). Above market.</li>
+</ul>
+<p><em>Key question: This code is operationally healthy. The smaller panel (102 vs. 145) may simply reflect that fewer CMHC clinicians are designated for screening compared to the broader market.</em></p>
+<hr />
+<h2>Section 4: Cross-Cutting Patterns</h2>
+<h3>4A. Rate Patterns</h3>
+<p>The CMHC sector shows a clear pattern: <strong>strong on HCPCS behavioral health codes, weak on CPT psychotherapy codes.</strong></p>
+<p>Codes where CMHCs collect at or above market:
+- H2019 Behavioral Therapy (+4.3%), H2017 PSR (+2.4%), H0040 ACT (-1.6%), H0031 Assessment (+0.3%), H0032 Treatment Plan (+0.6%), H2000 Psych Eval (+16.1%), 99214 Office Visit L4 (+20.9%), 90833 Therapy Add-On (+10.5%), 99215 Office Visit L5 (+5.5%), H0048 Screening (+3.2%)</p>
+<p>Codes where CMHCs collect below market:
+- 90837 Psychotherapy 60min (-32.8%), 90792 Psych Eval Medical (-27.3%), T1017 Case Management (-20.3%), H2010 Brief Therapy (-18.3%), 99204 New Patient L4 (-14.9%), 90834 Psychotherapy 45min (-10.4%), 99213 Office Visit L3 (-8.8%), T1015 Med Mgmt (-7.4%)</p>
+<p>The pattern suggests that CMHC-specific HCPCS codes (H-codes, T-codes) -- which are primarily used by community behavioral health providers -- are competitively reimbursed, while CPT codes shared with the broader medical market (90837, 90834, 99213) tend to be lower. This may reflect that CMHC MCO contracts are negotiated primarily around H-code rates, with CPT codes defaulting to lower fee schedules.</p>
+<h3>4B. Productivity Patterns (Panel Size)</h3>
+<p>CMHC clinicians consistently carry smaller panels than the market on therapy codes (H2019: 123 vs. 211, 90837: 26 vs. 95, 90834: 18 vs. 60) but comparable or larger panels on assessment and case management codes (H0031: 115 vs. 83, T1017: 275 vs. 258).</p>
+<p>This suggests a workforce model where case managers and PSR staff carry broad caseloads while therapists serve smaller, more intensive panels. Whether this is an intentional clinical model or a reflection of therapist retention challenges is an org-level question.</p>
+<h3>4C. Engagement Patterns (Visits per Patient)</h3>
+<p>Patient engagement in the CMHC sector trails the All FL median on most therapy and case management codes:
+- 90837: 1.67 vs. 2.03 (-17.7%)
+- H2019: 2.04 vs. 2.51 (-18.7%)
+- T1017: 4.70 vs. 5.57 (-15.6%)
+- H0036: 1.50 vs. 2.05 (-26.8%)</p>
+<p>The exception is high-intensity services where engagement is at or above market:
+- H0040 ACT: 23.60 vs. 21.32 (+10.7%)
+- H2017 PSR: 11.80 vs. 11.65 (+1.3%)</p>
+<p>This pattern raises a systemic question: are CMHC patients disengaging from outpatient and case management services at higher rates than the broader market? If so, the revenue impact compounds the per-claim rate gap -- the sector loses on both rate and volume per patient.</p>
+<h3>4D. Revenue Yield Patterns (Revenue per Patient)</h3>
+<p>The revenue-per-patient KPI combines rate and engagement into a single measure of per-patient yield. The largest absolute gaps are:</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>CMHC Rev/Patient</th>
+<th>All FL Rev/Patient</th>
+<th>Gap</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1017</td>
+<td>$240.24</td>
+<td>$361.14</td>
+<td>-$120.90</td>
+</tr>
+<tr>
+<td>H0036</td>
+<td>$78.25</td>
+<td>$182.91</td>
+<td>-$104.66</td>
+</tr>
+<tr>
+<td>90837</td>
+<td>$104.89</td>
+<td>$161.13</td>
+<td>-$56.24</td>
+</tr>
+<tr>
+<td>H2019</td>
+<td>$137.38</td>
+<td>$180.81</td>
+<td>-$43.43</td>
+</tr>
+</tbody>
+</table>
+<p>On T1017, a $120.90 per-patient gap across a caseload of 275 patients per clinician represents significant revenue exposure at the clinician level. On H2019, the $43.43 gap across 123 patients per clinician is smaller per-patient but still meaningful in aggregate.</p>
+<p>Codes where revenue per patient exceeds the market (H0040 at $721.37 vs. $643.55, 99214 at $59.91 vs. $48.71, H2000 at $231.46 vs. $206.51) demonstrate that the sector can outperform when rate and engagement align.</p>
+<hr />
+<h2>Section 5: Methodology &amp; Caveats</h2>
+<h3>Data Source</h3>
+<p>Florida Medicaid fee-for-service claims for 2024, filtered to professional servicing clinician-level billing. Managed care encounter data is included where reported through the FFS claims system. The CMHC sector is defined as organizations classified as Community Mental Health Centers in the Florida Medicaid provider enrollment file. The All FL comparison group includes all provider types billing each code.</p>
+<h3>KPI Definitions</h3>
+<ul>
+<li><strong>Rate per Claim (p50_ppc):</strong> Median of each organization's average paid amount per claim. This is an org-level median, not a claim-level median -- it gives equal weight to each organization regardless of volume.</li>
+<li><strong>Patients per Clinician (p50_bpc):</strong> Median of each organization's average unique patients per billing clinician (NPI). Reflects caseload breadth.</li>
+<li><strong>Visits per Patient (p50_cpb):</strong> Median of each organization's average claims per unique patient. Reflects service intensity and patient retention.</li>
+<li><strong>Revenue per Patient (p50_rpb):</strong> Median of each organization's average total paid amount per unique patient. Combines rate and engagement into a single yield metric.</li>
+</ul>
+<h3>Percentile Benchmarks</h3>
+<p>All FL benchmarks include p25, p50, and p75. CMHC benchmarks report the sector median (p50) only. The sector gap percentage is calculated as (CMHC p50 - All FL p50) / All FL p50.</p>
+<h3>Published Rate Context</h3>
+<p>Published rates are drawn from the Florida AHCA Medicaid fee schedule where available. Not all codes have published rates in the dataset. Where available, published rates represent the maximum allowable Medicaid FFS reimbursement. Actual collections are lower due to MCO contract discounts, modifier-driven rate adjustments, and billing pattern variation.</p>
+<h3>Time-Based Code Caveat</h3>
+<p>For codes billed in 15-minute units (H2019, H2017, T1017, H0031 limited, and others), per-claim rates reflect both the per-unit rate AND session duration. If the CMHC sector averages fewer units per claim than the broader market, the per-claim gap may partly reflect shorter sessions rather than lower per-unit reimbursement. Both are operationally meaningful -- shorter sessions may indicate efficiency or may indicate compressed service delivery. Distinguishing between per-unit rate compression and session-length compression requires unit-level claims data not included in this report.</p>
+<h3>Modifier Rollup</h3>
+<p>H0031 and H0032 rates in this dataset roll up across modifiers (e.g., HO for in-depth, no modifier for limited). The published rate for H0031 ranges from $17.90 (limited) to $126.11 (in-depth with HO modifier). The observed median of $31.70 likely reflects a mix of limited and in-depth assessments.</p>
+<h3>FQHC/RHC PPS Exception</h3>
+<p>The All FL comparison group includes Federally Qualified Health Centers (FQHCs) and Rural Health Clinics (RHCs), which may bill under Prospective Payment System (PPS) rates that differ from fee-for-service schedules. This means the All FL median on some codes may be influenced by PPS-rate billers whose effective per-claim payment follows a different structure.</p>
+<h3>Org Count Thresholds</h3>
+<p>Codes with very low CMHC org counts (3-4 organizations) should be interpreted with caution. Small samples are more sensitive to individual organizational billing patterns and may not represent sector-wide trends. Codes flagged in the dashboard with fewer than 5 CMHC orgs are: H0004 (4), H0036 (4), 90832 (3), T1007 (3), 99203 (4), 99204 (4).</p>
+<h3>What This Report Does Not Do</h3>
+<p>This report does not diagnose the cause of any gap, recommend specific actions, or evaluate individual organizations. It presents market-level observations and frames questions for further investigation. Gap closure may require contract renegotiation, billing practice changes, clinical workflow adjustments, or a combination -- the appropriate response depends on org-level analysis.</p>
+<hr />
+<p><em>Report generated from 2024 Florida Medicaid claims data. CMHC sector: 86 organizations. All metrics are org-level medians unless otherwise noted.</em></p><p style="margin-top:60px;border-top:1px solid #334155;padding-top:24px;font-size:12px;color:#64748b;text-align:center">FL Medicaid CMHC Landscape · 2024 · v2 (4-KPI Framework)</p></body></html>

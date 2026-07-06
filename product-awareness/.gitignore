@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+# built vector index (numpy .npz / local chroma) — rebuildable, not source.
+corpus/index/

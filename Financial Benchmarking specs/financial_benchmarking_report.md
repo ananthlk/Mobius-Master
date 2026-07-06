@@ -1,0 +1,48 @@
+# Financial Rate Benchmarking Report
+
+## Section A: Peer Context
+
+Your organization is a community mental health center (CMHC) operating in a sparse market area and classified as a medium-sized organization. This report compares your organization's 2024 Florida Medicaid billing performance against several peer groups: all Florida Medicaid organizations, similar CMHCs, organizations of similar size, organizations in similar market areas, and organizations with the same billing classification. Each peer group illuminates a different angle -- the broadest pool (all FL Medicaid) establishes the market baseline, while the CMHC and classification groups control for organizational mission and service mix.
+
+Because your organization bills at the organizational level, the "organization-billed" peer group is included throughout. Peer group sizes vary considerably by code, ranging from as few as 24 organizations (T1017, same classification) to over 4,200 (99214, all FL Medicaid). Smaller peer groups offer a tighter comparison but are more sensitive to outliers, so findings based on groups with fewer than 50 organizations should be interpreted with additional caution.
+
+All rates in this report reflect Florida Medicaid fee-for-service claims and do not capture managed care organization (MCO) contract rates, which may differ substantially. Where a code is commonly billed in 15-minute increments (such as H2019, T1017, and T1015), the payment-per-claim figure reflects the unit submitted on a single claim line, not a standardized hourly rate. Differences in how organizations bundle time into claim lines can make per-claim comparisons misleading without further investigation.
+
+## Section B: Service Line Findings
+
+### Outpatient Therapy
+
+**H2019 -- Behavioral Therapy Services.** Your organization's payment per claim of $143.65 ranks well above the median across every peer group, roughly double the all-FL median of $71.43 (n = 614). Payment per claim rose from $96.94 in 2019 to $143.65 in 2024, though it dipped in 2020 before recovering, with the trend signal diverging upward relative to peers. Revenue per patient ($360.27) is also well above peers, yet visits per patient (2.51) sit near the median for the broad market -- suggesting the revenue premium is rate-driven rather than utilization-driven. It would be worth investigating whether this rate reflects favorable MCO contract terms, higher-acuity service delivery, or differences in how time units are bundled per claim, since H2019 is a 15-minute code and per-claim comparisons depend heavily on unit structure.
+
+**T1015 -- Medication Management.** Your organization's payment per claim of $68.84 lands near the all-FL median of $70.18 (n = 550) but ranks above similar CMHCs (median $65.02, n = 53) and similar-size organizations (median $60.04, n = 149). Revenue per patient ($86.50) is above peers in most comparisons and well above among similar-size and same-classification groups. The rate trend has been volatile -- rising to $79.90 in 2021, dropping to $53.79 in 2022, and recovering to $68.84 in 2024 -- signaling divergence upward among CMHCs but downward relative to similar-market peers. Because T1015 is a 15-minute code, per-claim rate differences may partly reflect unit-bundling practices rather than true reimbursement variation; does your organization bill longer or shorter sessions on average compared to peers?
+
+### Case Management
+
+**T1017 -- Targeted Case Management.** Your organization's payment per claim of $49.69 is well below the all-FL median of $62.20 (n = 288), though it aligns near the median among similar CMHCs ($49.58, n = 34) and similar-market peers ($49.69, n = 77). Revenue per patient ($233.80) and visits per patient (4.70) are also below the broad market but track near CMHC medians, suggesting your case management intensity is typical for your organizational type. The rate declined from $59.69 in 2019 to $49.69 in 2024 with the trend diverging downward against most peer groups, which raises the question of whether payer rate changes, shifts in service mix, or differences in 15-minute unit bundling are driving the gap. Patients per clinician (179.5) falls well below the broad-market median but near similar-size peers, so caseload structure does not appear to be an outlier for organizations of your scale.
+
+### Assessment
+
+**H0031 -- Mental Health Assessment.** Your organization's payment per claim of $57.85 ranks well above peers in every comparison, exceeding the all-FL median of $31.59 (n = 383) by 83%. Payment per claim rose from $45.43 in 2019 to $57.85 in 2024, though it dipped during 2020-2021 before recovering. Revenue per patient ($69.27) is similarly well above across peer groups, while visits per patient (1.20) sits below the broad market but near the CMHC median. The trend signal is diverging upward, meaning the gap between your organization and peers has been widening -- is this driven by a specific payer's rate schedule, modifier usage, or a different assessment service mix? Note that H0031 rates may reflect modifier rollups (e.g., HN, HO, or other practitioner-type modifiers), which can shift apparent per-claim rates depending on how modifiers are aggregated in the data.
+
+**H0032 -- Treatment Plan Development.** Your organization's payment per claim of $76.81 is above the all-FL median of $70.33 (n = 390) and above similar CMHCs ($70.75, n = 55). Revenue per patient ($79.14) is above in most peer groups, while visits per patient (1.03) is near the median everywhere, indicating the revenue difference is rate-driven. The rate declined from $92.19 in 2019 to $76.81 in 2024, with the trend signal converging toward peers -- suggesting your previously higher rates are moving closer to the market. Patients per clinician (33.0) is well below the median in most groups, which may warrant a look at whether low clinician caseloads reflect staffing constraints, panel assignment practices, or early-stage program ramp-up. Note that H0032 rates may reflect modifier rollups (e.g., HN, HO, or other practitioner-type modifiers), which can shift apparent per-claim rates depending on how modifiers are aggregated in the data.
+
+### E&M Office Visits
+
+**99214 -- Office Visit (Level 4).** Your organization's payment per claim of $15.77 is well below the all-FL median of $42.75 (n = 4,211) and well below every peer group tested, including similar CMHCs ($51.68, n = 65). Revenue per patient ($19.18) follows the same pattern, well below across the board. This is the most pronounced outlier in the report -- your rate is less than 40% of the statewide median. The trend data shows near-zero payments in 2019-2020, rising to $15.77 in 2024 with a "recovering" signal, which suggests this code may be relatively new to your billing profile. Given the unusually low rate, it would be important to investigate whether your organization is billing 99214 under an arrangement (such as incident-to billing or an FQHC/RHC prospective payment) that results in separate adjudication, or whether the low reimbursement reflects a payer-specific fee schedule that diverges from the broader market.
+
+## Executive Summary
+
+- Your organization's H2019 (Behavioral Therapy) rate of $143.65 per claim is roughly double the statewide median, warranting investigation into whether this reflects rate terms, acuity, or unit-bundling differences.
+- T1017 (Targeted Case Management) rates have declined from $59.69 to $49.69 since 2019 and sit well below the broad market, though they align with similar CMHCs.
+- H0031 (Mental Health Assessment) rates are well above all peer groups and diverging upward, with the gap widening over the past five years.
+- 99214 (Office Visit Level 4) is the most significant outlier at $15.77 per claim -- less than 40% of the statewide median -- suggesting a billing arrangement or fee schedule difference worth investigating.
+- Assessment codes H0031 and H0032 may reflect modifier rollups that affect apparent per-claim rates, and all 15-minute codes should be compared with attention to unit-bundling practices.
+
+## Caveats & Methodology Notes
+
+- **15-minute code comparisons:** H2019, T1015, and T1017 are commonly billed in 15-minute increments. Payment-per-claim figures reflect the claim-line unit submitted, not a standardized hourly rate. Differences in how organizations bundle time into claim lines can inflate or deflate apparent rate differences.
+- **Modifier rollups:** H0031 and H0032 rates aggregate across all modifier combinations (e.g., HN, HO). Organizations using different modifier mixes may show different apparent rates even if underlying fee schedules are identical.
+- **Fee-for-service only:** All figures reflect Florida Medicaid FFS claims. MCO contract rates are not included and may differ substantially.
+- **FQHC/RHC prospective payment:** Organizations billing under prospective payment systems (PPS) will show different rate patterns. If your organization or its peers include FQHC/RHC sites, per-claim rate comparisons may not be directly applicable.
+- **Peer group size variation:** Peer groups range from 24 to 4,211 organizations depending on the code and comparison dimension. Findings from smaller peer groups (under 50) should be interpreted with caution.
+- **Trend interpretation:** Year-over-year changes in your organization's rates may reflect payer fee schedule updates, changes in service mix or coding practices, or shifts in the patient population served. Trend signals (diverging, converging, stable, recovering) describe movement relative to peer medians, not absolute rate changes.

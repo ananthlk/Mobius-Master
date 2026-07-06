@@ -1,0 +1,233 @@
+{
+  "sector_gaps": {
+    "99212": {
+      "all_fl": {
+        "p50_ppc": 26.52,
+        "p50_rpb": 28.85,
+        "n": 602
+      },
+      "CMHC": {
+        "p50_ppc": 20.67,
+        "p50_rpb": 25.33,
+        "n": 6
+      },
+      "BH_SPECIALTY": {
+        "p50_ppc": 23.11,
+        "p50_rpb": 27.66,
+        "n": 23
+      }
+    },
+    "99213": {
+      "all_fl": {
+        "p50_ppc": 33.32,
+        "p50_rpb": 37.46,
+        "n": 3657
+      },
+      "CMHC": {
+        "p50_ppc": 30.38,
+        "p50_rpb": 34.0,
+        "n": 39
+      },
+      "BH_SPECIALTY": {
+        "p50_ppc": 32.79,
+        "p50_rpb": 36.49,
+        "n": 225
+      }
+    },
+    "99214": {
+      "all_fl": {
+        "p50_ppc": 42.75,
+        "p50_rpb": 48.75,
+        "n": 4211
+      },
+      "CMHC": {
+        "p50_ppc": 51.68,
+        "p50_rpb": 59.91,
+        "n": 65
+      },
+      "BH_SPECIALTY": {
+        "p50_ppc": 45.91,
+        "p50_rpb": 53.74,
+        "n": 292
+      }
+    },
+    "H0031": {
+      "all_fl": {
+        "p50_ppc": 31.59,
+        "p50_rpb": 51.8,
+        "n": 383
+      },
+      "BH_SPECIALTY": {
+        "p50_ppc": 36.86,
+        "p50_rpb": 53.34,
+        "n": 75
+      },
+      "CMHC": {
+        "p50_ppc": 31.7,
+        "p50_rpb": 45.73,
+        "n": 48
+      }
+    },
+    "H0032": {
+      "all_fl": {
+        "p50_ppc": 70.33,
+        "p50_rpb": 73.39,
+        "n": 390
+      },
+      "BH_SPECIALTY": {
+        "p50_ppc": 68.67,
+        "p50_rpb": 71.34,
+        "n": 68
+      },
+      "CMHC": {
+        "p50_ppc": 70.75,
+        "p50_rpb": 72.49,
+        "n": 55
+      }
+    },
+    "H0040": {
+      "all_fl": {
+        "p50_ppc": 30.78,
+        "p50_rpb": 643.55,
+        "n": 22
+      },
+      "CMHC": {
+        "p50_ppc": 30.3,
+        "p50_rpb": 721.37,
+        "n": 6
+      }
+    },
+    "H2000": {
+      "all_fl": {
+        "p50_ppc": 193.95,
+        "p50_rpb": 206.51,
+        "n": 144
+      },
+      "CMHC": {
+        "p50_ppc": 225.18,
+        "p50_rpb": 231.46,
+        "n": 20
+      },
+      "BH_SPECIALTY": {
+        "p50_ppc": 181.44,
+        "p50_rpb": 218.74,
+        "n": 23
+      }
+    },
+    "H2017": {
+      "all_fl": {
+        "p50_ppc": 120.93,
+        "p50_rpb": 1376.24,
+        "n": 285
+      },
+      "BH_SPECIALTY": {
+        "p50_ppc": 103.87,
+        "p50_rpb": 915.65,
+        "n": 35
+      },
+      "CMHC": {
+        "p50_ppc": 123.82,
+        "p50_rpb": 1342.29,
+        "n": 39
+      }
+    },
+    "H2019": {
+      "all_fl": {
+        "p50_ppc": 71.43,
+        "p50_rpb": 180.81,
+        "n": 614
+      },
+      "CMHC": {
+        "p50_ppc": 74.53,
+        "p50_rpb": 137.38,
+        "n": 86
+      },
+      "BH_SPECIALTY": {
+        "p50_ppc": 77.47,
+        "p50_rpb": 183.06,
+        "n": 131
+      }
+    },
+    "T1015": {
+      "all_fl": {
+        "p50_ppc": 70.18,
+        "p50_rpb": 76.94,
+        "n": 550
+      },
+      "BH_SPECIALTY": {
+        "p50_ppc": 60.59,
+        "p50_rpb": 69.47,
+        "n": 77
+      },
+      "CMHC": {
+        "p50_ppc": 65.02,
+        "p50_rpb": 72.19,
+        "n": 53
+      }
+    },
+    "T1017": {
+      "all_fl": {
+        "p50_ppc": 62.2,
+        "p50_rpb": 361.14,
+        "n": 288
+      },
+      "BH_SPECIALTY": {
+        "p50_ppc": 59.78,
+        "p50_rpb": 256.29,
+        "n": 40
+      },
+      "CMHC": {
+        "p50_ppc": 49.58,
+        "p50_rpb": 240.24,
+        "n": 34
+      }
+    }
+  },
+  "published_rates": {
+    "H2019": {
+      "rate": 21.87,
+      "unit": "per 15min",
+      "note": "Individual/family therapy (HR modifier)"
+    },
+    "H2017": {
+      "rate": 9.08,
+      "unit": "per 15min",
+      "note": "Psychosocial rehabilitation"
+    },
+    "T1017": {
+      "rate": 14.82,
+      "unit": "per 15min",
+      "note": "Targeted case management"
+    },
+    "T1015": {
+      "rate": 71.61,
+      "unit": "per event",
+      "note": "Medication management"
+    },
+    "H0031": {
+      "rate": 126.11,
+      "unit": "per event",
+      "note": "In-depth assessment (HO modifier). Limited assessment: $17.90"
+    },
+    "H0032": {
+      "rate": 97.86,
+      "unit": "per event",
+      "note": "Treatment plan development. Review: $48.93"
+    },
+    "H0040": {
+      "rate": 31.55,
+      "unit": "per diem",
+      "note": "FACT per diem"
+    },
+    "H2000": {
+      "rate": 250.63,
+      "unit": "per eval",
+      "note": "Psychiatric evaluation (HP/physician). Non-physician: $179.02"
+    },
+    "99214": {
+      "rate": 53.43,
+      "unit": "per visit",
+      "note": "FSI rate. Facility: $50.77"
+    }
+  }
+}

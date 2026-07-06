@@ -1,0 +1,20 @@
+# Offline dev + tests need only numpy (local TF embedder + numpy store).
+numpy>=1.24
+
+# --- production backends (optional locally) ---
+# Embedder: Vertex AI gemini-embedding-001 (1536-dim, output_dimensionality pinned) —
+# the platform's own embedder, no new credential. Reuses VERTEX_PROJECT_ID/VERTEX_LOCATION.
+google-genai>=0.3
+# openai>=1.0        # optional alternative embedder (PRODUCT_DOCS_EMBEDDER=openai)
+# Store: pgvector on the existing Cloud SQL Postgres (durable, the platform's cutover
+# target). psycopg2 speaks to it directly; the query vector is passed as a text literal
+# so the pgvector Python adapter is NOT required.
+psycopg2-binary>=2.9
+
+# --- standalone service (product_awareness.service:app) ---
+fastapi>=0.110
+uvicorn>=0.27
+
+# Legacy only — Chroma is being migrated away from platform-wide; used solely if
+# PRODUCT_DOCS_STORE=chroma is forced (e.g. a one-off migration).
+# chromadb>=0.4

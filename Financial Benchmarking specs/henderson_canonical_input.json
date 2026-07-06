@@ -1,0 +1,843 @@
+{
+  "org_name": "HENDERSON BEHAVIORAL HEALTH, INC.",
+  "city": "LAUDERDALE LAKES",
+  "state": "FL",
+  "total_revenue": 3277908.71,
+  "total_claims": 76506,
+  "taxonomies": [
+    "101YM0800X",
+    "2084P0800X",
+    "251B00000X",
+    "261Q00000X"
+  ],
+  "org_types": [
+    "BH_SPECIALTY"
+  ],
+  "has_residential_taxonomy": false,
+  "has_crisis": false,
+  "has_act": true,
+  "service_line_breakdown": [
+    {
+      "service_line": "case_management",
+      "display_name": "Case Management",
+      "paid": 959613.77,
+      "share_pct": 29.3,
+      "claims": 22391,
+      "codes": [
+        "T1017"
+      ]
+    },
+    {
+      "service_line": "psychosocial_rehab",
+      "display_name": "Psychosocial Rehabilitation",
+      "paid": 869116.56,
+      "share_pct": 26.5,
+      "claims": 7782,
+      "codes": [
+        "H2017"
+      ]
+    },
+    {
+      "service_line": "act",
+      "display_name": "Assertive Community Treatment",
+      "paid": 796069.6,
+      "share_pct": 24.3,
+      "claims": 30927,
+      "codes": [
+        "H0040"
+      ]
+    },
+    {
+      "service_line": "outpatient_therapy",
+      "display_name": "Outpatient Therapy",
+      "paid": 614847.78,
+      "share_pct": 18.8,
+      "claims": 13881,
+      "codes": [
+        "H2019",
+        "T1015"
+      ]
+    },
+    {
+      "service_line": "assessment",
+      "display_name": "Assessment",
+      "paid": 37612.94,
+      "share_pct": 1.1,
+      "claims": 1470,
+      "codes": [
+        "H0031",
+        "H0032",
+        "H2000"
+      ]
+    },
+    {
+      "service_line": "medication_mgmt",
+      "display_name": "Medication Management",
+      "paid": 648.06,
+      "share_pct": 0.0,
+      "claims": 55,
+      "codes": [
+        "99212",
+        "99213"
+      ]
+    }
+  ],
+  "data_coverage_notes": [
+    "ACT represents 24.3% of visible revenue."
+  ],
+  "look_alike_count": 10,
+  "look_alike_similarity_range": [
+    0.8326,
+    0.9464
+  ],
+  "badge_definitions": {
+    "\ud83d\udfe2 On Track": "Performing at or above market \u2014 no action needed, worth protecting",
+    "\u26aa At Market": "Within the typical range \u2014 stable position",
+    "\ud83d\udfe1 Monitor": "Trend shifting or mixed signals across peer groups \u2014 track over time",
+    "\ud83d\udd34 Investigate": "Outside the typical range \u2014 warrants a review with your billing or operations team"
+  },
+  "outlier_framing_rule": "When a metric falls below P25 or above P75, this report does not interpret the cause. It raises the observation as a question for your team to investigate.",
+  "report_tone_rule": "This report observes and questions. It does not diagnose, recommend, or speculate.",
+  "data_scope_statement": "This report analyzes $3,277,908.71 in Florida Medicaid fee-for-service claims billed through professional servicing clinicians during 2024. This represents one component of your organization's total revenue.",
+  "scope_what_is_visible": "Within this $3.3 million, we benchmark codes where sufficient peer comparison data exists.",
+  "scope_what_is_not_visible": "MCO contract payments, facility-level billing, commercial insurance, grants, and other funding sources are not included.",
+  "codes": {
+    "T1017": {
+      "name": "Targeted Case Management",
+      "service_line": "Case Management",
+      "revenue_share_of_total_pct": 20.6,
+      "claims": 15041,
+      "paid": 674762.42,
+      "beneficiaries": 2978,
+      "svc_npis": 5,
+      "payment_per_claim": 44.86,
+      "revenue_per_bene": 226.58,
+      "claims_per_bene": 5.05,
+      "bene_per_clinician": 595.6,
+      "look_alike_n": 10,
+      "look_alike_p50_ppc": 49.12,
+      "look_alike_p50_rpb": 197.18,
+      "trend_signal": "Diverging DOWN",
+      "trend_arrow": "\u2193",
+      "trend_label": "Falling behind",
+      "trend_first_year": "2019",
+      "trend_first_ppc": 48.16,
+      "trend_last_year": "2024",
+      "trend_last_ppc": 44.86,
+      "badge_rate": "\ud83d\udd34 Investigate",
+      "badge_productivity": "\ud83d\udfe2 On Track",
+      "badge_utilization": "\ud83d\udfe2 On Track",
+      "badge_revenue": "\ud83d\udfe1 Monitor",
+      "peers": {
+        "All FL Medicaid Orgs": {
+          "n": 288,
+          "p50_ppc": 62.2,
+          "p50_rpb": 361.14,
+          "p50_cpb": 5.57,
+          "p50_bpc": 258.0,
+          "position_ppc": "WELL BELOW",
+          "position_rpb": "WELL BELOW"
+        },
+        "Organization-billed": {
+          "n": 280,
+          "p50_ppc": 62.68,
+          "p50_rpb": 369.98,
+          "p50_cpb": 5.57,
+          "p50_bpc": 254.11,
+          "position_ppc": "WELL BELOW",
+          "position_rpb": "WELL BELOW"
+        },
+        "Similar BH_SPECIALTY Peers": {
+          "n": 40,
+          "p50_ppc": 59.78,
+          "p50_rpb": 256.29,
+          "p50_cpb": 4.36,
+          "p50_bpc": 219.5,
+          "position_ppc": "WELL BELOW",
+          "position_rpb": "Below"
+        },
+        "Similar Size Orgs (Medium)": {
+          "n": 126,
+          "p50_ppc": 57.14,
+          "p50_rpb": 343.08,
+          "p50_cpb": 5.95,
+          "p50_bpc": 186.3,
+          "position_ppc": "WELL BELOW",
+          "position_rpb": "WELL BELOW"
+        },
+        "Similar Market (Moderate)": {
+          "n": 84,
+          "p50_ppc": 59.28,
+          "p50_rpb": 309.37,
+          "p50_cpb": 4.46,
+          "p50_bpc": 301.0,
+          "position_ppc": "WELL BELOW",
+          "position_rpb": "WELL BELOW"
+        },
+        "by_taxonomy:2084P0800X": {
+          "n": 7,
+          "p50_ppc": 70.41,
+          "p50_rpb": 640.99,
+          "p50_cpb": 7.31,
+          "p50_bpc": 114.0,
+          "position_ppc": "WELL BELOW",
+          "position_rpb": "WELL BELOW"
+        }
+      },
+      "trend_description": "Rate moved from $48.16 (2019) to $44.86 (2024). Signal: falling behind.",
+      "key_question": "Your per-claim rate of $44.86 is within the typical range vs look-alike peers ($49.12). Are there opportunities to improve?",
+      "all_fl_median_ppc": 62.2,
+      "cmhc_median_ppc": 49.58,
+      "sector_gap_pct": -20.3,
+      "published_rate": 14.82,
+      "published_unit": "per 15min",
+      "published_note": "Targeted case management",
+      "rate_layers": {
+        "published": 14.82,
+        "published_unit": "per 15min",
+        "industry_avg": 62.2,
+        "org_avg": 44.86,
+        "industry_to_published_note": "The All FL Medicaid median of $62.2 reflects industry-wide compression from the published rate of $14.82/per 15min.",
+        "org_to_industry_note": "Your rate of $44.86 vs the All FL median of $62.2 represents the org-specific variance."
+      },
+      "operational_investigation": [
+        {
+          "kpi": "Rate per Claim",
+          "position": "$44.86 is 27.9% below the All FL Medicaid median of $62.2",
+          "operational_questions": [
+            "What is your denial rate on this code? A rate gap of this magnitude could reflect claims being denied and resubmitted at lower amounts.",
+            "Are you billing with the optimal modifier combination? Different modifiers can yield different reimbursement for the same service.",
+            "Is this rate consistent across all your managed care contracts, or is one payer pulling the average down?",
+            "What percentage of claims for this code are paid at first submission vs requiring resubmission or appeal?"
+          ]
+        },
+        {
+          "kpi": "Patients per Clinician",
+          "position": "595.6 patients/clinician is 130.9% above the All FL median of 258.0",
+          "operational_questions": [
+            "What is your clinician turnover rate for this service line? High caseloads are associated with burnout and higher churn.",
+            "Are clinicians carrying this caseload sustainably, or are there quality-of-care indicators (patient complaints, outcome measures) that suggest strain?",
+            "Is the high caseload by design (efficiency-optimized model) or by default (understaffing)?"
+          ]
+        }
+      ],
+      "pct_delta_vs_lookalike": -8.7,
+      "pct_delta_vs_all_fl": -27.9
+    },
+    "H2017": {
+      "name": "Psychosocial Rehabilitation",
+      "service_line": "Psychosocial Rehabilitation",
+      "revenue_share_of_total_pct": 14.6,
+      "claims": 4847,
+      "paid": 479649.51,
+      "beneficiaries": 491,
+      "svc_npis": 2,
+      "payment_per_claim": 98.96,
+      "revenue_per_bene": 976.88,
+      "claims_per_bene": 9.87,
+      "bene_per_clinician": 245.5,
+      "look_alike_n": 8,
+      "look_alike_p50_ppc": 71.12,
+      "look_alike_p50_rpb": 673.2,
+      "trend_signal": "Recovering",
+      "trend_arrow": "\u2191",
+      "trend_label": "Recovering",
+      "trend_first_year": "2019",
+      "trend_first_ppc": 76.05,
+      "trend_last_year": "2024",
+      "trend_last_ppc": 98.96,
+      "badge_rate": "\u26aa At Market",
+      "badge_productivity": "\ud83d\udfe2 On Track",
+      "badge_utilization": "\ud83d\udfe2 On Track",
+      "badge_revenue": "\ud83d\udfe2 On Track",
+      "peers": {
+        "All FL Medicaid Orgs": {
+          "n": 285,
+          "p50_ppc": 120.93,
+          "p50_rpb": 1376.24,
+          "p50_cpb": 11.65,
+          "p50_bpc": 242.0,
+          "position_ppc": "Below",
+          "position_rpb": "WELL BELOW"
+        },
+        "Organization-billed": {
+          "n": 274,
+          "p50_ppc": 120.93,
+          "p50_rpb": 1390.84,
+          "p50_cpb": 11.68,
+          "p50_bpc": 252.0,
+          "position_ppc": "Below",
+          "position_rpb": "WELL BELOW"
+        },
+        "Similar BH_SPECIALTY Peers": {
+          "n": 35,
+          "p50_ppc": 103.87,
+          "p50_rpb": 915.65,
+          "p50_cpb": 8.77,
+          "p50_bpc": 223.0,
+          "position_ppc": "\u2248 P50",
+          "position_rpb": "Above"
+        },
+        "Similar Size Orgs (Medium)": {
+          "n": 122,
+          "p50_ppc": 124.7,
+          "p50_rpb": 1476.93,
+          "p50_cpb": 11.87,
+          "p50_bpc": 169.5,
+          "position_ppc": "WELL BELOW",
+          "position_rpb": "WELL BELOW"
+        },
+        "Similar Market (Moderate)": {
+          "n": 78,
+          "p50_ppc": 110.45,
+          "p50_rpb": 1204.11,
+          "p50_cpb": 10.62,
+          "p50_bpc": 245.5,
+          "position_ppc": "Below",
+          "position_rpb": "Below"
+        },
+        "by_taxonomy:2084P0800X": {
+          "n": 6,
+          "p50_ppc": 111.53,
+          "p50_rpb": 1600.56,
+          "p50_cpb": 12.78,
+          "p50_bpc": 292.5,
+          "position_ppc": "Below",
+          "position_rpb": "WELL BELOW"
+        }
+      },
+      "trend_description": "Rate moved from $76.05 (2019) to $98.96 (2024). Signal: recovering.",
+      "key_question": "Your per-claim rate of $98.96 is within the typical range vs look-alike peers ($71.12). Are there opportunities to improve?",
+      "all_fl_median_ppc": 120.93,
+      "cmhc_median_ppc": 123.82,
+      "sector_gap_pct": 2.4,
+      "published_rate": 9.08,
+      "published_unit": "per 15min",
+      "published_note": "Psychosocial rehabilitation",
+      "rate_layers": {
+        "published": 9.08,
+        "published_unit": "per 15min",
+        "industry_avg": 120.93,
+        "org_avg": 98.96,
+        "industry_to_published_note": "The All FL Medicaid median of $120.93 reflects industry-wide compression from the published rate of $9.08/per 15min.",
+        "org_to_industry_note": "Your rate of $98.96 vs the All FL median of $120.93 represents the org-specific variance."
+      },
+      "operational_investigation": [
+        {
+          "kpi": "Rate per Claim",
+          "position": "$98.96 is 18.2% below the All FL Medicaid median of $120.93",
+          "operational_questions": [
+            "What is your denial rate on this code? A rate gap of this magnitude could reflect claims being denied and resubmitted at lower amounts.",
+            "Are you billing with the optimal modifier combination? Different modifiers can yield different reimbursement for the same service.",
+            "Is this rate consistent across all your managed care contracts, or is one payer pulling the average down?",
+            "What percentage of claims for this code are paid at first submission vs requiring resubmission or appeal?"
+          ]
+        },
+        {
+          "kpi": "Visits per Patient",
+          "position": "9.87 visits/patient is 15.3% below the All FL median of 11.65",
+          "operational_questions": [
+            "What is your no-show rate for this service? Lower visits per patient could reflect patient disengagement or scheduling barriers.",
+            "Are treatment episodes shorter than clinically indicated? Check average length of treatment engagement for this code.",
+            "Is there a retention issue \u2014 are patients completing their treatment plans, or dropping off after initial visits?",
+            "Could access barriers (wait times, transportation, scheduling availability) be limiting visit frequency?"
+          ]
+        }
+      ],
+      "pct_delta_vs_lookalike": 39.1,
+      "pct_delta_vs_all_fl": -18.2
+    },
+    "H2019": {
+      "name": "Behavioral Therapy Services",
+      "service_line": "Outpatient Therapy",
+      "revenue_share_of_total_pct": 9.6,
+      "claims": 3954,
+      "paid": 314445.46,
+      "beneficiaries": 1333,
+      "svc_npis": 6,
+      "payment_per_claim": 79.53,
+      "revenue_per_bene": 235.89,
+      "claims_per_bene": 2.97,
+      "bene_per_clinician": 222.2,
+      "look_alike_n": 9,
+      "look_alike_p50_ppc": 68.34,
+      "look_alike_p50_rpb": 129.03,
+      "trend_signal": "Stable",
+      "trend_arrow": "\u2192",
+      "trend_label": "Steady",
+      "trend_first_year": "2019",
+      "trend_first_ppc": 72.41,
+      "trend_last_year": "2024",
+      "trend_last_ppc": 79.53,
+      "badge_rate": "\u26aa At Market",
+      "badge_productivity": "\ud83d\udfe2 On Track",
+      "badge_utilization": "\ud83d\udfe2 On Track",
+      "badge_revenue": "\ud83d\udfe2 On Track",
+      "peers": {
+        "All FL Medicaid Orgs": {
+          "n": 614,
+          "p50_ppc": 71.43,
+          "p50_rpb": 180.81,
+          "p50_cpb": 2.51,
+          "p50_bpc": 211.0,
+          "position_ppc": "Above",
+          "position_rpb": "WELL ABOVE"
+        },
+        "Organization-billed": {
+          "n": 568,
+          "p50_ppc": 71.9,
+          "p50_rpb": 182.49,
+          "p50_cpb": 2.51,
+          "p50_bpc": 218.0,
+          "position_ppc": "Above",
+          "position_rpb": "WELL ABOVE"
+        },
+        "Similar BH_SPECIALTY Peers": {
+          "n": 131,
+          "p50_ppc": 77.47,
+          "p50_rpb": 183.06,
+          "p50_cpb": 2.52,
+          "p50_bpc": 201.2,
+          "position_ppc": "\u2248 P50",
+          "position_rpb": "WELL ABOVE"
+        },
+        "Similar Size Orgs (Medium)": {
+          "n": 241,
+          "p50_ppc": 72.91,
+          "p50_rpb": 188.08,
+          "p50_cpb": 2.57,
+          "p50_bpc": 147.0,
+          "position_ppc": "Above",
+          "position_rpb": "WELL ABOVE"
+        },
+        "Similar Market (Moderate)": {
+          "n": 191,
+          "p50_ppc": 73.31,
+          "p50_rpb": 176.14,
+          "p50_cpb": 2.59,
+          "p50_bpc": 191.0,
+          "position_ppc": "Above",
+          "position_rpb": "WELL ABOVE"
+        },
+        "by_taxonomy:2084P0800X": {
+          "n": 9,
+          "p50_ppc": 76.75,
+          "p50_rpb": 235.89,
+          "p50_cpb": 2.97,
+          "p50_bpc": 193.0,
+          "position_ppc": "\u2248 P50",
+          "position_rpb": "\u2248 P50"
+        }
+      },
+      "trend_description": "Rate moved from $72.41 (2019) to $79.53 (2024). Signal: steady.",
+      "key_question": "Your per-claim rate of $79.53 is within the typical range vs look-alike peers ($68.34). Are there opportunities to improve?",
+      "all_fl_median_ppc": 71.43,
+      "cmhc_median_ppc": 74.53,
+      "sector_gap_pct": 4.3,
+      "published_rate": 21.87,
+      "published_unit": "per 15min",
+      "published_note": "Individual/family therapy (HR modifier)",
+      "rate_layers": {
+        "published": 21.87,
+        "published_unit": "per 15min",
+        "industry_avg": 71.43,
+        "org_avg": 79.53,
+        "industry_to_published_note": "The All FL Medicaid median of $71.43 reflects industry-wide compression from the published rate of $21.87/per 15min.",
+        "org_to_industry_note": "Your rate of $79.53 vs the All FL median of $71.43 represents the org-specific variance."
+      },
+      "operational_investigation": [
+        {
+          "kpi": "Visits per Patient",
+          "position": "2.97 visits/patient is 18.3% above the All FL median of 2.51",
+          "operational_questions": [
+            "Is the higher frequency clinically appropriate, or could it reflect a billing pattern where visits are split across more claim lines?",
+            "Are patients in this service line higher-acuity, requiring more frequent contact?"
+          ]
+        }
+      ],
+      "pct_delta_vs_lookalike": 16.4,
+      "pct_delta_vs_all_fl": 11.3
+    },
+    "H0031": {
+      "name": "Mental Health Assessment",
+      "service_line": "Assessment",
+      "revenue_share_of_total_pct": 0.8,
+      "claims": 1216,
+      "paid": 26021.5,
+      "beneficiaries": 1003,
+      "svc_npis": 5,
+      "payment_per_claim": 21.4,
+      "revenue_per_bene": 25.94,
+      "claims_per_bene": 1.21,
+      "bene_per_clinician": 200.6,
+      "look_alike_n": 6,
+      "look_alike_p50_ppc": 33.92,
+      "look_alike_p50_rpb": 53.35,
+      "trend_signal": "Stable",
+      "trend_arrow": "\u2192",
+      "trend_label": "Steady",
+      "trend_first_year": "2019",
+      "trend_first_ppc": 20.81,
+      "trend_last_year": "2024",
+      "trend_last_ppc": 21.4,
+      "badge_rate": "\ud83d\udd34 Investigate",
+      "badge_productivity": "\ud83d\udfe2 On Track",
+      "badge_utilization": "\ud83d\udfe1 Monitor",
+      "badge_revenue": "\ud83d\udd34 Investigate",
+      "peers": {
+        "All FL Medicaid Orgs": {
+          "n": 383,
+          "p50_ppc": 31.59,
+          "p50_rpb": 51.8,
+          "p50_cpb": 1.48,
+          "p50_bpc": 83.0,
+          "position_ppc": "WELL BELOW",
+          "position_rpb": "WELL BELOW"
+        },
+        "Organization-billed": {
+          "n": 366,
+          "p50_ppc": 31.36,
+          "p50_rpb": 52.06,
+          "p50_cpb": 1.48,
+          "p50_bpc": 92.0,
+          "position_ppc": "WELL BELOW",
+          "position_rpb": "WELL BELOW"
+        },
+        "Similar BH_SPECIALTY Peers": {
+          "n": 75,
+          "p50_ppc": 36.86,
+          "p50_rpb": 53.34,
+          "p50_cpb": 1.44,
+          "p50_bpc": 66.0,
+          "position_ppc": "WELL BELOW",
+          "position_rpb": "WELL BELOW"
+        },
+        "Similar Size Orgs (Medium)": {
+          "n": 142,
+          "p50_ppc": 29.81,
+          "p50_rpb": 50.67,
+          "p50_cpb": 1.44,
+          "p50_bpc": 31.0,
+          "position_ppc": "WELL BELOW",
+          "position_rpb": "WELL BELOW"
+        },
+        "Similar Market (Moderate)": {
+          "n": 116,
+          "p50_ppc": 32.39,
+          "p50_rpb": 54.31,
+          "p50_cpb": 1.42,
+          "p50_bpc": 101.0,
+          "position_ppc": "WELL BELOW",
+          "position_rpb": "WELL BELOW"
+        },
+        "by_taxonomy:2084P0800X": {
+          "n": 7,
+          "p50_ppc": 21.4,
+          "p50_rpb": 35.58,
+          "p50_cpb": 1.26,
+          "p50_bpc": 101.0,
+          "position_ppc": "\u2248 P50",
+          "position_rpb": "WELL BELOW"
+        }
+      },
+      "trend_description": "Rate moved from $20.81 (2019) to $21.4 (2024). Signal: steady.",
+      "key_question": "Your per-claim rate of $21.4 is outside the typical range vs look-alike peers ($33.92). What is driving this \u2014 session duration, modifier usage, contract terms, or billing structure?",
+      "all_fl_median_ppc": 31.59,
+      "cmhc_median_ppc": 31.7,
+      "sector_gap_pct": 0.3,
+      "published_rate": 126.11,
+      "published_unit": "per event",
+      "published_note": "In-depth assessment (HO modifier). Limited assessment: $17.90",
+      "rate_layers": {
+        "published": 126.11,
+        "published_unit": "per event",
+        "industry_avg": 31.59,
+        "org_avg": 21.4,
+        "industry_to_published_note": "The All FL Medicaid median of $31.59 reflects industry-wide compression from the published rate of $126.11/per event.",
+        "org_to_industry_note": "Your rate of $21.4 vs the All FL median of $31.59 represents the org-specific variance."
+      },
+      "operational_investigation": [
+        {
+          "kpi": "Rate per Claim",
+          "position": "$21.4 is 32.3% below the All FL Medicaid median of $31.59",
+          "operational_questions": [
+            "What is your denial rate on this code? A rate gap of this magnitude could reflect claims being denied and resubmitted at lower amounts.",
+            "Are you billing with the optimal modifier combination? Different modifiers can yield different reimbursement for the same service.",
+            "Is this rate consistent across all your managed care contracts, or is one payer pulling the average down?",
+            "What percentage of claims for this code are paid at first submission vs requiring resubmission or appeal?"
+          ]
+        },
+        {
+          "kpi": "Visits per Patient",
+          "position": "1.21 visits/patient is 18.2% below the All FL median of 1.48",
+          "operational_questions": [
+            "What is your no-show rate for this service? Lower visits per patient could reflect patient disengagement or scheduling barriers.",
+            "Are treatment episodes shorter than clinically indicated? Check average length of treatment engagement for this code.",
+            "Is there a retention issue \u2014 are patients completing their treatment plans, or dropping off after initial visits?",
+            "Could access barriers (wait times, transportation, scheduling availability) be limiting visit frequency?"
+          ]
+        },
+        {
+          "kpi": "Patients per Clinician",
+          "position": "200.6 patients/clinician is 141.7% above the All FL median of 83.0",
+          "operational_questions": [
+            "What is your clinician turnover rate for this service line? High caseloads are associated with burnout and higher churn.",
+            "Are clinicians carrying this caseload sustainably, or are there quality-of-care indicators (patient complaints, outcome measures) that suggest strain?",
+            "Is the high caseload by design (efficiency-optimized model) or by default (understaffing)?"
+          ]
+        }
+      ],
+      "pct_delta_vs_lookalike": -36.9,
+      "pct_delta_vs_all_fl": -32.3
+    },
+    "99212": {
+      "name": "Office Visit L2",
+      "service_line": "Medication Management",
+      "revenue_share_of_total_pct": 0.0,
+      "claims": 16,
+      "paid": 60.12,
+      "beneficiaries": 12,
+      "svc_npis": 1,
+      "payment_per_claim": 3.76,
+      "revenue_per_bene": 5.01,
+      "claims_per_bene": 1.33,
+      "bene_per_clinician": 12.0,
+      "look_alike_n": 1,
+      "look_alike_p50_ppc": 30.24,
+      "look_alike_p50_rpb": 32.72,
+      "trend_signal": "Stable",
+      "trend_arrow": "\u2192",
+      "trend_label": "Steady",
+      "trend_first_year": "2019",
+      "trend_first_ppc": 1.44,
+      "trend_last_year": "2024",
+      "trend_last_ppc": 3.76,
+      "badge_rate": "\ud83d\udd34 Investigate",
+      "badge_productivity": "\ud83d\udd34 Investigate",
+      "badge_utilization": "\ud83d\udfe2 On Track",
+      "badge_revenue": "\ud83d\udd34 Investigate",
+      "peers": {
+        "All FL Medicaid Orgs": {
+          "n": 602,
+          "p50_ppc": 26.52,
+          "p50_rpb": 28.85,
+          "p50_cpb": 1.07,
+          "p50_bpc": 60.0,
+          "position_ppc": "WELL BELOW",
+          "position_rpb": "WELL BELOW"
+        },
+        "Organization-billed": {
+          "n": 549,
+          "p50_ppc": 26.3,
+          "p50_rpb": 28.57,
+          "p50_cpb": 1.07,
+          "p50_bpc": 59.0,
+          "position_ppc": "WELL BELOW",
+          "position_rpb": "WELL BELOW"
+        },
+        "Similar BH_SPECIALTY Peers": {
+          "n": 23,
+          "p50_ppc": 23.11,
+          "p50_rpb": 27.66,
+          "p50_cpb": 1.09,
+          "p50_bpc": 42.0,
+          "position_ppc": "WELL BELOW",
+          "position_rpb": "WELL BELOW"
+        },
+        "Similar Size Orgs (Medium)": {
+          "n": 123,
+          "p50_ppc": 29.25,
+          "p50_rpb": 32.24,
+          "p50_cpb": 1.08,
+          "p50_bpc": 53.0,
+          "position_ppc": "WELL BELOW",
+          "position_rpb": "WELL BELOW"
+        },
+        "Similar Market (Moderate)": {
+          "n": 72,
+          "p50_ppc": 26.42,
+          "p50_rpb": 28.03,
+          "p50_cpb": 1.08,
+          "p50_bpc": 50.0,
+          "position_ppc": "WELL BELOW",
+          "position_rpb": "WELL BELOW"
+        },
+        "by_taxonomy:2084P0800X": {
+          "n": 5,
+          "p50_ppc": 14.25,
+          "p50_rpb": 18.63,
+          "p50_cpb": 1.12,
+          "p50_bpc": 52.0,
+          "position_ppc": "WELL BELOW",
+          "position_rpb": "WELL BELOW"
+        }
+      },
+      "trend_description": "Rate moved from $1.44 (2019) to $3.76 (2024). Signal: steady.",
+      "key_question": "Your per-claim rate of $3.76 is outside the typical range vs look-alike peers ($30.24). What is driving this \u2014 session duration, modifier usage, contract terms, or billing structure?",
+      "all_fl_median_ppc": 26.52,
+      "cmhc_median_ppc": 20.67,
+      "sector_gap_pct": -22.1,
+      "published_rate": 0,
+      "published_unit": "",
+      "published_note": "",
+      "rate_layers": null,
+      "operational_investigation": [
+        {
+          "kpi": "Rate per Claim",
+          "position": "$3.76 is 85.8% below the All FL Medicaid median of $26.52",
+          "operational_questions": [
+            "What is your denial rate on this code? A rate gap of this magnitude could reflect claims being denied and resubmitted at lower amounts.",
+            "Are you billing with the optimal modifier combination? Different modifiers can yield different reimbursement for the same service.",
+            "Is this rate consistent across all your managed care contracts, or is one payer pulling the average down?",
+            "What percentage of claims for this code are paid at first submission vs requiring resubmission or appeal?"
+          ]
+        },
+        {
+          "kpi": "Visits per Patient",
+          "position": "1.33 visits/patient is 24.3% above the All FL median of 1.07",
+          "operational_questions": [
+            "Is the higher frequency clinically appropriate, or could it reflect a billing pattern where visits are split across more claim lines?",
+            "Are patients in this service line higher-acuity, requiring more frequent contact?"
+          ]
+        },
+        {
+          "kpi": "Patients per Clinician",
+          "position": "12.0 patients/clinician is 80.0% below the All FL median of 60.0",
+          "operational_questions": [
+            "Is the lower caseload intentional (high-touch service model for complex patients) or a capacity gap (clinicians available but patients not flowing in)?",
+            "Has there been a recent staffing increase that hasn't been matched by patient volume growth?",
+            "Are patients being routed to a different service line (e.g., residential) instead of this outpatient code?"
+          ]
+        }
+      ],
+      "pct_delta_vs_lookalike": -87.6,
+      "pct_delta_vs_all_fl": -85.8
+    }
+  },
+  "dashboard_rows": [
+    {
+      "code": "T1017",
+      "name": "Targeted Case Management",
+      "service_line": "Case Management",
+      "revenue_share": 20.6,
+      "claims": 15041,
+      "badge_rate": "\ud83d\udd34 Investigate",
+      "badge_productivity": "\ud83d\udfe2 On Track",
+      "badge_utilization": "\ud83d\udfe2 On Track",
+      "badge_revenue": "\ud83d\udfe1 Monitor",
+      "trend_arrow": "\u2193",
+      "trend_label": "Falling behind",
+      "volume_caution": false
+    },
+    {
+      "code": "H2017",
+      "name": "Psychosocial Rehabilitation",
+      "service_line": "Psychosocial Rehabilitation",
+      "revenue_share": 14.6,
+      "claims": 4847,
+      "badge_rate": "\u26aa At Market",
+      "badge_productivity": "\ud83d\udfe2 On Track",
+      "badge_utilization": "\ud83d\udfe2 On Track",
+      "badge_revenue": "\ud83d\udfe2 On Track",
+      "trend_arrow": "\u2191",
+      "trend_label": "Recovering",
+      "volume_caution": false
+    },
+    {
+      "code": "H2019",
+      "name": "Behavioral Therapy Services",
+      "service_line": "Outpatient Therapy",
+      "revenue_share": 9.6,
+      "claims": 3954,
+      "badge_rate": "\u26aa At Market",
+      "badge_productivity": "\ud83d\udfe2 On Track",
+      "badge_utilization": "\ud83d\udfe2 On Track",
+      "badge_revenue": "\ud83d\udfe2 On Track",
+      "trend_arrow": "\u2192",
+      "trend_label": "Steady",
+      "volume_caution": false
+    },
+    {
+      "code": "H0031",
+      "name": "Mental Health Assessment",
+      "service_line": "Assessment",
+      "revenue_share": 0.8,
+      "claims": 1216,
+      "badge_rate": "\ud83d\udd34 Investigate",
+      "badge_productivity": "\ud83d\udfe2 On Track",
+      "badge_utilization": "\ud83d\udfe1 Monitor",
+      "badge_revenue": "\ud83d\udd34 Investigate",
+      "trend_arrow": "\u2192",
+      "trend_label": "Steady",
+      "volume_caution": false
+    },
+    {
+      "code": "99212",
+      "name": "Office Visit L2",
+      "service_line": "Medication Management",
+      "revenue_share": 0.0,
+      "claims": 16,
+      "badge_rate": "\ud83d\udd34 Investigate",
+      "badge_productivity": "\ud83d\udd34 Investigate",
+      "badge_utilization": "\ud83d\udfe2 On Track",
+      "badge_revenue": "\ud83d\udd34 Investigate",
+      "trend_arrow": "\u2192",
+      "trend_label": "Steady",
+      "volume_caution": true
+    }
+  ],
+  "executive_summary_guidance": {
+    "bullet_1": "Scope: This report covers $3,277,909 in Medicaid FFS professional claims \u2014 one component of total operations.",
+    "bullet_2": "Largest rate variance: Office Visit L2 at 85.8% below the All FL Medicaid median \u2014 the percentage gap, not the dollar impact, is the actionable signal since this data represents a partial view of total operations.",
+    "bullet_3": "Codes requiring attention: Targeted Case Management, Mental Health Assessment, Office Visit L2"
+  },
+  "sector_gap_framing": "An important context for this report: the CMHC sector in Florida systematically collects less per claim than the broader Medicaid market on several key codes. For example, CMHC median payment for targeted case management (T1017) is $49.58 \u2014 20% below the All FL Medicaid median of $62.20. For medication management (T1015), CMHCs collect $65.02 vs the market's $70.18 (7% below). This means that performing 'at the CMHC median' may still represent underperformance relative to the broader market. Throughout this report, we compare against both your sector peers (similar CMHCs) and the full Florida Medicaid market. The aspirational benchmark is closing the gap to the All FL Medicaid median.",
+  "rate_layer_framing": "When published fee schedule rates are available, this report frames rate performance across three layers: (1) the FL Medicaid published rate \u2014 the maximum AHCA will pay, (2) the All FL Medicaid average paid rate \u2014 what the industry actually collects after MCO discounts and billing variation, and (3) your organization's average paid rate. The gap between published and industry rates reflects structural compression the entire market faces. The gap between industry and your rate is the org-specific variance that is most actionable.",
+  "chart_reading_guide": "In each chart, the diamond marks your organization's value. The vertical line marks the peer group median \u2014 the midpoint where half of peers are above and half below. The shaded band shows the middle 50% of peers \u2014 the range within which most comparable organizations fall. If your diamond sits inside the band, you are in the typical range. If it sits outside the band, that is a signal worth investigating.",
+  "methodology_compendium": {
+    "title": "Methodology Compendium (Available on Request)",
+    "sections_to_build": [
+      {
+        "name": "Data Source & Processing",
+        "covers": "DOGE Medicaid Provider Spending dataset, NPPES enrichment, professional NPI filtering, FL state filtering, claim count reconciliation (total vs professional-channel)"
+      },
+      {
+        "name": "Peer Group Construction",
+        "covers": "Parallel single-dimension cuts (All FL, org type, size, market, taxonomy), minimum org thresholds, org-level aggregation methodology, billing NPI to org entity mapping via name normalization"
+      },
+      {
+        "name": "Look-alike Matching Algorithm",
+        "covers": "Service-line revenue mix vectorization, cosine similarity computation, minimum revenue threshold ($10K), top-N selection, similarity score interpretation (0.75+ = comparable, 0.90+ = highly similar)"
+      },
+      {
+        "name": "Org Profiling",
+        "covers": "NPPES taxonomy lookup (all taxonomies, not just primary), DOGE revenue breakdown by service line, data coverage assessment (residential/crisis/ACT detection), peer group recommendations"
+      },
+      {
+        "name": "Badge Assignment Logic",
+        "covers": "Primary peer group selection (org_type match), position classification (WELL ABOVE/Above/\u2248P50/Below/WELL BELOW based on % deviation from P50), trend signal computation (Diverging UP/DOWN, Converging, Stable, Recovering), badge mapping rules with override conditions"
+      },
+      {
+        "name": "Operational Investigation Triggers",
+        "covers": "Threshold rules: Rate \u00b110% vs All FL triggers denial/contract questions, Visits \u00b115% triggers engagement questions, Caseload \u00b130% triggers burnout/capacity questions, combined high-RPB + low-CPB triggers CAC questions"
+      },
+      {
+        "name": "Published Rate Reference",
+        "covers": "FL AHCA Rule 59G-4.002 fee schedules (CBH, Practitioner, TCM, STS), extraction methodology, per-unit vs per-event distinction, three-layer rate framing (published \u2192 industry paid \u2192 org paid)"
+      },
+      {
+        "name": "Trend Analysis",
+        "covers": "2019-2024 monthly data, annual aggregation, trend signal computation (early year vs late year gap vs peer, direction classification), COVID-19 context for 2020-2021 anomalies"
+      },
+      {
+        "name": "Report Generation Pipeline",
+        "covers": "Canonical input generation (deterministic, all numbers pre-computed), JSON template, LLM fill (no computation allowed), post-production validation (number matching, tone checking), chart generation (Plotly, dark theme, peer + trend pair)"
+      },
+      {
+        "name": "Limitations & Known Gaps",
+        "covers": "Per-claim not per-unit (no units column in DOGE), modifier rollup, FQHC/RHC PPS distortion in All FL comparisons, MCO vs FFS rate blending, residential/facility billing not in data, beneficiary overlap across months"
+      }
+    ],
+    "report_footnote": "A detailed methodology compendium documenting the data sources, algorithms, peer matching logic, and statistical methods used in this report is available on request. Contact your account team for access."
+  }
+}

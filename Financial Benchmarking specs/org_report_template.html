@@ -1,0 +1,318 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title><!-- FILL: org_name --> — Your Chapter</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{font-family:Inter,sans-serif;background:#0f172a;color:#e2e8f0;max-width:1100px;margin:0 auto;padding:40px 60px;line-height:1.75}
+h1{font-size:32px;color:#f1f5f9;border-bottom:2px solid #3b82f6;padding-bottom:16px;margin-bottom:32px}
+h2{font-size:24px;color:#f1f5f9;margin-top:48px;border-bottom:1px solid #334155;padding-bottom:8px}
+h3{font-size:18px;color:#94a3b8;margin-top:32px}
+p{font-size:15px;color:#cbd5e1;margin-bottom:16px}
+strong{color:#f1f5f9}
+ul,ol{margin:12px 0;padding-left:24px}
+li{font-size:15px;color:#cbd5e1;margin-bottom:10px}
+li strong{color:#f1f5f9}
+hr{border:none;border-top:1px solid #334155;margin:32px 0}
+table{border-collapse:collapse;width:100%;margin:20px 0;font-size:12px}
+th{background:#1e293b;color:#f1f5f9;padding:8px 10px;text-align:left;border:1px solid #334155;font-weight:600}
+td{padding:8px 10px;border:1px solid #334155;color:#cbd5e1;vertical-align:top}
+tr:nth-child(even){background:rgba(30,41,59,0.5)}
+em{color:#94a3b8}
+blockquote{border-left:3px solid #f59e0b;padding:12px 16px;margin:20px 0;background:rgba(245,158,11,0.08);border-radius:0 8px 8px 0}
+blockquote p{color:#fbbf24;margin:0;font-size:14px;line-height:1.6}
+.hero{text-align:center;padding:48px 0 24px}
+.hero h1{border:none;font-size:34px;margin-bottom:8px}
+.hero .subtitle{font-size:16px;color:#94a3b8;margin-bottom:12px;line-height:1.6}
+.hero .context{font-size:13px;color:#64748b;margin-bottom:28px;line-height:1.5}
+.stat-row{display:flex;gap:16px;justify-content:center;margin:16px 0 28px;flex-wrap:wrap}
+.stat-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px 22px;text-align:center;min-width:140px}
+.stat-card .number{font-size:24px;font-weight:700;color:#3b82f6}
+.stat-card .label{font-size:11px;color:#94a3b8;margin-top:4px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:22px 26px;margin:18px 0}
+.card h3{margin-top:0;color:#f1f5f9;font-size:15px}
+.card p{font-size:13px;color:#94a3b8}
+.badge{display:inline-block;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600}
+.badge-green{background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3)}
+.badge-yellow{background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3)}
+.badge-red{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3)}
+.badge-white{background:rgba(148,163,184,0.1);color:#94a3b8;border:1px solid rgba(148,163,184,0.2)}
+.sector-ref{background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:20px 28px;margin:20px 0}
+.sector-ref p{margin:0;font-size:14px;color:#94a3b8;line-height:1.6}
+.sector-ref strong{color:#93c5fd}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:20px 0}
+.problem-header{display:flex;align-items:center;gap:14px;margin-bottom:4px}
+.problem-num{font-size:14px;font-weight:700;color:#3b82f6;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);border-radius:8px;padding:4px 12px;white-space:nowrap}
+.insight-box{background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:20px 28px;margin:24px 0}
+.insight-box p{margin:0;font-size:14px;color:#cbd5e1;line-height:1.7}
+</style>
+</head><body>
+
+<!-- ==================== SECTION 1: HERO ==================== -->
+<div class="hero">
+<h1>Your Chapter in the CMHC Landscape</h1>
+<p class="subtitle">The sector landscape identified three problems facing Florida's CMHCs.<br>Here's where your organization sits within each.</p>
+<p class="context">You read the sector report: an <!-- FILL: industry_findings.hero_stats.rate_gap.value --> rate gap, a clinician productivity burden, and a <!-- FILL: industry_findings.hero_stats.leakage_gap.value --> patient leakage problem that dwarfs both. This report takes those three sector-level dynamics and maps them to your data.</p>
+<div class="stat-row">
+<div class="stat-card"><div class="number"><!-- FILL: org.total_revenue formatted as $X.XXM --></div><div class="label">Visible Medicaid Revenue</div></div>
+<div class="stat-card"><div class="number"><!-- FILL: org.total_claims formatted with commas --></div><div class="label">Total Claims</div></div>
+<div class="stat-card"><div class="number"><!-- FILL: count of org.service_line_breakdown --></div><div class="label">Active Service Lines</div></div>
+<div class="stat-card"><div class="number"><!-- FILL: org.org_types[0] --></div><div class="label">Classification</div></div>
+</div>
+<p style="font-size:12px;color:#64748b">FL Medicaid FFS 2024 &middot; DOGE public data &middot; Professional servicing NPIs only &middot; This report covers one billing channel &mdash; not total operations</p>
+</div>
+
+<!-- ==================== SECTION 2: SECTOR CONTEXT BRIDGE ==================== -->
+<div class="sector-ref">
+<p><strong>From the sector landscape:</strong> Florida's <!-- FILL: industry_findings.sector.n_orgs --> CMHCs collectively face three structural challenges: (1) lower effective rates costing the sector <!-- FILL: industry_findings.three_problems.problem_1_rates.sector_gap_display -->, (2) higher clinician burden per dollar earned, and (3) patient leakage from intake to ongoing care &mdash; a <!-- FILL: industry_findings.three_problems.problem_2_engagement.sector_gap_display --> gap that is <!-- FILL: industry_findings.three_problems.problem_2_engagement.ratio_display --> larger than the rate gap. Every CMHC feels these three forces, but in different proportions. Below, we map each to your organization.</p>
+</div>
+
+<hr />
+
+<!-- ==================== SECTION 3: REVENUE MIX ==================== -->
+<h2>Your Revenue Mix</h2>
+<p>Before diving into the three problems, here is how your Medicaid FFS revenue breaks down across the care continuum:</p>
+
+<table>
+<thead><tr><th>Service Line</th><th style="text-align:right">Revenue</th><th style="text-align:right">Share</th><th>Stage</th><th>Codes</th></tr></thead>
+<tbody>
+<!-- FILL: One row per service_line_breakdown entry. Stage badge assigned per ORG_REPORT_SPEC.md section 3 logic.
+     Badge classes: badge-white (Intake), badge-yellow (High-Acuity), badge-green (Ongoing)
+     Example row:
+     <tr><td>Outpatient Therapy</td><td style="text-align:right">$497,851</td><td style="text-align:right">40.8%</td><td><span class="badge badge-green">Ongoing</span></td><td>H2019, T1015, H0035</td></tr>
+-->
+</tbody>
+</table>
+
+<blockquote><p><!-- FILL: WRITE data scope caveat. Reference org.data_coverage_notes and note FFS-only, partial view. If org has residential taxonomy but no residential codes, note that. --></p></blockquote>
+
+<hr />
+
+<!-- ==================== SECTION 4: PROBLEM 1 — RATES ==================== -->
+<h2><div class="problem-header"><span class="problem-num">PROBLEM 1</span> Lower Effective Rates</div></h2>
+
+<div class="sector-ref">
+<p><strong>The sector picture:</strong> CMHCs collect less per claim than non-CMHC providers on most service codes. At intake, CMHCs earn <!-- FILL: industry_findings.three_problems.problem_1_rates.by_stage.intake.cmhc_rpb --> per beneficiary vs <!-- FILL: ...rest_rpb --> for the rest of FL (<!-- FILL: ...gap_pct -->%). In high-acuity services, the gap widens to <!-- FILL: ...high_acuity.gap_pct -->%. The total sector rate gap: <strong><!-- FILL: ...sector_gap_display --></strong>.</p>
+</div>
+
+<h3><!-- FILL: WRITE 1-sentence headline positioning org within sector rate gap --></h3>
+
+<p><!-- FILL: WRITE 2-3 sentences summarizing org's overall rate position. Reference how many codes are above vs below CMHC P50 and All FL P50. --></p>
+
+<table>
+<thead><tr><th>Code</th><th>Service</th><th style="text-align:center">Your Rate</th><th style="text-align:center">CMHC P50</th><th style="text-align:center">All FL P50</th><th style="text-align:center">vs CMHC</th><th style="text-align:center">vs All FL</th><th style="text-align:center">Trend</th></tr></thead>
+<tbody>
+<!-- FILL: One row per code in org_canonical_input.codes.
+     Your Rate = payment_per_claim (bold)
+     CMHC P50 = peers["Similar CMHCs"].p50_ppc
+     All FL P50 = all_fl_median_ppc
+     vs CMHC = ((org - cmhc) / cmhc * 100), color green if positive, red if negative
+     vs All FL = same calc against all_fl
+     Trend = trend_arrow + trend_label
+     If vs CMHC < -25%, highlight row with background: rgba(239,68,68,0.08)
+-->
+</tbody>
+</table>
+
+<!-- FILL: Insert strength/gap/trap cards per ORG_REPORT_SPEC.md section 4c decision logic.
+     Green card: border-top: 3px solid #22c55e — for codes >25% above CMHC P50
+     Red card: border-top: 3px solid #ef4444 — for codes >25% below CMHC P50
+     Yellow card: border-top: 3px solid #f59e0b — for codes at CMHC P50 but CMHC P50 is >10% below All FL P50
+     Each card contains: <h3>, observation paragraph, "Question:" paragraph
+     Use .grid-2 if exactly 2 cards, or stack vertically if 1 or 3.
+-->
+
+<div class="insight-box">
+<p><strong>Your Problem 1 verdict:</strong> <!-- FILL: WRITE 2-3 sentences. Is the org on the favorable or unfavorable side of the sector rate gap? Which specific codes are exposed? Is the problem narrow/addressable or structural? --></p>
+</div>
+
+<hr />
+
+<!-- ==================== SECTION 5: PROBLEM 2 — ENGAGEMENT ==================== -->
+<h2><div class="problem-header"><span class="problem-num">PROBLEM 2</span> Lack of Patient Engagement</div></h2>
+
+<div class="sector-ref">
+<p><strong>The sector picture:</strong> CMHCs assess <!-- FILL: industry_findings.three_problems.problem_2_engagement.market_share_by_stage.intake.cmhc_pct -->% of FL Medicaid BH patients at intake, but retain only <!-- FILL: ...ongoing.cmhc_pct -->% through ongoing care. For every $1 the sector loses to rates, $<!-- FILL: ...ratio_to_rate_gap --> is lost to patients who enter the front door and don't stay. The <strong><!-- FILL: ...sector_gap_display --></strong> dwarfs the rate gap.</p>
+</div>
+
+<h3><!-- FILL: WRITE 1-sentence headline about org's engagement pattern --></h3>
+
+<p><!-- FILL: WRITE 1-2 sentences introducing the org's engagement story --></p>
+
+<div class="grid-3">
+<!-- FILL: Three RPB cards for the org's three most important codes by revenue.
+     Card structure:
+     <div class="card" style="border-top:3px solid {COLOR};text-align:center">
+       <h3>Service Name</h3>
+       <p style="font-size:28px;font-weight:700;color:{COLOR};margin:12px 0">${RPB}</p>
+       <p style="font-size:12px">CMHC P50: ${peer_rpb}</p>
+       <p style="font-size:20px;font-weight:600;color:{COLOR}">{gap}%</p>
+       <p style="font-size:11px;color:#64748b">{code} · {bene_count} beneficiaries</p>
+     </div>
+     COLOR: #22c55e if RPB > peer by 10%+, #94a3b8 if within 10%, #ef4444 if below by 10%+
+-->
+</div>
+
+<h3>The engagement math</h3>
+
+<p><!-- FILL: WRITE 2-3 sentences decomposing the org's RPB on the largest code into rate premium + panel size + visit frequency. Use payment_per_claim, bene_per_clinician, claims_per_bene from org canonical. Compare each to CMHC P50. --></p>
+
+<!-- FILL: WRITE the org's revenue mix vs sector leakage pattern.
+     Compute % of revenue by stage:
+       intake_pct = sum of paid for intake codes / total_revenue * 100
+       high_acuity_pct = sum for high-acuity codes / total_revenue * 100
+       ongoing_pct = sum for ongoing codes / total_revenue * 100
+     Then compare to sector pattern (23.6% intake share → 5.0% ongoing share).
+-->
+
+<div class="grid-2">
+<div class="card">
+<h3>Your care continuum mix</h3>
+<table style="font-size:13px;margin:8px 0">
+<!-- FILL: Three rows: Intake, High-acuity, Ongoing with computed percentages -->
+</table>
+</div>
+<div class="card">
+<h3>What this means</h3>
+<p><!-- FILL: WRITE 2-3 sentences comparing org's mix to the sector's 23.6%→5.0% leakage pattern. Does the org show the same pattern, the opposite, or something different? --></p>
+</div>
+</div>
+
+<h3>The beneficiary pipeline</h3>
+
+<table>
+<thead><tr><th>Stage</th><th>Code</th><th style="text-align:center">Unique Benes</th><th style="text-align:center">Revenue</th><th style="text-align:center">RPB</th><th>Signal</th></tr></thead>
+<tbody>
+<!-- FILL: One row per code, grouped by stage.
+     Stage = Intake / Ongoing / High-Acuity (from segment classification)
+     Benes = org.codes.{code}.beneficiaries
+     Revenue = org.codes.{code}.paid
+     RPB = org.codes.{code}.revenue_per_bene
+     Signal: WRITE a short observation comparing bene count to intake benes
+-->
+</tbody>
+</table>
+<p style="font-size:11px;color:#64748b">Beneficiaries are not deduplicated across codes &mdash; the same patient may appear in multiple rows.</p>
+
+<blockquote><p><!-- FILL: WRITE observation about the relationship between intake benes and ongoing benes. If ongoing >> intake, note the question of where ongoing patients come from. If intake >> ongoing, note the leakage signal. --></p></blockquote>
+
+<div class="insight-box">
+<p><strong>Your Problem 2 verdict:</strong> <!-- FILL: WRITE 2-3 sentences. Does the org show the sector leakage pattern or the opposite? How does per-patient engagement compare? What is the revenue opportunity if the front door widens or retention improves? --></p>
+</div>
+
+<hr />
+
+<!-- ==================== SECTION 6: PROBLEM 3 — BURNOUT ==================== -->
+<h2><div class="problem-header"><span class="problem-num">PROBLEM 3</span> Clinician Churn and Burnout</div></h2>
+
+<div class="sector-ref">
+<p><strong>The sector picture:</strong> <!-- FILL: COPY or paraphrase from industry_findings.three_problems.problem_3_burnout.description --></p>
+</div>
+
+<h3><!-- FILL: WRITE 1-sentence headline about org's panel/capacity pattern --></h3>
+
+<p><!-- FILL: WRITE 1-2 sentences introducing the org's panel size story --></p>
+
+<table>
+<thead><tr><th>Code</th><th>Service</th><th style="text-align:center">Your Panel</th><th style="text-align:center">CMHC P50</th><th style="text-align:center">Gap</th><th style="text-align:center">Clinicians</th><th>Signal</th></tr></thead>
+<tbody>
+<!-- FILL: One row per code.
+     Your Panel = bene_per_clinician
+     CMHC P50 = peers["Similar CMHCs"].p50_bpc
+     Gap = percentage difference
+     Clinicians = svc_npis
+     Signal badge: per ORG_REPORT_SPEC.md section 6b logic
+-->
+</tbody>
+</table>
+
+<div class="grid-2">
+<!-- FILL: Two insight cards per ORG_REPORT_SPEC.md section 6c.
+     Card 1: highest-load service line (yellow or red border-top)
+     Card 2: lowest-throughput service line (red border-top)
+     Each: <h3>, observation paragraph, "Question:" paragraph
+-->
+</div>
+
+<h3>The churn/burnout connection</h3>
+
+<p>Problem 3 is an <em>outcome</em> of Problems 1 and 2. Here's how the dynamics connect for your organization:</p>
+
+<div class="card">
+<table style="font-size:13px;margin:0">
+<thead><tr><th style="width:30%">Dynamic</th><th style="width:35%">Sector Pattern</th><th style="width:35%">Your Pattern</th></tr></thead>
+<tbody>
+<!-- FILL: Four rows mapping burnout cycle to org data.
+     Row 1: "Low rates → more volume needed" | sector pattern | org's rate position from Problem 1
+     Row 2: "Low engagement → churn cycle" | sector pattern | org's engagement from Problem 2
+     Row 3: "High caseload → burnout" | sector pattern | org's panel data from this section
+     Row 4: "Burnout → turnover" | sector pattern | org's concentration risk (clinician count, benes at risk)
+-->
+</tbody>
+</table>
+</div>
+
+<div class="insight-box">
+<p><strong>Your Problem 3 verdict:</strong> <!-- FILL: WRITE 2-3 sentences. How does the burnout cycle apply? Where is risk concentrated? Where is it mitigated by above-market rates or strong retention? --></p>
+</div>
+
+<hr />
+
+<!-- ==================== SECTION 7: PUTTING IT TOGETHER ==================== -->
+<h2>Putting It Together: Your Organization's Position</h2>
+
+<div class="grid-3">
+<!-- FILL: Three verdict cards per ORG_REPORT_SPEC.md section 7.
+     Structure:
+     <div class="card" style="text-align:center;border-top:3px solid {COLOR}">
+       <h3 style="color:{COLOR}">Problem N: Label</h3>
+       <p style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#64748b">Sector: {headline number}</p>
+       <p style="font-size:28px;font-weight:700;color:{COLOR};margin:8px 0">{Verdict Word}</p>
+       <p style="font-size:12px">{1-2 sentence summary}</p>
+     </div>
+     Verdict words: Favorable / Opportunity / Exposed / Concentrated / At Risk / Mixed / Manageable
+     Colors: green=#22c55e, yellow=#f59e0b, red=#ef4444
+-->
+</div>
+
+<hr />
+
+<!-- ==================== SECTION 8: INVESTIGATION PRIORITIES ==================== -->
+<h2>Investigation Priorities</h2>
+
+<div class="grid-2">
+<!-- FILL: 3-4 investigation cards per ORG_REPORT_SPEC.md section 8.
+     Structure:
+     <div class="card" style="border-left:3px solid {COLOR}">
+       <h3>N. Title</h3>
+       <p>2-3 sentence observation and what to investigate.</p>
+       <p style="color:#64748b;font-size:11px">Impact: {rough dollar estimate or qualitative impact}</p>
+     </div>
+     Red border: Investigate (anomalous/billing)
+     Yellow border: Monitor (trend/capacity)
+     Green border: Strength (protect)
+-->
+</div>
+
+<!-- FILL: Optional — if org has a notable rate outlier (>50% above CMHC P50), add a card explaining what might drive it.
+     <h3>What the {code} Rate Premium Means</h3>
+     <div class="card">
+       <p>Observation + three possible explanations (session duration, contract terms, billing structure)</p>
+     </div>
+-->
+
+<hr />
+
+<!-- ==================== SECTION 9: METHODOLOGY ==================== -->
+<h2>Methodology</h2>
+<p><strong>Data source:</strong> FL Medicaid FFS claims (DOGE/Medicaid Provider Spending), 2024. MCO encounter data not included.</p>
+<p><strong>Org identification:</strong> Claims matched by billing NPI to organizational entity via NPPES. Professional servicing NPIs only (entity_type_code = 1).</p>
+<p><strong>Peer groups:</strong> CMHC sector (<!-- FILL: n from Similar CMHCs --> orgs), All FL Medicaid (full market), Similar Size, Similar Market, Same Classification, Look-alike peers (<!-- FILL: look_alike_count --> orgs, cosine similarity <!-- FILL: look_alike_similarity_range[0] -->&ndash;<!-- FILL: look_alike_similarity_range[1] --> on service-line revenue mix).</p>
+<p><strong>Metrics:</strong> Payment per claim (rate), revenue per beneficiary (engagement depth), claims per beneficiary (visit frequency), beneficiaries per clinician (panel size / productivity).</p>
+<p><strong>Sector context:</strong> Sector-level numbers (<!-- FILL: rate_gap -->, <!-- FILL: leakage share drop -->, <!-- FILL: leakage_gap -->) are from the FL CMHC Landscape Report v4, which benchmarks the full CMHC sector against all non-CMHC FL Medicaid providers.</p>
+<p><strong>Limitations:</strong> This report shows FL Medicaid FFS only &mdash; a partial view. Organization-level conclusions should be validated against internal data. Residential treatment revenue, facility-level crisis billing, and MCO encounter data are not captured. Beneficiary counts are not deduplicated across service codes.</p>
+
+<hr />
+
+<p style="text-align:center;color:#94a3b8;font-style:italic;margin-top:40px">This report maps your organization's position within the three structural challenges identified in the FL CMHC Landscape Report. It presents observations and investigation questions &mdash; it does not diagnose causes or prescribe actions. All numbers should be validated against internal claims data before operational decisions.</p>
+<p style="margin-top:60px;border-top:1px solid #334155;padding-top:24px;font-size:12px;color:#64748b;text-align:center">Organizational Benchmarking &middot; <!-- FILL: org_name --> &middot; 2024 &middot; v8 (Continuation of FL CMHC Landscape)</p>
+
+</body></html>
