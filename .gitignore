@@ -41,3 +41,4 @@ Mobius Diary/
 # QA eval artifacts
 mobius-qa/retrieval-eval/reports/
 mobius-qa/retrieval-eval/questions_generated.yaml
+mobius-answer-cache/
