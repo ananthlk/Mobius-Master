@@ -56,6 +56,14 @@ DOC_META: dict[str, dict] = {
     "infrastructure.md":           {"module": "infra",           "audience": "dev",   "in_scope": False},
 }
 
+# demo scripts (mobius-interact feeder): (module, section) -> published script ref.
+# Attached to answer outcomes so chat can render a "▶ Show me" chip. Scripts live in
+# product-awareness/demos/ and are published to the interact registry.
+DEMOS: dict[tuple[str, str], dict] = {
+    ("chat", "Composer & sending"): {
+        "script_id": "chat:upload-a-document", "title": "Show me: upload a document"},
+}
+
 # doc_type by section heading (falls back to "reference")
 SECTION_DOC_TYPE: dict[str, str] = {
     "Purpose": "concept",

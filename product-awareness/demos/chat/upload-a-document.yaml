@@ -1,0 +1,29 @@
+# chat:upload-a-document — production demo script (feeder: product-awareness).
+# Source of truth for the flow: docs/product-docs/mobius-chat.md § Composer & sending.
+# Published to mobius-interact via POST /scripts (X-Feeder-Source: product-awareness).
+schema: interact.v1
+id: chat:upload-a-document
+title: Upload a document and ask about it
+mode: guide
+surface: mobius-chat
+permissions: []
+preconditions:
+  - selector: "[data-tour-id=composer-input]"
+steps:
+  - find: "[data-tour-id=composer-attach]"
+    action: highlight
+    caption: "This paperclip attaches a document to your chat — PDF, DOCX, HTML, or TXT."
+  - find: "[data-tour-id=composer-attach]"
+    action: click
+    caption: "Click it and choose your file."
+    wait_for: "[data-tour-id=composer-attachment-chip]"
+  - find: "[data-tour-id=composer-attachment-chip]"
+    action: highlight
+    caption: "Your document is staged here — the ✕ removes it if you picked the wrong file."
+  - find: "[data-tour-id=composer-input]"
+    action: highlight
+    caption: "Now type a question about your document — e.g. \"summarize the prior-auth rules in this manual\"."
+  - find: "[data-tour-id=composer-send]"
+    action: highlight
+    caption: "Hit Send — your file uploads and the answer draws on it. Keep asking follow-ups in this thread; the document stays attached."
+    end: true
