@@ -49,7 +49,7 @@ DOCUMENT_UPLOAD_MARKDOWN = """\
 
 **What it does:** Attach files to **this chat thread** so other tools can search them. Each upload is chunked + embedded once; afterwards you can ask natural-language questions and the `search_uploaded_document` skill retrieves the relevant passages with page citations. You can upload **multiple documents at different times**; each is stored on the thread with a timestamp and filename.
 
-**End user:** Tap **⋯** next to Send → **Upload file** → pick a **PDF, DOCX, CSV, or XLSX**. The upload runs instant-RAG in the background; a receipt banner confirms when indexing is complete.
+**End user:** Click the **paperclip (📎)** in the composer → pick a **PDF, DOCX, HTML, or TXT**. The file is staged as a chip above the composer (✕ removes it) and uploads when you hit **Send**; instant-RAG indexes it in the background and a receipt banner confirms when it's searchable. (The old ⋯ → "Upload file" menu item was removed in the 2026-04-18 UX audit — the paperclip is the shipped upload affordance. CSV/XLSX are roster-reconciliation formats, not chat-upload formats.)
 
 **Supported purpose:**
 - `instant_rag` — the default. Chunks + embeds the document so `search_uploaded_document` can search inside it.
