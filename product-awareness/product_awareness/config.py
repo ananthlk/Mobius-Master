@@ -62,7 +62,22 @@ DOC_META: dict[str, dict] = {
 DEMOS: dict[tuple[str, str], dict] = {
     ("chat", "Composer & sending"): {
         "script_id": "chat:upload-a-document", "title": "Show me: upload a document"},
+    ("chat", "Operations Suite (open-in-tab products)"): {
+        "script_id": "chat:operations-suite-tour", "title": "Show me: tour the Operations Suite"},
+    ("chat", "Response modes & caching"): {
+        "script_id": "chat:response-modes", "title": "Show me: pick a response mode"},
+    # "Message-level actions" hosts BOTH feedback and email content; the section key
+    # takes the higher-demand demo and the keyword override below catches email intent.
+    ("chat", "Message-level actions"): {
+        "script_id": "chat:give-feedback", "title": "Show me: give feedback"},
 }
+
+# Keyword overrides — checked BEFORE the section map (module-scoped, word-boundary).
+# Only for genuine section collisions; keep this list tiny and precise.
+DEMO_KEYWORDS: list[tuple[str, str, dict]] = [
+    ("chat", r"\bemail\b", {
+        "script_id": "chat:email-a-thread", "title": "Show me: email this conversation"}),
+]
 
 # doc_type by section heading (falls back to "reference")
 SECTION_DOC_TYPE: dict[str, str] = {

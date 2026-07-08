@@ -1,0 +1,20 @@
+# chat:response-modes — includes the caching truth (the original stale-docs defect area).
+schema: interact.v1
+id: chat:response-modes
+title: Pick a response mode
+mode: guide
+surface: mobius-chat
+permissions: []
+preconditions:
+  - selector: "[data-tour-id=composer-mode]"
+steps:
+  - find: "[data-tour-id=composer-mode]"
+    action: highlight
+    caption: "This dropdown sets how hard Mobius works on your question — pick per message."
+  - find: "[data-tour-id=composer-mode]"
+    action: highlight
+    caption: "⚡ Fast: quick, brief answers (may reuse a recent cached answer). ◉ Normal (default): practical, registry-first — fresh unless a cached answer is a confident match."
+  - find: "[data-tour-id=composer-mode]"
+    action: highlight
+    caption: "✦ Thinking: deep research with the full tool chain — always fresh, never cached. Use it for the questions that matter most."
+    end: true

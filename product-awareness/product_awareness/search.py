@@ -92,7 +92,14 @@ class ProductHelp:
         # --- ANSWER: current docs above threshold ---
         current = [h for h in hits if h["metadata"].get("status") != "planned"]
         from . import config as _cfg  # local import keeps module load light
-        demo = _cfg.DEMOS.get((top_module, top["metadata"].get("section", "")))
+        import re as _re
+        demo = None
+        for mod, pat, ref in _cfg.DEMO_KEYWORDS:   # keyword overrides first (collisions)
+            if mod == top_module and _re.search(pat, query, _re.IGNORECASE):
+                demo = ref
+                break
+        if demo is None:
+            demo = _cfg.DEMOS.get((top_module, top["metadata"].get("section", "")))
         return SearchResult(
             outcome="answer", query=query, s_top=s_top, tau_gap=self.tau_gap,
             module=top_module,
