@@ -70,6 +70,10 @@ DEMOS: dict[tuple[str, str], dict] = {
     # takes the higher-demand demo and the keyword override below catches email intent.
     ("chat", "Message-level actions"): {
         "script_id": "chat:give-feedback", "title": "Show me: give feedback"},
+    # feedback questions also legitimately hit the answer-components section
+    # (nudge chips / capture card live there) — same demo.
+    ("chat", "Banners, status & answer components"): {
+        "script_id": "chat:give-feedback", "title": "Show me: give feedback"},
 }
 
 # Keyword overrides — checked BEFORE the section map (module-scoped, word-boundary).

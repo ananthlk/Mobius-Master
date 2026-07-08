@@ -33,7 +33,7 @@ A fourth `task` mode exists at the API level (raw text, skips the integrator) bu
 
 ## Message-level actions
 Per assistant message:
-- **Thumbs up / down** — Up records the rating and refreshes the sidebar "Most helpful"; Down opens a comment area for an optional note. Disabled after the first vote.
+- **Thumbs up / down** — Up records the rating and refreshes the sidebar "Most helpful"; Down opens a comment area for an optional note. Disabled after the first vote. **This is how you give feedback on an answer — there is no separate feedback form**: rate the message directly, or type product feedback straight into the composer (e.g. "I have feedback: …") and Mobius logs and routes it.
 - **Copy** — copies the message text; shows "Copied" briefly.
 - **Email this thread** (`#emailDialog`, two-step, **live**) — Step 1: recipient + scope (whole thread / last exchange) + mode (LLM summary or full transcript) → preview. Step 2: re-draft or send (`POST /chat/thread/{id}/email`).
 - **Per-source feedback** — thumbs up/down on each `[N]` source card (`POST /chat/source-feedback/{cid}`).
@@ -51,7 +51,7 @@ Per assistant message:
 - **Collapse** — a chevron collapses the sidebar to an icon rail (Recent 🔍, Most Helpful ⭐, Skills ⊞ with badges).
 
 ## Operations Suite (open-in-tab products)
-The sidebar's Operations Suite holds **open-in-tab product tiles** — distinct from the auto-invoked chat skills. Clicking a tile opens that product in a new tab; a Mobius-owned tile forwards your access token in the URL fragment (`#t=…`) so it signs you in without a second login. Current tiles (2026-04-29 layout):
+**What is the Public Library?** The Public Library is Mobius's shared knowledge base — payer manuals, regulations, and public sources — and it's one of the Operations Suite tiles in the chat sidebar. The sidebar's Operations Suite holds **open-in-tab product tiles** — distinct from the auto-invoked chat skills. Clicking a tile opens that product in a new tab; a Mobius-owned tile forwards your access token in the URL fragment (`#t=…`) so it signs you in without a second login. Current tiles (2026-04-29 layout):
 - **Strategy** — "Benchmarking + KPIs" — **live**. Opens the market-intelligence / benchmarking deck.
 - **Public Library** — "Shared corpus — payer manuals, regs, public sources" — **live**. Opens the shared RAG corpus UI (the public, non-private knowledge base). Renamed from "Library" to make room for Vault.
 - **Roster** — "Provider directory + credentialing" — **coming soon**. Credentialing was folded into Roster (same backing service; two tiles confused users), and the tile's click is currently disabled.
