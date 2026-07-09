@@ -75,6 +75,15 @@ DEMOS: dict[tuple[str, str], dict] = {
     # (nudge chips / capture card live there) — same demo.
     ("chat", "Banners, status & answer components"): {
         "script_id": "chat:give-feedback", "title": "Show me: give feedback"},
+    ("chat", "Sign in & sign out — how do I log in or out?"): {
+        "script_id": "chat:sign-in", "title": "Show me: sign in"},
+    ("chat", "Your past queries — where did my conversation go?"): {
+        "script_id": "chat:find-past-queries", "title": "Show me: find your past queries"},
+    ("skills", "Task management"): {
+        "script_id": "chat:complete-a-task", "title": "Show me: mark a task complete"},
+    # HELD until the menu-preferences anchor lands (script authored, unpublished):
+    # ("chat", "Preferences — how do I change the style of my answers?"): {
+    #     "script_id": "chat:update-preferences", "title": "Show me: change your answer style"},
 }
 
 # Keyword overrides — checked BEFORE the section map (module-scoped, word-boundary).
@@ -86,12 +95,11 @@ DEMO_KEYWORDS: list[tuple[str, str, dict]] = [
         "script_id": "chat:email-a-thread", "title": "Show me: email this conversation"}),
     ("skills", r"\bemail\b", {
         "script_id": "chat:email-a-thread", "title": "Show me: email this conversation"}),
-    # ── ENABLE AT PUBLISH (scripts authored, awaiting the chat anchor slice) ──
     # sign-in/out queries resolve to the chat doc OR the auth doc (same lesson as email):
-    # ("chat", r"\bsign.?(in|out)\b|\blog.?(in|out)\b", {
-    #     "script_id": "chat:sign-in", "title": "Show me: sign in"}),
-    # ("auth", r"\bsign.?(in|out)\b|\blog.?(in|out)\b", {
-    #     "script_id": "chat:sign-in", "title": "Show me: sign in"}),
+    ("chat", r"\bsign.?(in|out)\b|\blog.?(in|out)\b", {
+        "script_id": "chat:sign-in", "title": "Show me: sign in"}),
+    ("auth", r"\bsign.?(in|out)\b|\blog.?(in|out)\b", {
+        "script_id": "chat:sign-in", "title": "Show me: sign in"}),
 ]
 
 # doc_type by section heading (falls back to "reference")
