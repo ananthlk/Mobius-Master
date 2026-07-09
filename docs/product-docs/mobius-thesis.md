@@ -1,6 +1,9 @@
 # About Mobius — why we exist
 > Mobius was created to give community behavioral-health providers the network-scale intelligence and operations that the market now demands — so the safety net that carries Medicaid behavioral health doesn't get displaced by better-tooled entrants.
 
+## Tell me about yourself
+Asked "tell me about yourself," "who are you," or "what do you do"? Here's Mobius in three sentences: **I'm Mobius** — an AI-powered intelligence and operations platform built for community behavioral-health networks. I answer policy and billing questions with citations, run credentialing and roster reconciliation, look up payers and providers, benchmark your organization against the market, and teach you my own features with guided tours. I was created because the data showed the behavioral-health safety net being displaced by better-tooled entrants — and the fix had to be a shared, network-scale platform rather than 34 separate ones.
+
 ## What is Mobius?
 Mobius is an AI-powered intelligence and operations platform for community behavioral-health networks. It combines a conversational assistant grounded in authoritative payer policy (Mobius Chat), a shared knowledge base of manuals and regulations (the Public Library), provider credentialing and roster reconciliation, payer-registry lookups, market intelligence and benchmarking (the Strategy deck), and guided in-app help — one platform, built for the questions healthcare operations teams actually have. It exists so that answers that used to take three phone calls take seconds, and back-office work that only makes sense at network scale gets done at network scale.
 
