@@ -43,12 +43,17 @@ Per assistant message:
 
 ## Sidebar
 - **New chat** (`#btnNewChat`).
-- **Recent searches — where your past queries live.** Looking for a previous conversation or question? The sidebar's **Recent searches** list holds your last ~20 threads (`GET /chat/history/recent`); **click any entry to reopen that conversation** and keep going where you left off.
-- **Most helpful searches** — your best past answers: populated from thumbs-up feedback, refreshes after each "up". Use it to jump back to answers you rated.
+- **Recent searches** and **Most helpful searches** — your conversation history; see the dedicated section **Your past queries** below.
 - **Operations Suite** — open-in-tab product tiles (Strategy, Public Library, Roster, Vault) + an Appeals Agent demo tile + "Learn more about chat skills". Detailed in the **Operations Suite** section below.
 - **User / account area** — "Signed in as {name}"; click opens the auth modal.
 - **Onboarding nudge** (`#onboardingNudge`) — "⚙ Set up your profile" when not yet onboarded; opens Preferences.
 - **Collapse** — a chevron collapses the sidebar to an icon rail (Recent 🔍, Most Helpful ⭐, Skills ⊞ with badges).
+
+## Your past queries — where did my conversation go?
+**Your past queries and conversations live in the sidebar.** Looking for a previous question, thread, or answer?
+- **Recent searches** — your last ~20 conversations (`GET /chat/history/recent`). **Click any entry to reopen that conversation** and continue where you left off; nothing is lost when you start a new chat.
+- **Most helpful searches** — your best past answers: everything you rated 👍, one click away. It refreshes each time you thumbs-up an answer.
+- Starting fresh? **+ New chat** opens a new thread; your old ones stay in Recent searches.
 
 ## Operations Suite (open-in-tab products)
 **What is the Public Library?** The Public Library is Mobius's shared knowledge base — payer manuals, regulations, and public sources — and it's one of the Operations Suite tiles in the chat sidebar. The sidebar's Operations Suite holds **open-in-tab product tiles** — distinct from the auto-invoked chat skills. Clicking a tile opens that product in a new tab; a Mobius-owned tile forwards your access token in the URL fragment (`#t=…`) so it signs you in without a second login. Current tiles (2026-04-29 layout):
