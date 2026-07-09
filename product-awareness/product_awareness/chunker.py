@@ -104,8 +104,20 @@ def chunk_file(path: Path, source_commit: str = "uncommitted") -> list[Chunk]:
             source_path=rel, source_commit=source_commit, text=text, n_chars=len(text)))
 
     if tagline:
-        mk(f"{module}:overview:0", "Overview", "overview", "current",
-           f"# {doc_title}\n\n{tagline}")
+        # Thin overview chunks (title+tagline only) win retrieval on identity-ish
+        # queries but can't answer them (the honesty critic flags "only a title with
+        # no body"). Fold in the Purpose section's first paragraph so the overview
+        # is substantive enough to answer what it attracts.
+        purpose_lead = ""
+        for heading, body_lines in sections:
+            if heading == "Purpose":
+                body_text = "\n".join(body_lines).strip()
+                purpose_lead = body_text.split("\n\n", 1)[0].strip()
+                break
+        text = f"# {doc_title}\n\n{tagline}"
+        if purpose_lead:
+            text += f"\n\n{purpose_lead}"
+        mk(f"{module}:overview:0", "Overview", "overview", "current", text)
 
     for heading, body_lines in sections:
         if heading in config.EXCLUDE_SECTIONS:
