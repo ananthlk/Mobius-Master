@@ -4,8 +4,8 @@ Wraps ``run_lazy_rag`` with a filter scoped to exactly one uploaded
 document on a chat thread. This is the "search inside this PDF I just
 attached" skill.
 
-When a user uploads a file to a chat thread, the instant-rag service
-(mobius-skills/instant-rag on :8040) chunks + embeds it and writes the
+When a user uploads a file to a chat thread, mobius-rag's ``/upload``
+endpoint chunks + embeds it and writes the
 chunks to the same Chroma collection the approved corpus uses, tagged
 with ``instant_rag="true"`` + ``document_id=<upload id>``. This skill
 queries Chroma with that exact filter so it only returns chunks from

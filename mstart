@@ -410,9 +410,6 @@ if [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
   [[ -z "${CHAT_SKILLS_WEB_SCRAPER_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/web-scraper" ]] && export CHAT_SKILLS_WEB_SCRAPER_URL="http://localhost:8002/scrape/review"
   [[ -z "${CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/provider-roster-credentialing" ]] && export CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL="http://localhost:8011/report"
   [[ -z "${CHAT_SKILLS_TASK_MANAGER_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/task-manager" ]] && export CHAT_SKILLS_TASK_MANAGER_URL="http://localhost:8015"
-  # Instant-RAG skill for file uploads (port 8040). _handle_instant_rag_upload in chat main.py
-  # falls back to this URL when INSTANT_RAG_URL is unset.
-  [[ -z "${INSTANT_RAG_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/instant-rag" ]] && export INSTANT_RAG_URL="http://localhost:8040"
   # MCP: tool agent calls skills via MCP (mobius-skills-mcp on port 8006)
   [[ -z "${MCP_SERVER_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills-mcp" ]] && export MCP_SERVER_URL="http://localhost:8006/mcp"
   # Shared secret for credentialing skill → chat POST /internal/skill-llm (ModelRouter + llm_calls)
@@ -431,9 +428,6 @@ if [[ -d "$MOBIUS_ROOT/mobius-chat" ]]; then
   export MOBIUS_USE_REACT=1
   export QUEUE_TYPE="${QUEUE_TYPE:-redis}"
   [[ -z "${MCP_SERVER_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills-mcp" ]] && export MCP_SERVER_URL="http://localhost:8006/mcp"
-  # Worker path needs INSTANT_RAG_URL too — _handle_instant_rag_upload runs on the API, but
-  # the worker may construct follow-up calls via the same env var surface.
-  [[ -z "${INSTANT_RAG_URL:-}" ]] && [[ -d "$MOBIUS_ROOT/mobius-skills/instant-rag" ]] && export INSTANT_RAG_URL="http://localhost:8040"
   _wait_redis_for_chat
   # Same db-agent pinning as the API — see comment above the chat-api _start.
   _start "mobius-chat-worker" "cd $MOBIUS_ROOT/mobius-chat && MOBIUS_USE_REACT=1 DB_AGENT_CALLER_ID=mobius-chat DB_AGENT_MCP_URL=${DB_AGENT_MCP_URL:-http://localhost:8008/mcp} $VENV/bin/python3 -m app.worker"
@@ -602,27 +596,6 @@ if [[ -d "$MOBIUS_ROOT/mobius-skills/task-manager" ]]; then
   _start "mobius-task-manager" "cd $MOBIUS_ROOT/mobius-skills/task-manager && PORT=8015 $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8015"
 fi
 
-# --- instant-rag skill (port 8040): ingest uploaded PDF/DOCX/HTML → chunk → embed → write to Chat DB + ChromaDB ---
-# Consumed by chat's /chat/roster-upload?file_purpose=instant_rag path (see app/main.py _handle_instant_rag_upload)
-# and by the Phase B.1 search_uploaded_document ReAct tool (lazy RAG reads the chunks back out via ChromaDB).
-# Uses shared venv + reads its own config via app/config.py (mobius-config/.env + mobius-rag/.env + its own .env).
-if [[ -d "$MOBIUS_ROOT/mobius-skills/instant-rag" ]]; then
-  _kill_port 8040
-  [[ -f "$MOBIUS_ROOT/mobius-config/.env" ]] && _load_env "$MOBIUS_ROOT/mobius-config/.env"
-  _load_env "$MOBIUS_ROOT/mobius-rag/.env" 2>/dev/null || true
-  _load_env "$MOBIUS_ROOT/mobius-skills/instant-rag/.env" 2>/dev/null || true
-  _load_env "$MOBIUS_ROOT/mobius-chat/.env"
-  # Skill writes to the Chat DB (published_rag_metadata) via psycopg2 — use the Cloud SQL proxy
-  # same as the other skills so the URL is 127.0.0.1:5433 rather than the public IP.
-  export USE_CLOUD_SQL_PROXY=1
-  if [[ "$NEED_PROXY" == "true" ]] && [[ "${CHAT_RAG_DATABASE_URL:-}" =~ 34\.135\.72\.145 ]]; then
-    export CHAT_RAG_DATABASE_URL="${CHAT_RAG_DATABASE_URL/34.135.72.145:5432/127.0.0.1:$PROXY_PORT}"
-  fi
-  # The skill's config layers CHAT_DATABASE_URL on top of CHAT_RAG_DATABASE_URL; keep them aligned.
-  export CHAT_DATABASE_URL="${CHAT_DATABASE_URL:-$CHAT_RAG_DATABASE_URL}"
-  _start "mobius-instant-rag" "cd $MOBIUS_ROOT/mobius-skills/instant-rag && PORT=8040 $VENV/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8040"
-fi
-
 # --- mobius-skills healthcare (port 8007): NPI, ICD-10, CMS coverage — used by MCP healthcare_query ---
 if [[ -d "$MOBIUS_ROOT/mobius-skills/healthcare" ]]; then
   _kill_port 8007
@@ -693,7 +666,6 @@ printf "  %-24s  %s\n" "mobius-db-agent"   "http://localhost:8008/mcp"
 printf "  %-24s  %s\n" "mobius-skills-mcp" "http://localhost:8006/mcp"
 printf "  %-24s  %s\n" "provider-skill"        "http://localhost:8011/roster-ui/"
 printf "  %-24s  %s\n" "mobius-task-manager"   "http://localhost:8015"
-printf "  %-24s  %s\n" "mobius-instant-rag"    "http://localhost:8040"
 printf "  %-24s  %s\n" "mobius-rag frontend" "http://localhost:5173"
 printf "  %-24s  %s\n" "mobius-rag-api"         "http://localhost:8030"
 printf "  %-24s  %s\n" "mobius-qa lexicon API" "http://localhost:8010"

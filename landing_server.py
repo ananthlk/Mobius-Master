@@ -68,7 +68,6 @@ def _service_config() -> dict:
         "credentialing_url": _env_url("MOBIUS_CREDENTIALING_URL", "http://127.0.0.1:8011"),
         "task_manager_url": _env_url("MOBIUS_TASK_MANAGER_URL", "http://127.0.0.1:8015"),
         "doc_reader_url": _env_url("MOBIUS_DOC_READER_URL", "http://127.0.0.1:8018"),
-        "instant_rag_url": _env_url("MOBIUS_INSTANT_RAG_URL", "http://127.0.0.1:8040"),
         "financial_strategy_demo_url": _env_url("MOBIUS_FINANCIAL_STRATEGY_DEMO_URL", "http://127.0.0.1:8099"),
         # Infrastructure services
         "mcp_server_url": _env_url("MCP_SERVER_URL", "http://127.0.0.1:8006"),
@@ -105,7 +104,6 @@ def _get_skill_probes() -> list:
         ("credentialing", "Credentialing", c["credentialing_url"], c["credentialing_url"], "/health"),
         ("task-manager", "Task Manager", c["task_manager_url"], c["task_manager_url"], "/health"),
         ("doc-reader", "Doc Reader", c["doc_reader_url"], c["doc_reader_url"], "/health"),
-        ("instant-rag", "Instant RAG", c["instant_rag_url"], c["instant_rag_url"], "/health"),
     ]
 
 
@@ -163,7 +161,6 @@ SERVICE_STOP = {
     "credentialing": {"names": ["mobius-provider-roster-credentialing"], "ports": [8011]},
     "task-manager": {"names": ["mobius-task-manager"], "ports": [8015]},
     "doc-reader": {"names": ["mobius-doc-reader"], "ports": [8018]},
-    "instant-rag": {"names": ["mobius-instant-rag"], "ports": [8040]},
     # Infrastructure
     "mcp-server": {"names": ["mobius-skills-mcp"], "ports": [8006]},
     "db-agent": {"names": ["mobius-db-agent"], "ports": [8008]},
@@ -248,9 +245,6 @@ def _start_commands(root: Path) -> dict:
         ],
         "doc-reader": [
             ("mobius-doc-reader", f"cd {r}/mobius-skills/doc-reader && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8018"),
-        ],
-        "instant-rag": [
-            ("mobius-instant-rag", f"cd {r}/mobius-skills/instant-rag && {venv} -m uvicorn app.main:app --host 0.0.0.0 --port 8040"),
         ],
         # Infrastructure
         "mcp-server": [
@@ -545,7 +539,6 @@ def _get_api_config() -> dict:
         {"id": "credentialing", "url": c["credentialing_url"]},
         {"id": "task-manager", "url": c["task_manager_url"]},
         {"id": "doc-reader", "url": c["doc_reader_url"]},
-        {"id": "instant-rag", "url": c["instant_rag_url"]},
     ]
     infra = [
         {"id": "mcp-server", "url": c["mcp_server_url"]},
