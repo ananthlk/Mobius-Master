@@ -35,7 +35,7 @@ A fourth `task` mode exists at the API level (raw text, skips the integrator) bu
 Per assistant message:
 - **Thumbs up / down** — Up records the rating and refreshes the sidebar "Most helpful"; Down opens a comment area for an optional note. Disabled after the first vote. **This is how you give feedback on an answer — there is no separate feedback form**: rate the message directly, or type product feedback straight into the composer (e.g. "I have feedback: …") and Mobius logs and routes it.
 - **Copy** — copies the message text; shows "Copied" briefly.
-- **Email this thread** (`#emailDialog`, two-step, **live**) — Step 1: recipient + scope (whole thread / last exchange) + mode (LLM summary or full transcript) → preview. Step 2: re-draft or send (`POST /chat/thread/{id}/email`).
+- **Email this conversation** (`#emailDialog`, two-step, **live**) — the **Email button** under each answer is how you email this conversation or a summary of it. Step 1: recipient + scope (whole thread / last exchange) + mode (LLM summary or full transcript) → preview. Step 2: re-draft or send (`POST /chat/thread/{id}/email`). Nothing sends without your confirmation.
 - **Per-source feedback** — thumbs up/down on each `[N]` source card (`POST /chat/source-feedback/{cid}`).
 - **Show details** — expands hidden requirements/definitions in BLENDED answer cards.
 - **Source citation click** — "Open document" (inline doc reader), "Open in RAG ↗" (external), or "Download PDF" when the RAG API is configured.

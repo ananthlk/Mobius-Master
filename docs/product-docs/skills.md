@@ -97,11 +97,14 @@ They render an inline `task_list` UI block. **Reachability caveat:** these three
 - **LLM stages** — a skill whose handler calls the LLM must add its stage to `_SKILL_LLM_ALLOWED_STAGES` in `main.py` (pure-retrieval skills like `search_corpus` / `product_help_search` don't).
 - **Router-owned synthetic entries** — `skills_catalog()` appends a few non-`SkillSpec` names (`search_uploaded_document`, `healthcare_npi_lookup`, `refuse`) that route to real handlers; they aren't independently user-invokable skills.
 
-## Email (built + deployed, but agentic email is NOT wired)
-The **email service** (`mobius-email`, Cloud Run) is live and full-featured — a send chokepoint with validation, a suppression list, Redis rate limits, idempotency (required `idempotency_key`), an audit log, and a Gmail provider (SES stubbed). Two ways it surfaces:
-- **Email-a-thread (LIVE)** — the **Email button** on each assistant message opens a two-step dialog (recipient + scope + summary/full → preview → send) via the direct proxy `POST /chat/thread/{id}/email`. Supports LLM-summary or full-transcript, confirm-before-send, and idempotent replay. This is a proxy, **not** an agent tool, so it works regardless of MCP.
-- **Agentic email (NOT wired in dev)** — the MCP tools `email_send`, `email_craft_send`, `email_prepare`, `email_status`, `email_suppress` exist in `mobius-skills-mcp`, but that server isn't the wired MCP, so the planner has no email tool. "Email X to Y" in chat → the agent says it can't.
-- **Operational gotcha:** the Gmail OAuth token uses a testing-mode consent screen and **expires ~7 days**; rotate via `scripts/oauth_bootstrap.py` → `gcloud secrets versions add mobius-email-gmail-token` → bounce the revision. Publishing the consent screen removes this cap.
+## Email — how to email a conversation (LIVE)
+**To email this conversation: click the "Email" button under any assistant message.** It opens a two-step dialog — choose the recipient, the scope (whole thread or last exchange), and summary-or-full-transcript → **preview the draft** → send (or re-draft). Nothing sends without your confirmation. You can email a conversation summary or the complete transcript this way today; it's live on every answer.
+
+Behind the button: the **email service** (`mobius-email`, Cloud Run) — a send chokepoint with validation, a suppression list, rate limits, idempotency, an audit log, and a Gmail provider (SES stubbed). The button goes through the direct proxy `POST /chat/thread/{id}/email` (not an agent tool), so it works regardless of MCP wiring.
+
+**One nuance (dev-facing):** *agentic* email — the AI itself sending email on your behalf via the `email_*` MCP tools — is **not wired in dev** (that MCP server isn't the wired one). So typing "email X to Y" and expecting the agent to send it autonomously won't work; **the Email button is the way to email a conversation**.
+
+**Operational gotcha:** the Gmail OAuth token uses a testing-mode consent screen and **expires ~7 days**; rotate via `scripts/oauth_bootstrap.py` → `gcloud secrets versions add mobius-email-gmail-token` → bounce the revision.
 
 ## Not yet available / not reachable in dev
 - **Agentic email / appeals / extra `mobius-skills-mcp` tools** — code exists but not in the wired MCP (dev), so the agent can't call them. Reachable only when that MCP server is deployed and wired (or via `EXTRA_MCP_URLS`).

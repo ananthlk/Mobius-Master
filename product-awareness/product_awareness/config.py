@@ -79,7 +79,11 @@ DEMOS: dict[tuple[str, str], dict] = {
 # Keyword overrides — checked BEFORE the section map (module-scoped, word-boundary).
 # Only for genuine section collisions; keep this list tiny and precise.
 DEMO_KEYWORDS: list[tuple[str, str, dict]] = [
+    # email questions may resolve to the chat doc OR the skills doc's email section —
+    # the tour runs on the chat surface either way, so both modules map to it.
     ("chat", r"\bemail\b", {
+        "script_id": "chat:email-a-thread", "title": "Show me: email this conversation"}),
+    ("skills", r"\bemail\b", {
         "script_id": "chat:email-a-thread", "title": "Show me: email this conversation"}),
 ]
 
