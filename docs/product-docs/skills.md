@@ -83,7 +83,7 @@ These query BigQuery directly and return verified numbers — used (not `search_
 Chat can create and track operational tasks (credentialing follow-ups, roster gaps, etc.) via three skills added 2026-07-02 (chat commit `624f74f`), backed by the **mobius-task-manager** Cloud Run service (shared `mobius_chat` DB):
 - `list_tasks` — "show open tasks", "what's pending for Acme". Filters: org, module, status, assignee, npi, run_id, severity, type, workflow.
 - `create_task` — "log a follow-up for provider X". Requires org + text; optional severity/module/provider/npi/assignee.
-- `resolve_task` — "mark task `abcd1234` resolved" (full or 8-char UUID; optional note).
+- `resolve_task` — **to mark a task complete / done / resolved**: say "mark task `abcd1234` resolved" (full or 8-char UUID; optional note), or click **Resolve** directly on the task card in a task list.
 
 They render an inline `task_list` UI block. **Reachability caveat:** these three were *not* present in the live deployed manifest at last pull (2026-07-03) — so they may be pending deploy or pending the manifest hand-list; verify before telling users chat can manage tasks.
 

@@ -43,8 +43,8 @@ Per assistant message:
 
 ## Sidebar
 - **New chat** (`#btnNewChat`).
-- **Recent searches** — last ~20 threads (`GET /chat/history/recent`), collapsible; clicking reopens the thread.
-- **Most helpful searches** — populated from thumbs-up feedback; refreshes after each "up".
+- **Recent searches — where your past queries live.** Looking for a previous conversation or question? The sidebar's **Recent searches** list holds your last ~20 threads (`GET /chat/history/recent`); **click any entry to reopen that conversation** and keep going where you left off.
+- **Most helpful searches** — your best past answers: populated from thumbs-up feedback, refreshes after each "up". Use it to jump back to answers you rated.
 - **Operations Suite** — open-in-tab product tiles (Strategy, Public Library, Roster, Vault) + an Appeals Agent demo tile + "Learn more about chat skills". Detailed in the **Operations Suite** section below.
 - **User / account area** — "Signed in as {name}"; click opens the auth modal.
 - **Onboarding nudge** (`#onboardingNudge`) — "⚙ Set up your profile" when not yet onboarded; opens Preferences.
@@ -80,11 +80,17 @@ Opened via "Open document" on a source card (`#doc-reader-panel`, restored 2026-
 ## Skills modal
 "Mobius Operations Suite" (`#skillsModal`), from the sidebar "Learn more" or the rail skills icon: **Overview** tab (renders `/chat/skills-manifest`) + **Customize** tab (filter/order). Falls back to a curated chip list if the manifest is unavailable.
 
-## Sign in & preferences
-- **Auth gate** (`#authGate`) — blocks the UI until signed in.
-- **Auth modal** — email/password login + signup, and **Google sign-in** (live after `/api/v1/public-config` provides the client id).
-- **Preferences modal** — first/preferred name, tone, experience level, activity selection; saving refreshes the profile and hides the onboarding nudge.
-- Auth mode is env-controlled (`CHAT_AUTH_MODE`: off / optional / required; hosted defaults to required, dev to off).
+## Sign in — how do I log in?
+**To sign in: click the user area at the bottom of the sidebar** ("Signed in as…" / "Sign in") — it opens the auth modal. Sign in with **email/password** or one click with **Google**; first-time users get a signup path and a welcome panel. To switch accounts, open the user menu → "Not you? Sign in differently."
+- **Auth gate** (`#authGate`) — blocks the UI until signed in (hosted default; dev may run with auth off).
+- Auth mode is env-controlled (`CHAT_AUTH_MODE`: off / optional / required).
+
+## Preferences — how do I change the style of my answers?
+**To change how Mobius talks to you: open the user menu (sidebar user area) → "My Preferences."** The preferences modal is where you update the style under which you get messages:
+- **Communication tone** — Professional / Friendly / Concise: the style of every answer.
+- **AI experience level** (beginner / regular / expert) and **autonomy** for routine vs sensitive tasks (do it automatically / show me first / just guide me).
+- **Preferred name** (how Mobius greets you), **timezone**, and the **activities you focus on** (multi-select; one can be primary).
+Saving refreshes your profile immediately — the next answer uses the new style — and hides the onboarding nudge. The same modal opens from the "⚙ Set up your profile" nudge for new users.
 
 ## Banners, status & answer components
 - **Alpha banner** (`#alphaBanner`) + **Alpha notes modal** — release date, features, known limitations; dismiss persists.
