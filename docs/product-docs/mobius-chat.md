@@ -85,10 +85,13 @@ Opened via "Open document" on a source card (`#doc-reader-panel`, restored 2026-
 ## Skills modal
 "Mobius Operations Suite" (`#skillsModal`), from the sidebar "Learn more" or the rail skills icon: **Overview** tab (renders `/chat/skills-manifest`) + **Customize** tab (filter/order). Falls back to a curated chip list if the manifest is unavailable.
 
-## Sign in — how do I log in?
-**To sign in: click the user area at the bottom of the sidebar** ("Signed in as…" / "Sign in") — it opens the auth modal. Sign in with **email/password** or one click with **Google**; first-time users get a signup path and a welcome panel. To switch accounts, open the user menu → "Not you? Sign in differently."
+## Sign in & sign out — how do I log in or out?
+**To sign in: click the user area at the bottom of the sidebar** ("Signed in as…" / "Sign in") — it opens the auth modal. Sign in with **email/password** or one click with **Google**; first-time users get a signup path and a welcome panel.
+
+**To sign out: click the same user area → "Sign out"** (a confirmation click ends your session on this device). To switch accounts instead, choose **"Not you? Sign in differently"** — it signs you out and reopens the login modal in one step.
 - **Auth gate** (`#authGate`) — blocks the UI until signed in (hosted default; dev may run with auth off).
 - Auth mode is env-controlled (`CHAT_AUTH_MODE`: off / optional / required).
+- Password reset doesn't exist yet (see the auth doc's "Not yet available") — if you're locked out, use Google sign-in or contact your admin.
 
 ## Preferences — how do I change the style of my answers?
 **To change how Mobius talks to you: open the user menu (sidebar user area) → "My Preferences."** The preferences modal is where you update the style under which you get messages:

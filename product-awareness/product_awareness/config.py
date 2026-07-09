@@ -86,6 +86,12 @@ DEMO_KEYWORDS: list[tuple[str, str, dict]] = [
         "script_id": "chat:email-a-thread", "title": "Show me: email this conversation"}),
     ("skills", r"\bemail\b", {
         "script_id": "chat:email-a-thread", "title": "Show me: email this conversation"}),
+    # ── ENABLE AT PUBLISH (scripts authored, awaiting the chat anchor slice) ──
+    # sign-in/out queries resolve to the chat doc OR the auth doc (same lesson as email):
+    # ("chat", r"\bsign.?(in|out)\b|\blog.?(in|out)\b", {
+    #     "script_id": "chat:sign-in", "title": "Show me: sign in"}),
+    # ("auth", r"\bsign.?(in|out)\b|\blog.?(in|out)\b", {
+    #     "script_id": "chat:sign-in", "title": "Show me: sign in"}),
 ]
 
 # doc_type by section heading (falls back to "reference")
