@@ -37,13 +37,14 @@ Per assistant message:
 - **Copy** — copies the message text; shows "Copied" briefly.
 - **Email this conversation** (`#emailDialog`, two-step, **live**) — the **Email button** under each answer is how you email this conversation or a summary of it. Step 1: recipient + scope (whole thread / last exchange) + mode (LLM summary or full transcript) → preview. Step 2: re-draft or send (`POST /chat/thread/{id}/email`). Nothing sends without your confirmation.
 - **Per-source feedback** — thumbs up/down on each `[N]` source card (`POST /chat/source-feedback/{cid}`).
-- **Show details** — expands hidden requirements/definitions in BLENDED answer cards.
+- **Details / Citations tabs** *(2026-07-13; replaces the old "Show details" toggle)* — Details expands the answer's sections; Citations lists formatted, copyable reference strings.
 - **Source citation click** — "Open document" (inline doc reader), "Open in RAG ↗" (external), or "Download PDF" when the RAG API is configured.
 - **Admin-gated:** "Routing correct?" LLM-performance thumbs; "Adjudicator helpful?" thumbs in the QA scorecard.
 
 ## Sidebar
 - **New chat** (`#btnNewChat`).
 - **Recent searches** and **Most helpful searches** — your conversation history; see the dedicated section **Your past queries** below.
+- **Vault block** *(2026-07-13)* — a violet card with tabs (Recent / Liked / Tasks / Uploads) and "Manage →", opening the full Vault panel (your private documents; see Operations Suite → Vault).
 - **Operations Suite** — open-in-tab product tiles (Strategy, Public Library, Roster, Vault) + an Appeals Agent demo tile + "Learn more about chat skills". Detailed in the **Operations Suite** section below.
 - **User / account area** — "Signed in as {name}"; click opens the auth modal.
 - **Onboarding nudge** (`#onboardingNudge`) — "⚙ Set up your profile" when not yet onboarded; opens Preferences.
@@ -60,7 +61,7 @@ Per assistant message:
 - **Strategy** — "Benchmarking + KPIs" — **live**. Opens the market-intelligence / benchmarking deck.
 - **Public Library** — "Shared corpus — payer manuals, regs, public sources" — **live**. Opens the shared RAG corpus UI (the public, non-private knowledge base). Renamed from "Library" to make room for Vault.
 - **Roster** — "Provider directory + credentialing" — **coming soon**. Credentialing was folded into Roster (same backing service; two tiles confused users), and the tile's click is currently disabled.
-- **Vault** — "Your org, personal & patient documents (private namespaces)" — **coming soon**. The private counterpart to the Public Library: per-org / per-user / per-patient isolated document namespaces behind a separate agent + isolation boundary (next sprint).
+- **Vault** — "Your org, personal & patient documents (private namespaces)" — **partially live (2026-07-13)**. The private counterpart to the Public Library. Live now in chat: a violet **Vault sidebar block** with tabs (Recent / Liked / Tasks / Uploads) and a "Manage →" link that opens the **Vault panel** — a full-width slide-in with rail navigation and a file table (Status · Filename · Uploaded · Last used · TTL · Visibility · Actions; status chips Ready/Indexing/Failed/Expired). Still pending: **Promote to org corpus** (button present but disabled — "Available when org corpus is enabled").
 
 Also here: an **Appeals Agent demo** tile (external prototype) and a "Learn more about chat skills" link that opens the Skills modal.
 
@@ -105,7 +106,10 @@ Saving refreshes your profile immediately — the next answer uses the new style
 - **Chat status banner** — transient ("Document ready", etc.), auto-hides ~20s.
 - **Upload restore banner** — "Recent uploads from your other chats"; per-row "Attach" links an existing upload to this thread (no re-upload).
 - **Roster upload receipt** — TurboTax-style progress (storage → database → warehouse) with a conditional NPI-reconciliation link.
-- **Answer components** — a live **Thinking block** (phase dots, auto-collapse); an **Answer card** with a type badge (FACTUAL / CANONICAL / BLENDED) and a confidence badge (Approved Authoritative / Caution / Informational Only / No Sources), follow-up + suggested-action chips; **Clarification chips** (selections merge into the next send); a collapsible **Sources** citer; admin-only **LLM-performance**, **Adjudicator scorecard**, and **Retrieval-trace** panels; a **Credentialing Copilot** panel; a **Task-list** envelope (severity chips, resolve, Export CSV); and the **product-feedback capture card** + **feedback nudge chips** (the editable "share feedback" card and the low-weight prompts — live as of 2026-07-03).
+- **Answer components** — a live **Thinking block** (phase dots, auto-collapse); an **Answer card** with a type badge (FACTUAL / CANONICAL / BLENDED / **RECITAL**) and a confidence badge (Approved Authoritative / Caution / Informational Only / No Sources), follow-up + suggested-action chips; **Clarification chips** (selections merge into the next send); a collapsible **Sources** citer; admin-only **LLM-performance**, **Adjudicator scorecard**, and **Retrieval-trace** panels; a **Credentialing Copilot** panel; a **Task-list** envelope (severity chips, resolve, Export CSV); and the **product-feedback capture card** + **feedback nudge chips** (live 2026-07-03).
+- **RECITAL card mode** *(2026-07-13, revs 00413/414)* — for verbatim canonical texts (e.g. the founding "Why Mobius" essay): violet left border, an attribution line ("From the Mobius founding essay"), the full text as flowing serif prose (no bullet compression), a "Read the full essay" button, and a "Verbatim — Mobius founding document" badge.
+- **Answer-card tab bar** *(2026-07-13, revs 00413/414)* — **Details / Citations** tabs replace the old "Show details" toggle; Citations shows formatted, copyable reference strings.
+- **Envelope section formats** *(2026-07-13)* — answer sections can render as **table / steps / stats / conditions / bars / bullets** (per-section `format` field), not just bullet lists.
 
 ## Credentialing pipeline (`/pipeline`)
 - Start a credentialing **run** for an organization; choose **🧭 Copilot** (step-by-step, default) or **⚡ Autopilot** (full pipeline), then "Start Pipeline →".
@@ -130,7 +134,8 @@ Present in the surface but **not** wired for end users:
 - **⋯ → "Add link"** — disabled "coming soon".
 - **⋯ → "Upload file"** — hidden in the live bundle (the paperclip is the shipped composer upload path).
 - **Microsoft OAuth / Enterprise SSO** — **not implemented**: no Microsoft/SSO code is present in the frontend at all (earlier docs called these "coming soon" — they are not even rendered).
-- **Operations Suite: Vault + Roster tiles** — render but are **coming soon**: **Vault** = private per-org/user/patient document namespaces (next sprint, separate agent + isolation boundary); **Roster** tile's click is disabled. (The **Strategy** and **Public Library** tiles are live.)
+- **Operations Suite: Roster tile** — renders but click is disabled (**coming soon**). (Strategy, Public Library are live; **Vault is now partially live** — see the Operations Suite section — with only org-corpus Promote still pending.)
+- **Vault → Promote to org corpus** — button renders in the Vault panel but is **disabled**: "Available when org corpus is enabled."
 
 ## Doc-readiness notes
 - **Primary audience tag:** user (with distinct provider-ops, admin, and developer surfaces).
