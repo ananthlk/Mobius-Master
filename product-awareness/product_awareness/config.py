@@ -106,7 +106,9 @@ DEMO_KEYWORDS: list[tuple[str, str, dict]] = [
 # /search flags these with recital={...} so chat's integrator can pass the text
 # through as written instead of resummarizing (the founding essay's voice must survive).
 VERBATIM_SECTIONS: set[tuple[str, str]] = {
-    ("about", "Why Mobius"),
+    ("about", "Why Mobius"),                                      # the founding essay
+    ("about", "Why the name Mobius? What does Mobius mean?"),     # crafted quick answer
+    ("about", "Tell me about yourself"),                          # first-person voice
 }
 
 # doc_type by section heading (falls back to "reference")
