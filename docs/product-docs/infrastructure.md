@@ -60,7 +60,7 @@ Mobius is a multi-repo system: each product surface (chat, RAG, OS, credentialin
   - Pluggable backends (Chroma today → pgvector target) via a phased rollout; FastAPI service (`app/main.py`) + Cloud Run Dockerfile + pgvector migration.
 - **Consumed by:** mobius-chat (via HTTP skill calls, mirroring the `corpus_search` skill pattern).
 - **Audience tag:** dev
-- **Status caveat:** Carve-out bundle — per its README, "not yet a deployed service" (confirmed: the bundle is meant to be handed to a new repo and brought up). Phased plan (Phase 0 Chroma HTTP-shim → Phase 1 pgvector backend, currently a stub → later retire Chroma) with several open questions unresolved.
+- **Status caveat:** Carve-out bundle — per its README, "not yet a deployed service" (confirmed: the bundle is meant to be handed to a new repo and brought up). Phased plan (Phase 0 Chroma HTTP-shim → Phase 1 pgvector backend, currently a stub → later retire Chroma) with several open questions unresolved. **Note the fleet standard (2026-07-13): pgvector is the mandated vector store — any bring-up of this bundle should go straight to the pgvector backend, not the Chroma shim.**
 
 ### mobius-contracts
 - **Purpose:** Typed Pydantic contracts shared across modules — the seam that stops each module inventing its own envelope shape and versioning scheme.
