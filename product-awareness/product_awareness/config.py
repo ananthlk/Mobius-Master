@@ -102,6 +102,13 @@ DEMO_KEYWORDS: list[tuple[str, str, dict]] = [
         "script_id": "chat:sign-in", "title": "Show me: sign in"}),
 ]
 
+# Sections recorded VERBATIM (canonical text — never summarize, never "improve").
+# /search flags these with recital={...} so chat's integrator can pass the text
+# through as written instead of resummarizing (the founding essay's voice must survive).
+VERBATIM_SECTIONS: set[tuple[str, str]] = {
+    ("about", "Why Mobius"),
+}
+
 # doc_type by section heading (falls back to "reference")
 SECTION_DOC_TYPE: dict[str, str] = {
     "Purpose": "concept",

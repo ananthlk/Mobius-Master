@@ -25,12 +25,14 @@ class SearchResult:
     sources: list[dict] = field(default_factory=list)
     gap: dict | None = None          # payload for gapwriter when a gap should be filed
     demo: dict | None = None         # {script_id, title} — mobius-interact "Show me" ref
+    recital: dict | None = None      # {verbatim, section, document_id} — quote as written
 
     def to_dict(self) -> dict:
         return {
             "outcome": self.outcome, "query": self.query, "s_top": round(self.s_top, 4),
             "tau_gap": self.tau_gap, "module": self.module, "text": self.text,
             "sources": self.sources, "gap": self.gap, "demo": self.demo,
+            "recital": self.recital,
         }
 
 
@@ -100,6 +102,13 @@ class ProductHelp:
                 break
         if demo is None:
             demo = _cfg.DEMOS.get((top_module, top["metadata"].get("section", "")))
+        # verbatim/recital sections: tell the consumer NOT to resummarize —
+        # quote the text as written (and offer the full doc via the reader).
+        recital = None
+        top_section = top["metadata"].get("section", "")
+        if (top_module, top_section) in _cfg.VERBATIM_SECTIONS:
+            recital = {"verbatim": True, "section": top_section,
+                       "document_id": f"product-docs:{top_module}"}
         return SearchResult(
             outcome="answer", query=query, s_top=s_top, tau_gap=self.tau_gap,
             module=top_module,
@@ -107,6 +116,7 @@ class ProductHelp:
             sources=self._sources(current),
             gap=None,
             demo=demo,
+            recital=recital,
         )
 
     @staticmethod
