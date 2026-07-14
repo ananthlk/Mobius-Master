@@ -80,6 +80,18 @@ class ProductHelp:
     def search(self, query: str, k: int = 6, audience: str | None = None,
                module: str | None = None, in_scope_only: bool = False) -> SearchResult:
         query = (query or "").strip()
+        # "recite X" asks for a recorded verbatim text — never documentation ABOUT
+        # recital mode (the response-cards doc quotes the phrase "recite why mobius"
+        # as an example and would otherwise win its own retrieval). Scope recite-intent
+        # queries to the module(s) hosting verbatim sections.
+        if module is None:
+            import re as _re
+
+            from . import config as _cfg
+            if _re.search(r"\brecite\b|\brecital of\b", query, _re.IGNORECASE):
+                verbatim_modules = {m for (m, _s) in _cfg.VERBATIM_SECTIONS}
+                if len(verbatim_modules) == 1:   # filter supports single-module equality
+                    module = next(iter(verbatim_modules))
         where = self._where(audience, module, in_scope_only)
         hits = self.store.query(self.embedder.embed([query])[0], k=k, where=where)
         s_top = hits[0]["score"] if hits else 0.0
