@@ -98,12 +98,12 @@ Retrieval behavior for **payer queries** improved in three ways:
 Also: an admin `/admin/drive/relink` endpoint backfills `authority_level` + doc links on Drive-ingested documents, and the eval observability dashboard shipped in the Repository UI's EvalTab (see the eval doc).
 
 ## Not yet available (planned)
-All specced in `docs/rag-retrieval-learning-architecture.md` (strategy letter assignments TBD — that doc's placeholder letters conflict with the live a–e map and are planning artifacts only):
-- **Structured-fact lookup** — reads payor-registry fields directly instead of retrieving prose.
-- **Cache replay** — returns a prior positively-rated answer when the corpus fingerprint is still current.
-- **Validation ledger** — a per-claim breakdown returned with each answer.
-- **Tool collapse** — chat will call a single `rag(query, mode)` tool and RAG will internalize all strategy selection (today chat calls corpus_search / corpus_search_agent).
-- **Exploratory-intent feature** — a +b routing weight for overview-style queries.
+None of these retrieval capabilities are built yet — all are specced in `docs/rag-retrieval-learning-architecture.md` (that doc's strategy letters are placeholders that conflict with the live a–e map; treat them as planning artifacts):
+- **Structured-fact lookup** — can retrieval read the payor registry directly? Not yet: a planned strategy that answers from payor-registry fields instead of retrieving prose passages.
+- **Cache replay** — does RAG cache and replay prior answers? Not yet: a planned strategy returning a previous positively-rated answer when the corpus fingerprint is still current.
+- **Validation ledger** — does the answer include a validation ledger, a per-claim verification breakdown showing how each claim was checked? Not yet: specced for the response surface, not built.
+- **Tool collapse** — a single unified `rag(query, mode)` tool where RAG internalizes all strategy selection. Not yet: today chat calls corpus_search / corpus_search_agent directly.
+- **Exploratory-intent feature** — a routing weight boosting strategy b for overview-style exploratory queries. Not yet built.
 
 ## Doc-readiness notes
 
