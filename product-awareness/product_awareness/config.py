@@ -82,9 +82,9 @@ DEMOS: dict[tuple[str, str], dict] = {
         "script_id": "chat:find-past-queries", "title": "Show me: find your past queries"},
     ("skills", "Task management"): {
         "script_id": "chat:complete-a-task", "title": "Show me: mark a task complete"},
-    # HELD until the menu-preferences anchor lands (script authored, unpublished):
-    # ("chat", "Preferences — how do I change the style of my answers?"): {
-    #     "script_id": "chat:update-preferences", "title": "Show me: change your answer style"},
+    # anchor menu-preferences landed in live bundle 2026-07-14; published v1 same day
+    ("chat", "Preferences — how do I change the style of my answers?"): {
+        "script_id": "chat:update-preferences", "title": "Show me: change your answer style"},
 }
 
 # Keyword overrides — checked BEFORE the section map (module-scoped, word-boundary).
