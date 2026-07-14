@@ -36,6 +36,29 @@ class SearchResult:
         }
 
 
+def _section_text(module: str, section: str) -> str | None:
+    """Reconstruct one section's verbatim text, in order, from the chunks file.
+
+    Chunk text is ``# {title} — {heading}\\n\\n{piece}``; the heading prefix is
+    stripped so the payload is pure quotable prose."""
+    import json as _json
+
+    from . import config as _cfg
+
+    path = _cfg.CHUNKS_DIR / f"{module}.jsonl"
+    if not path.exists():
+        return None
+    pieces = []
+    for line in path.read_text().splitlines():
+        if not line.strip():
+            continue
+        rec = _json.loads(line)
+        if rec.get("section") == section:
+            t = rec.get("text", "")
+            pieces.append(t.split("\n\n", 1)[1] if "\n\n" in t else t)
+    return "\n\n".join(pieces) if pieces else None
+
+
 class ProductHelp:
     """Holds the embedder + store so they load once. Call ``search`` per query."""
 
@@ -109,10 +132,17 @@ class ProductHelp:
         if (top_module, top_section) in _cfg.VERBATIM_SECTIONS:
             recital = {"verbatim": True, "section": top_section,
                        "document_id": f"product-docs:{top_module}"}
+        # Recital payloads carry ONLY the matched section, reconstructed in order
+        # from the chunks file — not the top-k score mixture (which can splice
+        # several verbatim sections into one blob; UX finding 2026-07-13).
+        if recital:
+            text = _section_text(top_module, top_section) or top["document"]
+        else:
+            text = "\n\n---\n\n".join(h["document"] for h in current[:3])
         return SearchResult(
             outcome="answer", query=query, s_top=s_top, tau_gap=self.tau_gap,
             module=top_module,
-            text="\n\n---\n\n".join(h["document"] for h in current[:3]),
+            text=text,
             sources=self._sources(current),
             gap=None,
             demo=demo,
