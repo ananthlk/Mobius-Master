@@ -83,7 +83,13 @@ Corpus source of truth for live search (populated on user Publish): the `mobius-
 - **External fallback** — strategy (d) can call a Google search service (`CHAT_SKILLS_GOOGLE_SEARCH_URL`) and web scrape; disabled by default in the retriever pipeline (`apply_google=False`) since the chat React tool loop invokes Google explicitly when needed.
 - **Eval** — `mobius-rag/eval`, `mobius-retriever` CLI/eval-questions YAML, and rag-api all share the same pipeline so measured quality reflects production behavior.
 
-## Recent changes (2026-07-04 — from commit history; targeted sweep additions)
+## Recent changes (2026-07-04 — from commit history; targeted sweep additions; owner inventory 2026-07-14)
+
+**Owner inventory (RAG agent, 2026-07-14) — current behavior:**
+- **Live strategy routing:** a = precision, b = broad, d = web-grounding, c = honest-floor. (Owner-stated; supersedes the earlier a–e portfolio description above where it differs — notably d, previously verified as unwired, is now part of live routing, and c is stated as honest-floor rather than Reverse RAG.)
+- **Payor-authority inheritance:** plan-scoped queries inherit AHCA Florida Medicaid 59G rule coverage for Aetna and Sunshine Health (migration 004, `payor_inherited_authority` view).
+- **Per-doc chunk cap** — k=2 per document, with over-fetch on the inherited supplemental pass, so a single large document can't flood the k=5 answer window.
+- **Judge eval loop** (`eval/judge.py`) scores answers against a rubric of must_facts, forbidden_facts, and honest_abstain.
 
 Retrieval behavior for **payer queries** improved in three ways:
 - **Authority-inheritance union** — FL Medicaid MCO payer queries now union in documents inherited from the payer's parent authority (state Medicaid program docs count for the MCO), instead of matching only payer-tagged docs.
@@ -91,9 +97,15 @@ Retrieval behavior for **payer queries** improved in three ways:
 - **Contact-class query detection** — queries asking for contact/access facts (phone, fax, EDI, portal) are detected as a class; in chat these now prefer the **payor registry** (`payor_lookup` skill) over corpus search, since the corpus can't reliably ground such facts.
 Also: an admin `/admin/drive/relink` endpoint backfills `authority_level` + doc links on Drive-ingested documents, and the eval observability dashboard shipped in the Repository UI's EvalTab (see the eval doc).
 
+## Not yet available (planned)
+- **Strategy `s` (structured-fact lookup)** and **strategy `m` (cache replay)** — specced in `docs/rag-retrieval-learning-architecture.md`, not yet built.
+- **Validation ledger** — a per-claim breakdown returned with each answer; specced, not built.
+- **Tool collapse** — chat will call a single `rag(query, mode)` tool and RAG will internalize all strategy selection; planned, not live (today chat calls corpus_search / corpus_search_agent).
+
 ## Doc-readiness notes
 
-- **Primary audience tag:** dev (mostly). User-facing surface is indirect (chat answers, Repository UI). **Note:** this doc is still the 07-01 baseline + targeted sweep additions; a full current inventory from the RAG owner-agent is pending.
+- **Primary audience tag:** dev (mostly). User-facing surface is indirect (chat answers, Repository UI).
+- **Owner inventory folded 2026-07-14** (RAG agent). Owner-stated, not independently re-verified: live routing set (a/b/d/c), payor inheritance via `payor_inherited_authority`, per-doc chunk cap, judge rubric. One open discrepancy queried back to the owner: strategy `c` appears both in the live routing list (honest-floor) and in the specced-not-built list; strategy `e` (fail-fast) was not mentioned in the inventory — the a–e portfolio text above is retained until clarified.
 - **Solid / grounded in code:**
   - Three-module division of labor (heavy service / retrieval library / thin HTTP wrapper).
   - The retrieve → merge → rerank → assemble pipeline and its signals (score, tag match, authority level).
