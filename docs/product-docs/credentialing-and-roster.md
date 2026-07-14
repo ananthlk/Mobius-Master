@@ -14,6 +14,15 @@
 
 ## Capabilities
 
+### Ask in chat — the primary access point (2026-07)
+**Chat is now the front door for credentialing questions**; the roster UI remains for deep work, reached via a chip. Backed by the `check_provider_credentialing` MCP tool:
+
+- **Single-provider profile** — ask about a provider (by NPI) and get: NPPES validation status + taxonomy on file, FL Medicaid PML enrollment status + next revalidation date, compliance results with severity labels, license number / Medicaid ID / specialty, the last 3 change events, and a **readiness verdict**: clean · review_needed · action_required · incomplete. The answer includes a structured **credentialing card** (provider name, org, status, flags with severity, action link) rendered by the chat UI alongside the text.
+- **Org panel summary** — ask without an NPI ("credentialing report for [org]", "how is [org]'s panel doing?", "NPPES errors for [org]") and get the verdict count breakdown, validation coverage per source (NPPES / PML / compliance — how many checked, when last run), and a **providers-needing-attention list** with per-provider issue summaries and deep links.
+- **Open Credentialing Report chip** — credentialing-keyword questions carry an action chip into the full roster UI. Links are chips now; inline URLs no longer appear in the response text.
+- **Appeals link** — appeal-related questions surface an Appeals Agent link chip (appeals rules/playbook/letter tools are wired in chat).
+- **Tasks** — credentialing runs create tasks (`kind=credentialing`, `audience=provider`) visible in the chat task UI.
+
 ### Roster (provider-roster-credentialing service — the "Providr" app)
 - Upload a provider roster from Excel/CSV; the parser normalizes names, credentials, taxonomy, license, and Medicaid IDs (including dual/pending/missing handling).
 - Two-phase upload: **preview a diff** (adds/changes/terms vs. current master) before committing, or single-shot **ingest** (parse + commit in one call).
@@ -30,6 +39,7 @@
 - Change-event log per org / per provider.
 
 ### Credentialing (reconciliation runs + audit report)
+> **Owner correction 2026-07-14:** the batch report pipeline described below is the legacy path — per the module owner it has been removed in favor of the real-time DB profile read behind `check_provider_credentialing` (chat-first, above). The old MCP tools (`run_credentialing_report`, `run_roster_reconciliation_report`, `validate_credentialing_step`, `ask_credentialing_npi`, `lookup_npi`, `find_org_locations`, `find_associated_providers_at_locations`) are disconnected and no longer exist; "credentialing generates a PDF report" no longer describes current behavior. The reconciliation *model* (in_both / external_only / internal_only, waterfall buckets) remains the conceptual frame. Sections kept below for the roster-UI surfaces that still exist; treat run/PDF mechanics as historical until re-verified.
 - Start a **credentialing run** for an organization by name in one of two modes: **autopilot** (runs the full pipeline end-to-end in the background) or **copilot** — "Step-by-step (co-pilot)" — which runs one step at a time and pauses for the user to validate each step before advancing (`POST /chat/credentialing-runs/{id}/validate`). These are the only two modes in code (`mode: Literal["autopilot", "copilot"]`). The API request default is `copilot`; the credentialing-home "New run" dropdown defaults to autopilot ("Full credentialing run").
 - Pipeline: identify org locations → find associated/billing providers → PML enrollment validation → opportunity sizing, with a reconciliation status tagged on every NPI.
 - **Reconciliation status** (`in_both` / `external_only` / `internal_only`) tagged on every provider and featured throughout the report.
@@ -84,8 +94,16 @@ API surface (service base, roster router prefix `/roster`): `POST /roster/{org}/
 <!-- INTERNAL NOTE (not for user-facing docs): internal module-sync notes flag a possible DOGE double-compute concern between credentialing and roster and the absence of a scheduling cron. This is an open, unverified data-integrity risk, not a documented product behavior — do not surface it to users until a human confirms and it is resolved or owned. -->
 - **DOGE / Medicaid billing** is read from BigQuery to compute the external (billing) view of the roster and opportunity sizing.
 
+## Not yet available (planned)
+- **Task status signals back from runs** — `emit_signal` client + waterfall wiring (`source_ref=run_id`): tasks are created via `bulk_import_tasks` v1 today, but they don't auto-update when a credentialing run completes.
+- **Per-org private document store** — `POST /org/{slug}/doc-store/provision` is built (instant-RAG/Vault contract locked) but waits on the provisioner URL from RAG/Instant-RAG.
+- **Org-registry enforcement** — org validation runs in warn mode (unresolved orgs are logged); per-writer enforcement pending Ananth's review (~2026-07-16).
+- **Richer credentialing modal** — a UI modal with richer navigation of credentialing data (flagged by Ananth; frontend work not started).
+- **Membership approval flow** — self-claim org enrollment → pending → approval: org side ready, pending User Manager + chat wiring.
+
 ## Doc-readiness notes
 
+- **Owner inventory folded 2026-07-14** (Roster & Credentialing agent). Verified live before folding: `check_provider_credentialing` + 4 `appeals_*` tools in the dev skills manifest; old tool names absent as tools; `credentialing_card` + action chips present in the served chat bundle (rev 00448). NOT re-verified against service code: removal of the batch report/PDF pipeline (owner-attributed; see correction note above). Known manifest bug reported to owner: two stale "use ask_credentialing_npi" cross-references remain in other tools' guidance.
 - **Primary audience tag:** mixed (leaning **user** for Roster; the Credentialing run console reads as **user/operator mixed**).
 - **Solid (grounded in code):** roster upload/diff/commit flow; NPPES/PML/taxonomy validation and their flag names; compliance and gap buckets; status lifecycle; the credentialing = reconciliation model and A/B/C/D waterfall report; the two front-ends and their routes; the skill-interface split (roster = "who are my clinicians", credentialing = "are they enrolled/payable").
 - **Resolved against code:**

@@ -55,7 +55,6 @@ These query BigQuery directly and return verified numbers — used (not `search_
 - `get_org_service_line_profile` — per-service-line revenue/volume/KPIs for an org.
 - `get_org_type_stats` — aggregate KPIs for an org *type* in a year.
 - `get_org_leakage` — patient-leakage analysis for a CMHC.
-- `lookup_npi` — resolve an NPI/org → identity (name, entity type, taxonomy, address).
 
 **Benchmarks & positioning**
 - `get_top_orgs` — rank orgs by a volume metric.
@@ -78,6 +77,17 @@ These query BigQuery directly and return verified numbers — used (not `search_
 - `get_entrant_analysis` — new-entrant displacement (who captured CMHC share).
 - `get_fact_pack` — the full fact-pack behind the market-narrative story deck.
 - `get_valid_filters` — valid filter values for the dataset in a given year.
+
+## Credentialing, roster & appeals — is my provider enrolled and payable?
+**Ask credentialing questions directly in chat — chat is now the primary access point** (the roster UI still exists; a chip links you there). Wired 2026-07 via the roster-credentialing MCP:
+
+- `check_provider_credentialing(org_slug, npi optional)` — THE credentialing entry point.
+  - **With an NPI** (single provider): NPPES validation status, FL Medicaid PML enrollment + next revalidation date, compliance flags with severity, license/Medicaid ID/taxonomy, recent change events, and a readiness verdict (clean / review_needed / action_required / incomplete). The answer includes a structured **credentialing card** (provider, org, status, flags, action link) rendered alongside the text.
+  - **Without an NPI** (org panel): count breakdown by verdict, validation coverage per source (NPPES/PML/compliance, when last run), and a "providers needing attention" list with per-provider issues and deep links. Try: "credentialing report for [org]", "how is [org]'s panel doing", "NPPES errors for [org]".
+  - Credentialing-keyword questions also get an **"Open Credentialing Report" action chip** linking to the full roster UI (links are chips now, not inline URLs).
+- `healthcare_npi_lookup(question)` — NPPES registry lookup when you give a 10-digit NPI number.
+- **Appeals** — `appeals_lookup_rules(carc, …)`, `appeals_get_playbook(payor, carc_group)`, `appeals_validate_claim(carc, …)`, `appeals_assemble_letter(carc, …)`: denial-code rules, payor playbooks, claim validation, and appeal-letter assembly; appeal-related questions also surface an Appeals link chip.
+- Retired (ask via the tools above instead): `run_credentialing_report`, `run_roster_reconciliation_report`, `validate_credentialing_step`, `ask_credentialing_npi`, `lookup_npi`, `find_org_locations`, `find_associated_providers_at_locations` were disconnected and no longer exist.
 
 ## Task management
 Chat can create and track operational tasks (credentialing follow-ups, roster gaps, etc.) via three skills added 2026-07-02 (chat commit `624f74f`), backed by the **mobius-task-manager** Cloud Run service (shared `mobius_chat` DB):
