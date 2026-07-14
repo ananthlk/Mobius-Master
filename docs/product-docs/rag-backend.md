@@ -49,7 +49,7 @@ Primarily **developers / integrators** — these are backend services and librar
   - **(c)** Reverse RAG — LLM parametric-prior answer (bimodal; for stable conceptual/policy knowledge).
   - **(d)** External — Google search + web scrape fallback.
   - **(e)** Fail-Fast — refuse / clarify / reject before retrieval (PHI, jailbreak, or no topical anchor).
-  The router picks a primary + fallback per query and returns a `confidence` label (high / medium / low) and an `improvement_hint`. Routing is prior-driven (per query-class priors, `PRIORS_VERSION = "v1.2.7.2026-05-05"` in `corpus_search_router.py`) and is designed to be bandit-ready (telemetry logged for later learning). The priors are explicitly hand-set starting values (`StrategyPrior` docstring: "v1 ships hand-set values; the bandit updates the cell that matched the query"); their `accuracy_std`/`recall_std` fields are populated from forced-strategy calibration matrix runs (`derive_priors` script; matrix data dated 2026-05). So calibration is an active, code-driven area rather than a stale table — treat specific accuracy numbers as provisional, not stable. Strategy (d) external escalation exists as code (`corpus_search_strategy_d.py`) but is not yet wired into the agent loop: the `corpus_search_agent` docstring states "NO external escalation yet."
+  The router picks a primary + fallback per query and returns a `confidence` label (high / medium / low) and an `improvement_hint`. Routing is prior-driven (per query-class priors, `PRIORS_VERSION = "v1.2.7.2026-05-05"` in `corpus_search_router.py`) and is designed to be bandit-ready (telemetry logged for later learning). The priors are explicitly hand-set starting values (`StrategyPrior` docstring: "v1 ships hand-set values; the bandit updates the cell that matched the query"); their `accuracy_std`/`recall_std` fields are populated from forced-strategy calibration matrix runs (`derive_priors` script; matrix data dated 2026-05). So calibration is an active, code-driven area rather than a stale table — treat specific accuracy numbers as provisional, not stable. Strategy (d) external is **wired into the agent loop** (owner-confirmed 2026-07-14; implemented in `corpus_search_strategy_d.py`, invoked from `corpus_search_agent.py` — the older "NO external escalation yet" docstring was stale). Search backend is DuckDuckGo (Google CSE permanently 403 for new customers).
 
 ## Navigation & Access
 
@@ -85,8 +85,8 @@ Corpus source of truth for live search (populated on user Publish): the `mobius-
 
 ## Recent changes (2026-07-04 — from commit history; targeted sweep additions; owner inventory 2026-07-14)
 
-**Owner inventory (RAG agent, 2026-07-14) — current behavior:**
-- **Live strategy routing:** a = precision, b = broad, d = web-grounding, c = honest-floor. (Owner-stated; supersedes the earlier a–e portfolio description above where it differs — notably d, previously verified as unwired, is now part of live routing, and c is stated as honest-floor rather than Reverse RAG.)
+**Owner inventory (RAG agent, 2026-07-14, corrected same day) — current behavior:**
+- **Live strategy routing — the full a–e portfolio:** a = precision retrieval (BM25 + vector, plan-scoped) · b = broad/discovery (higher recall, thematic) · c = LLM validate / reverse RAG (generate → cite → verify each citation against the corpus; outcomes validated_correct / validated_hallucinated / unverified_robots / needs_scrape / needs_external) · d = external (web search → fetch → synthesize with `source_type="external"` framing; **DuckDuckGo is the active search backend** — Google CSE is permanently closed to new customers) · e = fail-fast (`fail_fast_gate()` runs first; PHI / out-of-scope / policy-violation queries get an immediate structured refusal with `fail_fast_reason`, never reaching retrieval).
 - **Payor-authority inheritance:** plan-scoped queries inherit AHCA Florida Medicaid 59G rule coverage for Aetna and Sunshine Health (migration 004, `payor_inherited_authority` view).
 - **Per-doc chunk cap** — k=2 per document, with over-fetch on the inherited supplemental pass, so a single large document can't flood the k=5 answer window.
 - **Judge eval loop** (`eval/judge.py`) scores answers against a rubric of must_facts, forbidden_facts, and honest_abstain.
@@ -98,14 +98,17 @@ Retrieval behavior for **payer queries** improved in three ways:
 Also: an admin `/admin/drive/relink` endpoint backfills `authority_level` + doc links on Drive-ingested documents, and the eval observability dashboard shipped in the Repository UI's EvalTab (see the eval doc).
 
 ## Not yet available (planned)
-- **Strategy `s` (structured-fact lookup)** and **strategy `m` (cache replay)** — specced in `docs/rag-retrieval-learning-architecture.md`, not yet built.
-- **Validation ledger** — a per-claim breakdown returned with each answer; specced, not built.
-- **Tool collapse** — chat will call a single `rag(query, mode)` tool and RAG will internalize all strategy selection; planned, not live (today chat calls corpus_search / corpus_search_agent).
+All specced in `docs/rag-retrieval-learning-architecture.md` (strategy letter assignments TBD — that doc's placeholder letters conflict with the live a–e map and are planning artifacts only):
+- **Structured-fact lookup** — reads payor-registry fields directly instead of retrieving prose.
+- **Cache replay** — returns a prior positively-rated answer when the corpus fingerprint is still current.
+- **Validation ledger** — a per-claim breakdown returned with each answer.
+- **Tool collapse** — chat will call a single `rag(query, mode)` tool and RAG will internalize all strategy selection (today chat calls corpus_search / corpus_search_agent).
+- **Exploratory-intent feature** — a +b routing weight for overview-style queries.
 
 ## Doc-readiness notes
 
 - **Primary audience tag:** dev (mostly). User-facing surface is indirect (chat answers, Repository UI).
-- **Owner inventory folded 2026-07-14** (RAG agent). Owner-stated, not independently re-verified: live routing set (a/b/d/c), payor inheritance via `payor_inherited_authority`, per-doc chunk cap, judge rubric. One open discrepancy queried back to the owner: strategy `c` appears both in the live routing list (honest-floor) and in the specced-not-built list; strategy `e` (fail-fast) was not mentioned in the inventory — the a–e portfolio text above is retained until clarified.
+- **Owner inventory folded 2026-07-14, corrected by owner same day** (RAG agent). The initial inventory misstated c as honest-floor and omitted e; owner correction confirms the full a–e portfolio live, with c = LLM validate / reverse RAG (`corpus_search_strategy_c.py`), e = fail-fast (`corpus_search_agent.py:3552`), and d wired (`:3835`; the "NO external escalation yet" docstring this doc previously cited was stale). Owner-stated, not independently re-verified: payor inheritance via `payor_inherited_authority` (migration 004), per-doc chunk cap, judge rubric, planned-items list.
 - **Solid / grounded in code:**
   - Three-module division of labor (heavy service / retrieval library / thin HTTP wrapper).
   - The retrieve → merge → rerank → assemble pipeline and its signals (score, tag match, authority level).
@@ -115,7 +118,7 @@ Also: an admin `/admin/drive/relink` endpoint backfills `authority_level` + doc 
 - **Verified during this pass (previously flagged, now resolved):**
   - **Policy lexicon / Path B tagging** — VERIFIED PRESENT. `PATH_B_STATUS.md` (2026-02-12) is stale: in this checkout `app/services/policy_lexicon_repo.py` exists with all required functions, all three policy migrations exist under `app/migrations/`, and `app/worker/path_b.py` builds `policy_paragraphs`/`policy_lines` and applies p/d/j tags. The gaps in that status doc were filled starting 2026-02-13. (Caveat: tags only apply when `policy_lexicon_entries` is seeded with `spec.phrases`.)
   - **Router priors** — VERIFIED as hand-set v1 starting values under active forced-strategy calibration (`PRIORS_VERSION = v1.2.7.2026-05-05`), not a stale abandoned table. Still: don't document accuracy numbers as stable.
-  - **Strategy (d) external escalation** — VERIFIED "not yet in the agent loop" per the `corpus_search_agent` docstring ("NO external escalation yet"); strategy-d code exists (`corpus_search_strategy_d.py`) but is unwired.
+  - **Strategy (d) external escalation** — earlier pass read the `corpus_search_agent` docstring ("NO external escalation yet") as authoritative; owner corrected 2026-07-14: that docstring was stale, d IS wired into the agent loop (`corpus_search_agent.py:3835` → `corpus_search_strategy_d.py`). Lesson: docstrings age; verify call sites.
 - **Still ambiguous / needs verification:**
   - **Table-name split** — the mobius-rag skill reads `rag_published_embeddings` while mobius-retriever reads `published_rag_metadata`. Whether these resolve to the same physical table/view in deployment was not confirmed here.
   - `mobius-rag-api` has essentially no README/docs beyond a one-line module docstring; capabilities inferred from `main.py`.
