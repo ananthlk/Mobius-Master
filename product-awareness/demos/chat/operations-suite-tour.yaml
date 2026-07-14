@@ -17,9 +17,11 @@ steps:
   - find: "[data-tour-id=sidebar-suite-roster]"
     action: highlight
     caption: "Roster — provider directory + credentialing. Coming soon (credentialing was folded into it)."
-  - find: "[data-tour-id=sidebar-suite-vault]"
+  # Vault promoted out of the suite section to a standalone sidebar tile
+  # (drift caught by Interact on rev 00467; was sidebar-suite-vault on 00347).
+  - find: "[data-tour-id=sidebar-vault]"
     action: highlight
-    caption: "Vault — the private counterpart to the Public Library: your org's own documents in isolated namespaces. Coming soon."
+    caption: "Vault — the private counterpart to the Public Library: your org's own documents, now a standalone tab. Partially live: the sidebar block and panel are in; corpus promotion is coming."
   - find: "[data-tour-id=sidebar-skills-info]"
     action: highlight
     caption: "And 'Learn more about chat skills' shows everything chat itself can do. Tiles open in a new tab — your chat stays right here."
