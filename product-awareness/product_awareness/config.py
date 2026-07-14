@@ -112,6 +112,14 @@ VERBATIM_SECTIONS: set[tuple[str, str]] = {
     ("about", "Tell me about yourself"),                          # first-person voice
 }
 
+# Recite-intent target per module: when a "recite …" query lands on ANY verbatim
+# section of the module, serve this section instead. UX contract (2026-07-14): the
+# RECITAL card clips at >3 paragraphs with an expand button — a recital needs the
+# full text for that UX to fire; short sections stay right for direct questions.
+RECITE_TARGETS: dict[str, str] = {
+    "about": "Why Mobius",                                        # the full essay
+}
+
 # doc_type by section heading (falls back to "reference")
 SECTION_DOC_TYPE: dict[str, str] = {
     "Purpose": "concept",

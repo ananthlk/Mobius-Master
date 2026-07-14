@@ -84,14 +84,14 @@ class ProductHelp:
         # recital mode (the response-cards doc quotes the phrase "recite why mobius"
         # as an example and would otherwise win its own retrieval). Scope recite-intent
         # queries to the module(s) hosting verbatim sections.
-        if module is None:
-            import re as _re
+        import re as _re
 
-            from . import config as _cfg
-            if _re.search(r"\brecite\b|\brecital of\b", query, _re.IGNORECASE):
-                verbatim_modules = {m for (m, _s) in _cfg.VERBATIM_SECTIONS}
-                if len(verbatim_modules) == 1:   # filter supports single-module equality
-                    module = next(iter(verbatim_modules))
+        from . import config as _cfg
+        recite_intent = bool(_re.search(r"\brecite\b|\brecital of\b", query, _re.IGNORECASE))
+        if module is None and recite_intent:
+            verbatim_modules = {m for (m, _s) in _cfg.VERBATIM_SECTIONS}
+            if len(verbatim_modules) == 1:   # filter supports single-module equality
+                module = next(iter(verbatim_modules))
         where = self._where(audience, module, in_scope_only)
         hits = self.store.query(self.embedder.embed([query])[0], k=k, where=where)
         s_top = hits[0]["score"] if hits else 0.0
@@ -128,8 +128,6 @@ class ProductHelp:
 
         # --- ANSWER: current docs above threshold ---
         current = [h for h in hits if h["metadata"].get("status") != "planned"]
-        from . import config as _cfg  # local import keeps module load light
-        import re as _re
         demo = None
         for mod, pat, ref in _cfg.DEMO_KEYWORDS:   # keyword overrides first (collisions)
             if mod == top_module and _re.search(pat, query, _re.IGNORECASE):
@@ -142,6 +140,13 @@ class ProductHelp:
         recital = None
         top_section = top["metadata"].get("section", "")
         if (top_module, top_section) in _cfg.VERBATIM_SECTIONS:
+            # Recite-intent override (UX contract 2026-07-14): "recite …" wants the
+            # module's FULL canonical text — the RECITAL card's clip-and-expand UX
+            # needs >3 paragraphs. Short verbatim sections stay for direct questions.
+            if recite_intent:
+                target = _cfg.RECITE_TARGETS.get(top_module)
+                if target and (top_module, target) in _cfg.VERBATIM_SECTIONS:
+                    top_section = target
             recital = {"verbatim": True, "section": top_section,
                        "document_id": f"product-docs:{top_module}"}
         # Recital payloads carry ONLY the matched section, reconstructed in order
