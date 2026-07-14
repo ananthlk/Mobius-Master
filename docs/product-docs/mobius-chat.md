@@ -43,18 +43,19 @@ Per assistant message:
 
 ## Sidebar
 - **New chat** (`#btnNewChat`).
-- **Recent searches** and **Most helpful searches** — your conversation history; see the dedicated section **Your past queries** below.
-- **Vault block** *(2026-07-13)* — a violet card with tabs (Recent / Liked / Tasks / Uploads) and "Manage →", opening the full Vault panel (your private documents; see Operations Suite → Vault).
+- **Vault block** *(2026-07-13 — replaced the former "Recent searches" and "Most helpful searches" sections)* — a violet card with tabs (Recent / Liked / Tasks / Uploads) and "Manage →", opening the full Vault panel. Your conversation history lives here now; see **Your past queries** below.
 - **Operations Suite** — open-in-tab product tiles (Strategy, Public Library, Roster, Vault) + an Appeals Agent demo tile + "Learn more about chat skills". Detailed in the **Operations Suite** section below.
 - **User / account area** — "Signed in as {name}"; click opens the auth modal.
 - **Onboarding nudge** (`#onboardingNudge`) — "⚙ Set up your profile" when not yet onboarded; opens Preferences.
-- **Collapse** — a chevron collapses the sidebar to an icon rail (Recent 🔍, Most Helpful ⭐, Skills ⊞ with badges).
+- **Collapse** — a chevron collapses the sidebar to an icon rail. [UNVERIFIED: rail icon set after the 2026-07-13 Vault-block replacement — the old rail showed Recent 🔍 / Most Helpful ⭐ / Skills ⊞; pending owner confirmation.]
 
 ## Your past queries — where did my conversation go?
-**Your past queries and conversations live in the sidebar.** Looking for a previous question, thread, or answer?
-- **Recent searches** — your last ~20 conversations (`GET /chat/history/recent`). **Click any entry to reopen that conversation** and continue where you left off; nothing is lost when you start a new chat.
-- **Most helpful searches** — your best past answers: everything you rated 👍, one click away. It refreshes each time you thumbs-up an answer.
-- Starting fresh? **+ New chat** opens a new thread; your old ones stay in Recent searches.
+**Your past queries and conversations live in the sidebar's My Vault block** (since 2026-07-13, when it replaced the separate "Recent searches" / "Most helpful searches" sections):
+- **Recent tab** — your recent conversations. **Click an entry to reopen that conversation** and continue where you left off; nothing is lost when you start a new chat.
+- **Liked tab** — your best past answers: everything you rated 👍, one click away.
+- **Manage →** opens the full Vault panel (Recent / Liked / Tasks / Uploads).
+- Starting fresh? **+ New chat** opens a new thread; your old ones stay in the Recent tab.
+[UNVERIFIED: whether the Recent tab still reads `GET /chat/history/recent` and keeps the ~20-entry window — pending Chat/Vault owner confirmation; the replacement itself is commit-verified (38af3d5).]
 
 ## Operations Suite (open-in-tab products)
 **What is the Public Library?** The Public Library is Mobius's shared knowledge base — payer manuals, regulations, and public sources — and it's one of the Operations Suite tiles in the chat sidebar. The sidebar's Operations Suite holds **open-in-tab product tiles** — distinct from the auto-invoked chat skills. Clicking a tile opens that product in a new tab; a Mobius-owned tile forwards your access token in the URL fragment (`#t=…`) so it signs you in without a second login. Current tiles (2026-04-29 layout):
