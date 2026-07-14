@@ -127,8 +127,49 @@ def chunk_file(path: Path, source_commit: str = "uncommitted") -> list[Chunk]:
             continue
         status = "planned" if heading.lower().startswith("not yet available") else "current"
         doc_type = config.SECTION_DOC_TYPE.get(heading, "reference")
+        # Planned sections chunk PER BULLET: each planned item must retrieve
+        # pinpoint on its own demand phrasing, and adding a 5th item must not
+        # dilute the other 4 (one fat section chunk loses to overview chunks —
+        # observed 2026-07-14 when rag's planned list grew 3→5 and "validation
+        # ledger" queries stopped hitting it).
+        if status == "planned":
+            preamble, items = _split_bullets(body_text)
+            if items:
+                for i, item in enumerate(items):
+                    label = _bullet_label(item) or f"item-{i}"
+                    text = f"# {doc_title} — {heading}\n\n"
+                    if preamble and len(preamble) <= 300:
+                        text += f"{preamble}\n\n"
+                    text += item
+                    mk(f"{module}:{_slug(heading)}--{_slug(label)}:0",
+                       heading, doc_type, status, text)
+                continue
         for n, piece in enumerate(_split_long(body_text, config.MAX_CHUNK_CHARS)):
             mk(f"{module}:{_slug(heading)}:{n}", heading, doc_type, status,
                f"# {doc_title} — {heading}\n\n{piece}")
 
     return chunks
+
+
+def _split_bullets(body_text: str) -> tuple[str, list[str]]:
+    """Split a section body into (preamble, top-level bullet items).
+
+    A top-level item starts with ``- `` at column 0; continuation lines
+    (including indented sub-bullets) stay attached to their item."""
+    preamble_lines: list[str] = []
+    items: list[list[str]] = []
+    for ln in body_text.splitlines():
+        if ln.startswith("- "):
+            items.append([ln])
+        elif items:
+            items[-1].append(ln)
+        else:
+            preamble_lines.append(ln)
+    return ("\n".join(preamble_lines).strip(),
+            ["\n".join(it).strip() for it in items])
+
+
+def _bullet_label(item: str) -> str:
+    """A bullet's bold lead (``- **Name** — …``) names its chunk."""
+    m = re.match(r"-\s+\*\*(.+?)\*\*", item)
+    return m.group(1) if m else ""
