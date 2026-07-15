@@ -163,6 +163,12 @@ const NODES = [
   tech:{tag:"Forced-strategy calibration → priors; oracle ceilings; judge loop in mobius-rag/eval.",
    pts:["Durable baseline 110-σ (router 0.510 / oracle 0.628)","Certify structure, not the eval number (standing directive)"]},
   doc:"eval.md", verified:"2026-07-05"},
+ {id:"cache", label:"Answer Cache", sub:"asked-and-answered memory", cluster:"intel", status:"planned",
+  user:{tag:"Mobius remembers what it already answered — repeat questions short-circuit to a vetted past answer.",
+   pts:["Repeat questions get the vetted prior answer, fast","Your Q&A history becomes queryable (“what has this thread asked”, “top repeated questions”)"]},
+  tech:{tag:"Carved out of mobius-chat behind a service boundary; built + green on FakeBackend, not yet deployed.",
+   pts:["cache_lookup / cache_write skills (chat previously imported chromadb directly)","Backend interface: Chroma Phase-0 → pgvector Phase-1 (fleet standard target)","Admin history endpoints; reframed as a parallel ReAct tool (decisions doc)"]},
+  doc:"mobius-answer-cache repo · CACHE agent", verified:"2026-07-15"},
  {id:"payor", label:"Payor Registry", sub:"payer source of truth", cluster:"intel", status:"live",
   user:{tag:"Authoritative payer facts — phone, fax, EDI, portals, timely filing — asked right in chat.",
    pts:["payor_lookup: contact/access facts (preferred over corpus for these)","payor_readiness: integration status per payer","3 payors: Aetna, Sunshine, AHCA (authority parent)"]},
@@ -197,7 +203,7 @@ const NODES = [
   user:{tag:"Set up a client org, enroll its people, sign in, set preferences.",
    pts:["Sign in (email+password or Google); greeting knows you","Org enrollment via preferences (self-claim, validated)","@-mention directory; per-user experience level","Coming: admin “add employees” UI + set-password page (email invites gated on it)"]},
   tech:{tag:"mobius-auth + mobius-user + org orchestrator; roster service is the org master.",
-   pts:["Invite / set-password / reset primitives shipped (migration 005)","Org datastore provision: POST /doc-store/provision → per-org pgvector schema","Known gate: frontend sends no Authorization on /chat/* — per-user features dark until header fix"]},
+   pts:["Invite / set-password / reset primitives shipped (migration 005)","Org datastore provision: POST /doc-store/provision → per-org pgvector schema (db-agent provisioner)","Known gate: frontend sends no Authorization on /chat/* — per-user features dark until header fix"]},
   doc:"user-and-auth.md · org agent snapshot", verified:"2026-07-15"},
  {id:"help", label:"Product Help & Docs", sub:"self-documenting", cluster:"enable", status:"live",
   user:{tag:"Ask Mobius about Mobius — features, how-tos, even “why the name” — answered from verified docs.",
@@ -221,8 +227,14 @@ const NODES = [
   user:{tag:"Warns before you overshare: uploads containing patient info get a “keep private” recommendation.",
    pts:["Visibility-ceiling recommendation at upload-complete (with instant-RAG flow)","Recall-over-precision: uncertain → private"]},
   tech:{tag:"Stateless /classify: regex + Presidio NER + LLM (HIPAA-locked Vertex route).",
-   pts:["18 Safe-Harbor identifiers + quasi-identifiers; masked evidence","LIVE on Cloud Run dev (64 tests); chat-side card shipping via instant-RAG"]},
+   pts:["18 Safe-Harbor identifiers + quasi-identifiers; masked evidence","LIVE on Cloud Run dev (82 tests); chat-side card shipping via instant-RAG"]},
   doc:"skills.md · phi inception", verified:"2026-07-15"},
+ {id:"db", label:"DB Agent", sub:"one door to the data", cluster:"enable", status:"partial",
+  user:{tag:"Invisible plumbing that keeps every module's data access governed — and sets up each client org's private document store at onboarding.",
+   pts:["Client org onboarding creates the org's private doc store automatically","Same door for every module = consistent, auditable data access","You never see it working — that's the point"]},
+  tech:{tag:"MCP server (:8008): per-module access manifests + pooled Postgres; owns the org doc-store provisioner and platform data-model stewardship.",
+   pts:["Access manifests: chat / rag / os / credentialing / task-manager; structured errors, db_transaction","Provisioner (ratified 07-15): POST /doc-store/provision → idempotent create/upgrade, schema_version assertion (409 = deploy drift)","mobius_org_docs live on dev: per-org pgvector namespaces, disjoint role grants vs mobius_rag","RAG org_docs schema v1 vendored (sync script, not runtime fetch); HNSW+FTS proven live","Platform data-model owner: cross-module audit, BQ-replica sync patterns"]},
+  doc:"mobius-db-agent INTEGRATION_SPEC.md · vault proposal App. B", verified:"2026-07-15"},
  {id:"email", label:"Email", sub:"send chokepoint", cluster:"enable", status:"live",
   user:{tag:"Email any conversation — summary or transcript — after a preview you confirm.",
    pts:["Email button on every answer; two-step dialog with preview","Nothing sends without your confirmation"]},
@@ -254,8 +266,14 @@ const EDGES = [
  {f:"cred",t:"org",     label:"roster service = org master"},
  {f:"org",t:"vault",    label:"org doc-store provision", status:"planned"},
  {f:"phi",t:"vault",    label:"visibility ceiling on promote", status:"planned"},
- {f:"phi",t:"chat",     label:"PHI card at upload-complete"},
+ {f:"phi",t:"chat",     label:"PHI card at upload-complete", status:"planned"},
+ {f:"phi",t:"chat",     label:"LLM pass via HIPAA-locked bandit stage (Vertex/BAA) — no PHI leaves the network"},
  {f:"strategy",t:"help",label:"deck narratives → thesis doc"},
+ {f:"chat",t:"cache",   label:"cache_lookup short-circuit + cache_write on completion", status:"planned"},
+ {f:"cred",t:"db",      label:"delegates doc-store provisioning (mig 041; env wiring pending)", status:"planned"},
+ {f:"rag",t:"db",       label:"defines org_docs schema vN; db-agent vendors + applies"},
+ {f:"db",t:"vault",     label:"provisions the per-org doc stores behind Vault"},
+ {f:"email",t:"tasks",  label:"lifecycle emits (step_start/done/failed) — workflow=email"},
 ];
 /* Drillable tool catalog for the Skills node — from skills.md (live 45-tool
    manifest, re-verified 2026-07-15). tier: builtin = in-process, always
@@ -363,10 +381,12 @@ document.getElementById("map").appendChild(svg);
 CLUSTERS.forEach((c,i)=>{
   const t=el("text",{x:PAD.l+i*(NW+GX),y:24,class:"cluster-label"},svg); t.textContent=c.label;
 });
-const edgeEls=EDGES.map(e=>{
+const edgeEls=EDGES.map((e,idx)=>{
   const a=byId[e.f],b=byId[e.t];
-  const x1=a.x+(a.x<b.x?NW:a.x>b.x?0:NW/2), y1=a.y+NH/2+(a.x===b.x?(a.y<b.y?NH/2:-NH/2):0);
-  const x2=b.x+(b.x<a.x?NW:b.x>a.x?0:NW/2), y2=b.y+NH/2+(a.x===b.x?(b.y<a.y?NH/2:-NH/2):0);
+  // parallel edges between the same pair fan out instead of overlapping
+  const dup=EDGES.slice(0,idx).filter(p=>p.f===e.f&&p.t===e.t).length*12;
+  const x1=a.x+(a.x<b.x?NW:a.x>b.x?0:NW/2), y1=a.y+NH/2+dup+(a.x===b.x?(a.y<b.y?NH/2:-NH/2):0);
+  const x2=b.x+(b.x<a.x?NW:b.x>a.x?0:NW/2), y2=b.y+NH/2+dup+(a.x===b.x?(b.y<a.y?NH/2:-NH/2):0);
   const mx=(x1+x2)/2;
   const d=a.x===b.x?`M${x1},${y1} C${x1+46},${y1} ${x2+46},${y2} ${x2},${y2}`
                    :`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`;
