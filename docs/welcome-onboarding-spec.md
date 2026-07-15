@@ -85,8 +85,18 @@ backlog!) or we key off future role; parked.
 - **PA (me):** persona content pack (per-row: opening, fear line, suggested first
   question) as versioned content UM/chat can consume; author the analytics tour;
   re-verify the 6 mapped tours against current anchors.
-- **UX:** welcome card layout + tour-chip placement; skippability (never trap);
-  RULING NEEDED on the direct fear question.
+- **UX: DELIVERED 2026-07-15.** Card design: inline soft card at thread top ("a colleague
+  left a note on your desk"), border-left 3px violet, surface-2 bg, no shadow, max 640px;
+  greeting + one-sentence fear-ease (no bullets) + 2 ghost-style tour chips + compact
+  3-step checklist ("A few things to get started") + "Skip for now" plain link. REPLACES
+  the onboarding nudge when a welcome payload is present; falls back to nudge otherwise.
+  Dismiss semantics (reconciled with Ananth's until-completed ruling): "Skip for now" =
+  per-session hide; "×" = permanent opt-out (the "explicitly turned off" path); checklist
+  completion = permanent auto-hide.
+- **Fear question RULED (UX):** NO on cold arrival (survey-before-trust). DEFERRED version
+  approved: if the user skips the tour chips or disengages in the first 3–5 turns, surface
+  an optional "help us tailor your experience" prompt; UM stores the answer as a preference
+  then. New build item (chat round): disengagement detection + deferred prompt.
 - **Task agent:** day-2/day-7 scheduled nudges ("you haven't tried X") via reminder
   kind + nudge machinery.
 - **Chat (deferred):** render welcome card when `welcome.first_session` (or
