@@ -10,7 +10,7 @@ GRADUATION artifact at the end of training, not the entry point.
 | # | Step | Mechanic | Writes (UM preference) |
 |---|---|---|---|
 | 1 | "90 seconds — I learn you, you learn me" | consent + skip always visible | — |
-| 2 | Pick your week | activity cards, multi-select, primary first | `activities` |
+| 2 | **"What walked through your door this week?"** (v2.3, Ananth) — COMMON USE CASES, not job labels: patient needs transportation · needs a PCP · claim denied · new clinician billing · coverage question · paid fairly? Multi-select; the FIRST pick becomes the THREAD — its real question drives the tone and depth calibrations, and the picked scenarios' questions become the graduation starter chips (by graduation the user has watched their own most common problem answered their way) | `activities` (scenario→activity map) |
 | 3 | Same answer, three ways | ONE real question rendered three ways, **UNLABELED** — "no labels, no right answer, tap the reply you'd rather read." The pick DEDUCES `tone`; the deduction is revealed only on the graduation chip (Ananth: labels bias the pick — deduce from answers, don't ask them to self-identify as 'friendly') | `tone` |
 | 4 | "A denial needs reworking. Should I…?" | scenario: Just do it / Show me first / Walk me through | `autonomy` (+ experience-level inference) |
 | 5 | "Anything make you hesitant?" | optional chips (wrong answers / patient data / too complex / nothing) — the UX-approved deferred fear question, now placed AFTER engagement | `hesitation` (new field, UM) |
