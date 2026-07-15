@@ -48,9 +48,12 @@ telemetry — flagged as a dependency; the analytics gap is a known skills-node 
   preference model's literal definition of sensitive. (Optionally routine = one notch
   more autonomous than the pick; v1 writes sensitive only.)
 - **Experience level is SELF-DECLARED, never inferred** — independent axis (the
-  counterexample: an expert who wants confirm-first on sensitive work). The autonomy pick
-  may PRE-SELECT a suggestion in a visible control the user confirms — never a silent write.
-  Training adds a micro-chip confirm ("How much AI have you used?") on the same screen.
+  counterexample: an expert who wants confirm-first on sensitive work). Never a silent write.
+  **v2.2 (Ananth): identity labels ("Just starting / Power user") mean nothing — the step
+  shows the SAME answer at three explanation depths (walk-me-through / standard / terse+routing)
+  and the pick deduces the level. Options must always be phrased as the responses the user
+  will really get, not as self-descriptions.** (The biasing "suggested" highlight is dropped —
+  a direct pick of a concrete preview is a stronger self-declaration than a label confirm.)
 - **`hesitations` = text[] multi-select** (UM migration 007, `hesitations` field on the
   preferences API, returned in /me; empty = skipped). Welcome block unchanged for now;
   can ride it additively if graduation ever re-renders server-side.

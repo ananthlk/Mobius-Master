@@ -183,10 +183,12 @@ function render(){
       c.querySelectorAll(".bigchip").forEach(b=>b.onclick=()=>{T.auto=AUTONOMY.find(a=>a.k===b.dataset.k);render();toast(T.auto.toast);});
     } else { c.innerHTML=`${prog(3)}
       <h2 class="enter">Deal: “${T.auto.b}” for sensitive work.</h2>
-      <p class="sub enter">One more — how much AI have you used? <span style="opacity:.7">(your call — the last pick just suggests, never decides)</span></p>
-      ${[["beginner","🌱 Just starting"],["regular","🙂 Comfortable"],["expert","⚡ Power user"]].map(([k,l],i)=>
-        `<button class="bigchip enter d${i+1} ${k===T.auto.exp?"suggest":""}" data-k="${k}"><b>${l}${k===T.auto.exp?" · suggested":""}</b></button>`).join("")}`;
-      c.querySelectorAll(".bigchip").forEach(b=>b.onclick=()=>{T.exp=b.dataset.k;T.step=4;render();toast("Self-declared — never inferred. Change it anytime.");});
+      <p class="sub enter">One more calibration — <b>how much should I explain?</b> Same Dr. Chen answer, three depths. Tap the response you'd actually want to read — this is really how I'll answer you:</p>
+      ${[["beginner","Dr. Chen is enrolled and payable ✅ Here's what that means: claims under her NPI will process normally. I verified it against NPPES and the state's PML roster. One heads-up — her revalidation is due Nov 2. Want me to set a reminder and walk you through how renewal works when it's time?"],
+         ["regular","Dr. Chen is enrolled ✅ (PML-verified; revalidation due 11/02 — want a reminder?)"],
+         ["expert","Enrolled ✅ PML row verified · NPPES active · taxonomy on file. Reval 11/02 — task it? Routing: registry-first, corpus skipped."]].map(([k,p],i)=>
+        `<button type="button" class="tone enter d${i+1}" data-k="${k}"><p>${p}</p></button>`).join("")}`;
+      c.querySelectorAll(".tone").forEach(b=>b.onclick=()=>{T.exp=b.dataset.k;T.step=4;render();toast("Got it — that's the depth you'll get. Dial it up or down anytime.");});
     }
   }
   else if(T.step===4){ c.innerHTML=`${prog(4)}
