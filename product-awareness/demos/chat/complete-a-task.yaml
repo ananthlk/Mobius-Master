@@ -1,0 +1,21 @@
+# chat:complete-a-task — mark a task resolved (works via NL even with no task card on screen).
+schema: interact.v1
+id: chat:complete-a-task
+title: Mark a task complete
+mode: guide
+surface: mobius-chat
+permissions: []
+preconditions:
+  - selector: "[data-tour-id=composer-input]"
+steps:
+  - find: "[data-tour-id=composer-input]"
+    action: highlight
+    caption: "Tasks are managed right from chat. Ask \"show my open tasks\" to get your task list."
+  - find: "[data-tour-id=task-resolve]"
+    action: highlight
+    optional: true
+    caption: "On any task card, Resolve marks it complete — done."
+  - find: "[data-tour-id=composer-input]"
+    action: highlight
+    caption: "Or just type it: \"mark task abc12345 resolved\" (the short id from the card works). Add a note if you want the reason on record."
+    end: true

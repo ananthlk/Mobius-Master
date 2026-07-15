@@ -1,0 +1,21 @@
+# chat:sign-in — how do I log in / switch accounts.
+schema: interact.v1
+id: chat:sign-in
+title: Sign in to Mobius
+mode: guide
+surface: mobius-chat
+permissions: []
+preconditions:
+  - selector: "[data-tour-id=sidebar-user]"
+steps:
+  - find: "[data-tour-id=sidebar-user]"
+    action: highlight
+    caption: "Your account lives here, at the bottom of the sidebar — it shows who's signed in."
+  - find: "[data-tour-id=sidebar-user]"
+    action: click
+    caption: "Click it to open sign-in (or your account view if you're already in)."
+    wait_for: "[data-tour-id=modal-auth]"
+  - find: "[data-tour-id=modal-auth]"
+    action: highlight
+    caption: "Sign in with your email + password, or one click with Google. New here? Switch to 'Create account' — you'll get a welcome panel to set up your preferences. To switch accounts later: 'Not you? Sign in differently.'"
+    end: true

@@ -65,3 +65,6 @@
 [submodule "mobius-contracts"]
 	path = mobius-contracts
 	url = https://github.com/ananthlk/mobius-contracts.git
+[submodule "mobius-interact"]
+	path = mobius-interact
+	url = https://github.com/ananthlk/mobius-interact.git

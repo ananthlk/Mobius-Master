@@ -1,0 +1,17 @@
+# chat:find-past-queries — where are my past queries / conversations.
+schema: interact.v1
+id: chat:find-past-queries
+title: Find your past queries
+mode: guide
+surface: mobius-chat
+permissions: []
+preconditions:
+  - selector: "[data-tour-id=sidebar-recent]"
+steps:
+  - find: "[data-tour-id=sidebar-recent]"
+    action: highlight
+    caption: "Your past queries live here — Recent searches holds your last ~20 conversations. Click any entry to reopen that thread and pick up where you left off."
+  - find: "[data-tour-id=sidebar-helpful]"
+    action: highlight
+    caption: "Most helpful searches collects the answers you rated 👍 — your personal best-of, one click away."
+    end: true

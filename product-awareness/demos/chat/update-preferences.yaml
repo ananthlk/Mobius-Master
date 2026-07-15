@@ -1,0 +1,25 @@
+# chat:update-preferences — change the style/tone of answers (top identity ask).
+schema: interact.v1
+id: chat:update-preferences
+title: Change how Mobius talks to you
+mode: guide
+surface: mobius-chat
+permissions: []
+preconditions:
+  - selector: "[data-tour-id=sidebar-user]"
+steps:
+  - find: "[data-tour-id=sidebar-user]"
+    action: highlight
+    caption: "Answer style is a preference — open your account area to change it."
+  - find: "[data-tour-id=sidebar-user]"
+    action: click
+    caption: "Click your account…"
+    wait_for: "[data-tour-id=menu-preferences]"
+  - find: "[data-tour-id=menu-preferences]"
+    action: click
+    caption: "…then 'My Preferences'."
+    wait_for: "[data-tour-id=modal-preferences]"
+  - find: "[data-tour-id=modal-preferences]"
+    action: highlight
+    caption: "This is where you set the style you get messages in: Communication tone (Professional / Friendly / Concise), your AI experience level, and how much autonomy Mobius gets on routine vs sensitive tasks. Save — your very next answer uses the new style."
+    end: true

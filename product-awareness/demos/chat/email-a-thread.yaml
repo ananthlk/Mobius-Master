@@ -1,0 +1,17 @@
+# chat:email-a-thread — two-step dialog behind the per-message email button.
+schema: interact.v1
+id: chat:email-a-thread
+title: Email this conversation
+mode: guide
+surface: mobius-chat
+permissions: []
+preconditions:
+  - selector: "[data-tour-id=msg-email]"
+steps:
+  - find: "[data-tour-id=msg-email]"
+    action: highlight
+    caption: "The email button sends this conversation to any recipient — whole thread or just the last exchange."
+  - find: "[data-tour-id=msg-email]"
+    action: highlight
+    caption: "It's a two-step dialog: pick recipient + scope + summary-or-full-transcript, PREVIEW the draft, then send (or re-draft). Nothing sends without your confirmation."
+    end: true

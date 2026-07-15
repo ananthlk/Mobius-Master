@@ -1,0 +1,20 @@
+# chat:give-feedback — direct user ask in docs_gap ("how to provide feedback or find feedback form").
+schema: interact.v1
+id: chat:give-feedback
+title: Give feedback on answers and the product
+mode: guide
+surface: mobius-chat
+permissions: []
+preconditions:
+  - selector: "[data-tour-id=msg-thumbs-up]"
+steps:
+  - find: "[data-tour-id=msg-thumbs-up]"
+    action: highlight
+    caption: "Rate any answer — a thumbs-up tells Mobius this was helpful (it powers the 'Most helpful' list)."
+  - find: "[data-tour-id=msg-thumbs-down]"
+    action: highlight
+    caption: "Thumbs-down opens a comment box so you can say what was wrong — it goes straight to the team."
+  - find: "[data-tour-id=composer-input]"
+    action: highlight
+    caption: "For product feedback — a wish, a bug, anything — just type it: e.g. \"I have feedback: the sidebar is confusing.\" Mobius logs and routes it, and you can edit the capture card it shows."
+    end: true

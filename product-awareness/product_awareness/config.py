@@ -49,12 +49,58 @@ DOC_META: dict[str, dict] = {
     "skills.md":                   {"module": "skills",          "audience": "mixed", "in_scope": True},
     "story-ui-and-landing.md":     {"module": "strategy",        "audience": "mixed", "in_scope": True},
     "eval.md":                     {"module": "eval",            "audience": "dev",   "in_scope": True},
+    "mobius-thesis.md":            {"module": "about",           "audience": "user",  "in_scope": True},
     "mobius-os.md":                {"module": "os",              "audience": "user",  "in_scope": False},
     "credentialing-and-roster.md": {"module": "credentialing",   "audience": "user",  "in_scope": False},
     "user-and-auth.md":            {"module": "auth",            "audience": "mixed", "in_scope": False},
     "mobius-document-viewer.md":   {"module": "document-viewer", "audience": "mixed", "in_scope": False},
     "infrastructure.md":           {"module": "infra",           "audience": "dev",   "in_scope": False},
 }
+
+# demo scripts (mobius-interact feeder): (module, section) -> published script ref.
+# Attached to answer outcomes so chat can render a "▶ Show me" chip. Scripts live in
+# product-awareness/demos/ and are published to the interact registry.
+DEMOS: dict[tuple[str, str], dict] = {
+    ("chat", "Composer & sending"): {
+        "script_id": "chat:upload-a-document", "title": "Show me: upload a document"},
+    ("chat", "Operations Suite (open-in-tab products)"): {
+        "script_id": "chat:operations-suite-tour", "title": "Show me: tour the Operations Suite"},
+    ("chat", "Response modes & caching"): {
+        "script_id": "chat:response-modes", "title": "Show me: pick a response mode"},
+    # "Message-level actions" hosts BOTH feedback and email content; the section key
+    # takes the higher-demand demo and the keyword override below catches email intent.
+    ("chat", "Message-level actions"): {
+        "script_id": "chat:give-feedback", "title": "Show me: give feedback"},
+    # feedback questions also legitimately hit the answer-components section
+    # (nudge chips / capture card live there) — same demo.
+    ("chat", "Banners, status & answer components"): {
+        "script_id": "chat:give-feedback", "title": "Show me: give feedback"},
+    ("chat", "Sign in & sign out — how do I log in or out?"): {
+        "script_id": "chat:sign-in", "title": "Show me: sign in"},
+    ("chat", "Your past queries — where did my conversation go?"): {
+        "script_id": "chat:find-past-queries", "title": "Show me: find your past queries"},
+    ("skills", "Task management"): {
+        "script_id": "chat:complete-a-task", "title": "Show me: mark a task complete"},
+    # HELD until the menu-preferences anchor lands (script authored, unpublished):
+    # ("chat", "Preferences — how do I change the style of my answers?"): {
+    #     "script_id": "chat:update-preferences", "title": "Show me: change your answer style"},
+}
+
+# Keyword overrides — checked BEFORE the section map (module-scoped, word-boundary).
+# Only for genuine section collisions; keep this list tiny and precise.
+DEMO_KEYWORDS: list[tuple[str, str, dict]] = [
+    # email questions may resolve to the chat doc OR the skills doc's email section —
+    # the tour runs on the chat surface either way, so both modules map to it.
+    ("chat", r"\bemail\b", {
+        "script_id": "chat:email-a-thread", "title": "Show me: email this conversation"}),
+    ("skills", r"\bemail\b", {
+        "script_id": "chat:email-a-thread", "title": "Show me: email this conversation"}),
+    # sign-in/out queries resolve to the chat doc OR the auth doc (same lesson as email):
+    ("chat", r"\bsign.?(in|out)\b|\blog.?(in|out)\b", {
+        "script_id": "chat:sign-in", "title": "Show me: sign in"}),
+    ("auth", r"\bsign.?(in|out)\b|\blog.?(in|out)\b", {
+        "script_id": "chat:sign-in", "title": "Show me: sign in"}),
+]
 
 # doc_type by section heading (falls back to "reference")
 SECTION_DOC_TYPE: dict[str, str] = {

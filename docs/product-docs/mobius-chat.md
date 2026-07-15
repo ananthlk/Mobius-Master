@@ -33,9 +33,9 @@ A fourth `task` mode exists at the API level (raw text, skips the integrator) bu
 
 ## Message-level actions
 Per assistant message:
-- **Thumbs up / down** — Up records the rating and refreshes the sidebar "Most helpful"; Down opens a comment area for an optional note. Disabled after the first vote.
+- **Thumbs up / down** — Up records the rating and refreshes the sidebar "Most helpful"; Down opens a comment area for an optional note. Disabled after the first vote. **This is how you give feedback on an answer — there is no separate feedback form**: rate the message directly, or type product feedback straight into the composer (e.g. "I have feedback: …") and Mobius logs and routes it.
 - **Copy** — copies the message text; shows "Copied" briefly.
-- **Email this thread** (`#emailDialog`, two-step, **live**) — Step 1: recipient + scope (whole thread / last exchange) + mode (LLM summary or full transcript) → preview. Step 2: re-draft or send (`POST /chat/thread/{id}/email`).
+- **Email this conversation** (`#emailDialog`, two-step, **live**) — the **Email button** under each answer is how you email this conversation or a summary of it. Step 1: recipient + scope (whole thread / last exchange) + mode (LLM summary or full transcript) → preview. Step 2: re-draft or send (`POST /chat/thread/{id}/email`). Nothing sends without your confirmation.
 - **Per-source feedback** — thumbs up/down on each `[N]` source card (`POST /chat/source-feedback/{cid}`).
 - **Show details** — expands hidden requirements/definitions in BLENDED answer cards.
 - **Source citation click** — "Open document" (inline doc reader), "Open in RAG ↗" (external), or "Download PDF" when the RAG API is configured.
@@ -43,15 +43,20 @@ Per assistant message:
 
 ## Sidebar
 - **New chat** (`#btnNewChat`).
-- **Recent searches** — last ~20 threads (`GET /chat/history/recent`), collapsible; clicking reopens the thread.
-- **Most helpful searches** — populated from thumbs-up feedback; refreshes after each "up".
+- **Recent searches** and **Most helpful searches** — your conversation history; see the dedicated section **Your past queries** below.
 - **Operations Suite** — open-in-tab product tiles (Strategy, Public Library, Roster, Vault) + an Appeals Agent demo tile + "Learn more about chat skills". Detailed in the **Operations Suite** section below.
 - **User / account area** — "Signed in as {name}"; click opens the auth modal.
 - **Onboarding nudge** (`#onboardingNudge`) — "⚙ Set up your profile" when not yet onboarded; opens Preferences.
 - **Collapse** — a chevron collapses the sidebar to an icon rail (Recent 🔍, Most Helpful ⭐, Skills ⊞ with badges).
 
+## Your past queries — where did my conversation go?
+**Your past queries and conversations live in the sidebar.** Looking for a previous question, thread, or answer?
+- **Recent searches** — your last ~20 conversations (`GET /chat/history/recent`). **Click any entry to reopen that conversation** and continue where you left off; nothing is lost when you start a new chat.
+- **Most helpful searches** — your best past answers: everything you rated 👍, one click away. It refreshes each time you thumbs-up an answer.
+- Starting fresh? **+ New chat** opens a new thread; your old ones stay in Recent searches.
+
 ## Operations Suite (open-in-tab products)
-The sidebar's Operations Suite holds **open-in-tab product tiles** — distinct from the auto-invoked chat skills. Clicking a tile opens that product in a new tab; a Mobius-owned tile forwards your access token in the URL fragment (`#t=…`) so it signs you in without a second login. Current tiles (2026-04-29 layout):
+**What is the Public Library?** The Public Library is Mobius's shared knowledge base — payer manuals, regulations, and public sources — and it's one of the Operations Suite tiles in the chat sidebar. The sidebar's Operations Suite holds **open-in-tab product tiles** — distinct from the auto-invoked chat skills. Clicking a tile opens that product in a new tab; a Mobius-owned tile forwards your access token in the URL fragment (`#t=…`) so it signs you in without a second login. Current tiles (2026-04-29 layout):
 - **Strategy** — "Benchmarking + KPIs" — **live**. Opens the market-intelligence / benchmarking deck.
 - **Public Library** — "Shared corpus — payer manuals, regs, public sources" — **live**. Opens the shared RAG corpus UI (the public, non-private knowledge base). Renamed from "Library" to make room for Vault.
 - **Roster** — "Provider directory + credentialing" — **coming soon**. Credentialing was folded into Roster (same backing service; two tiles confused users), and the tile's click is currently disabled.
@@ -80,11 +85,20 @@ Opened via "Open document" on a source card (`#doc-reader-panel`, restored 2026-
 ## Skills modal
 "Mobius Operations Suite" (`#skillsModal`), from the sidebar "Learn more" or the rail skills icon: **Overview** tab (renders `/chat/skills-manifest`) + **Customize** tab (filter/order). Falls back to a curated chip list if the manifest is unavailable.
 
-## Sign in & preferences
-- **Auth gate** (`#authGate`) — blocks the UI until signed in.
-- **Auth modal** — email/password login + signup, and **Google sign-in** (live after `/api/v1/public-config` provides the client id).
-- **Preferences modal** — first/preferred name, tone, experience level, activity selection; saving refreshes the profile and hides the onboarding nudge.
-- Auth mode is env-controlled (`CHAT_AUTH_MODE`: off / optional / required; hosted defaults to required, dev to off).
+## Sign in & sign out — how do I log in or out?
+**To sign in: click the user area at the bottom of the sidebar** ("Signed in as…" / "Sign in") — it opens the auth modal. Sign in with **email/password** or one click with **Google**; first-time users get a signup path and a welcome panel.
+
+**To sign out: click the same user area → "Sign out"** (a confirmation click ends your session on this device). To switch accounts instead, choose **"Not you? Sign in differently"** — it signs you out and reopens the login modal in one step.
+- **Auth gate** (`#authGate`) — blocks the UI until signed in (hosted default; dev may run with auth off).
+- Auth mode is env-controlled (`CHAT_AUTH_MODE`: off / optional / required).
+- Password reset doesn't exist yet (see the auth doc's "Not yet available") — if you're locked out, use Google sign-in or contact your admin.
+
+## Preferences — how do I change the style of my answers?
+**To change how Mobius talks to you: open the user menu (sidebar user area) → "My Preferences."** The preferences modal is where you update the style under which you get messages:
+- **Communication tone** — Professional / Friendly / Concise: the style of every answer.
+- **AI experience level** (beginner / regular / expert) and **autonomy** for routine vs sensitive tasks (do it automatically / show me first / just guide me).
+- **Preferred name** (how Mobius greets you), **timezone**, and the **activities you focus on** (multi-select; one can be primary).
+Saving refreshes your profile immediately — the next answer uses the new style — and hides the onboarding nudge. The same modal opens from the "⚙ Set up your profile" nudge for new users.
 
 ## Banners, status & answer components
 - **Alpha banner** (`#alphaBanner`) + **Alpha notes modal** — release date, features, known limitations; dismiss persists.
