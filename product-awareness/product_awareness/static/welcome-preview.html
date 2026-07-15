@@ -170,10 +170,10 @@ function render(){
   }
   else if(T.step===2){ c.innerHTML=`${prog(2)}
     <h2 class="enter">Same answer, three ways.</h2>
-    <p class="sub enter">You asked: <b>“Is Dr. Chen enrolled with Sunshine?”</b> — tap the reply you'd actually want:</p>
-    ${TONES.map((t,i)=>`<div class="tone enter d${i+1}" data-k="${t.k}"><span class="t">${t.t}</span><p>${t.p}</p></div>`).join("")}`;
+    <p class="sub enter">You asked: <b>“Is Dr. Chen enrolled with Sunshine?”</b> — no labels, no right answer. Just tap the reply you'd rather read:</p>
+    ${TONES.map((t,i)=>`<div class="tone enter d${i+1}" data-k="${t.k}"><p>${t.p}</p></div>`).join("")}`;
     c.querySelectorAll(".tone").forEach(el=>el.onclick=()=>{T.tone=el.dataset.k;T.step=3;render();
-      toast(`${el.dataset.k} it is — everything I say will sound like this. Change anytime.`);});
+      toast("Got it — that's how I'll sound from now on. (Change anytime.)");});
   }
   else if(T.step===3){
     if(!T.auto){ c.innerHTML=`${prog(3)}
