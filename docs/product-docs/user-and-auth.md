@@ -34,15 +34,21 @@ It also stores who you are and how you like to work: your display and preferred 
 - **Admin roster view** — allowlisted admins can list and search registered users and open a per-user detail panel.
 - **Multi-tenant accounts** — every user belongs to a tenant (organization). A default tenant is used when none is specified. Email uniqueness is scoped per tenant and enforced in application code (there is no database uniqueness constraint yet).
 
+## Invites, set-password & joining your org — how do I get my team in? (LIVE 2026-07-15)
+**The onboarding chain is live end-to-end, both directions:**
+- **Invited path** — an org admin (via the org-setup flow) invites you: you get an email with a secure link → the **set-password page** (`/auth/set-password`; the same page also serves password reset — it reads the link's purpose and titles itself accordingly) → set your password → you're an active member with your org and roles already attached. Verified with a real send 2026-07-15.
+- **Self-serve path** — register yourself (email+password or Google), then **claim your organization in Preferences**: the claim is validated against the org master and goes to **pending** until an authorized approver confirms it (approve endpoints are writer-gated). While pending, you can use Mobius as an individual; org-scoped features light up on approval.
+- **Password reset** — same primitives as invites: a reset email links to the set-password page.
+- Emails ride the **mobius-email send chokepoint** (validation, suppression list, audit log). Ops note: the email service's cold start once ate the first send after idle; hardened with a 30s timeout + one idempotent retry.
+
 ## Not yet available (planned)
 
 These are visible in the UI or present in the schema but are **not functional today**. Do not describe them to users as working features.
 
 - **Microsoft sign-in and Enterprise SSO** — the login modal renders **Microsoft** and **Enterprise SSO** buttons, but clicking either shows a "Coming soon" toast. There is no backend for any OAuth/SSO provider other than Google.
 - **Roles / granular permissions** — a `role` table exists in the schema, but it is never populated or read. Access control is effectively **binary**: a regular user vs. an email-allowlisted admin. A code comment notes a planned migration to an `is_admin` column once roles are wired in; treat roles as future, not shipped.
-- **Team / org management** — there is **no** invite flow, no add/remove member, and no team roster editing. Tenant membership is set implicitly at account creation; there is no self-service org management.
-- **Tenant self-management** — no CRUD for tenants and no way for a user to create, switch, or leave a tenant from the UI. How a user is assigned to a real org (vs. the default tenant) is not surfaced in the product.
-- **Password reset / forgot-password** — no reset flow exists (no route, no email token).
+- **Admin "add employees" UI** — the invite BACKEND is live (see the Invites section above), but there is no in-product admin screen to send invites or edit a team roster yet; invites go through the org-setup flow.
+- **Tenant self-management** — no CRUD for tenants and no way for a user to create, switch, or leave a tenant from the UI. (Org membership itself is now self-claimable with approval — see the Invites section — but tenant management remains unbuilt.)
 - **Email verification** — email/password signups are not required to verify their email. (Google's own `email_verified` claim is checked for Google sign-in only.)
 - **Account deletion (GDPR delete)** — no self-service or admin endpoint to delete a user or their data.
 
@@ -94,7 +100,7 @@ Other Mobius modules (chat, RAG, extension, OS, story-ui) consume auth rather th
   - The full preferences field list — grounded in `PreferencesModal.ts`, `preference.py`, and the onboarding/preferences routes.
   - Endpoints, token contract, and the personalization profile — authoritatively documented in `Mobius-user/SPEC.md`, `CONSUMER_RECIPE_PROFILE.md`, and `CONSUMER_RECIPE_ADMIN.md`.
   - Admin capabilities and the email-allowlist gating — grounded in `admin.py` and `CONSUMER_RECIPE_ADMIN.md`.
-- **Not yet available:** login methods, roles, and team/org features that are stubbed or planned are listed in the **"Not yet available (planned)"** section above (Microsoft/Enterprise SSO, roles, team/tenant management, password reset, email verification, account deletion). Do not document any of these as working.
+- **Not yet available:** stubbed/planned items live in the **"Not yet available (planned)"** section above (Microsoft/Enterprise SSO, granular roles, admin add-employees UI, tenant self-management, email verification, account deletion). Invites / set-password / password reset / org self-claim-with-approval moved to LIVE 2026-07-15 (owner-verified, real send confirmed) — see the Invites section.
 - **What's ambiguous / thin (for the docs author):**
   - **Flask vs FastAPI parity — user-relevant.** There are two backend implementations. The FastAPI implementation (used by chat, and the one deployed to Cloud Run) has Google sign-in, the welcome email, the personalization `profile` envelope in `/me`, and auto-complete-onboarding-on-preferences-save. The **Flask** blueprint is a thinner, older variant that lacks **all four**: no `/google` route (no Google sign-in), no welcome email, no `profile` key in its `/me` response, and it does not mark onboarding complete when preferences are saved. Describe the FastAPI/chat behavior as the norm and flag Flask hosts as reduced.
   - **Menu labels / navigation:** the defaults (`My Preferences`, `Not you? Sign in differently`, `Sign out`) come from `@mobius/auth`, but exact labels and placement (hamburger vs. sidebar) depend on the host app; verify against the specific surface being documented.
