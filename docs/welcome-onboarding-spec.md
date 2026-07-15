@@ -61,6 +61,25 @@ telemetry — flagged as a dependency; the analytics gap is a known skills-node 
   graduation = PUT /api/v1/auth/onboarding; /me lazily re-renders the profile prompt, so
   a step-3 tone pick shapes answers immediately.
 
+## Launch gate: TONE-FIDELITY CERTIFICATION (Ananth, 2026-07-15 — "this will force
+## us to also get the tone right when the actual responses come in")
+The calibration samples are PROMISES, not marketing — the user picked a voice and a depth
+by reading them, so every real answer under that profile is graded against them. Gate
+before chat hosts training mode:
+1. **Samples = acceptance fixtures.** The 6 scenarios × 3 tones × 3 depths in the
+   prototype are the eval bank. For each profile combination, run the scenario's real
+   question through the live pipeline and judge: could a user match this answer to the
+   sample they picked? (blind style-matching judge — same discipline as the RAG judge rubric).
+2. **No over-promising in samples.** Sample style must stay within what rendered_prompt
+   can actually elicit (e.g., emojis in the friendly samples are only allowed if the live
+   friendly voice emits them — verify, or strip them from samples).
+3. **Failures are pipeline bugs, not sample bugs** — the samples define the target; the
+   integrator/prompt templates move to meet them (concrete style targets beat adjectives).
+   Regression: tone-fidelity joins the eval loop so a prompt change can't silently flatten
+   the voices (certify structure, not vibes).
+Owners: PA (fixtures + judge spec) · UM (rendered_prompt enforcement) · Chat (integrator
+compliance, at wiring) · Eval agent (harness, when their round opens).
+
 **Ownership:** PA agent OWNS training mode (sequence, content, mechanics, prototype).
 UM owns the write path (each step → preference field; `hesitation` is a new field).
 UX polishes presentation. Chat hosts the mode (deferred round) — triggers: first
