@@ -146,7 +146,7 @@ const PERSONAS={
  default:{hook:"Ask me anything about payers, policies, or your documents.",tryits:["What can Mobius do for me?","What does code H0019 mean?","Show me around"],today:["Cited answers to policy questions","Upload a document and ask about it","Tours whenever you're lost"],coming:["A workspace that grows with you"]},
 };
 const $=id=>document.getElementById(id);
-let T={step:0,acts:[],tone:null,auto:null,exp:null,hes:null,pillar:"today",dots:[false,false,false],typing:null};
+let T={step:0,acts:[],tone:null,auto:null,exp:null,hesList:[],pillar:"today",dots:[false,false,false],typing:null};
 function persona(){ if(!T.acts.length) return "default"; const a=ACTIVITIES.find(x=>x.k===T.acts[0]); return a?a.persona:"default"; }
 function prog(n){ return `<div class="prog">${[0,1,2,3,4].map(i=>`<i class="${i<n?"on":""}"></i>`).join("")}</div>`; }
 function render(){
@@ -191,23 +191,27 @@ function render(){
   }
   else if(T.step===4){ c.innerHTML=`${prog(4)}
     <h2 class="enter">Last one. Anything make you hesitant?</h2>
-    <p class="sub enter">Honest answers get honest features. (This one's optional.)</p>
-    ${HESITATIONS.map((h,i)=>`<button class="bigchip enter d${i+1}" data-k="${h.k}"><b>${h.b}</b></button>`).join("")}
-    <div class="row"><button class="ghostbtn" id="skiph">skip this one</button></div>`;
-    c.querySelectorAll(".bigchip").forEach(b=>b.onclick=()=>{T.hes=HESITATIONS.find(h=>h.k===b.dataset.k);T.step=5;render();confetti();});
-    $("skiph").onclick=()=>{T.step=5;render();confetti();};
+    <p class="sub enter">Pick all that apply — honest answers get honest features. (Optional.)</p>
+    ${HESITATIONS.map((h,i)=>`<button class="bigchip enter d${i+1} ${T.hesList.includes(h.k)?"suggest":""}" data-k="${h.k}"><b>${h.b}${T.hesList.includes(h.k)?" ✓":""}</b></button>`).join("")}
+    <div class="row"><button class="primary" id="doneh">${T.hesList.length?"That's them →":"Nothing, honestly →"}</button>
+    <button class="ghostbtn" id="skiph">skip this one</button></div>`;
+    c.querySelectorAll(".bigchip").forEach(b=>b.onclick=()=>{const k=b.dataset.k;
+      T.hesList=T.hesList.includes(k)?T.hesList.filter(x=>x!==k):[...T.hesList,k];render();});
+    $("doneh").onclick=()=>{T.step=5;render();confetti();};
+    $("skiph").onclick=()=>{T.hesList=[];T.step=5;render();confetti();};
   }
   else graduation();
 }
 function graduation(){
-  const name=$("cName").value||"there", p=PERSONAS[persona()], hes=T.hes||HESITATIONS[0];
+  const name=$("cName").value||"there", p=PERSONAS[persona()],
+        hes=T.hesList.length?HESITATIONS.find(h=>h.k===T.hesList[0]):HESITATIONS[0];
   const actLabels=T.acts.map(k=>ACTIVITIES.find(a=>a.k===k).label.replace(/^\S+ /,""));
   const learned=[
     actLabels.length?`★ ${actLabels[0]}${actLabels.length>1?" +"+(actLabels.length-1):""}`:"explorer mode",
     T.tone?`🗣 ${T.tone}`:"🗣 professional (default)",
     T.auto?`🎚 ${T.auto.b.toLowerCase()} (sensitive)`:"🎚 show me first (default)",
     T.exp?`🧠 ${T.exp}`:null,
-    T.hes?`😬 ${T.hes.b.toLowerCase()}`:null].filter(Boolean);
+    T.hesList.length?`😬 ${HESITATIONS.find(h=>h.k===T.hesList[0]).b.toLowerCase()}${T.hesList.length>1?" +"+(T.hesList.length-1):""}`:null].filter(Boolean);
   const expLine=T.exp==="beginner"?"🛟 I explain myself and never act without you — locked in from your picks.":
                 T.exp==="expert"?"⚙️ Training wheels off where you allowed it — sensitive things still get your sign-off.":"";
   const pillarBody=T.pillar==="today"?`<ul>${p.today.map(x=>`<li>${x}</li>`).join("")}</ul>`
@@ -251,7 +255,7 @@ function confetti(){const c=$("confetti"),x=c.getContext("2d");c.width=innerWidt
   let f=0;const go=()=>{x.clearRect(0,0,c.width,c.height);
     P.forEach(p=>{p.y+=p.v;p.x+=Math.sin(p.a+=.08)*1.6;x.fillStyle=p.col;x.fillRect(p.x,p.y,p.r,p.r*1.6);});
     if(++f<140)requestAnimationFrame(go);else x.clearRect(0,0,c.width,c.height);};go();}
-$("restart").onclick=()=>{T={step:0,acts:[],tone:null,auto:null,exp:null,hes:null,pillar:"today",dots:[false,false,false],typing:null};render();};
+$("restart").onclick=()=>{T={step:0,acts:[],tone:null,auto:null,exp:null,hesList:[],pillar:"today",dots:[false,false,false],typing:null};render();};
 $("skipTo").onclick=()=>{T.step=5;render();};
 ["cName","cArrival"].forEach(id=>$(id).addEventListener("input",()=>render()));
 render();
