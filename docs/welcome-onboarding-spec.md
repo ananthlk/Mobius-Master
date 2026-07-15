@@ -11,7 +11,7 @@ GRADUATION artifact at the end of training, not the entry point.
 |---|---|---|---|
 | 1 | "90 seconds — I learn you, you learn me" | consent + skip always visible | — |
 | 2 | Pick your week | activity cards, multi-select, primary first | `activities` |
-| 3 | Same answer, three ways | ONE real question rendered professional / friendly / concise — pick the one you'd want (show, don't survey) | `tone` |
+| 3 | Same answer, three ways | ONE real question rendered three ways, **UNLABELED** — "no labels, no right answer, tap the reply you'd rather read." The pick DEDUCES `tone`; the deduction is revealed only on the graduation chip (Ananth: labels bias the pick — deduce from answers, don't ask them to self-identify as 'friendly') | `tone` |
 | 4 | "A denial needs reworking. Should I…?" | scenario: Just do it / Show me first / Walk me through | `autonomy` (+ experience-level inference) |
 | 5 | "Anything make you hesitant?" | optional chips (wrong answers / patient data / too complex / nothing) — the UX-approved deferred fear question, now placed AFTER engagement | `hesitation` (new field, UM) |
 | 6 | Graduation | profile summary ("here's what I learned — edit anytime in Preferences") + the tailored fun card + confetti; card retires when checklist completes | `onboarding_completed_at` |
