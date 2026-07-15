@@ -1,6 +1,5 @@
-/**
- * Mobius Design Tokens (dark) – from mobius-design/tokens-dark.css
- */
+/* VENDORED from mobius-design/tokens-dark.css — do not edit here */
+/* Source of truth: mobius-design/tokens-dark.css */
 
 :root.dark,
 [data-theme="dark"] {
@@ -9,7 +8,7 @@
   --mobius-logo-stroke-end: #94a3b8;
 
   --mobius-text-primary: #e6edf3;
-  --mobius-text-secondary: #8b949e;
+  --mobius-text-secondary: #cbd5e1;
   --mobius-text-muted: #8b949e;
   --mobius-text-tertiary: #6e7681;
 
@@ -23,14 +22,27 @@
   --mobius-border-light: rgba(255, 255, 255, 0.06);
   --mobius-border-medium: rgba(255, 255, 255, 0.12);
 
-  --mobius-accent: #58a6ff;
-  --mobius-accent-hover: #79b8ff;
-  --mobius-accent-text: #ffffff;
+  /* Brand accent family, one step lighter for on-dark contrast.
+     Never #58a6ff / #79b8ff (GitHub blues) — BRANDING.md §3. */
+  --mobius-accent: #60a5fa;
+  --mobius-accent-hover: #93c5fd;
+  --mobius-accent-text: #0f1419;
+
+  /* Semantic accents on dark (same family, lighter step) */
+  --mobius-indigo: #818cf8;
+  --mobius-indigo-hover: #a5b4fc;
+  --mobius-violet: #a78bfa;
+  --mobius-violet-hover: #c4b5fd;
+  --mobius-emerald: #34d399;
+  --mobius-emerald-hover: #6ee7b7;
+
+  /* Kind chips inherit the dark semantic accents via the aliases in
+     tokens.css — no separate dark definitions needed. */
 
   --mobius-success: #22c55e;
   --mobius-warning: #eab308;
-  --mobius-error: #f85149;
-  --mobius-info: #58a6ff;
+  --mobius-error: #f87171;
+  --mobius-info: #60a5fa;
 
   --mobius-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --mobius-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
