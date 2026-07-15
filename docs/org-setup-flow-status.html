@@ -1,0 +1,150 @@
+<title>New Client Setup — Flow &amp; Status</title>
+<style>
+  :root{
+    --text-primary:#1a1d21; --text-secondary:#374151; --text-muted:#64748b;
+    --bg:#f4f5f8; --card:#ffffff; --sunken:#f1f5f9; --border:#e2e8f0; --border-med:#d1d5db;
+    --violet:#7c3aed; --violet-wash:#f3eefe;
+    --ok:#0f9d6e; --ok-wash:#e7f6f0; --warn:#b45309; --warn-wash:#fdf3e5; --bad:#dc2626; --bad-wash:#fdecec;
+    --shadow:0 6px 20px rgba(16,20,30,.08);
+    --font-sans:"DM Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
+    --font-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --text-primary:#e6edf3; --text-secondary:#cbd5e1; --text-muted:#8b949e;
+    --bg:#0f1419; --card:#1a2332; --sunken:#161b22; --border:rgba(255,255,255,.09); --border-med:rgba(255,255,255,.14);
+    --violet:#a78bfa; --violet-wash:rgba(167,139,250,.13);
+    --ok:#34d399; --ok-wash:rgba(52,211,153,.13); --warn:#fbbf24; --warn-wash:rgba(251,191,36,.13); --bad:#f87171; --bad-wash:rgba(248,113,113,.13);
+    --shadow:0 6px 20px rgba(0,0,0,.45);
+  }}
+  :root[data-theme="dark"]{
+    --text-primary:#e6edf3; --text-secondary:#cbd5e1; --text-muted:#8b949e;
+    --bg:#0f1419; --card:#1a2332; --sunken:#161b22; --border:rgba(255,255,255,.09); --border-med:rgba(255,255,255,.14);
+    --violet:#a78bfa; --violet-wash:rgba(167,139,250,.13);
+    --ok:#34d399; --ok-wash:rgba(52,211,153,.13); --warn:#fbbf24; --warn-wash:rgba(251,191,36,.13); --bad:#f87171; --bad-wash:rgba(248,113,113,.13);
+    --shadow:0 6px 20px rgba(0,0,0,.45);
+  }
+  :root[data-theme="light"]{
+    --text-primary:#1a1d21; --text-secondary:#374151; --text-muted:#64748b;
+    --bg:#f4f5f8; --card:#ffffff; --sunken:#f1f5f9; --border:#e2e8f0; --border-med:#d1d5db;
+    --violet:#7c3aed; --violet-wash:#f3eefe;
+    --ok:#0f9d6e; --ok-wash:#e7f6f0; --warn:#b45309; --warn-wash:#fdf3e5; --bad:#dc2626; --bad-wash:#fdecec;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text-primary);font-family:var(--font-sans);line-height:1.5;-webkit-font-smoothing:antialiased;padding:30px 20px 60px}
+  .wrap{max-width:820px;margin:0 auto}
+  h1{font-size:1.35rem;font-weight:600;letter-spacing:-.01em;margin:0 0 4px}
+  .sub{color:var(--text-muted);font-size:.85rem;margin:0 0 4px}
+  .stamp{font-family:var(--font-mono);font-size:.68rem;color:var(--text-muted);margin:0 0 22px}
+  .legend{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-bottom:22px;font-size:.8rem;color:var(--text-secondary)}
+  .lg{display:inline-flex;align-items:center;gap:7px}
+  .dot{width:9px;height:9px;border-radius:50%}
+  .phase{display:flex;gap:15px}
+  .rail{display:flex;flex-direction:column;align-items:center;flex:0 0 auto}
+  .node{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;background:var(--violet-wash);border:1px solid var(--violet);color:var(--violet)}
+  .line{width:2px;flex:1;background:var(--border-med);min-height:16px}
+  .pcard{flex:1;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:14px 18px;margin-bottom:16px}
+  .phead{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
+  .phead h2{font-size:1.02rem;font-weight:600;margin:0}
+  .phead .own{font-size:.72rem;color:var(--text-muted);font-family:var(--font-mono);margin-left:auto}
+  .step{display:flex;align-items:center;gap:11px;padding:9px 0;border-top:1px solid var(--border)}
+  .step:first-of-type{border-top:none}
+  .ic{flex:0 0 auto;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700}
+  .ic.ok{background:var(--ok-wash);color:var(--ok)}
+  .ic.warn{background:var(--warn-wash);color:var(--warn)}
+  .ic.bad{background:var(--bad-wash);color:var(--bad)}
+  .sbody{flex:1;min-width:0}
+  .sname{font-size:.9rem;color:var(--text-primary)}
+  .ssub{font-size:.76rem;color:var(--text-muted);margin-top:1px}
+  .tag{font-size:.68rem;font-family:var(--font-mono);color:var(--text-secondary);background:var(--sunken);border:1px solid var(--border);padding:1px 6px;border-radius:5px;margin-right:6px}
+  .chip{flex:0 0 auto;font-size:.68rem;font-family:var(--font-mono);padding:3px 9px;border-radius:999px;white-space:nowrap}
+  .chip.ok{background:var(--ok-wash);color:var(--ok)}
+  .chip.warn{background:var(--warn-wash);color:var(--warn)}
+  .chip.bad{background:var(--bad-wash);color:var(--bad)}
+  .summ{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+  .mcard{flex:1;min-width:130px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px}
+  .mcard .lab{font-size:.74rem;color:var(--text-muted)}
+  .mcard .val{font-size:1.6rem;font-weight:600;margin-top:2px}
+  .foot{margin-top:20px;font-size:.8rem;color:var(--text-secondary);border-top:1px solid var(--border);padding-top:14px}
+  .foot b{color:var(--text-primary);font-weight:600}
+  @media (max-width:560px){.step{flex-wrap:wrap}.chip{margin-left:33px}}
+</style>
+
+<div class="wrap">
+  <h1>Setting up a new client — end-to-end</h1>
+  <p class="sub">mobius-org-agent · what's done vs. not, across the full org-setup flow</p>
+  <p class="stamp">status as of 2026-07-15 · owned by the Org Agent</p>
+
+  <div class="legend">
+    <span class="lg"><span class="dot" style="background:var(--ok)"></span> done &amp; verified</span>
+    <span class="lg"><span class="dot" style="background:var(--warn)"></span> wiring / gated</span>
+    <span class="lg"><span class="dot" style="background:var(--bad)"></span> not built</span>
+  </div>
+
+  <div class="phase">
+    <div class="rail"><div class="node">1</div><div class="line"></div></div>
+    <div class="pcard">
+      <div class="phead"><h2>Create the organization</h2><span class="own">org master</span></div>
+      <div class="step"><span class="ic ok">&#10003;</span>
+        <div class="sbody"><div class="sname"><span class="tag">org-intelligence</span>Discover or enter org &rarr; org_profile</div><div class="ssub">NPIs, aliases, locations resolved and persisted</div></div>
+        <span class="chip ok">done</span></div>
+      <div class="step"><span class="ic ok">&#10003;</span>
+        <div class="sbody"><div class="sname"><span class="tag">credentialing</span>Canonical org_slug assigned</div><div class="ssub">the key every downstream system references</div></div>
+        <span class="chip ok">done</span></div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="rail"><div class="node">2</div><div class="line"></div></div>
+    <div class="pcard">
+      <div class="phead"><h2>Provision the org datastore</h2><span class="own">per-org pgvector</span></div>
+      <div class="step"><span class="ic ok">&#10003;</span>
+        <div class="sbody"><div class="sname"><span class="tag">org-agent</span>Request provisioning</div><div class="ssub">POST /org/{slug}/datastore/provision &rarr; credentialing</div></div>
+        <span class="chip ok">done</span></div>
+      <div class="step"><span class="ic ok">&#10003;</span>
+        <div class="sbody"><div class="sname"><span class="tag">db-agent</span>Create per-org schema + apply DDL</div><div class="ssub">mobius_org_docs, role-isolated — proven live on dev</div></div>
+        <span class="chip ok">done</span></div>
+      <div class="step"><span class="ic warn">&#9881;</span>
+        <div class="sbody"><div class="sname"><span class="tag">roster</span>Wire provisioner URL + key</div><div class="ssub">two env vars unset &rarr; chain is a fail-open stub</div></div>
+        <span class="chip warn">wiring</span></div>
+      <div class="step"><span class="ic bad">&times;</span>
+        <div class="sbody"><div class="sname"><span class="tag">RAG</span>Ingest org documents &rarr; searchable</div><div class="ssub">cloned Path B pipeline — queued behind eval cycle</div></div>
+        <span class="chip bad">not built</span></div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="rail"><div class="node">3</div></div>
+    <div class="pcard">
+      <div class="phead"><h2>Onboard employees</h2><span class="own">accounts + access</span></div>
+      <div class="step"><span class="ic bad">&times;</span>
+        <div class="sbody"><div class="sname"><span class="tag">UX</span>Admin adds employees + roles</div><div class="ssub">admin console — claimed, no code yet (mockup ready)</div></div>
+        <span class="chip bad">not built</span></div>
+      <div class="step"><span class="ic ok">&#10003;</span>
+        <div class="sbody"><div class="sname"><span class="tag">org-agent</span><span class="tag">mobius-user</span>Create account + grant roles</div><div class="ssub">invite endpoint — shipped live, smoke-green</div></div>
+        <span class="chip ok">done</span></div>
+      <div class="step"><span class="ic warn">&#9203;</span>
+        <div class="sbody"><div class="sname"><span class="tag">mobius-user</span>Send invite email</div><div class="ssub">works; gated off until the set-password page is live</div></div>
+        <span class="chip warn">gated</span></div>
+      <div class="step"><span class="ic bad">&times;</span>
+        <div class="sbody"><div class="sname"><span class="tag">UX</span>Employee sets password</div><div class="ssub">/auth/set-password page — claimed, no code yet</div></div>
+        <span class="chip bad">not built</span></div>
+      <div class="step"><span class="ic ok">&#10003;</span>
+        <div class="sbody"><div class="sname"><span class="tag">mobius-user</span>Active — has org access + roles</div><div class="ssub">account activation + membership — backend done</div></div>
+        <span class="chip ok">done</span></div>
+    </div>
+  </div>
+
+  <div class="summ">
+    <div class="mcard"><div class="lab">Done &amp; verified</div><div class="val" style="color:var(--ok)">6</div></div>
+    <div class="mcard"><div class="lab">Wiring / gated</div><div class="val" style="color:var(--warn)">2</div></div>
+    <div class="mcard"><div class="lab">Not built</div><div class="val" style="color:var(--bad)">3</div></div>
+  </div>
+
+  <p class="foot">
+    <b>The backbone is done; the last mile is UI.</b> Every backend step is live and verified. What remains:
+    two <b>wiring/gated</b> items (roster env vars; the invite email, built but switched off until there's a page to link to)
+    and three <b>not-built</b> items — RAG's org-document ingest and the two UX surfaces (admin console + set-password page).
+    Critical path to a working new-client setup: <b>UX builds the two pages → email flips on → RAG builds ingest.</b>
+    Counts are by step, not effort — the not-built items are more actual work than the done backend steps, since the hard decisions were front-loaded.
+  </p>
+</div>
