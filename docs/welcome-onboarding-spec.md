@@ -92,8 +92,27 @@ backlog!) or we key off future role; parked.
 - **Chat (deferred):** render welcome card when `welcome.first_session` (or
   !is_onboarded per Ananth's pick); compose from the content pack.
 
-## 6. Open items
-- Ananth: fire once (first_session) vs until-completed (is_onboarded)? PA leans until-completed.
+## 6. Decisions & principles (Ananth, 2026-07-15)
+- **DECIDED: welcome persists until-completed** (renders while `!is_onboarded`; dismissible
+  per session, returns until the checklist is done or explicitly turned off).
+- **CONTENT PRINCIPLE — three pillars, in order:**
+  1. **True today** — only verified live capabilities (reality-gated, same as the docs).
+  2. **Evolving** — where the product is going, shown honestly as planned/coming.
+  3. **You shape it** — users steer the roadmap, and the loop is REAL: feedback files
+     backlog items, "no docs yet" auto-files gaps, asking for a planned feature tallies
+     demand (capability_demand), page-worthy feedback becomes tasks. The welcome says
+     this explicitly and invites it.
+
+## 7. Cheat code (testing + power users)
+- **In chat (when wired):** message exactly `/welcome` → deterministic pre-router trigger
+  (NOT planner-routed — planner paraphrase drops intent; same lesson as recite). Renders
+  the welcome card regardless of first_session/is_onboarded, using the caller's live profile.
+- **Client param:** `?welcome=1` on the chat URL forces the card client-side (same data).
+- **TODAY, before chat wiring:** GET /welcome-preview on the product-awareness service —
+  interactive harness with persona / arrival / experience / name toggles rendering the
+  exact card content per profile. Ananth-testable immediately.
+
+## 8. Open items
 - Ananth: membership-approval flow green-light (unlocks org_status="pending" + approval-aware welcome copy).
-- UX: fear-question ruling + card design.
+- UX: fear-question ruling + card design (three-pillar content structure per §6).
 - Exec persona gap (§3) — new activity or role.

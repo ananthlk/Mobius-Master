@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mobius Welcome — Preview Harness</title>
+<style>
+  /* Tokens inlined for iframe self-containment (canonical: mobius-design/tokens.css) */
+  :root{--mobius-violet:#7c3aed;--mobius-violet-soft:rgba(124,58,237,.12);--bg:#f8f7fb;--surface:#fff;--surface-2:#f1eff7;--text:#1c1a27;--muted:#6b6880;--border:#e2dff0;--live:#16a34a;--partial:#d97706;--planned:#94a3b8}
+  @media (prefers-color-scheme: dark){:root{--bg:#141220;--surface:#1d1a2e;--surface-2:#262238;--text:#eceaf6;--muted:#9d99b5;--border:#332e4d;--live:#4ade80;--partial:#fbbf24;--planned:#64748b}}
+  :root[data-theme="light"]{--bg:#f8f7fb;--surface:#fff;--surface-2:#f1eff7;--text:#1c1a27;--muted:#6b6880;--border:#e2dff0;--live:#16a34a;--planned:#94a3b8}
+  :root[data-theme="dark"]{--bg:#141220;--surface:#1d1a2e;--surface-2:#262238;--text:#eceaf6;--muted:#9d99b5;--border:#332e4d;--live:#4ade80;--planned:#64748b}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  header{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  header h1{font-size:15px;margin:0;font-weight:650}
+  header h1 b{color:var(--mobius-violet)}
+  header .note{color:var(--muted);font-size:12px}
+  #controls{display:flex;gap:10px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--surface)}
+  #controls label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:3px}
+  #controls select,#controls input{font:inherit;color:var(--text);background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:6px 9px}
+  main{max-width:680px;margin:26px auto;padding:0 16px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px 24px;box-shadow:0 3px 14px rgba(28,26,39,.08);border-top:3px solid var(--mobius-violet)}
+  .card h2{margin:0 0 4px;font-size:19px}
+  .card .opening{color:var(--text);margin:2px 0 10px;font-size:15px}
+  .card .persona{margin:0 0 10px}
+  .card .fear{background:var(--mobius-violet-soft);border-radius:10px;padding:9px 12px;margin:0 0 14px;font-size:13.5px}
+  .card h3{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:14px 0 5px}
+  .card ul{margin:0;padding-left:19px}
+  .card li{margin:4px 0}
+  .card li.planned{color:var(--muted)}
+  .card li.planned::marker{color:var(--planned)}
+  .card .shape{border-left:3px solid var(--live);padding:2px 0 2px 11px;margin:14px 0;font-size:13.5px}
+  .chips{display:flex;gap:8px;margin:14px 0 4px;flex-wrap:wrap}
+  .chip{border:1px solid var(--mobius-violet);color:var(--mobius-violet);background:transparent;border-radius:999px;padding:6px 14px;font:inherit;font-size:13px;cursor:pointer}
+  .chip.primary{background:var(--mobius-violet);color:#fff}
+  .check{display:flex;gap:14px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap}
+  .check span{font-size:12.5px;color:var(--muted)}
+  .check b{color:var(--text);font-weight:600}
+  .dismiss{margin-top:12px;text-align:right}
+  .dismiss button{background:none;border:none;color:var(--muted);font:inherit;font-size:12px;cursor:pointer;text-decoration:underline}
+  .meta{color:var(--muted);font-size:11.5px;margin-top:14px;text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <h1>Welcome Card <b>·</b> Preview Harness</h1>
+  <span class="note">test any profile — in product: renders while not onboarded; cheat code <code>/welcome</code> · <code>?welcome=1</code></span>
+</header>
+<div id="controls">
+  <div><label>Name</label><input id="cName" value="Ananth" size="9"></div>
+  <div><label>Arrival</label><select id="cArrival"><option value="invited">invited (org set you up)</option><option value="self_serve">self-serve</option></select></div>
+  <div><label>Persona</label><select id="cPersona"></select></div>
+  <div><label>Experience</label><select id="cExp"><option>beginner</option><option>regular</option><option>expert</option></select></div>
+</div>
+<main><div id="card" class="card"></div>
+<p class="meta">Content pack v1 — three pillars per Ananth: true today (verified only) · evolving (honest planned) · you shape it (the loop is real). Spec: docs/welcome-onboarding-spec.md</p>
+</main>
+<script>
+"use strict";
+/* PERSONA CONTENT PACK v1 — consumed later by chat's welcome composition.
+   Every "today" item is live+verified; every "evolving" item is honestly planned. */
+const SHAPE_LINE = "And you steer what gets built: every piece of feedback files a real backlog item, asking for something that doesn't exist yet literally votes for it, and the team works that list every week. The product you're using was shaped by users saying what was missing.";
+const PERSONAS = [
+ {key:"claims", label:"Billing / claims (rework_denials, submit_claims)",
+  fear:"“If the AI gets it wrong, it's my name on the claim.”",
+  fearLine:"Every answer shows its sources — click any citation to see the exact policy page. When Mobius isn't sure, it says so instead of guessing.",
+  persona:"Mobius answers payer-policy and billing questions with citations from the actual manuals — codes, prior auth rules, timely filing — and keeps your follow-ups from falling through the cracks.",
+  today:["Ask about denial codes, coverage, prior auth — cited answers in seconds","Check any provider's enrollment before you bill (credentialing card)","Log follow-ups in plain words — “remind me to rework that H0019 denial tomorrow”"],
+  evolving:["A per-claim validation ledger showing how each answer was verified","Vetted instant answers for questions your team asks repeatedly"],
+  firstQ:"What are the timely filing rules for Sunshine Health?",
+  tours:[["chat:complete-a-task","Show me: track a follow-up"],["chat:response-modes","Show me: how answers work"]]},
+ {key:"credentialing", label:"Credentialing coordinator (role)",
+  fear:"“Not another system to learn.”",
+  fearLine:"There's nothing to learn — ask in plain words, right here. The roster screens you know still exist; chat just became the fast way in.",
+  persona:"Ask “is Dr. Chen enrolled and payable?” or “how is our panel doing?” and get the full picture — NPPES, PML, compliance flags, readiness — on one card, with a link into the full report when you need depth.",
+  today:["Provider profile or whole-panel summary from one question","Ghost-billing and enrollment-gap checks on your roster","Credentialing runs create tasks automatically so nothing gets dropped"],
+  evolving:["Task statuses that update themselves when a run completes","A richer credentialing workspace for deep navigation"],
+  firstQ:"How is our panel doing on credentialing?",
+  tours:[["chat:operations-suite-tour","Show me: the operations suite"],["chat:complete-a-task","Show me: work a task"]]},
+ {key:"frontdesk", label:"Front desk / scheduling (schedule, check-in)",
+  fear:"“This looks complicated — it's probably not for me.”",
+  fearLine:"If you can type a question, you can use Mobius. And for anything on screen, ask “show me” and it will literally walk your cursor through it.",
+  persona:"Mobius is the coworker who always knows the answer — which payer covers what, what a code means, where a document is — and never makes you feel bad for asking.",
+  today:["Plain-word questions, plain-word answers — set the tone you like in Preferences","Guided “Show me” tours for anything on screen","Your past questions live in My Vault — nothing you find gets lost"],
+  evolving:["A tailored setup that learns what you do and surfaces just your tools"],
+  firstQ:"Show me how to change the style of my answers",
+  tours:[["chat:response-modes","Show me: how answers work"],["chat:update-preferences","Show me: set your style"]]},
+ {key:"phi", label:"Clinical / outreach (PHI-adjacent activities)",
+  fear:"“Is patient information safe in here?”",
+  fearLine:"Uploads are automatically checked for patient information and kept private by default — Mobius recommends the safest setting and never shares on its own.",
+  persona:"Use Mobius for policy answers and document questions without worrying about the compliance side — the platform watches for PHI so you don't have to.",
+  today:["Upload a document and ask about it — it stays yours, private by default","Automatic PHI detection flags patient info before anything is shared","Every answer cites its source so you can verify"],
+  evolving:["Org-level sharing with a safety gate: nothing with patient info can be one-clicked public"],
+  firstQ:"Upload a document and ask what's in it",
+  tours:[["chat:upload-a-document","Show me: upload & ask"],["chat:sign-in","Show me: your account"]]},
+ {key:"curator", label:"Corpus / knowledge admin (rag_admin, corpus_curator, eval_owner)",
+  fear:"“Can I trust what's in the corpus?”",
+  fearLine:"Every document goes through a publish pipeline with per-page extraction status, lexicon QA, and a scored eval harness — quality is measured, not assumed.",
+  persona:"You own the knowledge layer: ~9,000 published documents, a reviewed policy lexicon, and eval baselines that tell you whether retrieval actually got better.",
+  today:["Repository UI: upload, import, inspect extraction per page","Lexicon candidate review with human-in-the-loop tagging","Eval dashboard: baselines, lift-vs-drift on every change"],
+  evolving:["Per-org private corpora with promote-from-vault","Corpus-freshness loops that file their own review queues"],
+  firstQ:"What's in the Public Library?",
+  tours:[["chat:operations-suite-tour","Show me: the operations suite"],["chat:give-feedback","Show me: flag an issue"]]},
+ {key:"exec", label:"Ops / finance exec (persona gap — activity TBD)",
+  fear:"“Is this real analysis or a demo?”",
+  fearLine:"The numbers come from claims-level FL Medicaid data — market size, your share, rate gaps, who's taking your panel — computed live, not slideware.",
+  persona:"Ask market questions in plain English and get verified numbers: benchmarks against real peers, rate gaps worth actual dollars, displacement you can act on.",
+  today:["“How big is the market? Where are we underpaid? Who's growing at our expense?” — 26 analytics tools","Org benchmarking against peer percentiles on every KPI","The Strategy deck: the full market narrative, exportable"],
+  evolving:["Look-alike peer groups and org profiling for sharper comparisons"],
+  firstQ:"Benchmark my organization against the market",
+  tours:[["chat:operations-suite-tour","Show me: the operations suite"],["chat:email-a-thread","Show me: share an answer"]]},
+ {key:"expert", label:"AI-experienced user (experience=expert)",
+  fear:"“Is this just a chatbot wrapper?”",
+  fearLine:"Under the hood: a 45-tool manifest with a ReAct planner, a strategy-routed retrieval portfolio, honesty-checked composition, and a payor registry as ground truth. The platform schematic shows the whole machine.",
+  persona:"Mobius is an operations platform with a conversational front door — retrieval, verified analytics, credentialing, tasks, and a self-documenting help system, all dispatched per turn.",
+  today:["Cited retrieval over ~9,000 policy documents with strategy routing","Verified market analytics straight from claims data","Guided tours, recital-grade canonical texts, download cards, task automation"],
+  evolving:["Answer cache with corpus-fingerprint replay","A unified rag(query, mode) interface — retrieval strategy fully internalized"],
+  firstQ:"Show me the platform schematic",
+  tours:[["chat:operations-suite-tour","Show me: the operations suite"],["chat:email-a-thread","Show me: email a thread"]]},
+ {key:"default", label:"New self-serve user (no signals yet)",
+  fear:"“What even is this?”",
+  fearLine:"Ask anything about payers, policies, codes, or your own documents — and if Mobius can't answer, it says so honestly and logs it so the answer exists next time.",
+  persona:"Mobius is an AI-powered intelligence and operations platform for community behavioral health — it answers policy and billing questions with citations, checks provider enrollment, benchmarks your market, and teaches you its own features.",
+  today:["Cited answers to payer/policy/billing questions","Upload a document and ask about it — private by default","Guided “Show me” tours whenever you're unsure"],
+  evolving:["A workspace (My Vault) that grows with everything you touch","Org onboarding: your whole team set up with roles and private document space"],
+  firstQ:"What can Mobius do for me?",
+  tours:[["chat:response-modes","Show me: how answers work"],["chat:update-preferences","Show me: set your style"]]},
+];
+const sel=id=>document.getElementById(id);
+PERSONAS.forEach((p,i)=>{const o=document.createElement("option");o.value=i;o.textContent=p.label;sel("cPersona").appendChild(o);});
+function render(){
+  const p=PERSONAS[+sel("cPersona").value], name=sel("cName").value||"there",
+        arrival=sel("cArrival").value, exp=sel("cExp").value;
+  const opening = arrival==="invited"
+    ? `Your organization already set you up — no forms, no setup maze. Here's what Mobius does for someone in your seat.`
+    : `Welcome — here's Mobius in one card, honestly: what it does today, where it's going, and how you can shape it.`;
+  const expLine = exp==="beginner"
+    ? `<div class="fear">🛟 One more thing: Mobius explains itself and <b>asks before acting</b> — those are your default settings. You can't break anything.</div>`
+    : exp==="expert" ? `<div class="fear">⚙️ Power user? The <b>platform schematic</b> maps all 29 modules and 45 tools — and your autonomy settings can skip the confirmations.</div>` : "";
+  sel("card").innerHTML = `
+    <h2>Welcome, ${name} 👋</h2>
+    <p class="opening">${opening}</p>
+    <p class="persona">${p.persona}</p>
+    <div class="fear"><b>${p.fear}</b><br>${p.fearLine}</div>
+    ${expLine}
+    <h3>What you can do today</h3>
+    <ul>${p.today.map(x=>`<li>${x}</li>`).join("")}</ul>
+    <h3>Where it's going (honestly: not built yet)</h3>
+    <ul>${p.evolving.map(x=>`<li class="planned">${x}</li>`).join("")}</ul>
+    <div class="shape">${SHAPE_LINE}</div>
+    <div class="chips">
+      <button class="chip primary">▶ ${p.tours[0][1]}</button>
+      <button class="chip">▶ ${p.tours[1][1]}</button>
+    </div>
+    <div class="check">
+      <span>① <b>Set your style</b> — tone, experience, autonomy</span>
+      <span>② <b>Confirm your org</b></span>
+      <span>③ <b>Try it:</b> “${p.firstQ}”</span>
+    </div>
+    <div class="dismiss"><button>Not now — I'll explore on my own</button></div>`;
+}
+["cName","cArrival","cPersona","cExp"].forEach(id=>sel(id).addEventListener("input",render));
+render();
+</script>
+</body>
+</html>

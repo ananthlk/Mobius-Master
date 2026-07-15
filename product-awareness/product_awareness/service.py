@@ -59,6 +59,21 @@ def schematic():
     return HTMLResponse(path.read_text(encoding="utf-8"))
 
 
+@app.get("/welcome-preview")
+def welcome_preview():
+    """Test harness for the tailored welcome card (Ananth's cheat code, pre-chat-wiring).
+
+    Renders the persona content pack (docs/welcome-onboarding-spec.md §3/§6) for any
+    profile combination. In-product triggers when chat wiring lands: `/welcome` message
+    (deterministic pre-router) and `?welcome=1`."""
+    from fastapi.responses import HTMLResponse
+
+    path = config.PACKAGE_DIR / "static" / "welcome-preview.html"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="welcome preview not built into this image")
+    return HTMLResponse(path.read_text(encoding="utf-8"))
+
+
 @app.post("/search")
 def search(req: SearchRequest) -> dict:
     """Return {outcome, text, sources, s_top, tau_gap, module, gap}.
