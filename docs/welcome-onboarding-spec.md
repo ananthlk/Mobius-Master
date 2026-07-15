@@ -31,6 +31,13 @@ The mode is measured on OUTCOMES, not completion theater:
    highest-value gap signal we can collect.
 2. **Setup fidelity** — % of training picks later EDITED in Preferences is the
    mis-capture metric (low churn = we understood them). Per-step completion + skip rates.
+   **MEASURABLE (UM migration 008, live + smoke-verified 2026-07-15):** user_preference_audit
+   (user_id, field, old_value, new_value, source, changed_at). CONTRACT: every training-mode
+   write includes `"source": "training_mode"` in the PUT /preferences body; churn = rows where
+   source != 'training_mode' AND the field was previously written by training_mode. No-op
+   saves don't audit (metric stays clean); initial onboarding capture deliberately unaudited
+   (first writes aren't churn). Bonus: unexplained modal-source rows expose the
+   silent-default-flip bug class in data.
 3. **Return** — D1/D7 return rate of trained vs skipped users; first-question fire rate
    from the graduation card; second-session first-action.
 Owner: PA agent tracks these once chat wiring lands (needs skill_invocations-style
