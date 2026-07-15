@@ -71,6 +71,20 @@
   .conn b{cursor:pointer;color:var(--mobius-violet)}
   .conn span{color:var(--muted);font-size:12px}
   .src{font-size:11.5px;color:var(--muted);border-top:1px solid var(--border);margin-top:16px;padding-top:10px}
+  details.grp{border:1px solid var(--border);border-radius:8px;margin:7px 0;background:var(--surface-2)}
+  details.grp summary{cursor:pointer;padding:7px 10px;font-weight:600;font-size:13px;list-style:none;display:flex;align-items:center;gap:8px}
+  details.grp summary::before{content:"▸";color:var(--mobius-violet);transition:transform .15s}
+  details.grp[open] summary::before{transform:rotate(90deg)}
+  details.grp summary .n{margin-left:auto;font-weight:400;color:var(--muted);font-size:11.5px}
+  details.grp .tier{font-size:10px;font-weight:650;letter-spacing:.05em;text-transform:uppercase;padding:1px 7px;border-radius:999px}
+  details.grp .tier.builtin{background:color-mix(in srgb,var(--live) 15%,transparent);color:var(--live)}
+  details.grp .tier.mcp{background:var(--mobius-violet-soft);color:var(--mobius-violet)}
+  details.grp .tier.dead{background:color-mix(in srgb,var(--planned) 20%,transparent);color:var(--planned)}
+  .tool{padding:6px 10px 6px 26px;border-top:1px solid var(--border);font-size:12.5px}
+  .tool code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:var(--mobius-violet)}
+  .tool .td{color:var(--muted);margin-top:1px}
+  .subhead{padding:7px 10px 2px 26px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--border)}
+  .tool.dead code{color:var(--planned);text-decoration:line-through}
   .hint{color:var(--muted);font-size:13px}
   .pill{display:inline-block;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:1px 7px;font-size:11.5px;margin:2px 3px 2px 0;color:var(--muted)}
   @media (max-width:860px){ main{flex-direction:column} #panel{max-width:none;border-left:0;border-top:1px solid var(--border)} }
@@ -243,6 +257,94 @@ const EDGES = [
  {f:"phi",t:"chat",     label:"PHI card at upload-complete"},
  {f:"strategy",t:"help",label:"deck narratives → thesis doc"},
 ];
+/* Drillable tool catalog for the Skills node — from skills.md (live 45-tool
+   manifest, re-verified 2026-07-15). tier: builtin = in-process, always
+   reachable · mcp = wired MCP (dev) · dead = retired, kept findable. */
+const SKILLS_CATALOG = [
+ {label:"Chat builtins", tier:"builtin", tools:[
+  ["search_corpus","Hybrid BM25 + pgvector corpus search — the entry point for curated-corpus retrieval."],
+  ["fetch_document","Resolve a corpus document by name / policy ID → download link."],
+  ["healthcare_query","Healthcare code lookup (ICD-10-CM meanings, etc.)."],
+  ["healthcare_npi_lookup","NPPES registry lookup for a 10-digit NPI."],
+  ["document_upload_skill","How to attach a file to the thread for Q&A."],
+  ["list_thread_document_uploads","List documents already attached to the thread."],
+  ["search_uploaded_document","Instant-RAG: search inside a user-uploaded document."],
+  ["google_search","Web search — last-resort external lookup."],
+  ["web_scrape","Read the web from a seed URL (quick / medium / detailed)."],
+  ["ingest_url","Fetch a single URL and add it to the indexed corpus now."],
+  ["lookup_authoritative_sources","Curated registry of authoritative URLs per payer/state/topic."],
+  ["transform_previous_answer","Reshape the previous answer into a new artifact — no retrieval."],
+  ["vibe","A short, work-adjacent line (toast / empathy / dry observation)."],
+  ["product_feedback","Capture open product feedback + CSAT/CES/NPS surveys."],
+  ["product_help_search","Answer “how do I use Mobius?” from the product docs."],
+  ["payor_lookup","Payor registry fact: phone, appeals fax, EDI, portal, timely filing — preferred over corpus for these."],
+  ["payor_readiness","Payor readiness scorecard: ingested docs, coverage, gaps."],
+  ["refuse","Hard stop — no content returned (router-owned)."]]},
+ {label:"FL Medicaid analytics suite", tier:"mcp", subs:[
+  ["Market totals & trends",[
+   ["get_market_size","Total market: benes, claims, paid, KPI averages."],
+   ["get_market_timeseries","Year-by-year market totals (2019–2024)."],
+   ["get_market_share_timeseries","An org's market share over time."],
+   ["get_market_decomposition","Revenue/volume split across service lines."],
+   ["get_market_retention","Beneficiary retention, year over year."],
+   ["get_msa_map","MSA (zip3) market areas with org counts + tier."]]],
+  ["Orgs & profiles",[
+   ["search_orgs","Find an org by name → slug, bene counts, metadata."],
+   ["get_org_universe","Canonical list of FL Medicaid BH orgs."],
+   ["get_org_profile","Full financial + clinical profile for a named org."],
+   ["get_org_service_line_profile","Per-service-line revenue/volume/KPIs."],
+   ["get_org_type_stats","Aggregate KPIs for an org type in a year."],
+   ["get_org_leakage","Patient-leakage analysis for a CMHC."]]],
+  ["Benchmarks & positioning",[
+   ["get_top_orgs","Rank orgs by a volume metric."],
+   ["get_org_benchmark","Percentile positioning vs a peer group, all KPIs."],
+   ["get_benchmark_dimensions","P25/P50/P75 peer distributions across a dimension."],
+   ["get_churn_benchmark","Clinician retention/churn benchmarks."]]],
+  ["Rates",[
+   ["get_published_rates","Official FL AHCA fee schedule (ceiling) per HCPCS."],
+   ["get_rate_benchmarks","Actual-paid HCPCS rate benchmarks (P25–P90)."],
+   ["get_rate_trends","Monthly P50 rate trend by peer group."],
+   ["get_org_rate_gap","An org's realized rates vs market benchmarks."]]],
+  ["Service lines & opportunity",[
+   ["get_service_mix","An entity's service-line revenue mix."],
+   ["get_service_line_opportunity","Revenue-opportunity sizing (current vs potential)."],
+   ["get_service_line_code_map","HCPCS → service line / AHCA category."]]],
+  ["Entrants & meta",[
+   ["get_entrant_analysis","New-entrant displacement — who captured CMHC share."],
+   ["get_fact_pack","The full fact-pack behind the story deck."],
+   ["get_valid_filters","Valid filter values for the dataset in a year."]]]]},
+ {label:"Credentialing & appeals", tier:"mcp", tools:[
+  ["check_provider_credentialing","THE credentialing entry point: provider profile (with NPI) or org panel summary (without)."],
+  ["appeals_lookup_rules","Denial-code (CARC) rules."],
+  ["appeals_get_playbook","Payor playbook for a CARC group."],
+  ["appeals_validate_claim","Validate a claim before appealing."],
+  ["appeals_assemble_letter","Draft the appeal letter."]]},
+ {label:"Task management", tier:"builtin", tools:[
+  ["list_tasks","“Show open tasks”, “what's pending for Acme” — filters: org, module, status, assignee, npi…"],
+  ["create_task","“Log a follow-up for provider X” — requires org + text."],
+  ["resolve_task","Mark a task complete by id (or click Resolve on the card)."]]},
+ {label:"Retired (ask via the tools above)", tier:"dead", tools:[
+  ["run_credentialing_report","→ check_provider_credentialing"],
+  ["run_roster_reconciliation_report","→ check_provider_credentialing"],
+  ["validate_credentialing_step","→ check_provider_credentialing"],
+  ["ask_credentialing_npi","→ check_provider_credentialing"],
+  ["lookup_npi","→ healthcare_npi_lookup"],
+  ["find_org_locations","→ retired"],
+  ["find_associated_providers_at_locations","→ retired"]]},
+];
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function skillsCatalogHTML(){
+  const tierChip={builtin:'<span class="tier builtin">builtin</span>',
+                  mcp:'<span class="tier mcp">mcp · wired</span>',
+                  dead:'<span class="tier dead">retired</span>'};
+  const tool=(t,dead)=>`<div class="tool${dead?" dead":""}"><code>${esc(t[0])}</code><div class="td">${esc(t[1])}</div></div>`;
+  return `<h3>Tool catalog — drill in (45 live tools)</h3>`+SKILLS_CATALOG.map(g=>{
+    const count=g.tools?g.tools.length:g.subs.reduce((a,s)=>a+s[1].length,0);
+    const body=g.tools?g.tools.map(t=>tool(t,g.tier==="dead")).join("")
+      :g.subs.map(s=>`<div class="subhead">${esc(s[0])}</div>`+s[1].map(t=>tool(t,false)).join("")).join("");
+    return `<details class="grp"><summary>${esc(g.label)} ${tierChip[g.tier]}<span class="n">${count}</span></summary>${body}</details>`;
+  }).join("");
+}
 /* ============ RENDER ============ */
 const COLW=230, NW=190, NH=52, GX=36, GY=14, PAD={t:46,l:16};
 const byId=Object.fromEntries(NODES.map(n=>[n.id,n]));
@@ -310,6 +412,7 @@ function renderPanel(){
     <span class="status ${n.status}">${n.status}</span>
     <p class="tag">${v.tag}</p>
     <ul>${v.pts.map(x=>`<li>${x}</li>`).join("")}</ul>
+    ${sel==="skills"?skillsCatalogHTML():""}
     <h3>Feeds / calls</h3>${conn(outs,"out")}
     <h3>Fed / called by</h3>${conn(ins,"in")}
     <div class="src">Source: <span class="pill">${n.doc}</span> verified ${n.verified} · lens: ${lens}. Ask chat about any of this — e.g. “what is ${n.label}?”</div>`;
