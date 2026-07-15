@@ -44,6 +44,21 @@ def health() -> dict:
     return {"ok": True, "service": "product-awareness"}
 
 
+@app.get("/schematic")
+def schematic():
+    """The interactive platform schematic (self-contained HTML, iframe-safe).
+
+    Drill-downable module map with User/Technical lenses; statuses mirror the
+    verified docs' reality gates. Served here so it deploys/versions with the
+    docs and gives chat's envelope a stable URL to iframe."""
+    from fastapi.responses import HTMLResponse
+
+    path = config.PACKAGE_DIR / "static" / "schematic.html"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="schematic not built into this image")
+    return HTMLResponse(path.read_text(encoding="utf-8"))
+
+
 @app.post("/search")
 def search(req: SearchRequest) -> dict:
     """Return {outcome, text, sources, s_top, tau_gap, module, gap}.

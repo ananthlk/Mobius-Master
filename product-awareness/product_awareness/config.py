@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 
 # --- paths ---
+PACKAGE_DIR = Path(__file__).resolve().parent                 # product_awareness/ (pkg + static/)
 MODULE_ROOT = Path(__file__).resolve().parent.parent          # product-awareness/
 REPO_ROOT = MODULE_ROOT.parent                                # Mobius/
 DOCS_DIR = REPO_ROOT / "docs" / "product-docs"                # source manuals

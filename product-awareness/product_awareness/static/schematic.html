@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mobius Platform — Interactive Schematic</title>
+<style>
+  /* Minimal token set inlined for iframe self-containment.
+     Canonical source: mobius-design/tokens.css — keep values in sync. */
+  :root{
+    --mobius-violet:#7c3aed; --mobius-violet-soft:rgba(124,58,237,.12);
+    --bg:#f8f7fb; --surface:#ffffff; --surface-2:#f1eff7;
+    --text:#1c1a27; --muted:#6b6880; --border:#e2dff0;
+    --live:#16a34a; --partial:#d97706; --planned:#94a3b8;
+    --edge:#b6b1cc; --edge-hi:var(--mobius-violet);
+    --radius:12px; --shadow:0 2px 10px rgba(28,26,39,.07);
+  }
+  @media (prefers-color-scheme: dark){ :root{
+    --bg:#141220; --surface:#1d1a2e; --surface-2:#262238;
+    --text:#eceaf6; --muted:#9d99b5; --border:#332e4d;
+    --live:#4ade80; --partial:#fbbf24; --planned:#64748b;
+    --edge:#4a4468; --shadow:0 2px 10px rgba(0,0,0,.35);
+  }}
+  :root[data-theme="light"]{
+    --bg:#f8f7fb; --surface:#ffffff; --surface-2:#f1eff7;
+    --text:#1c1a27; --muted:#6b6880; --border:#e2dff0;
+    --live:#16a34a; --partial:#d97706; --planned:#94a3b8;
+    --edge:#b6b1cc; --shadow:0 2px 10px rgba(28,26,39,.07);
+  }
+  :root[data-theme="dark"]{
+    --bg:#141220; --surface:#1d1a2e; --surface-2:#262238;
+    --text:#eceaf6; --muted:#9d99b5; --border:#332e4d;
+    --live:#4ade80; --partial:#fbbf24; --planned:#64748b;
+    --edge:#4a4468; --shadow:0 2px 10px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box} html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column}
+  header{display:flex;align-items:center;gap:14px;padding:10px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+  header h1{font-size:15px;margin:0;font-weight:650}
+  header h1 .dot{color:var(--mobius-violet)}
+  .lens{display:flex;border:1px solid var(--border);border-radius:999px;overflow:hidden}
+  .lens button{border:0;background:transparent;color:var(--muted);padding:5px 14px;font:inherit;cursor:pointer}
+  .lens button.on{background:var(--mobius-violet);color:#fff}
+  .legend{display:flex;gap:12px;margin-left:auto;font-size:12px;color:var(--muted);align-items:center}
+  .legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:0}
+  main{flex:1;display:flex;min-height:0}
+  #map{flex:1.6;min-width:0;overflow:auto;padding:6px}
+  svg{width:100%;height:auto;min-width:760px;display:block}
+  #panel{flex:1;max-width:430px;min-width:300px;border-left:1px solid var(--border);overflow-y:auto;padding:16px 18px;background:var(--surface)}
+  .cluster-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;fill:var(--muted)}
+  .node rect{fill:var(--surface);stroke:var(--border);stroke-width:1.2;rx:10;filter:drop-shadow(0 1px 2px rgba(0,0,0,.08));cursor:pointer;transition:stroke .15s}
+  .node text{fill:var(--text);font-size:12.5px;font-weight:600;pointer-events:none}
+  .node .sub{fill:var(--muted);font-size:10px;font-weight:400}
+  .node circle.st{stroke:none}
+  .node:hover rect,.node.sel rect{stroke:var(--mobius-violet);stroke-width:1.8}
+  .node.dim{opacity:.28}
+  path.edge{fill:none;stroke:var(--edge);stroke-width:1.3;opacity:.75}
+  path.edge.planned{stroke-dasharray:4 4}
+  path.edge.hi{stroke:var(--edge-hi);stroke-width:2;opacity:1}
+  path.edge.dim{opacity:.1}
+  #panel h2{margin:0 0 2px;font-size:17px}
+  #panel .status{font-size:11px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;padding:2px 9px;border-radius:999px;display:inline-block;margin:4px 0 10px}
+  #panel .status.live{background:color-mix(in srgb,var(--live) 16%,transparent);color:var(--live)}
+  #panel .status.partial{background:color-mix(in srgb,var(--partial) 16%,transparent);color:var(--partial)}
+  #panel .status.planned{background:color-mix(in srgb,var(--planned) 20%,transparent);color:var(--planned)}
+  #panel p.tag{color:var(--muted);margin:0 0 12px}
+  #panel ul{margin:6px 0 14px;padding-left:18px}
+  #panel li{margin:5px 0}
+  #panel h3{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 4px}
+  .conn{display:flex;align-items:baseline;gap:6px;margin:5px 0;font-size:13px}
+  .conn b{cursor:pointer;color:var(--mobius-violet)}
+  .conn span{color:var(--muted);font-size:12px}
+  .src{font-size:11.5px;color:var(--muted);border-top:1px solid var(--border);margin-top:16px;padding-top:10px}
+  .hint{color:var(--muted);font-size:13px}
+  .pill{display:inline-block;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:1px 7px;font-size:11.5px;margin:2px 3px 2px 0;color:var(--muted)}
+  @media (max-width:860px){ main{flex-direction:column} #panel{max-width:none;border-left:0;border-top:1px solid var(--border)} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Mobius Platform <span class="dot">·</span> Schematic</h1>
+  <div class="lens" role="tablist">
+    <button id="lensUser" class="on">User view</button>
+    <button id="lensTech">Technical view</button>
+  </div>
+  <div class="legend">
+    <span><i style="background:var(--live)"></i>live</span>
+    <span><i style="background:var(--partial)"></i>partial</span>
+    <span><i style="background:var(--planned)"></i>planned</span>
+    <span style="border-left:1px solid var(--border);padding-left:12px">dashed edge = planned</span>
+  </div>
+</header>
+<main>
+  <div id="map"></div>
+  <aside id="panel">
+    <p class="hint">Click any module to drill in. The <b>User view</b> says what you can do and where; the <b>Technical view</b> says what runs where and what talks to what. Statuses are honest — they come from the verified product docs (reality-gated: planned ≠ live).</p>
+  </aside>
+</main>
+<script>
+"use strict";
+/* ============ MODEL — generated from docs/product-docs (verified corpus) ============
+   Statuses follow the docs' reality gates. Each node cites its source doc + date. */
+const CLUSTERS = [
+  {id:"surfaces",  label:"USER SURFACES"},
+  {id:"intel",     label:"INTELLIGENCE & RETRIEVAL"},
+  {id:"ops",       label:"OPERATIONS"},
+  {id:"enable",    label:"PLATFORM & ENABLEMENT"},
+];
+const NODES = [
+ {id:"chat", label:"Chat", sub:"the front door", cluster:"surfaces", status:"live",
+  user:{tag:"Ask anything — policy, codes, your own tools — and get cited answers.",
+   pts:["Cited answers with Details / Citations tabs and answer cards (incl. Recital mode for canonical texts)","Guided “Show me” tours on help questions","My Vault block: your recent + liked conversations, tasks, uploads","Upload a document and ask about it (instant Q&A)","Email a conversation via the Email button","Preferences: tone, experience level, autonomy"]},
+  tech:{tag:"FastAPI + ReAct planner over a 45-tool manifest; SSE streaming; envelope-based answer cards.",
+   pts:["ReAct loop, plan-path + dispatch-path (field-parity law on envelope fields)","Two-phase streaming (draft_ready → word-stream → AnswerCard transplant)","Golden gate for authoritative skill answers","Anchors (data-tour-id) for the interact runner","Cloud Run · deploy via scripts/deploy.sh (frontend needs --no-cache)"]},
+  doc:"mobius-chat.md", verified:"2026-07-15"},
+ {id:"vault", label:"My Vault", sub:"your workspace", cluster:"surfaces", status:"partial",
+  user:{tag:"Your private side of Mobius: recent work, liked answers, tasks, uploads — one place.",
+   pts:["Sidebar Vault block (Recent / Liked / Tasks / Uploads) — live","Full Vault panel via Manage → — live","Standalone Vault page (expanded workspace) — in progress","Promote an upload to your org's corpus — planned"]},
+  tech:{tag:"Vault block + panel in chat frontend; standalone page owned by the Vault agent; org doc-store behind it.",
+   pts:["Replaced sidebar Recent/Helpful sections (chat 38af3d5)","Per-org pgvector namespaces via db-agent provisioner","3-tier visibility (private / org / public) with PHI-gated promotion"]},
+  doc:"mobius-chat.md · instant-rag proposal", verified:"2026-07-15"},
+ {id:"strategy", label:"Strategy", sub:"the Mobius story deck", cluster:"surfaces", status:"live",
+  user:{tag:"The market-intelligence deck: why Mobius exists, the FL Medicaid BH analysis, the opportunity.",
+   pts:["Slide deck with per-slide narratives (exec summary → thesis → opportunity)","PDF export","Opens from the chat sidebar's Operations Suite"]},
+  tech:{tag:"mobius-story-ui; narrative.md per slide is the authoritative source the thesis doc synthesizes from.",
+   pts:["Acts VI–VIII (business/investment) — planned","briefing_modules live-slide data — planned"]},
+  doc:"story-ui-and-landing.md", verified:"2026-07-03"},
+ {id:"library", label:"Public Library", sub:"policy repository", cluster:"surfaces", status:"live",
+  user:{tag:"The shared corpus of payer manuals and regulations behind every cited answer — browse, upload, inspect.",
+   pts:["Repository UI: upload/import documents, per-page extraction status","Policy lexicon review (tags, candidates)","~1,900 published documents searchable from chat"]},
+  tech:{tag:"mobius-rag's frontend over the document/admin API; publish writes the searchable corpus layer.",
+   pts:["Publish → rag_published_embeddings / published_rag_metadata","Drive import + scraped-page ingestion","Nightly doc+lexicon pipeline (admin UI button)"]},
+  doc:"rag-backend.md", verified:"2026-07-14"},
+ {id:"rag", label:"RAG & Corpus", sub:"grounded retrieval", cluster:"intel", status:"live",
+  user:{tag:"Finds the passages your answer cites — from authoritative documents, not model memory.",
+   pts:["Hybrid keyword + semantic search with citations (doc + page)","Smart routing: exact codes vs conceptual questions vs web fallback","Payor-aware: plan questions inherit the state program's rules","Refuses cleanly on PHI / out-of-scope (fail-fast)"]},
+  tech:{tag:"Strategy portfolio a–e behind corpus_search_agent; pgvector fleet standard.",
+   pts:["a precision · b broad · c LLM-validate/reverse-RAG · d external (DuckDuckGo) · e fail-fast","Payor-authority inheritance (payor_inherited_authority, mig 004) + k=2/doc cap","Planned: structured-fact lookup, cache replay, validation ledger, rag(query, mode) tool-collapse","Priors v1 hand-set → bandit-ready; judge eval rubric (must/forbidden/abstain)"]},
+  doc:"rag-backend.md", verified:"2026-07-14"},
+ {id:"lexicon", label:"Lexicon", sub:"policy vocabulary", cluster:"intel", status:"live",
+  user:{tag:"The controlled vocabulary that makes policy search precise — payers, programs, code families.",
+   pts:["j/p/d tags (jurisdiction / prescriptive / descriptive) on policy lines","Human-reviewed candidate pipeline (rules → LLM → gate)"]},
+  tech:{tag:"3-DB sync QA → RAG → Chat; tag pools are a selectivity metric.",
+   pts:["91k→32k cleanup shipped; tag-IDF weighting proposed","Chat tagger reads chat DB copy (5-min TTL); push-to-chat lexicon_only"]},
+  doc:"lexicon.md", verified:"2026-07-03"},
+ {id:"eval", label:"Eval", sub:"measurement", cluster:"intel", status:"live",
+  user:{tag:"How we know answers are getting better — scored query banks, honest baselines.",
+   pts:["Query banks with must-facts scoring","Lift-vs-drift discipline (fingerprints), observability dashboard in the Repository UI"]},
+  tech:{tag:"Forced-strategy calibration → priors; oracle ceilings; judge loop in mobius-rag/eval.",
+   pts:["Durable baseline 110-σ (router 0.510 / oracle 0.628)","Certify structure, not the eval number (standing directive)"]},
+  doc:"eval.md", verified:"2026-07-05"},
+ {id:"payor", label:"Payor Registry", sub:"payer source of truth", cluster:"intel", status:"live",
+  user:{tag:"Authoritative payer facts — phone, fax, EDI, portals, timely filing — asked right in chat.",
+   pts:["payor_lookup: contact/access facts (preferred over corpus for these)","payor_readiness: integration status per payer","3 payors: Aetna, Sunshine, AHCA (authority parent)"]},
+  tech:{tag:"Own repo/service; the stack's canonicalization layer.",
+   pts:["3-tier payer-canonical resolver (RAG publish consumes)","Inheritance manifest + authority policy (GA complete 07-14)","Org-identity delegation (/org/resolve)"]},
+  doc:"skills.md · payor memory", verified:"2026-07-14"},
+ {id:"skills", label:"Skills", sub:"the tool belt", cluster:"ops", status:"live",
+  user:{tag:"Everything chat can DO for you — 45 tools from market analytics to task management.",
+   pts:["FL Medicaid analytics suite (26 tools): market size, org profiles, benchmarks, leakage","Credentialing status checks, appeals helpers, NPI lookups","Task management, document download, feedback capture"]},
+  tech:{tag:"Builtin (in-process) + MCP (wired via CHAT_SKILLS_MCP_URL); reachability is env-specific.",
+   pts:["Manifest-driven planner selection; “code exists ≠ in manifest ≠ reachable”","skill_invocations analytics table still missing (known gap)","PHI classifier joins as a platform primitive (built, not deployed)"]},
+  doc:"skills.md", verified:"2026-07-15"},
+ {id:"cred", label:"Credentialing & Roster", sub:"enrolled and payable?", cluster:"ops", status:"live",
+  user:{tag:"Is this provider actually enrolled and payable? Ask in chat — chat is the front door now.",
+   pts:["Provider profile: NPPES + PML + compliance flags + readiness verdict, on a card","Org panel summary: who needs attention, validation coverage","Roster upload → diff preview → commit; term/reactivate; ghost-billing checks","“Open Credentialing Report” chip into the full roster UI"]},
+  tech:{tag:"check_provider_credentialing MCP tool over the roster service; real-time DB profile reads.",
+   pts:["7 legacy tools retired (run_credentialing_report et al.)","Reconciliation model: in_both / external_only / internal_only","Planned: emit_signal task updates, richer modal, membership approval"]},
+  doc:"credentialing-and-roster.md", verified:"2026-07-14"},
+ {id:"appeals", label:"Appeals", sub:"denials → letters", cluster:"ops", status:"partial",
+  user:{tag:"Turn a denial code into an appeal: rules, payor playbook, validation, a drafted letter.",
+   pts:["Ask about a CARC denial → rules + playbook","appeals_assemble_letter drafts the appeal","Appeal questions surface an Appeals link chip in chat"]},
+  tech:{tag:"4 appeals_* tools wired in the chat manifest; agent inventory still owed to docs.",
+   pts:["appeals_lookup_rules / get_playbook / validate_claim / assemble_letter","Owner inventory pending (no reachable session)"]},
+  doc:"skills.md", verified:"2026-07-15"},
+ {id:"tasks", label:"Tasks", sub:"operational follow-ups", cluster:"ops", status:"live",
+  user:{tag:"Work items that don't get forgotten — created from chat, credentialing runs, or highlights.",
+   pts:["My-tasks view, nudges, banner; highlight-to-task","Entity overlap: tasks about the same provider find each other","Task chips on credentialing report steps"]},
+  tech:{tag:"mobius-task-manager service; 13 typed interfaces; contract-driven entity extraction.",
+   pts:["bulk_import_tasks v1 (credentialing); promotion from chat turns","?with_overlap=1 + /tasks/{id}/related (mobius_task_entity)"]},
+  doc:"skills.md · task contract", verified:"2026-07-15"},
+ {id:"org", label:"Org & Users", sub:"who's who", cluster:"ops", status:"partial",
+  user:{tag:"Set up a client org, enroll its people, sign in, set preferences.",
+   pts:["Sign in (email+password or Google); greeting knows you","Org enrollment via preferences (self-claim, validated)","@-mention directory; per-user experience level","Coming: admin “add employees” UI + set-password page (email invites gated on it)"]},
+  tech:{tag:"mobius-auth + mobius-user + org orchestrator; roster service is the org master.",
+   pts:["Invite / set-password / reset primitives shipped (migration 005)","Org datastore provision: POST /doc-store/provision → per-org pgvector schema","Known gate: frontend sends no Authorization on /chat/* — per-user features dark until header fix"]},
+  doc:"user-and-auth.md · org agent snapshot", verified:"2026-07-15"},
+ {id:"help", label:"Product Help & Docs", sub:"self-documenting", cluster:"enable", status:"live",
+  user:{tag:"Ask Mobius about Mobius — features, how-tos, even “why the name” — answered from verified docs.",
+   pts:["product_help answers with honest outcomes (answer / planned / no-docs-yet)","“▶ Show me” guided tours (8 published, drift-audited weekly)","Recital mode: the founding essay, verbatim","This schematic"]},
+  tech:{tag:"pgvector corpus over 13 verified docs; τ-gap single-threshold; feedback loop closes gaps.",
+   pts:["Vertex gemini-embedding-001 @1536; τ=0.544 calibrated live","docs_gap / doc_stale → weekly sweep → refresh → drain","git-hook auto-files doc_stale on user-facing commits (07-15)"]},
+  doc:"README.md (product-docs)", verified:"2026-07-15"},
+ {id:"interact", label:"Interact", sub:"guided-tour engine", cluster:"enable", status:"live",
+  user:{tag:"The hand that shows you: highlights, clicks, and walks you through any Mobius surface.",
+   pts:["Guide-mode tours from “Show me” chips","Polite aborts when a surface changed (no broken clicking)"]},
+  tech:{tag:"interact.v1 schema; anchor-first resolution; registry with full lifecycle.",
+   pts:["find/highlight/click/type/read/assert; MutationObserver wait_for","auto + external modes HARD-disabled pending approval","Future: RPA on external sites (Sunshine prior-auth pilot)"]},
+  doc:"interact-agent-spec.md", verified:"2026-07-15"},
+ {id:"feedback", label:"Feedback", sub:"the listening loop", cluster:"enable", status:"live",
+  user:{tag:"Tell Mobius what's wrong or missing — it files, routes, and actually gets fixed.",
+   pts:["Thumbs, CSAT/NPS chips, feedback capture card","“No docs on that yet” auto-files the gap"]},
+  tech:{tag:"Classifier service + chat storage; provenance tiers; two backlog views.",
+   pts:["docs_gap→docs_backlog · doc_stale→docs_refresh","close-signals drain API (race-free, idempotent)","Task promotion on page-worthy feedback"]},
+  doc:"feedback contract", verified:"2026-07-15"},
+ {id:"phi", label:"PHI Classifier", sub:"safety primitive", cluster:"enable", status:"partial",
+  user:{tag:"Warns before you overshare: uploads containing patient info get a “keep private” recommendation.",
+   pts:["Visibility-ceiling recommendation at upload-complete (with instant-RAG flow)","Recall-over-precision: uncertain → private"]},
+  tech:{tag:"Stateless /classify: regex + Presidio NER + LLM (HIPAA-locked Vertex route).",
+   pts:["18 Safe-Harbor identifiers + quasi-identifiers; masked evidence","LIVE on Cloud Run dev (64 tests); chat-side card shipping via instant-RAG"]},
+  doc:"skills.md · phi inception", verified:"2026-07-15"},
+ {id:"email", label:"Email", sub:"send chokepoint", cluster:"enable", status:"live",
+  user:{tag:"Email any conversation — summary or transcript — after a preview you confirm.",
+   pts:["Email button on every answer; two-step dialog with preview","Nothing sends without your confirmation"]},
+  tech:{tag:"mobius-email on Cloud Run: validation, suppression, rate limits, audit log, Gmail provider.",
+   pts:["Direct proxy POST /chat/thread/{id}/email (not an agent tool)","Agentic email via MCP: not wired in dev","Gmail OAuth token expires ~7 days (testing-mode consent)"]},
+  doc:"skills.md", verified:"2026-07-15"},
+];
+const EDGES = [
+ {f:"chat",t:"rag",     label:"grounded answers (corpus_search_agent)"},
+ {f:"chat",t:"skills",  label:"planner → 45-tool manifest"},
+ {f:"chat",t:"vault",   label:"sidebar Vault block"},
+ {f:"chat",t:"help",    label:"product_help + “Show me”"},
+ {f:"chat",t:"email",   label:"Email button → send proxy"},
+ {f:"chat",t:"tasks",   label:"task chips · my-tasks · promotion"},
+ {f:"chat",t:"feedback",label:"thumbs · capture card · surveys"},
+ {f:"chat",t:"strategy",label:"Operations Suite tile"},
+ {f:"chat",t:"library", label:"Operations Suite tile · citations open here"},
+ {f:"interact",t:"chat",label:"guide runner on chat anchors"},
+ {f:"help",t:"interact",label:"authors + publishes tours"},
+ {f:"help",t:"feedback",label:"docs_gap / doc_stale loop"},
+ {f:"rag",t:"lexicon",  label:"j/p/d tagging · query classify"},
+ {f:"rag",t:"payor",    label:"payer-canonical + authority inheritance"},
+ {f:"eval",t:"rag",     label:"judge loop · calibration · baselines"},
+ {f:"library",t:"rag",  label:"publish → searchable corpus"},
+ {f:"skills",t:"cred",  label:"check_provider_credentialing"},
+ {f:"skills",t:"appeals",label:"appeals_* tools"},
+ {f:"skills",t:"payor", label:"payor_lookup / readiness"},
+ {f:"cred",t:"tasks",   label:"bulk_import_tasks on runs"},
+ {f:"cred",t:"org",     label:"roster service = org master"},
+ {f:"org",t:"vault",    label:"org doc-store provision", status:"planned"},
+ {f:"phi",t:"vault",    label:"visibility ceiling on promote", status:"planned"},
+ {f:"phi",t:"chat",     label:"PHI card at upload-complete"},
+ {f:"strategy",t:"help",label:"deck narratives → thesis doc"},
+];
+/* ============ RENDER ============ */
+const COLW=230, NW=190, NH=52, GX=36, GY=14, PAD={t:46,l:16};
+const byId=Object.fromEntries(NODES.map(n=>[n.id,n]));
+const cols=CLUSTERS.map(c=>NODES.filter(n=>n.cluster===c.id));
+const H=PAD.t+Math.max(...cols.map(c=>c.length))*(NH+GY)+20;
+const W=PAD.l+CLUSTERS.length*(NW+GX)+140;
+NODES.forEach(n=>{
+  const ci=CLUSTERS.findIndex(c=>c.id===n.cluster), ri=cols[ci].indexOf(n);
+  n.x=PAD.l+ci*(NW+GX); n.y=PAD.t+ri*(NH+GY);
+});
+let lens="user", sel=null;
+const svgNS="http://www.w3.org/2000/svg";
+function el(tag,attrs,parent){const e=document.createElementNS(svgNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+const svg=el("svg",{viewBox:`0 0 ${W} ${H}`},null);
+document.getElementById("map").appendChild(svg);
+CLUSTERS.forEach((c,i)=>{
+  const t=el("text",{x:PAD.l+i*(NW+GX),y:24,class:"cluster-label"},svg); t.textContent=c.label;
+});
+const edgeEls=EDGES.map(e=>{
+  const a=byId[e.f],b=byId[e.t];
+  const x1=a.x+(a.x<b.x?NW:a.x>b.x?0:NW/2), y1=a.y+NH/2+(a.x===b.x?(a.y<b.y?NH/2:-NH/2):0);
+  const x2=b.x+(b.x<a.x?NW:b.x>a.x?0:NW/2), y2=b.y+NH/2+(a.x===b.x?(b.y<a.y?NH/2:-NH/2):0);
+  const mx=(x1+x2)/2;
+  const d=a.x===b.x?`M${x1},${y1} C${x1+46},${y1} ${x2+46},${y2} ${x2},${y2}`
+                   :`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`;
+  const p=el("path",{d,class:"edge"+(e.status==="planned"?" planned":"")},svg);
+  const title=el("title",{},p); title.textContent=`${byId[e.f].label} → ${byId[e.t].label}: ${e.label}`;
+  return p;
+});
+const nodeEls={};
+NODES.forEach(n=>{
+  const g=el("g",{class:"node",transform:`translate(${n.x},${n.y})`},svg);
+  el("rect",{width:NW,height:NH,rx:10},g);
+  el("circle",{cx:14,cy:NH/2,r:4.5,class:"st",fill:`var(--${n.status})`},g);
+  const t1=el("text",{x:28,y:NH/2-4},g); t1.textContent=n.label;
+  const t2=el("text",{x:28,y:NH/2+13,class:"sub"},g); t2.textContent=n.sub;
+  g.addEventListener("click",ev=>{ev.stopPropagation();select(n.id);});
+  nodeEls[n.id]=g;
+});
+svg.addEventListener("click",()=>select(null));
+function select(id){
+  sel=id;
+  NODES.forEach(n=>{
+    const connected=!id||n.id===id||EDGES.some(e=>(e.f===id&&e.t===n.id)||(e.t===id&&e.f===n.id));
+    nodeEls[n.id].classList.toggle("dim",!!id&&!connected);
+    nodeEls[n.id].classList.toggle("sel",n.id===id);
+  });
+  EDGES.forEach((e,i)=>{
+    edgeEls[i].classList.toggle("hi",!!id&&(e.f===id||e.t===id));
+    edgeEls[i].classList.toggle("dim",!!id&&e.f!==id&&e.t!==id);
+  });
+  renderPanel();
+}
+function renderPanel(){
+  const p=document.getElementById("panel");
+  if(!sel){p.innerHTML=`<p class="hint">Click any module to drill in. The <b>User view</b> says what you can do and where; the <b>Technical view</b> says what runs where and what talks to what. Statuses come from the verified product docs (reality-gated: planned ≠ live).</p>`;return;}
+  const n=byId[sel], v=n[lens];
+  const outs=EDGES.filter(e=>e.f===sel), ins=EDGES.filter(e=>e.t===sel);
+  const conn=(list,dir)=>list.map(e=>{
+    const o=byId[dir==="out"?e.t:e.f];
+    return `<div class="conn"><b data-go="${o.id}">${dir==="out"?"→":"←"} ${o.label}</b><span>${e.label}${e.status==="planned"?" (planned)":""}</span></div>`;
+  }).join("")||`<div class="hint">none mapped</div>`;
+  p.innerHTML=`
+    <h2>${n.label}</h2>
+    <span class="status ${n.status}">${n.status}</span>
+    <p class="tag">${v.tag}</p>
+    <ul>${v.pts.map(x=>`<li>${x}</li>`).join("")}</ul>
+    <h3>Feeds / calls</h3>${conn(outs,"out")}
+    <h3>Fed / called by</h3>${conn(ins,"in")}
+    <div class="src">Source: <span class="pill">${n.doc}</span> verified ${n.verified} · lens: ${lens}. Ask chat about any of this — e.g. “what is ${n.label}?”</div>`;
+  p.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>select(b.dataset.go)));
+}
+document.getElementById("lensUser").addEventListener("click",()=>setLens("user"));
+document.getElementById("lensTech").addEventListener("click",()=>setLens("tech"));
+function setLens(l){lens=l;
+  document.getElementById("lensUser").classList.toggle("on",l==="user");
+  document.getElementById("lensTech").classList.toggle("on",l==="tech");
+  renderPanel();
+}
+</script>
+</body>
+</html>
