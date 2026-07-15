@@ -116,6 +116,7 @@
    Statuses follow the docs' reality gates. Each node cites its source doc + date. */
 const CLUSTERS = [
   {id:"surfaces",  label:"USER SURFACES"},
+  {id:"skills",    label:"SKILLS — THE TOOL BELT"},
   {id:"intel",     label:"INTELLIGENCE & RETRIEVAL"},
   {id:"ops",       label:"OPERATIONS"},
   {id:"enable",    label:"PLATFORM & ENABLEMENT"},
@@ -175,11 +176,77 @@ const NODES = [
   tech:{tag:"Own repo/service; the stack's canonicalization layer.",
    pts:["3-tier payer-canonical resolver (RAG publish consumes)","Inheritance manifest + authority policy (GA complete 07-14)","Org-identity delegation (/org/resolve)"]},
   doc:"skills.md · payor memory", verified:"2026-07-14"},
- {id:"skills", label:"Skills", sub:"the tool belt", cluster:"ops", status:"live",
-  user:{tag:"Everything chat can DO for you — 45 tools from market analytics to task management.",
-   pts:["FL Medicaid analytics suite (26 tools): market size, org profiles, benchmarks, leakage","Credentialing status checks, appeals helpers, NPI lookups","Task management, document download, feedback capture"]},
-  tech:{tag:"Builtin (in-process) + MCP (wired via CHAT_SKILLS_MCP_URL); reachability is env-specific.",
-   pts:["Manifest-driven planner selection; “code exists ≠ in manifest ≠ reachable”","skill_invocations analytics table still missing (known gap)","PHI classifier joins as a platform primitive (built, not deployed)"]},
+ /* ---- SKILLS cluster: two sections — direct (in-process builtins) vs MCP-accessed ---- */
+ {id:"skillreg", label:"Skill Registry", sub:"manifest & dispatch law", cluster:"skills", section:"direct", status:"live",
+  user:{tag:"The master list of what Mobius can do — you never pick a tool; ask plainly and the planner routes.",
+   pts:["45 tools live in dev across the two sections below","Every answer says which tool fired (tool attribution)"]},
+  tech:{tag:"Builtin (in-process) + MCP (registers at boot via CHAT_SKILLS_MCP_URL); reachability is env-specific.",
+   pts:["“code exists ≠ in manifest ≠ reachable” — this map shows reachability, not code","Planner descriptions are load-bearing — routing rules live in them","skill_invocations analytics table still missing (known gap)"]},
+  tier:"dead", tools:[["run_credentialing_report","retired → check_provider_credentialing"],["run_roster_reconciliation_report","retired → check_provider_credentialing"],["validate_credentialing_step","retired → check_provider_credentialing"],["ask_credentialing_npi","retired → check_provider_credentialing"],["lookup_npi","retired → healthcare_npi_lookup"],["find_org_locations","retired"],["find_associated_providers_at_locations","retired"]],
+  tools_label:"Retired tools (kept findable)",
+  doc:"skills.md", verified:"2026-07-15"},
+ {id:"sk_corpus", label:"Corpus & Documents", sub:"search · fetch · upload", cluster:"skills", section:"direct", status:"live",
+  user:{tag:"Find, cite, download, and question documents — the corpus and your own uploads.",
+   pts:["Cited corpus answers; download cards for originals","Upload a document and ask about it"]},
+  tech:{tag:"In-process builtins over the published corpus + thread uploads.", pts:["fetch_document 4-tier resolution; GET /documents/search unification shipped"]},
+  tier:"builtin", tools:[["search_corpus","Hybrid BM25 + pgvector corpus search — the retrieval entry point."],["fetch_document","Resolve a document by name / policy ID → download link."],["document_upload_skill","How to attach a file to the thread."],["list_thread_document_uploads","List documents attached to the thread."],["search_uploaded_document","Instant-RAG: search inside an uploaded document."],["ingest_url","Fetch a URL and add it to the corpus now."],["lookup_authoritative_sources","Curated registry of authoritative URLs per payer/state/topic."]],
+  doc:"skills.md", verified:"2026-07-15"},
+ {id:"sk_payor", label:"Payor Lookup", sub:"registry facts", cluster:"skills", section:"direct", status:"live",
+  user:{tag:"Payer phone, fax, EDI, portals, timely filing — from the registry, not guessed from documents.",pts:["Ask “Aetna appeals fax” and get the registry's answer"]},
+  tech:{tag:"Builtins over the payor-registry service (source of truth for contact/access facts).",pts:["field accepts natural aliases (phone, appeals fax, edi, portal…)"]},
+  tier:"builtin", tools:[["payor_lookup","Authoritative operational fact for a payor — preferred over corpus for contact/access facts."],["payor_readiness","Readiness/coverage scorecard per payer."]],
+  doc:"skills.md", verified:"2026-07-15"},
+ {id:"sk_tasks", label:"Task Skills", sub:"create · list · resolve", cluster:"skills", section:"direct", status:"live",
+  user:{tag:"Log, list, and resolve work items in plain words.",pts:["“Log a follow-up for provider X”, “show open tasks”, “mark abcd1234 resolved”"]},
+  tech:{tag:"Chat-side skills over mobius-task-manager (shared mobius_chat DB).",pts:["v2 pending: get/patch/dismiss task skills"]},
+  tier:"builtin", tools:[["list_tasks","Show open tasks — filters: org, module, status, assignee, npi, run_id…"],["create_task","Log a follow-up — requires org + text."],["resolve_task","Mark complete by id (or click Resolve on the card)."]],
+  doc:"skills.md", verified:"2026-07-15"},
+ {id:"sk_help", label:"Product Help", sub:"Mobius explains itself", cluster:"skills", section:"direct", status:"live",
+  user:{tag:"“How do I…?” about Mobius itself — answered from verified docs, with Show-me tours.",pts:["Honest outcomes: answer / planned / no-docs-yet (gap auto-filed)"]},
+  tech:{tag:"Builtin handler → product-awareness service (pgvector, τ-gap).",pts:["Recital passthrough; demo refs; ctx.message read for intent verbs"]},
+  tier:"builtin", tools:[["product_help_search","Product questions from the docs corpus; files docs_gap on miss."]],
+  doc:"skills.md", verified:"2026-07-15"},
+ {id:"sk_feedback", label:"Feedback Capture", sub:"tell us what's wrong", cluster:"skills", section:"direct", status:"live",
+  user:{tag:"Give feedback in the flow of work — it files, routes, and gets fixed.",pts:["Editable capture card before anything is filed"]},
+  tech:{tag:"Builtin → feedback storage (classifier, provenance tiers).",pts:["CSAT/CES/NPS survey chips ride the same skill"]},
+  tier:"builtin", tools:[["product_feedback","Capture open feedback + surveys → routed backlogs."]],
+  doc:"skills.md", verified:"2026-07-15"},
+ {id:"sk_web", label:"Web & External", sub:"last-resort lookup", cluster:"skills", section:"direct", status:"live",
+  user:{tag:"When the corpus can't answer, Mobius can look outside — and says so.",pts:["External answers are framed as external, never dressed as corpus"]},
+  tech:{tag:"Builtins; the react loop invokes explicitly (not silently).",pts:["Also strategy-d's escalation path consumes the same capabilities"]},
+  tier:"builtin", tools:[["google_search","Web search — last resort."],["web_scrape","Read the web from a seed URL (quick / medium / detailed)."]],
+  doc:"skills.md", verified:"2026-07-15"},
+ {id:"sk_util", label:"Utilities", sub:"codes · NPI · reshape", cluster:"skills", section:"direct", status:"live",
+  user:{tag:"The small tools: code meanings, NPI lookups, reshaping an answer you already got.",pts:["“What does H0019 mean”, “turn that into a table”"]},
+  tech:{tag:"In-process builtins incl. the router-owned hard stop.",pts:["refuse is router-owned — content never reaches composition"]},
+  tier:"builtin", tools:[["healthcare_query","Code lookup — ICD-10-CM meanings, etc."],["healthcare_npi_lookup","NPPES registry lookup for a 10-digit NPI."],["transform_previous_answer","Reshape the previous answer — no retrieval."],["vibe","A short work-adjacent line."],["refuse","Hard stop — no content returned."]],
+  doc:"skills.md", verified:"2026-07-15"},
+ {id:"sk_cache", label:"Cache Skills", sub:"asked-and-answered", cluster:"skills", section:"direct", status:"planned",
+  user:{tag:"Repeat questions will short-circuit to a vetted past answer.",pts:["Not live yet — ships with the Answer Cache service"]},
+  tech:{tag:"Planned parallel ReAct tools over mobius-answer-cache.",pts:["cache_lookup short-circuit + cache_write on completion"]},
+  tier:"builtin", tools:[["cache_lookup","Planned: vetted prior answer when corpus fingerprint is current."],["cache_write","Planned: persist the turn's answer for replay."]],
+  doc:"mobius-answer-cache · CACHE agent", verified:"2026-07-15"},
+ {id:"sk_analytics", label:"Market Analytics", sub:"FL Medicaid BH suite", cluster:"skills", section:"mcp", status:"live",
+  user:{tag:"Verified market numbers — size, share, benchmarks, rates, leakage — straight from claims data.",
+   pts:["“How big is the market”, “benchmark my org”, “where are we underpaid”"]},
+  tech:{tag:"26 tools on the wired MCP; BigQuery-backed, returns verified numbers (not retrieval).",pts:["Largest capability in the manifest; use instead of search_corpus for quantitative questions"]},
+  tier:"mcp", subs:[
+   ["Market totals & trends",[["get_market_size","Total market: benes, claims, paid, KPI averages."],["get_market_timeseries","Year-by-year market totals (2019–2024)."],["get_market_share_timeseries","An org's market share over time."],["get_market_decomposition","Revenue/volume split across service lines."],["get_market_retention","Beneficiary retention year over year."],["get_msa_map","MSA (zip3) market areas with org counts + tier."]]],
+   ["Orgs & profiles",[["search_orgs","Find an org by name → slug, bene counts, metadata."],["get_org_universe","Canonical list of FL Medicaid BH orgs."],["get_org_profile","Full financial + clinical profile."],["get_org_service_line_profile","Per-service-line revenue/volume/KPIs."],["get_org_type_stats","Aggregate KPIs for an org type in a year."],["get_org_leakage","Patient-leakage analysis for a CMHC."]]],
+   ["Benchmarks & positioning",[["get_top_orgs","Rank orgs by a volume metric."],["get_org_benchmark","Percentile positioning vs a peer group."],["get_benchmark_dimensions","P25/P50/P75 peer distributions."],["get_churn_benchmark","Clinician retention/churn benchmarks."]]],
+   ["Rates",[["get_published_rates","Official FL AHCA fee schedule per HCPCS."],["get_rate_benchmarks","Actual-paid HCPCS benchmarks (P25–P90)."],["get_rate_trends","Monthly P50 rate trend by peer group."],["get_org_rate_gap","Realized rates vs market benchmarks."]]],
+   ["Service lines & opportunity",[["get_service_mix","Service-line revenue mix."],["get_service_line_opportunity","Revenue-opportunity sizing."],["get_service_line_code_map","HCPCS → service line / AHCA category."]]],
+   ["Entrants & meta",[["get_entrant_analysis","New-entrant displacement analysis."],["get_fact_pack","The fact-pack behind the story deck."],["get_valid_filters","Valid filter values per year."]]]],
+  doc:"skills.md", verified:"2026-07-15"},
+ {id:"sk_cred", label:"Credentialing & Appeals", sub:"enrolled? payable? appeal it", cluster:"skills", section:"mcp", status:"live",
+  user:{tag:"Provider enrollment answers and denial-to-appeal help, right in chat.",pts:["Provider profile or org panel on a card; appeal letters drafted"]},
+  tech:{tag:"Wired MCP tools over the roster service + appeals engine.",pts:["Credentialing card + “Open Credentialing Report” chip ride these"]},
+  tier:"mcp", tools:[["check_provider_credentialing","THE credentialing entry point: provider profile (NPI) or org panel."],["appeals_lookup_rules","Denial-code (CARC) rules."],["appeals_get_playbook","Payor playbook for a CARC group."],["appeals_validate_claim","Validate a claim before appealing."],["appeals_assemble_letter","Draft the appeal letter."]],
+  doc:"skills.md", verified:"2026-07-15"},
+ {id:"sk_email", label:"Agentic Email", sub:"not wired in dev", cluster:"skills", section:"mcp", status:"planned",
+  user:{tag:"“Email this to X” as an agent action — not available yet; use the Email button instead.",pts:["The Email button works today (it's a direct proxy, not an agent tool)"]},
+  tech:{tag:"email_* tools exist in mobius-skills-mcp but that server isn't the wired one in dev.",pts:["Reachable only when that MCP deploys or via EXTRA_MCP_URLS"]},
+  tier:"mcp", tools:[["email_*","Agentic send/draft tools — code exists, not in the wired manifest."]],
   doc:"skills.md", verified:"2026-07-15"},
  {id:"cred", label:"Credentialing & Roster", sub:"enrolled and payable?", cluster:"ops", status:"live",
   user:{tag:"Is this provider actually enrolled and payable? Ask in chat — chat is the front door now.",
@@ -244,7 +311,18 @@ const NODES = [
 ];
 const EDGES = [
  {f:"chat",t:"rag",     label:"grounded answers (corpus_search_agent)"},
- {f:"chat",t:"skills",  label:"planner → 45-tool manifest"},
+ {f:"chat",t:"skillreg", label:"ReAct planner reads the manifest, dispatches per turn"},
+ {f:"chat",t:"sk_corpus", label:"dispatch"},
+ {f:"chat",t:"sk_payor", label:"dispatch"},
+ {f:"chat",t:"sk_tasks", label:"dispatch"},
+ {f:"chat",t:"sk_help", label:"dispatch"},
+ {f:"chat",t:"sk_feedback", label:"dispatch"},
+ {f:"chat",t:"sk_web", label:"dispatch"},
+ {f:"chat",t:"sk_util", label:"dispatch"},
+ {f:"chat",t:"sk_cache", label:"dispatch (planned)", status:"planned"},
+ {f:"chat",t:"sk_analytics", label:"dispatch (quantitative questions)"},
+ {f:"chat",t:"sk_cred", label:"dispatch (credentialing/appeals questions)"},
+ {f:"chat",t:"sk_email", label:"dispatch — not wired in dev", status:"planned"},
  {f:"chat",t:"vault",   label:"sidebar Vault block"},
  {f:"chat",t:"help",    label:"product_help + “Show me”"},
  {f:"chat",t:"email",   label:"Email button → send proxy"},
@@ -259,9 +337,9 @@ const EDGES = [
  {f:"rag",t:"payor",    label:"payer-canonical + authority inheritance · web-domain gate"},
  {f:"eval",t:"rag",     label:"judge loop · calibration · baselines"},
  {f:"library",t:"rag",  label:"publish → searchable corpus"},
- {f:"skills",t:"cred",  label:"check_provider_credentialing"},
- {f:"skills",t:"appeals",label:"appeals_* tools"},
- {f:"skills",t:"payor", label:"payor_lookup / readiness"},
+ {f:"sk_cred",t:"cred",  label:"check_provider_credentialing → roster service"},
+ {f:"sk_cred",t:"appeals",label:"appeals_* → appeals engine"},
+ {f:"sk_payor",t:"payor", label:"registry API (source of truth)"},
  {f:"cred",t:"tasks",   label:"bulk_import_tasks on runs"},
  {f:"cred",t:"org",     label:"roster service = org master"},
  {f:"org",t:"vault",    label:"org doc-store provision (provisioner live v0; RAG ingest pending)"},
@@ -275,7 +353,12 @@ const EDGES = [
  {f:"db",t:"vault",     label:"provisions the per-org doc stores behind Vault"},
  {f:"email",t:"tasks",  label:"lifecycle emits (step_start/done/failed) — workflow=email"},
  {f:"chat",t:"rag",     label:"instant-RAG upload → Path B ingest → pgvector"},
- {f:"skills",t:"rag",   label:"document resolution + original-file downloads (/documents/search · /file)"},
+ {f:"sk_corpus",t:"rag",   label:"published corpus · document resolution · original-file downloads"},
+ {f:"sk_tasks",t:"tasks", label:"task-manager API"},
+ {f:"sk_help",t:"help",  label:"/search · /doc (product-awareness service)"},
+ {f:"sk_feedback",t:"feedback", label:"feedback storage + views"},
+ {f:"sk_cache",t:"cache", label:"cache service (planned)", status:"planned"},
+ {f:"sk_email",t:"email", label:"send chokepoint (when wired)", status:"planned"},
  {f:"feedback",t:"tasks",label:"page-worthy feedback → task promotion (enforced)"},
  {f:"feedback",t:"help", label:"backlog views → curation priority"},
  {f:"rag",t:"tasks",    label:"drive_doc_review queue · instant-RAG doc-ready notifications"},
@@ -290,104 +373,44 @@ const EDGES = [
  {f:"vault",t:"org",    label:"coworker directory for reassign (/chat/coworkers)"},
  {f:"payor",t:"interact",label:"portal RPA scripts (payor:* namespace)", status:"planned"},
 ];
-/* Drillable tool catalog for the Skills node — from skills.md (live 45-tool
-   manifest, re-verified 2026-07-15). tier: builtin = in-process, always
-   reachable · mcp = wired MCP (dev) · dead = retired, kept findable. */
-const SKILLS_CATALOG = [
- {label:"Chat builtins", tier:"builtin", tools:[
-  ["search_corpus","Hybrid BM25 + pgvector corpus search — the entry point for curated-corpus retrieval."],
-  ["fetch_document","Resolve a corpus document by name / policy ID → download link."],
-  ["healthcare_query","Healthcare code lookup (ICD-10-CM meanings, etc.)."],
-  ["healthcare_npi_lookup","NPPES registry lookup for a 10-digit NPI."],
-  ["document_upload_skill","How to attach a file to the thread for Q&A."],
-  ["list_thread_document_uploads","List documents already attached to the thread."],
-  ["search_uploaded_document","Instant-RAG: search inside a user-uploaded document."],
-  ["google_search","Web search — last-resort external lookup."],
-  ["web_scrape","Read the web from a seed URL (quick / medium / detailed)."],
-  ["ingest_url","Fetch a single URL and add it to the indexed corpus now."],
-  ["lookup_authoritative_sources","Curated registry of authoritative URLs per payer/state/topic."],
-  ["transform_previous_answer","Reshape the previous answer into a new artifact — no retrieval."],
-  ["vibe","A short, work-adjacent line (toast / empathy / dry observation)."],
-  ["product_feedback","Capture open product feedback + CSAT/CES/NPS surveys."],
-  ["product_help_search","Answer “how do I use Mobius?” from the product docs."],
-  ["payor_lookup","Payor registry fact: phone, appeals fax, EDI, portal, timely filing — preferred over corpus for these."],
-  ["payor_readiness","Payor readiness scorecard: ingested docs, coverage, gaps."],
-  ["refuse","Hard stop — no content returned (router-owned)."]]},
- {label:"FL Medicaid analytics suite", tier:"mcp", subs:[
-  ["Market totals & trends",[
-   ["get_market_size","Total market: benes, claims, paid, KPI averages."],
-   ["get_market_timeseries","Year-by-year market totals (2019–2024)."],
-   ["get_market_share_timeseries","An org's market share over time."],
-   ["get_market_decomposition","Revenue/volume split across service lines."],
-   ["get_market_retention","Beneficiary retention, year over year."],
-   ["get_msa_map","MSA (zip3) market areas with org counts + tier."]]],
-  ["Orgs & profiles",[
-   ["search_orgs","Find an org by name → slug, bene counts, metadata."],
-   ["get_org_universe","Canonical list of FL Medicaid BH orgs."],
-   ["get_org_profile","Full financial + clinical profile for a named org."],
-   ["get_org_service_line_profile","Per-service-line revenue/volume/KPIs."],
-   ["get_org_type_stats","Aggregate KPIs for an org type in a year."],
-   ["get_org_leakage","Patient-leakage analysis for a CMHC."]]],
-  ["Benchmarks & positioning",[
-   ["get_top_orgs","Rank orgs by a volume metric."],
-   ["get_org_benchmark","Percentile positioning vs a peer group, all KPIs."],
-   ["get_benchmark_dimensions","P25/P50/P75 peer distributions across a dimension."],
-   ["get_churn_benchmark","Clinician retention/churn benchmarks."]]],
-  ["Rates",[
-   ["get_published_rates","Official FL AHCA fee schedule (ceiling) per HCPCS."],
-   ["get_rate_benchmarks","Actual-paid HCPCS rate benchmarks (P25–P90)."],
-   ["get_rate_trends","Monthly P50 rate trend by peer group."],
-   ["get_org_rate_gap","An org's realized rates vs market benchmarks."]]],
-  ["Service lines & opportunity",[
-   ["get_service_mix","An entity's service-line revenue mix."],
-   ["get_service_line_opportunity","Revenue-opportunity sizing (current vs potential)."],
-   ["get_service_line_code_map","HCPCS → service line / AHCA category."]]],
-  ["Entrants & meta",[
-   ["get_entrant_analysis","New-entrant displacement — who captured CMHC share."],
-   ["get_fact_pack","The full fact-pack behind the story deck."],
-   ["get_valid_filters","Valid filter values for the dataset in a year."]]]]},
- {label:"Credentialing & appeals", tier:"mcp", tools:[
-  ["check_provider_credentialing","THE credentialing entry point: provider profile (with NPI) or org panel summary (without)."],
-  ["appeals_lookup_rules","Denial-code (CARC) rules."],
-  ["appeals_get_playbook","Payor playbook for a CARC group."],
-  ["appeals_validate_claim","Validate a claim before appealing."],
-  ["appeals_assemble_letter","Draft the appeal letter."]]},
- {label:"Task management", tier:"builtin", tools:[
-  ["list_tasks","“Show open tasks”, “what's pending for Acme” — filters: org, module, status, assignee, npi…"],
-  ["create_task","“Log a follow-up for provider X” — requires org + text."],
-  ["resolve_task","Mark a task complete by id (or click Resolve on the card)."]]},
- {label:"Retired (ask via the tools above)", tier:"dead", tools:[
-  ["run_credentialing_report","→ check_provider_credentialing"],
-  ["run_roster_reconciliation_report","→ check_provider_credentialing"],
-  ["validate_credentialing_step","→ check_provider_credentialing"],
-  ["ask_credentialing_npi","→ check_provider_credentialing"],
-  ["lookup_npi","→ healthcare_npi_lookup"],
-  ["find_org_locations","→ retired"],
-  ["find_associated_providers_at_locations","→ retired"]]},
-];
-function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
-function skillsCatalogHTML(){
-  const tierChip={builtin:'<span class="tier builtin">builtin</span>',
+function esc(t){return t.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+/* Generic per-node tool drill: node.tools = [[name, desc]…] (flat) or
+   node.subs = [[subhead, [[name, desc]…]]…]; node.tier chips the group. */
+function toolsHTML(n){
+  const tierChip={builtin:'<span class="tier builtin">builtin · in-process</span>',
                   mcp:'<span class="tier mcp">mcp · wired</span>',
-                  dead:'<span class="tier dead">retired</span>'};
-  const tool=(t,dead)=>`<div class="tool${dead?" dead":""}"><code>${esc(t[0])}</code><div class="td">${esc(t[1])}</div></div>`;
-  return `<h3>Tool catalog — drill in (45 live tools)</h3>`+SKILLS_CATALOG.map(g=>{
-    const count=g.tools?g.tools.length:g.subs.reduce((a,s)=>a+s[1].length,0);
-    const body=g.tools?g.tools.map(t=>tool(t,g.tier==="dead")).join("")
-      :g.subs.map(s=>`<div class="subhead">${esc(s[0])}</div>`+s[1].map(t=>tool(t,false)).join("")).join("");
-    return `<details class="grp"><summary>${esc(g.label)} ${tierChip[g.tier]}<span class="n">${count}</span></summary>${body}</details>`;
-  }).join("");
+                  dead:'<span class="tier dead">retired</span>'}[n.tier]||"";
+  const dead=n.tier==="dead";
+  const tool=t=>`<div class="tool${dead?" dead":""}"><code>${esc(t[0])}</code><div class="td">${esc(t[1])}</div></div>`;
+  const count=n.tools?n.tools.length:n.subs.reduce((a,x)=>a+x[1].length,0);
+  const body=n.tools?n.tools.map(tool).join("")
+    :n.subs.map(x=>`<div class="subhead">${esc(x[0])}</div>`+x[1].map(tool).join("")).join("");
+  const label=n.tools_label||`${n.label} — tools`;
+  return `<h3>Drill in</h3><details class="grp" open><summary>${esc(label)} ${tierChip}<span class="n">${count}</span></summary>${body}</details>`;
 }
 /* ============ RENDER ============ */
-const COLW=230, NW=190, NH=52, GX=36, GY=14, PAD={t:46,l:16};
+const COLW=230, NW=190, NH=52, GX=36, GY=14, SEC_GAP=34, PAD={t:46,l:16};
 const byId=Object.fromEntries(NODES.map(n=>[n.id,n]));
 const cols=CLUSTERS.map(c=>NODES.filter(n=>n.cluster===c.id));
-const H=PAD.t+Math.max(...cols.map(c=>c.length))*(NH+GY)+20;
-const W=PAD.l+CLUSTERS.length*(NW+GX)+140;
-NODES.forEach(n=>{
-  const ci=CLUSTERS.findIndex(c=>c.id===n.cluster), ri=cols[ci].indexOf(n);
-  n.x=PAD.l+ci*(NW+GX); n.y=PAD.t+ri*(NH+GY);
+const sectionLabels=[];   // {x,y,text} sub-cluster dividers (skills: direct vs mcp)
+let maxY=0;
+cols.forEach((col,ci)=>{
+  let y=PAD.t, prevSection=null;
+  col.forEach(n=>{
+    if(n.section && n.section!==prevSection){
+      if(prevSection!==null) y+=SEC_GAP;
+      sectionLabels.push({x:PAD.l+ci*(NW+GX), y:y-6,
+        text:n.section==="direct"?"DIRECT · IN-PROCESS BUILTINS":"MCP-ACCESSED · CHAT_SKILLS_MCP_URL"});
+      if(prevSection===null) y+=14;   // room for the first section label
+      else y+=14;
+      prevSection=n.section;
+    }
+    n.x=PAD.l+ci*(NW+GX); n.y=y; y+=NH+GY;
+  });
+  maxY=Math.max(maxY,y);
 });
+const H=maxY+20;
+const W=PAD.l+CLUSTERS.length*(NW+GX)+140;
 let lens="user", sel=null;
 const svgNS="http://www.w3.org/2000/svg";
 function el(tag,attrs,parent){const e=document.createElementNS(svgNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
@@ -395,6 +418,9 @@ const svg=el("svg",{viewBox:`0 0 ${W} ${H}`},null);
 document.getElementById("map").appendChild(svg);
 CLUSTERS.forEach((c,i)=>{
   const t=el("text",{x:PAD.l+i*(NW+GX),y:24,class:"cluster-label"},svg); t.textContent=c.label;
+});
+sectionLabels.forEach(s=>{
+  const t=el("text",{x:s.x,y:s.y+8,class:"cluster-label","font-size":"9.5"},svg); t.textContent=s.text;
 });
 const edgeEls=EDGES.map((e,idx)=>{
   const a=byId[e.f],b=byId[e.t];
@@ -447,7 +473,7 @@ function renderPanel(){
     <span class="status ${n.status}">${n.status}</span>
     <p class="tag">${v.tag}</p>
     <ul>${v.pts.map(x=>`<li>${x}</li>`).join("")}</ul>
-    ${sel==="skills"?skillsCatalogHTML():""}
+    ${(n.tools||n.subs)?toolsHTML(n):""}
     <h3>Feeds / calls</h3>${conn(outs,"out")}
     <h3>Fed / called by</h3>${conn(ins,"in")}
     <div class="src">Source: <span class="pill">${n.doc}</span> verified ${n.verified} · lens: ${lens}. Ask chat about any of this — e.g. “what is ${n.label}?”</div>`;
