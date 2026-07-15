@@ -27,14 +27,14 @@ install_into() {
 }
 
 # Primary module checkouts (repo->module mapping lives in the hook itself).
-for r in mobius-chat mobius-rag mobius-skills mobius-skills-core mobius-auth mobius-story-ui; do
+for r in mobius-chat mobius-rag mobius-skills mobius-skills-core mobius-auth mobius-user mobius-story-ui; do
   install_into "$ROOT/$r"
 done
 
 # Agent worktrees: cover module checkouts inside .claude/worktrees/*/
 for wt in "$ROOT"/.claude/worktrees/*/; do
   [ -d "$wt" ] || continue
-  for r in mobius-chat mobius-rag mobius-skills mobius-skills-core mobius-auth mobius-story-ui; do
+  for r in mobius-chat mobius-rag mobius-skills mobius-skills-core mobius-auth mobius-user mobius-story-ui; do
     install_into "$wt$r"
   done
 done

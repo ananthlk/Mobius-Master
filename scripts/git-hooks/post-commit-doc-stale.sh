@@ -38,6 +38,7 @@ main() {
       printf '%s\n' "$non_doc" | grep -qE '^provider-roster-credentialing/' && module="credentialing" ;;
     mobius-skills-core) module="skills" ;;
     mobius-auth)      module="auth" ;;
+    mobius-user)      module="auth" ;;   # enrollment/invite/set-password → user-and-auth.md
     mobius-story-ui)  module="strategy" ;;
     *) return 0 ;;
   esac
