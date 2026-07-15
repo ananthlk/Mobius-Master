@@ -1,4 +1,36 @@
-# Tailored Welcome & Onboarding — contract spec v1
+# Training Mode (Welcome & Onboarding) — contract spec v2
+
+**v2 pivot (Ananth, 2026-07-15): this is a MODE, not a card — "TRAINING MODE", owned by
+the Product-Awareness agent.** Interaction IS the profiling: users click and respond,
+and each response BUILDS their profile (the baseline for all tailoring). Engagement-first
+— "have them click, have them respond." The tailored welcome card (v1 below) becomes the
+GRADUATION artifact at the end of training, not the entry point.
+
+## Training sequence (v2 — each step teaches the product AND learns the user)
+| # | Step | Mechanic | Writes (UM preference) |
+|---|---|---|---|
+| 1 | "90 seconds — I learn you, you learn me" | consent + skip always visible | — |
+| 2 | Pick your week | activity cards, multi-select, primary first | `activities` |
+| 3 | Same answer, three ways | ONE real question rendered professional / friendly / concise — pick the one you'd want (show, don't survey) | `tone` |
+| 4 | "A denial needs reworking. Should I…?" | scenario: Just do it / Show me first / Walk me through | `autonomy` (+ experience-level inference) |
+| 5 | "Anything make you hesitant?" | optional chips (wrong answers / patient data / too complex / nothing) — the UX-approved deferred fear question, now placed AFTER engagement | `hesitation` (new field, UM) |
+| 6 | Graduation | profile summary ("here's what I learned — edit anytime in Preferences") + the tailored fun card + confetti; card retires when checklist completes | `onboarding_completed_at` |
+
+Principles carried from v1: promise-what-the-profile-guarantees; three honesty pillars
+(Today / Coming — really not built / You steer it, with a working make-a-wish);
+skippable at every step, never trapped; picks demonstrate their effect INSTANTLY
+(pick concise → the sample re-renders concise).
+
+**Ownership:** PA agent OWNS training mode (sequence, content, mechanics, prototype).
+UM owns the write path (each step → preference field; `hesitation` is a new field).
+UX polishes presentation. Chat hosts the mode (deferred round) — triggers: first
+session / !is_onboarded, cheat codes `/welcome`, `/training`, `?welcome=1`.
+**Prototype live at product-awareness `/welcome-preview` (training flow + graduation card).**
+
+---
+# v1 spec below (welcome block contract §2 unchanged — UM's build stands)
+
+
 
 **Directive (Ananth, 2026-07-15):** new users' first message is a product tour + summary;
 ease their fears based on their profile; a tailored set-up module, with a scheduled follow-up.

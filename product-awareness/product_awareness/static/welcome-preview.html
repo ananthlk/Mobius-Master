@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mobius Welcome — Preview Harness</title>
+<title>Mobius Training Mode — Prototype</title>
 <style>
   /* Tokens inlined for iframe self-containment (canonical: mobius-design/tokens.css) */
-  :root{--violet:#7c3aed;--violet-soft:rgba(124,58,237,.10);--bg:#f8f7fb;--surface:#fff;--surface-2:#f1eff7;--text:#1c1a27;--muted:#6b6880;--border:#e2dff0;--live:#16a34a;--planned:#94a3b8;--amber:#d97706}
-  @media (prefers-color-scheme: dark){:root{--bg:#141220;--surface:#1d1a2e;--surface-2:#262238;--text:#eceaf6;--muted:#9d99b5;--border:#332e4d;--live:#4ade80;--planned:#64748b;--amber:#fbbf24}}
+  :root{--violet:#7c3aed;--violet-soft:rgba(124,58,237,.10);--bg:#f8f7fb;--surface:#fff;--surface-2:#f1eff7;--text:#1c1a27;--muted:#6b6880;--border:#e2dff0;--live:#16a34a;--planned:#94a3b8}
+  @media (prefers-color-scheme: dark){:root{--bg:#141220;--surface:#1d1a2e;--surface-2:#262238;--text:#eceaf6;--muted:#9d99b5;--border:#332e4d;--live:#4ade80;--planned:#64748b}}
   :root[data-theme="light"]{--bg:#f8f7fb;--surface:#fff;--surface-2:#f1eff7;--text:#1c1a27;--muted:#6b6880;--border:#e2dff0;--live:#16a34a;--planned:#94a3b8}
   :root[data-theme="dark"]{--bg:#141220;--surface:#1d1a2e;--surface-2:#262238;--text:#eceaf6;--muted:#9d99b5;--border:#332e4d;--live:#4ade80;--planned:#64748b}
   *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
@@ -15,219 +15,228 @@
   header h1{font-size:14px;margin:0;font-weight:650}
   header h1 b{color:var(--violet)}
   header .note{color:var(--muted);font-size:11.5px}
-  #controls{display:flex;gap:10px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface)}
+  #controls{display:flex;gap:10px;flex-wrap:wrap;padding:9px 16px;border-bottom:1px solid var(--border);background:var(--surface);align-items:end}
   #controls label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:2px}
-  #controls select,#controls input{font:inherit;font-size:13px;color:var(--text);background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:5px 8px}
-  main{max-width:620px;margin:24px auto;padding:0 16px}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 24px 18px;box-shadow:0 3px 16px rgba(28,26,39,.09);border-top:3px solid var(--violet);position:relative;overflow:hidden}
-  .enter{animation:pop .45s cubic-bezier(.2,.9,.3,1.2) both}
-  .enter.d1{animation-delay:.08s}.enter.d2{animation-delay:.16s}.enter.d3{animation-delay:.26s}.enter.d4{animation-delay:.36s}
+  #controls input,#controls select{font:inherit;font-size:13px;color:var(--text);background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:5px 8px}
+  #controls .mini{background:none;border:1px solid var(--border);border-radius:999px;color:var(--muted);font:inherit;font-size:12px;padding:5px 12px;cursor:pointer}
+  main{max-width:620px;margin:22px auto;padding:0 16px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:20px 24px 18px;box-shadow:0 3px 16px rgba(28,26,39,.09);border-top:3px solid var(--violet);position:relative;overflow:hidden}
+  .enter{animation:pop .4s cubic-bezier(.2,.9,.3,1.2) both}
+  .enter.d1{animation-delay:.07s}.enter.d2{animation-delay:.14s}.enter.d3{animation-delay:.22s}.enter.d4{animation-delay:.3s}
   @keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
-  h2{margin:0;font-size:21px;display:flex;align-items:center;gap:8px}
+  /* progress */
+  .prog{display:flex;gap:6px;margin:0 0 16px}
+  .prog i{flex:1;height:4px;border-radius:2px;background:var(--border);transition:background .3s}
+  .prog i.on{background:var(--violet)}
+  h2{margin:0 0 4px;font-size:20px;display:flex;align-items:center;gap:8px}
   h2 .wave{display:inline-block;animation:wave 1.8s ease-in-out 1;transform-origin:70% 70%}
   @keyframes wave{0%,100%{transform:rotate(0)}15%{transform:rotate(18deg)}30%{transform:rotate(-8deg)}45%{transform:rotate(14deg)}60%{transform:rotate(-4deg)}}
+  .sub{color:var(--muted);margin:0 0 14px;font-size:13.5px}
+  .primary{background:var(--violet);color:#fff;border:none;border-radius:999px;padding:9px 22px;font:inherit;font-size:14.5px;font-weight:650;cursor:pointer;transition:transform .12s}
+  .primary:hover{transform:translateY(-2px)}
+  .ghostbtn{background:none;border:none;color:var(--muted);font:inherit;font-size:12.5px;cursor:pointer;text-decoration:underline}
+  .row{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+  /* activity grid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:9px;margin:8px 0 4px}
+  .act{border:1.5px solid var(--border);background:var(--surface-2);border-radius:12px;padding:11px 12px;font:inherit;font-size:13.5px;cursor:pointer;text-align:left;transition:all .15s;color:var(--text)}
+  .act:hover{transform:translateY(-2px)}
+  .act.on{border-color:var(--violet);background:var(--violet-soft);font-weight:650}
+  .act .p{display:block;font-size:10.5px;color:var(--violet);margin-top:3px;font-weight:650;letter-spacing:.04em}
+  /* tone samples */
+  .tone{border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;margin:8px 0;cursor:pointer;transition:all .15s;background:var(--surface-2)}
+  .tone:hover{transform:translateX(4px)}
+  .tone.on{border-color:var(--violet);background:var(--violet-soft)}
+  .tone .t{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--violet);font-weight:700}
+  .tone p{margin:4px 0 0;font-size:13.5px}
+  /* scenario + hesitation chips */
+  .bigchip{display:block;width:100%;text-align:left;border:1.5px solid var(--border);background:var(--surface-2);border-radius:12px;padding:12px 15px;margin:8px 0;font:inherit;font-size:14px;cursor:pointer;transition:all .15s;color:var(--text)}
+  .bigchip:hover{transform:translateX(4px)}
+  .bigchip b{display:block}
+  .bigchip span{color:var(--muted);font-size:12.5px}
+  /* graduation card bits (fun edition) */
   .hook{font-size:16.5px;margin:8px 0 2px;font-weight:600}
-  .hooksub{color:var(--muted);margin:0 0 14px;font-size:13.5px}
-  /* flip chip */
+  .learned{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 4px}
+  .learned span{background:var(--violet-soft);color:var(--violet);border-radius:999px;padding:4px 12px;font-size:12px;font-weight:650;animation:pop .35s both}
+  .learned span:nth-child(2){animation-delay:.07s}.learned span:nth-child(3){animation-delay:.14s}.learned span:nth-child(4){animation-delay:.21s}
+  .editnote{color:var(--muted);font-size:11.5px;margin:2px 0 12px}
   .flip{perspective:700px;margin:6px 0 14px;cursor:pointer;user-select:none}
   .flip-inner{position:relative;transition:transform .5s;transform-style:preserve-3d;min-height:52px}
   .flip.on .flip-inner{transform:rotateX(180deg)}
   .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:14px}
-  .face.q{background:var(--violet-soft);color:var(--text);font-weight:600}
-  .face.q .tap{margin-left:auto;font-size:11px;color:var(--violet);font-weight:650;letter-spacing:.04em;white-space:nowrap}
+  .face.q{background:var(--violet-soft);font-weight:600}
+  .face.q .tap{margin-left:auto;font-size:11px;color:var(--violet);font-weight:650;white-space:nowrap}
   .face.a{background:color-mix(in srgb,var(--live) 10%,transparent);transform:rotateX(180deg)}
-  /* try-it chips + composer */
   .tryits{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 10px}
   .try{border:1.5px solid var(--violet);color:var(--violet);background:transparent;border-radius:999px;padding:7px 14px;font:inherit;font-size:13.5px;cursor:pointer;transition:transform .12s, background .12s}
   .try:hover{transform:translateY(-2px) scale(1.03);background:var(--violet-soft)}
-  .try:active{transform:scale(.97)}
   .composer{display:flex;align-items:center;gap:9px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin:4px 0 16px;min-height:42px}
   .composer .cursor{width:2px;height:17px;background:var(--violet);animation:blink 1s steps(1) infinite}
   @keyframes blink{50%{opacity:0}}
   .composer .ghost{color:var(--muted);font-size:13.5px}
   .composer .send{margin-left:auto;color:var(--violet);font-weight:700}
-  /* pillars tabs */
   .tabs{display:flex;gap:6px;margin:2px 0 10px}
   .tabs button{border:1px solid var(--border);background:var(--surface-2);color:var(--muted);border-radius:999px;padding:5px 13px;font:inherit;font-size:12.5px;cursor:pointer;font-weight:600}
   .tabs button.on{background:var(--violet);border-color:var(--violet);color:#fff}
-  .pillar{min-height:84px}
+  .pillar{min-height:80px}
   .pillar ul{margin:4px 0 0;padding-left:20px}
-  .pillar li{margin:5px 0;animation:pop .3s both}
-  .pillar li:nth-child(2){animation-delay:.06s}.pillar li:nth-child(3){animation-delay:.12s}
+  .pillar li{margin:5px 0}
   .pillar .planned li{color:var(--muted)}
   .pillar .steer{border-left:3px solid var(--live);padding:2px 0 2px 11px;font-size:14px;margin-top:4px}
   .wish{margin-top:8px;border:1px dashed var(--live);color:var(--live);background:transparent;border-radius:999px;padding:5px 13px;font:inherit;font-size:12.5px;cursor:pointer}
-  .toast{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;background:var(--text);color:var(--bg);border-radius:999px;padding:7px 16px;font-size:12.5px;opacity:0;transition:opacity .25s;pointer-events:none}
+  .toast{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;background:var(--text);color:var(--bg);border-radius:999px;padding:7px 16px;font-size:12.5px;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;text-align:center}
   .toast.show{opacity:1}
-  /* setup dots */
-  .setup{display:flex;gap:16px;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);flex-wrap:wrap}
-  .setup .lbl{font-size:12px;color:var(--muted);font-weight:650;letter-spacing:.05em;text-transform:uppercase}
-  .step{display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none;font-size:13px;color:var(--muted)}
-  .step .dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;transition:all .2s}
-  .step.done{color:var(--text)}
-  .step.done .dot{background:var(--live);border-color:var(--live);transform:scale(1.12)}
-  .skip{margin-left:auto;background:none;border:none;color:var(--muted);font:inherit;font-size:12px;cursor:pointer;text-decoration:underline}
   canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:9}
   .meta{color:var(--muted);font-size:11.5px;margin-top:12px;text-align:center}
 </style>
 </head>
 <body>
 <header>
-  <h1>Welcome Card <b>·</b> Preview Harness <span style="font-weight:400;color:var(--muted)">(fun edition)</span></h1>
-  <span class="note">cheat code in product: <code>/welcome</code> · <code>?welcome=1</code></span>
+  <h1>Training Mode <b>·</b> Prototype</h1>
+  <span class="note">every answer below writes a REAL preference in product · cheat codes <code>/training</code> · <code>/welcome</code></span>
 </header>
 <div id="controls">
   <div><label>Name</label><input id="cName" value="Ananth" size="8"></div>
   <div><label>Arrival</label><select id="cArrival"><option value="invited">invited</option><option value="self_serve">self-serve</option></select></div>
-  <div><label>Persona</label><select id="cPersona"></select></div>
-  <div><label>Experience</label><select id="cExp"><option>beginner</option><option>regular</option><option>expert</option></select></div>
+  <button class="mini" id="restart">↻ restart training</button>
+  <button class="mini" id="skipTo">⏭ skip to graduation</button>
 </div>
 <main><div id="card" class="card"></div>
-<p class="meta">Everything clickable is honest: Today = live, Coming = really not built, wishes really file. Spec: docs/welcome-onboarding-spec.md</p>
+<p class="meta">Prototype: picks are simulated locally. In product each pick saves via the User Manager's preferences API — show, don't survey. Spec: docs/welcome-onboarding-spec.md §Training</p>
 </main>
 <canvas id="confetti"></canvas>
 <script>
 "use strict";
-/* PERSONA CONTENT PACK v2 — short, punchy, interactive. Same honesty gates. */
-const PERSONAS = [
- {key:"claims", label:"Billing / claims",
-  hook:"Denials, codes, timely filing — answered with receipts.",
-  sub:"Ask like you'd ask a coworker. Get the answer plus the exact policy page it came from.",
-  fearQ:"“What if it gets it wrong — it's my name on the claim.”",
-  fearA:"No source, no claim. Every answer shows receipts — click any citation. Unsure? It says so.",
-  tryits:["What's the timely filing rule for Sunshine?","Is Dr. Chen enrolled with Medicaid?","Remind me to rework that H0019 denial"],
-  today:["Cited policy answers in seconds","Enrollment checks before you bill","Plain-word reminders that nudge you back"],
-  coming:["A per-claim validation ledger","Instant answers for your team's repeat questions"],
-  tour:["chat:complete-a-task","▶ Watch: track a follow-up"]},
- {key:"credentialing", label:"Credentialing coordinator",
-  hook:"“Is this provider payable?” — one question, whole answer.",
-  sub:"NPPES, PML, compliance flags, readiness — on one card. The roster screens are still there when you want depth.",
-  fearQ:"“Ugh, another system to learn.”",
-  fearA:"Nothing to learn. You just ask. Chat is the fast way into the tools you already know.",
-  tryits:["How is our panel doing?","NPPES errors for Acme Health?","Show me the credentialing report"],
-  today:["Provider or whole-panel status from one question","Ghost-billing + enrollment-gap checks","Runs create follow-up tasks automatically"],
-  coming:["Tasks that close themselves when a run completes","A richer credentialing workspace"],
-  tour:["chat:operations-suite-tour","▶ Watch: the ops suite"]},
- {key:"frontdesk", label:"Front desk / scheduling",
-  hook:"The coworker who always knows — and never sighs.",
-  sub:"Which payer covers what, what a code means, where that document went. Just ask.",
-  fearQ:"“This looks complicated. Probably not for me.”",
-  fearA:"If you can type a question, you're overqualified. Say “show me” and it walks your cursor through it.",
-  tryits:["What does code H0019 mean?","Show me how to change my answer style","Where did my last conversation go?"],
-  today:["Plain words in, plain words out","“Show me” tours for anything on screen","Your past questions live in My Vault"],
-  coming:["A setup that learns what you do and surfaces just your tools"],
-  tour:["chat:response-modes","▶ Watch: how answers work"]},
- {key:"phi", label:"Clinical / outreach",
-  hook:"Ask freely. The compliance worrying is Mobius's job.",
-  sub:"Policy answers and document questions — with patient-info guardrails built in, not bolted on.",
-  fearQ:"“Is patient information safe in here?”",
-  fearA:"Uploads get scanned for PHI automatically and stay private by default. Nothing shares itself.",
-  tryits:["Upload this document and tell me what's in it","What's the prior auth rule for outpatient?","Who can see my uploads?"],
-  today:["Upload & ask — private by default","Automatic PHI detection before anything shares","Receipts on every answer"],
-  coming:["Org sharing with a hard safety gate — PHI can't be one-clicked public"],
-  tour:["chat:upload-a-document","▶ Watch: upload & ask"]},
- {key:"curator", label:"Corpus / knowledge admin",
-  hook:"~9,000 documents. Measured quality. Your kingdom.",
-  sub:"Publish pipeline, reviewed lexicon, eval baselines that catch regressions before users do.",
-  fearQ:"“Can I trust what's in the corpus?”",
-  fearA:"Quality is measured, not assumed — per-page extraction status, lexicon QA, scored eval runs on every change.",
-  tryits:["What's in the Public Library?","How does the publish pipeline work?","What did the last eval run score?"],
-  today:["Repository UI with per-page extraction status","Human-in-the-loop lexicon review","Eval dashboard: lift vs drift"],
-  coming:["Per-org private corpora with promote-from-vault"],
-  tour:["chat:operations-suite-tour","▶ Watch: the ops suite"]},
- {key:"exec", label:"Ops / finance exec",
-  hook:"Real claims data. Real benchmarks. Zero slideware.",
-  sub:"Market size, your share, rate gaps worth actual dollars, who's growing at your expense.",
-  fearQ:"“Is this real analysis or a demo?”",
-  fearA:"Computed live from claims-level FL Medicaid data — 26 analytics tools, percentile benchmarks, exportable.",
-  tryits:["How big is the FL Medicaid BH market?","Benchmark my organization","Where are we underpaid?"],
-  today:["26 verified analytics tools","Peer-percentile benchmarks on every KPI","The Strategy deck, exportable"],
-  coming:["Look-alike peer groups for sharper comparisons"],
-  tour:["chat:operations-suite-tour","▶ Watch: the ops suite"]},
- {key:"expert", label:"AI-experienced user",
-  hook:"Not a chatbot wrapper. Come look under the hood.",
-  sub:"45-tool ReAct manifest, strategy-routed retrieval, honesty-checked composition, a registry as ground truth.",
-  fearQ:"“Let me guess — GPT with a system prompt?”",
-  fearA:"Open the platform schematic: 30 modules, 5 clusters, honest live/planned status on every node. Judge for yourself.",
-  tryits:["Show me the platform schematic","What retrieval strategy did you just use?","Recite the Why Mobius essay"],
-  today:["Strategy-routed retrieval over ~9k documents","Verified analytics from claims data","Recital-grade canonical texts, tours, download cards"],
-  coming:["Answer cache with fingerprint replay","One rag(query, mode) interface"],
-  tour:["chat:operations-suite-tour","▶ Watch: the ops suite"]},
- {key:"default", label:"Brand-new user",
-  hook:"Ask me anything about payers, policies, or your own documents.",
-  sub:"I answer with receipts, I say “I don't know” out loud, and I can walk you through anything on screen.",
-  fearQ:"“What even is this?”",
-  fearA:"An operations platform that talks. Behind the chat: policy corpus, market analytics, credentialing, tasks.",
-  tryits:["What can Mobius do for me?","What does code H0019 mean?","Show me around"],
-  today:["Cited answers to policy questions","Upload a document and ask about it","Tours whenever you're lost"],
-  coming:["A workspace that grows with everything you touch"],
-  tour:["chat:response-modes","▶ Watch: how answers work"]},
+/* ======== TRAINING MODE v2 — interaction IS the profiling ======== */
+const ACTIVITIES=[
+ {k:"rework_denials",label:"⚔️ Fighting denials",persona:"claims"},
+ {k:"submit_claims",label:"🧾 Submitting claims",persona:"claims"},
+ {k:"credentialing",label:"🪪 Credentialing providers",persona:"credentialing"},
+ {k:"schedule",label:"📅 Scheduling & check-in",persona:"frontdesk"},
+ {k:"outreach",label:"🤝 Patient outreach",persona:"phi"},
+ {k:"knowledge",label:"📚 Documents & knowledge",persona:"curator"},
+ {k:"strategy",label:"📈 Market & finance",persona:"exec"},
 ];
+const TONES=[
+ {k:"professional",t:"Professional",p:"Dr. Chen is actively enrolled with Sunshine Health (PML-verified). Next revalidation: 2026-11-02. Source: PML roster, p.4."},
+ {k:"friendly",t:"Friendly",p:"Good news — Dr. Chen's all set with Sunshine! ✅ Active enrollment, revalidation due Nov 2. Receipts attached if you want them."},
+ {k:"concise",t:"Concise",p:"Yes. Active. Revalidates 11/02. [src]"},
+];
+const AUTONOMY=[
+ {k:"automatic",b:"Just handle it",s:"I'll act on routine things and tell you after.",exp:"expert",toast:"Bold. I'll handle routine things — sensitive ones still get your sign-off. Always."},
+ {k:"confirm_first",b:"Show me before you act",s:"I'll line it up, you press go.",exp:"regular",toast:"Deal. I stage, you approve — that's enforced, not a vibe."},
+ {k:"manual",b:"Walk me through it",s:"We do it together, step by step.",exp:"beginner",toast:"Perfect. I'll explain everything and never act without you. You can't break anything."},
+];
+const HESITATIONS=[
+ {k:"wrong",b:"It'll get things wrong",fearQ:"“What if it's wrong — it's my name on this.”",fearA:"No source, no claim. Every answer shows receipts — click any citation. Unsure? I say so out loud."},
+ {k:"phi",b:"Patient data safety",fearQ:"“Is patient information safe in here?”",fearA:"Uploads get scanned for PHI automatically and stay private by default. Nothing shares itself."},
+ {k:"complex",b:"Too complicated for me",fearQ:"“This looks complicated…”",fearA:"You just did the hardest part — clicking buttons. Say “show me” anytime and I'll walk your cursor through it."},
+ {k:"none",b:"Honestly? Nothing 😎",fearQ:"“Impress me.”",fearA:"Open the platform schematic — 30 modules, honest live/planned status on every one. Then ask me anything on it."},
+];
+const PERSONAS={
+ claims:{hook:"Denials, codes, timely filing — answered with receipts.",tryits:["What's the timely filing rule for Sunshine?","Is Dr. Chen enrolled with Medicaid?","Remind me to rework that H0019 denial"],today:["Cited policy answers in seconds","Enrollment checks before you bill","Plain-word reminders that nudge back"],coming:["Per-claim validation ledger","Instant answers for repeat questions"]},
+ credentialing:{hook:"“Is this provider payable?” — one question, whole answer.",tryits:["How is our panel doing?","NPPES errors for Acme Health?","Show me the credentialing report"],today:["Provider or panel status from one question","Ghost-billing + gap checks","Runs create follow-up tasks themselves"],coming:["Tasks that close themselves on run completion","Richer credentialing workspace"]},
+ frontdesk:{hook:"The coworker who always knows — and never sighs.",tryits:["What does code H0019 mean?","Show me how to change my answer style","Where did my last conversation go?"],today:["Plain words in, plain words out","“Show me” tours for anything on screen","Past questions live in My Vault"],coming:["A setup that surfaces just your tools"]},
+ phi:{hook:"Ask freely. The compliance worrying is my job.",tryits:["Upload this document and tell me what's in it","What's the prior auth rule for outpatient?","Who can see my uploads?"],today:["Upload & ask — private by default","Automatic PHI detection before anything shares","Receipts on every answer"],coming:["Org sharing behind a hard PHI gate"]},
+ curator:{hook:"~9,000 documents. Measured quality. Your kingdom.",tryits:["What's in the Public Library?","How does the publish pipeline work?","What did the last eval run score?"],today:["Per-page extraction status","Human-in-the-loop lexicon review","Eval dashboard: lift vs drift"],coming:["Per-org corpora with promote-from-vault"]},
+ exec:{hook:"Real claims data. Real benchmarks. Zero slideware.",tryits:["How big is the FL Medicaid BH market?","Benchmark my organization","Where are we underpaid?"],today:["26 verified analytics tools","Peer-percentile benchmarks on every KPI","The Strategy deck, exportable"],coming:["Look-alike peer groups"]},
+ default:{hook:"Ask me anything about payers, policies, or your documents.",tryits:["What can Mobius do for me?","What does code H0019 mean?","Show me around"],today:["Cited answers to policy questions","Upload a document and ask about it","Tours whenever you're lost"],coming:["A workspace that grows with you"]},
+};
 const $=id=>document.getElementById(id);
-PERSONAS.forEach((p,i)=>{const o=document.createElement("option");o.value=i;o.textContent=p.label;$("cPersona").appendChild(o);});
-let pillar="today", steps=[false,false,false], typing=null;
+let T={step:0,acts:[],tone:null,auto:null,hes:null,pillar:"today",dots:[false,false,false],typing:null};
+function persona(){ if(!T.acts.length) return "default"; const a=ACTIVITIES.find(x=>x.k===T.acts[0]); return a?a.persona:"default"; }
+function prog(n){ return `<div class="prog">${[0,1,2,3,4].map(i=>`<i class="${i<n?"on":""}"></i>`).join("")}</div>`; }
 function render(){
-  const p=PERSONAS[+$("cPersona").value], name=$("cName").value||"there",
-        arrival=$("cArrival").value, exp=$("cExp").value;
-  const opener = arrival==="invited" ? "Your org set you up. Zero forms. Let's go." :
-                 "Two minutes, no tour bus — poke anything below.";
-  const expLine = exp==="beginner" ? "🛟 Default settings: I explain myself and ask before acting. You cannot break anything."
-    : exp==="expert" ? "⚙️ Autonomy settings can drop the training wheels whenever you're ready."
-    : "";
-  const pillarBody = pillar==="today"
-    ? `<ul>${p.today.map(x=>`<li>${x}</li>`).join("")}</ul>`
-    : pillar==="coming"
-    ? `<div class="planned"><ul>${p.coming.map(x=>`<li>${x} <span style="font-size:11px">(really not built yet)</span></li>`).join("")}</ul></div>`
-    : `<div class="steer">Feedback here isn't a suggestion box that eats letters — every wish files a real backlog item, and asking for something that doesn't exist <b>votes for it</b>.</div>
-       <button class="wish" id="wishBtn">🎁 make a wish</button>`;
-  $("card").innerHTML=`
-    <h2 class="enter">Hey ${name} <span class="wave">👋</span></h2>
-    <p class="hooksub enter" style="margin:2px 0 12px">${opener}</p>
+  const name=$("cName").value||"there", arrival=$("cArrival").value, c=$("card");
+  if(T.step===0){ c.innerHTML=`${prog(0)}
+    <h2 class="enter">Hey ${name} <span class="wave">👋</span> I'm Mobius.</h2>
+    <p class="sub enter d1">${arrival==="invited"?"Your org set you up — zero forms.":"Welcome in."} Give me <b>90 seconds</b>: you click, I learn how you like to work. You can retrain me anytime.</p>
+    <div class="row enter d2"><button class="primary" id="go">Let's go →</button>
+    <button class="ghostbtn" id="skip">skip — I'll explore on my own</button></div>`;
+    $("go").onclick=()=>{T.step=1;render();};
+    $("skip").onclick=()=>{T.step=5;render();toast("No pressure — training is in the sidebar whenever.");};
+  }
+  else if(T.step===1){ c.innerHTML=`${prog(1)}
+    <h2 class="enter">What's your week made of?</h2>
+    <p class="sub enter">Pick everything that's yours — first pick counts as your main thing.</p>
+    <div class="grid enter d1">${ACTIVITIES.map(a=>`<button class="act ${T.acts.includes(a.k)?"on":""}" data-k="${a.k}">${a.label}${T.acts[0]===a.k?'<span class="p">★ MAIN</span>':""}</button>`).join("")}</div>
+    <div class="row"><button class="primary" ${T.acts.length?"":"disabled style='opacity:.4'"} id="next">That's me →</button></div>`;
+    c.querySelectorAll(".act").forEach(b=>b.onclick=()=>{const k=b.dataset.k;
+      T.acts=T.acts.includes(k)?T.acts.filter(x=>x!==k):[...T.acts,k];render();});
+    const n=$("next"); if(n) n.onclick=()=>{if(T.acts.length){T.step=2;render();toast("Noted. Watch how that changes everything from here →");}};
+  }
+  else if(T.step===2){ c.innerHTML=`${prog(2)}
+    <h2 class="enter">Same answer, three ways.</h2>
+    <p class="sub enter">You asked: <b>“Is Dr. Chen enrolled with Sunshine?”</b> — tap the reply you'd actually want:</p>
+    ${TONES.map((t,i)=>`<div class="tone enter d${i+1}" data-k="${t.k}"><span class="t">${t.t}</span><p>${t.p}</p></div>`).join("")}`;
+    c.querySelectorAll(".tone").forEach(el=>el.onclick=()=>{T.tone=el.dataset.k;T.step=3;render();
+      toast(`${el.dataset.k} it is — everything I say will sound like this. Change anytime.`);});
+  }
+  else if(T.step===3){ c.innerHTML=`${prog(3)}
+    <h2 class="enter">A denial needs reworking.</h2>
+    <p class="sub enter">Real scenario: I found the fix. What should I do?</p>
+    ${AUTONOMY.map((a,i)=>`<button class="bigchip enter d${i+1}" data-k="${a.k}"><b>${a.b}</b><span>${a.s}</span></button>`).join("")}`;
+    c.querySelectorAll(".bigchip").forEach(b=>b.onclick=()=>{T.auto=AUTONOMY.find(a=>a.k===b.dataset.k);T.step=4;render();toast(T.auto.toast);});
+  }
+  else if(T.step===4){ c.innerHTML=`${prog(4)}
+    <h2 class="enter">Last one. Anything make you hesitant?</h2>
+    <p class="sub enter">Honest answers get honest features. (This one's optional.)</p>
+    ${HESITATIONS.map((h,i)=>`<button class="bigchip enter d${i+1}" data-k="${h.k}"><b>${h.b}</b></button>`).join("")}
+    <div class="row"><button class="ghostbtn" id="skiph">skip this one</button></div>`;
+    c.querySelectorAll(".bigchip").forEach(b=>b.onclick=()=>{T.hes=HESITATIONS.find(h=>h.k===b.dataset.k);T.step=5;render();confetti();});
+    $("skiph").onclick=()=>{T.step=5;render();confetti();};
+  }
+  else graduation();
+}
+function graduation(){
+  const name=$("cName").value||"there", p=PERSONAS[persona()], hes=T.hes||HESITATIONS[0];
+  const actLabels=T.acts.map(k=>ACTIVITIES.find(a=>a.k===k).label.replace(/^\S+ /,""));
+  const learned=[
+    actLabels.length?`★ ${actLabels[0]}${actLabels.length>1?" +"+(actLabels.length-1):""}`:"explorer mode",
+    T.tone?`🗣 ${T.tone}`:"🗣 professional (default)",
+    T.auto?`🎚 ${T.auto.b.toLowerCase()}`:"🎚 show me first (default)",
+    T.hes?`😬 ${T.hes.b.toLowerCase()}`:null].filter(Boolean);
+  const expLine=T.auto&&T.auto.exp==="beginner"?"🛟 I explain myself and never act without you — locked in from your pick.":
+                T.auto&&T.auto.exp==="expert"?"⚙️ Training wheels off for routine work — sensitive things still get your sign-off.":"";
+  const pillarBody=T.pillar==="today"?`<ul>${p.today.map(x=>`<li>${x}</li>`).join("")}</ul>`
+    :T.pillar==="coming"?`<div class="planned"><ul>${p.coming.map(x=>`<li>${x} <span style="font-size:11px">(really not built yet)</span></li>`).join("")}</ul></div>`
+    :`<div class="steer">Wishes here aren't a suggestion box that eats letters — each one files a real backlog item, and asking for something that doesn't exist <b>votes for it</b>.</div><button class="wish" id="wishBtn">🎁 make a wish</button>`;
+  $("card").innerHTML=`${prog(5)}
+    <h2 class="enter">Trained. Here's your Mobius, ${name} 🎓</h2>
+    <div class="learned enter">${learned.map(x=>`<span>${x}</span>`).join("")}</div>
+    <p class="editnote enter">That's what I learned — edit any of it in Preferences, or hit ↻ to retrain me.</p>
     <p class="hook enter d1">${p.hook}</p>
-    <p class="hooksub enter d1">${p.sub}</p>
-    <div class="flip enter d2" id="flip"><div class="flip-inner">
-      <div class="face q">😬 ${p.fearQ}<span class="tap">tap to flip</span></div>
-      <div class="face a">✅ ${p.fearA}</div>
-    </div></div>
-    ${expLine?`<p class="hooksub enter d2">${expLine}</p>`:""}
-    <div class="tryits enter d3">${p.tryits.map((t,i)=>`<button class="try" data-q="${t.replace(/"/g,'&quot;')}">${t}</button>`).join("")}</div>
-    <div class="composer enter d3"><span class="ghost" id="ghost">tap a question — watch it type itself…</span><span class="cursor"></span><span class="send">➤</span></div>
-    <div class="tabs enter d4">
-      <button data-p="today" class="${pillar==="today"?"on":""}">✅ Today</button>
-      <button data-p="coming" class="${pillar==="coming"?"on":""}">🔭 Coming</button>
-      <button data-p="steer" class="${pillar==="steer"?"on":""}">🎁 You steer it</button>
-    </div>
-    <div class="pillar enter d4">${pillarBody}</div>
-    <div class="setup enter d4">
-      <span class="lbl">Get set up</span>
-      ${["Style","Your org","First question"].map((s,i)=>`<span class="step ${steps[i]?"done":""}" data-i="${i}"><span class="dot">${steps[i]?"✓":""}</span>${s}</span>`).join("")}
-      <button class="skip">skip for now</button>
-    </div>
+    <div class="flip enter d1" id="flip"><div class="flip-inner">
+      <div class="face q">😬 ${hes.fearQ}<span class="tap">tap to flip</span></div>
+      <div class="face a">✅ ${hes.fearA}</div></div></div>
+    ${expLine?`<p class="sub enter d2">${expLine}</p>`:""}
+    <div class="tryits enter d2">${p.tryits.map(t=>`<button class="try" data-q="${t.replace(/"/g,'&quot;')}">${t}</button>`).join("")}</div>
+    <div class="composer enter d2"><span class="ghost" id="ghost">tap a question — watch it type itself…</span><span class="cursor"></span><span class="send">➤</span></div>
+    <div class="tabs enter d3">
+      <button data-p="today" class="${T.pillar==="today"?"on":""}">✅ Today</button>
+      <button data-p="coming" class="${T.pillar==="coming"?"on":""}">🔭 Coming</button>
+      <button data-p="steer" class="${T.pillar==="steer"?"on":""}">🎁 You steer it</button></div>
+    <div class="pillar enter d3">${pillarBody}</div>
     <div class="toast" id="toast"></div>`;
-  $("flip").addEventListener("click",()=>$("flip").classList.toggle("on"));
-  document.querySelectorAll(".try").forEach(b=>b.addEventListener("click",()=>typeIt(b.dataset.q)));
-  document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{pillar=b.dataset.p;render();}));
-  document.querySelectorAll(".step").forEach(s=>s.addEventListener("click",()=>{
-    steps[+s.dataset.i]=!steps[+s.dataset.i]; render();
-    if(steps.every(Boolean)){toast("You're in. 🎉  (in product: card retires itself)");confetti();}
-  }));
-  const w=$("wishBtn"); if(w) w.addEventListener("click",()=>toast("Wish filed — for real, this button works in product 🎯"));
+  $("flip").onclick=()=>$("flip").classList.toggle("on");
+  document.querySelectorAll(".try").forEach(b=>b.onclick=()=>typeIt(b.dataset.q));
+  document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{T.pillar=b.dataset.p;graduation();});
+  const w=$("wishBtn"); if(w) w.onclick=()=>toast("Wish filed — for real, this button works in product 🎯");
 }
-function typeIt(q){
-  clearInterval(typing); const g=$("ghost"); g.textContent=""; let i=0;
-  typing=setInterval(()=>{ g.textContent=q.slice(0,++i);
-    if(i>=q.length){clearInterval(typing); toast("in product this fires in chat — for real");} },22);
-}
-function toast(msg){const t=$("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2600);}
-function confetti(){
-  const c=$("confetti"),x=c.getContext("2d"); c.width=innerWidth; c.height=innerHeight;
-  const P=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*80,v:2+Math.random()*3.5,r:3+Math.random()*4,a:Math.random()*6.28,
+function typeIt(q){clearInterval(T.typing);const g=$("ghost");g.textContent="";let i=0;
+  T.typing=setInterval(()=>{g.textContent=q.slice(0,++i);
+    if(i>=q.length){clearInterval(T.typing);toast("in product this fires in chat — for real");}},22);}
+function toast(msg){let t=$("toast");
+  if(!t){t=document.createElement("div");t.className="toast";t.id="toast";$("card").appendChild(t);}
+  t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2800);}
+function confetti(){const c=$("confetti"),x=c.getContext("2d");c.width=innerWidth;c.height=innerHeight;
+  const P=Array.from({length:130},()=>({x:Math.random()*c.width,y:-20-Math.random()*80,v:2+Math.random()*3.5,r:3+Math.random()*4,a:Math.random()*6.28,
     col:["#7c3aed","#16a34a","#d97706","#60a5fa"][Math.floor(Math.random()*4)]}));
-  let f=0; const go=()=>{x.clearRect(0,0,c.width,c.height);
+  let f=0;const go=()=>{x.clearRect(0,0,c.width,c.height);
     P.forEach(p=>{p.y+=p.v;p.x+=Math.sin(p.a+=.08)*1.6;x.fillStyle=p.col;x.fillRect(p.x,p.y,p.r,p.r*1.6);});
-    if(++f<130)requestAnimationFrame(go); else x.clearRect(0,0,c.width,c.height);}; go();
-}
-["cName","cArrival","cPersona","cExp"].forEach(id=>$(id).addEventListener("input",render));
+    if(++f<140)requestAnimationFrame(go);else x.clearRect(0,0,c.width,c.height);};go();}
+$("restart").onclick=()=>{T={step:0,acts:[],tone:null,auto:null,hes:null,pillar:"today",dots:[false,false,false],typing:null};render();};
+$("skipTo").onclick=()=>{T.step=5;render();};
+["cName","cArrival"].forEach(id=>$(id).addEventListener("input",()=>render()));
 render();
 </script>
 </body>
