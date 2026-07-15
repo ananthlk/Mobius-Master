@@ -150,7 +150,7 @@ const NODES = [
   user:{tag:"Finds the passages your answer cites — from authoritative documents, not model memory.",
    pts:["Hybrid keyword + semantic search with citations (doc + page)","Smart routing: exact codes vs conceptual questions vs web fallback","Payor-aware: plan questions inherit the state program's rules","Refuses cleanly on PHI / out-of-scope (fail-fast)"]},
   tech:{tag:"Strategy portfolio a–e behind corpus_search_agent; pgvector fleet standard.",
-   pts:["a precision · b broad · c LLM-validate/reverse-RAG · d external (DuckDuckGo) · e fail-fast","Payor-authority inheritance (payor_inherited_authority, mig 004) + k=2/doc cap","Planned: structured-fact lookup, cache replay, validation ledger, rag(query, mode) tool-collapse","Priors v1 hand-set → bandit-ready; judge eval rubric (must/forbidden/abstain)"]},
+   pts:["a precision · b broad · c LLM-validate/reverse-RAG · d external (Vertex AI Grounding primary; DDG legacy fallback) · e fail-fast","Payor-authority inheritance (payor_inherited_authority, mig 004) + k=2/doc cap","Router v2 in DEV (ROUTER_VERSION=v2): linear scoring + multi-invoke fan-out on impure leaves → union chunks → synthesize once; PRIORS_VERSION per-request in routing_dump (/version) — in-flight, not GA","Planned: structured-fact lookup, cache replay, validation ledger, rag(query, mode) tool-collapse","Priors v1 hand-set → bandit-ready; judge eval rubric (must/forbidden/abstain)"]},
   doc:"rag-backend.md", verified:"2026-07-14"},
  {id:"lexicon", label:"Lexicon", sub:"policy vocabulary", cluster:"intel", status:"live",
   user:{tag:"The controlled vocabulary that makes policy search precise — payers, programs, code families.",
