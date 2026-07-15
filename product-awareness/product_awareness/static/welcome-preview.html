@@ -224,6 +224,7 @@ function render(){
       ${sc.depths.map((d,i)=>`<button type="button" class="tone enter d${i+1}" data-k="${d[0]}"><p>${d[1]}</p></button>`).join("")}`;
       c.querySelectorAll(".tone").forEach(b=>b.onclick=()=>{T.exp=b.dataset.k;T.step=4;render();toast("Got it — that's the depth you'll get. Dial it up or down anytime.");});
     }
+  }
   else if(T.step===4){ c.innerHTML=`${prog(4)}
     <h2 class="enter">Last one. Anything make you hesitant?</h2>
     <p class="sub enter">Pick all that apply — honest answers get honest features. (Optional.)</p>
