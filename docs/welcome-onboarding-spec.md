@@ -21,6 +21,36 @@ Principles carried from v1: promise-what-the-profile-guarantees; three honesty p
 skippable at every step, never trapped; picks demonstrate their effect INSTANTLY
 (pick concise → the sample re-renders concise).
 
+## Success criteria (Ananth, 2026-07-15): "truly capturing the user intents and
+## experience so that they are set up and will come back"
+The mode is measured on OUTCOMES, not completion theater:
+1. **Intent capture** — the graduation first-question is USER-AUTHORED (chips are
+   starters, not scripts — "user select… as against saying it for them"). The typed/chosen
+   question is stored as an intent signal; if Mobius can't answer it, it AUTO-FILES into
+   the demand loop (docs_gap / feature_request) — a new user's unmet first intent is the
+   highest-value gap signal we can collect.
+2. **Setup fidelity** — % of training picks later EDITED in Preferences is the
+   mis-capture metric (low churn = we understood them). Per-step completion + skip rates.
+3. **Return** — D1/D7 return rate of trained vs skipped users; first-question fire rate
+   from the graduation card; second-session first-action.
+Owner: PA agent tracks these once chat wiring lands (needs skill_invocations-style
+telemetry — flagged as a dependency; the analytics gap is a known skills-node item).
+
+## v2.1 corrections (User Manager, preference owner, 2026-07-15 — accepted)
+- **Step 4 writes `autonomy_sensitive`, NOT routine** — a denial-rework scenario is the
+  preference model's literal definition of sensitive. (Optionally routine = one notch
+  more autonomous than the pick; v1 writes sensitive only.)
+- **Experience level is SELF-DECLARED, never inferred** — independent axis (the
+  counterexample: an expert who wants confirm-first on sensitive work). The autonomy pick
+  may PRE-SELECT a suggestion in a visible control the user confirms — never a silent write.
+  Training adds a micro-chip confirm ("How much AI have you used?") on the same screen.
+- **`hesitations` = text[] multi-select** (UM migration 007, `hesitations` field on the
+  preferences API, returned in /me; empty = skipped). Welcome block unchanged for now;
+  can ride it additively if graduation ever re-renders server-side.
+- Per-step writes confirmed: existing PUT /api/v1/auth/preferences (all-optional body);
+  graduation = PUT /api/v1/auth/onboarding; /me lazily re-renders the profile prompt, so
+  a step-3 tone pick shapes answers immediately.
+
 **Ownership:** PA agent OWNS training mode (sequence, content, mechanics, prototype).
 UM owns the write path (each step → preference field; `hesitation` is a new field).
 UX polishes presentation. Chat hosts the mode (deferred round) — triggers: first

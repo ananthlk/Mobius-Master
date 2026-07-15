@@ -52,6 +52,10 @@
   .bigchip{display:block;width:100%;text-align:left;border:1.5px solid var(--border);background:var(--surface-2);border-radius:12px;padding:12px 15px;margin:8px 0;font:inherit;font-size:14px;cursor:pointer;transition:all .15s;color:var(--text)}
   .bigchip:hover{transform:translateX(4px)}
   .bigchip b{display:block}
+  .bigchip.suggest{border-color:var(--violet);background:var(--violet-soft)}
+  .composer input{flex:1;border:none;background:transparent;font:inherit;font-size:13.5px;color:var(--text);outline:none}
+  .composer input::placeholder{color:var(--muted)}
+  .composer .send{cursor:pointer}
   .bigchip span{color:var(--muted);font-size:12.5px}
   /* graduation card bits (fun edition) */
   .hook{font-size:16.5px;margin:8px 0 2px;font-weight:600}
@@ -142,7 +146,7 @@ const PERSONAS={
  default:{hook:"Ask me anything about payers, policies, or your documents.",tryits:["What can Mobius do for me?","What does code H0019 mean?","Show me around"],today:["Cited answers to policy questions","Upload a document and ask about it","Tours whenever you're lost"],coming:["A workspace that grows with you"]},
 };
 const $=id=>document.getElementById(id);
-let T={step:0,acts:[],tone:null,auto:null,hes:null,pillar:"today",dots:[false,false,false],typing:null};
+let T={step:0,acts:[],tone:null,auto:null,exp:null,hes:null,pillar:"today",dots:[false,false,false],typing:null};
 function persona(){ if(!T.acts.length) return "default"; const a=ACTIVITIES.find(x=>x.k===T.acts[0]); return a?a.persona:"default"; }
 function prog(n){ return `<div class="prog">${[0,1,2,3,4].map(i=>`<i class="${i<n?"on":""}"></i>`).join("")}</div>`; }
 function render(){
@@ -171,11 +175,19 @@ function render(){
     c.querySelectorAll(".tone").forEach(el=>el.onclick=()=>{T.tone=el.dataset.k;T.step=3;render();
       toast(`${el.dataset.k} it is — everything I say will sound like this. Change anytime.`);});
   }
-  else if(T.step===3){ c.innerHTML=`${prog(3)}
-    <h2 class="enter">A denial needs reworking.</h2>
-    <p class="sub enter">Real scenario: I found the fix. What should I do?</p>
-    ${AUTONOMY.map((a,i)=>`<button class="bigchip enter d${i+1}" data-k="${a.k}"><b>${a.b}</b><span>${a.s}</span></button>`).join("")}`;
-    c.querySelectorAll(".bigchip").forEach(b=>b.onclick=()=>{T.auto=AUTONOMY.find(a=>a.k===b.dataset.k);T.step=4;render();toast(T.auto.toast);});
+  else if(T.step===3){
+    if(!T.auto){ c.innerHTML=`${prog(3)}
+      <h2 class="enter">A denial needs reworking.</h2>
+      <p class="sub enter">Real scenario — this is <b>sensitive</b> territory (billing). I found the fix. What should I do?</p>
+      ${AUTONOMY.map((a,i)=>`<button class="bigchip enter d${i+1}" data-k="${a.k}"><b>${a.b}</b><span>${a.s}</span></button>`).join("")}`;
+      c.querySelectorAll(".bigchip").forEach(b=>b.onclick=()=>{T.auto=AUTONOMY.find(a=>a.k===b.dataset.k);render();toast(T.auto.toast);});
+    } else { c.innerHTML=`${prog(3)}
+      <h2 class="enter">Deal: “${T.auto.b}” for sensitive work.</h2>
+      <p class="sub enter">One more — how much AI have you used? <span style="opacity:.7">(your call — the last pick just suggests, never decides)</span></p>
+      ${[["beginner","🌱 Just starting"],["regular","🙂 Comfortable"],["expert","⚡ Power user"]].map(([k,l],i)=>
+        `<button class="bigchip enter d${i+1} ${k===T.auto.exp?"suggest":""}" data-k="${k}"><b>${l}${k===T.auto.exp?" · suggested":""}</b></button>`).join("")}`;
+      c.querySelectorAll(".bigchip").forEach(b=>b.onclick=()=>{T.exp=b.dataset.k;T.step=4;render();toast("Self-declared — never inferred. Change it anytime.");});
+    }
   }
   else if(T.step===4){ c.innerHTML=`${prog(4)}
     <h2 class="enter">Last one. Anything make you hesitant?</h2>
@@ -193,10 +205,11 @@ function graduation(){
   const learned=[
     actLabels.length?`★ ${actLabels[0]}${actLabels.length>1?" +"+(actLabels.length-1):""}`:"explorer mode",
     T.tone?`🗣 ${T.tone}`:"🗣 professional (default)",
-    T.auto?`🎚 ${T.auto.b.toLowerCase()}`:"🎚 show me first (default)",
+    T.auto?`🎚 ${T.auto.b.toLowerCase()} (sensitive)`:"🎚 show me first (default)",
+    T.exp?`🧠 ${T.exp}`:null,
     T.hes?`😬 ${T.hes.b.toLowerCase()}`:null].filter(Boolean);
-  const expLine=T.auto&&T.auto.exp==="beginner"?"🛟 I explain myself and never act without you — locked in from your pick.":
-                T.auto&&T.auto.exp==="expert"?"⚙️ Training wheels off for routine work — sensitive things still get your sign-off.":"";
+  const expLine=T.exp==="beginner"?"🛟 I explain myself and never act without you — locked in from your picks.":
+                T.exp==="expert"?"⚙️ Training wheels off where you allowed it — sensitive things still get your sign-off.":"";
   const pillarBody=T.pillar==="today"?`<ul>${p.today.map(x=>`<li>${x}</li>`).join("")}</ul>`
     :T.pillar==="coming"?`<div class="planned"><ul>${p.coming.map(x=>`<li>${x} <span style="font-size:11px">(really not built yet)</span></li>`).join("")}</ul></div>`
     :`<div class="steer">Wishes here aren't a suggestion box that eats letters — each one files a real backlog item, and asking for something that doesn't exist <b>votes for it</b>.</div><button class="wish" id="wishBtn">🎁 make a wish</button>`;
@@ -210,7 +223,7 @@ function graduation(){
       <div class="face a">✅ ${hes.fearA}</div></div></div>
     ${expLine?`<p class="sub enter d2">${expLine}</p>`:""}
     <div class="tryits enter d2">${p.tryits.map(t=>`<button class="try" data-q="${t.replace(/"/g,'&quot;')}">${t}</button>`).join("")}</div>
-    <div class="composer enter d2"><span class="ghost" id="ghost">tap a question — watch it type itself…</span><span class="cursor"></span><span class="send">➤</span></div>
+    <div class="composer enter d2"><input id="ci" placeholder="ask what YOU actually came here for — or tap a starter above"><span class="send" id="fire">➤</span></div>
     <div class="tabs enter d3">
       <button data-p="today" class="${T.pillar==="today"?"on":""}">✅ Today</button>
       <button data-p="coming" class="${T.pillar==="coming"?"on":""}">🔭 Coming</button>
@@ -219,12 +232,16 @@ function graduation(){
     <div class="toast" id="toast"></div>`;
   $("flip").onclick=()=>$("flip").classList.toggle("on");
   document.querySelectorAll(".try").forEach(b=>b.onclick=()=>typeIt(b.dataset.q));
+  $("fire").onclick=fireIntent; $("ci").addEventListener("keydown",e=>{if(e.key==="Enter")fireIntent();});
   document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{T.pillar=b.dataset.p;graduation();});
   const w=$("wishBtn"); if(w) w.onclick=()=>toast("Wish filed — for real, this button works in product 🎯");
 }
-function typeIt(q){clearInterval(T.typing);const g=$("ghost");g.textContent="";let i=0;
-  T.typing=setInterval(()=>{g.textContent=q.slice(0,++i);
-    if(i>=q.length){clearInterval(T.typing);toast("in product this fires in chat — for real");}},22);}
+function typeIt(q){clearInterval(T.typing);const g=$("ci");g.value="";let i=0;
+  T.typing=setInterval(()=>{g.value=q.slice(0,++i);
+    if(i>=q.length){clearInterval(T.typing);toast("a starter — edit it, or ask your own. Then ➤");}},22);}
+function fireIntent(){const v=($("ci").value||"").trim();
+  if(!v){toast("type anything — what YOU came for is the point");return;}
+  toast("🎯 captured as your first intent — in product: fires in chat + teaches Mobius what you came for (unanswerable → files a real gap)");}
 function toast(msg){let t=$("toast");
   if(!t){t=document.createElement("div");t.className="toast";t.id="toast";$("card").appendChild(t);}
   t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2800);}
@@ -234,7 +251,7 @@ function confetti(){const c=$("confetti"),x=c.getContext("2d");c.width=innerWidt
   let f=0;const go=()=>{x.clearRect(0,0,c.width,c.height);
     P.forEach(p=>{p.y+=p.v;p.x+=Math.sin(p.a+=.08)*1.6;x.fillStyle=p.col;x.fillRect(p.x,p.y,p.r,p.r*1.6);});
     if(++f<140)requestAnimationFrame(go);else x.clearRect(0,0,c.width,c.height);};go();}
-$("restart").onclick=()=>{T={step:0,acts:[],tone:null,auto:null,hes:null,pillar:"today",dots:[false,false,false],typing:null};render();};
+$("restart").onclick=()=>{T={step:0,acts:[],tone:null,auto:null,exp:null,hes:null,pillar:"today",dots:[false,false,false],typing:null};render();};
 $("skipTo").onclick=()=>{T.step=5;render();};
 ["cName","cArrival"].forEach(id=>$(id).addEventListener("input",()=>render()));
 render();
