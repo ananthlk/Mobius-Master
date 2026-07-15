@@ -113,6 +113,10 @@ backlog!) or we key off future role; parked.
   exact card content per profile. Ananth-testable immediately.
 
 ## 8. Open items
-- Ananth: membership-approval flow green-light (unlocks org_status="pending" + approval-aware welcome copy).
+- ~~Ananth: membership-approval flow green-light~~ **GREEN-LIT 2026-07-15** — User Manager
+  builds the flow (self-claim → pending → approve; org side ready per Org agent; instant-RAG
+  is the named consumer). `org_status:"pending"` joins the welcome block when it ships;
+  welcome copy for pending users: "your org membership is awaiting approval — here's what
+  you can do meanwhile."
 - UX: fear-question ruling + card design (three-pillar content structure per §6).
 - Exec persona gap (§3) — new activity or role.
