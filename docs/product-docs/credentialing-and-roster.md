@@ -14,6 +14,8 @@
 
 ## Capabilities
 
+> Joining your org — self-claim → pending → approve — SHIPPED 2026-07-15 (User Manager agent); see the *Invites, set-password & joining your org* section of the user-and-auth doc. It was previously listed as planned here.
+
 ### Ask in chat — the primary access point (2026-07)
 **Chat is now the front door for credentialing questions**; the roster UI remains for deep work, reached via a chip. Backed by the `check_provider_credentialing` MCP tool:
 
@@ -99,7 +101,6 @@ API surface (service base, roster router prefix `/roster`): `POST /roster/{org}/
 - **Per-org private document store** — `POST /org/{slug}/doc-store/provision` is built (instant-RAG/Vault contract locked) but waits on the provisioner URL from RAG/Instant-RAG.
 - **Org-registry enforcement** — org validation runs in warn mode (unresolved orgs are logged); per-writer enforcement pending Ananth's review (~2026-07-16).
 - **Richer credentialing modal** — a UI modal with richer navigation of credentialing data (flagged by Ananth; frontend work not started).
-- **Membership approval flow** — self-claim org enrollment → pending → approval: org side ready, pending User Manager + chat wiring.
 
 ## Doc-readiness notes
 
