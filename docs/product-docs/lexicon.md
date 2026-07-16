@@ -108,6 +108,7 @@ Tag changes are **live**: retrieval reads `document_tags` via a `LEFT JOIN` at q
 - **Nightly pipeline kickoff moved to Cloud Scheduler** (10pm daily, app-independent, `/admin/nightly/run`), self-healing zombie-run cleanup; the admin UI button remains as manual override.
 - Ephemeral (`expires_at`) documents excluded from auto-retag.
 - Standing loop: per-tag pool-size monitoring + demand-driven leaf creation from failed eval queries (proven on cmhc009).
+- Note: a small set of `p` entries overlap `j` dimensions (p:payor/p:state/p:program vs j:payor/j:state/j:program — legacy kinding from before the j-dimension existed; cleanup queued in the selectivity loop's hygiene pass).
 
 ## Doc-readiness notes
 
