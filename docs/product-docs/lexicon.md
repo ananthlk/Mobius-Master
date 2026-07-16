@@ -4,7 +4,7 @@
 
 ## Purpose
 
-The lexicon is Mobius's curated, versioned vocabulary of policy concepts. Every entry is a hand-approved tag of one of three **kinds** — `p` (payer / prescriptive / process), `d` (domain / descriptive), `j` (jurisdiction) — with a `code` and a `spec` (JSON) holding the phrases and aliases that identify it. During ingestion, Path B matches these phrases against policy text and stamps documents with `p_tags` / `d_tags` / `j_tags`. At query time the same vocabulary is matched against the user's question to expand the search query and to classify how the retrieval agent should behave.
+The lexicon is Mobius's curated, versioned vocabulary of policy concepts. Every entry is a hand-approved tag of one of three **kinds** — `p` (payer / prescriptive / process), `d` (domain topic — e.g. claims.timely_filing, place_of_service.telehealth), `j` (jurisdiction) — with a `code` and a `spec` (JSON) holding the phrases and aliases that identify it. During ingestion, Path B matches these phrases against policy text and stamps documents with `p_tags` / `d_tags` / `j_tags`. At query time the same vocabulary is matched against the user's question to expand the search query and to classify how the retrieval agent should behave.
 
 It matters because tags are the join key between "what a document is about" and "what a query is asking for." Good tag coverage lets the retrieval agent filter the corpus to the right documents and pick a confident, precise strategy; poor coverage forces it into broad, low-precision fallbacks. The lexicon is therefore both a **filtering vocabulary** (document_tags join) and a **routing signal** (tag coverage → query classification).
 
@@ -101,6 +101,13 @@ Tag changes are **live**: retrieval reads `document_tags` via a `LEFT JOIN` at q
 - **Query expansion** — `corpus_search_lexicon.py::expand_query_via_lexicon` matches the raw query against an in-process snapshot of `active` entries (5-minute TTL cache; `invalidate_cache()` forces reload). Matching is word-boundary aligned; single-word phrases >4 chars are rejected as too generic (short acronyms like NPI/DME/HCPCS pass). Returns `expansion_phrases` (OR-joined into the BM25 tsquery) and `matched_codes` split into domain/jurisdiction/process tags. Capped at 12 entries/query. An env-gated (`LEXICON_PRECISION_CSV`) experimental filter can prune noisy phrases.
 - **Strategy selection** — `corpus_search_agent.py::classify_query` calls `expand_query_via_lexicon`, then computes **coverage** = (tagged + literal-anchor tokens) / meaningful tokens. Coverage + tag matches classify the query: `PRECISION_DOMINANT` (any literal anchor), `CONCEPTUAL` (coverage ≥ 0.5 and tag matches), `MIXED` (coverage ≥ 0.2 and tag matches), else `VAGUE`. This `QueryProfile` drives the adaptive strategy order and the Fail-Fast gate — i.e., higher lexicon coverage → more confident, more precise strategies.
 - **Republishing / eval loop** — improving the lexicon (approve phrases → `bump_revision`) raises tag coverage, which the eval loop measures as a lift in routing/answer quality; `retag/status` surfaces which documents still need re-tagging after a revision bump.
+
+## Owner refresh (2026-07-15, Lexicon agent inventory)
+- Lexicon at **rev 1082** (from 1064): new `billing_codes.modifier`, IOP phrases, `disputes.claim_dispute` — the first demand-driven leaf from the standing tag-selectivity loop.
+- **tag-IDF dtag-arm weighting implemented** (env-gated `DTAG_ARM_IDF=1` in the RAG deploy; binary-vs-IDF eval A/B pending).
+- **Nightly pipeline kickoff moved to Cloud Scheduler** (10pm daily, app-independent, `/admin/nightly/run`), self-healing zombie-run cleanup; the admin UI button remains as manual override.
+- Ephemeral (`expires_at`) documents excluded from auto-retag.
+- Standing loop: per-tag pool-size monitoring + demand-driven leaf creation from failed eval queries (proven on cmhc009).
 
 ## Doc-readiness notes
 
