@@ -108,8 +108,22 @@ compliance, at wiring) · Eval agent (harness, when their round opens).
   UM's guaranteed literal "Tone: {x}." prefix (deterministic). Structural question open — does the AnswerCard schema cap the
   pager voice? (if yes → concise samples re-cut to "concise within a card").
   Reliability: 3/12 agentic turns failed (2 no-card, 1 formatting apology) — flagged.
-- Blind-sort bar (9/10): NOT MET. Training mode remains live (voices degrade gracefully
-  to base, no wrong content) but the tone promise is not yet kept — gate stays open.
+- Round 3 (12 agentic turns, vs chat rev 00498 VOICE-DIRECTIVE fix): partial — friendly
+  voice landed (consistent "Hey Biller" openers, contractions 2.0); concise still bulleted.
+- **MEASUREMENT-SURFACE CORRECTION (Chat, verified app.ts 11082–11138, 2026-07-17):**
+  rounds 1–3 scored the WRONG surface. In the two-phase streaming path (all copilot turns)
+  `direct_answer` is built off-DOM and NEVER transplanted (child of renderedBubble, not
+  renderedSummaryPanel) — the user reads `react_draft` PROSE (word-streamed into
+  `.ac-summary-prose`) as PRIMARY + completed-card `sections[].bullets` appended below as
+  SECONDARY. Consequence for owners: card `sections` count is set by `final.py` (VOICE
+  DIRECTIVE fix, rev 00498); PROSE brevity/register is set by the ReAct reasoning system
+  prompt (`react/prompts.py:417`, which does splice the profile) — two DIFFERENT prompt
+  paths, both must comply. **The eval MUST score prose-primary + sections-secondary, drop
+  direct_answer.** Round 4 (copilot, cache-busted, prose-primary) is the first valid
+  measurement of the user-visible surface. This measurement contract is inherited by the
+  formal Eval harness.
+- Blind-sort bar (9/10): NOT MET as of round 3. Training mode remains live (voices degrade
+  gracefully to base, no wrong content) but the tone promise is not yet kept — gate stays open.
 
 **Ownership:** PA agent OWNS training mode (sequence, content, mechanics, prototype).
 UM owns the write path (each step → preference field; `hesitation` is a new field).
