@@ -1,0 +1,195 @@
+<title>Setting up a new client &mdash; how it works</title>
+<style>
+  :root{
+    --text:#1a1d21; --muted:#64748b; --bg:#f4f5f8; --card:#ffffff; --sunken:#f1f5f9;
+    --border:#e2e8f0; --border-med:#d1d5db;
+    --violet:#7c3aed; --violet-wash:#f3eefe;
+    --user:#0f9d6e; --user-wash:#e7f6f0;      /* what the user does */
+    --invoke:#2563eb; --invoke-wash:#e8f0fe;   /* services invoked */
+    --store:#b45309; --store-wash:#fdf3e5;      /* data stored */
+    --shadow:0 6px 20px rgba(16,20,30,.08);
+    --font:"DM Sans",system-ui,-apple-system,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --text:#e6edf3; --muted:#8b949e; --bg:#0f1419; --card:#1a2332; --sunken:#161b22;
+    --border:rgba(255,255,255,.09); --border-med:rgba(255,255,255,.16);
+    --violet:#a78bfa; --violet-wash:rgba(167,139,250,.13);
+    --user:#34d399; --user-wash:rgba(52,211,153,.13);
+    --invoke:#60a5fa; --invoke-wash:rgba(96,165,250,.13);
+    --store:#fbbf24; --store-wash:rgba(251,191,36,.13);
+    --shadow:0 6px 20px rgba(0,0,0,.45);
+  }}
+  :root[data-theme="dark"]{
+    --text:#e6edf3; --muted:#8b949e; --bg:#0f1419; --card:#1a2332; --sunken:#161b22;
+    --border:rgba(255,255,255,.09); --border-med:rgba(255,255,255,.16);
+    --violet:#a78bfa; --violet-wash:rgba(167,139,250,.13);
+    --user:#34d399; --user-wash:rgba(52,211,153,.13);
+    --invoke:#60a5fa; --invoke-wash:rgba(96,165,250,.13);
+    --store:#fbbf24; --store-wash:rgba(251,191,36,.13);
+    --shadow:0 6px 20px rgba(0,0,0,.45);
+  }
+  :root[data-theme="light"]{
+    --text:#1a1d21; --muted:#64748b; --bg:#f4f5f8; --card:#ffffff; --sunken:#f1f5f9;
+    --border:#e2e8f0; --border-med:#d1d5db; --violet:#7c3aed; --violet-wash:#f3eefe;
+    --user:#0f9d6e; --user-wash:#e7f6f0; --invoke:#2563eb; --invoke-wash:#e8f0fe;
+    --store:#b45309; --store-wash:#fdf3e5;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5;
+    -webkit-font-smoothing:antialiased;padding:30px 18px 60px}
+  .wrap{max-width:880px;margin:0 auto}
+  h1{font-size:1.4rem;font-weight:600;letter-spacing:-.01em;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:.9rem;margin:0 0 6px}
+  .stamp{font-family:var(--mono);font-size:.68rem;color:var(--muted);margin:0 0 20px}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:22px;font-size:.8rem}
+  .lg{display:inline-flex;align-items:center;gap:7px;color:var(--muted)}
+  .sw{width:11px;height:11px;border-radius:3px}
+  .phase{display:flex;gap:15px}
+  .rail{display:flex;flex-direction:column;align-items:center;flex:0 0 auto;padding-top:2px}
+  .node{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:.85rem;font-weight:700;background:var(--violet-wash);border:1px solid var(--violet);color:var(--violet)}
+  .line{width:2px;flex:1;background:var(--border-med);min-height:14px;margin:4px 0}
+  .card{flex:1;background:var(--card);border:1px solid var(--border);border-radius:14px;
+    box-shadow:var(--shadow);padding:15px 18px;margin-bottom:16px}
+  .phead{display:flex;align-items:baseline;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+  .phead h2{font-size:1.05rem;font-weight:600;margin:0}
+  .phead .auto{font-size:.66rem;font-family:var(--mono);color:var(--store);background:var(--store-wash);
+    padding:1px 7px;border-radius:5px}
+  .row{display:grid;grid-template-columns:74px 1fr;gap:10px;padding:5px 0;align-items:start}
+  .tag{font-size:.62rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+    padding:3px 0;text-align:left}
+  .tag.user{color:var(--user)} .tag.invoke{color:var(--invoke)} .tag.store{color:var(--store)}
+  .val{font-size:.87rem;color:var(--text)}
+  .chips{display:flex;flex-wrap:wrap;gap:5px}
+  .chip{font-size:.72rem;font-family:var(--mono);padding:2px 8px;border-radius:6px;white-space:nowrap}
+  .chip.invoke{background:var(--invoke-wash);color:var(--invoke)}
+  .chip.store{background:var(--store-wash);color:var(--store)}
+  .chip .db{opacity:.7}
+  .note{background:var(--violet-wash);border:1px solid var(--violet);border-radius:12px;
+    padding:13px 17px;margin:6px 0 20px;font-size:.88rem}
+  .note b{color:var(--violet)}
+  .homes{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:15px 18px}
+  .homes h3{font-size:.82rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:0 0 10px}
+  .home{display:grid;grid-template-columns:150px 1fr;gap:12px;padding:6px 0;border-top:1px solid var(--border);font-size:.85rem}
+  .home:first-of-type{border-top:none}
+  .home .k{font-family:var(--mono);font-size:.75rem;color:var(--store)}
+  .home .v{color:var(--muted)}
+  @media (max-width:560px){.row{grid-template-columns:1fr}.home{grid-template-columns:1fr}}
+</style>
+
+<div class="wrap">
+  <h1>Setting up a new client</h1>
+  <p class="sub">What the admin does &middot; what gets invoked &middot; what gets stored &mdash; org-agent orchestration</p>
+  <p class="stamp">Mobius org-setup &middot; verified live 2026-07-17</p>
+
+  <div class="legend">
+    <span class="lg"><span class="sw" style="background:var(--user)"></span> what the user does</span>
+    <span class="lg"><span class="sw" style="background:var(--invoke)"></span> services invoked</span>
+    <span class="lg"><span class="sw" style="background:var(--store)"></span> data stored</span>
+  </div>
+
+  <!-- 1 -->
+  <div class="phase">
+    <div class="rail"><div class="node">1</div><div class="line"></div></div>
+    <div class="card">
+      <div class="phead"><h2>Create the client</h2></div>
+      <div class="row"><span class="tag user">User</span><span class="val">In <b>/admin/clients</b>, type the org name + state &rarr; &ldquo;create&rdquo;.</span></div>
+      <div class="row"><span class="tag invoke">Invokes</span><span class="chips">
+        <span class="chip invoke">chat proxy /api/v1/org/setup</span>
+        <span class="chip invoke">org-agent POST /org/setup</span>
+        <span class="chip invoke">org-intelligence (discovery)</span>
+        <span class="chip invoke">credentialing /org/upsert</span>
+      </span></div>
+      <div class="row"><span class="tag store">Stores</span><span class="chips">
+        <span class="chip store">org_profile <span class="db">&middot; chat DB</span></span>
+        <span class="chip store">slug &middot; NPIs &middot; locations &middot; aliases</span>
+      </span></div>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="phase">
+    <div class="rail"><div class="node">2</div><div class="line"></div></div>
+    <div class="card">
+      <div class="phead"><h2>Provision the knowledge base</h2><span class="auto">automatic &mdash; part of create</span></div>
+      <div class="row"><span class="tag user">User</span><span class="val">Nothing &mdash; sees a &ldquo;Setting up&hellip;&rdquo; pill turn to &ldquo;Ready&rdquo;.</span></div>
+      <div class="row"><span class="tag invoke">Invokes</span><span class="chips">
+        <span class="chip invoke">org-agent /datastore/provision</span>
+        <span class="chip invoke">credentialing /doc-store/provision</span>
+        <span class="chip invoke">db-agent provisioner</span>
+      </span></div>
+      <div class="row"><span class="tag store">Stores</span><span class="chips">
+        <span class="chip store">per-org schema <span class="db">&middot; mobius_org_docs</span></span>
+        <span class="chip store">org_documents &middot; org_chunks (pgvector)</span>
+        <span class="chip store">doc_store descriptor <span class="db">&middot; chat DB</span></span>
+      </span></div>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="phase">
+    <div class="rail"><div class="node">3</div><div class="line"></div></div>
+    <div class="card">
+      <div class="phead"><h2>Onboard employees</h2></div>
+      <div class="row"><span class="tag user">User</span><span class="val">Add people (name + roles), one or many &rarr; &ldquo;invite&rdquo;.</span></div>
+      <div class="row"><span class="tag invoke">Invokes</span><span class="chips">
+        <span class="chip invoke">org-agent /employees/invite</span>
+        <span class="chip invoke">mobius-user /users/invite</span>
+        <span class="chip invoke">mobius-email (set-password link)</span>
+      </span></div>
+      <div class="row"><span class="tag store">Stores</span><span class="chips">
+        <span class="chip store">app_user (invited) <span class="db">&middot; mobius_user</span></span>
+        <span class="chip store">user_org_membership (roles)</span>
+        <span class="chip store">auth_token (invite)</span>
+      </span></div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="phase">
+    <div class="rail"><div class="node">4</div><div class="line"></div></div>
+    <div class="card">
+      <div class="phead"><h2>Employee activates</h2></div>
+      <div class="row"><span class="tag user">User</span><span class="val">Employee clicks the email link &rarr; <b>/auth/set-password</b> &rarr; sets a password.</span></div>
+      <div class="row"><span class="tag invoke">Invokes</span><span class="chips">
+        <span class="chip invoke">chat /api/v1/auth/token-info</span>
+        <span class="chip invoke">mobius-user /auth/set-password</span>
+      </span></div>
+      <div class="row"><span class="tag store">Stores</span><span class="chips">
+        <span class="chip store">password_hash &middot; status &rarr; active</span>
+        <span class="chip store">session <span class="db">&middot; mobius_user</span></span>
+      </span></div>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <div class="phase">
+    <div class="rail"><div class="node">5</div></div>
+    <div class="card">
+      <div class="phead"><h2>Dashboard (ongoing)</h2></div>
+      <div class="row"><span class="tag user">User</span><span class="val">Opens the org page &mdash; a live progress hub: Identity &middot; Knowledge base &middot; Team.</span></div>
+      <div class="row"><span class="tag invoke">Invokes</span><span class="chips">
+        <span class="chip invoke">org-agent GET /org/{slug}</span>
+        <span class="chip invoke">credentialing + mobius-user (aggregate)</span>
+      </span></div>
+      <div class="row"><span class="tag store">Stores</span><span class="chips">
+        <span class="chip store" style="opacity:.75">nothing &mdash; read-only aggregation</span>
+      </span></div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>The org-agent stores nothing.</b> It is pure orchestration &mdash; it sequences the calls above and
+    aggregates the reads. Every piece of data lives in the subsystem that owns it, so there is one
+    source of truth per concern and no duplicated state.
+  </div>
+
+  <div class="homes">
+    <h3>Where the data lives</h3>
+    <div class="home"><span class="k">org_profile</span><span class="v">Org identity &mdash; slug, NPIs, locations, aliases. Owned by credentialing (chat Postgres DB).</span></div>
+    <div class="home"><span class="k">mobius_org_docs</span><span class="v">Per-org knowledge base &mdash; a Postgres schema per org with pgvector chunks. Provisioned by db-agent; ingested by RAG; role-isolated.</span></div>
+    <div class="home"><span class="k">mobius_user</span><span class="v">Accounts, org memberships + roles, invite/reset tokens, sessions. Owned by mobius-user.</span></div>
+    <div class="home"><span class="k">mobius-email</span><span class="v">Sends invite / set-password / reset emails; keeps a send audit.</span></div>
+  </div>
+</div>
