@@ -122,8 +122,21 @@ compliance, at wiring) · Eval agent (harness, when their round opens).
   direct_answer.** Round 4 (copilot, cache-busted, prose-primary) is the first valid
   measurement of the user-visible surface. This measurement contract is inherited by the
   formal Eval harness.
-- Blind-sort bar (9/10): NOT MET as of round 3. Training mode remains live (voices degrade
-  gracefully to base, no wrong content) but the tone promise is not yet kept — gate stays open.
+- Round 4b (2026-07-17, 12 copilot turns, CORRECTED prose capture = draft_ready.data.text,
+  fixtures re-verified): **VOICE CHARACTER NOW DIFFERENTIATES on the surface users read.**
+  Contractions: professional 0.0 · friendly 1.2 · concise 0.8 (matches guide). Openers:
+  friendly "Hey there!" warm-beat every turn · professional formal finding-first · concise
+  bolded-verdict. rev 00498 VOICE DIRECTIVE + react/prompts.py splice landing on prose.
+  ONE OPEN DEFECT: concise LENGTH not differentiating — prof:concise word ratio 1.07 (target
+  ~3:1); concise verdict-first WINS the opener but loses total length to the ReAct planner
+  preamble's "be thorough/complete" preceding the spliced rendered_prompt (react/prompts.py:417)
+  — Chat's court, same explicit-authority fix as final.py rev 00498. Emoji sample-over-promise
+  (friendly prose emits 0 emoji) FIXED PA-side: samples + guide stripped. UM's rendered_prompt
+  v2 VALIDATED as load-bearing tone instruction (UM's gate side CLOSED). Blind-sort estimate
+  ~7/10 (up from ~3). Round 5 fires after Chat's concise-length fix (prose surface).
+- Blind-sort bar (9/10): NOT MET as of round 4b (voice yes, concise-length no). Training mode
+  remains live (voices degrade gracefully to base, no wrong content); tone promise partially
+  kept — gate stays open on the single concise-length defect.
 
 **Ownership:** PA agent OWNS training mode (sequence, content, mechanics, prototype).
 UM owns the write path (each step → preference field; `hesitation` is a new field).

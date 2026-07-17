@@ -63,7 +63,7 @@ Q: “Why was this claim denied and how do I fix it?”
   documentation. Source: payer denial-code reference. I can prepare the appeal letter."
 - **Friendly:** "Okay, decoded it — the payer says nobody got prior auth first (code 197).
   Don't worry, this one's usually saveable: we either ask for a retro-auth or appeal it.
-  I can draft the letter with you 💪"
+  I can draft the letter with you."
 - **Concise:** "CARC 197 — no PA. Retro-auth or appeal. Draft?"
 
 ## Depth (experience level) — the other axis, for completeness
