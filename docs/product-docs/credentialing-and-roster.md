@@ -60,6 +60,7 @@ Two front-ends cover these features (ports are the local-dev defaults from the l
   - `report.html` — **Panel Credentialing Audit Report**
   - `org.html` — **Org Profile**; `intelligence.html` — **Org Intelligence**; `tables.html` — **Reference Data**; `displacement.html`, `story.html` — market analyses
   - The app's `index.html` links back to a **Main Dashboard** and out to the **Pipeline** (chat service).
+  - **Architecture schematic ↗** — a header link on the Providr admin surface (live 2026-07-17, rev 00066) opens the fleet-ratified platform schematic (`https://mobius-chat-ortabkknqa-uc.a.run.app/platform`) in a new tab: every module in five columns, User + Technical lenses, honest live/partial/planned status. The role-appropriate admin front door to the map (everyone else reaches it via the chat sidebar's Platform tile).
 - **Credentialing home / operational console** — `landing/credentialing-home.html` (titled "Credentialing — Mobius"). Tabs/filters: **Active runs · Decisions pending · Blockers · Completed runs**. "New run" panel takes an org name + mode and starts a run; run cards deep-link to the **roster workflow** feed (`roster-workflow.html?run_id=…`, workflow base `http://localhost:3999`). Related landing pages: `org-profile.html`, `roster-preview.html`, `roster-workflow.html`, `workflow-explorer.html`.
 - **Launcher entry points** (`landing/index.html`): a **Credentialing** worker card linking to Provider Hub / Org / Roster (`:8011/roster-ui/…`) and Pipeline (`:8000/pipeline`); a top-nav "Provider Hub" link.
 
