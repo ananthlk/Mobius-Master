@@ -134,9 +134,19 @@ compliance, at wiring) · Eval agent (harness, when their round opens).
   (friendly prose emits 0 emoji) FIXED PA-side: samples + guide stripped. UM's rendered_prompt
   v2 VALIDATED as load-bearing tone instruction (UM's gate side CLOSED). Blind-sort estimate
   ~7/10 (up from ~3). Round 5 fires after Chat's concise-length fix (prose surface).
-- Blind-sort bar (9/10): NOT MET as of round 4b (voice yes, concise-length no). Training mode
-  remains live (voices degrade gracefully to base, no wrong content); tone promise partially
-  kept — gate stays open on the single concise-length defect.
+- Round 5 (2026-07-17, 12 copilot turns, chat rev 00504 = react/prompts.py FINAL-AUTHORITY-
+  over-length fix, rev + fixtures both re-verified): **FIX WORKED, sub-target not fully met.**
+  prof:concise word ratio 1.07 → **2.01** (concise now genuinely shorter). concise avg 37.0 →
+  **26.2** (Chat's ≤15 sub-target NOT met; per-turn 19/39/37/10, two of the longer ones are
+  clarification-request turns). professional 52.8 (≥30 met). Voice HOLDS: contractions prof
+  0.5 / friendly 2.3 / concise 0.0; openers differentiate (friendly "Hey there!" · concise
+  verdict-first · professional formal clause). Mechanical blind-sort proxy ~8/10 (up from ~7).
+  DECISION POINT (Chat + Ananth): (a) one more compression increment on react/prompts.py
+  (hard ~15-word cap on concise) vs (b) accept 2:1 + verdict-first as gate-clearing and let
+  the formal Eval blind-judge rule 9/10. Reliability: 1/12 turns returned no prose (flagged).
+- Blind-sort bar (9/10): mechanically ~8/10 after round 5 (voice differentiates, concise now
+  2:1 shorter + verdict-first). Formal 9/10 verdict awaits the Eval harness. Gate near-closed;
+  one optional concise-compression increment outstanding. Training mode live throughout.
 
 **Ownership:** PA agent OWNS training mode (sequence, content, mechanics, prototype).
 UM owns the write path (each step → preference field; `hesitation` is a new field).
