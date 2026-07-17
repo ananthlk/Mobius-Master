@@ -48,6 +48,12 @@ The mode is measured on OUTCOMES, not completion theater:
    graduation questions POST to /chat/product-feedback as category=feature_request,
    trigger=graduation (chip fires excluded — curated starters aren't fresh intent).
 Owner: PA agent tracks; all three metrics now measurable-or-collecting.
+   Graduation-fire integrity: the profile race (stale session-boot profile on the
+   graduation turn → base voice at the exact promise-keeping moment) is FIXED FE-side
+   (chat rev 00497: onboarding PUT chains a profile refetch; area_tags mapping
+   rework_denials→appeals, credentialing→credentialing, else→rag). OPEN HARDENING
+   (Chat-flagged, unscheduled): server-side profile fallback when body.profile absent
+   but JWT resolves an identity — defense-in-depth for API callers + future FE races.
 
 ## v2.1 corrections (User Manager, preference owner, 2026-07-15 — accepted)
 - **Step 4 writes `autonomy_sensitive`, NOT routine** — a denial-rework scenario is the
