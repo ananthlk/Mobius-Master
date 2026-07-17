@@ -36,6 +36,7 @@ It also stores who you are and how you like to work: your display and preferred 
 
 ## Invites, set-password & joining your org — how do I get my team in? (LIVE 2026-07-15)
 **The onboarding chain is live end-to-end, both directions:**
+- **Google sign-in does not activate invited accounts** *(policy, 2026-07-17)* — if you were invited, signing in with Google keeps your account in "invited" status; only completing the set-password link activates it. (Prevents invite-bypass; ruled by Ananth, live on mobius-user rev 00025.)
 - **Invited path** — an org admin (via the org-setup flow) invites you: you get an email with a secure link → the **set-password page** (`/auth/set-password`; the same page also serves password reset — it reads the link's purpose and titles itself accordingly) → set your password → you're an active member with your org and roles already attached. Verified with a real send 2026-07-15.
 - **Self-serve path** — register yourself (email+password or Google), then **claim your organization in Preferences**: the claim is validated against the org master and goes to **pending** until an authorized approver confirms it (approve endpoints are writer-gated). While pending, you can use Mobius as an individual; org-scoped features light up on approval.
 - **Password reset** — same primitives as invites: a reset email links to the set-password page.
