@@ -374,6 +374,8 @@ const EDGES = [
  {f:"vault",t:"feedback",label:"Liked tab = 👍 answers (My-feedback tab planned)"},
  {f:"vault",t:"org",    label:"coworker directory for reassign (/chat/coworkers)"},
  {f:"payor",t:"interact",label:"portal RPA scripts (payor:* namespace)", status:"planned"},
+ {f:"cred",t:"payor",   label:"/org/resolve → payer-canonical delegation (1h TTL cache)"},
+ {f:"chat",t:"cred",    label:"instant-RAG upload routing reads org_doc_store descriptor (mig 041)", status:"planned"},
 ];
 function esc(t){return t.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
 /* Generic per-node tool drill: node.tools = [[name, desc]…] (flat) or
