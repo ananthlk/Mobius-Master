@@ -99,9 +99,13 @@ compliance, at wiring) · Eval agent (harness, when their round opens).
 - Round 2 (2026-07-17, 12 agentic turns, profile-in-body, fixtures pre-verified):
   **FAILING** — length ratio inverted (concise longest, 98w avg), verdict-first absent;
   friendly shows first life ("Hey Biller…", contractions leaking through). Split:
-  concise = PIPELINE (instruction verifiably in profile, ignored — Chat investigating
-  integrator-stage splice/ordering on agentic path); friendly/professional fixtures
-  under UM drift-check; structural question open — does the AnswerCard schema cap the
+  ALL THREE TONES = PIPELINE (UM forensics 2026-07-17: fixtures were correct at probe
+  time — audit trail shows zero interloping writes, stored prompts match fetched
+  lengths exactly; the "fixture caveat" was a probe-side marker bug — capitalized
+  needle vs lowercased haystack. Every round-2 result is valid pipeline data:
+  instructions verifiably in all three profiles, voices absent. Chat investigating
+  integrator-stage splice/ordering on agentic path). Probe fixture-check now uses
+  UM's guaranteed literal "Tone: {x}." prefix (deterministic). Structural question open — does the AnswerCard schema cap the
   pager voice? (if yes → concise samples re-cut to "concise within a card").
   Reliability: 3/12 agentic turns failed (2 no-card, 1 formatting apology) — flagged.
 - Blind-sort bar (9/10): NOT MET. Training mode remains live (voices degrade gracefully
