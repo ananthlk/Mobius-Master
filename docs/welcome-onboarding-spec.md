@@ -40,8 +40,14 @@ The mode is measured on OUTCOMES, not completion theater:
    silent-default-flip bug class in data.
 3. **Return** — D1/D7 return rate of trained vs skipped users; first-question fire rate
    from the graduation card; second-session first-action.
-Owner: PA agent tracks these once chat wiring lands (needs skill_invocations-style
-telemetry — flagged as a dependency; the analytics gap is a known skills-node item).
+   **MEASURABLE (Chat rev 00495, migration 043, 2026-07-17):** `training_events` table
+   (training_completed / training_skipped / training_dismissed / graduation_question_fired
+   with source=chip|typed — chip=accepted starter verbatim, any input event flips to typed)
+   + views `training_outcome_summary` (D1/D7 join against UM's login log) and
+   `training_graduation_funnel` (fire_pct, typed vs chip). INTENT CAPTURE WIRED: typed-only
+   graduation questions POST to /chat/product-feedback as category=feature_request,
+   trigger=graduation (chip fires excluded — curated starters aren't fresh intent).
+Owner: PA agent tracks; all three metrics now measurable-or-collecting.
 
 ## v2.1 corrections (User Manager, preference owner, 2026-07-15 — accepted)
 - **Step 4 writes `autonomy_sensitive`, NOT routine** — a denial-rework scenario is the
