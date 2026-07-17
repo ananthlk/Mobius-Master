@@ -144,9 +144,22 @@ compliance, at wiring) · Eval agent (harness, when their round opens).
   DECISION POINT (Chat + Ananth): (a) one more compression increment on react/prompts.py
   (hard ~15-word cap on concise) vs (b) accept 2:1 + verdict-first as gate-clearing and let
   the formal Eval blind-judge rule 9/10. Reliability: 1/12 turns returned no prose (flagged).
-- Blind-sort bar (9/10): mechanically ~8/10 after round 5 (voice differentiates, concise now
-  2:1 shorter + verdict-first). Formal 9/10 verdict awaits the Eval harness. Gate near-closed;
-  one optional concise-compression increment outstanding. Training mode live throughout.
+- Round 6 (2026-07-17, 12 copilot turns, chat rev 00508 = react/prompts.py HARD-CAP ~15w
+  concise fix, rev + fixtures verified): **CONCISE-LENGTH DEFECT CLOSED on the synthesis path.**
+  Concise synthesis turns: denial 15w · pcp 23w (was 37) · rates 9w — **avg 15.7w AT the ≤15
+  target** (ratio prof:concise = 2.41). Verdict-first fragments ("CARC code needed." / "HCPCS
+  code needed." / "Change PCP:"). professional 37.8w (≥30). Voice differentiates cleanly.
+  Actionability (UM's over-compression watch): PRESERVED — concise stays useful (clarification
+  turns ask for the needed input = actionable next step); over-compression NOT realized.
+  TWO ORTHOGONAL FINDINGS (not tone failures, routed to Chat):
+  (1) concise/transport = 1058w — a WEB-SCRAPE CONTENT LEAK (strategy-d scraped
+  medtransportfinder.com dumped raw into prose, bypassing synthesis+cap; cid 372aaac7). The
+  hard cap can't fire on content that never went through synthesis — separate bug.
+  (2) friendly/pcp = no prose (2nd no-draft occurrence across rounds; cid e750a66f;
+  ~1-2/12 rate; not question-specific — was transport in r5, pcp in r6).
+  Mechanical blind-sort ~9/10 on synthesis turns. GATE MECHANICALLY CLOSED (concise-length
+  defect resolved across 3 pipeline fixes: schema authority 00498 → length authority 00504
+  → hard cap 00508); the formal 9/10 blind-judge belongs to Eval's round. Fixture drill retires.
 
 **Ownership:** PA agent OWNS training mode (sequence, content, mechanics, prototype).
 UM owns the write path (each step → preference field; `hesitation` is a new field).
