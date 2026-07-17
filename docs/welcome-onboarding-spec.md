@@ -1,5 +1,24 @@
 # Training Mode (Welcome & Onboarding) — contract spec v2
 
+## FIRST-RUN DESIGN VISION (Ananth, 2026-07-17): "a grand reveal like iPhone packaging — simple yet sophisticated"
+The grandeur is in the REVEAL and the RESTRAINT, not in more content. Three acts:
+- **ACT 1 — THE GRAND REVEAL (opening ceremony):** simple, sophisticated, cinematic — an
+  unboxing moment. The personalized welcome + training tour as premium, restrained motion.
+  Whitespace, confident typography, intentional transitions. NOT busy, NOT confetti-cluttered.
+- **ACT 2 — THE REVEALED PAGE (end state):** a SIMPLE, GOOGLE-LIKE PAGE. Chat box centered,
+  left panel COLLAPSED, generous BLANK SPACE. Nothing else. The blankness IS the message:
+  "this is your space — ask anything." Radical simplicity as the destination.
+- **ACT 3 — OVERLAYS:** tours, prompts, suggestions arrive as OPTIONAL OVERLAYS on the clean
+  base — never permanent landing clutter.
+**Consequence:** the current landing thesis block ("Support for the non-clinical work…",
+"Together we will", Quick Prompts list) comes OFF the default revealed page. The training/landing
+collision is resolved by DELETING clutter, not hiding one card. The mission/thesis belongs in
+the opening act (Mobius introducing itself in its own voice) or an overlay — never stacked on
+the working chat. Owners: PA (content/sequence of the acts) · UX (the stage — full-canvas
+reveal, motion, minimal end-state) · Chat (wiring: strip landing clutter, collapse panel default).
+
+
+
 **v2 pivot (Ananth, 2026-07-15): this is a MODE, not a card — "TRAINING MODE", owned by
 the Product-Awareness agent.** Interaction IS the profiling: users click and respond,
 and each response BUILDS their profile (the baseline for all tailoring). Engagement-first
