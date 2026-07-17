@@ -41,6 +41,16 @@ Per assistant message:
 - **Source citation click** — "Open document" (inline doc reader), "Open in RAG ↗" (external), or "Download PDF" when the RAG API is configured.
 - **Admin-gated:** "Routing correct?" LLM-performance thumbs; "Adjudicator helpful?" thumbs in the QA scorecard.
 
+## Training mode — your first 90 seconds (LIVE 2026-07-17)
+**New users get a 90-second interactive setup where every click teaches Mobius how you like to work** — and each pick saves a real preference (edit anytime in Preferences; retrain whenever):
+1. Pick the situations you actually deal with (patient transportation, PCP changes, denials, new-clinician billing, coverage, rates) — your first pick becomes the thread.
+2. See YOUR question answered three ways — tap the reply you'd rather read (sets your tone; no labels, no right answer).
+3. A real scenario sets how much autonomy Mobius gets on sensitive work, then the same question at three depths sets how much explanation you want.
+4. Optional: what makes you hesitant (multi-select) — your graduation card answers it head-on.
+5. Graduation: what Mobius learned (chips), your situations as ready-to-fire starter questions, and an honest Today / Coming / You-steer-it summary with a working make-a-wish button.
+
+**Triggers:** automatic on arrival until you're set up; type `/training` or `/welcome` any time; or add `?welcome=1` to the URL. **Skipping:** "Skip for now" hides it for the session; "×" turns it off permanently; completing setup retires it automatically.
+
 ## Sidebar
 - **New chat** (`#btnNewChat`).
 - **Vault block** *(2026-07-13 — replaced the former "Recent searches" and "Most helpful searches" sections)* — a violet card with tabs (Recent / Liked / Tasks / Uploads) and "Manage →", opening the full Vault panel. Your conversation history lives here now; see **Your past queries** below.

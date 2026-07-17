@@ -82,8 +82,7 @@ compliance, at wiring) · Eval agent (harness, when their round opens).
 
 **Ownership:** PA agent OWNS training mode (sequence, content, mechanics, prototype).
 UM owns the write path (each step → preference field; `hesitation` is a new field).
-UX polishes presentation. Chat hosts the mode (deferred round) — triggers: first
-session / !is_onboarded, cheat codes `/welcome`, `/training`, `?welcome=1`.
+UX polishes presentation. Chat hosts the mode — **LIVE 2026-07-17, chat commit 9715785**: is_onboarded gate, /training + /welcome pre-router intercepts, ?welcome=1, per-step writes, PUT /auth/onboarding dismiss, sessionStorage session-skip.
 **Prototype live at product-awareness `/welcome-preview` (training flow + graduation card).**
 
 ---

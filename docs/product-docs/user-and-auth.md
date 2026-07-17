@@ -42,6 +42,16 @@ It also stores who you are and how you like to work: your display and preferred 
 - **Password reset** — same primitives as invites: a reset email links to the set-password page.
 - Emails ride the **mobius-email send chokepoint** (validation, suppression list, audit log). Ops note: the email service's cold start once ate the first send after idle; hardened with a 30s timeout + one idempotent retry.
 
+## Setting up a new client organization — how it works (admin; LIVE 2026-07-17)
+Five phases, one command center (`/admin/clients`):
+1. **Create the client** — admin enters org name + state → org-agent orchestrates: org-intelligence discovers NPIs/locations/aliases → writes the org profile (the org master).
+2. **Provision the knowledge base** (automatic) — a private, role-isolated document store is created for the org (per-org pgvector schema in mobius_org_docs, via the db-agent provisioner). *Document ingest to FILL it is coming (RAG agent building); provisioning itself is live.*
+3. **Onboard employees** — admin adds people + roles → invite accounts created → set-password emails sent (mobius-email).
+4. **Employee activates** — clicks the email link → sets password → invited → active, signed in. (Google sign-in does not shortcut this — see the policy above.)
+5. **Dashboard** — the org page aggregates identity + datastore + team, read-only.
+
+**Architecture note:** the org-setup orchestrator STORES NOTHING — each subsystem owns its data (identity → org profile, vectors → mobius_org_docs, users → mobius_user DB, email audit → mobius-email). One source of truth per concern. Full visual walkthrough: `docs/new-client-setup-howitworks.html` (Org agent, on branch claude/serene-mendeleev pending merge).
+
 ## Not yet available (planned)
 
 These are visible in the UI or present in the schema but are **not functional today**. Do not describe them to users as working features.
