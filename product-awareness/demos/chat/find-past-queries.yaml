@@ -1,4 +1,7 @@
-# chat:find-past-queries — where are my past queries / conversations.
+# chat:find-past-queries v2 — re-authored against the My Vault block after the
+# 2026-07-13 sidebar replacement (38af3d5) retired sidebar-recent/sidebar-helpful.
+# Anchors verified present in served rev 00493 by the Interact agent; sidebar-vault
+# rename vetoed (load-bearing in ops-suite v2).
 schema: interact.v1
 id: chat:find-past-queries
 title: Find your past queries
@@ -6,12 +9,15 @@ mode: guide
 surface: mobius-chat
 permissions: []
 preconditions:
-  - selector: "[data-tour-id=sidebar-recent]"
+  - selector: "[data-tour-id=sidebar-vault]"
 steps:
-  - find: "[data-tour-id=sidebar-recent]"
+  - find: "[data-tour-id=sidebar-vault]"
     action: highlight
-    caption: "Your past queries live here — Recent searches holds your last ~20 conversations. Click any entry to reopen that thread and pick up where you left off."
-  - find: "[data-tour-id=sidebar-helpful]"
-    action: highlight
-    caption: "Most helpful searches collects the answers you rated 👍 — your personal best-of, one click away."
+    caption: "Everything you've touched lives in My Vault — right here in the sidebar."
+  - find: "[data-tour-id=vault-tab-recent]"
+    action: click
+    caption: "Recent = your past conversations. Click any entry to reopen it and pick up where you left off — nothing is lost when you start a new chat."
+  - find: "[data-tour-id=vault-tab-liked]"
+    action: click
+    caption: "Liked = every answer you rated 👍 — your best finds, one click away. Manage → opens the full Vault panel."
     end: true

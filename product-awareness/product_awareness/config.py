@@ -79,11 +79,9 @@ DEMOS: dict[tuple[str, str], dict] = {
         "script_id": "chat:give-feedback", "title": "Show me: give feedback"},
     ("chat", "Sign in & sign out — how do I log in or out?"): {
         "script_id": "chat:sign-in", "title": "Show me: sign in"},
-    # HELD 2026-07-14: sidebar Recent/Helpful sections replaced by the My Vault
-    # block (chat commit 38af3d5); tour retired from registry pending re-author
-    # against the Vault block surface (needs anchors from Chat/Vault agents).
-    # ("chat", "Your past queries — where did my conversation go?"): {
-    #     "script_id": "chat:find-past-queries", "title": "Show me: find your past queries"},
+    # v2 re-authored 2026-07-17 against the Vault block (anchors verified rev 00493)
+    ("chat", "Your past queries — where did my conversation go?"): {
+        "script_id": "chat:find-past-queries", "title": "Show me: find your past queries"},
     ("skills", "Task management"): {
         "script_id": "chat:complete-a-task", "title": "Show me: mark a task complete"},
     # anchor menu-preferences landed in live bundle 2026-07-14; published v1 same day
