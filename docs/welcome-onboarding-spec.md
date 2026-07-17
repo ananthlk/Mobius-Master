@@ -92,6 +92,21 @@ before chat hosts training mode:
 Owners: PA (fixtures + judge spec) · UM (rendered_prompt enforcement) · Chat (integrator
 compliance, at wiring) · Eval agent (harness, when their round opens).
 
+**GATE STATUS (probe log):**
+- Round 1 (2026-07-17, 18 turns): INVALID — bare POSTs; profile is FE-supplied in the
+  request body, so all turns ran base-voice. Yielded the profile-race finding → fixed
+  (chat 00497) + open server-side-fallback hardening item.
+- Round 2 (2026-07-17, 12 agentic turns, profile-in-body, fixtures pre-verified):
+  **FAILING** — length ratio inverted (concise longest, 98w avg), verdict-first absent;
+  friendly shows first life ("Hey Biller…", contractions leaking through). Split:
+  concise = PIPELINE (instruction verifiably in profile, ignored — Chat investigating
+  integrator-stage splice/ordering on agentic path); friendly/professional fixtures
+  under UM drift-check; structural question open — does the AnswerCard schema cap the
+  pager voice? (if yes → concise samples re-cut to "concise within a card").
+  Reliability: 3/12 agentic turns failed (2 no-card, 1 formatting apology) — flagged.
+- Blind-sort bar (9/10): NOT MET. Training mode remains live (voices degrade gracefully
+  to base, no wrong content) but the tone promise is not yet kept — gate stays open.
+
 **Ownership:** PA agent OWNS training mode (sequence, content, mechanics, prototype).
 UM owns the write path (each step → preference field; `hesitation` is a new field).
 UX polishes presentation. Chat hosts the mode — **LIVE 2026-07-17, chat commit 9715785**: is_onboarded gate, /training + /welcome pre-router intercepts, ?welcome=1, per-step writes, PUT /auth/onboarding dismiss, sessionStorage session-skip.
