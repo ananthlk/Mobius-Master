@@ -55,6 +55,7 @@ These query BigQuery directly and return verified numbers — used (not `search_
 - `get_org_service_line_profile` — per-service-line revenue/volume/KPIs for an org.
 - `get_org_type_stats` — aggregate KPIs for an org *type* in a year.
 - `get_org_leakage` — patient-leakage analysis for a CMHC.
+- `lookup_npi` — resolve an NPI or org → full identity (name, entity type, taxonomy, address; org_slug/org_name accepted). *(re-verified in live manifest 2026-07-17)*
 
 **Benchmarks & positioning**
 - `get_top_orgs` — rank orgs by a volume metric.
@@ -87,7 +88,7 @@ These query BigQuery directly and return verified numbers — used (not `search_
   - Credentialing-keyword questions also get an **"Open Credentialing Report" action chip** linking to the full roster UI (links are chips now, not inline URLs).
 - `healthcare_npi_lookup(question)` — NPPES registry lookup when you give a 10-digit NPI number.
 - **Appeals** — `appeals_lookup_rules(carc, …)`, `appeals_get_playbook(payor, carc_group)`, `appeals_validate_claim(carc, …)`, `appeals_assemble_letter(carc, …)`: denial-code rules, payor playbooks, claim validation, and appeal-letter assembly; appeal-related questions also surface an Appeals link chip.
-- Retired (ask via the tools above instead): `run_credentialing_report`, `run_roster_reconciliation_report`, `validate_credentialing_step`, `ask_credentialing_npi`, `lookup_npi`, `find_org_locations`, `find_associated_providers_at_locations` were disconnected and no longer exist.
+- Retired (ask via the tools above instead): `run_credentialing_report`, `run_roster_reconciliation_report`, `validate_credentialing_step`, `ask_credentialing_npi`, `find_org_locations`, `find_associated_providers_at_locations` were disconnected and no longer exist. (`lookup_npi` was listed here 07-14 but is BACK in the live manifest as of 07-17 — analytics flavor, see the suite below.)
 
 ## Task management
 Chat can create and track operational tasks (credentialing follow-ups, roster gaps, etc.) via three skills added 2026-07-02 (chat commit `624f74f`), backed by the **mobius-task-manager** Cloud Run service (shared `mobius_chat` DB):
