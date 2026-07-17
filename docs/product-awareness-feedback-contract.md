@@ -279,3 +279,15 @@ top-gap module → replay that module's `docs_gap` verbatims through
 coherence spine (see the republishing + eval-observability work) pointed at
 documentation debt. The feedback agent stops being a suggestion box and becomes
 the thing that tells us which doc to write and proves we wrote it well.
+
+
+## Trigger: `graduation` (added 2026-07-17, Feedback-agent ruling)
+Training mode's graduation first-question, when USER-TYPED (starter-chip fires excluded),
+files as `category=feature_request, trigger=graduation` (chat rev 00495). TIER: **harvested**
+(alongside `auto_harvest`) — provenance is about the FILING, not the content: the filing is
+system-driven, so it must NOT advance the user's feedback cadence or count in the
+prompt→capture funnel (enforced feedback-side, commit 484ead7 — the skip now excludes all
+non-user-voiced triggers). The verbatim remains pure user authorship — the highest-value
+demand signal — and flows into `capability_demand` alongside planned-hit tallies.
+Implementation note (chat): pass `area_tags=[module]` when the intent's module is inferable,
+else it pools in the '(untagged)' bucket. A trigger split in the view is available on ask.
