@@ -10,6 +10,23 @@ The grandeur is in the REVEAL and the RESTRAINT, not in more content. Three acts
   "this is your space — ask anything." Radical simplicity as the destination.
 - **ACT 3 — OVERLAYS:** tours, prompts, suggestions arrive as OPTIONAL OVERLAYS on the clean
   base — never permanent landing clutter.
+## THE DECLUTTERED LANDING (Ananth, 2026-07-17): "simple middle-of-the-box big chat message"
+The real chat landing page IS being changed to a simple, decluttered centered chat box — and
+it IS the reveal's end-state (all 4 A/B arms dissolve into it). Design it ONCE. Ownership:
+PA = content · UX = look · Chat = implementation. Content brief:
+- HERO: one big centered chat input, generous blank space (the page's center of gravity).
+- Greeting above: "Good [time], [Name]." — small, warm.
+- Placeholder: "Ask about billing, credentialing, denials, or your roster…" (steady-state
+  generic; the three-phone-call framing is the REVEAL hero, not the everyday landing).
+- 3-4 minimal quick-start chips (Denial appeals · Prior auth · Coverage · Claims), low weight.
+- Sidebar collapsed to the icon rail by default; expandable.
+- REMOVED from default (the clutter): the "Support for the non-clinical work" thesis card,
+  "Together we will" bullets, Release Updates section → become OVERLAYS if they earn a place
+  (release notes → a "what's new" pill; mission → an "about" surface), never stacked on chat.
+- Blank space is the feature. This also RETIRES the old landing-collision bug (the cluttered
+  page is simply gone). The reveal-ending mirrors this real component exactly — not two drifting
+  versions.
+
 ## THE HERO MOMENT (Ananth, 2026-07-17): "type your three-phone-call moment"
 The reveal's climax is not a tagline — it's an INTERACTIVE PROOF. Don't tell users what
 Mobius does; invite them to prove it on their own worst question, live, in their own words.
