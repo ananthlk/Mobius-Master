@@ -262,8 +262,9 @@ function graduation(){
       <div class="face q">${hes.emo} ${hes.fearQ}<span class="tap">tap to flip</span></div>
       <div class="face a">✅ ${hes.fearA}</div></div></div>
     ${expLine?`<p class="sub enter d2">${expLine}</p>`:""}
+    <p class="hook enter d2" style="margin-top:14px">Now — type your three-phone-call moment.</p>
     <div class="tryits enter d2">${(T.acts.length?T.acts.slice(0,3).map(k=>SCENARIOS.find(a=>a.k===k).q):p.tryits).map(t=>`<button class="try" data-q="${t.replace(/"/g,'&quot;')}">${t}</button>`).join("")}</div>
-    <div class="composer enter d2"><input id="ci" placeholder="ask what YOU actually came here for — or tap a starter above"><span class="send" id="fire">➤</span></div>
+    <div class="composer enter d2"><input id="ci" placeholder="The prior auth, the denial, the coverage question you're stuck on…"><span class="send" id="fire">➤</span></div>
     <div class="tabs enter d3">
       <button data-p="today" class="${T.pillar==="today"?"on":""}">✅ Today</button>
       <button data-p="coming" class="${T.pillar==="coming"?"on":""}">🔭 Coming</button>

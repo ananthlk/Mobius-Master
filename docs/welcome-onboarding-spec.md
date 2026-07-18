@@ -10,6 +10,27 @@ The grandeur is in the REVEAL and the RESTRAINT, not in more content. Three acts
   "this is your space — ask anything." Radical simplicity as the destination.
 - **ACT 3 — OVERLAYS:** tours, prompts, suggestions arrive as OPTIONAL OVERLAYS on the clean
   base — never permanent landing clutter.
+## THE HERO MOMENT (Ananth, 2026-07-17): "type your three-phone-call moment"
+The reveal's climax is not a tagline — it's an INTERACTIVE PROOF. Don't tell users what
+Mobius does; invite them to prove it on their own worst question, live, in their own words.
+The "three phone calls" is this audience's universal pain (a knowable answer made
+unreachable — 3 holds, 3 departments, 45 min stolen from care). The arc threads it:
+- **PROMISE (opening, scene 1 mission line):** "Answers, not phone calls." (replaces the
+  weak "Your practice, answered"). States the promise.
+- **PROVE (graduation input, the climax):** prompt "Now — type your three-phone-call moment."
+  placeholder "The prior auth, the denial, the coverage question you're stuck on…" — the user
+  types the real question that used to cost them three calls; Mobius answers it in seconds,
+  cited, IN THE TONE THEY JUST PICKED. This IS the graduation first-question (intent capture:
+  fires a real turn + logs the demand signal) — Ananth's frame turns a bland input into the
+  emotional peak.
+- **LIVE IN IT (revealed page, scene 8):** "Ask anything about your practice…" — steady state;
+  the three phone calls are simply gone.
+**The one risk (design for all three):** the first answer MUST land. Protections: (1) training
+already primed their thread (scene-4 pick tells us their domain); (2) the tone-certified
+pipeline answers cleanly in-voice; (3) an honest "I don't know that yet" + gap-file is
+on-brand ("when it doesn't know, it says so") — a humble miss survives, a confident wrong
+answer does not.
+
 **Consequence:** the current landing thesis block ("Support for the non-clinical work…",
 "Together we will", Quick Prompts list) comes OFF the default revealed page. The training/landing
 collision is resolved by DELETING clutter, not hiding one card. The mission/thesis belongs in
