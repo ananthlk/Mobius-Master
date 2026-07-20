@@ -83,7 +83,8 @@ def classify(req: ClassifyRequest) -> ClassifyResponse:
     try:
         raw = _parse_json(text)
     except Exception as e:
-        logger.warning("[feedback] parse failed: %s (text=%r)", e, text[:200])
+        # §3 PHI-in-logs: never log raw model output text — length only.
+        logger.warning("[feedback] parse failed: %s (output len=%d)", e, len(text or ""))
         return _fallback(verbatim, req.provisional_category, reason="parse_failed", usage=usage)
 
     category = coerce_category(raw.get("category") or req.provisional_category)
