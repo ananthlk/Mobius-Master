@@ -41,6 +41,18 @@ Mobius.
 ## What is Mobius?
 Mobius is an AI-powered intelligence and operations platform for community behavioral-health networks. It combines a conversational assistant grounded in authoritative payer policy (Mobius Chat), a shared knowledge base of manuals and regulations (the Public Library), provider credentialing and roster reconciliation, payer-registry lookups, market intelligence and benchmarking (the Strategy deck), and guided in-app help — one platform, built for the questions healthcare operations teams actually have. It exists so that answers that used to take three phone calls take seconds, and back-office work that only makes sense at network scale gets done at network scale.
 
+## Is Mobius like Google? How is Mobius different from a search engine?
+No — and the difference is the point. A general search engine like Google ranks pages from the open public web and hands you a list of links to read and reconcile yourself. Mobius answers the actual question, in behavioral-health operations terms, from a **curated, authoritative corpus** — payer manuals, Medicaid policy, provider registries — and shows its sources so you can verify the answer instead of vetting ten blue links. Where a search engine is broad and shallow across everything, Mobius is narrow and deep on one job: the non-clinical work behind community behavioral health. It also *does* things a search engine cannot — look up a provider in the NPPES registry, run a credentialing workup, reconcile your roster, benchmark your rates — because it is an operations platform, not an index of the web. That is what the tagline means: "some questions should take seconds, not three phone calls" — answered, sourced, and acted on, not just searched.
+
+## How is Mobius different from ChatGPT or a general AI assistant?
+Mobius and ChatGPT are both conversational, but they are built for different jobs. A general assistant draws on broad world knowledge and will answer almost anything — but it is not grounded in *your* payer policies, *your* roster, or authoritative behavioral-health sources; it does not cite where an answer came from; and it can state something confidently that is not true. Mobius is the opposite by design:
+- **Grounded, not general.** Every answer is retrieved from a curated corpus of payer policy, manuals, and regulations — plus your uploaded documents, live web search, and the NPPES provider registry — and comes **with citations** you can check.
+- **It does the work, not just talks about it.** Mobius is the entry point to real operational workflows — provider credentialing pipelines, roster reconciliation, appeals and claims support, market benchmarking — not just a chat window.
+- **It knows your context.** It is scoped to your organization and role, learns your language and preferences, and personalizes tone and autonomy to how you actually work.
+- **It is honest about limits.** When the sources do not cover something, Mobius says so and logs the gap rather than guessing — trust earned in citations instead of confidence.
+
+In short: ChatGPT is a brilliant generalist; Mobius is a specialist for behavioral-health operations that answers from authoritative sources, shows its work, and can actually run the workflows behind the question.
+
 ## Why was Mobius created?
 Mobius was born from a data finding, not a product idea. A ground-up analysis of the Florida Medicaid behavioral-health market (2019–2024, claims-level) showed that the community mental-health centers (CMHCs) who carry the safety net were being structurally displaced:
 
