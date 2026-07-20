@@ -84,7 +84,12 @@ def search(req: SearchRequest) -> dict:
     result = _get_engine().search(
         req.query, k=req.k, audience=req.audience,
         module=req.module, in_scope_only=req.in_scope_only)
-    return result.to_dict()
+    d = result.to_dict()
+    # sources_count: lets the caller (chat react_loop) compose a concrete progress
+    # emit — "✓ found N product-doc section(s)" — without re-counting client-side.
+    # Section titles are already in sources[].section. (emit-progress audit 2026-07-20)
+    d["sources_count"] = len(d.get("sources") or [])
+    return d
 
 
 class DocRequest(BaseModel):
