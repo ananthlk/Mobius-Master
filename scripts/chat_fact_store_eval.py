@@ -15,6 +15,10 @@ Usage:
 Suite entries: {"q": "...", "expect_answer": "substring", "expect_route": "s|a|b|d",
                 "expect_not": "substring"}  (all expect_* optional)
 Re-run after each fix lands; the table diffs by eye or by --json artifacts.
+
+PHI policy (docs/hipaa-phi-policy.md): suite queries MUST be PHI-free — this
+tool prints answers and (with --json) persists raw envelopes. Never point it
+at member/patient data.
 """
 import argparse
 import json

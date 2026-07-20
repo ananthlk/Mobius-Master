@@ -194,6 +194,14 @@ changes** — that's the acceptance test for having designed A honestly.
 - **P4 (gated, later) — auto mode + external driver.** Playwright or extension
   backend; permission gates + audit; the Sunshine prior-auth script as the pilot,
   fed by the payor registry agent. *Accept:* zero schema changes from P1–P3.
+  **PHI obligation (fleet policy v1, docs/hipaa-phi-policy.md):** auto-mode
+  `read` on payor portals captures DOM text that may contain PHI (member IDs,
+  auth statuses) — that makes P4's result envelope a NEW PHI SURFACE. Per
+  policy, the P4 design goes to the PHI agent for a gate contract BEFORE build:
+  read-captured values pass the classifier pre-persistence, fail closed, and
+  run records never store raw captured text under NOT-allowed mode. (P1–P3
+  surfaces are PHI-clean: run records are structural only — no typed values,
+  no DOM text, no raw user text in logs.)
 
 Testing note (per the fleet's consolidated-harness push): schema/validator tests are
 plain pytest; runner gets a DOM-fixture test page; deployed-smoke = run one guide
