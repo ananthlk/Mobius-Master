@@ -13,7 +13,7 @@ A user cares because it collapses slow, multi-tool operational work into a singl
 - **Developer:** Interacts through the HTTP API (`POST /chat`, SSE streaming, per-turn mode/profile overrides) and the skill registry.
 
 ## Response modes & caching
-Choose a **response mode** in the composer dropdown (`#composerMode`; persists to `localStorage._mobiusChatMode`). Thinking is a *mode*, selected from the same dropdown as Fast/Normal — not a separate toggle:
+Choose a **response mode** from the composer **mode pill** (`#composerModePill`, class `composer-mode-pill`; its `data-active` reflects the current mode and the choice persists to `localStorage._mobiusChatMode`). Clicking the pill opens a compact dropdown menu (`.mode-dropdown`) of mode options (`.mode-option` rows). Thinking is a *mode*, picked from the same pill as Fast/Normal — not a separate toggle. *(The pre-2026-07 `<select id="composerMode">` and the interim segmented strip were both replaced by this pill dropdown; the demo anchor `data-tour-id="composer-mode"` carried over.)*
 
 | Mode (label) | `chat_mode` | Behavior | Caching |
 |---|---|---|---|

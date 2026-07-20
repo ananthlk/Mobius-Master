@@ -117,14 +117,16 @@ Behind the button: the **email service** (`mobius-email`, Cloud Run) — a send 
 
 **Operational gotcha:** the Gmail OAuth token uses a testing-mode consent screen and **expires ~7 days**; rotate via `scripts/oauth_bootstrap.py` → `gcloud secrets versions add mobius-email-gmail-token` → bounce the revision.
 
+## PHI detection & the HIPAA gate (LIVE)
+**Does Mobius detect PHI / patient information / protected health information?** Yes — a dedicated PHI classifier (`mobius-skills/phi-classifier`) is **deployed and live** (Cloud Run dev). It checks text for the 18 HIPAA Safe-Harbor identifiers (names, dates of birth, SSN, MRN, member/beneficiary IDs, dates of service, addresses, phone/email) plus contextual quasi-identifiers (e.g. "34-yo veteran from Tampa"). Detection is layered — **regex + Presidio NER + an LLM context pass** — and the LLM pass runs on a HIPAA-locked bandit stage (Google Cloud Vertex, within Mobius's BAA boundary), so no PHI leaves the network. Stored evidence is always **masked**; raw text is never logged (categories + counts only). Recall-over-precision: when uncertain it flags.
+
+**It now gates, not just recommends.** In the platform's current **HIPAA-NOT-allowed** default, a PHI hit is a hard stop at the point of ingestion — the classifier is called *before* anything is embedded or stored, and if PHI is found the content is not stored, not indexed, and not retrievable. This gate is live on three surfaces: **chat message pre-send** (a message with patient identifiers is blocked that turn, with an attest-to-override path for false positives), **document / instant-RAG upload** (ingestion terminated, extracted text purged), and **roster CSV/Excel upload** (fail-closed across all upload handlers). The full user-facing story — what a block looks like, false-positive override tiering, and HIPAA-allowed mode — lives in the **Data privacy, PHI & HIPAA** doc.
+
+Contract: `POST /classify {text, document_id?}` → `{phi_flag, recommended_ceiling, confidence, identifiers_found[], phi_evidence[] (masked), classifier_version, layers_run}`. Owner: PHI Classifier agent; source of truth `mobius-skills/phi-classifier/README.md` (`/classify` section) + `docs/hipaa-phi-policy.md`.
+
 ## Not yet available / not reachable in dev
-- **Agentic email / appeals / extra `mobius-skills-mcp` tools** — code exists but not in the wired MCP (dev), so the agent can't call them. Reachable only when that MCP server is deployed and wired (or via `EXTRA_MCP_URLS`).
+- **Agentic email / extra `mobius-skills-mcp` tools** — code exists but not in the wired MCP (dev), so the agent can't call them. Reachable only when that MCP server is deployed and wired (or via `EXTRA_MCP_URLS`). *(The `appeals_*` tools that were listed here are now in the live manifest — see the Appeals entry above.)*
 - **Skill-invocation analytics** — there is still **no `skill_invocations` table**; skill usage isn't recorded per-call, so skills are invisible to analytics. (Confirmed gap.)
-
-## Not yet available — PHI detection on uploads (does Mobius detect patient info?)
-**Does Mobius detect PHI / patient information / protected health information in my uploaded documents? It will — built, not yet deployed.** A stateless PHI classifier (`mobius-skills/phi-classifier`) checks uploaded document text for Protected Health Information — the 18 HIPAA Safe-Harbor identifiers (names, dates of birth, SSN, MRN, member/beneficiary IDs, dates of service, addresses, phone/email) plus contextual quasi-identifiers (e.g. "34-yo veteran from Tampa") — and recommends a visibility ceiling (private / org / public). Recall-over-precision: when uncertain it recommends **private**.
-
-You'll see its effect at upload-complete in the instant-RAG/Vault promote flow ("Recommended: keep private — contains patient info"), so a PHI document can't be one-click shared to public. It only classifies — it never blocks, redacts, or edits your document. Detection is layered (regex + Presidio NER + LLM); stored evidence is masked. Contract: `POST /classify {text, document_id?}` → `{phi_flag, recommended_ceiling, confidence, identifiers_found[], phi_evidence[] (masked), classifier_version, layers_run}`; source of truth `docs/instant-rag-vault-proposal.md` §2.5 + `mobius-skills/phi-classifier/README.md`. Owner: PHI Classifier agent; built with 58 tests green 2026-07-14; ships with the instant-RAG upload flow.
 
 ## Doc-readiness notes
 - **Primary audience tag:** mixed (users benefit; devs build).
