@@ -1,0 +1,23 @@
+RUN START 2026-07-13T18:44:42Z  |  RAG rev: mobius-rag-00315-57w
+
+===== CASE A_small_txt : t_alpha_quickfacts.txt =====
+size_bytes=     287  upload_latency_s=0  document_id=2c918c2e-d652-4137-bcf9-0c2405a06530
+time_to_searchable_s=TIMEOUT  phrase_retrieved=NO  facts_retrieved=NO  (facts checked: CPW-5120 2,900)
+
+===== CASE B_multifact_txt : t_bravo_payer.txt =====
+size_bytes=     500  upload_latency_s=0  document_id=2e14f363-0ef6-48af-b313-9999d4771d3e
+time_to_searchable_s=TIMEOUT  phrase_retrieved=NO  facts_retrieved=NO  (facts checked: 18 27.30 120)
+
+===== CASE C_html : t_charlie_policy.html =====
+size_bytes=     572  upload_latency_s=0  document_id=b9912055-b619-4731-94d4-789a44357209
+time_to_searchable_s=1  phrase_retrieved=YES  facts_retrieved=YES  (facts checked: 52 SBC-9040)
+
+===== CASE D_pdf : t_delta_auth.pdf =====
+size_bytes=    1620  upload_latency_s=0  document_id=dfd646da-cf97-4de1-b753-60bf521cdf23
+time_to_searchable_s=0  phrase_retrieved=YES  facts_retrieved=YES  (facts checked: RWH-AUTH-7719 25)
+
+===== CASE E_large_1_6MB : t_foxtrot_large.txt =====
+size_bytes= 1595176  upload_latency_s=1  document_id=da1eec88-6b9b-4955-8778-3add455aad8d
+time_to_searchable_s=2  phrase_retrieved=YES  facts_retrieved=YES  (facts checked: FOX-7788 18.90)
+
+RUN END 2026-07-13T18:47:14Z

@@ -99,6 +99,33 @@ The Vault is the **user-facing view of `instant_rag_uploads`** — no new physic
   (HIPAA-grade separate collection/DB boundary — see `hipaa-compliance-gap-analysis.md`).
   v1 keeps the shared-store + flag model; v2 adds the isolation boundary.
 
+### 2.3b Vault action endpoints — contract (settled w/ Vault agent 2026-07-13)
+
+The Vault page (owned by the Vault agent) consumes these. Read + re-attach + download
+exist today; delete + extend are mine to build; promote is P2-gated (stub in UI).
+
+**EXISTS (live):** `GET /chat/uploads?user_id=&include_inactive=`, `GET /chat/uploads/{id}`,
+`POST /chat/uploads/{id}/link-to-thread` (re-attach), `GET /chat/uploads/{id}/download`.
+
+**TO BUILD — `DELETE /chat/uploads/{document_id}`** (chat, catalog-only for v1):
+- `require_user` + ownership. Sets `instant_rag_uploads.status='discarded'`.
+- Returns `200 {document_id, status:"discarded"}`; `404` not-found/not-owner;
+  **idempotent** (already-discarded → 200 no-op). Drops from default list.
+- v1: catalog soft-delete only; the RAG doc TTLs out naturally (≤7 d). RAG hard-expire
+  (`documents.expires_at=now()`) is an optional follow-up to free it sooner.
+
+**TO BUILD — `POST /chat/uploads/{document_id}/extend {days:N}`** (chat **+ RAG**):
+- `require_user` + ownership. `N` optional → default `INSTANT_RAG_TTL_DAYS` (7).
+- Updates `instant_rag_uploads.expires_at = now() + N` **AND** calls RAG to set
+  `documents.expires_at = now() + N` — ⚠ **the RAG value is what drives cleanup**, so
+  extend must update it too or the doc is cleaned despite the catalog. **RAG needs a small
+  endpoint** (e.g. `POST /documents/{id}/extend {days}` / PATCH expires_at) — it doesn't
+  have one today.
+- Returns `200 {document_id, expires_at}` (ISO) for in-place countdown update. `404`
+  not-found/not-owner. (Reactivating `expired`→`active` = nice-to-have, deferred to v1.)
+
+**promote:** P2 — needs the physically-separate org-doc store (not built). UI stubs it disabled.
+
 ### 2.4 Permission-gated promotion — 3 tiers
 A doc's `visibility` moves up a ladder; each rung is gated and changes retrieval.
 
@@ -151,6 +178,91 @@ A doc's `visibility` moves up a ladder; each rung is gated and changes retrieval
   to non-sensitive until then. The global gate is unaffected.
 
 ---
+
+## 2.5 Promotion recommendation — content-eligibility (Ananth 2026-07-13)
+
+Users won't reliably self-classify, and a wrong "public" on a PHI doc is a HIPAA breach.
+So on **upload-complete** (and backfillable for prior docs) the system **auto-classifies
+the content and recommends a visibility ceiling** — the highest tier the doc is *safe* for.
+The user approves/overrides; the system does the classifying.
+
+**Two layers gate a promotion** (both required):
+- **Content-eligibility** (this recommendation) — the safe ceiling from content.
+- **Authority** (§2.4) — role (`corpus_curator` for public) + the physically-separate store.
+A doc promotes only when `target_tier ≤ recommended_ceiling` **and** user-approved **and**
+(for public) role-authorized.
+
+**Decisions:**
+- **GATE, not advisory.** The promote UI disables tiers above the ceiling. Going above
+  requires an explicit override + warning + audit (and public still needs the role). A
+  distracted user cannot one-click a PHI doc to public.
+- **PHI-first v1.** Ship the PHI/HIPAA detector first (highest-risk, most detectable).
+  Default **private** unless clearly PHI-free. Confidential + org-specific are fast-follows.
+
+**Model:**
+- `recommended_ceiling`: PHI detected → **private**; PHI-free (v1) → **public-eligible**
+  (confidential/org-specific fast-follows will lower this later).
+- **Asymmetric risk → conservative:** high-recall PHI (catch it even with false positives);
+  uncertain → assume PHI → private. **Only recommends, never auto-acts.**
+
+**Mechanics:**
+- Runs **async post-index** (doesn't slow the fast path) — same lane as deferred enrichment.
+- PHI detector = the 18 HIPAA identifiers (names, DOB, SSN, MRN, dates-of-service, address,
+  phone, …) via regex + NER + an LLM pass. Recall bar/test set anchored on
+  `docs/hipaa-compliance-gap-analysis.md` + `docs/PHI_PATIENT_TEST_CASES.md`.
+- Stored on `instant_rag_uploads` (new columns): `suggested_visibility` (private|org|public),
+  `phi_flag`, `phi_evidence` (redacted reasons/spans), `classifier_confidence`, `classified_at`.
+- **Surfaced at upload-complete:** "Recommended: keep private — contains patient info" /
+  "Recommended: safe to share with your org" + [Approve] [Override…]. Backfill runs it over
+  existing catalog rows.
+- Can ship **ahead of the org-store (P2)** — the recommendation informs + pre-fills the
+  eventual promote; it's useful even while promote is stubbed.
+
+**Owner: a DEDICATED PHI-classifier SKILL** (Ananth 2026-07-13) — `mobius-skills/phi-classifier/`,
+its own service. Not the feedback classifier, not a RAG pass — a focused, high-stakes,
+**platform-reusable** component (instant-RAG is the *first* consumer; org-docs, Drive
+doc-review, compliance also need it).
+- **Interface:** `POST /classify {text, document_id?} → {phi_flag, phi_evidence[] (redacted
+  spans/reasons), recommended_ceiling (private|org|public), confidence, identifiers_found[]}`.
+- **Detection = layered, high-recall:** regex for structured identifiers (SSN, MRN, DOB,
+  phone, email, dates-of-service, ZIP), NER for names/locations, an LLM pass for context +
+  edge cases. Recall over precision — false positives are cheap, a missed PHI is a breach.
+- **Recall bar (hard gate on the skill):** a test suite anchored on
+  `docs/PHI_PATIENT_TEST_CASES.md` + `docs/hipaa-compliance-gap-analysis.md`; the skill must
+  catch ~all PHI in it before it ships. This bar is the skill owner's contract.
+
+**Finalized `/classify` contract (settled with PHI agent 2026-07-13):**
+```
+POST /classify {text: str, document_id?: str}
+→ { phi_flag: bool,
+    recommended_ceiling: "private"|"org"|"public",
+    confidence: float 0-1,
+    identifiers_found: [category strings],
+    phi_evidence: [{category, redacted_span, offset}],
+    classifier_version: str,     # detector version — for re-classify when recall bar improves
+    layers_run: [str] }          # which of regex/ner/llm executed (degraded-mode visibility)
+```
+- `offset` = 0-indexed char offset into the **submitted** text (valid against the exact
+  string POSTed; we store evidence, don't re-locate in the doc).
+- `redacted_span` = fully masked, format-preserving where safe (`***-**-####`, `J•••• S••••`,
+  `[DOB]`) — **never** raw PHI; the skill logs no raw text/spans.
+- **Conservative default (skill guarantee):** any uncertainty, LLM-layer timeout, or failure
+  → `phi_flag=true` / `recommended_ceiling="private"`. Fails toward private, never public.
+
+**Consumer wiring (this agent):** async post-index → POST extracted text → store the verdict
+on `instant_rag_uploads` → the Vault/promote UI reads it to gate tiers. Columns (migration):
+`suggested_visibility`, `phi_flag`, `phi_evidence` (jsonb), `classifier_confidence`,
+`identifiers_found` (jsonb), `classifier_version`, `layers_run` (jsonb), `classified_at`.
+- **`classifier_version` stored** → when the skill bumps its recall bar, backfill re-classifies
+  rows tagged with an older version.
+- **`layers_run` stored** → verdicts produced in **degraded mode** (LLM skipped/timed out →
+  defaulted private) are flagged for **re-classification when the LLM layer is healthy**, so a
+  transient timeout never *permanently* under-promotes a doc that's actually shareable.
+- Wire + live-test the moment the skill pings a dev `/classify` URL.
+- **Consumers** call async post-index; instant-RAG stores the result on `instant_rag_uploads`
+  and gates the promote UI on it. The skill is stateless (classify text → verdict).
+The instant-RAG surface (recommendation display + `suggested_visibility` column + promote-UI
+gating) stays chat/Vault-agent/mine; I'm the first consumer + wrote the contract.
 
 ## 3. Ownership & boundaries
 
