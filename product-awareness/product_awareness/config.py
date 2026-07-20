@@ -51,6 +51,7 @@ DOC_META: dict[str, dict] = {
     "story-ui-and-landing.md":     {"module": "strategy",        "audience": "mixed", "in_scope": True},
     "eval.md":                     {"module": "eval",            "audience": "dev",   "in_scope": True},
     "mobius-thesis.md":            {"module": "about",           "audience": "user",  "in_scope": True},
+    "hipaa-and-phi.md":            {"module": "hipaa",           "audience": "user",  "in_scope": True},
     "response-cards.md":           {"module": "response-cards",  "audience": "user",  "in_scope": True},
     "mobius-os.md":                {"module": "os",              "audience": "user",  "in_scope": False},
     "credentialing-and-roster.md": {"module": "credentialing",   "audience": "user",  "in_scope": False},
