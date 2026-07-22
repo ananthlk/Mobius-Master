@@ -1,0 +1,200 @@
+<title>Mobius · Board Index</title>
+<style>
+  :root{
+    --bg:#f5f7fb; --surface:#ffffff; --surface-2:#eef2f8; --ink:#1a2032; --muted:#5b6479;
+    --border:#e2e8f2; --border-strong:#cfd7e6;
+    --accent:#2f6fed; --accent-soft:#e7eefc;
+    --live:#12965a; --live-bg:#e2f3ea;
+    --signoff:#c26b06; --signoff-bg:#fbeedd;
+    --spec:#2f6fed; --spec-bg:#e7eefc;
+    --map:#5b6479; --map-bg:#eaeef4;
+    --shadow:0 1px 2px rgba(20,28,55,.05), 0 6px 20px rgba(20,28,55,.05);
+    --shadow-hover:0 2px 6px rgba(20,28,55,.09), 0 14px 34px rgba(20,28,55,.10);
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#0e131f; --surface:#171d2b; --surface-2:#1f2637; --ink:#e8ecf5; --muted:#95a0b8;
+    --border:#28303f; --border-strong:#333c4e;
+    --accent:#5b91f5; --accent-soft:#1a2740;
+    --live:#3fbc7f; --live-bg:#153025;
+    --signoff:#e0a24a; --signoff-bg:#332614;
+    --spec:#5b91f5; --spec-bg:#182238;
+    --map:#95a0b8; --map-bg:#222a3a;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.28);
+    --shadow-hover:0 2px 8px rgba(0,0,0,.4), 0 16px 40px rgba(0,0,0,.4);
+  }}
+  :root[data-theme="light"]{
+    --bg:#f5f7fb; --surface:#ffffff; --surface-2:#eef2f8; --ink:#1a2032; --muted:#5b6479;
+    --border:#e2e8f2; --border-strong:#cfd7e6; --accent:#2f6fed; --accent-soft:#e7eefc;
+    --live:#12965a; --live-bg:#e2f3ea; --signoff:#c26b06; --signoff-bg:#fbeedd;
+    --spec:#2f6fed; --spec-bg:#e7eefc; --map:#5b6479; --map-bg:#eaeef4;
+    --shadow:0 1px 2px rgba(20,28,55,.05), 0 6px 20px rgba(20,28,55,.05);
+    --shadow-hover:0 2px 6px rgba(20,28,55,.09), 0 14px 34px rgba(20,28,55,.10);
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e131f; --surface:#171d2b; --surface-2:#1f2637; --ink:#e8ecf5; --muted:#95a0b8;
+    --border:#28303f; --border-strong:#333c4e; --accent:#5b91f5; --accent-soft:#1a2740;
+    --live:#3fbc7f; --live-bg:#153025; --signoff:#e0a24a; --signoff-bg:#332614;
+    --spec:#5b91f5; --spec-bg:#182238; --map:#95a0b8; --map-bg:#222a3a;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.28);
+    --shadow-hover:0 2px 8px rgba(0,0,0,.4), 0 16px 40px rgba(0,0,0,.4);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1100px;margin:0 auto;padding:40px 24px 72px}
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+
+  header{margin-bottom:8px}
+  .kicker{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  h1{font-size:30px;line-height:1.1;font-weight:760;letter-spacing:-.02em;margin:10px 0 0;text-wrap:balance}
+  .lede{color:var(--muted);font-size:15px;margin:10px 0 0;max-width:64ch}
+  .meta{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-top:18px;font-size:12.5px;color:var(--muted)}
+  .meta .dot{width:5px;height:5px;border-radius:50%;background:var(--border-strong);display:inline-block;margin:0 2px 1px 0}
+  .count{font-weight:700;color:var(--ink)}
+
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px}
+  .legend .pill{cursor:default}
+  .pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.03em;
+    text-transform:uppercase;padding:3px 9px;border-radius:999px;white-space:nowrap}
+  .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.9}
+  .pill.live{color:var(--live);background:var(--live-bg)}
+  .pill.signoff{color:var(--signoff);background:var(--signoff-bg)}
+  .pill.spec{color:var(--spec);background:var(--spec-bg)}
+  .pill.map{color:var(--map);background:var(--map-bg)}
+
+  h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:720;
+    margin:42px 0 0;display:flex;align-items:center;gap:12px}
+  h2 .n{font-size:11px;color:var(--muted);font-weight:600;background:var(--surface-2);border:1px solid var(--border);
+    border-radius:999px;padding:1px 8px}
+  h2::after{content:"";flex:1;height:1px;background:var(--border)}
+  .hint{font-size:12.5px;color:var(--muted);margin:8px 0 0}
+
+  .grid{display:grid;gap:12px;margin-top:16px}
+  .grid.feature{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+  .grid.compact{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+
+  .card{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--border);
+    border-radius:13px;padding:15px 16px;box-shadow:var(--shadow);transition:box-shadow .16s ease,border-color .16s ease,transform .16s ease}
+  .card:hover,.card:focus-visible{box-shadow:var(--shadow-hover);border-color:var(--border-strong);transform:translateY(-1px)}
+  .card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .card .top{display:flex;align-items:flex-start;gap:10px}
+  .card .title{font-weight:680;font-size:15px;letter-spacing:-.01em;line-height:1.28;flex:1;text-wrap:balance}
+  .card:hover .title{color:var(--accent)}
+  .card .purpose{font-size:13px;color:var(--muted);line-height:1.45}
+  .card .foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:2px}
+  .card .date{font-size:11.5px;color:var(--muted)}
+  .card .go{font-size:12px;font-weight:650;color:var(--accent);opacity:0;transition:opacity .16s ease}
+  .card:hover .go{opacity:1}
+
+  .grid.compact .card{padding:13px 14px}
+  .grid.compact .title{font-size:14px;font-weight:650}
+  .grid.compact .purpose{font-size:12.5px}
+
+  footer{margin-top:48px;border-top:1px solid var(--border);padding-top:18px;font-size:12.5px;color:var(--muted);line-height:1.6}
+  footer b{color:var(--ink)}
+  footer code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--accent)}
+
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="kicker">Mobius · Fleet</div>
+    <h1>Board Index</h1>
+    <p class="lede">Every coordination board in one place — grouped by what's in flight. The living map of what the fleet is aligning on, restructuring, and shipping.</p>
+    <div class="meta">
+      <span><span class="count" id="cnt">–</span> boards tracked</span>
+      <span><span class="dot"></span>as of <span class="mono">2026&#8209;07&#8209;22</span></span>
+      <span><span class="dot"></span>maintained by Product&#8209;Awareness</span>
+    </div>
+    <div class="legend">
+      <span class="pill live">Live</span>
+      <span class="pill signoff">Sign-off</span>
+      <span class="pill spec">Spec</span>
+      <span class="pill map">Map</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>In flight — Tech Day &amp; RAG refactor <span class="n" id="n-active"></span></h2>
+    <p class="hint">The active governance + restructure boards. These change day to day — check here first.</p>
+    <div class="grid feature" id="g-active"></div>
+  </section>
+
+  <section>
+    <h2>Design &amp; UI specs <span class="n" id="n-design"></span></h2>
+    <div class="grid compact" id="g-design"></div>
+  </section>
+
+  <section>
+    <h2>Reports &amp; scorecards <span class="n" id="n-report"></span></h2>
+    <div class="grid compact" id="g-report"></div>
+  </section>
+
+  <footer>
+    <b>Keeping it live:</b> this index is the canonical navigation surface for fleet boards, owned by Product-Awareness (product-truth &amp; discoverability). New board, or a status change? Ping me and I re-publish to this same URL. Source of record: <code>reports/techday/boards-hub.html</code>.<br>
+    <b>Status key:</b> <b>Live</b> = actively-updated tracker · <b>Sign-off</b> = awaiting governance sign-offs before it proceeds · <b>Spec</b> = a target/design to build against · <b>Map</b> = structural/ownership reference.
+  </footer>
+</div>
+
+<script>
+  const A = "https://claude.ai/code/artifact/";
+  const BOARDS = {
+    active: [
+      {t:"Mobius · Technical Health", id:"3c4417e4-6e8f-4404-b3fe-c2b7de5a276b", s:"live",  p:"The fleet health dashboard — the Technical Day surface. Per-module status, drilldown to defects.", d:"07-22"},
+      {t:"Retriever Refactor · Alignment Board", id:"d52879f9-e86a-4bf9-a0ae-bb2b202052fc", s:"signoff", p:"6-lens current→future sign-off before the retriever refactor. Nothing builds until all green.", d:"07-22"},
+      {t:"RAG Restructure — Live Board", id:"f61e4b92-a71d-4687-bc32-981cf0cab436", s:"live", p:"Live tracking of the RAG restructure — modules, moves, and who's carrying each leg.", d:"07-22"},
+      {t:"RAG Answer Engine — Target Module Schematic", id:"5c5eca99-21aa-442e-9a94-8b65bf5daaba", s:"spec", p:"The 7-module target the retriever splits into: pool · shape · fillers · router · synthesis · contract · timing.", d:"07-22"},
+      {t:"Mobius · Fleet Ownership", id:"f4928d53-7db1-4366-a14d-6828b446667b", s:"map", p:"Who owns what across the fleet — the ownership map behind assignment + escalation.", d:"07-22"},
+      {t:"Mobius · Agent Fabric", id:"88cd2217-e999-4d42-b86d-abfe7979c5bd", s:"map", p:"The cross-cutting agent structure — how the modules and governance lenses interconnect.", d:"07-22"},
+      {t:"RAG · Macro-Agent Structure", id:"7881e00c-4fec-4962-bb9e-5e4c3f9eedcf", s:"map", p:"The macro view of the RAG agent group and its sub-agents.", d:"07-22"},
+      {t:"RAG · Agent Tree", id:"52c87385-6a8a-4095-9706-1468a57df82f", s:"map", p:"The RAG sub-agent tree — Sourcing, Curation, Retriever, Maintaining and their seams.", d:"07-22"},
+      {t:"Mobius Chat — Full Page Refactor Spec", id:"d1c8e4c2-50e1-4b36-bac4-5c8b971eb877", s:"spec", p:"The chat full-page refactor target — the 9-tab bubble + composer + landing.", d:"07-22"},
+    ],
+    design: [
+      {t:"Mobius Chat — Simple Landing (Spec)", id:"503fa3b4-ef82-4c3f-8dc9-f121faf04a92", s:"spec", p:"The decluttered centered-composer landing spec.", d:"07-18"},
+      {t:"Composer Mode Pill — Design Spec v2", id:"f73cb2c0-446d-44a0-adc0-6cf26be1c42b", s:"spec", p:"The Fast/AI mode selector strip in the composer.", d:"07-20"},
+      {t:"Sidebar Pills — LLM + Collapsed Initials", id:"efd897ea-7080-4504-aee0-b164a9c25882", s:"spec", p:"Sidebar LLM pill + collapsed-rail user initials.", d:"07-20"},
+      {t:"RAG Ready Tray — Design Spec", id:"53164a2b-9119-4401-b9c2-14ae823adc31", s:"spec", p:"The upload 'is ready / ask now' tray.", d:"07-20"},
+      {t:"Diagnostics Drill-Down — All Strategies", id:"d8ef7d47-14bd-467c-9a41-4cfbc81b83e4", s:"spec", p:"The diagnostics tab content-tree, one sub-tree per strategy.", d:"07-19"},
+      {t:"Strategy s · Fact Store Serve — Leaf Spec", id:"3d85ff78-211f-4a43-82fe-9825478c181f", s:"spec", p:"Diagnostics leaf for the fact-store serve strategy.", d:"07-19"},
+      {t:"Team & Access — Deactivate/Reactivate", id:"e8324cdb-7a58-4a81-a0fb-339e2e64184d", s:"spec", p:"Member deactivate/reactivate flow.", d:"07-20"},
+      {t:"PHI Recommendation Card — States", id:"6a579564-255b-4477-80ec-7dd1f131caf6", s:"spec", p:"The upload PHI recommendation card, all states.", d:"07-14"},
+      {t:"PHI Classification Card — Upload", id:"7502e519-bef1-488e-b0bd-254b64cc85ce", s:"spec", p:"PHI classification card on upload.", d:"07-14"},
+      {t:"HIPAA Diagnostics — Mockup", id:"173a7f08-5eae-4e58-bc44-d33d53c672d1", s:"map", p:"HIPAA diagnostics surface mockup.", d:"07-17"},
+      {t:"Parallel Integrator — A/B Spec", id:"fdba6e32-05dc-4714-94e3-70328b4d7501", s:"spec", p:"A/B spec for the parallel integrator.", d:"07-18"},
+      {t:"Mobius · Grand Reveal — Flow Storyboard", id:"cd9f296c-320d-4a70-951b-7ad1dce2bcdd", s:"map", p:"The onboarding grand-reveal flow storyboard.", d:"07-17"},
+      {t:"Welcome Card — Mobius Onboarding", id:"f54b4bcc-ad98-43b1-ad32-020486874f69", s:"spec", p:"The first-run welcome card.", d:"07-15"},
+      {t:"Org Onboarding — Mockup", id:"4d3230ef-cf46-4021-bc14-f471bfd559f8", s:"map", p:"New-client org onboarding mockup.", d:"07-15"},
+      {t:"My Vault — Sidebar Redesign", id:"11cb050a-9f3f-4c9f-a800-644cd8fa77fa", s:"spec", p:"The Vault sidebar redesign.", d:"07-13"},
+      {t:"Mobius Brand &amp; UI Guidelines", id:"b4a6b916-5b40-49c5-a05b-0af94aed5709", s:"map", p:"The brand + UI token guidelines (tokens, accents, wordmark).", d:"07-06"},
+    ],
+    report: [
+      {t:"Mobius Chat — UX &amp; Consistency Scorecard", id:"a3a9069a-697e-460d-860d-3c1f717230d0", s:"live", p:"Running UX/consistency scorecard for the chat surface.", d:"07-13"},
+      {t:"Chat Answer Pipeline — Latency Breakdown", id:"9a6731d0-9be1-4832-b477-1521177cd7a0", s:"map", p:"Where the answer latency goes, stage by stage.", d:"07-18"},
+      {t:"RAG Eval — New Surfaces", id:"30bdbb5d-fec6-47e0-9457-44d2e244e5ef", s:"map", p:"The eval observability surfaces (lift/drift/σ-band).", d:"07-17"},
+      {t:"UX QA Report — rev 00425", id:"273b7c69-1956-48e2-a641-3b28f7068572", s:"map", p:"UX QA pass on chat rev 00425.", d:"07-14"},
+      {t:"How to Read a Mobius Response Card", id:"4d5775e3-11b2-40df-9c13-47e29a982387", s:"map", p:"Reader's guide to the answer-card envelopes.", d:"07-13"},
+    ],
+  };
+  const SLABEL = {live:"Live", signoff:"Sign-off", spec:"Spec", map:"Map"};
+  function card(b){
+    const a=document.createElement("a");
+    a.className="card"; a.href=A+b.id; a.target="_blank"; a.rel="noopener";
+    a.innerHTML =
+      '<div class="top"><span class="title">'+b.t+'</span><span class="pill '+b.s+'">'+SLABEL[b.s]+'</span></div>'+
+      '<div class="purpose">'+b.p+'</div>'+
+      '<div class="foot"><span class="date mono">Updated '+b.d+'</span><span class="go">Open &rarr;</span></div>';
+    return a;
+  }
+  let total=0;
+  for(const [k,elid] of [["active","g-active"],["design","g-design"],["report","g-report"]]){
+    const g=document.getElementById(elid); const list=BOARDS[k];
+    list.forEach(b=>g.appendChild(card(b)));
+    document.getElementById("n-"+k).textContent=list.length;
+    total+=list.length;
+  }
+  document.getElementById("cnt").textContent=total;
+</script>
