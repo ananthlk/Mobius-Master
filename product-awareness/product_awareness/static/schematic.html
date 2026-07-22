@@ -88,6 +88,31 @@
   .hint{color:var(--muted);font-size:13px}
   .pill{display:inline-block;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:1px 7px;font-size:11.5px;margin:2px 3px 2px 0;color:var(--muted)}
   @media (max-width:860px){ main{flex-direction:column} #panel{max-width:none;border-left:0;border-top:1px solid var(--border)} }
+
+  /* Roadmap view */
+  #roadmap{flex:1;overflow-y:auto;padding:22px 26px 60px}
+  #roadmap .rhead{max-width:1000px;margin:0 auto 4px}
+  #roadmap .rhead h2{font-size:15px;font-weight:700;margin:0;letter-spacing:-.01em}
+  #roadmap .rhead p{font-size:12.5px;color:var(--muted);margin:6px 0 0;max-width:70ch}
+  #roadmap .rgrid{max-width:1000px;margin:16px auto 0;display:grid;gap:11px;grid-template-columns:repeat(auto-fill,minmax(290px,1fr))}
+  #roadmap a.rcard{display:flex;flex-direction:column;gap:7px;text-decoration:none;color:var(--text);
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px;
+    box-shadow:var(--shadow);transition:transform .15s,border-color .15s}
+  #roadmap a.rcard:hover{transform:translateY(-1px);border-color:var(--mobius-violet)}
+  #roadmap a.rcard:focus-visible{outline:2px solid var(--mobius-violet);outline-offset:2px}
+  #roadmap .rcard .rt{display:flex;align-items:flex-start;gap:9px}
+  #roadmap .rcard .rname{font-weight:660;font-size:14px;line-height:1.28;flex:1}
+  #roadmap a.rcard:hover .rname{color:var(--mobius-violet)}
+  #roadmap .rcard .rp{font-size:12.5px;color:var(--muted);line-height:1.42}
+  #roadmap .rpill{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:999px;white-space:nowrap}
+  #roadmap .rpill.live{color:var(--live);background:color-mix(in srgb,var(--live) 15%,transparent)}
+  #roadmap .rpill.signoff{color:var(--partial);background:color-mix(in srgb,var(--partial) 15%,transparent)}
+  #roadmap .rpill.spec{color:var(--mobius-violet);background:var(--mobius-violet-soft)}
+  #roadmap .rpill.map{color:var(--planned);background:color-mix(in srgb,var(--planned) 18%,transparent)}
+  #roadmap .rfull{max-width:1000px;margin:22px auto 0;font-size:12.5px;color:var(--muted)}
+  #roadmap .rfull a{color:var(--mobius-violet);font-weight:640;text-decoration:none}
+  #roadmap .rfull a:hover{text-decoration:underline}
+  @media (prefers-reduced-motion:reduce){#roadmap *{transition:none!important}}
 </style>
 </head>
 <body>
@@ -96,6 +121,7 @@
   <div class="lens" role="tablist">
     <button id="lensUser" class="on">User view</button>
     <button id="lensTech">Technical view</button>
+    <button id="lensRoad">Roadmap</button>
   </div>
   <div class="legend">
     <span><i style="background:var(--live)"></i>live</span>
@@ -110,6 +136,7 @@
     <p class="hint">Click any module to drill in. The <b>User view</b> says what you can do and where; the <b>Technical view</b> says what runs where and what talks to what. Statuses are honest — they come from the verified product docs (reality-gated: planned ≠ live).</p>
   </aside>
 </main>
+<section id="roadmap" hidden></section>
 <script>
 "use strict";
 /* ============ MODEL — generated from docs/product-docs (verified corpus) ============
@@ -483,13 +510,41 @@ function renderPanel(){
     <div class="src">Source: <span class="pill">${n.doc}</span> verified ${n.verified} · lens: ${lens}. Ask chat about any of this — e.g. “what is ${n.label}?”</div>`;
   p.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>select(b.dataset.go)));
 }
-document.getElementById("lensUser").addEventListener("click",()=>setLens("user"));
-document.getElementById("lensTech").addEventListener("click",()=>setLens("tech"));
-function setLens(l){lens=l;
-  document.getElementById("lensUser").classList.toggle("on",l==="user");
-  document.getElementById("lensTech").classList.toggle("on",l==="tech");
-  renderPanel();
+/* ============ ROADMAP lens — the in-flight boards (product evolution) ============ */
+const ROADMAP=[
+  {t:"Mobius · Technical Health",id:"3c4417e4-6e8f-4404-b3fe-c2b7de5a276b",s:"live",p:"The fleet health dashboard — the Technical Day surface. Per-module status, drilldown to defects."},
+  {t:"Retriever Refactor · Alignment Board",id:"d52879f9-e86a-4bf9-a0ae-bb2b202052fc",s:"signoff",p:"6-lens current→future sign-off before the retriever refactor. Nothing builds until all green."},
+  {t:"RAG Restructure — Live Board",id:"f61e4b92-a71d-4687-bc32-981cf0cab436",s:"live",p:"Live tracking of the RAG restructure — modules, moves, who carries each leg."},
+  {t:"RAG Answer Engine — Target Module Schematic",id:"5c5eca99-21aa-442e-9a94-8b65bf5daaba",s:"spec",p:"The 7-module target: pool · shape · fillers · router · synthesis · contract · timing."},
+  {t:"Mobius · Fleet Ownership",id:"f4928d53-7db1-4366-a14d-6828b446667b",s:"map",p:"Who owns what — the ownership map behind assignment + escalation."},
+  {t:"Mobius · Agent Fabric",id:"88cd2217-e999-4d42-b86d-abfe7979c5bd",s:"map",p:"The cross-cutting agent structure — how modules + governance lenses interconnect."},
+  {t:"RAG · Macro-Agent Structure",id:"7881e00c-4fec-4962-bb9e-5e4c3f9eedcf",s:"map",p:"The macro view of the RAG agent group + sub-agents."},
+  {t:"RAG · Agent Tree",id:"52c87385-6a8a-4095-9706-1468a57df82f",s:"map",p:"The RAG sub-agent tree — Sourcing, Curation, Retriever, Maintaining + their seams."},
+  {t:"Mobius Chat — Full Page Refactor Spec",id:"d1c8e4c2-50e1-4b36-bac4-5c8b971eb877",s:"spec",p:"The chat full-page refactor target — 9-tab bubble + composer + landing."},
+];
+const RLABEL={live:"Live",signoff:"Sign-off",spec:"Spec",map:"Map"};
+function renderRoadmap(){
+  const r=document.getElementById("roadmap");
+  if(r.dataset.done)return;
+  let h='<div class="rhead"><h2>Product roadmap — what’s in flight</h2><p>The active governance + refactor boards the fleet is aligning on right now. Reality-gated, same discipline as the map: these are live work, not aspiration. Click any board to open it.</p></div><div class="rgrid">';
+  ROADMAP.forEach(b=>{h+=`<a class="rcard" href="https://claude.ai/code/artifact/${b.id}" target="_blank" rel="noopener"><div class="rt"><span class="rname">${b.t}</span><span class="rpill ${b.s}">${RLABEL[b.s]}</span></div><div class="rp">${b.p}</div></a>`;});
+  h+='</div><div class="rfull">Full board index — all 30 boards (design specs + reports too): <a href="https://claude.ai/code/artifact/468c140f-a38e-41c3-92fb-9ce0e8ea2b4a" target="_blank" rel="noopener">open the Board Index →</a></div>';
+  r.innerHTML=h; r.dataset.done="1";
 }
+function setMode(m){
+  const road=m==="road";
+  document.querySelector("main").style.display=road?"none":"";
+  document.getElementById("roadmap").style.display=road?"block":"none";
+  const lg=document.querySelector("header .legend"); if(lg) lg.style.visibility=road?"hidden":"";
+  document.getElementById("lensUser").classList.toggle("on",m==="user");
+  document.getElementById("lensTech").classList.toggle("on",m==="tech");
+  document.getElementById("lensRoad").classList.toggle("on",road);
+  if(road){renderRoadmap();}
+  else{lens=m;renderPanel();}
+}
+document.getElementById("lensUser").addEventListener("click",()=>setMode("user"));
+document.getElementById("lensTech").addEventListener("click",()=>setMode("tech"));
+document.getElementById("lensRoad").addEventListener("click",()=>setMode("road"));
 </script>
 </body>
 </html>
