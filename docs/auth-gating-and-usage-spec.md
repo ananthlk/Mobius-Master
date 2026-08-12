@@ -67,18 +67,30 @@ the front-door work; the dashboard is a read over the ledger.
   Run origins (mobius-story-ui-…, mobius-chat-…, mobius-provider-roster-…, each its own host under
   `a.run.app`). `a.run.app` is on the Public Suffix List → cross-service cookies are BLOCKED;
   localStorage is per-origin. So no free shared session. **Decision: Path 1 + chat hand-off.**
-  - **Path 1 (v1):** each surface authenticates against mobius-user via its own `@mobius/auth`.
-    A person may sign in per surface, but it's the SAME account / token format / user_id — identity
-    (and therefore usage attribution) is unified. Ships the gate + full usage visibility now.
-  - **Chat hand-off (v1):** navigating FROM chat to another surface passes auth so the common
-    journey needs no second login. Mechanism — NOT a raw token in the URL (history/referrer leak).
-    Chat calls `POST /api/v1/auth/handoff/mint` (bearer) → 60s single-use code (reuses the
-    auth_token model from migration 005, new purpose='handoff'); appends `#h=<code>` to the
-    outbound link; target surface on load calls `POST /api/v1/auth/handoff/redeem` → real
-    access+refresh token → stores it, strips the fragment. Redeem-then-fall-back-to-login.
-  - **Deferred:** true cross-origin SSO (central redirect hub) OR custom domains
-    (`story.mobius.com` under shared `.mobius.com` → cookie SSO free) — build when routine
-    cross-surface hopping makes per-surface login real friction. Not needed for launch.
+  **DECISION UPDATED 2026-07-22 → HUB-BASED SIGN-IN (chat is the hub).** Rationale: Google is the
+  primary login path, and Google requires each JS origin be registered in the OAuth client
+  (Console-only, error-prone, fails as `origin_mismatch` in front of customers). Registering N
+  surface origins is a treadmill. Instead: **Google sign-in happens on exactly ONE origin — chat,
+  which is already OAuth-registered.** Every other surface redirects to chat to authenticate, then
+  gets its session via a hand-off code. Register ZERO new OAuth origins, ever.
+
+  **The flow (every surface, identical):**
+  1. Land on surface. `#h=<code>` in the URL? → redeem (`POST /api/v1/auth/handoff/redeem`) →
+     session → strip fragment → done. (This is also the chat→surface click path.)
+  2. No code, no stored token → redirect to chat's sign-in with a return pointer:
+     `https://mobius-chat-…/signin?return=<surface-url>`.
+  3. Chat: already signed in → mint hand-off, redirect back to `return` with `#h=<code>`.
+     Not signed in → show Google sign-in (works on chat's origin) → then mint + redirect back.
+  4. Back on the surface with `#h=` → redeem → session. User is in, on the page they started on.
+
+  **Endpoints (mine, LIVE):** `POST /api/v1/auth/handoff/mint` (bearer → 60s single-use code) +
+  `POST /api/v1/auth/handoff/redeem` (code → session). Reuse auth_token purpose='handoff'.
+  **Chat owns (the hub):** a `/signin?return=` page that ensures a session (Google/email) then
+  mints + redirects. **Open-redirect guard:** chat validates `return` against an allow-list of
+  known Mobius surface origins — never bounces to an arbitrary URL.
+  **Each surface owns:** redeem-on-load, and "no session → redirect to chat/signin?return=self".
+  No local Google button, no @mobius/auth modal per surface — LESS work than Path 1.
+  **Deferred:** custom domains (`*.mobius.com` cookie SSO) when GTM moves off run.app.
 - **Acting-user propagation (Tier-2, urgent on public exposure):** the human's identity must
   reach the *skills*, not just the page. Providr still hardcodes `uploaded_by='admin'`; external
   users on PHI-adjacent credentialing/appeals without a real acting user is a compliance blocker,
@@ -105,13 +117,15 @@ surface post-auth. Fail-open (a dropped beacon never blocks the user).
 
 ## 6. UX design + workflow
 
-### 6.1 Per-surface sign-in (the recipe, identical everywhere)
-1. App shell checks for a valid token on load → none → `@mobius/auth` AuthModal (email+password,
-   Google SSO). Google SSO does NOT auto-activate invited accounts (policy, keep it).
-2. Signed in → "Signed in as {name}" in the header/sidebar (reads greeting_name); sign-out wired.
-3. Every `/api/*` call carries the token (the apiFetch wrapper — bare fetch = silent anonymous).
-4. Post-auth, fire the access beacon once per session-load.
-5. Invited-user path (set-password page, 4 certified states) unchanged.
+### 6.1 Per-surface sign-in (the recipe, identical everywhere) — HUB-BASED
+1. On load: `#h=<code>` in URL? → `POST /api/v1/auth/handoff/redeem` → store token, strip fragment.
+   Else valid stored token? → use it. Else → redirect to `https://mobius-chat-…/signin?return=<self>`.
+2. (Sign-in itself happens at chat — Google/email — then chat hands back. Surface shows no login UI.)
+3. Signed in → "Signed in as {name}" (reads greeting_name); sign-out clears local token + redirects to chat.
+4. Every `/api/*` call carries the token (apiFetch wrapper — bare fetch = silent anonymous).
+5. Post-auth, fire the access beacon once per session-load.
+6. Invited-user path (set-password page, 4 certified states) unchanged — activation still one-per-account.
+NB: Google's no-auto-activate policy is enforced at chat (the one sign-in point), not re-implemented per surface.
 
 ### 6.2 Users & Usage Console (the dashboard Ananth wants)
 Admin-gated (allowlist today; capability later). Extends the existing `/admin` console. Screens:
