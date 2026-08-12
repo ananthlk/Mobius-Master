@@ -218,6 +218,7 @@
   <button onclick="showSection('agents')">Agents</button>
   <button onclick="showSection('design')">Design</button>
   <button onclick="showSection('onboarding')">Onboarding</button>
+  <button onclick="showSection('sprint')">Sprint Status</button>
 </nav>
 
 <main>
@@ -847,6 +848,176 @@
       <li><input type="checkbox"> Sign off by 2026-08-06</li>
     </ul>
   </div>
+
+<!-- SPRINT STATUS -->
+<div id="sprint" class="section">
+  <h2>Sprint Status & Roadmap</h2>
+  <p><strong>PA Architect (Ananth) Platform Coherence Initiative:</strong> Building unified 5-tab platform view (User/Technical/Specs/Eval/Git) + sprint board + onboarding.</p>
+
+  <h3>Current Sprint: Sprint 36 (Aug 12–Aug 26)</h3>
+  <p><strong>Owner:</strong> PA Architect (Ananth)</p>
+  <p><strong>Phase:</strong> Phase 1 — User Tab + 23-Module Framework</p>
+  <p><strong>Target Completion:</strong> Aug 24, 2026</p>
+
+  <table>
+    <tr>
+      <th>Task ID</th>
+      <th>Task</th>
+      <th>Status</th>
+      <th>Started</th>
+      <th>Est. Finish</th>
+      <th>Notes</th>
+    </tr>
+    <tr>
+      <td>PA-001</td>
+      <td>Define 23-module unified list</td>
+      <td><span class="badge live">✅ Done</span></td>
+      <td>2026-08-12</td>
+      <td>2026-08-12</td>
+      <td>All modules documented</td>
+    </tr>
+    <tr>
+      <td>PA-002</td>
+      <td>User Tab UI structure</td>
+      <td><span class="badge progress">🔨 In Progress</span></td>
+      <td>2026-08-13</td>
+      <td>2026-08-18</td>
+      <td>Schema validated with 3 modules</td>
+    </tr>
+    <tr>
+      <td>PA-003</td>
+      <td>Populate all 23 modules + capabilities</td>
+      <td><span class="badge progress">🔨 In Progress</span></td>
+      <td>2026-08-13</td>
+      <td>2026-08-22</td>
+      <td>3/23 done (Chat, Vault, Dashboard)</td>
+    </tr>
+    <tr>
+      <td>PA-004</td>
+      <td>Add status badges</td>
+      <td><span class="badge planned">🗺️ Planned</span></td>
+      <td>2026-08-19</td>
+      <td>2026-08-23</td>
+      <td>Cross-check against live data</td>
+    </tr>
+    <tr>
+      <td>PA-005</td>
+      <td>Add entry points + key features</td>
+      <td><span class="badge planned">🗺️ Planned</span></td>
+      <td>2026-08-19</td>
+      <td>2026-08-24</td>
+      <td>Verify with module owners</td>
+    </tr>
+    <tr>
+      <td>PA-006</td>
+      <td>E2E testing (2–3 modules)</td>
+      <td><span class="badge planned">🗺️ Planned</span></td>
+      <td>2026-08-23</td>
+      <td>2026-08-25</td>
+      <td>Verify links + accuracy</td>
+    </tr>
+    <tr>
+      <td>PA-007</td>
+      <td>Commit Phase 1 to git</td>
+      <td><span class="badge planned">🗺️ Planned</span></td>
+      <td>2026-08-25</td>
+      <td>2026-08-26</td>
+      <td>Update completion tracker</td>
+    </tr>
+  </table>
+
+  <h3>Upcoming Phases (8-Phase Roadmap)</h3>
+  <table>
+    <tr>
+      <th>Phase</th>
+      <th>What</th>
+      <th>Target Date</th>
+      <th>Owner</th>
+      <th>Status</th>
+    </tr>
+    <tr>
+      <td><strong>1</strong></td>
+      <td>User Tab (capabilities, entry points)</td>
+      <td>Aug 24</td>
+      <td>PA Architect</td>
+      <td><span class="badge progress">🔨 15%</span></td>
+    </tr>
+    <tr>
+      <td><strong>2</strong></td>
+      <td>Technical Tab (services, owners, APIs)</td>
+      <td>Sep 7</td>
+      <td>PA Architect + Platform</td>
+      <td><span class="badge planned">🗺️ Planned</span></td>
+    </tr>
+    <tr>
+      <td><strong>3</strong></td>
+      <td>Specs Tab (gates, acceptance criteria)</td>
+      <td>Sep 14</td>
+      <td>PA Architect + Agents</td>
+      <td><span class="badge planned">🗺️ Planned</span></td>
+    </tr>
+    <tr>
+      <td><strong>4</strong></td>
+      <td>Eval/Test Tab (coverage, metrics, confidence)</td>
+      <td>Sep 21</td>
+      <td>Eval Agent + PA Architect</td>
+      <td><span class="badge planned">🗺️ Planned</span></td>
+    </tr>
+    <tr>
+      <td><strong>5</strong></td>
+      <td>Git Tab (commits, deployment, build status)</td>
+      <td>Sep 28</td>
+      <td>Technical Team + PA Architect</td>
+      <td><span class="badge planned">🗺️ Planned</span></td>
+    </tr>
+    <tr>
+      <td><strong>6</strong></td>
+      <td>Sprint Board (active + archive)</td>
+      <td>Oct 5</td>
+      <td>PA Architect</td>
+      <td><span class="badge planned">🗺️ Planned</span></td>
+    </tr>
+    <tr>
+      <td><strong>7</strong></td>
+      <td>Onboarding Section (STANDING RESP.)</td>
+      <td>Oct 5 (then ongoing)</td>
+      <td>PA Architect (Ananth)</td>
+      <td><span class="badge planned">🗺️ Planned</span></td>
+    </tr>
+    <tr>
+      <td><strong>8</strong></td>
+      <td>Verification + Final Sync</td>
+      <td>Oct 12</td>
+      <td>PA Architect</td>
+      <td><span class="badge planned">🗺️ Planned</span></td>
+    </tr>
+  </table>
+
+  <h3>Key Metrics</h3>
+  <ul>
+    <li><strong>Current Completion:</strong> ~15% (Phase 1 in progress)</li>
+    <li><strong>Target Completion:</strong> Oct 12, 2026 (10 weeks from start)</li>
+    <li><strong>Modules in Scope:</strong> 23 (same across all 5 tabs)</li>
+    <li><strong>Weekly Effort:</strong> PA Architect: 8–12 hours/week (Phase 1–6), then 1–2 hours/sprint (ongoing onboarding maintenance)</li>
+  </ul>
+
+  <div class="checklist">
+    <h4>✓ Platform Coherence Success Criteria</h4>
+    <ul>
+      <li><input type="checkbox"> All 5 tabs show same 23 modules in same order</li>
+      <li><input type="checkbox"> User tab: entry points + key features</li>
+      <li><input type="checkbox"> Technical tab: owner, service, dependencies, API</li>
+      <li><input type="checkbox"> Specs tab: gate status, acceptance criteria, sign-offs</li>
+      <li><input type="checkbox"> Eval/Test tab: coverage %, metrics, confidence levels</li>
+      <li><input type="checkbox"> Git tab: commits, deployment status, build health</li>
+      <li><input type="checkbox"> All specs linked + current (100% coverage)</li>
+      <li><input type="checkbox"> Onboarding enables new hires to self-serve (&lt;1 hour Day 1)</li>
+      <li><input type="checkbox"> PA Architect owns ongoing onboarding updates (1–2 hrs/sprint)</li>
+    </ul>
+  </div>
+
+  <h3>Full Details</h3>
+  <p>For complete sprint board with weekly updates, blockers, and dependencies, see <a href="/specs/PA_ARCHITECT_SPRINT_BOARD.md">PA Architect Sprint Board</a>.</p>
 
 </div>
 
