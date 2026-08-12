@@ -4,11 +4,33 @@ WORKDIR /app
 
 # Copy specs catalog
 COPY index.html .
-COPY specs/ ./specs/ 2>/dev/null || true
+COPY specs ./specs
 
-# Simple HTTP server
-RUN echo 'import http.server\nimport socketserver\nimport os\n\nPORT = int(os.getenv("PORT", "8080"))\n\nclass MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):\n    def end_headers(self):\n        # Allow for CORS and cache policy\n        self.send_header("Cache-Control", "public, max-age=3600")\n        super().end_headers()\n\nwith socketserver.TCPServer(("", PORT), MyHTTPRequestHandler) as httpd:\n    print(f"Server running on port {PORT}")\n    httpd.serve_forever()' > server.py
+# Install dependencies (none needed for basic server)
+RUN pip install --no-cache-dir gunicorn
+
+# Create Flask app to serve static files
+RUN cat > app.py << 'EOF'
+from flask import Flask
+from flask.helpers import send_file
+import os
+
+app = Flask(__name__, static_folder='.')
+
+@app.route('/')
+def index():
+    return send_file('index.html')
+
+@app.route('/<path:path>')
+def serve_static(path):
+    return send_file(path)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+EOF
+
+RUN pip install --no-cache-dir flask
 
 EXPOSE 8080
 
-CMD ["python", "server.py"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "1", "app:app"]
