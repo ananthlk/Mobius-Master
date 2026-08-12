@@ -63,10 +63,22 @@ the front-door work; the dashboard is a read over the ledger.
 - **Issuer:** mobius-user, one shared `JWT_SECRET`, HS256, `sub` = canonical user_id. Unchanged.
 - **Relying party per surface:** adopt `@mobius/auth` (AuthModal + AuthService + PreferencesModal),
   proxy `/api/v1/auth/*` to mobius-user (the chat pattern), gate the app shell on a valid token.
-- **Token sharing across origins — THE Tier-0 question (needs answers §8):** if surfaces are
-  subdomains of the chat origin, a cookie-domain session shares cleanly; if separate origins,
-  we need a token hand-off (central sign-in redirect) or per-origin proxy. Determines everything
-  downstream; must be settled before the first surface ships public.
+- **Token sharing across origins — RESOLVED (Ananth, 2026-07-22).** Surfaces are SEPARATE Cloud
+  Run origins (mobius-story-ui-…, mobius-chat-…, mobius-provider-roster-…, each its own host under
+  `a.run.app`). `a.run.app` is on the Public Suffix List → cross-service cookies are BLOCKED;
+  localStorage is per-origin. So no free shared session. **Decision: Path 1 + chat hand-off.**
+  - **Path 1 (v1):** each surface authenticates against mobius-user via its own `@mobius/auth`.
+    A person may sign in per surface, but it's the SAME account / token format / user_id — identity
+    (and therefore usage attribution) is unified. Ships the gate + full usage visibility now.
+  - **Chat hand-off (v1):** navigating FROM chat to another surface passes auth so the common
+    journey needs no second login. Mechanism — NOT a raw token in the URL (history/referrer leak).
+    Chat calls `POST /api/v1/auth/handoff/mint` (bearer) → 60s single-use code (reuses the
+    auth_token model from migration 005, new purpose='handoff'); appends `#h=<code>` to the
+    outbound link; target surface on load calls `POST /api/v1/auth/handoff/redeem` → real
+    access+refresh token → stores it, strips the fragment. Redeem-then-fall-back-to-login.
+  - **Deferred:** true cross-origin SSO (central redirect hub) OR custom domains
+    (`story.mobius.com` under shared `.mobius.com` → cookie SSO free) — build when routine
+    cross-surface hopping makes per-surface login real friction. Not needed for launch.
 - **Acting-user propagation (Tier-2, urgent on public exposure):** the human's identity must
   reach the *skills*, not just the page. Providr still hardcodes `uploaded_by='admin'`; external
   users on PHI-adjacent credentialing/appeals without a real acting user is a compliance blocker,
@@ -147,7 +159,7 @@ seat) owns the visual/experience sign-off** — this spec defers presentation to
 |---|---|
 | **Platform Architect — UX seat** | dashboard UX + per-surface sign-in experience, design-system conformance |
 | **Platform Architect — DB seat** | `user_access_event` schema, retention, BQ replica, migration 011 |
-| **Chat Agent** | reference-impl alignment; beacon add |
+| **Chat Agent** | reference-impl alignment; beacon add; **mint hand-off code + append `#h=` to cross-surface links** |
 | **Strategy Agent** (Mobius Story) | gating + beacon on the deck (FIRST surface) |
 | **Roster & Credentialing Agent** | credentialing surface gating + acting-user propagation |
 | **Appeals Agent** | appeals surface gating |
