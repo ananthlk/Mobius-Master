@@ -10,15 +10,17 @@
 
 ## 🎯 The Direction
 
-**Three views, one truth:**
+**Five perspectives, one truth:**
 - **User Tab:** "What can you do?" — Surface capabilities, features, entry points
 - **Technical Tab:** "Where does it run?" — Services, owners, infrastructure, APIs
 - **Specs Tab:** "Is it done?" — Acceptance criteria, gates, sign-off status
-- **All three show the same 23 core modules**, just with different detail columns
+- **Eval/Test Tab:** "Is it validated?" — Test coverage, eval metrics, confidence scores (Eval Agent owns)
+- **Git Tab:** "What changed?" — Commit history, deployment status, version tracking (Technical team owns)
+- **All five show the same 23 core modules**, just with different detail columns
 
 **Plus:**
 - **Sprint Board:** Current sprint (now) + archive of past sprints (history)
-- **Onboarding Section:** For new team members — taxonomy, module map, first-day workflow
+- **Onboarding Section:** For new team members — taxonomy, module map, first-day workflow (PA Architect owns as standing responsibility)
 
 ---
 
@@ -29,11 +31,13 @@
 | **User Tab** | ✅ LIVE | 9 tabs (Overview, Governance, Surfaces, RAG Pipeline, Agents, Design, Onboarding), agent table, status badges |
 | **Technical Tab** | ⏸️ BLOCKED | No single comprehensive view; agents scattered across CLAUDE.md memories |
 | **Specs Tab** | ✅ LIVE | Specs Catalog live at https://mobius-specs-1032922478554.us-central1.run.app; specs linked from git; markdown→HTML rendering |
+| **Eval/Test Tab** | ❌ MISSING | No module-keyed eval metrics view; Eval owns but needs UI + data plumbing |
+| **Git Tab** | ❌ MISSING | No central deployment/commit status view; Technical team owns but needs aggregation |
 | **Sprint Roadmap** | ❌ MISSING | No persistent sprint board; quarterly review SOP exists but no UI/structure |
-| **Onboarding Section** | ❌ MISSING | Exists as fragments in product-docs; needs unified, new-hire-first-day structure |
-| **Module Alignment** | 🔨 PARTIAL | User view covers ~60% of modules; Technical view incomplete; Specs view module-keyed |
+| **Onboarding Section** | 🔨 PARTIAL | Fragments in product-docs; PA Architect now owns as standing responsibility |
+| **Module Alignment** | 🔨 PARTIAL | User view covers ~60% of modules; Tech/Specs/Eval/Git views incomplete |
 
-**Completion: ~35%**
+**Completion: ~25%** (was 35%, but expanded scope with 2 new tabs)
 
 ---
 
@@ -146,6 +150,62 @@ Acceptance Criteria:
   🔨 A/B test compliance checklist UX (in progress)
 Sign-off: PA Architect (2026-07-15) + UX Architect (2026-07-18)
 Next Review: 2026-10-01 (Q4 standing review)
+```
+
+---
+
+### **Eval/Test Tab** — "Is it validated?" (OWNED BY EVAL AGENT)
+**Columns per module:**
+- Module name
+- Status badge (same)
+- Test coverage (% unit tests, % integration tests)
+- Eval metrics (primary: accuracy/F1/recall; secondary: latency/cost)
+- Confidence level (green/yellow/red based on bandit data)
+- Last eval run (date, version)
+- Outstanding issues (count: P0/P1/P2)
+- Eval owner (Eval Agent or delegated)
+
+**Example — Payor Dashboard:**
+```
+Module: Payor Dashboard
+Status: ✅ LIVE
+Test Coverage: 87% unit | 64% integration (target: 90% unit, 75% integration)
+Eval Metrics:
+  • Accuracy: 0.94 (target: 0.92)
+  • Latency p95: 280ms (target: 300ms)
+  • Cost per query: $0.032 (target: $0.05)
+Confidence: 🟢 HIGH (5000+ samples, CI > 0.95)
+Last Eval: 2026-08-10 (v2.3.1)
+Outstanding Issues: P0: 0 | P1: 2 ("appeals tracker date format") | P2: 3
+Eval Owner: Eval Agent (primary), UX Architect (secondary)
+```
+
+---
+
+### **Git Tab** — "What changed?" (OWNED BY TECHNICAL TEAM)
+**Columns per module:**
+- Module name
+- Status badge (same)
+- Latest commit (commit hash, message, date, author)
+- Branch status (main? staging? feature branch?)
+- Deployment status (✅ LIVE on prod | 🔨 STAGING | 🗺️ DEV ONLY)
+- Version (semver tag or docker image SHA)
+- Last deployed (date, deployed by)
+- Pending changes (commits ahead of prod, count)
+- Build status (✅ passing | ⚠️ failing | 🔨 running)
+
+**Example — Payor Dashboard:**
+```
+Module: Payor Dashboard
+Status: ✅ LIVE
+Latest Commit: 3f8a2c9 "fix: compliance checklist date formatting" (2026-08-11, @uxa)
+Branch: main
+Deployment: ✅ LIVE on prod (mobile: staging)
+Version: v2.3.1 (docker: gcr.io/.../payor-dashboard:v2.3.1)
+Last Deployed: 2026-08-11 19:32 UTC by DevOps (CI/CD auto)
+Pending Changes: 0 commits ahead of prod
+Build Status: ✅ All checks passing (unit: ✅, integration: ✅, lint: ✅, deploy: ✅)
+Next Deployment Window: 2026-08-18 (weekly Sunday 0200 UTC)
 ```
 
 ---
@@ -320,7 +380,27 @@ Current blockers (if you're joining to unblock something):
 - **Blocker:** Agents confirm their specs are authoritative  
 - **Owner:** PA Architect + all agents
 
-### **Phase 4: Sprint Board (100% by 2026-09-21)**
+### **Phase 4: Eval/Test Tab (100% by 2026-09-21)**
+- [ ] Create Eval/Test Tab UI (test coverage, eval metrics, confidence, outstanding issues)
+- [ ] Populate all 23 modules with test coverage % from CI logs
+- [ ] Add eval metrics per module (accuracy/F1/latency/cost)
+- [ ] Add confidence levels + last eval run date
+- [ ] Wire up "Outstanding Issues" count from bug tracking
+- **Effort:** 4–5 days  
+- **Blocker:** Eval Agent confirms metrics schema + CI integration  
+- **Owner:** Eval Agent (primary) + PA Architect (UI/integration)
+
+### **Phase 5: Git Tab (100% by 2026-09-28)**
+- [ ] Create Git Tab UI (latest commit, branch, deployment status, version, build status)
+- [ ] Populate all 23 modules with latest commit from GitHub API
+- [ ] Add deployment status (prod/staging/dev) via Cloud Run metadata
+- [ ] Add build status from CI/CD pipeline
+- [ ] Add version tags + last deployed date
+- **Effort:** 4–5 days  
+- **Blocker:** DevOps confirms CI/CD metadata access  
+- **Owner:** Technical team (primary) + PA Architect (UI/integration)
+
+### **Phase 6: Sprint Board (100% by 2026-10-05)**
 - [ ] Create "Active Sprint" table (current work, ETA, owner, notes)
 - [ ] Archive "Previous Sprints" (clickable timeline, Sprint 34 / 33 / 32 / ...)
 - [ ] Populate with data from memory + current work assignments
@@ -328,19 +408,22 @@ Current blockers (if you're joining to unblock something):
 - **Blocker:** None  
 - **Owner:** PA Architect
 
-### **Phase 5: Onboarding Section (100% by 2026-09-28)**
+### **Phase 7: Onboarding Section (STANDING RESPONSIBILITY)**
 - [ ] Build Onboarding UI tab (Welcome, 101, Module Map, First Week, Org Chart, Rituals)
 - [ ] Write all 6 sections (Mobius 101 + interactive glossary)
 - [ ] Build clickable module-grid + first-task recommendations
 - [ ] Populate Org Chart + Slack handles
-- **Effort:** 5–6 days  
+- [ ] **Ongoing:** Update onboarding every sprint (new modules, changed rituals, Org Chart changes)
+- **Effort:** 5–6 days (initial) + 1–2 hours/sprint (maintenance)  
 - **Blocker:** Org chart confirmation (who owns what)  
-- **Owner:** PA Architect + Platform team
+- **Owner:** PA Architect (Ananth) — this is my standing responsibility for team scaling
 
-### **Phase 6: Verification + Sync (100% by 2026-09-30)**
-- [ ] Cross-check all 3 tabs: same module order, same status
+### **Phase 8: Verification + Sync (100% by 2026-10-12)**
+- [ ] Cross-check all 5 tabs: same module order, same status across all views
 - [ ] Verify all specs links work + content is current
-- [ ] Test onboarding flow with a new team member (if available)
+- [ ] Verify all eval metrics pull live from Eval Agent
+- [ ] Verify all git info pulls live from GitHub API
+- [ ] Test onboarding flow with a new team member (pilot)
 - [ ] Commit all changes to git
 - **Effort:** 2–3 days  
 - **Blocker:** None  
@@ -350,64 +433,116 @@ Current blockers (if you're joining to unblock something):
 
 ## 📊 Completion Status Tracker
 
-| Phase | Modules | Status | % Complete | Est. Done |
-|-------|---------|--------|------------|-----------|
-| **Phase 1** | 23-module list + User Tab | 🔨 IN PROGRESS | 10% | 2026-08-24 |
-| **Phase 2** | Technical Tab | 🗺️ PLANNED | 0% | 2026-09-07 |
-| **Phase 3** | Specs Tab refinement | 🗺️ PLANNED | 0% | 2026-09-14 |
-| **Phase 4** | Sprint Board | 🗺️ PLANNED | 0% | 2026-09-21 |
-| **Phase 5** | Onboarding Section | 🗺️ PLANNED | 0% | 2026-09-28 |
-| **Phase 6** | Verification + sync | 🗺️ PLANNED | 0% | 2026-09-30 |
-| **TOTAL** | **100% Platform Coherence** | 🔨 IN PROGRESS | **~10%** | **2026-09-30** |
+| Phase | What | Status | % Complete | Est. Done | Owner |
+|-------|------|--------|------------|-----------|-------|
+| **Phase 1** | 23-module list + User Tab | 🔨 IN PROGRESS | 10% | 2026-08-24 | PA Architect |
+| **Phase 2** | Technical Tab (services, APIs) | 🗺️ PLANNED | 0% | 2026-09-07 | PA Architect + Technical |
+| **Phase 3** | Specs Tab (gates, acceptance) | 🗺️ PLANNED | 0% | 2026-09-14 | PA Architect + Agents |
+| **Phase 4** | Eval/Test Tab (metrics, coverage) | 🗺️ PLANNED | 0% | 2026-09-21 | Eval Agent + PA Architect |
+| **Phase 5** | Git Tab (commits, deployment) | 🗺️ PLANNED | 0% | 2026-09-28 | Technical Team + PA Architect |
+| **Phase 6** | Sprint Board (current + archive) | 🗺️ PLANNED | 0% | 2026-10-05 | PA Architect |
+| **Phase 7** | Onboarding (STANDING RESP.) | 🗺️ PLANNED | 0% | Initial 2026-10-05, then ongoing | PA Architect (Ananth) |
+| **Phase 8** | Verification + Final Sync | 🗺️ PLANNED | 0% | 2026-10-12 | PA Architect |
+| **TOTAL** | **5-Tab Platform + Onboarding** | 🔨 IN PROGRESS | **~10%** | **2026-10-12** | PA Architect + all teams |
 
 ---
 
 ## 🎯 Success Criteria (Done = All True)
 
-- [ ] User/Technical/Specs tabs show same 23 modules in same order
-- [ ] Each tab has consistent column headers (status, owner, links)
+- [ ] All 5 tabs (User/Technical/Specs/Eval/Git) show same 23 modules in same order
+- [ ] Each tab has consistent column headers + status badge (same across all views)
+- [ ] User tab: shows entry points + key features (product POV)
+- [ ] Technical tab: shows owner, service, dependencies, data model, API (infrastructure POV)
+- [ ] Specs tab: shows gate status, acceptance criteria, sign-offs (delivery POV)
+- [ ] Eval/Test tab: shows test coverage, eval metrics, confidence, outstanding issues (quality POV)
+- [ ] Git tab: shows latest commit, deployment status, build health, version (ops POV)
 - [ ] All specs linked from Specs Catalog exist + are current
+- [ ] Eval metrics pull live from Eval Agent infrastructure
+- [ ] Git info pulls live from GitHub API + CI/CD pipeline
 - [ ] Sprint board shows current + past sprints (searchable/filterable)
-- [ ] Onboarding section is the first thing new hires see on Day 1
-- [ ] One team member can onboard using Onboarding section alone (no external help)
+- [ ] Onboarding section is first thing new hires see on Day 1
+- [ ] One team member can complete onboarding using Onboarding section alone (no external help)
+- [ ] PA Architect (Ananth) owns onboarding updates as standing responsibility (1–2 hrs/sprint)
 - [ ] All module data is version-controlled (git), not ephemeral
-- [ ] Weekly standup references sprint board (becomes source of truth)
+- [ ] Weekly standup references sprint board + flags modules with ⏸️ BLOCKED status
+- [ ] Quarterly review uses Specs tab + Eval tab + Git tab to validate module maturity
 
 ---
 
 ## 📝 Implementation Notes
 
-**Implementation order:** User → Technical → Specs → Sprint → Onboarding  
-**Why:** Each phase builds on the previous (User is foundation; Technical adds depth; Specs adds gates; Sprint references them; Onboarding ties it all together)
+**Implementation order:** User → Technical → Specs → Eval/Test → Git → Sprint → Onboarding → Verification  
+**Why:** Each phase builds on the previous:
+1. User is foundation (capabilities)
+2. Technical adds depth (infrastructure)
+3. Specs adds gates (delivery criteria)
+4. Eval adds validation (quality proof)
+5. Git adds history (change tracking)
+6. Sprint adds workflow (when)
+7. Onboarding stitches it together (for new hires)
+8. Verification ensures consistency
 
 **Git commits per phase:**
 - Phase 1: `docs: add 23-module unified framework + update user tab`
 - Phase 2: `docs: add technical tab + service mapping`
 - Phase 3: `docs: refine specs tab + gate tracking`
-- Phase 4: `docs: add sprint board + archive`
-- Phase 5: `docs: add onboarding section`
-- Phase 6: `docs: final verification + sync all tabs`
+- Phase 4: `docs: add eval/test tab + quality metrics`
+- Phase 5: `docs: add git tab + deployment status`
+- Phase 6: `docs: add sprint board + archive`
+- Phase 7: `docs: add onboarding section (PA Architect standing responsibility)`
+- Phase 8: `docs: final verification + sync all 5 tabs`
 
-**Owner's weekly check-in:**
-- Monday: Update sprint board with current status
-- Wednesday: Verify specs links (broken links get filed immediately)
-- Friday: Sync new changes to git + update completion tracker
+**PA Architect's Standing Responsibilities (Onboarding)**
+- **Initial build** (Phase 7, ~5–6 days): Create Onboarding section with all 6 subsections
+- **Ongoing maintenance** (1–2 hours/sprint, every sprint):
+  - Update Org Chart when roles change
+  - Add new modules to Module Map when they launch
+  - Revise "First Week" workflow based on feedback from recent hires
+  - Update rituals (standup time, tech review cadence, quarterly dates)
+  - File "Onboarding Gap" issues if new hires report confusion
+- **Quarterly refresh** (1 hour, each quarterly review):
+  - Revisit all links (do they still work?)
+  - Update module ownership + Slack handles
+  - Archive old rituals, announce new ones
+  - Metrics: track new-hire onboarding time (target: <1 hour from first day to first code commit)
+
+**PA Architect's Weekly Check-in (Standalone)**
+- Monday: Update sprint board with current status + blockers
+- Wednesday: Verify specs links (broken links → immediate file-it)
+- Thursday: Check if any module's test coverage dropped below target (flag with Eval Agent)
+- Friday: Sync new changes to git + update completion tracker + onboarding delta (1–2 hrs)
 
 ---
 
 ## 💡 Why This Matters
 
 **For the team:**
-- New hires onboard in 1 hour instead of 1 week
-- Specs Catalog becomes single source of truth (auditable, version-controlled)
-- Sprint board replaces Slack threads (persistent, searchable)
-- Everyone sees same view: "what's done, what's in progress, what's blocked"
+- New hires onboard in **1 hour** (not 1 week) — PA Architect owns this
+- Specs Catalog becomes **single source of truth** (auditable, version-controlled)
+- Sprint board replaces Slack threads (persistent, searchable, archivable)
+- Everyone sees same 23 modules from 5 angles: "what's done, where it runs, if it's validated, what changed, how we got here"
+- Eval metrics + test coverage visible to everyone (quality becomes transparent)
+- Git status shows health at a glance (no more "is this version deployed?")
 
-**For you:**
-- One place to manage everything (this is the "i dont want to go to differnet places to manage" requirement)
-- Forced discipline: can't claim a module is LIVE if it doesn't have a spec + acceptance criteria
-- Quarterly reviews run like clockwork (specs → gates → sign-offs → archive)
+**For you (PA Architect):**
+- One place to manage everything (eliminates "go to different places" friction)
+- **Onboarding is your standing responsibility** — new hires become your responsibility, not a one-time doc
+- Forced discipline: can't claim a module is LIVE if it doesn't have spec + acceptance criteria + test coverage + git health
+- Quarterly reviews run like clockwork (specs → gates → eval results → git status → archive)
+- Team scales with **quality built in** (not bolted on later)
 
 ---
 
-**Next step:** Approve direction → Phase 1 starts 2026-08-13
+## 🚀 Ready to Launch
+
+**Direction locked:**
+- 5 tabs (User/Technical/Specs/Eval/Git) + Sprint Board + Onboarding
+- 23 modules, same order, different lenses
+- PA Architect owns onboarding as standing responsibility
+- Eval Agent owns Eval/Test tab
+- Technical team owns Git tab
+- All others contribute data to their modules
+
+**Next step:** Phase 1 starts 2026-08-13 (User Tab + framework)
+
+**Timeline to 100% coherence:** 2026-10-12 (10 weeks from now)
