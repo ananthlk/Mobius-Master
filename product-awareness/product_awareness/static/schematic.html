@@ -121,6 +121,7 @@
   <div class="lens" role="tablist">
     <button id="lensUser" class="on">User view</button>
     <button id="lensTech">Technical view</button>
+    <button id="lensBiz">Business model</button>
     <button id="lensRoad">Roadmap</button>
   </div>
   <div class="legend">
@@ -136,6 +137,7 @@
     <p class="hint">Click any module to drill in. The <b>User view</b> says what you can do and where; the <b>Technical view</b> says what runs where and what talks to what. Statuses are honest — they come from the verified product docs (reality-gated: planned ≠ live).</p>
   </aside>
 </main>
+<section id="business" hidden></section>
 <section id="roadmap" hidden></section>
 <script>
 "use strict";
@@ -175,10 +177,10 @@ const NODES = [
   doc:"rag-backend.md", verified:"2026-07-14"},
  {id:"rag", label:"RAG & Corpus", sub:"grounded retrieval", cluster:"intel", status:"live",
   user:{tag:"Finds the passages your answer cites — from authoritative documents, not model memory.",
-   pts:["Hybrid keyword + semantic search with citations (doc + page)","Smart routing: exact codes vs conceptual questions vs web fallback","Payor-aware: plan questions inherit the state program's rules","Refuses cleanly on PHI / out-of-scope (fail-fast)"]},
-  tech:{tag:"Strategy portfolio a–e behind corpus_search_agent; pgvector fleet standard.",
-   pts:["a precision · b broad · c LLM-validate/reverse-RAG · d external (Vertex AI Grounding primary; DDG legacy fallback) · e fail-fast","Payor-authority inheritance (payor_inherited_authority, mig 004) + k=2/doc cap","Router v2 in DEV (ROUTER_VERSION=v2): linear scoring + multi-invoke fan-out on impure leaves → union chunks → synthesize once; PRIORS_VERSION per-request in routing_dump (/version) — in-flight, not GA","Planned: structured-fact lookup, cache replay, validation ledger, rag(query, mode) tool-collapse","Priors v1 hand-set → bandit-ready; judge eval rubric (must/forbidden/abstain)"]},
-  doc:"rag-backend.md", verified:"2026-07-14"},
+   pts:["Hybrid keyword + semantic search with citations (doc + page)","Smart routing: exact codes vs conceptual questions vs web fallback","Payor-aware: plan questions inherit the state program's rules","Refuses cleanly on PHI / out-of-scope (fail-fast)","Multi-turn: per-slot verdicts on whether another retrieval round would help"]},
+  tech:{tag:"5-step production pipeline (Steps 1–4 live, Step 4e built+live-validated, Step 5 v1 built). Strategy portfolio a–e; pgvector fleet standard.",
+   pts:["Step 1: Shape (6-contour classify → 6-field ResourcePosture → AnswerShapeResult slots)","Step 2: Pool (union BM25 + vector + inherited AHCA coverage; dedup by normalized text; capacity gating)","Step 3: Fillers a–e (BM25 rerank · vector junk-defense · LLM-validate/reverse-RAG · Vertex+web fallback · Payor fact-store). P0 fixes 2026-07-24: authority_level column, tag-coverage clamping.","Step 4: Router (Thompson-sampling shadow-allocator + continuation logic; authority/citability gating).","Step 4e: Observer (BUILT + LIVE-VALIDATED, NOT WIRED YET: per-slot verdicts WOULD_BENEFIT/SATISFIED/EXHAUSTED; awaiting Eval calibration plan).","Step 5: Synthesis (v1 BUILT, SPEC WRITTEN, NOT WIRED YET: per-slot rerank + cross-slot dedup + neighbor completion + doc-name resolution; awaiting AsyncSession threading).","Orchestrator multi-turn loop + whole-loop retry on TECHNICAL failure (run_retriever_partial_with_retry).","Planned: structured-fact lookup, cache replay, validation ledger, rag(query, mode) tool-collapse"]},
+  doc:"rag-backend.md · retriever-fleet-schematic.md (live status source)", verified:"2026-08-11"},
  {id:"lexicon", label:"Lexicon", sub:"policy vocabulary", cluster:"intel", status:"live",
   user:{tag:"The controlled vocabulary that makes policy search precise — payers, programs, code families.",
    pts:["j/p/d tags (jurisdiction · payer/process · domain-topic) on policy lines","Human-reviewed candidate pipeline (rules → LLM → gate)"]},
@@ -532,18 +534,70 @@ function renderRoadmap(){
   r.innerHTML=h; r.dataset.done="1";
 }
 function setMode(m){
-  const road=m==="road";
-  document.querySelector("main").style.display=road?"none":"";
+  const road=m==="road", biz=m==="biz";
+  document.querySelector("main").style.display=(road||biz)?"none":"";
   document.getElementById("roadmap").style.display=road?"block":"none";
-  const lg=document.querySelector("header .legend"); if(lg) lg.style.visibility=road?"hidden":"";
+  document.getElementById("business").style.display=biz?"block":"none";
+  const lg=document.querySelector("header .legend"); if(lg) lg.style.visibility=(road||biz)?"hidden":"";
   document.getElementById("lensUser").classList.toggle("on",m==="user");
   document.getElementById("lensTech").classList.toggle("on",m==="tech");
+  document.getElementById("lensBiz").classList.toggle("on",biz);
   document.getElementById("lensRoad").classList.toggle("on",road);
   if(road){renderRoadmap();}
+  else if(biz){renderBusiness();}
   else{lens=m;renderPanel();}
+}
+function renderBusiness(){
+  const b=document.getElementById("business");
+  if(b.dataset.done)return;
+  let h=`<div style="padding:22px 26px 60px;max-width:1000px;margin:0 auto">
+  <div class="rhead"><h2>Business model — RCM gates & tier progression</h2>
+  <p>Mobius unlocks revenue cycle management at network scale through 8 sequential gates across 3 tiers. Each gate is a revenue-cycle capability. Gates are cumulative.</p></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:32px auto">
+    <div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--surface)">
+      <h3 style="margin:0 0 8px;font-size:13px;font-weight:600;text-transform:uppercase;color:var(--muted);letter-spacing:0.1em">Tier A · Point Solutions</h3>
+      <p style="margin:0 0 12px;font-size:12px;color:var(--muted)">Gates 1–2 live · $5M–$20M</p>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="padding:8px;background:var(--surface-2);border-radius:4px;font-size:12px"><strong>Gate 1</strong> · Claim closure <span style="color:var(--live)">✓ Live</span></div>
+        <div style="padding:8px;background:var(--surface-2);border-radius:4px;font-size:12px"><strong>Gate 2</strong> · Denial mgmt <span style="color:var(--live)">✓ Live</span></div>
+      </div>
+    </div>
+    <div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--surface)">
+      <h3 style="margin:0 0 8px;font-size:13px;font-weight:600;text-transform:uppercase;color:var(--muted);letter-spacing:0.1em">Tier B · Network Intelligence</h3>
+      <p style="margin:0 0 12px;font-size:12px;color:var(--muted)">Gates 3–7 live/building · $20M–$60M</p>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="padding:8px;background:var(--surface-2);border-radius:4px;font-size:12px"><strong>Gate 3</strong> · Eligibility <span style="color:var(--live)">✓ Live</span></div>
+        <div style="padding:8px;background:var(--surface-2);border-radius:4px;font-size:12px"><strong>Gate 4</strong> · Payor policies <span style="color:var(--live)">✓ Live</span></div>
+        <div style="padding:8px;background:var(--surface-2);border-radius:4px;font-size:12px"><strong>Gate 5</strong> · Credentialing <span style="color:var(--live)">✓ Live</span></div>
+        <div style="padding:8px;background:var(--surface-2);border-radius:4px;font-size:12px"><strong>Gate 6</strong> · Appeals <span style="color:var(--partial)">🔨 Building</span></div>
+        <div style="padding:8px;background:var(--surface-2);border-radius:4px;font-size:12px"><strong>Gate 7</strong> · Coding <span style="color:var(--partial)">✓ Partial</span></div>
+      </div>
+    </div>
+    <div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--surface);grid-column:1/-1">
+      <h3 style="margin:0 0 8px;font-size:13px;font-weight:600;text-transform:uppercase;color:var(--muted);letter-spacing:0.1em">Tier C · Virtual Network</h3>
+      <p style="margin:0 0 12px;font-size:12px;color:var(--muted)">Gate 8 roadmap · $60M–$150M+</p>
+      <div style="padding:8px;background:var(--surface-2);border-radius:4px;font-size:12px"><strong>Gate 8</strong> · Network effects <span style="color:var(--planned)">🗺 Roadmap</span></div>
+    </div>
+  </div>
+  <div style="background:var(--surface-2);border-left:3px solid var(--edge-hi);border-radius:4px;padding:16px;margin:24px auto;max-width:1000px">
+    <p style="margin:0;font-size:13px;color:var(--text)"><strong>You are here:</strong> Tier B signal phase (Gates 1–5 live, Gate 6 building, Gate 7 partial). Gates 1–3 capture ~$22M year 1; gates 4–5 add ~$19M year 2; gates 6–8 target $69M+ run-rate by year 3.</p>
+  </div>
+  <div style="max-width:1000px;margin:0 auto">
+    <h3 style="font-size:13px;font-weight:600;text-transform:uppercase;color:var(--muted);margin:24px 0 12px;letter-spacing:0.1em">How this works</h3>
+    <ul style="margin:0;padding-left:18px;font-size:12px;color:var(--text);line-height:1.8">
+      <li><strong>Gates are cumulative:</strong> you don't skip Tier A to reach Tier B. Each gate unlocks the next.</li>
+      <li><strong>Status is honest:</strong> "planned" means roadmap; "building" means spec signed + work in progress; "live" means deployed + reality-gated (verified in docs).</li>
+      <li><strong>Value is quantified:</strong> each gate has a revenue-opportunity sizing from the FL Medicaid BH analysis (2019–2024, claims-level).</li>
+      <li><strong>Ownership is clear:</strong> each gate has a module owner (Payor Platform Agent, Appeals Agent, etc.). Click any module in the schematic to see who owns what.</li>
+    </ul>
+  </div>
+</div>`;
+  b.innerHTML=h;
+  b.dataset.done="1";
 }
 document.getElementById("lensUser").addEventListener("click",()=>setMode("user"));
 document.getElementById("lensTech").addEventListener("click",()=>setMode("tech"));
+document.getElementById("lensBiz").addEventListener("click",()=>setMode("biz"));
 document.getElementById("lensRoad").addEventListener("click",()=>setMode("road"));
 </script>
 </body>

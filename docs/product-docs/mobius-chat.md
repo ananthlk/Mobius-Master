@@ -1,6 +1,9 @@
 # Mobius Chat
 > A conversational assistant for the non-clinical work behind healthcare operations — ask a question, upload a file, run a credentialing workup, get sourced answers in seconds instead of three phone calls.
 
+🎯 **Enables:** Gates 4–5 live (Payor Policies, Credentialing); Gate 6 (Appeals) W7 roadmap; Gate 7 (Coding) planned  
+See [The Mobius Model](mobius-model.md) for context on how Chat surfaces these gates. [Appeals Decision Engine product-truth sign-offs](../appeals-agent-spec.md) locked 2026-08-11 (mode visibility, promise fidelity, corpus timing).
+
 ## Purpose
 Mobius Chat is the flagship user-facing product of the Mobius platform: a chat interface where a healthcare operations user can ask policy, billing, and provider questions and get answers grounded in a curated corpus, uploaded documents, live web search, and the NPPES provider registry — with citations. It is more than a chatbot: it doubles as the entry point to structured operational workflows, most notably **provider credentialing** (a pipeline) and a **provider roster** that tracks who is billable, who has gaps, and what tasks are open.
 
@@ -77,6 +80,35 @@ Per assistant message:
 
 Also here: an **Appeals Agent demo** tile (external prototype) and a "Learn more about chat skills" link that opens the Skills modal.
 
+## Current work in progress (2026-08-11)
+
+**Chat v2 FE refactoring** — owned by Chat FE/UX Agent. The backend work is complete (Arm B graduating, DiagnosticsCard live); the frontend requires 3 missing envelope improvements post-RAG-P1. Product-truth sign-off pending (§2.1 progressive summary, §3 surface roadmap v1 final, v2 messaging, PHI egress disclosure).
+
+**Answer Cache service** — v1 LIVE in dev (pgvector, mobius_cache, 1536-dim output). Chat edge integration awaiting deployment.
+
+**Appeals integration** — Decision engine W1 building (DB approved, Eval ratified, LLM Agent + Chat FE closed). W7 chat surface integration gates on three product-truth sign-offs (locked 2026-08-11): (1) mode visibility (hidden until live), (2) promise fidelity (from mode-governor state), (3) product-help corpus timing (post-M1).
+
+---
+
+## Diagnostics tab (admin-gated)
+*(2026-08-04, revs 00643-pkq → 00651; current as of 2026-08-11)* — The **DIAGNOSTICS** tab on every answer card surfaces live system telemetry for each turn. Visible to admin-profiled users.
+
+**Top-level rows** (collapsed, each has a ▾ expand):
+- **LLM performance** — model name · latency · cost · quality score (populates post-adjudication, shown as `—` until then)
+- **QA / Adjudicator** — `PASS` or `FAIL` verdict chip · effective score · stage label (`post_run_adjudicator`). Expands to:
+  - Score summary: Automated (overall) · User override · Effective (displayed)
+  - Rubric sub-scores with progress bars: Actionability, Addresses Question, Clarity, Clinical Boundary, Completeness, Confidence Calibration, Factual Consistency, Grounding, Json Compliance, Language Quality, Phi Boundary, Response Efficiency
+  - Adjudicator model label (e.g. `gemini-2.5-pro`) + call ID
+  - Full adjudicator response (raw JSON, collapsible)
+  - Bandit reward row: `awaiting bandit reward event…` → `✓ bandit event persisted (N)` once the post-run reward write lands
+- **Retrieval** — filler strategy · mode · confidence tier · latency · round count
+- **React** — mode · round count · status · groundedness verdict
+- **HIPAA checked · no PHI** — green banner confirming PHI classifier cleared this turn; only shown when PHI check passed
+
+**Timing:** The QA / Adjudicator row and quality score are injected asynchronously after the turn completes (post-run adjudication). The panel updates in place via the qc poll (up to 130s post-completion window). The bandit reward checkmark fires within the same window once `llm_calls.quality_score` is written.
+
+**Ruler consistency:** All three reward stages (rag_fact_check, rag_eval_adjudicate, adjudicator) are locked to `gemini-2.5-pro` so eval-judge == prod-scorer == bandit-reward — the ruler shown in the adjudicator row is the same model scoring all reward signals.
+
 ## Config drawer (hamburger ☰)
 - **Config version** — short SHA from `/chat/config`.
 - **Preferences tabs** — Profile / Activities / AI Comfort / Display.
@@ -122,6 +154,9 @@ Saving refreshes your profile immediately — the next answer uses the new style
 - **RECITAL card mode** *(2026-07-13, revs 00413/414)* — for verbatim canonical texts (e.g. the founding "Why Mobius" essay): violet left border, an attribution line ("From the Mobius founding essay"), the full text as flowing serif prose (no bullet compression), a "Read the full essay" button, and a "Verbatim — Mobius founding document" badge.
 - **Answer-card tab bar** *(2026-07-13, revs 00413/414)* — **Details / Citations** tabs replace the old "Show details" toggle; Citations shows formatted, copyable reference strings.
 - **Envelope section formats** *(2026-07-13)* — answer sections can render as **table / steps / stats / conditions / bars / bullets** (per-section `format` field), not just bullet lists.
+- **Output-intent chip** *(2026-08-04, rev 00649-xmb)* — a read-only chip at the top of each answer card showing the enricher's deliverable classification: `read`, `report`, `email`, `sms`, `emr`, `appeal`, or `payor_report`. Suppressed when `output_intent` is null/unknown.
+- **Failed-turn retry button** *(2026-08-04)* — when a turn fails, the failed message renders with a **Retry** button that re-sends the original question (not a generic re-send). Failed turn history is preserved and visible in the thread.
+- **Mid-turn stop recovery** *(2026-08-04, backend live on 00642-p8l)* — if the ReAct agent is stopped mid-run, the partial answer is checkpointed. A **Continue** button appears under the partial answer; pressing it resumes from the checkpoint via `system_context` (not a restart). A **Try again** button restarts from scratch. The response fields `was_truncated`, `partial_message`, and `checkpoint_kind` drive this UI.
 
 ## Credentialing pipeline (`/pipeline`)
 - Start a credentialing **run** for an organization; choose **🧭 Copilot** (step-by-step, default) or **⚡ Autopilot** (full pipeline), then "Start Pipeline →".
@@ -139,6 +174,17 @@ Mobius Chat orchestrates and proxies to other modules (URLs via env):
 - **provider-roster-credentialing** — roster page + reconciliation data.
 - **LLM backend** — Vertex AI (LLM + embeddings) with an in-process model router / bandit for per-stage selection.
 - **MCP** — remote MCP tools auto-register as chat skills.
+
+## Model intelligence & quality (2026-08-04)
+
+### Model bandit
+Mobius uses Thompson-sampling to select the best LLM per stage per turn. The bandit reads real quality data from the `model_performance_by_stage` matview (live since migrations 051+052), differentiating models by `quality_ruler=gemini-2.5-pro`. After enough turns, the bandit will route to higher-quality models automatically — no manual config needed.
+
+### Dynamic thinking allocation
+The ReAct governor assigns `reasoning_depth` (`fast` / `normal` / `thinking`) per round based on query intent. Report and complex multi-step queries get `thinking`; quick factual queries stay `fast`. A `reasoning_depth_floor` from the Product Promise contract can only raise depth, never lower it. Visible in Diagnostics → React row.
+
+### MCP tool discovery
+At boot, mobius-chat auto-discovers tools from `CHAT_SKILLS_MCP_URL` (primary, 28 tools including `check_provider_credentialing`, all FL Medicaid analytics tools, NPI lookup, etc.) plus any `EXTRA_MCP_URLS`. Tools are registered as first-class skills and available to the ReAct planner. A failed MCP call correctly reports `success=False` via `SkillEnvelope` and the agent falls back gracefully — error text from failed tool calls never reaches the answer.
 
 ## Not yet available (planned)
 Present in the surface but **not** wired for end users:

@@ -1,6 +1,9 @@
 # RAG & Retrieval (Backend)
 > The grounded-search engine behind Mobius chat: it ingests policy documents, builds a searchable corpus, and returns ranked, cited passages that answers are built from.
 
+🎯 **Enables:** Gates 3–4 (Eligibility Verification, Payor Policies & Benefits) in Tier B  
+See [The Mobius Model](mobius-model.md) for context on how retrieval powers these gates.
+
 ## Purpose
 
 The RAG (Retrieval-Augmented Generation) backend is what lets Mobius answer questions from *authoritative source documents* instead of from a model's memory. It ingests documents (PDFs, HTML pages, Google Drive files, scraped web pages), turns them into a searchable corpus, and — when a user asks a question in chat — finds the most relevant passages, ranks them, and returns them with document name and page number so the answer can cite where it came from.
@@ -83,9 +86,13 @@ Corpus source of truth for live search (populated on user Publish): the `mobius-
 - **External fallback** — strategy (d) can call a Google search service (`CHAT_SKILLS_GOOGLE_SEARCH_URL`) and web scrape; disabled by default in the retriever pipeline (`apply_google=False`) since the chat React tool loop invokes Google explicitly when needed.
 - **Eval** — `mobius-rag/eval`, `mobius-retriever` CLI/eval-questions YAML, and rag-api all share the same pipeline so measured quality reflects production behavior.
 
-## Recent changes (2026-07-04 — from commit history; targeted sweep additions; owner inventory 2026-07-14)
+## Current Architecture (As of 2026-08-11)
 
-**Owner inventory (RAG agent, 2026-07-14, corrected same day) — current behavior:**
+**Full answer-engine chain:** The complete retrieval pipeline is now live end-to-end (Steps 1–4 production, Step 4e live-validated but not yet wired, Step 5 built + specced). See [Retriever Fleet Schematic](../rag-agents/retriever-fleet-schematic.md) for the authoritative current state — read this before assuming any status.
+
+**Recent changes (2026-07-04 through 2026-08-11) — from commit history + 2026-08-11 owner audit:**
+
+**Owner inventory (RAG agent, 2026-08-11 audit; 2026-07-14 initial) — current behavior:**
 - **Live strategy routing — the full a–e portfolio:** a = precision retrieval (BM25 + vector, plan-scoped) · b = broad/discovery (higher recall, thematic) · c = LLM validate / reverse RAG (generate → cite → verify each citation against the corpus; outcomes validated_correct / validated_hallucinated / unverified_robots / needs_scrape / needs_external) · d = external (web search → fetch → synthesize with `source_type="external"` framing; **Vertex AI Grounding-with-Google-Search primary, DuckDuckGo legacy fallback** — corrected from call sites 2026-07-15 after the initial inventory misstated DDG as active; Google CSE is permanently closed to new customers) · e = fail-fast (`fail_fast_gate()` runs first; PHI / out-of-scope / policy-violation queries get an immediate structured refusal with `fail_fast_reason`, never reaching retrieval).
 - **Payor-authority inheritance:** plan-scoped queries inherit AHCA Florida Medicaid 59G rule coverage for Aetna and Sunshine Health (migration 004, `payor_inherited_authority` view).
 - **Per-doc chunk cap** — k=2 per document, with over-fetch on the inherited supplemental pass, so a single large document can't flood the k=5 answer window.
@@ -97,13 +104,30 @@ Retrieval behavior for **payer queries** improved in three ways:
 - **Contact-class query detection** — queries asking for contact/access facts (phone, fax, EDI, portal) are detected as a class; in chat these now prefer the **payor registry** (`payor_lookup` skill) over corpus search, since the corpus can't reliably ground such facts.
 Also: an admin `/admin/drive/relink` endpoint backfills `authority_level` + doc links on Drive-ingested documents, and the eval observability dashboard shipped in the Repository UI's EvalTab (see the eval doc).
 
-## Not yet available (planned)
-None of these retrieval capabilities are built yet — all are specced in `docs/rag-retrieval-learning-architecture.md` (that doc's strategy letters are placeholders that conflict with the live a–e map; treat them as planning artifacts):
-- **Structured-fact lookup** — can retrieval read the payor registry directly? Not yet: a planned strategy that answers from payor-registry fields instead of retrieving prose passages.
-- **Cache replay** — does RAG cache and replay prior answers? Not yet: a planned strategy returning a previous positively-rated answer when the corpus fingerprint is still current.
-- **Validation ledger** — does the answer include a validation ledger, a per-claim verification breakdown showing how each claim was checked? Not yet: specced for the response surface, not built.
-- **Tool collapse** — a single unified `rag(query, mode)` tool where RAG internalizes all strategy selection. Not yet: today chat calls corpus_search / corpus_search_agent directly.
-- **Exploratory-intent feature** — a routing weight boosting strategy b for overview-style exploratory queries. Not yet built.
+## Built but not yet wired to production (awaiting gatekeepers)
+
+**Observer (Step 4e)** — `observer-module-spec.md` — *built + live-validated, not yet integrated into orchestrator.py*
+- Per-slot, per-attempt verdicts: "would this benefit from another turn?"
+- Strategy-specific logic (a/b/c/s ships with real verdicts; d placeholder pending web-search session quality criteria)
+- Emits Router's verdict enum (WOULD_BENEFIT / SATISFIED / EXHAUSTED_ATTEMPTS / EXHAUSTED_BUDGET / ERROR) + reason string for Eval calibration
+- **Build-gate:** awaiting Eval's calibration plan
+
+**Synthesis (Step 5)** — `synthesis-module-spec.md` — *v1 built + spec written, not yet integrated into orchestrator.py*
+- Per-slot rerank, cross-slot dedup (two-tier), neighbor completion, document_name resolution (batched lookup)
+- Verified/unverified + planned/live passthrough (byte-for-byte, required by Eval)
+- Full cross-module telemetry compilation
+- **Integration-gate:** awaiting AsyncSession threading (Fillers already have this; Synthesis needs to reuse it)
+
+---
+
+## Not yet available (planned capabilities beyond Step 5)
+
+Specced in `docs/rag-retrieval-learning-architecture.md` and other design docs:
+- **Structured-fact lookup** — answer from payor-registry fields instead of retrieving prose passages.
+- **Cache replay** — return a previous positively-rated answer when the corpus fingerprint is still current.
+- **Validation ledger** — per-claim verification breakdown showing how each claim was checked.
+- **Tool collapse** — single unified `rag(query, mode)` tool where RAG internalizes all strategy selection (today chat calls corpus_search / corpus_search_agent directly).
+- **Exploratory-intent feature** — routing weight boost for overview-style exploratory queries.
 
 ## Doc-readiness notes
 
