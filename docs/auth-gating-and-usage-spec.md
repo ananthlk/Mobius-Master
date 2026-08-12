@@ -140,18 +140,21 @@ seat) owns the visual/experience sign-off** — this spec defers presentation to
 - **T3** acting-user propagation into skills (Tier-2) — with PHI agent for the classifier-gated paths.
 - **T4** dashboard usage panel fills in as beacons land; org-admin access + capability-gated admin.
 
-## 8. Open questions (need answers before build)
+## 8. Open questions
 
-1. **First surface + timeline?** (drives gating order — Ananth: Story first.)
-2. **Origin topology** — are Story/credentialing/appeals/org subdomains of the chat origin, or
-   separate URLs? (cookie-domain session vs token hand-off — Tier-0.)
-3. **Admin access model for the console** — email allowlist now, or a real `platform_admin`
-   capability (I can add it to the capabilities table)? Who besides Ananth sees it?
-4. **Org-scoped visibility** — should an org admin see only *their* org's users/usage (multi-tenant
-   dashboard), or is this Ananth-only for v1?
-5. **DB architect:** `user_access_event` retention + BQ replica for marts — own it or defer?
-6. **Anonymous landing** — do we beacon pre-auth landing hits (user_id null) for funnel visibility,
-   or only post-auth? (privacy call.)
+1. **First surface + timeline** — RESOLVED: **Story, public in ~1 week** (Ananth 2026-07-22). Sets
+   the whole clock: my hand-off endpoints + migration 011 + beacon + Story gating must be ready
+   this week. Gating proceeds in exposure order after Story.
+2. **Origin topology** — RESOLVED (§4): separate origins → Path 1 + chat hand-off.
+3. **Admin console access model** — RESOLVED: **v1 = internal Mobius employees via email allowlist**
+   (reuse the existing `MOBIUS_USER_ADMIN_EMAILS` gate the /admin console already uses — zero new
+   build). Console shows the GLOBAL internal view (all users/orgs/usage), NOT org-scoped. The
+   `platform_admin` capability + per-org admin views come LATER, when organizations + agents onboard
+   as their own admins (Ananth: "over time we'll work admin auth as we bring on org entry + agents").
+   Resolves old Q3 + Q4.
+4. **DB architect:** `user_access_event` retention + BQ replica for marts — own it or defer? (still open)
+5. **Anonymous landing** — beacon pre-auth landing hits (user_id null) for funnel, or only post-auth?
+   (privacy call — defaulting to post-auth only unless told otherwise.)
 
 ## 9. Sign-off matrix
 
