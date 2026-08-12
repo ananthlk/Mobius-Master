@@ -552,8 +552,8 @@
     <tr>
       <td><strong>3d</strong></td>
       <td>Web Search (Vertex + DDG)</td>
-      <td><span class="badge live">✅ Live</span></td>
-      <td>—</td>
+      <td><span class="badge blocked">⏸️ Built, Not Live</span></td>
+      <td>DB url field missing (document_pages url column)</td>
       <td>Fillers Spec</td>
     </tr>
     <tr>
@@ -586,6 +586,49 @@
     </tr>
   </table>
 
+  <h3>Current Sprint: Retriever 7-Module Refactor</h3>
+  <p><strong>Status:</strong> Design phase 90% complete (in gate sign-off). Build 0% (awaiting approvals).</p>
+  <p><strong>Duration:</strong> Started 2026-07-22. ETA: After Ananth approval + gate sign-offs (build timeline TBD).</p>
+  <p><strong>Goals:</strong></p>
+  <ul>
+    <li>Clean architecture: pool · shape · fillers · router · synthesis · contract · timing</li>
+    <li>Module board signed by all 6 lenses ✓</li>
+    <li>Performance gates in final review (Master RAG conditional sent, DB + Eval pending)</li>
+    <li>Awaiting: DB url fix (filler d), Eval calibration plan + routing confirmation, Ananth approval</li>
+  </ul>
+
+  <h3>Cross-Agent Blockers (Identified 2026-08-11)</h3>
+  <table>
+    <tr>
+      <th>Blocker</th>
+      <th>Blocking Agent</th>
+      <th>Blocked Agent/Gate</th>
+      <th>Impact</th>
+      <th>Status</th>
+    </tr>
+    <tr>
+      <td>Observer calibration plan</td>
+      <td>Eval Agent</td>
+      <td>RAG / Observer wiring, Router scaling</td>
+      <td>Observer verdicts can't scale to production</td>
+      <td>No ETA</td>
+    </tr>
+    <tr>
+      <td>Filler d url field (document_pages.url)</td>
+      <td>Database Agent</td>
+      <td>RAG / Web strategy deployment</td>
+      <td>Filler d not fully deployable</td>
+      <td>No committed ETA</td>
+    </tr>
+    <tr>
+      <td>Retriever refactor gate sign-offs</td>
+      <td>DB + Eval + Ananth</td>
+      <td>RAG / 7-module refactor build</td>
+      <td>Refactor architecture can't be built</td>
+      <td>In progress</td>
+    </tr>
+  </table>
+
   <h3>P0 Fixes (2026-07-24)</h3>
   <ul>
     <li><strong>authority_level column bug:</strong> Was nonexistent, broke tag-select/vector/inherited arms → FIXED</li>
@@ -594,14 +637,15 @@
   </ul>
 
   <div class="checklist">
-    <h4>✓ RAG Acceptance Criteria</h4>
+    <h4>✓ RAG Acceptance Criteria (Agent-Verified 2026-08-11)</h4>
     <ul>
-      <li><input type="checkbox"> All 5 steps producing results in production</li>
-      <li><input type="checkbox"> P0 fixes verified (authority_level, tag-coverage)</li>
-      <li><input type="checkbox"> Fillers a–e all wired and ranked correctly</li>
-      <li><input type="checkbox"> Router verdicts logged per slot for Observer/Eval</li>
-      <li><input type="checkbox"> Observer calibration plan drafted (blocks wiring)</li>
-      <li><input type="checkbox"> Synthesis spec written and AsyncSession plan ready</li>
+      <li><input type="checkbox" checked> All 5 steps producing results in production (Shape, Pool, Fillers, Router, Synthesis/Observer)</li>
+      <li><input type="checkbox" checked> P0 fixes verified (authority_level, tag-coverage) — FIXED 2026-07-24</li>
+      <li><input type="checkbox" checked> Fillers a/b/c/s all wired and ranked, live (filler d blocked on DB url field)</li>
+      <li><input type="checkbox" checked> Router verdicts logged per slot for Observer/Eval — 276 tests</li>
+      <li><input type="checkbox"> Observer calibration plan drafted — BLOCKED: Eval owns, no ETA</li>
+      <li><input type="checkbox" checked> Synthesis live and wired (blend model deactivated, awaiting calibration) — LIVE 2026-07-24</li>
+      <li><input type="checkbox" checked> Retriever 7-module refactor design 90% (gates in final review, build awaiting approvals)</li>
     </ul>
   </div>
 
