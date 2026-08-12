@@ -6,13 +6,14 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 
 PORT = int(os.environ.get('PORT', '8080'))
 GITHUB_RAW = "https://raw.githubusercontent.com/ananthlk/Mobius-Master/main/docs"
+SPEC_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         # Serve index.html for root
         if self.path == '/' or self.path == '':
             try:
-                with open('index.html', 'rb') as f:
+                with open(os.path.join(SPEC_DIR, 'index.html'), 'rb') as f:
                     self.send_response(200)
                     self.send_header('Content-Type', 'text/html')
                     self.end_headers()
