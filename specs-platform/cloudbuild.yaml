@@ -1,0 +1,53 @@
+steps:
+  # Step 1: Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/mobius-specs:$SHORT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/mobius-specs:latest'
+      - '-f'
+      - 'specs-platform/Dockerfile'
+      - '.'
+
+  # Step 2: Push to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/mobius-specs:$SHORT_SHA'
+
+  # Step 3: Deploy to Cloud Run
+  - name: 'gcr.io/cloud-builders/gke-deploy'
+    args:
+      - 'run'
+      - '--filename=specs-platform/'
+      - '--image=gcr.io/$PROJECT_ID/mobius-specs:$SHORT_SHA'
+      - '--location=us-central1'
+
+  # Step 4: Deploy to Cloud Run (alternative simpler approach)
+  - name: 'gcr.io/cloud-builders/run'
+    args:
+      - 'deploy'
+      - 'mobius-specs'
+      - '--image=gcr.io/$PROJECT_ID/mobius-specs:$SHORT_SHA'
+      - '--region=us-central1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+
+options:
+  machineType: 'N1_HIGHCPU_8'
+
+tags:
+  - 'gcp-cloud'
+  - 'mobius-specs'
+  - 'specs-catalog'
+
+# Automatically trigger on main branch push
+# Configuration in Cloud Build console:
+# Branch: ^main$
+# Included files filter: specs-platform/**
+
+images:
+  - 'gcr.io/$PROJECT_ID/mobius-specs:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/mobius-specs:latest'

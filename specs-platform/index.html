@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mobius Specs Catalog — Team Source of Truth</title>
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --success: #16a34a;
+      --warning: #d97706;
+      --blocked: #dc2626;
+      --planned: #94a3b8;
+      --bg: #f8f7fb;
+      --surface: #ffffff;
+      --text: #1c1a27;
+      --muted: #6b6880;
+      --border: #e2dff0;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141220;
+        --surface: #1d1a2e;
+        --text: #eceaf6;
+        --muted: #9d99b5;
+        --border: #332e4d;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    header h1 { margin: 0; font-size: 24px; font-weight: 700; }
+    header .dot { color: var(--primary); }
+    header p { margin: 0; color: var(--muted); font-size: 14px; }
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+    }
+    nav button {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      padding: 12px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    nav button.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    nav button:hover { color: var(--text); }
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+    .section {
+      display: none;
+    }
+    .section.active {
+      display: block;
+    }
+    h2 {
+      font-size: 20px;
+      margin: 32px 0 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border);
+    }
+    h3 {
+      font-size: 16px;
+      margin: 24px 0 12px;
+      color: var(--primary);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    th {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text);
+    }
+    td {
+      border: 1px solid var(--border);
+      padding: 12px;
+    }
+    tr:nth-child(even) td {
+      background: rgba(124, 58, 237, 0.02);
+    }
+    a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .badge.live {
+      background: rgba(22, 163, 74, 0.15);
+      color: var(--success);
+    }
+    .badge.progress {
+      background: rgba(217, 119, 6, 0.15);
+      color: var(--warning);
+    }
+    .badge.planned {
+      background: rgba(148, 163, 184, 0.15);
+      color: var(--planned);
+    }
+    .badge.blocked {
+      background: rgba(220, 38, 38, 0.15);
+      color: var(--blocked);
+    }
+    .badge.review {
+      background: rgba(124, 58, 237, 0.15);
+      color: var(--primary);
+    }
+    .checklist {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+    }
+    .checklist h4 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: var(--primary);
+    }
+    .checklist ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .checklist li {
+      padding: 6px 0;
+      font-size: 13px;
+    }
+    .checklist input[type="checkbox"] {
+      margin-right: 8px;
+      cursor: pointer;
+    }
+    .gate-status {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      margin: 6px 0;
+    }
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 60px;
+    }
+    @media (max-width: 768px) {
+      header { flex-direction: column; align-items: flex-start; }
+      table { font-size: 12px; }
+      th, td { padding: 8px; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Mobius Specs Catalog <span class="dot">·</span> Team Source of Truth</h1>
+    <p>Master index of all product governance, architecture, and design specifications • Last updated: 2026-08-11</p>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showSection('overview')">Overview</button>
+  <button onclick="showSection('governance')">Governance</button>
+  <button onclick="showSection('surfaces')">Surfaces</button>
+  <button onclick="showSection('rag')">RAG Pipeline</button>
+  <button onclick="showSection('agents')">Agents</button>
+  <button onclick="showSection('design')">Design</button>
+  <button onclick="showSection('onboarding')">Onboarding</button>
+</nav>
+
+<main>
+
+<!-- OVERVIEW -->
+<div id="overview" class="section active">
+  <h2>Overview</h2>
+  <p><strong>This catalog is the single source of truth for all Mobius product specifications, acceptance criteria, and sign-off status.</strong></p>
+  <p>Every feature, gate, and product promise traces back to a spec with clear acceptance criteria. Before shipping anything, verify it's listed here and all criteria are met.</p>
+
+  <h3>Key Documents</h3>
+  <ul>
+    <li><strong><a href="/specs/The_Mobius_Model.md">The Mobius Model</a></strong> — RCM gates, 3-tier progression, economics, current position</li>
+    <li><strong><a href="/specs/Retriever_Fleet_Schematic.md">Retriever Fleet Schematic</a></strong> — Live status of RAG Steps 1–5, all blockers and fixes</li>
+    <li><strong><a href="/specs/Quarterly_Vision_Alignment.md">Quarterly Vision Alignment</a></strong> — Standing review process (Jan/Apr/Jul/Oct)</li>
+  </ul>
+
+  <h3>What's Live Now (Verified 2026-08-11)</h3>
+  <table>
+    <tr>
+      <th>Gate</th>
+      <th>Feature</th>
+      <th>Status</th>
+      <th>Notes</th>
+    </tr>
+    <tr>
+      <td>1–3 (Tier A)</td>
+      <td>Claim closure, denials, eligibility</td>
+      <td><span class="badge live">✅ Live</span></td>
+      <td>Foundational gates operational</td>
+    </tr>
+    <tr>
+      <td>4 (Tier B)</td>
+      <td>Payor policies (Chat)</td>
+      <td><span class="badge live">✅ Live</span></td>
+      <td>Policy questions with citations</td>
+    </tr>
+    <tr>
+      <td>5 (Tier B)</td>
+      <td>Credentialing & roster</td>
+      <td><span class="badge live">✅ Live</span></td>
+      <td>Provider enrollment verification</td>
+    </tr>
+    <tr>
+      <td>6 (Tier B→C)</td>
+      <td>Appeals automation</td>
+      <td><span class="badge progress">🔨 W7 Roadmap</span></td>
+      <td>DB approved, sign-offs locked, Chat surface integration gated on mode rules</td>
+    </tr>
+    <tr>
+      <td>7–8 (Tier C)</td>
+      <td>Coding, network operations</td>
+      <td><span class="badge planned">🗺️ Planned</span></td>
+      <td>Roadmap post-Gate 6</td>
+    </tr>
+  </table>
+
+  <h3>RAG Pipeline Status (2026-08-11)</h3>
+  <table>
+    <tr>
+      <th>Step</th>
+      <th>Component</th>
+      <th>Status</th>
+      <th>Blocker</th>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Shape (classify → structure)</td>
+      <td><span class="badge live">✅ Live</span></td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Pool (candidate retrieval)</td>
+      <td><span class="badge live">✅ Live</span></td>
+      <td>P0 fixes 2026-07-24: authority_level, tag-coverage clamping</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Fillers a–e (ranking)</td>
+      <td><span class="badge live">✅ All Built</span></td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Router (allocation)</td>
+      <td><span class="badge live">✅ Live</span></td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td>4e</td>
+      <td>Observer (continuation verdicts)</td>
+      <td><span class="badge blocked">⏸️ Built+Validated</span></td>
+      <td>Awaiting Eval's calibration plan</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Synthesis (compilation)</td>
+      <td><span class="badge blocked">⏸️ v1 Built</span></td>
+      <td>Awaiting AsyncSession threading</td>
+    </tr>
+  </table>
+
+</div>
+
+<!-- GOVERNANCE -->
+<div id="governance" class="section">
+  <h2>Product Governance</h2>
+  <p>Foundation documents that organize all product development around RCM gates and tier progression.</p>
+
+  <h3>RCM Model & Framework</h3>
+  <table>
+    <tr>
+      <th>Document</th>
+      <th>Status</th>
+      <th>Purpose</th>
+      <th>Link</th>
+    </tr>
+    <tr>
+      <td><strong>The Mobius Model</strong></td>
+      <td><span class="badge live">✅ Live</span></td>
+      <td>8 RCM gates, 3-tier progression, FL Medicaid economics, current position</td>
+      <td><a href="/specs/mobius-model.md">Read</a></td>
+    </tr>
+    <tr>
+      <td><strong>Why Mobius?</strong></td>
+      <td><span class="badge live">✅ Live</span></td>
+      <td>Philosophical foundation: Möbius strip, care/finance as one surface</td>
+      <td><a href="/specs/WHY_MOBIUS_NAME.md">Read</a></td>
+    </tr>
+    <tr>
+      <td><strong>Self-Awareness</strong></td>
+      <td><span class="badge live">✅ Live</span></td>
+      <td>RCM gate progression positioning for Chat</td>
+      <td><a href="/specs/mobius-thesis.md">Read</a></td>
+    </tr>
+    <tr>
+      <td><strong>CMHC Partner Pitch</strong></td>
+      <td><span class="badge live">✅ Live</span></td>
+      <td>Quantified economics, 5 live gates, network value</td>
+      <td><a href="/specs/MOBIUS_PARTNER_PITCH.md">Read</a></td>
+    </tr>
+  </table>
+
+  <h3>Quarterly Governance</h3>
+  <table>
+    <tr>
+      <th>Document</th>
+      <th>Status</th>
+      <th>Purpose</th>
+      <th>Next Review</th>
+    </tr>
+    <tr>
+      <td><strong>Quarterly Vision Alignment</strong></td>
+      <td><span class="badge live">✅ Process Live</span></td>
+      <td>Standing Jan/Apr/Jul/Oct review: gate owner status, blockers, dependencies</td>
+      <td>2026-10-01</td>
+    </tr>
+    <tr>
+      <td><strong>Q4 2026 Template</strong></td>
+      <td><span class="badge progress">🔨 Template Ready</span></td>
+      <td>Gate owner checklist for Q4 review (Oct 1–7)</td>
+      <td>2026-10-01</td>
+    </tr>
+  </table>
+
+  <div class="checklist">
+    <h4>✓ Governance Acceptance Criteria</h4>
+    <ul>
+      <li><input type="checkbox"> Model correctly maps all 8 gates to deployment status</li>
+      <li><input type="checkbox"> Economics align with actual FL Medicaid BH data (2019–2024)</li>
+      <li><input type="checkbox"> Current position reflects real, verified product state</li>
+      <li><input type="checkbox"> All product references use RCM model as authoritative source</li>
+      <li><input type="checkbox"> Quarterly review template filled by all gate owners by Oct 1</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- SURFACES -->
+<div id="surfaces" class="section">
+  <h2>Product Surfaces</h2>
+  <p>User-facing products and their specifications, acceptance criteria, and sign-off status.</p>
+
+  <h3>Chat (Gates 4–7)</h3>
+  <table>
+    <tr>
+      <th>Component</th>
+      <th>Status</th>
+      <th>Acceptance Criteria</th>
+    </tr>
+    <tr>
+      <td><strong>Chat Product Doc</strong></td>
+      <td><span class="badge live">✅ Live</span></td>
+      <td>All modes documented, training flow, Vault, Diagnostics, integrations</td>
+    </tr>
+    <tr>
+      <td><strong>Chat v2 FE Sign-Off</strong></td>
+      <td><span class="badge blocked">⏸️ Awaiting</span></td>
+      <td>§2.1 progressive summary ≤5 lines, §3 surface roadmap, v2 messaging, PHI egress disclosure</td>
+    </tr>
+    <tr>
+      <td><strong>Answer Cache Service</strong></td>
+      <td><span class="badge progress">🔨 Dev→Edge</span></td>
+      <td>pgvector service live, chat edge integration pending, cache_lookup/_write skills wired</td>
+    </tr>
+    <tr>
+      <td><strong>Chat FE Refactor</strong></td>
+      <td><span class="badge progress">🔨 In Progress</span></td>
+      <td>3 missing envelopes post-RAG-P1, audit required before merge</td>
+    </tr>
+  </table>
+
+  <div class="checklist">
+    <h4>✓ Chat Sign-Off Checklist</h4>
+    <ul>
+      <li><input type="checkbox"> Chat v2 messaging approved (PA sign-off locked)</li>
+      <li><input type="checkbox"> Answer Cache edge integrated and tested</li>
+      <li><input type="checkbox"> FE refactor 3 envelopes complete and audited</li>
+      <li><input type="checkbox"> Training mode, Vault, Diagnostics verified live</li>
+      <li><input type="checkbox"> All modes (Fast/Normal/Thinking) functional and cached correctly</li>
+    </ul>
+  </div>
+
+  <h3>Appeals (Gate 6, W7 Roadmap)</h3>
+  <table>
+    <tr>
+      <th>Component</th>
+      <th>Status</th>
+      <th>Locked Sign-Off</th>
+    </tr>
+    <tr>
+      <td><strong>Appeals Decision Engine</strong></td>
+      <td><span class="badge progress">🔨 W1 DB Building</span></td>
+      <td><span class="gate-status">✅ 3 Gates Locked 2026-08-11</span></td>
+    </tr>
+  </table>
+
+  <p><strong>Product-Truth Sign-Offs (LOCKED by PA 2026-08-11):</strong></p>
+  <ol>
+    <li><strong>Mode Visibility:</strong> Unbuilt modes HIDDEN until live (not visible-but-disabled)</li>
+    <li><strong>Promise Fidelity:</strong> Card claims generated from mode-governor state ONLY</li>
+    <li><strong>Product-Help Corpus:</strong> File docs post-M1 (after real usage data available)</li>
+  </ol>
+
+  <div class="checklist">
+    <h4>✓ Appeals Readiness</h4>
+    <ul>
+      <li><input type="checkbox"> DB approved by Platform Architects (Status: ✅ Approved)</li>
+      <li><input type="checkbox"> Tech-health sign-off unconditional (Status: ✅ Approved)</li>
+      <li><input type="checkbox"> Eval ratified decision engine (Status: ✅ Approved)</li>
+      <li><input type="checkbox"> W7 chat surface implements mode visibility rules</li>
+      <li><input type="checkbox"> Post-M1: product-help docs filed to corpus with usage data</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- RAG PIPELINE -->
+<div id="rag" class="section">
+  <h2>RAG Pipeline (Steps 1–5)</h2>
+  <p>Complete retrieval pipeline: Shape → Pool → Fillers → Router → Observer/Synthesis</p>
+
+  <h3>All Steps Overview</h3>
+  <table>
+    <tr>
+      <th>Step</th>
+      <th>Component</th>
+      <th>Status</th>
+      <th>Blocker</th>
+      <th>Spec</th>
+    </tr>
+    <tr>
+      <td><strong>1a</strong></td>
+      <td>Shape Gate (classify)</td>
+      <td><span class="badge live">✅ Closed</span></td>
+      <td>—</td>
+      <td><a href="/specs/shape-gate-spec.md">Spec</a></td>
+    </tr>
+    <tr>
+      <td><strong>1b</strong></td>
+      <td>Shape Reformat</td>
+      <td><span class="badge live">✅ Closed</span></td>
+      <td>—</td>
+      <td><a href="/specs/shape-reformat-spec.md">Spec</a></td>
+    </tr>
+    <tr>
+      <td><strong>1c</strong></td>
+      <td>Shape Structure (ResourcePosture)</td>
+      <td><span class="badge live">✅ Closed</span></td>
+      <td>—</td>
+      <td><a href="/specs/shape-structure-spec.md">Spec</a></td>
+    </tr>
+    <tr>
+      <td><strong>1d</strong></td>
+      <td>Shape Slots (AnswerShapeResult)</td>
+      <td><span class="badge live">✅ Closed</span></td>
+      <td>—</td>
+      <td><a href="/specs/shape-slots-spec.md">Spec</a></td>
+    </tr>
+    <tr>
+      <td><strong>2</strong></td>
+      <td>Pool (candidate retrieval)</td>
+      <td><span class="badge live">✅ Closed</span></td>
+      <td>P0 fixes 2026-07-24</td>
+      <td><a href="/specs/pool-spec.md">Spec</a></td>
+    </tr>
+    <tr>
+      <td colspan="5"><strong>Fillers (Step 3): All 5 Built and Live</strong></td>
+    </tr>
+    <tr>
+      <td><strong>3a</strong></td>
+      <td>BM25 (precision rerank)</td>
+      <td><span class="badge live">✅ Live</span></td>
+      <td>—</td>
+      <td>Fillers Spec</td>
+    </tr>
+    <tr>
+      <td><strong>3b</strong></td>
+      <td>Vector (junk defense)</td>
+      <td><span class="badge live">✅ Live</span></td>
+      <td>—</td>
+      <td>Fillers Spec</td>
+    </tr>
+    <tr>
+      <td><strong>3c</strong></td>
+      <td>LLM-validate (quote verification)</td>
+      <td><span class="badge live">✅ Live</span></td>
+      <td>—</td>
+      <td>Fillers Spec</td>
+    </tr>
+    <tr>
+      <td><strong>3d</strong></td>
+      <td>Web Search (Vertex + DDG)</td>
+      <td><span class="badge live">✅ Live</span></td>
+      <td>—</td>
+      <td>Fillers Spec</td>
+    </tr>
+    <tr>
+      <td><strong>3s</strong></td>
+      <td>Payor Fact-Store (deterministic)</td>
+      <td><span class="badge live">✅ Live</span></td>
+      <td>—</td>
+      <td>Fillers Spec</td>
+    </tr>
+    <tr>
+      <td><strong>4</strong></td>
+      <td>Router (Thompson sampling + continuation)</td>
+      <td><span class="badge live">✅ Live</span></td>
+      <td>—</td>
+      <td><a href="/specs/router-spec.md">Spec</a></td>
+    </tr>
+    <tr>
+      <td><strong>4e</strong></td>
+      <td>Observer (per-slot verdicts)</td>
+      <td><span class="badge blocked">⏸️ Built+Validated</span></td>
+      <td>Awaiting Eval calibration plan</td>
+      <td><a href="/specs/observer-spec.md">Spec</a></td>
+    </tr>
+    <tr>
+      <td><strong>5</strong></td>
+      <td>Synthesis (compilation)</td>
+      <td><span class="badge blocked">⏸️ v1 Built</span></td>
+      <td>Awaiting AsyncSession threading</td>
+      <td><a href="/specs/synthesis-spec.md">Spec</a></td>
+    </tr>
+  </table>
+
+  <h3>P0 Fixes (2026-07-24)</h3>
+  <ul>
+    <li><strong>authority_level column bug:</strong> Was nonexistent, broke tag-select/vector/inherited arms → FIXED</li>
+    <li><strong>tag-coverage clamping:</strong> Was false-positive 1.0 scores → FIXED</li>
+    <li><strong>Content dedup:</strong> Now by normalized-text-grouping, not content_sha</li>
+  </ul>
+
+  <div class="checklist">
+    <h4>✓ RAG Acceptance Criteria</h4>
+    <ul>
+      <li><input type="checkbox"> All 5 steps producing results in production</li>
+      <li><input type="checkbox"> P0 fixes verified (authority_level, tag-coverage)</li>
+      <li><input type="checkbox"> Fillers a–e all wired and ranked correctly</li>
+      <li><input type="checkbox"> Router verdicts logged per slot for Observer/Eval</li>
+      <li><input type="checkbox"> Observer calibration plan drafted (blocks wiring)</li>
+      <li><input type="checkbox"> Synthesis spec written and AsyncSession plan ready</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- AGENTS -->
+<div id="agents" class="section">
+  <h2>Standing Agents & Ownership</h2>
+  <p>Agent charters, responsibilities, and interfaces.</p>
+
+  <table>
+    <tr>
+      <th>Agent</th>
+      <th>Charter Status</th>
+      <th>Primary Responsibility</th>
+      <th>Critical Gates</th>
+    </tr>
+    <tr>
+      <td><strong>Appeals Agent</strong></td>
+      <td><span class="badge live">✅ Confirmed</span></td>
+      <td>Appeals domain end-to-end (denials→letters)</td>
+      <td>W1 DB + 3 product-truth gates locked</td>
+    </tr>
+    <tr>
+      <td><strong>Payor Platform Agent</strong></td>
+      <td><span class="badge live">✅ Confirmed</span></td>
+      <td>Cross-module contracts/config/build (highest-blast-radius)</td>
+      <td>Draft contracts policy</td>
+    </tr>
+    <tr>
+      <td><strong>Retriever Agent</strong></td>
+      <td><span class="badge live">✅ Confirmed</span></td>
+      <td>Entire RAG pipeline (Steps 1–5)</td>
+      <td>Observer calibration + Synthesis AsyncSession</td>
+    </tr>
+    <tr>
+      <td><strong>Eval Agent</strong></td>
+      <td><span class="badge live">✅ Confirmed</span></td>
+      <td>QA, calibration, judge loop, two-grade scoring</td>
+      <td>Draft Observer calibration plan</td>
+    </tr>
+  </table>
+
+</div>
+
+<!-- DESIGN -->
+<div id="design" class="section">
+  <h2>Design Systems & Patterns</h2>
+  <p>Reusable components and governance surfaces for the whole team.</p>
+
+  <h3>Governance Surface Pattern</h3>
+  <table>
+    <tr>
+      <th>Component</th>
+      <th>Status</th>
+      <th>Purpose</th>
+    </tr>
+    <tr>
+      <td><strong>Spec</strong></td>
+      <td><span class="badge review">🔨 UX Review</span></td>
+      <td>Tier card, Gate card, Status badge, Detail panel — reusable across any agent</td>
+    </tr>
+    <tr>
+      <td><strong>Review Package</strong></td>
+      <td><span class="badge review">🔨 Review</span></td>
+      <td>Comprehensive UX checklist (layout, states, tokens, accessibility)</td>
+    </tr>
+    <tr>
+      <td><strong>Hub Dashboard</strong></td>
+      <td><span class="badge live">✅ Reference</span></td>
+      <td>Interactive prototype: Dashboard/Status/Blockers tabs</td>
+    </tr>
+    <tr>
+      <td><strong>Business Model Lens</strong></td>
+      <td><span class="badge live">✅ Live</span></td>
+      <td>Platform schematic with Tier A/B/C gates</td>
+    </tr>
+  </table>
+
+  <div class="checklist">
+    <h4>✓ Design System Sign-Offs</h4>
+    <ul>
+      <li><input type="checkbox"> UX Architect approves layout + tokens + accessibility</li>
+      <li><input type="checkbox"> Figma symbols created (TierCard, GateCard, StatusBadge)</li>
+      <li><input type="checkbox"> Appeals Agent adopts for roadmap tracking</li>
+      <li><input type="checkbox"> Router Agent adopts for phase tracking</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- ONBOARDING -->
+<div id="onboarding" class="section">
+  <h2>Team Onboarding</h2>
+  <p>Use this checklist to onboard new team members. Each role has critical documents they must review and sign off on before contributing.</p>
+
+  <h3>Product Lead</h3>
+  <div class="checklist">
+    <h4>Required Reading</h4>
+    <ul>
+      <li><input type="checkbox"> <a href="/specs/mobius-model.md">The Mobius Model</a> — RCM gates, current position, blocker gates</li>
+      <li><input type="checkbox"> <a href="/specs/quarterly-vision-alignment.md">Quarterly Vision Alignment</a> — Review process, standing questions</li>
+      <li><input type="checkbox"> <a href="/specs/MOBIUS_PARTNER_PITCH.md">CMHC Partner Pitch</a> — Market opportunity, economics, competitive positioning</li>
+    </ul>
+    <h4>First Task</h4>
+    <ul>
+      <li><input type="checkbox"> Review current gate status on the Platform schematic (/platform)</li>
+      <li><input type="checkbox"> Meet with each agent (Appeals, Payor, RAG) to understand blockers</li>
+    </ul>
+  </div>
+
+  <h3>Chat Owner</h3>
+  <div class="checklist">
+    <h4>Required Reading</h4>
+    <ul>
+      <li><input type="checkbox"> <a href="/specs/mobius-chat.md">Chat Product Doc</a> — All modes, integrations, current work</li>
+      <li><input type="checkbox"> Chat v2 FE sign-off gates (in product doc) — Acceptance criteria</li>
+    </ul>
+    <h4>First Task</h4>
+    <ul>
+      <li><input type="checkbox"> Verify Chat v2 messaging aligns with §2.1/§3 gates</li>
+      <li><input type="checkbox"> Wire Answer Cache edge integration</li>
+    </ul>
+  </div>
+
+  <h3>RAG/Retriever Owner</h3>
+  <div class="checklist">
+    <h4>Required Reading</h4>
+    <ul>
+      <li><input type="checkbox"> <a href="/specs/retriever-fleet-schematic.md">Retriever Fleet Schematic</a> — Source of truth for all Steps 1–5</li>
+      <li><input type="checkbox"> <a href="/specs/rag-backend.md">RAG Backend Product Doc</a> — All components and integrations</li>
+    </ul>
+    <h4>First Task</h4>
+    <ul>
+      <li><input type="checkbox"> Verify all Step 1–5 acceptance criteria are met</li>
+      <li><input type="checkbox"> Work with Eval on Observer calibration plan</li>
+      <li><input type="checkbox"> Plan AsyncSession threading for Synthesis</li>
+    </ul>
+  </div>
+
+  <h3>Appeals Owner</h3>
+  <div class="checklist">
+    <h4>Required Reading</h4>
+    <ul>
+      <li><input type="checkbox"> <a href="/specs/appeals-agent-spec.md">Appeals Agent Charter</a> — Scope, responsibilities, interfaces</li>
+      <li><input type="checkbox"> Product-truth gates (3 locked 2026-08-11) — Mode visibility, promise fidelity, corpus timing</li>
+    </ul>
+    <h4>First Task</h4>
+    <ul>
+      <li><input type="checkbox"> Confirm DB build schedule and blockers</li>
+      <li><input type="checkbox"> Plan W7 chat surface integration with mode rules</li>
+    </ul>
+  </div>
+
+  <h3>Payor Platform Owner</h3>
+  <div class="checklist">
+    <h4>Required Reading</h4>
+    <ul>
+      <li><input type="checkbox"> <a href="/specs/platform-agent-spec.md">Payor Platform Agent Charter</a> — Contracts, config, build ownership</li>
+    </ul>
+    <h4>First Task</h4>
+    <ul>
+      <li><input type="checkbox"> Draft mobius-contracts compatibility/change policy</li>
+      <li><input type="checkbox"> Stand ready for Technical Day items #7/#19</li>
+    </ul>
+  </div>
+
+  <h3>Eval Owner</h3>
+  <div class="checklist">
+    <h4>Required Reading</h4>
+    <ul>
+      <li><input type="checkbox"> <a href="/specs/observer-spec.md">Observer Module Spec</a> — What calibration plan must cover</li>
+      <li><input type="checkbox"> <a href="/specs/synthesis-spec.md">Synthesis Module Spec</a> — Requirements for next phase</li>
+    </ul>
+    <h4>First Task</h4>
+    <ul>
+      <li><input type="checkbox"> Draft Observer calibration plan (blocks production wiring)</li>
+      <li><input type="checkbox"> Queue Synthesis calibration after Observer ships</li>
+    </ul>
+  </div>
+
+  <h3>UX/Design Lead</h3>
+  <div class="checklist">
+    <h4>Required Reading</h4>
+    <ul>
+      <li><input type="checkbox"> <a href="/specs/governance-surface-spec.md">Governance Surface Spec</a> — Pattern definition</li>
+      <li><input type="checkbox"> <a href="/specs/ux-review-package.md">UX Review Package</a> — Checklist for sign-off</li>
+    </ul>
+    <h4>First Task</h4>
+    <ul>
+      <li><input type="checkbox"> Review Governance Surface pattern</li>
+      <li><input type="checkbox"> Create Figma symbols (TierCard, GateCard, StatusBadge)</li>
+      <li><input type="checkbox"> Sign off by 2026-08-06</li>
+    </ul>
+  </div>
+
+</div>
+
+</main>
+
+<footer>
+  <p>This catalog is the single source of truth for all Mobius specifications. Every feature ships only after all acceptance criteria are met and documented here.</p>
+  <p><strong>Last reviewed:</strong> 2026-08-11 by PA Architect</p>
+  <p><strong>Next quarterly review:</strong> 2026-10-01 (Q4 Alignment)</p>
+</footer>
+
+<script>
+function showSection(sectionId) {
+  // Hide all sections
+  document.querySelectorAll('.section').forEach(el => {
+    el.classList.remove('active');
+  });
+
+  // Remove active from all nav buttons
+  document.querySelectorAll('nav button').forEach(btn => {
+    btn.classList.remove('active');
+  });
+
+  // Show the selected section
+  document.getElementById(sectionId).classList.add('active');
+
+  // Add active to the clicked button
+  event.target.classList.add('active');
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
