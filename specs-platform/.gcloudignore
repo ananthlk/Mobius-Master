@@ -1,0 +1,7 @@
+# Cloud Run ignores these files during deployment
+Dockerfile
+cloudbuild.yaml
+*.bak
+.DS_Store
+__pycache__/
+*.pyc
