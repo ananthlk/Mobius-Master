@@ -123,6 +123,7 @@
     <button id="lensTech">Technical view</button>
     <button id="lensBiz">Business model</button>
     <button id="lensRoad">Roadmap</button>
+    <button id="lensSpecs">Specs Catalog</button>
   </div>
   <div class="legend">
     <span><i style="background:var(--live)"></i>live</span>
@@ -139,6 +140,9 @@
 </main>
 <section id="business" hidden></section>
 <section id="roadmap" hidden></section>
+<section id="specs" hidden style="flex:1;overflow:hidden;padding:0">
+  <iframe src="https://specs-platform-1032922478554.us-central1.run.app" style="width:100%;height:100%;border:none"></iframe>
+</section>
 <script>
 "use strict";
 /* ============ MODEL — generated from docs/product-docs (verified corpus) ============
@@ -534,15 +538,17 @@ function renderRoadmap(){
   r.innerHTML=h; r.dataset.done="1";
 }
 function setMode(m){
-  const road=m==="road", biz=m==="biz";
-  document.querySelector("main").style.display=(road||biz)?"none":"";
+  const road=m==="road", biz=m==="biz", specs=m==="specs";
+  document.querySelector("main").style.display=(road||biz||specs)?"none":"";
   document.getElementById("roadmap").style.display=road?"block":"none";
   document.getElementById("business").style.display=biz?"block":"none";
+  document.getElementById("specs").style.display=specs?"flex":"none";
   const lg=document.querySelector("header .legend"); if(lg) lg.style.visibility=(road||biz)?"hidden":"";
   document.getElementById("lensUser").classList.toggle("on",m==="user");
   document.getElementById("lensTech").classList.toggle("on",m==="tech");
   document.getElementById("lensBiz").classList.toggle("on",biz);
   document.getElementById("lensRoad").classList.toggle("on",road);
+  document.getElementById("lensSpecs").classList.toggle("on",specs);
   if(road){renderRoadmap();}
   else if(biz){renderBusiness();}
   else{lens=m;renderPanel();}
@@ -599,6 +605,7 @@ document.getElementById("lensUser").addEventListener("click",()=>setMode("user")
 document.getElementById("lensTech").addEventListener("click",()=>setMode("tech"));
 document.getElementById("lensBiz").addEventListener("click",()=>setMode("biz"));
 document.getElementById("lensRoad").addEventListener("click",()=>setMode("road"));
+document.getElementById("lensSpecs").addEventListener("click",()=>setMode("specs"));
 </script>
 </body>
 </html>
