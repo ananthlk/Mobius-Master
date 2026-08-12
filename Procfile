@@ -1,0 +1,1 @@
+web: python specs-platform/server.py
