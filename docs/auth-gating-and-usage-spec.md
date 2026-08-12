@@ -1,8 +1,13 @@
 # Platform Auth Gating + Usage Visibility — Spec v1 (for sign-off)
 
 **Author:** User Manager Agent (owns mobius-user / @mobius/auth / identity)
-**Status:** DRAFT — circulating for sign-off. NO build until impacted agents + platform architects ratify.
+**Status:** UX APPROVED by Ananth (mockup, 2026-07-22) — circulating for sign-off. Build sequence: signed → build. NO code until impacted agents + platform architects ratify.
 **Date:** 2026-07-22
+
+> **Ratified UX (Ananth-approved visual):** the sign-in flow + Users&Usage console layout are
+> locked to the mockup at https://claude.ai/code/artifact/8f10d500-4200-4b35-827f-b35a5f9515b8
+> — §6 text conforms to it, not the reverse. Sign-offs are against that visual; the build
+> reproduces it. Platform Architect (UX seat) owns visual/design-system conformance on top.
 
 ---
 
