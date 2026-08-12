@@ -1,0 +1,98 @@
+[
+  {
+    "case_id": "tp_sunshine_phone",
+    "query": "What is the phone number for Sunshine Health?",
+    "tag_matches": [
+      "j:payor.sunshine_health",
+      "d:contact"
+    ],
+    "expected_gate_pass": true,
+    "actual_gate_pass": true,
+    "gate_match_expected": true,
+    "hit": true,
+    "served_text": "1-844-477-8313",
+    "served_score": 1.0,
+    "fact_store_ms": 535,
+    "note": "Known-payer, non-conceptual, factual predicate -- gate should pass, real hit expected."
+  },
+  {
+    "case_id": "tp_aetna_priorauth_url",
+    "query": "What is the prior authorization URL for Aetna?",
+    "tag_matches": [
+      "j:payor.aetna",
+      "d:prior_auth"
+    ],
+    "expected_gate_pass": true,
+    "actual_gate_pass": true,
+    "gate_match_expected": true,
+    "hit": true,
+    "served_text": "https://www.aetnabetterhealth.com/florida/providers/prior-authorization.html",
+    "served_score": 1.0,
+    "fact_store_ms": 190,
+    "note": "Known-payer, non-conceptual -- gate should pass, real hit expected."
+  },
+  {
+    "case_id": "tp_ahca_portal",
+    "query": "What portal do I use for AHCA Florida Medicaid?",
+    "tag_matches": [
+      "j:payor.ahca",
+      "d:portal"
+    ],
+    "expected_gate_pass": true,
+    "actual_gate_pass": true,
+    "gate_match_expected": true,
+    "hit": false,
+    "served_text": null,
+    "served_score": null,
+    "fact_store_ms": 141,
+    "note": "Known-payer, non-conceptual -- gate should pass, real hit expected."
+  },
+  {
+    "case_id": "tn_conceptual_with_payer",
+    "query": "Explain the philosophy behind Sunshine Health's prior authorization process",
+    "tag_matches": [
+      "j:payor.sunshine_health",
+      "d:prior_auth"
+    ],
+    "expected_gate_pass": false,
+    "actual_gate_pass": false,
+    "gate_match_expected": true,
+    "hit": null,
+    "served_text": null,
+    "served_score": null,
+    "fact_store_ms": null,
+    "note": "Payer tag present but conceptual marker ('explain', 'philosophy') -- client gate must reject, ZERO HTTP calls."
+  },
+  {
+    "case_id": "tn_no_payer_tag",
+    "query": "What is the credentialing process for behavioral health providers?",
+    "tag_matches": [
+      "d:credentialing",
+      "p:process"
+    ],
+    "expected_gate_pass": false,
+    "actual_gate_pass": false,
+    "gate_match_expected": true,
+    "hit": null,
+    "served_text": null,
+    "served_score": null,
+    "fact_store_ms": null,
+    "note": "No j:payor.* tag at all -- client gate must reject, ZERO HTTP calls."
+  },
+  {
+    "case_id": "known_bug_repro_unstored_payer",
+    "query": "What is the phone number for Humana?",
+    "tag_matches": [
+      "j:payor.humana",
+      "d:contact"
+    ],
+    "expected_gate_pass": true,
+    "actual_gate_pass": true,
+    "gate_match_expected": true,
+    "hit": true,
+    "served_text": "1-800-441-5501",
+    "served_score": 1.0,
+    "fact_store_ms": 184,
+    "note": "Payer tag present, non-conceptual -- client gate PASSES (it only checks tag presence, not whether the payer is actually stored). This is the documented, PARKED over-fire bug ([[project-payor-fact-store]]) -- expected to reproduce live, not a new bug introduced by Filler s."
+  }
+]
