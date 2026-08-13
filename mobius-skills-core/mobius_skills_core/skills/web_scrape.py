@@ -94,6 +94,12 @@ WEB_SCRAPE_MODE_OUTPUT_CAPS: dict[str, int] = {
 _DEFAULT_MODE = "quick"
 _VALID_SCHEMES = ("http", "https")
 
+# How many discovered links we show the caller. Enough that the right
+# follow-up URL is almost always present (the Sunshine billing master has 33
+# hub pages), bounded so a 280-node site cannot crowd out the page content.
+_LINK_MANIFEST_PAGES = 40
+_LINK_MANIFEST_FILES = 25
+
 
 def _normalize_mode(raw: str | None) -> str:
     """Clamp an unknown or missing mode to ``quick``.
@@ -303,6 +309,51 @@ def run_web_scrape(
         body += "\n\n[... truncated ...]"
     if summary:
         body += f"\n\nSummary: {summary}"
+
+    # ── Link manifest: the site map, handed to the model ──────────────
+    #
+    # Without this the caller has to GUESS follow-up URLs, and it does.
+    # Live 2026-08-12: ReAct scraped this exact page, decided it needed the
+    # behavioral-health guide, invented
+    # /providers/Billing-manual/behavioral-health.html, and got a 404. The
+    # real page — /providers/Billing-manual/bh.html — had ALREADY been
+    # discovered by that very scrape. We simply never showed it. The model
+    # then treated the failure as a dead end and answered from a weaker source.
+    #
+    # The scraper already returns a full discovery manifest, so the fix is to
+    # stop hiding it: list real URLs the caller can invoke next, and say
+    # plainly that guessing is not allowed. Pages first (those are the
+    # navigable follow-ups), then files, capped so a 280-node site cannot
+    # crowd out the content itself.
+    nodes = data.get("nodes") or []
+    if nodes:
+        pages_l = [n for n in nodes if n.get("content_kind") == "page" and n.get("url") != clean_url]
+        files_l = [n for n in nodes if n.get("content_kind") == "file"]
+
+        def _fmt(n: dict) -> str:
+            title = (n.get("title") or "").strip()
+            return f"  - {n['url']}" + (f"  ({title[:70]})" if title else "")
+
+        lines: list[str] = []
+        if pages_l:
+            lines.append(f"Pages ({len(pages_l)} found, showing up to {_LINK_MANIFEST_PAGES}):")
+            lines += [_fmt(n) for n in pages_l[:_LINK_MANIFEST_PAGES]]
+        if files_l:
+            lines.append(f"Documents ({len(files_l)} found, showing up to {_LINK_MANIFEST_FILES}):")
+            lines += [_fmt(n) for n in files_l[:_LINK_MANIFEST_FILES]]
+        if lines:
+            body += (
+                "\n\nLinks discovered on this site — invoke web_scrape again with one of "
+                "these EXACT urls if you need more detail. Do NOT construct or guess a "
+                "URL: a guessed URL returns 404 and wastes a round. If none of these fit, "
+                "re-scrape this page with a higher max_depth instead.\n"
+                + "\n".join(lines)
+            )
+    if data.get("partial"):
+        body += (
+            "\n\n[Note: the crawl hit its time budget and returned early. The pages above "
+            "are the most relevant ones found; more exist on a larger budget.]"
+        )
 
     _safe_emit(emitter, SkillEvent(
         signal="tool_completed", step_id=_STEP_ID,
