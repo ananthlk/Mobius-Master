@@ -62,10 +62,22 @@ _STEP_ID = "web_scrape"
 # Single source of truth for mode specs. Before this module both chat
 # (tool_agent.WEB_SCRAPE_MODE_SPECS) and the MCP server kept their own
 # copies; they're now gone — import from here.
+#
+# ``time_budget_s`` is the LATENCY CONTRACT, and it is the field that matters
+# most here. The caller declares how long it is willing to wait; the scraper
+# returns the best result it has when that expires and flags it ``partial``.
+#
+# Every budget below sits under the ReAct loop's own 30s kill
+# (MOBIUS_WEB_SCRAPE_TIMEOUT_S in mobius-chat), and that gap is deliberate.
+# Measured 2026-08-12: a detailed crawl took 37.7s, so ReAct killed the
+# thread at 30s and discarded a perfectly good 120KB result — the caller got
+# a timeout instead of an answer. A budget that expires BEFORE the caller
+# gives up converts that into a fast, useful partial. Never raise these above
+# the ReAct cap; lower the work, not the deadline.
 WEB_SCRAPE_MODE_SPECS: dict[str, dict[str, int]] = {
-    "quick":    {"max_depth": 1, "max_pages": 1,  "max_doc_downloads": 0},
-    "medium":   {"max_depth": 3, "max_pages": 6,  "max_doc_downloads": 0},
-    "detailed": {"max_depth": 5, "max_pages": 50, "max_doc_downloads": 10},
+    "quick":    {"max_depth": 1, "max_pages": 1,  "max_doc_downloads": 0, "time_budget_s": 10},
+    "medium":   {"max_depth": 3, "max_pages": 6,  "max_doc_downloads": 0, "time_budget_s": 18},
+    "detailed": {"max_depth": 5, "max_pages": 50, "max_doc_downloads": 10, "time_budget_s": 24},
 }
 
 # Per-mode HTTP read timeout. Deeper crawls legitimately take longer.
