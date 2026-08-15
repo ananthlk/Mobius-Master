@@ -1,0 +1,293 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Mobius Fleet — Ownership Map  (source of truth for module → owning agent)
+# ══════════════════════════════════════════════════════════════════════════════
+# THE RULE: every module has exactly one owner, and everyone understands it.
+#
+# WHY THIS FILE EXISTS
+#   Git cannot tell us ownership — every commit across the fleet is authored as
+#   "Ananth Lalithakumar", because the agents all commit as Ananth. Ownership is a
+#   LOGICAL assignment that otherwise lives only in agent memories. This file makes
+#   it declared, machine-checkable, and the resolvable target the Technical Day
+#   uses to assign every defect (checklist #9).
+#
+# AUTHORITY
+#   produced_by : Technical Review Agent (draft; never assigns real fleet work)
+#   ratified_by : Ananth   <-- pending. See docs/fleet-ownership-and-new-agents-spec.md
+#   Only Ananth assigns fleet ownership + creates the 2 new agents. Entries marked
+#   `proposed` point at their TARGET owner and flip to `confirmed` on acknowledgment.
+#
+# STATUS VOCAB
+#   confirmed         high-confidence, memory-settled or single-session-owned
+#   proposed          target owner assigned; awaiting that agent's acknowledgment
+#   platform          Ananth catch-all, pending an open decision (spec §5)
+#   archive_candidate owned by an agent that may be archived — confirm first
+#
+# NEW agents (spec): Platform, Skills, Analytics, Extension, Auth, Appeals.
+#   EXPANDED existing: RAG, DB→"Data & DB". (User Manager unchanged — auth split out.)
+#
+# TWO-LEVEL SKILLS OWNERSHIP: the Skills agent is CUSTODIAN of the mobius-skills
+#   subsystem (repo, registry/dispatch law, skills-core runtime, skills-mcp bridge,
+#   and any skill with no domain owner). Individual skills are DELEGATED to domain
+#   agents for their logic (phi→PHI, task-manager→Task, cmhc→Analytics, ...).
+#   Glob resolution encodes this: specific skill rules → domain agent; the
+#   `mobius-skills/**` fallback → Skills agent.
+#
+# MATCHING: first matching `path` glob wins; most-specific (subdir) rules ABOVE
+# the repo-level rule they live in. Paths are relative to the superrepo root.
+# ══════════════════════════════════════════════════════════════════════════════
+
+version: 2
+ratified: false                 # flip true once Ananth has reviewed + created new agents
+cycle_context: techday
+
+owners:
+# ── Product / service repos — clean single owner ─────────────────────────────
+  - path: "mobius-chat/**"
+    owner: "Chat agent"
+    status: confirmed
+
+  - path: "mobius-rag/**"
+    owner: "RAG agent"
+    status: confirmed
+    notes: "backs schematic nodes rag / library / lexicon"
+
+  # Sub-path rule ABOVE the repo rule (most-specific wins, per MATCHING above).
+  - path: "mobius-payor/app/robots.py"
+    owner: "Crawler (Sourcing agent)"
+    status: confirmed
+    notes: >-
+      The fleet's robots.txt / no-crawl compliance gate. Ananth 2026-08-12 made Crawler
+      responsible for "everything we scrape related honoring the no crawl rules", and this
+      file IS that gate, so ownership follows the responsibility. Handed over by Sources
+      (mobius-payor/docs/sources-crawler-contract.md, "Inherited assets").
+      ⚠️ DEPLOY-SENSITIVE: crawlable tri-state also feeds Router strategy-`d` selection, so
+      changes here are a Router input change — coordinate with RAG + Technical Review, do
+      not land unilaterally. Physically still in mobius-payor; migration deferred (Ananth:
+      "if it needs to be migrated so be it") — the rest of mobius-payor stays Payor agent's.
+      Payor agent + Technical Review notified.
+
+  - path: "mobius-payor/**"
+    owner: "Payor agent"
+    status: confirmed
+
+  - path: "mobius-vault/**"
+    owner: "Vault agent"
+    status: confirmed
+    notes: "off-pattern: own repo, not wired as submodule (techday:01:mobius-vault:11)"
+
+  - path: "mobius-interact/**"
+    owner: "Interact agent"
+    status: confirmed
+
+  - path: "mobius-feedback/**"
+    owner: "Feedback agent"
+    status: confirmed
+    notes: "off-pattern: embedded as loose tracked files, not a submodule (item #11)"
+
+  - path: "mobius-qa/**"
+    owner: "Eval agent"
+    status: confirmed
+  - path: "mobius-qa-modules/**"
+    owner: "Eval agent"
+    status: confirmed
+
+  - path: "product-awareness/**"
+    owner: "Product-Awareness agent"
+    status: confirmed
+    notes: "owns the schematic + the Technical-view render this map feeds"
+
+  - path: "mobius-design/**"
+    owner: "UX agent"
+    status: confirmed
+
+  - path: "Mobius-user/**"
+    owner: "User Manager agent"
+    status: confirmed
+    notes: "was contested (two sessions); settled. Auth split into its own Auth agent (2026-07-22) — no rename."
+
+# ── EXPANDED: Data & DB agent (was DB agent) ─────────────────────────────────
+  - path: "mobius-db-agent/**"
+    owner: "Data & DB agent"
+    status: confirmed
+  - path: "mobius-migrations/**"
+    owner: "Data & DB agent"
+    status: proposed
+    notes: "scope-expansion (spec §4): migrations are the data layer"
+  - path: "mobius-dbt/**"
+    owner: "Data & DB agent"
+    status: proposed
+    notes: "scope-expansion (spec §4): data build"
+
+# ── NEW: Auth agent — the P0 security surface ────────────────────────────────
+  - path: "mobius-auth/**"
+    owner: "Auth agent"
+    status: proposed
+    notes: "NEW AGENT (Ananth 2026-07-22): dedicated owner for the auth/identity security surface (P0 items #5/#8)"
+
+# ── EXPANDED: RAG agent owns the full retrieval/corpus stack ──────────────────
+  - path: "mobius-retriever/**"
+    owner: "RAG agent"
+    status: proposed
+    notes: "scope-expansion (spec §4): part of the RAG stack"
+  - path: "mobius-rag-api/**"
+    owner: "RAG agent"
+    status: proposed
+    notes: "scope-expansion (spec §4): part of the RAG stack"
+  - path: "mobius-answer-cache/**"
+    owner: "RAG agent"
+    status: proposed
+    notes: "answer-memory service; Chat consumes it. Off-pattern: own repo, .gitignore'd (item #11)"
+  - path: "mobius-document-viewer/**"
+    owner: "RAG agent"
+    status: proposed
+    notes: "renders Library/corpus docs"
+
+# ── NEW: Platform agent — the shared substrate (spec) ────────────────────────
+  - path: "mobius-contracts/**"
+    owner: "Platform agent"
+    status: proposed
+    notes: "NEW AGENT. Cross-module schemas — highest blast radius in the fleet"
+  - path: "mobius-config/**"
+    owner: "Platform agent"
+    status: proposed
+    notes: "NEW AGENT"
+
+# ── NEW: Skills agent — custodian of the mobius-skills subsystem (spec) ───────
+  - path: "mobius-skills-core/**"
+    owner: "Skills agent"
+    status: proposed
+    notes: "NEW AGENT. Skills runtime (embedded, not a submodule)"
+  - path: "mobius-skills-mcp/**"
+    owner: "Skills agent"
+    status: proposed
+    notes: "NEW AGENT. Skills MCP bridge"
+
+# ── NEW: Analytics agent — market intelligence (spec §3) ─────────────────────
+  - path: "mobius-story-ui/**"
+    owner: "Analytics agent"
+    status: proposed
+    notes: "NEW AGENT. Strategy deck / market-intelligence surface (schematic 'Strategy' node)"
+  - path: "Financial Benchmarking specs/**"
+    owner: "Analytics agent"
+    status: proposed
+    notes: "NEW AGENT"
+
+# ── mobius-skills — ONE repo, subdir-level owners ────────────────────────────
+  - path: "mobius-skills/phi-classifier/**"
+    owner: "PHI Classifier agent"
+    status: confirmed
+  - path: "mobius-skills/task-manager/**"
+    owner: "Task agent"
+    status: confirmed
+  - path: "mobius-skills/provider-roster-credentialing/**"
+    owner: "Credentialing agent"
+    status: confirmed
+  - path: "mobius-skills/org-intelligence/**"
+    owner: "Org agent"
+    status: confirmed
+  - path: "mobius-skills/instant-rag/**"
+    owner: "Instant-RAG agent"
+    status: confirmed
+  - path: "mobius-skills/chat-document-upload/**"
+    owner: "Instant-RAG agent"
+    status: confirmed
+  - path: "mobius-skills/doc-reader/**"
+    owner: "RAG agent"
+    status: proposed
+    notes: "corpus fetch/read — folds into RAG stack (spec §4)"
+  - path: "mobius-skills/google-search/**"
+    owner: "RAG agent"
+    status: proposed
+    notes: "web curator lives in RAG (strategy-d)"
+  - path: "mobius-skills/web-scraper/**"
+    owner: "Crawler (Sourcing agent)"
+    status: confirmed
+    notes: >-
+      REASSIGNED by Ananth 2026-08-12 (was: RAG agent, proposed). Verbatim:
+      "no you will own it go forward.. if it needs to be migrated so be it. but I hold you
+      responsible for everything we scrape related honoring the no crawl rules etc".
+      Crawler is a SUB-SCOPE of the Sourcing agent, not a separate agent — resolve defects
+      to the Sourcing session. Two parties had been assigning this module (this file → RAG;
+      mobius-payor/docs/sources-crawler-contract.md → Crawler); Ananth settled it.
+      Edited by the Crawler/Sourcing agent on Ananth's explicit instruction — Technical
+      Review notified, please verify rather than take this on trust.
+  - path: "mobius-skills/cmhc-cost-report/**"
+    owner: "Analytics agent"
+    status: proposed
+    notes: "NEW AGENT. CMHC cost reports"
+  - path: "mobius-skills/fl-medicaid-npi/**"
+    owner: "Analytics agent"
+    status: proposed
+    notes: "NEW AGENT. FL Medicaid NPI validation/analytics"
+  # -- skills with no domain owner → held by the Skills-agent custodian --
+  - path: "mobius-skills/email/**"
+    owner: "Skills agent"
+    status: proposed
+    notes: "no domain owner; Skills custodian holds it. Delegate to a comms owner later if one emerges."
+  - path: "mobius-skills/appeals-agent/**"
+    owner: "Appeals agent"
+    status: proposed
+    notes: "NEW AGENT (Ananth 2026-07-22): appeals is an important domain — dedicated agent, NOT archived. Owns the appeals skill + schematic 'appeals' node."
+  - path: "mobius-skills/healthcare/**"
+    owner: "Skills agent"
+    status: proposed
+    notes: "no domain owner; Skills custodian holds it. Confirm purpose."
+  - path: "mobius-skills/vibe/**"
+    owner: "Skills agent"
+    status: proposed
+    notes: "the fleet's REFERENCE skill template (cited in feedback-agent-spec) — keep; Skills custodian owns it."
+  - path: "mobius-skills/**"          # FALLBACK: repo, registry/dispatch law, any unlisted skill
+    owner: "Skills agent"
+    status: proposed
+    notes: "NEW AGENT. Custodian of the mobius-skills repo + registry + any skill not delegated above."
+
+# ── NEW: Extension agent — the browser extension ─────────────────────────────
+  - path: "mobius-os/**"
+    owner: "Extension agent"
+    status: proposed
+    notes: "NEW AGENT (Ananth 2026-07-22): dedicated owner for the browser extension"
+
+# ── Superrepo root loose files → Platform agent ──────────────────────────────
+  - path: "*.py"
+    owner: "Platform agent"
+    status: proposed
+    notes: "NEW AGENT. Root orchestration/experiment scripts"
+  - path: "Dockerfile.module-hub"
+    owner: "Platform agent"
+    status: proposed
+  - path: "cloudbuild.module-hub.yaml"
+    owner: "Platform agent"
+    status: proposed
+  - path: "requirements.txt"
+    owner: "Platform agent"
+    status: proposed
+  - path: "mstart"
+    owner: "Platform agent"
+    status: proposed
+  - path: "mstop"
+    owner: "Platform agent"
+    status: proposed
+  - path: "meval"
+    owner: "Platform agent"
+    status: proposed
+  - path: "credentials.env.template"
+    owner: "Platform agent"
+    status: proposed
+
+# ── Reviewer-owned (Technical Review Agent) ──────────────────────────────────
+  - path: "ownership.yaml"
+    owner: "Technical Review Agent"
+    status: confirmed
+    notes: "reviewer produces, Ananth ratifies"
+  - path: "reports/techday/**"
+    owner: "Technical Review Agent"
+    status: confirmed
+  - path: "scripts/techday/**"
+    owner: "Technical Review Agent"
+    status: confirmed
+    notes: "the AUTO check harness (read-only reviewer tooling)"
+
+# ── Untracked / off-superrepo (not in git ls-tree) — flagged by item #11 ─────
+  # mobius-vault, mobius-answer-cache : own repos, not wired as submodules (owners above)
+  # mobius-skills-phiwt              : feature-branch checkout of mobius-skills (not a module)
+  # "Mobius Diary"                   : personal, .gitignore'd — no owner needed
