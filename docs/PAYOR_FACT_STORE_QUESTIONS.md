@@ -118,62 +118,125 @@ _(not yet answered)_
 **Specific angle:** what's asked repeatedly during onboarding/recredentialing that's currently manual lookup (panel requirements, recredentialing cycle length, required documents, specialty-specific criteria)? Flag anything high-stakes for compliance specifically.
 
 ### Response
-_Answered by Credentialing / Story-UI session — 2026-08-15_
+_Answered by Credentialing Agent — 2026-08-15 (complete pass; replaces partial draft from earlier session)_
 
-**Q1 — Fact inventory (highest-value candidates for the fact store):**
+---
 
-1. **Credentialing document checklist by payor + specialty** — "What does Cigna require to credential a licensed clinical social worker in Florida?" Currently manual lookup from payor provider manuals or CAQH ProView guidance. Answered inconsistently across the team.
-2. **Recredentialing cycle length by payor** — "When does my Aetna credentialing expire?" Most payors are 24 months, some behavioral health carve-outs are 36, NCQA-accredited plans vary. Frequently asked, currently a manual lookup or memory-based answer.
-3. **Panel status / open-vs-closed by payor+specialty+geography** — "Is Humana accepting new in-network BH providers in Tampa right now?" This is the highest-frequency onboarding question and the most inconsistent — often answered from stale memory or a phone call.
-4. **Effective-date lag** — "How long from submission to being credentialed and seeing patients in-network?" Varies 60–180 days by payor; frequently underestimated, causing real revenue loss when providers start seeing patients before they're officially paneled.
-5. **Specialty-specific criteria** — e.g., some payors require a specific license type (LCSW vs. LMHC) for behavioral health; others require a PhD not an EdD for psychology. Currently answered from RAG retrieval of payor PDFs with low confidence.
-6. **Provisional / locum arrangements** — conditions under which a not-yet-credentialed provider can see patients and bill. High variance by payor, high compliance risk if wrong.
+**What the live service already answers reliably (not strong Fact Store candidates — per-entity queries, not flat facts):**
 
-**Q2 — Fact shape:**
+| Question | Live tool | Notes |
+|---|---|---|
+| Is provider NPI X on org Y's roster? | `check_provider_credentialing(org_slug, npi)` | Direct DB read, high confidence |
+| What documents has org Y uploaded for NPI X? | `check_provider_credentialing` | docs table, live |
+| Who is on org Y's active roster? | `get_roster(org_slug)` | High confidence |
+| NPPES identity for an NPI | `lookup_npi(npi)` | Live NPPES call, high confidence |
+| Search clinician by name | `search_clinician_by_name(name, org_slug?)` | Added 2026-08-14 |
+
+These are already served to chat. They're row-level lookups (org × NPI), not shareable flat facts — not useful to cache in the Fact Store.
+
+---
+
+**Fact inventory — strong Fact Store candidates:**
+
+**1. Exclusion / sanction status — "Is this provider excluded from Medicare/Medicaid?"**
+- Shape: structured/boolean + navigational (link to OIG LEIE, SAM.gov entry)
+- Source: OIG LEIE (exclusion.oig.hhs.gov, updated monthly), SAM.gov (federal), state Medicaid exclusion lists (vary by state, no unified feed)
+- Freshness: OIG updates monthly; drift risk is real and consequence of staleness is catastrophic
+- Confidence today: **zero — no exclusion check exists anywhere in our system**
+- Risk if wrong: **HIGHEST of any credentialing fact** — billing Medicare/Medicaid for an excluded provider is False Claims Act exposure. This fact must never be served as a cached boolean without a retrieval timestamp, and arguably should always hard-link to the live OIG lookup rather than storing the answer at all.
+- Frequency: high at onboarding; should run monthly for active roster
+- Compliance flag: **P0 — do not serve cached, ever. Link to live source + last-checked timestamp.**
+
+**2. Credentialing document checklist by payor + specialty**
+- "What does Cigna require to credential an LCSW in Florida?"
+- Shape: procedural + eligibility logic (required IF specialty = X AND state = Y AND licensure type = Z)
+- Source: payor provider manuals (PDFs, per-payor, per-state) + CAQH ProView guidance. Requires reconciliation — payor website, provider manual, and credentialing team often differ.
+- Freshness: changes ~annually (contract cycle), but cost of serving stale version is HIGH — provider submits incomplete application, adds 30–60 days.
+- Confidence today: low — extraction quality from RAG-retrieved PDFs varies; chunking loses conditional logic ("required if..."); no human verification at field level.
+- Risk if wrong: High — delays onboarding 1–3 months.
+- Frequency: high (every new credentialing)
+
+**3. Recredentialing cycle length by payor**
+- "When does my Aetna credentialing expire?" Most payors: 24 months. Some BH carve-outs: 36 months. NCQA-accredited plans vary.
+- Shape: structured/numeric (N months, triggering payor)
+- Source: NCQA standards as baseline; individual payor manuals for exceptions. Mostly single-source per payor.
+- Freshness: very stable (changes rarely). Low drift risk.
+- Confidence today: medium — can be extracted from PDF tables with reasonable confidence. Partially human-verified by credentialing staff in practice, though not formally in our system.
+- Risk if wrong: Medium/High — missed recredentialing deadline = payor can claw back payments for services rendered during the gap. Compliance risk.
+- Frequency: medium (asked at onboarding and annual reviews)
+- **Best first-pilot candidate — stable, structured, extractable, low drift risk.**
+
+**4. Panel status / open-vs-closed by payor + specialty + geography**
+- "Is Humana accepting new in-network BH providers in Tampa right now?"
+- Shape: eligibility/coverage logic (open/closed, conditional on specialty + geo + plan type)
+- Source: payor provider portals — no machine-readable feed. Phone call or portal login required.
+- Freshness: **HIGH drift risk** — panels open/close mid-year with no public announcement. This is the most volatile fact we'd ever serve.
+- Confidence today: low — not in our system; currently answered from stale memory or a phone call.
+- Risk if wrong: Medium/High — wasted time + application submitted into a closed panel.
+- Frequency: very high (most common onboarding question)
+- **Do not serve as a first-class fact** — too volatile without a live data feed we don't have.
+
+**5. Effective-date lag by payor**
+- "How long from submission to being credentialed and seeing patients in-network?"
+- Shape: structured/numeric (range: 60–180 days by payor)
+- Source: payor provider manuals + historical data from credentialing teams. Real lag diverges from policy lag during high-backlog periods.
+- Freshness: stable in policy; varies with payor backlog in practice.
+- Risk if wrong: High — revenue loss if provider starts seeing patients pre-panel.
+- Frequency: high (every new credentialing)
+
+**6. Specialty-specific credential requirements**
+- e.g., some payors require LCSW vs. LMHC for BH; PhD vs. EdD for psychology.
+- Shape: eligibility logic (conditional, multi-branch)
+- Source: payor provider manuals; state licensing board requirements layer on top.
+- Confidence today: low — retrieval surfaces these but conditional logic is fragile.
+- Risk if wrong: High — compliance risk if wrong license type accepted/rejected.
+
+**7. Provisional / locum billing rules**
+- Conditions under which a not-yet-credentialed provider can see patients and bill.
+- Shape: procedural + conditional
+- Source: payor-specific policies; highly variable.
+- Risk if wrong: **Very high** — billing compliance, potential clawback.
+- Frequency: low-medium
+
+---
+
+**Fact shape summary:**
 
 | Fact | Shape |
-|------|-------|
-| Document checklist | Procedural + eligibility logic (required IF specialty = X AND state = Y) |
-| Recredentialing cycle | Structured/numeric (N months) |
-| Panel status | Eligibility/coverage logic (open/closed, conditional on specialty+geo) |
-| Effective-date lag | Structured/numeric (range, not a single number) |
-| Specialty-specific criteria | Eligibility logic (conditional, multi-branch) |
+|---|---|
+| Exclusion/sanction status | Structured/boolean + navigational (always link to live source) |
+| Document checklist | Procedural + eligibility logic |
+| Recredentialing cycle | Structured/numeric |
+| Panel status | Eligibility/coverage logic — **do not cache** |
+| Effective-date lag | Structured/numeric (range) |
+| Specialty criteria | Eligibility logic, multi-branch |
 | Provisional billing rules | Procedural + conditional |
 
-**Q3 — Source & provenance:**
+---
 
-- **Authoritative source:** payor provider manuals (PDFs, per-payor, per-state). CAQH ProView for document requirements — partially standardized but payors layer on additional requirements.
-- **Requires reconciliation:** yes, frequently. A payor's website, their provider manual, and what their credentialing team actually accepts often differ. The document is the policy; the call center is reality.
-- **Change schedule:** mostly annual (tied to contract cycles), but panel open/closed status changes unpredictably and with no external signal — a plan closes BH panels mid-year with no announcement.
+**Confidence summary:**
 
-**Q4 — Freshness & drift risk:**
+- **Would I trust any of these served directly with no citation?**
+  - Recredentialing cycles: yes, with a source link. Most stable fact here.
+  - Document checklists: no — must cite the source PDF + retrieval date.
+  - Panel status: definitely not — too volatile.
+  - Exclusion status: never as a cached boolean; link to live OIG/SAM source always.
 
-- Document checklists: change ~annually, but the cost of serving a stale version is HIGH — provider submits incomplete application, adds 30–60 days to the process.
-- Recredentialing cycles: very stable (change rarely, low drift risk).
-- Panel status: HIGH drift risk. This is the most volatile fact we'd ever serve. Open/closed can flip in weeks. Serving a stale "open" answer when the panel is closed wastes a provider's time and ours.
-- Effective-date lag: stable-ish but varies by payor backlog (real lag can diverge from the policy lag).
-- **No automated drift detection exists today** — we'd need to crawl provider portals or re-extract from PDFs to detect changes.
+---
 
-**Q5 — Confidence today:**
+**Pilot priority recommendation:**
 
-- Rates from `claim_lines` (adjudicated data): **high confidence** — this is actual money that was paid, not a policy document.
-- Credentialing requirements from RAG-extracted payor PDFs: **medium-low confidence** — extraction quality varies, chunking sometimes loses conditional logic ("required if..."), and we have no human verification at field level.
-- Panel status: **low confidence** — we're not the system of record and have no live feed.
-- **Would I trust any of these served directly with no citation?** Rates yes. Credentialing requirements: no, not without a source link. Panel status: definitely not.
+1. **Recredentialing cycle by payor** — stable, structured, extractable, low drift risk, medium-high compliance importance
+2. **Document checklists** — high frequency, extractable from structured PDF sections, link to source
+3. **Effective-date lag** — structured, extractable, useful operationally
+4. Skip panel status until there's a live data feed.
+5. Exclusion status: build as a live-lookup pointer (OIG LEIE URL for the NPI), not a cached fact.
 
-**Q6 — Value and risk if served directly:**
+---
 
-| Fact | Frequency | Cost if wrong |
-|------|-----------|---------------|
-| Document checklist | High (every new credentialing) | High — delays onboarding 1–3 months |
-| Recredentialing cycle | Medium | Medium — missed deadline = lapse in participation |
-| Panel status | Very high | Medium-high — wasted time; can't be recovered |
-| Effective-date lag | High (every new credentialing) | High — revenue loss if provider sees patients pre-panel |
-| Specialty criteria | Medium | High — compliance risk if wrong license type |
-| Provisional rules | Low-medium | Very high — billing compliance, potential clawback |
+**Open question for Payor Platform:**
 
-**Recommendation for extraction pilot priority:**
-Start with **recredentialing cycles** (stable, high confidence, low drift risk) and **document checklists** (high frequency, extractable from structured PDF sections, can link to source). Avoid panel status as a first-class fact — it's too volatile to serve without a live data feed we don't have.
+Exclusion status is the clearest case where the Fact Store probably shouldn't store the fact at all — it should store a pointer to the live authoritative source and serve the link + last-checked timestamp rather than the cached boolean. Is the architecture expecting to handle "always-live" facts (where caching is itself the compliance risk) differently from stable cached facts, or is that a serving-layer concern handled per-fact?
 
 ---
 
