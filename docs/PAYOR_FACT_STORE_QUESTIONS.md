@@ -245,7 +245,64 @@ Exclusion status is the clearest case where the Fact Store probably shouldn't st
 **Specific angle:** decision-critical facts an appeal argument leans on (filing deadlines, what's appealable at all, precedent thresholds, required documentation). Likely the highest-risk-if-wrong domain of the five — flag which facts need a stricter verification bar before ever being served without a human check first.
 
 ### Response
-_(not yet answered)_
+
+*Answered by Appeals, 2026-08-15. Detail already handed over in `docs/appeals/payor-store-handoff/` (`00_FACT_CATALOG.md` = predicate list + key; `05_INTEGRATION_CONTRACT.md` = the seam we already agreed with redlines). This is the same content answered against your six universal questions — read the handoff as the normative version if the two ever diverge.*
+
+**Headline number first, because it frames every answer below:** the live appeals corpus is **141 fact records / 339 filing-critical values / 0 citable / 0.0% sourced**. Not "mostly unsourced" — *zero*. Everything appeals serves today is generated or inferred. So for Q5 (confidence) and Q6 (value-if-served-direct), the honest answer for every fact below is the same: **no, not today, not without a citation, not without a human check.** That is exactly why we asked for the store.
+
+**1. Fact inventory.** Ranked by how much damage a wrong value does:
+
+| Fact | Asked | Answered today by |
+|---|---|---|
+| `appeal.deadline_days` — days to file, by level | every single appeal | generated text, unsourced |
+| `appeal.resubmit_deadline_days` — corrected-claim clock (a *different* clock) | very high | generated, often conflated with the appeal clock |
+| `appeal.levels` — how many rungs, who each is with, what the next one is | every appeal | generated; **had an outright wrong rung in all 141 rows** (below) |
+| `appeal.submission_channels` — portal / fax / mail, and the actual URL, fax number, address | every appeal | partial; many blank |
+| `appeal.required_docs` — the document set, with a **link to the form** | every appeal | names a form, frequently can't link it (FL Medicaid: **zero** form URLs today) |
+| `appeal.contacts` — provider-services / appeals-unit phone | medium | mostly blank |
+| *is this even appealable, or is it a resubmit / a credentialing action / patient responsibility* | every appeal | inferred from CARC, no payor fact behind it |
+| *(later)* `recoupment.lookback_days` | long-tail, high stakes | not answered at all |
+
+**2. Fact shape.** Three distinct shapes, and the mistake to avoid is flattening them:
+- **Numeric-with-qualifiers** — deadlines. Never a bare integer. `{days, day_type: calendar|business, anchor_event, receipt_presumption}`. "60 days" is unusable without the anchor; **and `anchor_event` must be able to name a prior level**, because level 2 anchors on the level-1 *decision* date, not the original denial. A flat enum can't express that.
+- **Navigational** — portal URL, fax, mail address, **form URL**. Lowest-glamour, highest daily value. A biller with a correct deadline and no working form link is still stuck.
+- **Procedural** — the level chain. Ordered, branching, and **party-scoped** (see below).
+
+Coverage/eligibility logic is *not* ours — that's the denial reason, not a payor reference fact.
+
+**3. Source & provenance — and this is the part I'd push hardest on.** Provenance must be **per field, not per record**. The deadline comes from the provider manual or the state contract; the fax number comes from a web page; they age at completely different rates. Record-level provenance can't express that, and we'd be back to one timestamp for a document that's half fresh and half rotten.
+
+Reconciliation across documents is the **normal case, not the exception** — regulation says 90, the contract says 120, the manual says 60, and all three can be correctly sourced. Which is why I'd gently push back on the phrase "indisputed source of truth" that's floated around this effort: the store's value isn't hiding the conflict behind one number, it's being the single place the conflict is **visible and explicitly resolved**. Authoritative about *what we know and how we know it*. Our agreed contract already surfaces `conflict.candidates` rather than resolving them away.
+
+**4. Freshness & drift.** Deadlines change slowly (contract renewal / state amendment) but change **discontinuously and invisibly**, which is the worst combination. Portal URLs and forms change unpredictably and often. Two things that follow:
+- **Resolution must be as-of the DENIAL date, never `now()`.** Otherwise today's appeal cites today's deadline for a November claim, and every completed assessment silently goes wrong retroactively at contract renewal. This is in the contract as a non-negotiable.
+- No existing drift detection on our side. Your "verified fact vs. what RAG returns right now" idea is the first real drift signal any of us would have — worth doing.
+
+**5. Confidence today.** Zero formally verified. Answer to "would you trust it served with no citation" is **no**, and we've already coded that stance rather than just asserting it: filing-critical values below the citable bar are **removed, not labelled**. A draft banner does not stop a billing coordinator from acting on a number, and if the number is a deadline the harm is a permanently lost claim.
+
+**6. Value & cost of getting it wrong.** High-frequency *and* high-cost, which is unusual — most facts are one or the other. A missed appeal deadline is unrecoverable revenue with no remedy. This isn't "annoying."
+
+---
+
+**What needs a stricter bar before being served without a human check — your specific ask:**
+
+Our evidence ladder, as coded (`04_thresholds_as_coded.json`, port it verbatim rather than approximately):
+
+`unverified < inferred < network_experience < stated_verbal < observed_claims < stated_policy < regulatory`
+
+**CITABLE = (`stated_policy`, `regulatory`)** — only these may be quoted *inside* an appeal letter.
+
+**Strict-bar list (citable or suppress, no middle):** `deadline_days`, `resubmit_deadline_days`, `submission_channels`, `required_docs`, `levels`, plus `portal_url` / `fax` / `mail_address`.
+
+**`stated_verbal` is the one to get exactly right.** A rep's phone call is enough to *investigate* and enough to *file early*. It is **never** enough to establish the **outer bound** of a deadline. Acting on a phone call for a regulated deadline is the original bug with a source stapled to it.
+
+**Two dimensions that are not optional in the key**, because getting either wrong serves a real, correctly-sourced fact that is wrong for *this* claim, silently, with a citation attached:
+- **`audience` (provider vs. member).** Concretely: an unsourced **member** fair-hearing deadline reached all **141 rows** and rendered on live customer cards as a **provider** deadline. My first fix stripped the number but left the *rung* — the wrong-counterparty action survived. Which is why `party` belongs on **actions** and `audience` on **values**; conflating them is how it survived. Your §9.6 DoD ("audience wrong is structurally blocked") is the right acceptance criterion, and the Postgres trigger is the piece that has to survive the move to your table — application guards get bypassed by generation jobs.
+- **`network_status`.** Contracted vs. non-contracted Medicare Advantage isn't a different number, it's a **different appeal chain entirely** (non-par: reconsideration → IRE → ALJ, plus a Waiver of Liability; contracted: contract dispute, no IRE). Flagging again since it's absent from your `(state, payer, product)` health-plan unit: a provider agreement governs contracted providers only, so a fact sourced from a contract *is* contracted-scoped by the nature of its source. With no network scope on documents, a human has to assert it on the fact — hand-entry back in the derivation chain.
+
+**Scoping opinion, offered because we already made this mistake:** we generated 800 questions and 141 fact records before sourcing a single one. Building a complete store for all payers before anything ships is that same error at greater expense. Suggested bar: **one payer × the predicates the pilot needs, sourced properly, plus the UI that makes the next payer cheap.**
+
+**Consumer side is already built and waiting** — `api/fact_store_adapter.py`, two backends behind one interface, fails **closed** on resolver outage (`resolver_unavailable`, deliberately a distinct code from `unsourced` so a blip doesn't masquerade as a sourcing gap and corrupt coverage telemetry). Cutover is `APPEALS_FACT_STORE_URL` and nothing else. Acceptance test, verbatim from our contract: **our evidence audit reports `percent_citable > 0` for the first time.**
 
 ---
 
