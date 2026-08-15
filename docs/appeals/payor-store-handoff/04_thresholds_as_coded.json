@@ -1,0 +1,49 @@
+{
+ "EVIDENCE_BASES": [
+  "unverified",
+  "inferred",
+  "network_experience",
+  "stated_verbal",
+  "observed_claims",
+  "stated_policy",
+  "regulatory"
+ ],
+ "CITABLE": [
+  "stated_policy",
+  "regulatory"
+ ],
+ "FILING_CRITICAL": [
+  "deadline_appeal_days",
+  "deadline_resubmit_days",
+  "submission_method",
+  "portal_url",
+  "fax",
+  "mail_address"
+ ],
+ "PARTIES": [
+  "provider",
+  "member",
+  "member_via_representative"
+ ],
+ "AUDIENCES": [
+  "provider",
+  "member",
+  "both"
+ ],
+ "_notes": {
+  "EVIDENCE_BASES": "ordered WEAKEST -> STRONGEST; rank = index",
+  "CITABLE": "only these may be quoted INSIDE an appeal letter",
+  "FILING_CRITICAL": "values that drive a filing action; below CITABLE they are REMOVED not labelled (suppress_unsourced_filing_fields)",
+  "stated_verbal": "sufficient to investigate and to file EARLY; NEVER sufficient to establish the outer bound of a deadline",
+  "conflict_policy_defaults": {
+   "appeal.deadline_days": "shortest",
+   "appeal.resubmit_deadline_days": "shortest",
+   "appeal.levels": "union",
+   "appeal.required_docs": "union",
+   "appeal.submission_channels": "union",
+   "recoupment.lookback_days": "longest",
+   "_default": "block"
+  },
+  "why_defaults": "'shortest wins' is a DEADLINE rule. It is unsafe for levels (forecloses escalation), docs (files an incomplete package), channels (may drop the only working one), and INVERTED for recoupment lookback. Unclassified predicates must BLOCK, not guess."
+ }
+}

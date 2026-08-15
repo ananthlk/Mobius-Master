@@ -1,0 +1,28 @@
+{
+ "description": "GOLD FIXTURE \u2014 same payor, N distinct fact signatures for what must resolve to ONE fact set. Sunshine's divergence is the acceptance test: these must collapse.",
+ "signatures_per_payor": {
+  "Sunshine Health": 14,
+  "FL Medicaid": 1
+ },
+ "detail": {
+  "Sunshine Health": {
+   "2b1bdd54": 11,
+   "628836c1": 12,
+   "f5a9501f": 7,
+   "7a8d22bf": 2,
+   "377decce": 6,
+   "19ad37c0": 1,
+   "055a9bd9": 3,
+   "79c13b3b": 1,
+   "65e93c0a": 2,
+   "52afe237": 7,
+   "cad95e54": 5,
+   "7998ab6b": 8,
+   "9a937bf9": 3,
+   "8213d577": 1
+  },
+  "FL Medicaid": {
+   "08597b4e": 72
+  }
+ }
+}

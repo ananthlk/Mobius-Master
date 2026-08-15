@@ -1,0 +1,8 @@
+{
+  "description": "GOLD FIXTURE — the write that reached 141 live rows and customer cards. It MUST be rejected by the store's trigger, from ANY endpoint. Two variants: (a) undeclared party on an enrollee remedy, (b) declared member with no consent artifact. Variant (c) MUST be ACCEPTED — member party WITH a consent artifact is the legitimate Medicare Advantage non-par case.",
+  "must_reject_a": {"appeal_levels":[{"level":4,"name":"FL Medicaid Fair Hearing","notes":"Administrative law judge. Request via AHCA.","deadline_days":90}]},
+  "must_reject_b": {"appeal_levels":[{"level":4,"name":"State Fair Hearing","party":"member"}]},
+  "must_accept_c": {"appeal_levels":[{"level":3,"name":"IRE reconsideration","party":"member_via_representative","requires_consent_artifact":"CMS Waiver of Liability"}]},
+  "must_reject_d_unsourced_duration": {"deadline_appeal_days":90,"appeal_levels":[{"level":2,"name":"Peer-to-Peer","party":"provider","notes":"Request within 72 hours of denial."}]},
+  "why_d": "72 hours appears in prose but not on the structured surface [90]. payor_day_values() then READ it and treated it as licence for guidance to repeat it — the fact record was both the only unguarded artifact and the licence-granting authority."
+}
