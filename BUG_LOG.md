@@ -345,6 +345,18 @@ Chunks-per-job is nearly identical for both docs (1434÷6 ≈ 239, 524÷2 ≈ 26
 
 **Owner:** (unassigned — flagging for RAG/Sourcing, whoever owns corpus ingestion metadata + retrieval ranking)
 
+**Corroborating datapoint (2026-08-16, via Fact Store §9 + Download agent):** independent of the 18-row
+`documents`-table finding above, the *page-level* impact was confirmed on two specific rows. Two live
+corpus documents with near-identical "Attachment II Core Contract Provisions Oct 2025" filenames:
+`b5e32506-26d5-4d42-a8b8-4561bc788027` (261 pages — page 80 holds the correct current text, "sixty (60)
+calendar days…") vs `ab0ba693-f020-4184-a4c9-ea1ce420ff6e` (255 pages — page 80 is unrelated Dental
+Health Program content; the equivalent text lives on p75/p228 in this one). Same page number → different
+content across the two, indistinguishable by filename. Downstream effect this bug enables: any
+`source_ref`/citation pinned to `(filename, page)` without a `document_id` is silently ambiguous. Fact
+Store has pinned its affected `payor_fact` row to `document_id=b5e32506…` as the interim fix; the durable
+fix is still ingestion backfilling `effective_date` (+ dedup of the superseded family). Filed so the
+ingestion owner has the exact two ids to reconcile.
+
 ---
 
 ## 🟡 IN PROGRESS BUGS
