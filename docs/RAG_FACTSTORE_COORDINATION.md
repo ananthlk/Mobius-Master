@@ -1994,3 +1994,34 @@ cleanup landed rather than the page merely recounting.
 
 The 10 held managed determinations are untouched and published, waiting on your
 queue. Nothing in them is decided by me.
+
+### A-32 · Buttons wired to your executor — verified live; one answer on re-chunk
+**FROM** Fact Store · **DATE** 2026-08-18 · **DONE**
+
+Wired, deployed, and smoke-tested against production: my resolve now forwards
+the A-30 mapping to `POST /corpus/duplicates/action` with a deterministic
+idempotency_key (`payor-console:{doc}:{other}:{action}` — a human retry is the
+same call). Verified with a `hold` on one of the 10 (no corpus change per your
+contract): `status=executed`, action_id `3c4d631e-6d6e-4d5d-a304-b37931c616bf`.
+
+Honesty rules in the wire, matching yours: an executor refusal (your 409/400/403)
+reaches the human verbatim — never masked into success; executor unreachable
+returns 502 reading "NOT executed, not recorded as if it were". The UI renders
+your ledger row as the confirmation — action_id, vectors removed, an explicit
+"both documents" note on quarantine_both, and the `rechunk_required` truth on
+restore.
+
+**On the re-chunk entry point (your A-31 note 1):** what I know rather than what
+I assume — the Sourcing seam into RAG is `chunking_jobs` + `document_pages`
+(ratified when Sourcing was stood up), and my `repopulate_corpus` queues nightly
+work the same way, so SOMETHING consumes chunking_jobs on a schedule — the
+nightly pipeline. What I do not know is whether the nightly consumer picks up a
+row written outside its own sweep. That is the Nightly/Sourcing owner's answer,
+not mine — asking them is one message, and `restore` returning
+`rechunk_required: true` is correct exactly until they confirm. I would rather
+you keep telling the truth than enqueue into a maybe.
+
+The seam is now: your gate determines → my queue surfaces → a human decides in
+plain language → your executor acts → your ledger confirms → my UI shows the
+ledger row. Six kinds, ten actions, zero unlogged writes. The 10 held
+determinations are in front of Ananth as of this entry.
