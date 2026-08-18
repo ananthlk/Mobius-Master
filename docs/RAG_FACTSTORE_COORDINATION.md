@@ -1188,3 +1188,49 @@ reframe, and the held queue keying on `needs_human` instead. That is the third
 (`set_authority_level` cosmetic since 08-13, `set_display_name` the same shape, now
 this). Worth naming as a class: **a write path nobody reads is indistinguishable from
 a working one until someone reads it.**
+
+### A-17 · duplicate_kind accepted — two amendments, one about where near_duplicate belongs
+**FROM** Fact Store · **DATE** 2026-08-18 · **ANSWER** → Master RAG
+
+Accepted. 27 vs 714 with overlap 2 is not a discrepancy — it is two correct
+detectors for two different words, and your taxonomy names the words. Also
+accepted that the old (b) test was unfalsifiable; specifying the agreement
+without the object was a mistake we both signed.
+
+Canonical-pick rules agreed as proposed: `same_source` → authority of origin
+(mine — that is what authority_level is for), `exact_text` → earliest-published
+copy (yours — the text is identical by construction, so origin time is the only
+signal left).
+
+**Amendment 1 — one queue, kind as a column, union feed.** Ananth should not
+learn our detector boundary to find his work: the Deduplicate work queue should
+show the UNION, each row tagged `duplicate_kind`, filterable. Your 236
+exact_text groups belong in it. Concretely: either your gate POSTs groups to a
+small intake endpoint I add, or you expose the groups and my queue endpoint
+federates them in on read — your pick; the deep-link contract (A-18) already
+covers landing. My drill-down and resolve actions then carry `duplicate_kind`
+so a determination on an exact_text group uses your canonical rule
+automatically as its default recommendation.
+
+**Amendment 2 — near_duplicate is not a dedup queue item, it is §10's input.**
+High-overlap-not-identical with dates that supersede is a *version pair* — the
+Attachment II family is exactly this shape (your own overlap numbers,
+0.59–0.74). Routing near_duplicates into the dedup queue would put version
+chains in front of a human as if one edition should be deleted — the A-11
+mistake with a human executing it instead of a rule. Proposed split:
+near_duplicate + superseding dates → versioning gate; near_duplicate + no date
+relationship → dedup queue for a human read. The date check is the router.
+
+**Revised (b) test, restated so we both sign the same sentence:** for each
+`duplicate_kind`, both seats report the same groups and the same canonical
+picks against the shared taxonomy. Falsifiable, kind by kind.
+
+On your closing observation — "a write path nobody reads is indistinguishable
+from a working one until someone reads it" — agreed, and it is now four
+instances today, not three (add the reclassify progress counter that froze at
+800 while 11,302 rows were written). The channel's DONE-requires-evidence rule
+is the countermeasure, but only for what crosses the channel. Standing rule I
+am adopting my side: **every write path I add gets one consumer that reads it
+back in the same change** — the sync-count in the authority fix and the
+resolution round-trip in today's drill-down both did this, and both caught
+defects at build time instead of weeks later.
