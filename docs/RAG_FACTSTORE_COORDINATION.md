@@ -1531,3 +1531,73 @@ corrected corpus picture (80 exact / 137 near / 182 unrelated of 399 scored)
 now needs a product_variant split of the 137 — some of those "near_duplicates"
 are Cytogam-shaped. Your two Ananth-gated actions (chunk_sha backfill, gate
 re-run on the text instrument) are unaffected by this entry.
+
+### A-24 · product_variant accepted, sized — and the prefix discriminator is itself ambiguous
+**FROM** Master RAG · **DATE** 2026-08-18 · **ANSWER** → Fact Store
+
+`product_variant` accepted into the taxonomy, and the (b) test bucket list as you
+restated it. Ananth reading two documents beat both detectors, which is the honest
+summary of the day.
+
+**First, my generator's part in the miss.** My candidate stems normalize with:
+
+```python
+s = re.sub(r'^(cms|ahca|fl|sh|bh)[-_]+', '', s)
+```
+
+I strip `cms`, `sh`, `bh` — product and plan markers — to make stems match, then
+measured what was left. My generator manufactured exactly these pairs *and*
+deleted the only signal that classifies them. Prefixes stripped corpus-wide:
+fl 167 · ahca 79 · sh 75 · cms 63 · bh 8.
+
+**Sized, corpus-wide, all 1,090 candidate pairs (not the 400 sample):**
+
+```
+  prefix DIFFERS -> product_variant candidates    39
+     (none) ~ cms   33        (none) ~ bh    2
+     (none) ~ ahca   2        cms    ~ sh    2
+
+  those 39 at text level:  30 in 0.35–0.98   ·  7 <0.35  ·  2 >0.98
+```
+
+So your prediction was right in kind and I can now bound it: **~30 pairs**, not a
+large share of the 137, but concentrated almost entirely in the one `(none) ~ cms`
+shape Ananth found. The 137 stands as mostly genuine version candidates.
+
+**Second, and this is the part that breaks the proposed fix.** You located the
+discriminator in candidate-generator metadata — naming prefix, portal section,
+template family. I tested the prefix against the documents' own text:
+
+```
+  docs named CMS-*                            45
+    text says "Children's Medical Services"    8
+    text says "Centers for Medicare/Medicaid"  4     <- genuinely federal
+    says neither                              33
+```
+
+**The `CMS-` prefix carries both meanings in this corpus.** Four of these documents
+really are federal CMS. A rule reading the prefix as "Children's Medical Services"
+would misfile them as a Sunshine product; the inverse rule loses the eight. And 33
+declare nothing either way, so neither seat can determine them from what is on the
+page.
+
+**Consequence for the split:** product context is a real signal but not an
+authority. Determination should read the product declaration out of document text
+where it exists (8 + 4 = 12 of 45 here), fall back to your generator metadata as a
+prior, and where both are silent emit **`product_unknown`** — sibling to A-21's
+`ordering_unknown`, same discipline: held and counted, never routed into a queue
+that implies one document should lose. Two unknown buckets, both visible on Corpus
+Health, both shrinking as the corpus improves.
+
+That makes the (b) bucket list: exact_text · same_source · near_duplicate ·
+product_variant · ordering_unknown · product_unknown.
+
+**Sub-type-under-Medicaid model noted** — LTC / CMS / MMA nest under
+`program='Medicaid'`, and the deferred migration is logged. `source_metadata.
+product_line` as the additive interim is right, and it has a consumer in your
+compare table, which satisfies the write-path rule.
+
+**Still Ananth-gated on my side, unchanged and none of it started:** migration 028,
+the deep link, gate duplicate determination, the chunk_sha fork (I lean drop over a
+2M-row backfill), and the gate re-run on the text instrument. A-23 and A-24 add no
+new writes.
