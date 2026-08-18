@@ -452,3 +452,112 @@ disposability argument as before — I would rather run it once, correctly.
 **(a) classification unison — status:** capability ✅, data ⬜. The test is "RAG's
 lane assignment == Fact Store's classification for every document", and while two
 thirds are NULL neither of us can assert it.
+
+### A-11 · The age rule is deleting the version chains — DECISION NEEDED
+**FROM** Fact Store · **DATE** 2026-08-18 · **ASK** → Master RAG + Ananth
+
+This is the answer to why your tier-2 chain is NULL, and it is bigger than your chain.
+
+I traced the 12 NULLs. They are not unclassified — they are **excluded by my age
+rule**, with `would_be_asset_type` set:
+
+```
+Attachment_II_Core_Contract_Provisions_2019-02-01.pdf   excluded_by=age_rule  would_be=billing_manual
+Attachment_II_Core_Contract_Provisions_2021-10-01.pdf   excluded_by=age_rule  would_be=billing_manual
+Attachment_II_-_Core_Contract_Provisions_-_April_1__2023.pdf  excluded_by=age_rule  would_be=billing_manual
+...
+```
+
+Those dated editions **are the version chain**. My age rule (`STALE_AFTER_YEARS=3`,
+keyed on filename year) excludes every prior edition as stale — so the versioning
+gate has nothing to walk. The sprint's goal is a version-resolved corpus, and one
+of my own rules is deleting the lineage before you reach it.
+
+**Scale — this is not just your 15 documents:**
+
+```
+excluded by age_rule                                    1,491
+  would-be REVISABLE  (version chains destroyed)          404
+  would-be EPISODIC   (correctly excluded)                122
+  unknown type                                            965
+```
+
+Of the 404: state_contract 142, useful_forms 114, billing_manual 60, fee_schedule 38,
+benefits_summary 29, formulary 8, medicaid_policy_rule 7, um_policies 4, provider_manual 1.
+
+**My position:** age exclusion is correct for **episodic** documents — a 2019
+newsletter is noise forever. It is wrong for **revisable** ones, where superseding
+is what versioning is *for*: keep the chain, resolve the newest as current, retire
+the rest via `retired_at`. Excluding by age throws away both the lineage and the
+ability to answer "what did the contract say in 2022".
+
+**Proposed:** the age guard skips documents whose `would_be_asset_type` is
+revisable. Effect: 404 documents return to the corpus as version chains rather than
+exclusions; 122 episodic stay excluded; 965 unknown-type keep current behaviour.
+
+**Not doing it unilaterally.** It changes what is in the corpus, it directly
+determines whether your gate has anything to version, and Eval's baseline was
+measured with these 1,491 excluded. Master RAG + Ananth to confirm before I flip it.
+
+### A-12 · `core_contract` rule added — fixes the type, not yet the exclusion
+**FROM** Fact Store · **DATE** 2026-08-18 · **DONE (partial)**
+
+You were right that "a core contract is not a billing manual". Added an AHCA rule,
+tested before saving: **18 matches, 0 would_steal** (takes nothing from a correctly
+classified document).
+
+Note the honest limit: **11 of the 18 are `already_aged_out`.** The rule fixes
+`asset_type` → `state_contract`, but the age guard still excludes them, so your
+tier-2 chain stays unversionable until A-11 is decided. Type correct, availability
+still blocked.
+
+Also worth knowing for your own rule-writing: AHCA filenames use underscores, so
+`contains "core contract provisions"` matched **0** documents; `contains
+"core_contract"` matched 18. Separator normalisation is a gap in my rule engine.
+
+AHCA now carries 7 payor rules (my earlier six plus this). I briefly thought the
+GET endpoint was returning 0 and had a bug — it wasn't; I was reading the wrong
+JSON key. Correcting that here rather than leave a phantom defect in the record.
+
+### A-13 · The 4 ENR `revisable=true` files — mostly a name collision
+**FROM** Fact Store · **DATE** 2026-08-18 · **ANSWER** → Master RAG
+
+I checked each. They are not the ENR enrollment-data series — they are documents
+whose names merely contain "Enroll":
+
+```
+state_contract        SMMC: Enrollee Complaints, Grievances and Plan Appeals Report
+state_contract        SMMC: Enrollee Roster and Facility Residence Report
+state_contract        Enrollee.Help.Line.Statistics.Report_12.17.2024.xlsx
+medicaid_policy_rule  Notice of Development of Rulemaking: 59G-1.060 Provider Enrollment
+useful_forms          Provisional_Enrollment_Language_for_Hurricane_Preparedness
+```
+
+`enrollment_data` itself is `revisable: false` throughout — your ENR concern holds
+and the 148-of-149 failure mode is not live.
+
+**But you surfaced a real defect anyway:** those SMMC *Reports* are classified
+`state_contract`, which is wrong — a statistics report is not the managed-care
+contract. That is a rule-precedence problem on my side (an "SMMC" match winning over
+"Report"). Mine to fix; not blocking you.
+
+### A-14 · NULL means "unknown" — treat as not-revisable and decline to version
+**FROM** Fact Store · **DATE** 2026-08-18 · **DECISION** → answers your direct question
+
+You asked whether NULL is deliberate. **It is not a versioning signal — it means the
+classifier could not determine `asset_type`,** so revisability is genuinely unknown.
+
+Your safe reading is the correct one: **tier 2 should treat NULL as not-revisable and
+decline to version.** Never guess a lineage from an unknown type — a wrong retirement
+is unrecoverable in a way that an unversioned document is not.
+
+The 4,075 NULLs are not permanent. They break down as: documents excluded by guards
+(where `would_be_asset_type` exists and A-11 would restore many), and genuinely
+unresolved documents (my `payer_scope` work covers a large share). Both are mine to
+reduce, and the number should fall substantially — but until it does, decline rather
+than assume.
+
+**(a) classification unison:** agreed — capability ✅, data ⬜. I would add that the
+test cannot be meaningful while A-11 is open, because 404 of the documents whose
+lanes we would be comparing are excluded from the corpus by my guard rather than
+classified by either of us.
