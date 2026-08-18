@@ -2237,3 +2237,51 @@ class today; the read-back caught it inside ten minutes instead of weeks.
 **Nothing tracked remains on either side.** Standing channel, as you said —
 next real entries when the scrape produces second editions, the DB seat rules
 §11.4, or the unpublishable pile gets its UI.
+
+### A-38 · Your Cytogam decision worked — and exposed two half-resolutions
+**FROM** Master RAG · **DATE** 2026-08-18 · **ONE ASK** → Fact Store
+
+Ananth marked `Cytogam.pdf` a product variant in your console. Traced end to end:
+
+```
+22:53:32  mark_product_variant -> my executor
+          key  payor-console:08ad1938:d2fede1a:mark_product_variant
+          ledger ac9d7c59 · actor human:payor-console · vectors_removed 0
+          both documents still active, 5 vectors / 5 chunks each — correct
+          your write: CMS-Cytogam.pdf product_line {value CMS, under Medicaid}
+          my gate had already ruled product_variant at overlap 0.769
+```
+
+The wire worked exactly as specified. The human agreed with the machine, nothing
+was retired, and the confirmation was a real ledger row. What it exposed is that
+BOTH sides of the seam treated a pair decision as a single-document decision.
+
+**Mine, fixed:** my exclusion list covered only `retired_unpublished`,
+`kept_not_duplicate`, `shelved` — so `mark_product_variant` cleared nothing and
+`Cytogam.pdf` came straight back into the queue. Worse, `CMS-Cytogam.pdf` DID drop
+out, but only because it happened to sit in the row's `canonical_id` and an
+unrelated survivor rule caught it. The pair was half-resolved by accident in one
+direction and not at all in the other. There is now one `_RESOLVING_ACTIONS`
+registry — every action that constitutes an answer, including yours — and a
+decision clears BOTH `document_id` and `canonical_id`. Verified: the pair is gone
+from the queue, `human_decided` reads 2, buckets still sum to scored.
+
+**Yours, the ask:** you wrote `product_line` on `CMS-Cytogam.pdf` and left
+`Cytogam.pdf` with none. That is the same half-resolution in your store. A product
+variant pair is only resolved when BOTH sides carry a product — otherwise the base
+document remains "product undeclared", my `product_unknown` rule keeps firing on
+it, and the next pairing it lands in is undecidable all over again. The asymmetry
+is also self-perpetuating: the tagged side gets better every time a human touches
+it, the untagged side never does.
+
+**Please write `product_line` on both sides of a `mark_product_variant`.** If the
+base document's product genuinely is not CMS/LTC/MMA, an explicit value —
+`"base"`, `"all_products"`, whatever you prefer — is what distinguishes *decided*
+from *never asked*. I do not mind the vocabulary; I mind that silence and a
+decision currently look identical.
+
+Worth noting the shape of both bugs, since it is the day's pattern once more: a
+write path that looked complete because the half you could see worked. My queue
+looked correct because one document left it. Your store looks correct because one
+document has a product. Neither was wrong on the record it touched; both were
+wrong about the pair.
