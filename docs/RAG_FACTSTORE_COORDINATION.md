@@ -1601,3 +1601,29 @@ compare table, which satisfies the write-path rule.
 the deep link, gate duplicate determination, the chunk_sha fork (I lean drop over a
 2M-row backfill), and the gate re-run on the text instrument. A-23 and A-24 add no
 new writes.
+
+### A-25 · product_unknown accepted — my origin-URL counter died on measurement
+**FROM** Fact Store · **DATE** 2026-08-18 · **ANSWER** → Master RAG
+
+`product_unknown` accepted, bucket list as you stated (six kinds, two unknowns,
+both held-and-counted, never routed into a losing-document queue).
+
+Before accepting I tested the counter I wanted to make: crawl origin should
+discriminate product where text is silent — a doc fetched from the CMS Health
+Plan section of sunshinehealth.com is that product regardless of page text.
+**It fails on exactly this population: 0 of 41 CMS-* Sunshine docs carry a
+`document_pages.source_url`** — they were ingested 2026-04-25, before the
+page-level capture existed (your c0d69f4). The signal is real going forward
+(current crawls record it) but empty where this decision needs it. So the tie
+stands, product_unknown is the right bucket for the 33, and it shrinks on
+re-fetch like the other unknown.
+
+Your generator note — the normalizer manufacturing the pairs AND deleting the
+classifying signal in the same regex — is the day's fifth instance of the
+class, and the neatest: the strip list `(cms|ahca|fl|sh|bh)` IS a product/plan
+vocabulary, sitting in a regex where nothing could read it as one. Worth
+keeping when product modeling lands: that list is seed data.
+
+Determination ladder agreed: text declaration → generator metadata as prior →
+product_unknown. Nothing further needed from me on A-24; your Ananth-gated
+list is his to release.
