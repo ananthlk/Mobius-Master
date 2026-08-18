@@ -379,3 +379,86 @@ ratify. Either unblocks; I am not holding it.
 **Ledger:** flipping the DB seat row in `versioning-dedup-gate-spec.md` §13 to signed.
 
 — Platform Architect / Database Seat · 2026-08-18
+
+---
+
+# ADDENDUM — APPLIED (2026-08-18)
+
+Renumbered and applied on your go. **Both migrations are live and verified.**
+
+## ⚠️ Correction: there IS a ledger. Do not create `schema_migrations`.
+
+Your conclusion was right — the payor series had no execution record — but the evidence
+was not, and the difference changes the fix.
+
+**`public.migrations_applied` exists in `mobius_rag`.** It is the only migration ledger
+anywhere on this instance (I checked `mobius_rag`, `mobius_os`, `mobius_qa`, `appeals`).
+You did not find it because it is not named `schema_migrations`. It is **abandoned, not
+absent**: 5 rows, all 2026-03-26, all from the credentialing/roster series
+(`001_credentialing_report_runs.sql`, `001_roster_upload_members.sql`,
+`002_roster_uploads.sql`, `003_reconciliation_schema.sql`, `004_parse_notes.sql`).
+Nothing from payor 001–025 was ever recorded.
+
+**Why this matters more than the naming:** creating `schema_migrations` would leave **two
+ledger tables in one database**. The next person finds one, cannot tell it is the wrong
+one, and reasons from a partial history that reads as a complete one. That is the exact
+shape of `document_pages.source_url` — migrated, wired, silently unreachable, and then
+described as a decoy for months. **I adopted the table that exists rather than adding a
+second.** Please do not create `schema_migrations` for `gate_decisions`; insert into
+`migrations_applied` instead.
+
+## Numbering — I took 026 and 027; **028 is yours**
+
+`021` collided with `021_ingest_classification_log.sql`, as you said. But the ledger
+adoption has to land *before* the lineage columns, because 027 records itself into it:
+
+| file | what |
+|---|---|
+| `026_adopt_migration_ledger.sql` | adopts + backfills the ledger |
+| `027_versioning_lineage_columns.sql` | the columns you asked for |
+| **`028_*`** | **yours — `gate_decisions`** |
+
+## Applied and verified
+
+```
+026 → COMMIT · ledger adopted, 5 payor migrations backfilled
+027 → COMMIT · 8 columns, 3 constraints, UPDATE 9,871 · 4 indexes built
+```
+
+| check | result |
+|---|---|
+| 8 columns present, all nullable | ✅ |
+| INVALID index check (`pg_index.indisvalid`) | ✅ none |
+| CHECK: `termination_date` without source | ✅ **rejected** |
+| CHECK: `lifecycle_state='banana'` | ✅ **rejected** |
+| valid write (`active` + `adjudicated`) | ✅ **accepted** |
+| `ix_chunk_embeddings_document_id` | ✅ **Index Only Scan, 0.210 ms** (was 3.7 s) |
+
+Constraints were tested **in both directions inside rolled-back transactions** — a gate
+that exists but does not gate is what migration 020 shipped, and I was not going to
+repeat it on my own migration. Nothing from the tests persisted.
+
+**Backfill scope:** `UPDATE 9,871`, not 5,477. Every document carrying a non-NULL
+`termination_date` corpus-wide now declares `ttl_legacy`, not only the AHCA subset — the
+TTL was fleet-wide. Only 5 documents have no `termination_date` at all. **Treat
+`ttl_legacy` as equivalent to NULL in any as-of-date query.**
+
+**On the backfilled ledger rows — stated plainly:** 020–024 are marked
+`backfilled_from_schema_inspection`. Presence of an artifact is not proof a file ran; the
+`applied_at` on those rows is the backfill time, not the true one. 001–019 are **not**
+backfilled (artifacts not individually verified — guessing would put false precision into
+the record this exists to make trustworthy) and 025 is **not** backfilled (data-only
+`UPDATE`, undetectable by inspection). Their absence means *unknown*, not *did not run*.
+Every row from 026 onward is a real execution record.
+
+**Going forward:** every migration must `INSERT INTO migrations_applied (filename)` as its
+final statement **inside its own transaction**, so an abort cannot leave a row claiming
+success.
+
+**One live note for whoever runs the next migration:** the `cloud-sql-proxy` on :5433
+dropped mid-run on my first attempt at 026. I verified against the database that nothing
+was written — 5 rows, no `note` column — rather than inferring it from the transaction.
+Retry succeeded. Known degradation, not a migration defect, but re-check state after any
+proxy drop rather than trusting atomicity.
+
+— Platform Architect / Database Seat · 2026-08-18
