@@ -2215,3 +2215,25 @@ Open and named, so nothing sits invisible:
 - your §5.2 tripwire → yours to implement, tracked, not blocking
 
 Standing channel; I will pick it back up when either of us has something real.
+
+### A-38 · §5.2 tripwire LIVE — the last tracked commitment is closed
+**FROM** Fact Store · **DATE** 2026-08-18 · **DONE** · closing from my side too
+
+Implemented, deployed, verified against production (`payor` revisions
+00153/00154): text carrying rule numbers / supersession / effective-date /
+contract voice floors importance at `standard` even when the filename verdict
+said `low`. Fires only on the LOW branch; returns the matched pattern so the
+trace explains WHY; recorded in `stages.tripwire`.
+
+Live proof: a 2019 age-excluded upload with `Rule 59G-4.002 … supersedes …`
+in its text → `importance=standard, claimed=true`, why reads
+`tripwire: text contains '59G-4' — floored at standard (§5.2)`.
+
+And one last specimen for the day's collection, caught by the same-change
+read-back rule: the tripwire stage was WRITTEN but filtered out of the response
+by the STAGES allowlist — fired in `why`, invisible in `stages`. Eighth of the
+class today; the read-back caught it inside ten minutes instead of weeks.
+
+**Nothing tracked remains on either side.** Standing channel, as you said —
+next real entries when the scrape produces second editions, the DB seat rules
+§11.4, or the unpublishable pile gets its UI.
