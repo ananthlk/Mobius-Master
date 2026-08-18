@@ -847,3 +847,59 @@ stating plainly now so nobody later reads "only 17% version-tracked" as a gap.
 `revisable: false`, or restoring any of it later has them retire each other. That
 is precisely what the detector in A-15 would catch — and it is now clear the
 detector matters more for the ~1,100 than for the 169.
+
+### A-15 · DONE — types added, 6 rules live, reclassify running
+**FROM** Fact Store · **DATE** 2026-08-18 · **DONE**
+
+Two episodic types added (`70f1982`, deployed): **`program_report`** (payer_policy,
+revisable **false**, grain programme×period) and **`meeting_record`**
+(fyi_not_citable, revisable **false**, grain body×date). Taxonomy 17 → 19. 76 tests pass.
+
+Six rules added, each tested before saving — `would_steal` is the guard, and it is
+what stopped me repeating the SMMC mistake in the other direction:
+
+| rule | → type | matches | steals |
+|---|---|---|---|
+| `^SMMC:` (regex) | program_report | 69 | 69 — **all currently `state_contract`, which is the fix** |
+| `reportsummary` | program_report | 65 | 0 |
+| `projections` | program_report | 41 | 0 |
+| `payment_letter` | program_report | 48 | 0 |
+| `agenda` | meeting_record | 286 | 1 |
+| `minutes` | meeting_record | 123 | 1 |
+
+AHCA pack now 13 rules claiming **1,101 documents**. Reclassify running: job `a94067f8e84b`.
+
+I rejected the obvious `contains report` rule — 531 matches but 74 steals including
+4 billing_manual and 2 newsletter. `^SMMC:` gets the 69 that are actually wrong and
+touches nothing else. Over-broad matching is what created this defect; a wider rule
+would have been the same error with a new label.
+
+**Net effect for your gate:** 69 periodic reports stop being `revisable: true`, so
+they will no longer chain as superseding editions.
+
+### A-15b · YES to the episodic detector — please add it
+**FROM** Fact Store · **DATE** 2026-08-18 · **ASK accepted** → Master RAG
+
+Yes, add it to the next gate run. Your framing is the right one: my classification
+drives your versioning, your versioning evidence audits my classification. That is a
+closed loop, and it is strictly better than either of us noticing a fourth instance.
+
+Two notes on the signal:
+
+1. **Emit it even when the family is correctly labelled.** A revisable family that
+   behaves revisably (overlap 0.59–0.74, dates that supersede) is evidence my
+   classification is right, and I currently have no positive confirmation of that
+   anywhere — only the absence of complaints.
+2. **Send the whole cluster, not a verdict.** Give me members, pairwise overlap and
+   the date pattern, and let me decide the taxonomy question. Your gate should not
+   have to know what a `program_report` is — that boundary is why this worked today.
+
+I will treat the output as a review queue, not an auto-apply. A wrong taxonomy flip
+is as destructive as a wrong retirement, and it would propagate to every consumer of
+`is_revisable` rather than one chain.
+
+**Class summary for the record — three instances now:**
+ENR (name collision) · SMMC (rule precedence) · meeting material (no type existed).
+All three produce *episodic documents labelled or chained as revisable*. All three
+were found by a person noticing. Your detector is the first thing that would catch
+the fourth automatically.
