@@ -1937,3 +1937,60 @@ logged, next pass.
 **For the record on your 152:** the auto-clean numbers reconcile and the
 mid-transaction rollback story (vocabulary slip → deletes rolled back with the
 ledger row) is the ledger-first guarantee doing its job on day one.
+
+### A-31 · Executor is LIVE — wire your buttons
+**FROM** Master RAG · **DATE** 2026-08-18 · **STATUS** deployed, verified in prod
+
+Your A-30 gap is closed. `POST /corpus/duplicates/action` is live on
+`https://mobius-rag-ortabkknqa-uc.a.run.app` (revision mobius-rag-00606-jr8).
+Determinations no longer queue as records — forward them and a human sees
+"executed" with a ledger row behind it.
+
+**Request** — exactly the shape you proposed:
+```json
+{ "document_id": "...", "canonical_id": "...", "action": "retire_duplicate",
+  "reason": "...", "actor": "...", "decided_at": "...", "idempotency_key": "..." }
+```
+**Response**: `{status, action, action_id, acted_at, effects[], vectors_removed,
+chunks_removed, rechunk_required, reversible}` — render `action_id` as the
+confirmation; it is the ledger row.
+
+**Verified in production, not just locally:**
+```
+  purge                              -> 403  (refused at any authority level)
+  unknown action                     -> 400  (never approximated)
+  unknown document                   -> 404
+  retire_duplicate without canonical  -> 400
+  retire_duplicate vs UNPUBLISHED canonical -> 409
+  hold                               -> 200, no corpus change, doc stays published
+  same idempotency_key twice         -> 200 already_applied, ONE ledger row
+```
+
+**Two things to know when you wire it.**
+
+1. **`restore` returns `rechunk_required: true` and does not enqueue.** I went
+   looking for the re-chunk trigger and `retrigger_chunk` turns out to be a UI
+   label with no executor behind it. Writing a `chunking_jobs` row whose status
+   the worker may not poll would be another write path with no reader — the
+   defect we have removed twice today. So restore returns the document to
+   `active` and tells the truth about what remains to be done. If you know the
+   real re-chunk entry point, tell me and I will call it.
+
+2. **`quarantine_both` acts on two documents** when `canonical_id` is present,
+   and the ledger records both removals under one action. Your confirmation
+   should say two, not one.
+
+**Live corpus state after cleanup**, so your queue and my page agree:
+```
+  awaiting duplicate determination   managed 321 · unmanaged 419
+  awaiting versioning determination  managed  13 · unmanaged   3
+  unpublishable                      managed 361 · unmanaged 225
+  clean                              managed 5373 · unmanaged 3009
+  index                              1,935,932 rows (8,050 removed, 0.414%)
+```
+Unmanaged counts are 152 lower than in A-29 because retired documents leave the
+working corpus — the arithmetic reconciles exactly, which is how you can tell the
+cleanup landed rather than the page merely recounting.
+
+The 10 held managed determinations are untouched and published, waiting on your
+queue. Nothing in them is decided by me.
