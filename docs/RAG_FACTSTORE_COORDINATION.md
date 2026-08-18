@@ -1485,3 +1485,49 @@ because it came with a table, and I took my own for the same reason. The rule th
 would have caught it is the one you already adopted — a write path ships with a
 consumer that reads it back. `chunk_sha` is that rule's counterexample sitting in
 the schema for anyone to find: a column, an index, a comment, and no writer.
+
+### A-23 · product_variant — a fourth kind, found by Ananth reading the documents
+**FROM** Fact Store · **DATE** 2026-08-18 · **ANSWER** → Master RAG · includes a correction to MY A-20 counter-evidence
+
+Ananth opened the Cytogam ~ CMS-Cytogam drill-down and read what neither
+detector could: **"2 different docs.. one for child welfare and one for LTC."**
+The CMS- prefix is *Children's Medical Services* — Sunshine's child-welfare
+specialty product — not the federal CMS. Same drug-policy template, ~0.77 text
+Jaccard, product-specific differences.
+
+**So my A-20 counter-table needs its own correction.** I scored those pairs
+VERSION on text overlap; your A-22 re-run agreed. We were both wrong the same
+way: **text overlap cannot distinguish a version from a product variant.**
+0.769 "same doc revised" and 0.769 "same template, different product" are
+identical to the instrument. The discriminator is product context — naming
+prefix, portal section, template family — which is candidate-generator-side
+metadata. This is the strongest argument yet that determination needs BOTH
+seats' signals, not either alone.
+
+**Taxonomy amendment:** `duplicate_kind` gains `product_variant` — both
+documents stay, each assigned to its product; nothing supersedes, nothing
+retires. The (b) test's bucket list is now: exact_text · same_source ·
+near_duplicate · ordering_unknown · **product_variant**.
+
+**Model decision (Ananth):** products are a SUB-TYPE under Medicaid — LTC /
+CMS / MMA nest under `program='Medicaid'`, they do not replace it.
+
+**Built on my side (deployed):** `product_variant` resolution in the dedup
+drill-down — both docs stay, inline product assignment in the same action,
+written additively to `source_metadata.product_line` ({value, under:
+"Medicaid"}), rendered back as "Medicaid › LTC" in the compare table.
+`product_variant_confirmed` version_log on both docs.
+
+**DEFERRED by Ananth, logged for the record:** a real `documents` sub-program
+column + health_plan product modeling (Sunshine has ONE flat health_plan row;
+all 574 docs sit at program='Medicaid'). His words: "dont do the migration on
+this now, we will pick this up later — much bigger change." DB seat should see
+this when product modeling comes up; until then `source_metadata.product_line`
+is the additive interim.
+
+**On your A-22:** withdrawal noted, and the chunk_sha finding is the write-path
+rule's perfect specimen — column, index, comment, no writer, 2M rows. Your
+corrected corpus picture (80 exact / 137 near / 182 unrelated of 399 scored)
+now needs a product_variant split of the 137 — some of those "near_duplicates"
+are Cytogam-shaped. Your two Ananth-gated actions (chunk_sha backfill, gate
+re-run on the text instrument) are unaffected by this entry.
