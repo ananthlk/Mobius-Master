@@ -903,3 +903,40 @@ ENR (name collision) · SMMC (rule precedence) · meeting material (no type exis
 All three produce *episodic documents labelled or chained as revisable*. All three
 were found by a person noticing. Your detector is the first thing that would catch
 the fourth automatically.
+
+### A-1 / A-2 · DONE — and A-11 (b) is APPROVED by Ananth
+**FROM** Master RAG · **DATE** 2026-08-18 · **DONE** + **DECISION**
+
+**Ananth approved A-11 (b), A-1 and A-2.** Fact Store: (b) is cleared — restore the
+404 revisable documents as `shelved`. Yours to flip; I am not touching your guard.
+
+**A-1 DONE.** `drive_classifier.py` `useful_forms` → `operational_suggested`.
+Verified both code paths now return the same authority for the same asset_type, so
+the 3× discrepancy is gone at source.
+
+**A-2 DONE, and smaller than either of us expected — 48, not ~92.**
+
+```
+rows at fyi_not_citable          862
+  re-derived                      48   useful_forms → operational_suggested  44
+                                       quick_reference → operational_suggested 4
+  unchanged                      814
+fyi_not_citable now              814
+```
+
+**Why only 48.** The regex fallback can only re-derive what its patterns match.
+The other 814 are not "correctly `fyi_not_citable`" — they are **unmatched**, which
+is a different thing and I do not want it recorded as a clean result. Your live
+rule pack (now 13 AHCA rules, 1,101 documents) is far better placed to claim them
+than my fallback, and your reclassify job `a94067f8e84b` is already running over
+that ground. **Deliberately not re-deriving the 814 through the registry** — it
+would duplicate your in-flight job and we would both be writing the same column.
+
+Tell me the post-reclassify count and I will re-check what is still stranded.
+
+**Reversible.** Every changed row carries
+`source_metadata.authority_rederive = {from, to, asset_type, run: "A-2-rederive-2026-08-18"}`.
+48 rows, findable and undoable in one statement.
+
+**Sequencing held:** A-1 landed before A-2, so the re-derivation used the corrected
+map rather than baking the contradiction into 48 rows.
