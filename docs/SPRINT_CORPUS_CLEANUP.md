@@ -283,3 +283,68 @@ answers, unless told otherwise.
 
 **Still open from my side, unchanged:** (b) my 478 / 236 remains unverified by Fact Store — that
 number is (b)'s entire pass/fail. (c) the round trip still does not exist in either direction.
+
+## Deferred — ingest-time duplicate rejection (logged 2026-08-18, Ananth)
+
+**Decision: corpus cleanup first, then a new ingestion.** The ingest router below
+is designed and measured but NOT built, by direction. Recorded here so the next
+scrape does not start without it being a conscious choice.
+
+**What already exists and works.** `documents.file_hash` is sha256 of file bytes,
+`unique=True`, checked before insert on both the upload path (`app/main.py:6055`)
+and the scraper path (`app/main.py:6579`). All 9,876 documents have distinct
+hashes because byte-identical re-fetches are already rejected with a 409. On the
+next AHCA scrape every unchanged page is blocked before it costs a chunk or an
+embedding. The payor-store "dup detection" this was meant to be is, for the
+byte-identical case, already live.
+
+**What gets through.** 168 pairs are byte-DIFFERENT but extract to identical text
+— different PDF producer, timestamp or generation run. sha256 of bytes cannot see
+that.
+
+**What must NOT be built: rejection on text identity.** Next year's GME
+attestation is byte-different and text-identical to last year's. A text-equality
+rejector drops it on arrival and leaves no document to inspect — silent data
+loss. Same for `CMS-Panretin` arriving when `Panretin` exists: a product variant,
+not a copy. 185 period-series pairs and 39 product-variant pairs are this shape.
+
+**The rule to build when ingestion resumes** — one reject, one router:
+
+| signal | action |
+|---|---|
+| same bytes | reject (already built — keep) |
+| same URL + same text digest | re-observation: no new document, bump last-seen |
+| same URL + different text digest | successor -> versioning gate |
+| different URL + same text digest | ADMIT, flag for determination |
+
+Only the first two are rejections; both are safe because identity AND provenance
+agree. `documents.content_digest` exists and is populated on 0 of 9,876 rows —
+it is the natural home for the text digest, and the second declared-but-unwritten
+column found today. Unlike `chunk_sha` (dropped in 029, no job), this one now has
+one.
+
+**Prerequisite noted:** versioning stays theoretical until a scrape produces
+second editions — the corpus run yields 5 successors and 16 awaiting versioning
+across 9,876 documents because no URL has ever been re-fetched.
+
+## Duplicate pollution — the mechanism, measured
+
+All 892 duplicate-pair documents are live in the published index; 17,054
+embedding rows come from `duplicate`-kind pairs (of 1,943,982 total), roughly
+half of which are the redundant copy.
+
+**Flagging alone does nothing today.** `lifecycle_state` appears exactly once in
+the whole service — in the Corpus Health query written today. No retrieval path
+reads it. A flag with no reader is the same defect class as `chunk_sha`: it looks
+like protection and is not. Two levers actually exist:
+
+1. **Flag** — `lifecycle_state='superseded'` + `supersedes_id`. Reversible, keeps
+   the record and the reason. Requires a retrieval filter to have any effect.
+2. **Remove from the index** — `DELETE FROM rag_published_embeddings WHERE
+   document_id = ...` (`app/main.py:807`) already exists and is exercised by the
+   unpublish path. Reversible: chunks survive in `hierarchical_chunks`, so a
+   document can be re-published without re-extraction.
+
+Correct order is flag then unpublish: the flag records WHY, the unpublish stops
+the pollution. Neither is safe to automate yet — retirable is 0 because every
+all-signals-match pair lacks the dates to pick a canonical.
