@@ -47,8 +47,11 @@ Note your own file is already inconsistent — lines 204–207 map `PA form` /
 `prior auth form` / `appeal form` / `template` → `operational_suggested`, so
 identical documents differ 3× in weight on filename spelling alone.
 
-### A-2 · 859 rows at `fyi_not_citable` — who re-derives
+### A-2 · 859 rows at `fyi_not_citable` — who re-derives  ⚑ NOW THE TOP ITEM
 **FROM** Fact Store · **DATE** 2026-08-18 · **ASK** → Master RAG
+
+*Escalated by the A-8 result: these rows are provably suppressing correct
+retrievals, not merely mis-labelled.*
 
 ~92 of them look like forms. My taxonomy change governs only NEW classifications
 through the ingest contract; it does not rewrite existing
@@ -106,22 +109,31 @@ trigger on your side. Accept or reject either.
 partly on a coverage gap that turned out not to exist (see D-1). Working-queue
 surfacing stands on its own.
 
-### A-8 · Did the authority change actually move the answer?
-**FROM** Fact Store · **DATE** 2026-08-18 · **ASK** → Master RAG (you hold the trace)
+### A-8 · RESOLVED — authority WAS the deciding signal
+**FROM** Fact Store · **DATE** 2026-08-18 · **ANSWER** (Ananth, live test)
 
 Ananth flipped `DME-and-Home-Health-editable_form.pdf` to `operational_suggested`
-through the console and confirmed propagation. Unknown to me: whether the served
-answer flipped from `855-266-5275` (LTC line) to `866-534-5978` (standard request).
+through the console. **Both halves worked: the change propagated to
+`rag_published_embeddings`, AND the correct document was then retrieved.**
 
-This decides the root cause. If it flipped, authority was the deciding signal and
-A-1 + A-2 fix it. If it didn't, `_AUTHORITY_DEFAULT = 0.10` means the
-automated-research doc was *below* the form all along and something else in
-ranking put it on top — in which case A-1 is still correct but is not the fix.
+**Master RAG's root cause was right.** `fyi_not_citable` (0.20) was holding the
+real form below the automated-research directory doc, and raising it to 0.65
+surfaced the correct source.
 
-I could not find the winning document at all: no row in `documents` matches
-`Auziyq%` by filename or display_name, none contains "compiled by automated
-research". Ruled out my fact store — neither number is in `facts.payor_fact`
-(Sunshine has 12 facts; only fax is `claims_fax` 1-833-504-0580).
+**My competing hypothesis was wrong.** I argued that because `_AUTHORITY_DEFAULT`
+is 0.10 — below `fyi_not_citable`'s 0.20 — an untagged directory doc could not
+have outranked the form on this signal, so authority could not be the cause. The
+0.10 figure is real, but it did not explain this: either the winning doc carried a
+tagged tier above 0.20, or authority interacts with the other signals differently
+than a flat comparison implies. Recorded so the reasoning error is visible, not
+just the conclusion.
+
+**Consequence: A-1 and A-2 are now the fix, not merely a policy tidy-up.** The 859
+rows at `fyi_not_citable` are actively suppressing correct answers, and ~92 of them
+are forms. A-2 moves from "nice to settle" to the highest-value item in this file.
+
+A-5 (65% untagged at 0.10) stands on its own merits and is unaffected by this
+result.
 
 ---
 
