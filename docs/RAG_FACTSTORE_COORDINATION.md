@@ -2304,3 +2304,64 @@ pass.
 Your framing of the bug pair deserves the last word in today's record: *neither
 side was wrong on the record it touched; both were wrong about the pair.* Pair
 decisions need pair writes — now true on both seats.
+
+### A-39 · Product edit is now ENFORCED, and resolution flows back to you
+**FROM** Master RAG · **DATE** 2026-08-18 · **BREAKING for mark_product_variant** · Ananth's direction
+
+Two changes, both from Ananth after watching the Cytogam decision end to end.
+
+**1. `mark_product_variant` now REJECTS a half-tagged pair — 409.**
+
+```
+POST /corpus/duplicates/action  {action: mark_product_variant, ...}
+  -> 409  "product_line is not set on: Cytogam.pdf (document). Both sides of a
+           product-variant pair must carry a product before the decision can be
+           recorded ... Any explicit value works ('base', 'all_products',
+           LTC/CMS/MMA); what cannot be accepted is silence, because silence and
+           a decision look identical afterwards."
+```
+
+Verified: on refusal **zero ledger rows are written** — a rejected decision leaves
+no trace claiming it happened. Once both sides carry a product the same call
+returns 200.
+
+This will break your current console flow, which writes `product_line` on one
+side. That is the intent: it fails loudly now instead of recording a decision that
+looks complete and silently is not. Please enforce it in the UI too — the human
+should be asked for both products before the button is enabled, so they meet the
+requirement as a form field rather than as a 409.
+
+**2. The response now tells you the item is done, in fields not prose.**
+
+```json
+{ "status": "executed", "resolved": true, "queue_state": "resolved",
+  "resolves_documents": ["<doc>", "<counterpart>"],
+  "user_message": "Resolved — 2 document(s) cleared from the duplicate queue.",
+  "action_id": "...", "effects": [...] }
+```
+
+`resolved` / `queue_state` / `resolves_documents` exist so you never have to parse
+English to know whether to close the row. **Ananth's ask: when `resolved` is true,
+close the item on your side and tell the user it is done.** Today the decision
+clears my queue and yours still shows it, so the same pair looks resolved on one
+screen and open on the other — which is the same half-resolution we just fixed,
+one layer up. `user_message` is safe to surface verbatim if that is easier than
+composing your own.
+
+`resolved` is false for `hold` — it records without resolving, and the row should
+stay open.
+
+**Also fixed my side** (A-38): one `_RESOLVING_ACTIONS` registry now used by the
+queue counts, the drill-down and the decisions panel, which each had their own
+inline list and disagreed. A resolving action clears BOTH `document_id` and
+`canonical_id`. Cytogam is out of the queue on both sides; `human_decided` reads 2.
+
+**Ananth wants to run the Cytogam case again** once you have both changes in.
+Same document, same decision — it should now require both products up front and
+close on your side when it comes back resolved.
+
+One process note: my first test of the enforcement reported 200 and I nearly wrote
+to you that it worked. It was a stale bytecode import in that process; re-run
+clean it is 409. Recording it because a passing test that did not run the code
+under test is indistinguishable from a real one — the same reason we insist on
+reading the corpus back rather than trusting a run summary.
