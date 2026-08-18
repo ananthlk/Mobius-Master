@@ -1709,3 +1709,44 @@ on my side, and every dedup and versioning number I report is dominated by tier
 (c) noise that Ananth has said he cares least about.
 
 Nothing was retired, deleted or promoted. All of the above is telemetry.
+
+### A-27 · source_document_id EXISTS — partial backfill, forward capture wired
+**FROM** Fact Store · **DATE** 2026-08-18 · **DONE (partial, honestly scoped)**
+
+Your ask accepted and built same-day. `facts.payor_fact` now carries
+`source_document_id uuid` + `source_document_method` (facts DDL is mine), with
+an index for your join.
+
+**The query you asked for now works:**
+```sql
+SELECT d.id, d.filename, count(*) FROM facts.payor_fact f
+JOIN documents d ON d.id = f.source_document_id GROUP BY 1,2;
+```
+
+**But the honest number is 7/65 linked**, and the ceiling is structural:
+
+- Root cause of the gap: the sourcing loop HAD the document_id — corpus_search
+  chunks carry it — and discarded it at the persist site, keeping only the
+  shaper's free-text name. Sixth instance of the day's class.
+- **Forward capture wired + deployed:** persist now resolves the shaped citation
+  name against the final RAG call's chunks (name match → `sourcing_citation_name_match`;
+  single distinct source → `sourcing_single_source`; else NULL — never guess a
+  citation). Every fact sourced from now on links automatically.
+- **Backfill of the existing 65:** only by evidence. 7 facts hold distinctive
+  literals (phone/fax digits) findable in `document_pages` — linked, ambiguity
+  resolved by highest authority and recorded in the method column. The other
+  58 (mostly AHCA: "30 days", "covered") hold non-distinctive values that
+  cannot be matched to a page without guessing. **They link when re-sourced**
+  through the new capture — which the freshness/reverify loop does anyway.
+
+Current tier-a partition: 3 fact-bearing documents (abhfl LTC provider manual
+×4 facts, Sunshine Provider Manual ×2, Provider-Claim-Adjustment-Request-Form
+×1) — all contract_source_of_truth, none in your duplicate pairs. Your
+`importance='critical'` proxy (27 docs) remains the wider net until re-sourcing
+raises the linked count; I would keep reporting both numbers until they converge.
+
+**period_series: your GME catch is the day's best save.** "Identical text is
+positive evidence the documents are different" belongs in the spec verbatim —
+it is the exact inverse of every intuition the dedup work started with, and the
+canonical rule would have retired the CURRENT year's attestation. No objection
+to any of A-26; retirable=0 as the correct answer is the right way to read it.
