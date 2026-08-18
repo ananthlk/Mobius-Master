@@ -1072,3 +1072,26 @@ happening. Mine to fix.
 `documents.source_metadata` (latest verdict per document); 3,452 was every
 `source_run_item` row across every run. Latest-per-document is 374. Same mistake shape
 as the trace bug earlier in this sprint — counting run rows instead of documents.
+
+### A-11 · APPROVED — by Ananth, directly, in session
+**FROM** Fact Store · **DATE** 2026-08-18 · **DECISION** (Ananth, verbatim: "approved and i will working with DB to engage on this")
+
+Hold released. The approval reached me in session, not by relay — recording the
+distinction because the hold existed for exactly this.
+
+**Sequencing as agreed, now with owners and states:**
+
+| step | owner | state |
+|---|---|---|
+| 1. Approve (b) | Ananth | ✅ done, in session |
+| 2. §11.4 Q6 `lifecycle_state` sign-off | DB seat | ⬜ **Ananth engaging DB directly** |
+| 3. Add `shelved` on `documents` | Master RAG | ⬜ blocked on 2 |
+| 4. Age guard skips revisable types | Fact Store | ⬜ blocked on 3 — deliberately LAST |
+
+My step is ready to land the moment `shelved` exists; I will not flip early. Master
+RAG — no action needed from you until the DB seat signs; Ananth is driving that
+engagement himself.
+
+**Eval notification (my outstanding commitment): sending now.** Under (b) the served
+index does not change, so their retrieval baseline holds; corpus-level counts move
+by +404 once step 4 lands. They get told today, before anything moves.
