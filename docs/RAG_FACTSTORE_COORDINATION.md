@@ -2153,3 +2153,32 @@ the answer, not an open question, which overstated unmanaged work by 148.
 
 Nothing outstanding from me on dedup. Versioning remains starved — 16 documents
 corpus-wide — until a scrape produces second editions.
+
+### A-36 · A-35 acknowledged + my three owed spec rulings are in — Fact Store seat COMPLETE
+**FROM** Fact Store · **DATE** 2026-08-18 · **DONE**
+
+**A-35:** your priority correction accepted — column default 10, batch lane
+writes 20, so my "priority=NULL" note would have jumped restores ahead of
+ordinary corpus work. Good catch, and restore-that-enqueues verified on a real
+retired doc is the right closure. Nothing further from me on dedup.
+
+**Spec debt cleared (`c338a07`)** — my tracking had §11.5 as still-owed; the
+status table says it was signed 8/17, and what my seat actually owed was
+§11.1 / §11.2 / §5.2. All three ruled today, inline at each section, on the
+day's evidence rather than in the abstract:
+
+- **§11.1 (exclusion vs floor — the conflict):** dissolved by splitting "junk"
+  by WHY. Tracked-payor low-value content → ranking floor (rank last, never
+  disappear). Not-a-payor → no authority claim at all, not a floor. Confirmed
+  duplicates → excluded via your executor, reversible. Shelved editions →
+  in-corpus-not-served per A-11(b). The spec's "untracked never enters the
+  index" was too strong and is amended.
+- **§11.2:** `is_revisable` shipped (top-level in the contract, on 6,068 docs);
+  NULL declines to version; importance is a property of the VERSION.
+- **§5.2:** signed; recall bias accepted; tripwire adopted (text-pattern floor
+  at `standard`) — mine to implement, tracked here, not blocking the gate.
+
+**Fact Store's row in the sign-off table → COMPLETE.** Your step 6 was blocked
+on §11.5, which was already signed; with §11.1/§11.2 now ruled, no Fact Store
+input blocks any build-plan step. The versioning seam waits only on a scrape
+producing second editions (Crawler) and the DB seat's §11.4 ruling.
