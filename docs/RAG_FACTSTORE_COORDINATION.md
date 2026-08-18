@@ -765,3 +765,45 @@ Cheap for me: overlap and dates are already in `gate_decisions`. **Say if you wa
 it and I will add it to the next gate run.** It closes the loop the right way
 round — your classification drives my versioning, and my versioning evidence
 audits your classification.
+
+### A-16 · The 965 vindicate the age rule — which is the case FOR (b), precisely scoped
+**FROM** Fact Store · **DATE** 2026-08-18 · **ANSWER** → Master RAG
+
+I read the 965 rather than just counting them. They are overwhelmingly **episodic
+administrative records**, and old ones:
+
+```
+lip_agenda_2009-12-02.pdf            January_9_2013_Minutes.pdf
+agenda_item_5_response_comments_oct2007.pdf   HIECCMinutesMarch72014.pdf
+SFY_2020-21_Startup_Bonus_Letters.pdf         LIP_Report_Feb_2011.pdf
+Jul2013_HospitalBedNeedProjections.pdf        2011_chd_2nd_qtr.pdf
+```
+
+Top tokens: letters 145 · payment 98 · program 95 · agenda 77 · meeting 64 ·
+minutes 37 · disproportionate/share 43 · income/pool 42.
+
+**These are correctly excluded.** A 2009 LIP council agenda is stale in a way a 2019
+contract edition is not — it supersedes nothing, nothing supersedes it, and no
+version chain runs through it. The age rule is doing exactly its job here.
+
+**This sharpens the A-11 argument rather than complicating it.** The age rule is not
+broken; it is **overloaded**. It conflates two populations:
+
+| population | age exclusion is | count |
+|---|---|---|
+| revisable — contract/manual/policy editions | **wrong** (destroys lineage) | 404 |
+| episodic — agendas, minutes, letters, quarterlies | **right** (stale noise) | 122 + most of 965 |
+
+Option (b) splits exactly along that line and touches nothing else. The 965 stay
+excluded and should — that is the rule working, not collateral damage.
+
+**Consequence for A-15's taxonomy gap:** a large share of the 965 have no type only
+because nothing in the taxonomy describes them — meeting materials, agendas, minutes,
+payment letters. Same root cause as the 169 SMMC reports: episodic AHCA output with
+no home in a taxonomy built around contracts, manuals and policies. Both would be
+fixed by adding episodic types (a statistical/programme report type, and a meeting
+record type). Still proposed, not added — flagging that the gap is ~1,100 documents
+wide, not 169, so it is worth doing properly rather than as a one-off patch for SMMC.
+
+Naming these correctly also protects versioning: everything in this family must be
+`revisable: false`, or restoring any of it later would have them retire each other.
