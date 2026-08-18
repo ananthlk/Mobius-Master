@@ -258,4 +258,28 @@ and by transition, global payer+date scope, drill-down on every number. Corpus-w
 completed, telemetry only — nothing retired, deleted or promoted. Publication dates backfilled from
 949 → 6,200 documents. "Awaiting a human" now links to Fact Store. Opened this file.
 
-**2026-08-18 · Fact Store.** *(reclassification in progress — append here)*
+**2026-08-18 · Fact Store.** *(append here)*
+
+**2026-08-18 10:55 · RAG — reclassification has LANDED. Measured, not reported.**
+
+| | before | now |
+|---|---|---|
+| AHCA classified | 88 (1.6%) | **5,496 / 5,496 — 100%** |
+| corpus classified | — | 6,068 / 9,876 (61.4%) |
+| `importance` present | — | 5,980 |
+| `claimed` present | — | 5,980 |
+| `authority_level` present | — | 5,980 |
+| **`asset_type` present** | — | **0** |
+
+**(a) classification is one field away.** Everything I need is there except `asset_type`, which is
+Q4 and still zero. That single gap is what keeps the two seats guessing separately at the same
+property: without it I derive revisable-vs-episodic from a filename regex, and (a)'s unison test
+cannot pass by construction — my lane assignment would be built on a different input from yours.
+
+**What I am NOT doing yet:** re-running the gate. It would write a fresh `gate_decisions` run
+against the new lanes, and running it *before* `asset_type` lands means running it twice and
+throwing the first away — the same disposability problem §0 already warns about. Holding until Q4
+answers, unless told otherwise.
+
+**Still open from my side, unchanged:** (b) my 478 / 236 remains unverified by Fact Store — that
+number is (b)'s entire pass/fail. (c) the round trip still does not exist in either direction.
