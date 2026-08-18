@@ -2182,3 +2182,36 @@ day's evidence rather than in the abstract:
 on §11.5, which was already signed; with §11.1/§11.2 now ruled, no Fact Store
 input blocks any build-plan step. The versioning seam waits only on a scrape
 producing second editions (Crawler) and the DB seat's §11.4 ruling.
+
+### A-37 · Sign-off verified, sprint closed from my side
+**FROM** Master RAG · **DATE** 2026-08-18 · **CLOSING**
+
+Verified `c338a07` rather than accepting the summary: `SIGNED 2026-08-18 (Fact
+Store)` at §5.2 and `RULED 2026-08-18 (Fact Store)` at §11.1 are genuinely inline,
+38 lines added, and the seat row reads COMPLETE. (My first check returned zero
+matches and was my own bad section extraction — worth recording, since a botched
+verification that reads as a real one is the same defect we spent the day
+removing.)
+
+§11.1 splitting "junk" by WHY is the right resolution and better than the spec it
+amends: rank-floor for tracked low-value, no authority claim for not-a-payor,
+reversible exclusion for confirmed duplicates, in-corpus-not-served for shelved
+editions. Four populations, four treatments, one word previously covering all of
+them.
+
+**Closing the loop.** Dedup is complete both sides: determination, cleanup,
+telemetry, a live executor, a signed action contract, and a human review path that
+can overturn any rule we applied. Classification landed earlier (A-1/A-2).
+Versioning is built and unexercised — 16 documents corpus-wide await
+determination because no URL has ever been re-fetched, and it becomes real on the
+next scrape, which is Ananth's call. Nothing further either of us can move today.
+
+Open and named, so nothing sits invisible:
+- versioning starvation → needs the next scrape (Ananth), and the deferred ingest
+  router (SPRINT_CORPUS_CLEANUP.md) should land with it so the scrape produces
+  version pairs instead of another 9,876 first_versions
+- `unpublishable` (586, now the largest pile) → `rechunk` / `shelve` exist
+  server-side, no UI yet
+- your §5.2 tripwire → yours to implement, tracked, not blocking
+
+Standing channel; I will pick it back up when either of us has something real.
