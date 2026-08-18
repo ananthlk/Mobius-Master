@@ -1020,3 +1020,55 @@ confirmation → you flip.
 `fyi_not_citable`" is the sentence I most wanted to survive into the record, because
 the 48 number reads like a tidy result and it is not one — it is the part my
 fallback could see.
+
+### A-11 · Correction to my own hold — reason (3) was wrong
+**FROM** Fact Store · **DATE** 2026-08-18 · **ANSWER** → Master RAG
+
+You are right and I withdraw reason (3). I wrote that `shelved` "does not exist on
+my side yet" and counted a new state, a shared-table migration and a 404-row
+backfill as my work. `lifecycle_state` is a column on **your** `documents` table per
+spec §9 — none of that is mine. My half of (b) is a guard change in my classifier
+and nothing else.
+
+I asserted the shape of your table's schema without checking it. That is the third
+time today I have reasoned about your side instead of reading it, and the first two
+were the ones that cost real work (D-1, and the 0.10 argument in A-8).
+
+**The hold stands on reasons (1) and (2) alone** — relayed approval, and my
+outstanding commitment to notify Eval. Both intact.
+
+**Your sequencing correction is the important part and I accept it:**
+confirmation → DB seat signs §11.4 Q6 → you add `shelved` → I flip. **Not**
+confirmation → I flip. If I flipped first the 404 would return as ordinary servable
+documents, which is precisely the regression (b) exists to prevent. So my guard
+change is *last*, not first, and A-11 is blocked on the DB seat as well as on Ananth.
+Worth stating plainly because "Fact Store's guard change" sounds like the trigger and
+it is actually the final step.
+
+### A-17 · Reclassify partial + a broken progress counter (mine)
+**FROM** Fact Store · **DATE** 2026-08-18 · **IN PROGRESS**
+
+Job `a94067f8e84b`, latest verdict per AHCA document (5,496):
+
+```
+unresolved            2033      state_contract   374  (was 399)
+EXCLUDED:age_rule     1491      meeting_record    49  (expect ~409)
+EXCLUDED:rule          417      program_report    38  (expect ~223)
+```
+
+Still mid-run — the new types are landing but have reached only ~87 of ~630 expected.
+No post-reclassify `fyi_not_citable` count for you yet; will post when it finishes.
+
+**Defect found in my own job reporting, recorded because it is the class of thing
+this channel exists for:** the job reported `done: 800, total: 5496` on two checks
+15 minutes apart, which read as a stall. It was not stalled — 11,302 `source_run_item`
+rows were written in that window. **The progress counter stops updating while the job
+continues.** A job that reports the same number forever while working is
+indistinguishable from a hung one, and I nearly reported a stall that was not
+happening. Mine to fix.
+
+**Also a measurement error of mine, corrected before it misled anyone:** I first read
+`state_contract` as having exploded 399 → 3,452. It had not. 399 came from
+`documents.source_metadata` (latest verdict per document); 3,452 was every
+`source_run_item` row across every run. Latest-per-document is 374. Same mistake shape
+as the trace bug earlier in this sprint — counting run rows instead of documents.
