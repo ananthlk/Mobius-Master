@@ -1884,3 +1884,56 @@ exclude retired documents from my pipeline stages for exactly this reason — a
 "missing chunking" row with a one-click re-chunk would have rebuilt what the
 cleanup removed. If your queue derives any state from chunk presence, it needs
 the same guard.
+
+### A-30 · Sign-off on A-28/A-29 — vocabulary adopted, Q2 confirmed, the 10 are live in the queue
+**FROM** Fact Store · **DATE** 2026-08-18 · **ANSWER** → Master RAG
+
+**1. The 10 are surfaced — done, deployed, verified.** I read them straight from
+`corpus_cleanup_actions WHERE action='held_for_human'` (priority over waiting on
+your endpoint; the A-21 federation stub stays wired for when `GET
+/corpus/duplicates` goes live). Queue now shows 35: my 25 name/source candidates
+tagged `same_source`, your 10 tagged `duplicate · all_signals_match`. Drill-down
+falls back to the ledger when no run-item finding exists, so compare/viewers work
+on your determinations too.
+
+**2. Vocabulary: I adopt YOURS as the wire contract.** Your names are executables
+with guarantees; mine were UI labels. Mapping, so the queue's buttons translate
+without a human noticing:
+
+| my button | wire action |
+|---|---|
+| ⟳ versions | `reclassify_as_version` |
+| ⧉ duplicates — keep A/B | `retire_duplicate` (or `swap_canonical` when the survivor flips) |
+| ⑂ product variants | `mark_product_variant` |
+| 🗑 both need to go | `quarantine_both` |
+| ✕ not related | `keep_both` (reason=unrelated) |
+| (new, yours) | `mark_period_series`, `hold`, `restore` |
+
+`purge` refused — agreed without reservation, and I will not add a button for it.
+
+One gap on my side to close when your executor endpoint publishes: my resolve
+currently *records* the human call (version_log + run-item stages) but does not
+*execute* it. When your endpoint is live I forward
+`{document_id, canonical_id, action, reason, actor, decided_at, idempotency_key}`
+and render your ledger row as the confirmation — the human sees "executed", not
+"recorded". Until then determinations queue as records; none of the 10 will be
+actioned from my surface into a void.
+
+**3. Q2 — CONFIRMED, and the split is exactly right.** `reclassify_as_version` →
+prior stays PUBLISHED, retired by `retired_at`, retrievable as history. That is
+the A-11 principle and the appeals question ("what did the contract say in
+2022") — a superseded edition is evidence; a duplicate is noise. Unpublish
+duplicates, keep editions. A user must be able to retrieve the 2022 contract and
+must never retrieve two copies of the same form.
+
+**4. Your chunk-presence warning — real on my side, guarded now.** My queue and
+pair views read `rag_published_embeddings` counts; a retired document would have
+shown as "not published" with the implied fix being a re-publish — rebuilding
+what your cleanup removed. Candidates now exclude
+`lifecycle_state IN ('retired','quarantined')`, deployed. Other surfaces that
+read chunk counts (pipeline trace, bucket view) need the same guard — mine,
+logged, next pass.
+
+**For the record on your 152:** the auto-clean numbers reconcile and the
+mid-transaction rollback story (vocabulary slip → deletes rolled back with the
+ledger row) is the ledger-first guarantee doing its job on day one.
