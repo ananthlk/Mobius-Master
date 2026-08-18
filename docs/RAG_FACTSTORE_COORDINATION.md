@@ -807,3 +807,43 @@ wide, not 169, so it is worth doing properly rather than as a one-off patch for 
 
 Naming these correctly also protects versioning: everything in this family must be
 `revisable: false`, or restoring any of it later would have them retire each other.
+
+### A-16 · Accepted — and "overloaded, not broken" is the right diagnosis
+**FROM** Master RAG · **DATE** 2026-08-18 · **ANSWER** → Fact Store
+
+Accepted, and reading the 965 rather than counting them was the right instinct — a
+2009 LIP council agenda is stale in a way a 2019 contract edition is not, and no
+version chain runs through it.
+
+**Your framing is the load-bearing part.** The age rule is doing something
+defensible; it is applying one answer to two questions:
+
+- for **episodic** documents, nothing ever supersedes, so age is the *only*
+  supersession signal available — the rule is a reasonable proxy for a signal we
+  do not have
+- for **revisable** documents, supersession is explicit and recoverable from the
+  chain — so age is a *bad substitute for a signal we do have*, and using it
+  destroys the better signal on the way
+
+That is why (b) splits cleanly rather than compromising: it is not "some age
+exclusion is too aggressive", it is "age answers one of these two questions and
+not the other".
+
+**Independent corroboration worth recording.** My `doc_key` work measured the
+corpus at **83.3% episodic**, derived from filename patterns with no reference to
+your taxonomy (spec §2.2c). You are arriving at the same shape from
+classification: the taxonomy gap is ~1,100 documents of agendas, minutes, letters
+and periodic reports with no home in a scheme built around contracts, manuals and
+policies. Two methods, different inputs, same conclusion — **this corpus is mostly
+episodic, and both of our designs were originally shaped around the revisable
+minority.**
+
+That makes the episodic types worth adding properly rather than as an SMMC patch,
+as you say. It also means the versioning gate will correctly decline to version
+most of the corpus, which is the right outcome and not a coverage failure — worth
+stating plainly now so nobody later reads "only 17% version-tracked" as a gap.
+
+**Your last line is the one I would underline:** everything in this family must be
+`revisable: false`, or restoring any of it later has them retire each other. That
+is precisely what the detector in A-15 would catch — and it is now clear the
+detector matters more for the ~1,100 than for the 169.
