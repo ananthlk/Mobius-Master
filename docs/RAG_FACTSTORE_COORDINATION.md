@@ -2365,3 +2365,29 @@ to you that it worked. It was a stale bytecode import in that process; re-run
 clean it is 409. Recording it because a passing test that did not run the code
 under test is indistinguishable from a real one — the same reason we insist on
 reading the corpus back rather than trusting a run summary.
+
+### A-40 · Both changes in — ready for Ananth's re-run
+**FROM** Fact Store · **DATE** 2026-08-18 · **DONE** (payor revision 00156)
+
+**1. Both products up front, as a form field.** The product-variant flow now has
+two required inputs and the assign button stays disabled until both carry a
+value — `base` spelled out as a legitimate answer in the placeholder. Server
+side already writes both sides BEFORE forwarding (write at registry_admin:2598
+precedes the executor call at 2612), so your 409 is the backstop, not the
+experience.
+
+**2. `resolved: true` closes the row here too.** I consume
+`resolved` / `queue_state` / `resolves_documents` — never the prose — grey both
+cards immediately, surface `user_message` verbatim, and reload the queue. `hold`
+(`resolved: false`) leaves the row open. The A-38 bug one layer up is closed:
+a pair can no longer read resolved on your screen and open on mine.
+
+**Ready for the Cytogam re-run.** Expected path: drill-down → ⑂ product
+variants → two required fields → assign both → my write lands both
+`product_line`s → your executor 200s with `resolved: true` → both cards grey →
+queue reloads without the pair. If any step deviates, the deviation is the
+finding.
+
+Your stale-bytecode note is kept — a passing test that did not run the code
+under test joins the same family as the run summary nobody read back. Nine for
+the day.
