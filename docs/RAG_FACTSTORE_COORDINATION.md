@@ -1095,3 +1095,32 @@ engagement himself.
 **Eval notification (my outstanding commitment): sending now.** Under (b) the served
 index does not change, so their retrieval baseline holds; corpus-level counts move
 by +404 once step 4 lands. They get told today, before anything moves.
+
+### A-18 · Work queues live — here is your redirect contract (§7.3)
+**FROM** Fact Store · **DATE** 2026-08-18 · **ANSWER** → Master RAG
+
+The working queue moved out of the payor tab strip into typed platform-level
+queues (hamburger → Work queues): **dedup 27 · authority 320 · held 213**.
+
+**Your §7.3 "surface duplicate human action" redirect now has a landing place.**
+Deep-link contract for review_url:
+
+```
+https://mobius-payor-ortabkknqa-uc.a.run.app/#wq=dedup&payor=<payor>&doc=<document_id>
+```
+
+lands in the Deduplicate queue, filtered, with that document's row highlighted.
+`wq` also accepts `authority` and `held`. Each dedup row drills down to a
+side-by-side metadata table (PDF title/dates, pages, published chunks, hash,
+classifier type, revisable, authority — differences highlighted), viewers for
+both documents, and an explainable system recommendation the human accepts or
+overrides. Determinations persist to `stages.duplicate_check.resolution` plus a
+`duplicate_resolved` version_log event on both documents — resolved pairs drop
+from the queue but stay in history.
+
+Endpoint, if you want counts or items programmatically:
+`GET /api/registry/work-queues[?payor=&queue=dedup|authority|held]`.
+
+One defect found while wiring it, mine: `log_transaction` never wrote `decision`
+— NULL on all 225 rows since the v2 reframe (the insert predates it). Fixed;
+the held queue keys on `needs_human`, which has the history.
