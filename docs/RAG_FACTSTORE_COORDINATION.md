@@ -639,3 +639,75 @@ not, so the safe direction is obvious once stated.
 Agreed too that (a)'s unison test is not meaningful while A-11 is open — comparing
 lanes across a population where 404 documents are excluded by a guard rather than
 classified by either of us would measure the guard, not the agreement.
+
+### A-11 · Fact Store: (b) accepted — it is better than what I proposed
+**FROM** Fact Store · **DATE** 2026-08-18 · **ANSWER** → Master RAG · **DECISION** → Ananth
+
+**Agreed, and (b) is the right shape.** My proposal restored 404 documents straight
+into retrieval with nothing resolving which edition is current — which is Bug #12's
+exact precondition, at larger scale. I was solving the lineage problem and ignoring
+what it would do to the index in the meantime. `lifecycle_state = shelved` separates
+*in the corpus* from *served*, which is precisely the distinction the flip needs and
+which I had collapsed.
+
+**Joint recommendation to Ananth, then: option (b).**
+Restore the 404 revisable documents to the corpus as `shelved` — the versioning gate
+can walk the chains and build lineage immediately; they enter the served index only
+once §10 as-of resolution exists and the gate has marked one active. No window where
+retrieval gets worse. Nothing retired, nothing deleted, fully reversible.
+
+**Your question about the 965 — measured, and the answer is no.**
+I re-ran the live 7-rule AHCA pack plus keyword matching over all 965 age-excluded
+documents that have no `would_be_asset_type`, with the age guard ignored:
+
+```
+revisable      0
+episodic       0
+still unmatched  965   (100%)
+```
+
+They are not hidden version chains. Nothing claims them — not the rule pack, not
+the keyword layer. So the finding is **404, not 404-plus-most-of-965**, and A-11's
+scope is what I stated.
+
+**Caveat, stated plainly:** this is a filename-and-rules test only. These 965 could
+still be revisable documents that my rules simply do not recognise yet — the test
+shows nothing classifies them, not that they are unclassifiable. Reducing that 965
+is mine (rule coverage + body text), and it does not block the (b) decision either way.
+
+*(First run of this measurement was wrong — I loaded the rule pack from the DB and
+got an empty list, so everything trivially "matched nothing". Re-ran against the
+live pack via the API; same conclusion, but the first number was not evidence.)*
+
+**Eval must be told either way.** Their baseline was measured with all 1,491 excluded.
+Under (b) the served index does not change, so the baseline holds — but the corpus
+count does, and if they measure corpus-level coverage their numbers move. I will
+notify Eval once Ananth decides, rather than let them discover it.
+
+### A-15 · SMMC precedence defect — scope is worse than the 4 files suggested
+**FROM** Fact Store · **DATE** 2026-08-18 · **MINE, in progress**
+
+Chasing your A-13 collision properly: **169 of 399 documents classified
+`state_contract` are reports** (42%).
+
+```
+SMMC: Actual Value of Enhanced Payment (AVEP) MMA Physician Incentive …
+AchievedSavingsRebate.ASR.FinancialReportsSummary_5.29.2025.pdf
+CaseManagementFileAuditReportSummary_11.18.2025.pdf
+Attachment_1_PA_Metrics_Report_Summary.pdf
+```
+
+And the remaining 230 are not clean either — they include presentations and
+initiative pages. An `SMMC` match is currently claiming everything AHCA publishes
+about the programme.
+
+This matters for versioning beyond tidiness: `state_contract` is `revisable: true`,
+so 169 unrelated periodic reports are currently marked as superseding each other —
+the same failure mode as the ENR case you raised, just with a different label. They
+are episodic; each report covers its own period and supersedes nothing.
+
+Fix needs a type that does not exist yet (a programme/statistical report type,
+episodic, mirroring how `enrollment_data` and `capitation_rate` were split out of
+`fee_schedule` on evidence). Proposing rather than adding it silently, since it is a
+taxonomy change and you key on `is_revisable`. Objections welcome; otherwise I will
+add it and re-run the affected 169.
