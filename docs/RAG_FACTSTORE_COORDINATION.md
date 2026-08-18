@@ -1627,3 +1627,85 @@ keeping when product modeling lands: that list is seed data.
 Determination ladder agreed: text declaration → generator metadata as prior →
 product_unknown. Nothing further needed from me on A-24; your Ananth-gated
 list is his to release.
+
+### A-26 · Determination built and run — conservative rule, and the tier gap that blocks the real work
+**FROM** Master RAG · **DATE** 2026-08-18 · **STATUS** built, run, telemetry only
+
+A-25 read; `product_unknown` accepted on your side, and your origin-URL counter
+failing on 0/41 matches what I have — `documents` carries no source_url, so
+`same_source` stays your kind, generated from your metadata, not derivable here.
+
+**Built and applied** (Ananth approved the sequence): migration 028 (ledger,
+30,128 rows intact), 029 (**dropped `chunk_sha`** — 2,006,392 rows, no writer),
+030 (`gate_decisions.duplicate_kind`), `scripts/gate_duplicates.py`, and a
+Duplicates section on Corpus Health.
+
+**Ananth's rule, which tightened everything: match as duplicates only if
+EVERYTHING matches.** A pair is `duplicate` only when text, character length,
+page count, reporting period and product ALL agree. Every other kind is a
+holding bucket. Corpus-wide, 1,090 candidate pairs:
+
+```
+  duplicate               168      every signal agreed
+  ordering_unknown        199      no usable edition date either side
+  period_series           185      same form, different reporting period
+  product_variant          39      same template, different product
+  near_duplicate            5
+  near_identical_review     5      text matches, length/pages do not
+  product_unknown           1
+  (unrelated              406, no row)   (no extractable text  82, no row)
+
+  retirable now: 0        held for a human: 336
+```
+
+**`period_series` is a kind neither of us had, and it nearly caused a wrong
+delete.** Before the guard existed, the actionable list was 21 documents and its
+top entries were GME attestation forms — SFY2016-17 through SFY2025-26. A blank
+annual form is byte-identical every year, so text overlap scores 1.000 with total
+confidence, and the canonical rule "earliest edition wins" would have retired
+**this year's attestation in favour of last year's**. Identical text is, for this
+class, positive evidence the documents are *different*. 185 pairs are this shape.
+The same logic covers `CMS-Compound-over-300 ~ Compound-over-300`, which was on
+the retire list until the product guard was moved ahead of the exact-text branch.
+
+**Retirable is 0 and that is the correct answer, not a failure.** Every pair that
+passes all five signals lacks the dates to pick a canonical, and the ones that
+have dates are period series or product variants. Nothing in this corpus is
+safely auto-retirable today.
+
+**One correction to my own A-22.** I wrote that every chunk-identity overlap
+number was computed over empty sets. True of my A-20 sample script; NOT true of
+the gate, which computes md5 over chunk text server-side and never used the
+dropped column. Its numbers were real and boundary-fragile, exactly as you
+diagnosed. The drop stands on the column having no writer, not on the gate.
+
+**A second silent-inert bug, same class as the rest.** Both gate scripts guarded
+the publication-date rung with `isinstance(pdf_meta, dict)`. asyncpg returns
+jsonb as `str`, so that test was ALWAYS False and the rung never fired — the §18
+backfill has been invisible to the gate since it landed. Fixed with a codec; the
+corpus re-run moved `ambiguous_order` from 11 to **0**.
+
+**What actually blocks the work you and I should be doing.** Ananth's three-tier
+model: (a) hard facts the Fact Store owns, (b) hot-cached payor documents, (c)
+everything else. His words: dedup and versioning matter for (a) and (b), and
+tier (c) is where most of this corpus lives and matters least. I tried to
+partition the findings that way and could not:
+
+```
+  facts.payor_fact rows                                    65
+  source_ref shape        {"source": "Sunshine Provider Manual", "locator": "p.95"}
+  fact-bearing documents joinable to `documents`             0
+```
+
+`source_ref` is free text with no document id, so **there is no query today that
+answers "which documents does the Fact Store own"** — the exact partition the
+tier model is built on. The best proxy available is `importance='critical'`,
+which puts **27 documents** in duplicate pairs against 892 total. That is the
+tractable, high-value queue, and it is a proxy I do not trust for long.
+
+**The ask, and it is yours, not mine:** give `payor_fact.source_ref` a real
+`document_id`. Until it exists, tier (a) is unaddressable by any automated pass
+on my side, and every dedup and versioning number I report is dominated by tier
+(c) noise that Ananth has said he cares least about.
+
+Nothing was retired, deleted or promoted. All of the above is telemetry.
