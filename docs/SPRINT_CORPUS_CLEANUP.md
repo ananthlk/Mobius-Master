@@ -107,6 +107,48 @@ would share definitions, boilerplate, appeals language. An identical filename wi
 content is either a real revision or a truncated extraction, and a reviewer cannot tell which.
 **RAG diagnoses this group first; Fact Store receives ~6.**
 
+### 3.1 DIAGNOSED 2026-08-18 — not adjudications. A CHUNKER defect.
+
+They are not extraction failures and they are not version questions. **Extraction is healthy on
+every one of them.**
+
+| document | pages | chunks | chunks/page | avg chunk length |
+|---|---|---|---|---|
+| healthy 2019–2020 editions | 217–235 | 1,893–2,170 | **8.7** | **252–280 chars** |
+| `…Oct_2025.pdf` | 261 | 420 | 1.6 | **1,685** |
+| `…October_2025.pdf` | 255 | 300 | 1.2 | **2,326** |
+| `abhfl…ltc_provider_manual.pdf` (both) | 173/174 | 193/190 | 1.1 | **2,412–2,468** |
+
+Same generator (`B`), same threshold (`0.6`), same chunker — **9× coarser output**.
+
+Ruled out, by measurement:
+- **not thin extraction** — 2,756 chars/page, in line with healthy editions
+- **not lost structure** — 54–205 newlines per page; `abhfl` has the *most* structure (205/page) and
+  the *coarsest* chunks
+- **not a config difference** — generator and threshold are identical
+
+What the data does say: `count(distinct (page_number, paragraph_index)) == chunk count` in every
+case, so the chunker emitted **1.2 paragraphs per page** where healthy documents got **8.7**. The
+chunker's own paragraph segmentation is producing wildly different granularity on comparable input.
+Mechanism unconfirmed — the semantic-merge threshold over-merging uniform contract prose is a
+hypothesis, not a finding.
+
+**Three consequences:**
+1. **Versioning is unaffected by judgement here.** 0.0000 overlap is an artifact — a 252-char-chunk
+   document can never hash-match a 2,400-char-chunk document however similar the text. These pairs
+   must not go to a human at all.
+2. **Retrieval is silently degraded.** 2,400-character chunks are far too coarse to retrieve
+   precisely, and these documents are published and serving right now.
+3. **Every stage reports green.** The documents have pages, have chunks, are embedded, are
+   published. No count in Corpus Health catches this — which is itself a gap in the page.
+
+**Action:** re-chunk the affected documents and re-measure, before any adjudication. Fact Store
+should expect **~6, not 12**, and the 6 will be the AHCA `Attachment II` consecutive editions only.
+
+**Open:** how widespread is this? A corpus-wide chunks-per-page sweep timed out at 90s; it needs the
+missing `chunk_embeddings.document_id` index (Q7) or an offline pass. If a meaningful share of the
+corpus is chunked this coarsely, it is a bigger retrieval problem than anything else in this sprint.
+
 ### Payload shape (agreed with Fact Store's §7 refinements)
 
 ```jsonc
