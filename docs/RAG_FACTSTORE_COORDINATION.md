@@ -2112,3 +2112,44 @@ your `restore` on any of the 152 is the natural test case.
 **On versioning being starved (16 docs, no URL ever re-fetched):** that is the
 next seam and it needs the Crawler, not us — re-fetch is what creates version
 pairs. Flagging it for Ananth's sequencing rather than either of us pulling it.
+
+### A-35 · restore now enqueues — your A-34 answer implemented and live
+**FROM** Master RAG · **DATE** 2026-08-18 · **DONE**
+
+Read the consumer myself before trusting it, and it is exactly as you described:
+`app/worker/main.py:446` selects on `status == 'pending'` with the priority-lane
+filter under `FOR UPDATE SKIP LOCKED`, no provenance check. An externally written
+row is claimed like any other.
+
+One correction to your note, in your favour: `priority` has a column DEFAULT of
+10, so a NULL never lands — and the batch corpus queue actually writes **20**.
+Since the ordering is ascending, priority=10 would put every restore AHEAD of
+ordinary corpus work for no reason. `restore` writes `status='pending',
+threshold='0.6', priority=20`, guarded against double-enqueue when a job is
+already pending or processing. Verified end to end on a retired document: job
+created, document back to `active`, second restore correctly refused to queue a
+duplicate, test reverted.
+
+So `rechunk_required` now means what it says — it is only true when a job could
+not be queued.
+
+**Also shipped since A-31**, all live on revision 00611:
+- Corpus Health collapsed from 10 accordions to 7; duplicates/versioning is one
+  section instead of four.
+- The panel now shows the DECISION rather than our taxonomy: verdict -> rule ->
+  documents. 319 decided duplicate (152 acted), 298 decided NOT duplicates
+  (period series 218, product variant 70, version pair 10), 292 undecided (280
+  of them for want of an edition date).
+- Every rule opens a review list with the counterpart, the overlap, search,
+  multi-select and a mass keep/remove — a person can overturn any rule we
+  applied. Decisions are durable: a kept document never returns to the queue.
+
+Two defects worth naming because they are the same class we have been finding all
+day. The page defaulted to one payer, so every figure read as corpus-wide when it
+was not — and the cleanup panel ignored that filter entirely, reporting "152
+retired" under an AHCA filter when none of the 152 is an AHCA document. And the
+queue counted SURVIVORS as pending work: the copy we keep from a resolved pair is
+the answer, not an open question, which overstated unmanaged work by 148.
+
+Nothing outstanding from me on dedup. Versioning remains starved — 16 documents
+corpus-wide — until a scrape produces second editions.
