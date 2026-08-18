@@ -343,7 +343,38 @@ Chunks-per-job is nearly identical for both docs (1434÷6 ≈ 239, 524÷2 ≈ 26
 2. Whoever owns retrieval: apply a recency boost or supersession filter (e.g. only the most-recent `effective_date` per document family/`authority_level='contract_source_of_truth'` group) — or at minimum surface `effective_date` to the LLM shaping the answer so it can prefer the newer citation when multiple versions appear in the same result set.
 3. Likely affects every payer with a multi-year contract history, not just AHCA — worth checking whether other `contract_source_of_truth` documents have the same NULL/placeholder pattern before scoping the fix.
 
-**Owner:** (unassigned — flagging for RAG/Sourcing, whoever owns corpus ingestion metadata + retrieval ranking)
+**Owner:** **Master RAG Coordinator** (claimed 2026-08-18). Tracked in
+`docs/SPRINT_CORPUS_CLEANUP.md` and specced in `mobius-rag/docs/versioning-dedup-gate-spec.md`.
+
+**CORRECTION + status, 2026-08-18 (RAG).** One detail in this report has changed, and the change is
+for the worse. This report says all 18 rows have `effective_date` NULL. **They no longer do — all 18
+now carry `2026-07-01`.** Same defect, worse shape: a *fabricated* value rather than an honest
+absence. A NULL is a findable gap; a populated wrong value is a confident wrong answer with nothing
+to detect it. The `termination_date` observation holds exactly as filed — verified today, 1 distinct
+value across all 18 rows.
+
+Measured corpus-wide since: `termination_date` is `created_at + 182 days` on **5,475 of 5,494** AHCA
+documents, five distinct values in the whole corpus. It is a refresh TTL wearing a policy date's
+name. This is not an AHCA problem — step 3 of this report's "next steps" was right.
+
+**Against the three next steps filed here:**
+1. *Backfill effective dates* — **partly done.** Publication dates (PDF `/CreationDate`, `/ModDate`)
+   backfilled to **6,200 documents**, up from 949. That is the ORDERING clock, not valid time, so it
+   sequences a version chain but does not close this step. Valid time still requires reading the
+   document, and the design now treats a document as perpetually valid until superseded rather than
+   inventing an end date (spec §6).
+2. *Retrieval supersession filter* — **specced and signed, unimplemented.** Spec §10: resolve
+   as-of a date rather than filter on an `active` flag. Retriever signed it; it cannot ship until the
+   lineage columns exist (DB seat, §11.4, unsigned).
+3. *Check other payers* — **confirmed, corpus-wide.**
+
+**Additional finding on the two document_ids in the corroborating datapoint below.** Both are chunked
+~5× too coarsely: `b5e32506` is 261 pages → **420 chunks** (avg 1,685 chars) and `ab0ba693` is 255
+pages → **300 chunks** (avg 2,326 chars), against healthy editions of the same contract family at
+~2,200 chunks and 252–280 chars. Same generator, same threshold. Two consequences for this bug:
+the Fact Store pin to `b5e32506` happens to be on the *better*-chunked of the two, and coarse chunks
+make the page-level ambiguity described below materially harder to resolve, because a 2,300-character
+chunk spans far more of the page than a 260-character one.
 
 **Corroborating datapoint (2026-08-16, via Fact Store §9 + Download agent):** independent of the 18-row
 `documents`-table finding above, the *page-level* impact was confirmed on two specific rows. Two live

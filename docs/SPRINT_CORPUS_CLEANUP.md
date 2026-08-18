@@ -1,7 +1,20 @@
 # Sprint · Corpus cleanup + UX endpoint attachment
 
 **Between:** Master RAG Coordinator (`mobius-rag`) ↔ Fact Store / Payor Platform (`mobius-payor`)
-**Opened:** 2026-08-18 · **Goal:** get the corpus ready for new ingestion
+**Opened:** 2026-08-18
+
+**OBJECTIVE (Ananth, 2026-08-18):** *"the scope for now is fact store and rag to be in unison across
+(a) classification (b) dedup and versioning."*
+
+Two seats, three things, one answer each. Success is **not** "both shipped something" — it is that
+neither of us can be asked one of these three questions and give a different answer. Everything else
+in this file is context for those three.
+
+**Explicitly out of scope for this sprint:** OCR, the 151 blocked jobs, worker capacity, the
+chunker defect (§3.1 — logged, not fixed here), UX action wiring. They are real and they are
+recorded; they are not what "in unison" means.
+
+**Carries Bug #12** (`BUG_LOG.md`) — filed by Fact Store 2026-08-16, claimed by RAG 2026-08-18.
 **Channel rule:** this file is the source of truth between us. Messages get lost or fan out to
 sessions they were never meant for — a committed file does neither. Append a numbered section;
 do not rewrite someone else's.
@@ -43,21 +56,46 @@ reclassification, and its numbers should not be treated as final by either side.
 
 ---
 
-## 1. Today's scope
+## 1. The three things, and what "in unison" means for each
 
-### Fact Store
-- [ ] Reclassify the corpus *(in progress)*
-- [ ] **`asset_type` carries revisable vs episodic** — the §11.2 ask. Blocks `doc_key` tier 2.
-- [ ] Take the version adjudications into the working queue — see §3
-- [ ] Give RAG the **queue URL** so Corpus Health can link to it — see §4
+### (a) CLASSIFICATION
+One classification, both seats reading it the same way.
 
-### RAG
-- [x] Corpus Health tab live — sources, pipeline, stopped, classifiers, versioning, time-to-serve
-- [x] Corpus-wide gate run, telemetry only
-- [x] Publication dates backfilled — 6,200 documents, up from 949
-- [ ] **Wire the remediation actions** — every "Action" cell is a label today; nothing executes
-- [ ] Diagnose the suspected data defects before they reach a human — see §3
-- [ ] Re-run the gate once reclassification lands
+| | Fact Store | RAG |
+|---|---|---|
+| owns | the verdict | consuming it |
+| doing | reclassifying the corpus *(in progress)* | re-running the gate once it lands |
+| **unison test** | — | **RAG's lane assignment == Fact Store's `importance`, for every document** |
+
+Open: **`asset_type` must carry revisable vs episodic** (Q4). Without it RAG derives revisability
+from a filename regex, and the two seats are guessing separately at the same property. This is the
+single biggest blocker to (a) being true.
+
+### (b) DEDUP
+One definition of "duplicate", both seats counting the same number.
+
+| | Fact Store | RAG |
+|---|---|---|
+| owns | which copy is canonical (`authority_level` — authority is a property of origin) | detecting the duplicate set |
+| **unison test** | — | **same duplicate count, same canonical pick, on the same corpus** |
+
+RAG currently measures **478 redundant documents** across 236 digest groups. Fact Store has not
+verified that number. Until they have, we do not have (b).
+
+Open: §11.1 (Q5) — junk on the `fyi_not_citable` ranking floor vs excluded from the index. Two
+different answers to "what happens to a non-canonical copy", and both are currently written down as
+policy.
+
+### (c) VERSIONING
+One lineage, one verdict store, one set of dates.
+
+| | Fact Store | RAG |
+|---|---|---|
+| owns | the human verdict + valid-time dates | detection, chains, the gate |
+| **unison test** | — | **a version verdict reached in Fact Store is readable in RAG and changes what retrieval serves** |
+
+Today that round trip does not exist in either direction: no hand-off (Q1), no verdict ingest path,
+no lineage columns (Q6). RAG can detect and Fact Store can decide, and the two never meet.
 
 ---
 
@@ -106,6 +144,24 @@ Zero overlap between two editions of the same contract three years apart is not 
 would share definitions, boilerplate, appeals language. An identical filename with 83% different
 content is either a real revision or a truncated extraction, and a reviewer cannot tell which.
 **RAG diagnoses this group first; Fact Store receives ~6.**
+
+### 3.0 Why this sprint exists — a real, observed retrieval failure
+
+From Bug #12, filed by Fact Store 2026-08-16 while sourcing AHCA appeal-deadline facts. This is the
+user-visible cost of everything else in this file:
+
+> A `corpus_search_agent` call asking for the **current** enrollee plan-appeal deadline returned
+> **10 chunks, zero of them from the correct Oct 2025 document.** One came from the **2020-02-01**
+> version of the same contract. The right answer — 60-calendar-day deadline, citing 42 CFR
+> 438.402/.406/.408 — is in the corpus and fully embedded. 17 near-duplicate historical variants
+> outranked it, with no recency signal to break the tie.
+
+Fact Store's workaround was to read the source document directly and record the fact with honest
+sourcing rather than cite RAG. That is the correct call and it is not scalable.
+
+Note the two failure modes compound: **(b) dedup** would remove the near-duplicates competing for
+the slot, and **(c) versioning** would mark the 2020 edition superseded. Neither alone fixes it,
+which is why this sprint pairs them.
 
 ### 3.1 DIAGNOSED 2026-08-18 — not adjudications. A CHUNKER defect.
 
