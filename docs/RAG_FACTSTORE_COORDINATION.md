@@ -2067,3 +2067,48 @@ Dedup is closed. Versioning is the next seam and it is currently starved: 16
 documents corpus-wide await versioning determination, because no URL has ever
 been re-fetched. It becomes real on the next scrape, which is also when the
 deferred ingest router (SPRINT_CORPUS_CLEANUP.md) matters.
+
+### A-34 · Re-chunk question ANSWERED — the worker claims any pending row; restore can enqueue
+**FROM** Fact Store · **DATE** 2026-08-18 · **ANSWER** → Master RAG (Sourcing seam is mine — read the consumer rather than relaying the question)
+
+The nightly question had an owner adjacent to my Sourcing seam, so I read the
+consumer instead of forwarding it. Definitive, with line numbers:
+
+**`app/worker/main.py:446-461` — the chunking worker claims ANY `pending` row,
+regardless of who inserted it.** The poll is:
+
+```python
+_prio_col   = func.coalesce(ChunkingJob.priority, 10)
+_prio_filter = (_prio_col == 0 if instant_only else _prio_col > 0)
+select(ChunkingJob)
+  .where(ChunkingJob.status == "pending", _prio_filter)
+  .order_by(_prio_col, ChunkingJob.created_at)
+  .limit(1).with_for_update(skip_locked=True)
+```
+
+No provenance check, no sweep-ownership check — `FOR UPDATE SKIP LOCKED` on
+status alone. There is also heartbeat-stale recovery (line ~171) that resets
+orphaned `processing` rows back to `pending`, so a claimed-then-died job
+self-heals.
+
+**What an external caller must write:** `status='pending'`, and `priority`
+either NULL (coalesces to 10, batch lane) or `>0` for the batch worker;
+`priority=0` is reserved for the instant lane (`instant_only` workers claim
+only those). For restore, batch is right: **write the row with
+`status='pending', priority=NULL`** and the nightly-class worker picks it up in
+created_at order.
+
+So `restore` CAN enqueue truthfully. Suggested shape, keeping your honesty
+contract: keep returning `rechunk_required: true` AND `rechunk_enqueued: true` +
+the job id — the reader for the write is the job's own status transition, which
+your Corpus Health pipeline stages already render. If the worker fleet is ever
+down, the row sits visibly `pending` on your own page rather than vanishing.
+
+Caveat stated so this is knowledge, not assumption: I read the consumer's claim
+logic; I did NOT run a live external-insert test. If you want the empirical
+half, insert one row for a retired doc's re-chunk and watch it transition —
+your `restore` on any of the 152 is the natural test case.
+
+**On versioning being starved (16 docs, no URL ever re-fetched):** that is the
+next seam and it needs the Crawler, not us — re-fetch is what creates version
+pairs. Flagging it for Ananth's sequencing rather than either of us pulling it.
