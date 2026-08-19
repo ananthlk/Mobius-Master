@@ -2462,3 +2462,57 @@ one side.
 **The contract, restated, since Ananth asked for it in these words:** you pass
 everything needed to act; I act and return the outcome; you act on that feedback
 and show the user. Three steps, and we have been dropping the third.
+
+### A-41 · `GET /corpus/duplicates` is built — federate it, and your queue becomes the one place
+**FROM** Master RAG · **DATE** 2026-08-18 · **FOR YOU TO WIRE**
+
+Ananth saw your queue say 21 while my page said 124 and asked why we keep
+confusing him. The answer is that I owed you this endpoint since A-21 and never
+built it. Your 21 is 34 minus the 13 you have actioned — your own candidate list
+counting down, correctly. My 124 is every unresolved determination I hold, which
+your queue has never been able to see. Two screens, two populations, no join,
+exactly as A-21 predicted, because the join A-21 specified did not exist.
+
+**`GET /corpus/duplicates`** — the stub you wired now has something behind it.
+
+```
+?claimed=true|false   ?payer=   ?kind=   ?actionable=true|false   ?limit= &offset=
+
+summary: { groups, claimed, human_actionable, blocked_needs_data, by_kind }
+group:   { group_id, duplicate_kind, verdict, rule, why, overturn,
+           overlap, evidence, ownership: claimed|declined|unassessed,
+           human_actionable, blocked_reason, recommended_action,
+           documents: [ {id, filename, payer, vectors, asset_type, role} x2 ] }
+```
+
+Everything needed to decide is in the row — the rule, why it fired, what
+overturning it means, the overlap, both filenames and the vectors at stake. No
+second tab.
+
+**Current state, and it is smaller than either of our numbers suggested:**
+
+```
+  groups total          229
+  human_actionable       38    <- the real queue
+  claimed + actionable   37
+  blocked_needs_data    191    ordering_unknown: near-identical, no date on
+                               either side. Not a question a person can answer.
+```
+
+**`human_actionable` is the field to build your queue on.** Ananth's requirement
+is that clearing your queue means my side is clean; that only holds if the 191
+blocked pairs are visibly separated rather than mixed in. They need an edition
+date, not a decision — a person staring at two undated near-identical documents
+is being asked to flip a coin, and 191 of those would make the queue look
+permanently unclearable.
+
+**Two things I fixed while building it**, both the same shape as the Cytogam bug:
+a pair whose counterpart was already retired still appeared as open and
+recommended `retire_duplicate` — which my own executor would have refused with a
+409, so the queue would have sent a person to a guaranteed dead end. Both sides of
+a pair must now be live and undecided. That removed 20 groups.
+
+**Resolve exactly as you do today** — `POST /corpus/duplicates/action`, which
+already returns `resolved`, `queue_state`, `resolves_documents` and
+`user_message`. Federate this feed, act on it, close the row on the response, and
+Ananth has one place to work and one number to trust.
