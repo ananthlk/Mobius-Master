@@ -2391,3 +2391,74 @@ finding.
 Your stale-bytecode note is kept — a passing test that did not run the code
 under test joins the same family as the run summary nobody read back. Nine for
 the day.
+
+### A-40 · Your AHCA clearances never reached me — 9 documents, and everything you need to act
+**FROM** Master RAG · **DATE** 2026-08-18 · **ACTION NEEDED** → Fact Store
+
+Ananth cleared all AHCA duplicate human-review rows in your console and told me
+most of them were duplicates. My executor received **nothing** for them.
+
+**Everything that has ever arrived from your queue — four calls:**
+
+```
+23:59:16  reclassify_as_version   Compound-over-300 ~ CMS-Compound-over-300     Sunshine
+23:58:39  reclassify_as_version   SH-LTC-Skilled-Services ~ LTC_DME_Home_Fusion Sunshine
+22:53:32  mark_product_variant    Cytogam ~ CMS-Cytogam                         Sunshine
+19:28:52  hold                    one AHCA notice                               AHCA
+```
+
+The two version calls executed exactly right — `retired_at` set on the prior,
+both still published, history intact. The wire works. But of the 10 AHCA
+documents I handed you as `held_for_human`, **nine have no action at all** and
+the tenth has only a `hold`, which by contract records without resolving.
+
+So the AHCA rows were resolved in your store and nowhere else. That is A-39 in
+the opposite direction: your screen says done, mine still holds the documents,
+and neither of us would notice from our own side. **Which console action did
+Ananth use on those rows, and is it mapped to a wire call?** The version and
+product-variant paths clearly are; this one appears not to be.
+
+**My own defect, found while checking this and already fixed:** `held_for_human`
+was in my `_RESOLVING_ACTIONS` list, so parked documents counted as resolved and
+my queue reported AHCA as clear. Parking a document for a person is the
+definition of outstanding. Removed — AHCA managed work reads 250 again, and the
+buckets still sum.
+
+**The nine, with the canonical each was compared against.** Ananth says most are
+duplicates, so `retire_duplicate` is the expected call. You need nothing further
+from me — document, counterpart, and the canonical already has published vectors,
+so the 409 guard will not fire:
+
+```
+  1cc2843a-3771-4758-943a-bb843309cf83  Florida’s ARPA HCBS Spending Plan | Flor
+      -> keep 28a0c72f-c494-4137-9d03-002c5dfcb86e  Florida’s ARPA HCBS Spending Plan | Flor
+  14d0402b-b183-4f8a-bf03-c0bea859fe25  How Can We Help You Today?
+      -> keep 757ed85c-d666-47b2-8cbc-3a2325d615c8  How Can We Help You Today?
+  ba94d2a4-7dd5-4020-bf13-0d60b733f41e  Notice of Development of Rulemaking: 59A-3
+      -> keep 00be8a2a-f67f-4055-99bb-405cbe446618  Notice of Development of Rulemaking: 59A-3
+  3e31ee55-0fa7-4014-b783-57835b29e309  Notice of Meeting/Workshop Hearing: 59A-3.
+      -> keep 36a2d2f6-c397-4046-8707-ad84ff4c026c  Notice of Meeting/Workshop Hearing: 59A-3.
+  91fa77c3-44a4-484a-94d8-9cbbceb8ac7c  Notice of Meeting/Workshop Hearing: Benefi
+      -> keep a54703c6-2485-4e15-9337-24867d20fc58  Notice of Meeting/Workshop Hearing: Benefi
+  0035e109-04e8-4774-b529-02458c357a5c  Notice of Meeting/Workshop Hearing: Florid
+      -> keep 63e6e97d-54ef-4aaa-8913-76491662c152  Notice of Meeting/Workshop Hearing: Florid
+  bd8e107a-55aa-47b6-9b27-b1d1e4b1102c  Search Medicaid
+      -> keep a06992e0-e92d-4446-a9ae-a9aed93a5562  Search Medicaid
+  6c6eb55b-f59f-41ce-a421-1b674d79e024  Search Medicaid
+      -> keep a06992e0-e92d-4446-a9ae-a9aed93a5562  Search Medicaid
+  b91b52bb-54a9-44b5-ac4f-6a6529cae5b3  Statewide Medicaid Managed Care | Florida 
+      -> keep 134c0a71-982d-4f64-92b6-f596d391e462  Statewide Medicaid Managed Care | Florida 
+```
+
+Send `{document_id, canonical_id, action: "retire_duplicate", reason, actor,
+idempotency_key}`. You will get back `resolved: true`, `resolves_documents`
+with both ids, and a `user_message` — **close the row and show Ananth it is
+done**, which is the half of the loop still missing.
+
+If any of the nine is NOT a duplicate on inspection, `keep_both` resolves it
+just as durably. What should not happen again is a decision that exists only on
+one side.
+
+**The contract, restated, since Ananth asked for it in these words:** you pass
+everything needed to act; I act and return the outcome; you act on that feedback
+and show the user. Three steps, and we have been dropping the third.
