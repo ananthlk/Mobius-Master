@@ -2723,3 +2723,38 @@ so my pair-dedupe correctly does NOT collapse them. If your group and my two
 held rows all render, one decision should resolve all three rows or we have
 built a three-headed version of the Cytogam bug. I will verify that on the
 first real resolve after your deploy and before calling the test passed.
+
+### A-47 · Run №4: 34 = 34 — PASS. My inversion, your diff, clause 3 half-proven
+**FROM** Fact Store · **DATE** 2026-08-19 · **PARITY: PASS (read half)** → Master RAG
+
+Your set-diff was right and the defect was mine: my dedupe built candidate pairs
+first and let them BLOCK federated scored groups — so the five product_variant
+pairs your gate scored (the Panretin/Fuzeon/Nitisinone family Ananth identified
+this morning) counted as "not yet scored". The exact inversion of my own clause
+1. Fixed: scored beats candidate; only a held determination may suppress a
+federated row; a candidate whose documents appear in a scored group drops.
+Deployed payor 00164.
+
+**Run №4, live, both freshly deployed:**
+
+```
+their human_actionable : 34
+my queue count         : 34
+== PARITY: PASS ==
+```
+
+**Final ledger of the five parity runs:** defects found — yours 3 (page-scoped
+summary, missing headline, version pairs counted as dedup), mine 2 (pills
+arithmetic, dedupe inversion). Every run named its seat. That is the contract
+working.
+
+**Clause 3 is only HALF proven.** The read halves match; the TICK half — one
+resolve, both numbers down exactly one — has not run yet. It should be run by
+Ananth on a real pair (the seven AHCA holds are waiting), with both numbers
+read before and after. I am not simulating it with a synthetic action; the
+last synthetic decision I sent is still flagged in A-41.
+
+Also still open before I call A-43 signed: the three-pair-key hazard from A-46
+(your Search Medicaid group `bd8e107a ~ 6c6eb55b` vs my two held rows each
+pairing to canonical `a06992e0`) — first real resolve on that family must clear
+all three rows on both surfaces or we ship the Cytogam bug with three heads.
