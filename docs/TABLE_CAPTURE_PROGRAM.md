@@ -55,10 +55,25 @@ Manifest: `scratchpad/purge_manifest.json` (document_id → count).
 A chunker that re-creates what the purge removed is worse than doing neither, so
 these two must move together or not at all.
 
-**OPEN — needs a ruling (Eval? Sourcing?).** The threshold drops `N/A` and `$12`
-(two alphanumerics each). Those are *real answers* in a fee schedule. Measuring
-how many genuine 1–2-alnum chunks exist before deciding whether the floor moves
-to 2. Evidence survives the purge because `hierarchical_chunks` is intact.
+**RESOLVED 2026-08-19 — threshold stays at 3.** I raised the concern that the
+rule drops `N/A` and `$12` (two alphanumerics each), which are real fee-schedule
+answers. Measured it against `hierarchical_chunks` (intact, so the evidence
+survived the purge), 3% `TABLESAMPLE`:
+
+| 1–2 alnum chunks in sample | 804 |
+|---|---|
+| `N/A`-shaped | **2** (0.2%) |
+| `$NN` / `$NN.NN`-shaped | **0** |
+| everything else | 802 (99.8%) |
+
+The 802 are the same disease: `0\n0\n-`, bare digits, `N`, `X`, `OR`, `(0)`, `0%` —
+orphaned table cells. Dropping the floor to 2 would re-admit roughly **26,000
+chunks corpus-wide to rescue about 66 `N/A` fragments**, and a standalone `N/A`
+with no surrounding context cannot answer anything anyway — the fix for those is
+Sourcing's extractor putting the cell back in its row, not a lower noise floor.
+
+Concern was real, evidence says it does not bite. Ask #5 is closed; Eval and
+Sourcing need not spend time on it.
 
 **Gate 0:** junk = 0 · index total reconciles to `1,935,454 − purged` · zero
 documents left with no chunks (the script refuses to run if any would be).
@@ -202,7 +217,7 @@ Reingest ordered **by duplicate group**, per the rule in stage 2.
 | 2 | **Sourcing** | `capture_page_tables()` at the signature above, pure, fail-open | stage 2 |
 | 3 | **Retriever** | ack the contract; start design, wire on gate 2 | stage 3 |
 | 4 | **Eval** | own gate-2 assertion 4 and gate-4 recall scoring | stages 2, 4 |
-| 5 | **Eval/Sourcing** | ruling on `MIN_SUBSTANCE_ALNUM` 3 vs 2 (`N/A`, `$12`) | stage 0 close-out |
+| 5 | ~~Eval/Sourcing~~ | ~~`MIN_SUBSTANCE_ALNUM` 3 vs 2~~ — **CLOSED**, measured, stays at 3 | — |
 | 6 | **Chat** | can the answer-card table format carry an attached passenger table? | stage 3 close-out |
 
 ---
@@ -216,3 +231,8 @@ Seam identified at `extract_text_from_gcs` after finding eight `DocumentPage(`
 sites in `main.py`. Token granted to Sourcing at that seam (S-5). Retriever gated
 on rows, not on design. Identity-vs-reingest hazard raised and ruled: reingest by
 duplicate group.
+
+### 2026-08-19 · Master RAG · ask #5 closed with evidence
+Measured the `N/A` / `$12` concern I raised myself: 2 of 804 sampled 1–2-alnum
+chunks are `N/A`-shaped, none are money-shaped, 99.8% are orphaned table cells.
+Threshold stays at 3 in both the purge and `has_min_substance()`. No change.
