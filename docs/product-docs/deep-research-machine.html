@@ -117,34 +117,87 @@ is worth spending.</p>
 </div>
 
 <h2>What the caller supplies</h2>
-<p>Four things, and the last one is the one we do not accept yet.</p>
+<p>The bar is the caller's call, not ours. The registry wants a certified fact and takes
+all-or-nothing; Appeals wants a usable answer and will decide on confidence. Same machine,
+same states &mdash; one line of policy apart.</p>
 <pre><code>POST /api/skills/v1/research
 {
-  "consumer":   "service_line_registry",     // who is asking, and who gets the answer
-  "subject":    "bh_therapy/service_limit_H2019_HR",
+  "consumer":  "service_line_registry",
+  "subject":   "bh_therapy/service_limit_H2019_HR",
+  "question":  "For Florida Medicaid CBH, H2019 with modifier HR ...",
 
-  "question":   "For Florida Medicaid CBH, H2019 with modifier HR ...",
-
-  "evaluation": {                            // how to judge the answer
+  "evaluation": {
     "instructions": "...what a good answer must establish...",
     "required":     ["code", "unit_definition", "limit_amount"],
-    "authority":    "standard"               // standard | any_cited
+    "optional":     ["exceedable_by", "per_whom"],   // captured, never blocking
+    "authority":    "standard"                        // standard | any_cited
   },
 
-  "output": {                                // the shape the caller will store
-    "schema": { "code": "...", "limits": [ { "limit_type": "...", ... } ] }
+  "output": { "schema": { "code": "...", "limits": [ {...} ] } },
+
+  "bar": {                          // THE CALLER'S CALL, not ours
+    "policy":         "completeness",   // completeness | confidence
+    "min_confidence":  null             // required when policy = confidence
   },
 
-  "bar": {                                   // when to stop and return
-    "min_required_fields": "all",            // all | any
-    "accept_partial_at_deadline": true
-  },
-
-  "clock": {                                 // BOTH bounds, not one
-    "max_rounds":  3,                        // turns the loop may spend
-    "needed_by":   "2026-08-26T17:00:00Z"    // wall clock the caller lives by
+  "clock": {
+    "max_rounds": 3,                            // how much thinking it is worth
+    "needed_by":  "2026-08-26T17:00:00Z"        // how long the caller can wait
   }
+}
+
+GET    /research/{id}      -> current state, any time, mid-flight
+DELETE /research/{id}      -> caller withdraws it from the queue</code></pre>
+
+<div class="cards">
+  <div class="card k-in"><h4>completeness</h4>
+  <p>Every <em>required</em> field survived every check. Nothing partial is ever certified.
+  Optional fields are captured and never block.</p>
+  <span class="who">fact stores &mdash; service line registry</span></div>
+
+  <div class="card k-out"><h4>confidence</h4>
+  <p>The weakest required field clears the caller's threshold. A record can be usable without
+  being complete, and the caller says where that line is.</p>
+  <span class="who">reasoning agents &mdash; Appeals</span></div>
+</div>
+
+<h2>What comes back &mdash; always</h2>
+<p>One shape, at every stage, whatever the verdict. A caller polling a request that is still
+waiting on an acquisition gets the same envelope as one that succeeded &mdash; fewer fields
+filled in, and <code>blocked_on</code> saying what is holding it. Whatever was captured is
+returned even when the bar was not met, because a partial answer the caller can see is worth
+more than a failure they cannot inspect.</p>
+<pre><code>// Always the same shape, at every stage, whatever the verdict.
+{
+  "state":    "waiting",              // open|asking|judging|waiting|human|answered|closed
+  "verdict":  "unmet",                // met | partial | unmet
+
+  "captured": {                       // ALWAYS returned, even mid-flight
+    "code": "H2019", "unit_definition": "15 minutes"
+  },
+
+  "confidence": 0.0,                  // min over REQUIRED fields — weakest link
+  "coverage":   0.4,                  // of required + optional, how much we hold
+
+  "fields": [                         // per field, so the caller can judge for itself
+    {"name":"code","value":"H2019","confidence":0.95,
+     "source":"fl_bh_therapy_services_59G-4.052.pdf","authority":"standard"},
+    {"name":"limit_amount","value":null,"missing":"not_retrievable"}
+  ],
+
+  "blocked_on": {                     // present whenever state = waiting | human
+    "action":"reindex","owner":"curation",
+    "next_step":"fl_bh_therapy_services_59G-4.052.pdf is chunked but did not surface..."
+  },
+  "partial_because": null             // set to "deadline" when the clock ended it
 }</code></pre>
+
+<h3>Two numbers, and they answer different questions</h3>
+<p><b>Confidence</b> is the <em>minimum</em> across required fields, not the average &mdash; a
+record is only as sound as its weakest grounded value, and averaging lets four solid fields
+carry one invented one. <b>Coverage</b> is how much of required plus optional we hold. A record
+can be fully covered and barely confident, or highly confident about very little; collapsing
+them into one score would hide exactly the case a caller needs to see.</p>
 
 <h2>The states</h2>
 <div class="scroll"><table>
@@ -157,6 +210,20 @@ is worth spending.</p>
 <tr><td><b>Human</b></td><td>a person has to decide or supply</td><td><code>feedback_kind='human'</code></td><td><span class='tag need'>half-built</span></td></tr>
 <tr><td><b>Answered</b></td><td>every required field survived</td><td><code>request.status='sourced'</code></td><td><span class='tag have'>built</span></td></tr>
 <tr><td><b>Closed</b></td><td>output delivered to the caller</td><td>&mdash;</td><td><span class='tag need'>not built</span></td></tr></tbody></table></div>
+
+<h2>Who owns which repair</h2>
+<div class="scroll"><table>
+<thead><tr><th>Action</th><th>What it means</th><th>Owner</th></tr></thead>
+<tbody>
+<tr><td><code>acquire</code></td><td>the corpus has never had this document</td><td>RAG</td></tr>
+<tr><td><code>reingest</code></td><td>present but never chunked &mdash; ingest did not finish</td><td>RAG</td></tr>
+<tr><td><code>reindex</code></td><td>chunked but never surfaces for the question</td><td>Curation</td></tr>
+<tr><td><code>lexicon</code></td><td>the words in the question do not reach the document</td><td>Curation</td></tr>
+<tr><td><code>refine</code></td><td>the ask was wrong; the corpus can already answer</td><td>the loop itself</td></tr>
+<tr><td><code>registry</code> / <code>escalate</code></td><td>nothing mechanical is left</td><td>a person</td></tr>
+</tbody></table></div>
+<p>Two poller consumers, not one &mdash; which is why the queue needs an owner column before
+either can claim work without racing the other.</p>
 
 <h2>How a repair gets done</h2>
 <p>The loop never performs a repair itself &mdash; it files one and stops. Pollers claim work
@@ -199,23 +266,34 @@ deadline by returning whatever survived, clearly marked as partial.</p>
 <tr><td><b>The diagnosis ladder</b></td><td>Six gap classes, each resolving to one action, decided from database state rather than a model.</td><td><span class='tag have'>in place</span></td></tr>
 <tr><td><b>The repair queue</b></td><td><code>research.diagnosis</code> + <code>research.open_repairs</code>, ordered by what blocks the most.</td><td><span class='tag have'>in place</span></td></tr></tbody></table></div>
 
-<h2>Three calls I need from you</h2>
+<h2>Settled, and what it costs</h2>
+<div class="q"><b>All-or-nothing for fact stores; confidence for everyone else.</b>
+Both are the same machine with one line of policy different, so a second consumer is a
+config change and not a fork. The cost is that <code>confidence</code> has to mean something
+defensible per field &mdash; which is why it is the minimum over required fields and is
+computed from the critic&rsquo;s own per-field verdicts, not asserted separately.</div>
 
-<div class="q"><b>What does &ldquo;with confidence&rdquo; mean?</b>
-Today it is all-or-nothing: every required field survives, or the record is refused. The
-alternative is a caller-set bar &mdash; &ldquo;three of five, flag the rest&rdquo; &mdash; which
-returns more, and returns some facts that are only partly grounded. For a certified store I
-lean to all-or-nothing, with partials returned only at deadline and marked.</div>
+<div class="q"><b>RAG owns acquire and reingest; Curation owns reindex and lexicon.</b>
+Two consumers claiming from one queue. Nothing prevents them racing today, so the owner
+column and the claim are the first thing to build, before either side is asked to poll.</div>
 
-<div class="q"><b>Who owns each repair class?</b>
-<code>acquire</code> and <code>reingest</code> look like the RAG agent. <code>reindex</code>
-and <code>lexicon</code> look like Curation. If that is right, the poller contract is two
-consumers, not one, and the queue needs an owner column before either can claim work.</div>
+<div class="q"><b>Return whatever was captured, always, and mark it.</b>
+At the deadline the caller gets the partial with <code>partial_because: "deadline"</code>
+&mdash; and the same envelope answers a mid-flight poll. The risk this creates is a partial
+being mistaken for a finished answer downstream, so <code>verdict</code> and
+<code>partial_because</code> are top-level, not buried in metadata.</div>
 
-<div class="q"><b>What happens at the deadline mid-repair?</b>
-A document is being acquired and Tuesday arrives. Return nothing and say why, or return the
-partially-grounded answer marked as such? This is the caller's risk to take, which is why it
-sits in the request rather than in our defaults.</div>
+<h2>Sequenced &mdash; enhancements, not today</h2>
+<div class="scroll"><table>
+<thead><tr><th>#</th><th>Enhancement</th><th>Why this order</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Owner + claim on the repair queue</td><td>two consumers were just named; without this they race</td></tr>
+<tr><td>2</td><td>Resume &mdash; a landed repair wakes its turn</td><td>the queue is write-only until this exists; everything waiting stays waiting</td></tr>
+<tr><td>3</td><td><code>needed_by</code> and the deadline sweep</td><td>the only bound that can end a wait on an external repair</td></tr>
+<tr><td>4</td><td><code>bar.policy</code> + required/optional split</td><td>what a second consumer needs before it can call at all</td></tr>
+<tr><td>5</td><td>The always-returned envelope, poll and withdraw</td><td>the caller-facing surface, once there is state worth polling</td></tr>
+<tr><td>6</td><td>Delivery back to the consumer</td><td>last: a caller that can poll is not blocked without it</td></tr>
+</tbody></table></div>
 
 <footer>State names match <code>research.request.status</code> and
 <code>research.turn.status</code>. Marked &ldquo;built&rdquo; means the column or table exists
