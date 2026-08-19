@@ -51,6 +51,15 @@ def gather():
                      from research.discovery_effect order by discovery_reason""")
     d["effect"] = [dict(x) for x in cur.fetchall()]
 
+    cur.execute("""select t.request_id, t.n, t.status, t.query, t.extract_state,
+                          t.feedback_state, t.feedback_kind, t.next_query,
+                          t.poll_count, w.blocked_on, w.waiting_for
+                     from research.turn t
+                     left join research.waiting_on w
+                       on w.request_id=t.request_id and w.n=t.n
+                    order by t.request_id, t.n""")
+    d["turns"] = [dict(x) for x in cur.fetchall()]
+
     cur.execute("""select gap_class, count(*) n from research.gap group by 1""")
     d["gap_profile"] = {x["gap_class"]: x["n"] for x in cur.fetchall()}
 
@@ -245,6 +254,19 @@ def render(d):
         f'<td><span class="pill p-warn"><span class="d"></span>{x["state"]}</span></td></tr>'
         for x in esc_rows) or '<tr><td colspan="4" class="ev">nothing escalated</td></tr>'
 
+    A_PILL = {"extracted": "ok", "rejected": "warn", "error": "crit", "pending": "mute"}
+    B_PILL = {"settled": "ok", "dispatched": "info", "failed": "crit", "none": "mute"}
+    turn_html = "".join(
+        f'<tr><td class="mono">{t["request_id"]}.{t["n"]}</td>'
+        f'<td class="ev">{esc((t["query"] or "")[:70])}</td>'
+        f'<td><span class="pill p-{A_PILL.get(t["extract_state"], "mute")}"><span class="d"></span>'
+        f'{t["extract_state"]}</span></td>'
+        f'<td><span class="pill p-{B_PILL.get(t["feedback_state"], "mute")}"><span class="d"></span>'
+        f'{t["feedback_state"]}{" · " + t["feedback_kind"] if t["feedback_kind"] else ""}</span></td>'
+        f'<td class="ev">{esc(t["blocked_on"] or "—")}</td>'
+        f'<td class="num">{t["poll_count"]}</td></tr>'
+        for t in d["turns"]) or '<tr><td colspan="6" class="ev">no turns yet</td></tr>'
+
     return HEAD + f"""
 <div class="wrap">
   <header>
@@ -287,6 +309,19 @@ def render(d):
     <code>.outpatient</code>. Downloading it again, adding the term again, or retagging would
     each have changed nothing. The rule simply does not state a place of service —
     <code>absent_from_source</code>, escalated.</div>
+
+  <div class="card"><div class="ch"><h3>Turns in flight</h3>
+    <span class="hint">a turn advances only when BOTH tracks settle — waiting is normal</span></div>
+    <div class="scroll"><table><thead><tr><th>Req.turn</th><th>Query</th>
+      <th>Track A · extract</th><th>Track B · feedback</th><th>Blocked on</th>
+      <th style="text-align:right">Polls</th></tr></thead><tbody>{turn_html}</tbody></table></div>
+    <div class="cb" style="border-top:1px solid var(--line)">
+      <div class="ev"><b>Why both.</b> Advancing on track A alone re-asks the corpus that
+      just failed and burns a turn. Advancing on track B alone throws away the refinement
+      the answer earned. Track B settles in minutes (ingest), hours (lexicon adoption) or
+      days (a person) — so a turn is a row that survives process death, with backoff, not a
+      stack frame.</div>
+    </div></div>
 
   <div class="card"><div class="ch"><h3>Chat attempts</h3>
     <span class="hint">deployed ReAct · a new thread per call, so a long run can't accumulate context</span></div>

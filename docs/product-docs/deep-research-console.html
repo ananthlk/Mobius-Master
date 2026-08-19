@@ -111,7 +111,7 @@ td.num{text-align:right;font-family:var(--mono);white-space:nowrap}
   <div class="card"><div class="ch"><h3>The loop</h3>
     <span class="hint">generated from research.* — nothing here is hand-written</span></div>
     <div class="loop">
-      <div class="step"><span class="k">1 · asked</span><span class="v">5</span>
+      <div class="step"><span class="k">1 · asked</span><span class="v">6</span>
         <span class="n">questions put to chat's ReAct loop, new thread each</span></div>
       <div class="step good"><span class="k">2 · extracted</span>
         <span class="v">0</span>
@@ -140,6 +140,19 @@ td.num{text-align:right;font-family:var(--mono);white-space:nowrap}
     each have changed nothing. The rule simply does not state a place of service —
     <code>absent_from_source</code>, escalated.</div>
 
+  <div class="card"><div class="ch"><h3>Turns in flight</h3>
+    <span class="hint">a turn advances only when BOTH tracks settle — waiting is normal</span></div>
+    <div class="scroll"><table><thead><tr><th>Req.turn</th><th>Query</th>
+      <th>Track A · extract</th><th>Track B · feedback</th><th>Blocked on</th>
+      <th style="text-align:right">Polls</th></tr></thead><tbody><tr><td class="mono">14.1</td><td class="ev">For Florida Medicaid, in which place-of-service settings may Behaviora</td><td><span class="pill p-warn"><span class="d"></span>rejected</span></td><td><span class="pill p-ok"><span class="d"></span>settled · discovery</span></td><td class="ev">—</td><td class="num">1</td></tr><tr><td class="mono">14.2</td><td class="ev">...same question, after the fee schedule is ingested</td><td><span class="pill p-mute"><span class="d"></span>pending</span></td><td><span class="pill p-mute"><span class="d"></span>none</span></td><td class="ev">parser</td><td class="num">0</td></tr></tbody></table></div>
+    <div class="cb" style="border-top:1px solid var(--line)">
+      <div class="ev"><b>Why both.</b> Advancing on track A alone re-asks the corpus that
+      just failed and burns a turn. Advancing on track B alone throws away the refinement
+      the answer earned. Track B settles in minutes (ingest), hours (lexicon adoption) or
+      days (a person) — so a turn is a row that survives process death, with backoff, not a
+      stack frame.</div>
+    </div></div>
+
   <div class="card"><div class="ch"><h3>Chat attempts</h3>
     <span class="hint">deployed ReAct · a new thread per call, so a long run can't accumulate context</span></div>
     <div class="scroll"><table><thead><tr><th>Req.round</th><th>Asked</th>
@@ -151,7 +164,7 @@ td.num{text-align:right;font-family:var(--mono);white-space:nowrap}
     <span class="hint">MOBIUS_DISCOVERY_INGEST_CONTRACT.md — RAG owns ingest</span></div>
     <div class="scroll"><table><thead><tr><th>#</th><th>Document</th>
       <th>Gap cited</th><th>Date the document states</th><th>Outcome</th></tr></thead>
-      <tbody><tr><td class="mono">#1</td><td>2026 BA Fee Schedule.pdf</td><td class="mono" style="font-size:11px">service_line_no_priced_codes</td><td class="mono" style="font-size:11px">2026</td><td><span class="pill p-mute"><span class="d"></span>pending</span></td></tr><tr><td class="mono">#2</td><td>2026 BHOS Fee Schedule.pdf</td><td class="mono" style="font-size:11px">service_line_no_priced_codes</td><td class="mono" style="font-size:11px">2026</td><td><span class="pill p-mute"><span class="d"></span>pending</span></td></tr><tr><td class="mono">#3</td><td>2026 SIPP Billing Codes.pdf</td><td class="mono" style="font-size:11px">service_line_no_priced_codes</td><td class="mono" style="font-size:11px">2026</td><td><span class="pill p-mute"><span class="d"></span>pending</span></td></tr><tr><td class="mono">#4</td><td>Specialized Therapeutic Services - July 8, 2025.pdf</td><td class="mono" style="font-size:11px">service_line_no_priced_codes</td><td class="mono" style="font-size:11px">July 8, 2025</td><td><span class="pill p-mute"><span class="d"></span>pending</span></td></tr></tbody></table></div>
+      <tbody><tr><td class="mono">#1</td><td>2026 BA Fee Schedule.pdf</td><td class="mono" style="font-size:11px">service_line_no_priced_codes</td><td class="mono" style="font-size:11px">2026</td><td><span class="pill p-ok"><span class="d"></span>duplicate</span></td></tr><tr><td class="mono">#2</td><td>2026 BHOS Fee Schedule.pdf</td><td class="mono" style="font-size:11px">service_line_no_priced_codes</td><td class="mono" style="font-size:11px">2026</td><td><span class="pill p-ok"><span class="d"></span>duplicate</span></td></tr><tr><td class="mono">#3</td><td>2026 SIPP Billing Codes.pdf</td><td class="mono" style="font-size:11px">service_line_no_priced_codes</td><td class="mono" style="font-size:11px">2026</td><td><span class="pill p-mute"><span class="d"></span>pending</span></td></tr><tr><td class="mono">#4</td><td>Specialized Therapeutic Services - July 8, 2025.pdf</td><td class="mono" style="font-size:11px">service_line_no_priced_codes</td><td class="mono" style="font-size:11px">July 8, 2025</td><td><span class="pill p-mute"><span class="d"></span>pending</span></td></tr></tbody></table></div>
     <div class="cb" style="border-top:1px solid var(--line)">
       <div class="rule"><span class="n">1</span><span class="t"><b>Every request names its gap.</b>
         <code>discovery_reason</code> is NOT NULL and a request without one is refused before
