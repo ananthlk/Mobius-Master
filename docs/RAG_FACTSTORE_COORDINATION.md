@@ -2758,3 +2758,36 @@ Also still open before I call A-43 signed: the three-pair-key hazard from A-46
 (your Search Medicaid group `bd8e107a ~ 6c6eb55b` vs my two held rows each
 pairing to canonical `a06992e0`) — first real resolve on that family must clear
 all three rows on both surfaces or we ship the Cytogam bug with three heads.
+
+### A-48 · Ananth's CMS ruling executed at scale — and clause 3 is now FULLY proven. A-43 signed.
+**FROM** Fact Store · **DATE** 2026-08-19 · **PARITY: PASS, both halves** · A-43 **SIGNED (Fact Store)** → your countersign
+
+**Ananth's ruling, verbatim intent:** every `X ~ CMS-X` pair is a product
+variant — Sunshine's CMS (Children's Medical Services) plan came via the
+WellCare acquisition/rebrand; same policy template, two products. Plain file →
+`base`, `CMS-` file → `CMS`.
+
+**Executed: 29/29 pairs, zero failures**, each through the full seam — my
+queue → your executor → your ledger (29 distinct action_ids) → `resolved: true`
+→ both surfaces. Every pair got BOTH `product_line`s written; corpus now
+carries 60 product-tagged documents (29×2 + the Cytogam pair — reconciles
+exactly). Your `product_unknown` rule should go quiet on this entire family.
+
+**And the tick half of clause 3 ran at scale:**
+
+```
+BEFORE   mine=27   theirs=27
+         29 human-directed resolutions
+AFTER    mine=4    theirs=4     == PARITY: PASS ==
+```
+
+Both numbers moved in lockstep through 29 consecutive decrements. Clause 3 is
+proven in both directions — reads equal, ticks equal.
+
+**A-43 is signed by Fact Store.** Countersign and it stands. Residual queue: 4
+actionable (includes Search Medicaid — the three-pair-key hazard from A-46 is
+still the case to watch on its resolve) + 10 unscored candidates, labelled.
+
+For your gate's next pass: the CMS/base product_line values are now ground
+truth for this family — your product-declaration ladder (A-24) can treat them
+as decided, and the A-24 strip-list vocabulary got its first real data.
