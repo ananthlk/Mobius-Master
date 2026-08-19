@@ -1,0 +1,223 @@
+<title>Deep Research — the machine</title>
+<style>
+:root{--ink:#161a22;--ink-2:#4a5261;--ink-3:#79808f;--page:#f6f4f0;--card:#fffefc;
+--line:#e2ddd4;--in:#2c6e49;--out:#a06a12;--human:#6b3f8f;--stop:#b3452b;--accent:#2f6b8f;
+--have:#2c6e49;--need:#b3452b;}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#eceaf0;--ink-2:#b3b8c4;
+--ink-3:#848b99;--page:#14161b;--card:#1b1e25;--line:#2c313b;--in:#6fbf92;--out:#d9ab5c;
+--human:#b28fd4;--stop:#e08a72;--accent:#7fb4d4;--have:#6fbf92;--need:#e08a72;}}
+:root[data-theme="dark"]{--ink:#eceaf0;--ink-2:#b3b8c4;--ink-3:#848b99;--page:#14161b;
+--card:#1b1e25;--line:#2c313b;--in:#6fbf92;--out:#d9ab5c;--human:#b28fd4;--stop:#e08a72;
+--accent:#7fb4d4;--have:#6fbf92;--need:#e08a72;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);
+font:16px/1.6 ui-serif,Georgia,"Iowan Old Style",serif}
+.wrap{max-width:1000px;margin:0 auto;padding:3rem 1.5rem 5rem}
+h1{font-size:2rem;margin:0 0 .3rem;letter-spacing:-.02em;text-wrap:balance}
+.lede{color:var(--ink-2);max-width:64ch;margin:0 0 1rem}
+.status{display:inline-block;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.72rem;
+letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);border:1px solid var(--line);
+padding:.2rem .55rem;border-radius:2px;margin-bottom:2.5rem}
+h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-3);
+font-family:ui-sans-serif,system-ui,sans-serif;margin:3.2rem 0 1rem;padding-bottom:.5rem;
+border-bottom:1px solid var(--line)}
+h3{font-size:1rem;font-family:ui-sans-serif,system-ui,sans-serif;margin:1.8rem 0 .5rem;font-weight:640}
+p{max-width:66ch}
+.mermaid{background:var(--card);border:1px solid var(--line);border-radius:3px;
+padding:1.4rem;overflow-x:auto;margin:1rem 0}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.86rem;margin:.5rem 0}
+th{text-align:left;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.7rem;
+text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);padding:.5rem .7rem;
+border-bottom:1px solid var(--line);font-weight:600}
+td{padding:.6rem .7rem;border-bottom:1px solid var(--line);vertical-align:top}
+code{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.84em;
+background:var(--card);padding:.08rem .3rem;border-radius:2px;border:1px solid var(--line)}
+pre{background:var(--card);border:1px solid var(--line);border-radius:3px;padding:1rem 1.1rem;
+overflow-x:auto;font-size:.78rem;line-height:1.55;
+font-family:ui-monospace,SFMono-Regular,monospace;color:var(--ink-2)}
+pre code{background:none;border:none;padding:0;font-size:1em}
+.tag{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.68rem;padding:.1rem .42rem;
+border-radius:2px;border:1px solid currentColor;white-space:nowrap;letter-spacing:.03em}
+.have{color:var(--have)}.need{color:var(--need)}
+.cards{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin:1rem 0}
+.card{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--ink-3);
+border-radius:3px;padding:1rem 1.1rem}
+.card.k-in{border-left-color:var(--in)}
+.card.k-out{border-left-color:var(--out)}
+.card.k-human{border-left-color:var(--human)}
+.card h4{margin:0 0 .3rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.9rem;font-weight:640}
+.card p{margin:0;font-size:.85rem;color:var(--ink-2)}
+.card .who{display:block;margin-top:.6rem;font-size:.73rem;color:var(--ink-3);
+font-family:ui-sans-serif,system-ui,sans-serif}
+.q{border-left:2px solid var(--accent);padding:.2rem 0 .2rem 1rem;margin:1.2rem 0;color:var(--ink-2)}
+.q b{color:var(--ink);font-family:ui-sans-serif,system-ui,sans-serif;font-size:.9rem;
+display:block;margin-bottom:.2rem}
+footer{margin-top:3.5rem;padding-top:1.2rem;border-top:1px solid var(--line);font-size:.78rem;
+color:var(--ink-3);font-family:ui-sans-serif,system-ui,sans-serif}
+</style>
+<div class="wrap">
+<h1>Deep Research &mdash; the machine</h1>
+<p class="lede">A caller asks for a fact, says how to judge it, what shape to return it in, and
+when they need it. The loop spends turns until the answer survives every check &mdash; or until
+it can name exactly what is stopping it and hand that to someone who can fix it.</p>
+<span class="status">Design &middot; forward-deployed &middot; what exists is marked</span>
+
+<h2>The whole machine</h2>
+<pre class="mermaid">stateDiagram-v2
+  direction TB
+  [*] --> Open : caller files a request
+  Open --> Asking : round 1
+
+  Asking --> Judging : answer + sources
+  Judging --> Answered : every required field survived
+  Judging --> Diagnosing : something was rejected
+
+  state Diagnosing {
+    direction LR
+    [*] --> ask_the_db
+    ask_the_db --> verdict
+  }
+
+  Diagnosing --> Asking : refine — the fix is another turn
+  Diagnosing --> Waiting : acquire / reingest / reindex / lexicon
+  Diagnosing --> Human : registry / escalate
+
+  Waiting --> Asking : repair landed, resume
+  Waiting --> Human : repair failed or nothing can fix it
+  Waiting --> Human : deadline reached while waiting
+
+  Asking --> Human : rounds exhausted
+  Human --> Asking : human supplied what was missing
+  Human --> Closed : answered, or declared unanswerable
+  Answered --> Closed : output delivered to caller
+  Closed --> [*]
+</pre>
+
+<p>Everything turns on one distinction. When a turn fails, the repair is either
+<b>inside the loop</b> or <b>outside</b> it, and that single fact decides whether another turn
+is worth spending.</p>
+
+<div class="cards">
+  <div class="card k-in"><h4>Inside &mdash; spend another turn</h4>
+  <p>The corpus can already answer this; the ask was wrong. Reframe and go again.
+  Bounded by the turn budget, because that is what a budget is for.</p>
+  <span class="who">refine &middot; the loop fixes itself</span></div>
+
+  <div class="card k-out"><h4>Outside &mdash; file it and wait</h4>
+  <p>The document is missing, unchunked, unindexed, or unreachable by the words in the
+  question. No rephrasing fixes any of those. Spending turns here is waste, so the loop
+  stops and files a repair.</p>
+  <span class="who">acquire &middot; reingest &middot; reindex &middot; lexicon &mdash; pollers</span></div>
+
+  <div class="card k-human"><h4>Up &mdash; raise a hand</h4>
+  <p>Nothing mechanical is left: the source says nothing, two authorities disagree, or the
+  clock ran out. Available from <em>every</em> state, not just the end.</p>
+  <span class="who">registry &middot; escalate &mdash; a person</span></div>
+</div>
+
+<h2>What the caller supplies</h2>
+<p>Four things, and the last one is the one we do not accept yet.</p>
+<pre><code>POST /api/skills/v1/research
+{
+  "consumer":   "service_line_registry",     // who is asking, and who gets the answer
+  "subject":    "bh_therapy/service_limit_H2019_HR",
+
+  "question":   "For Florida Medicaid CBH, H2019 with modifier HR ...",
+
+  "evaluation": {                            // how to judge the answer
+    "instructions": "...what a good answer must establish...",
+    "required":     ["code", "unit_definition", "limit_amount"],
+    "authority":    "standard"               // standard | any_cited
+  },
+
+  "output": {                                // the shape the caller will store
+    "schema": { "code": "...", "limits": [ { "limit_type": "...", ... } ] }
+  },
+
+  "bar": {                                   // when to stop and return
+    "min_required_fields": "all",            // all | any
+    "accept_partial_at_deadline": true
+  },
+
+  "clock": {                                 // BOTH bounds, not one
+    "max_rounds":  3,                        // turns the loop may spend
+    "needed_by":   "2026-08-26T17:00:00Z"    // wall clock the caller lives by
+  }
+}</code></pre>
+
+<h2>The states</h2>
+<div class="scroll"><table>
+<thead><tr><th>State</th><th>Meaning</th><th>Where it lives</th><th></th></tr></thead>
+<tbody><tr><td><b>Open</b></td><td>request filed, nothing spent yet</td><td><code>request.status='open'</code></td><td><span class='tag have'>built</span></td></tr>
+<tr><td><b>Asking</b></td><td>a turn is in flight against chat</td><td><code>turn.status='running'</code></td><td><span class='tag have'>built</span></td></tr>
+<tr><td><b>Judging</b></td><td>extract, then critique field by field</td><td><code>turn.extract_state</code></td><td><span class='tag have'>built</span></td></tr>
+<tr><td><b>Diagnosing</b></td><td>the database decides what the repair is</td><td><code>research.diagnosis</code></td><td><span class='tag have'>built</span></td></tr>
+<tr><td><b>Waiting</b></td><td>external work filed; pollers own it</td><td><code>turn.status='waiting'</code>, <code>next_poll_at</code></td><td><span class='tag need'>half-built</span></td></tr>
+<tr><td><b>Human</b></td><td>a person has to decide or supply</td><td><code>feedback_kind='human'</code></td><td><span class='tag need'>half-built</span></td></tr>
+<tr><td><b>Answered</b></td><td>every required field survived</td><td><code>request.status='sourced'</code></td><td><span class='tag have'>built</span></td></tr>
+<tr><td><b>Closed</b></td><td>output delivered to the caller</td><td>&mdash;</td><td><span class='tag need'>not built</span></td></tr></tbody></table></div>
+
+<h2>How a repair gets done</h2>
+<p>The loop never performs a repair itself &mdash; it files one and stops. Pollers claim work
+they own, act on the world, and report back. A repair that lands wakes the turn that was
+waiting for it; a repair that cannot be done raises a hand instead of re-queueing forever.</p>
+<pre class="mermaid">sequenceDiagram
+  participant L as Loop
+  participant Q as research.diagnosis
+  participant P as Poller
+  participant W as World
+
+  L->>Q: file repair (class, action, target, evidence, due_at)
+  Note over L: turn -> waiting. No further turns spent.
+  P->>Q: claim oldest unclaimed repair it owns
+  Q-->>P: repair + target
+  P->>W: fetch / re-chunk / re-index / add alias
+  W-->>P: outcome
+  P->>Q: resolve(outcome) or fail(reason, retryable)
+  Q-->>L: repair settled
+  L->>L: resume the turn that filed it
+</pre>
+
+<h2>Two clocks, and they disagree on purpose</h2>
+<p>The turn budget bounds how much thinking a question is worth. The deadline bounds how long
+the caller can wait. They are not the same limit and neither implies the other: a request can
+exhaust three rounds in four minutes, or spend one round and then sit for two days behind an
+acquisition. Whichever runs out first ends the wait &mdash; the turn budget by escalating, the
+deadline by returning whatever survived, clearly marked as partial.</p>
+
+<h2>What is built, and what is not</h2>
+<div class="scroll"><table>
+<thead><tr><th>Piece</th><th>Where it stands</th><th></th></tr></thead>
+<tbody><tr><td><b>A deadline</b></td><td><code>max_rounds</code> bounds turns; nothing bounds the calendar. A caller who needs an answer Tuesday cannot say so, and the loop cannot choose to stop waiting on a poller and raise its hand.</td><td><span class='tag need'>to build</span></td></tr>
+<tr><td><b>A confidence bar</b></td><td>The critic is binary today &mdash; every required field survived, or none of it counts. The caller cannot say &ldquo;three of five is enough, flag the rest.&rdquo;</td><td><span class='tag need'>to build</span></td></tr>
+<tr><td><b>Repair ownership</b></td><td><code>research.diagnosis</code> names the action but not who performs it, and carries no claim. Two pollers would race for the same repair.</td><td><span class='tag need'>to build</span></td></tr>
+<tr><td><b>A repair result</b></td><td>A poller can resolve a repair but cannot say <em>failed, and retrying will not help</em> &mdash; which is the signal that should raise a hand rather than re-queue.</td><td><span class='tag need'>to build</span></td></tr>
+<tr><td><b>Resume</b></td><td><code>next_poll_at</code> and <code>poll_count</code> exist on the turn. Nothing reads them, so a landed repair never wakes the turn that was waiting for it.</td><td><span class='tag need'>to build</span></td></tr>
+<tr><td><b>Delivery</b></td><td>The answer is written to the fact store; the caller is never told. <code>consumer</code> is recorded but there is no delivery record and no retry.</td><td><span class='tag need'>to build</span></td></tr>
+<tr><td><b>The turn machine</b></td><td>Two tracks, poll fields, and a <code>waiting</code> status are already in <code>research.turn</code>.</td><td><span class='tag have'>in place</span></td></tr>
+<tr><td><b>The diagnosis ladder</b></td><td>Six gap classes, each resolving to one action, decided from database state rather than a model.</td><td><span class='tag have'>in place</span></td></tr>
+<tr><td><b>The repair queue</b></td><td><code>research.diagnosis</code> + <code>research.open_repairs</code>, ordered by what blocks the most.</td><td><span class='tag have'>in place</span></td></tr></tbody></table></div>
+
+<h2>Three calls I need from you</h2>
+
+<div class="q"><b>What does &ldquo;with confidence&rdquo; mean?</b>
+Today it is all-or-nothing: every required field survives, or the record is refused. The
+alternative is a caller-set bar &mdash; &ldquo;three of five, flag the rest&rdquo; &mdash; which
+returns more, and returns some facts that are only partly grounded. For a certified store I
+lean to all-or-nothing, with partials returned only at deadline and marked.</div>
+
+<div class="q"><b>Who owns each repair class?</b>
+<code>acquire</code> and <code>reingest</code> look like the RAG agent. <code>reindex</code>
+and <code>lexicon</code> look like Curation. If that is right, the poller contract is two
+consumers, not one, and the queue needs an owner column before either can claim work.</div>
+
+<div class="q"><b>What happens at the deadline mid-repair?</b>
+A document is being acquired and Tuesday arrives. Return nothing and say why, or return the
+partially-grounded answer marked as such? This is the caller's risk to take, which is why it
+sits in the request rather than in our defaults.</div>
+
+<footer>State names match <code>research.request.status</code> and
+<code>research.turn.status</code>. Marked &ldquo;built&rdquo; means the column or table exists
+and is written by the running loop &mdash; not that it has been exercised end to end.</footer>
+</div>
