@@ -195,60 +195,47 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
         }
       ],
+      "payor_requirements": [],
       "requirement_counts": {
-        "applies": 4,
-        "answered": 1,
+        "applies": 0,
+        "answered": 0,
         "standard": 0,
-        "deltas": 1,
-        "payers": 1
+        "deltas": 0,
+        "payers": 0
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -630,32 +617,41 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        }
+      ],
+      "payor_requirements": [
         {
           "predicate": "benefits.mental_health.community_bh_services",
           "label": "Community Behavioral Health Services (general/EI)",
@@ -735,35 +731,14 @@
           ],
           "has_standard": true,
           "deltas": []
-        },
-        {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
         }
       ],
       "requirement_counts": {
-        "applies": 9,
-        "answered": 6,
+        "applies": 5,
+        "answered": 5,
         "standard": 5,
-        "deltas": 1,
-        "payers": 2
+        "deltas": 0,
+        "payers": 1
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -1147,32 +1122,41 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        }
+      ],
+      "payor_requirements": [
         {
           "predicate": "benefits.mental_health.community_bh_services",
           "label": "Community Behavioral Health Services (general/EI)",
@@ -1252,35 +1236,14 @@
           ],
           "has_standard": true,
           "deltas": []
-        },
-        {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
         }
       ],
       "requirement_counts": {
-        "applies": 9,
-        "answered": 6,
+        "applies": 5,
+        "answered": 5,
         "standard": 5,
-        "deltas": 1,
-        "payers": 2
+        "deltas": 0,
+        "payers": 1
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -1650,32 +1613,41 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        }
+      ],
+      "payor_requirements": [
         {
           "predicate": "benefits.mental_health.community_bh_services",
           "label": "Community Behavioral Health Services (general/EI)",
@@ -1755,35 +1727,14 @@
           ],
           "has_standard": true,
           "deltas": []
-        },
-        {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
         }
       ],
       "requirement_counts": {
-        "applies": 9,
-        "answered": 6,
+        "applies": 5,
+        "answered": 5,
         "standard": 5,
-        "deltas": 1,
-        "payers": 2
+        "deltas": 0,
+        "payers": 1
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -2245,32 +2196,41 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        }
+      ],
+      "payor_requirements": [
         {
           "predicate": "benefits.mental_health.community_bh_services",
           "label": "Community Behavioral Health Services (general/EI)",
@@ -2350,35 +2310,14 @@
           ],
           "has_standard": true,
           "deltas": []
-        },
-        {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
         }
       ],
       "requirement_counts": {
-        "applies": 9,
-        "answered": 6,
+        "applies": 5,
+        "answered": 5,
         "standard": 5,
-        "deltas": 1,
-        "payers": 2
+        "deltas": 0,
+        "payers": 1
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -2433,60 +2372,47 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
         }
       ],
+      "payor_requirements": [],
       "requirement_counts": {
-        "applies": 4,
-        "answered": 1,
+        "applies": 0,
+        "answered": 0,
         "standard": 0,
-        "deltas": 1,
-        "payers": 1
+        "deltas": 0,
+        "payers": 0
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -2870,32 +2796,41 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        }
+      ],
+      "payor_requirements": [
         {
           "predicate": "benefits.mental_health.community_bh_services",
           "label": "Community Behavioral Health Services (general/EI)",
@@ -2975,35 +2910,14 @@
           ],
           "has_standard": true,
           "deltas": []
-        },
-        {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
         }
       ],
       "requirement_counts": {
-        "applies": 9,
-        "answered": 6,
+        "applies": 5,
+        "answered": 5,
         "standard": 5,
-        "deltas": 1,
-        "payers": 2
+        "deltas": 0,
+        "payers": 1
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -3058,60 +2972,47 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
         }
       ],
+      "payor_requirements": [],
       "requirement_counts": {
-        "applies": 4,
-        "answered": 1,
+        "applies": 0,
+        "answered": 0,
         "standard": 0,
-        "deltas": 1,
-        "payers": 1
+        "deltas": 0,
+        "payers": 0
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -3166,32 +3067,41 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        }
+      ],
+      "payor_requirements": [
         {
           "predicate": "benefits.primary_care.after_hours_standard",
           "label": "PCP after-hours availability standard",
@@ -3287,35 +3197,14 @@
           ],
           "has_standard": true,
           "deltas": []
-        },
-        {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
         }
       ],
       "requirement_counts": {
-        "applies": 10,
-        "answered": 7,
+        "applies": 6,
+        "answered": 6,
         "standard": 6,
-        "deltas": 1,
-        "payers": 2
+        "deltas": 0,
+        "payers": 1
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -3685,32 +3574,41 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        }
+      ],
+      "payor_requirements": [
         {
           "predicate": "benefits.mental_health.community_bh_services",
           "label": "Community Behavioral Health Services (general/EI)",
@@ -3790,35 +3688,14 @@
           ],
           "has_standard": true,
           "deltas": []
-        },
-        {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
         }
       ],
       "requirement_counts": {
-        "applies": 9,
-        "answered": 6,
+        "applies": 5,
+        "answered": 5,
         "standard": 5,
-        "deltas": 1,
-        "payers": 2
+        "deltas": 0,
+        "payers": 1
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -3873,32 +3750,41 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        }
+      ],
+      "payor_requirements": [
         {
           "predicate": "benefits.mental_health.community_bh_services",
           "label": "Community Behavioral Health Services (general/EI)",
@@ -3978,35 +3864,14 @@
           ],
           "has_standard": true,
           "deltas": []
-        },
-        {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
         }
       ],
       "requirement_counts": {
-        "applies": 9,
-        "answered": 6,
+        "applies": 5,
+        "answered": 5,
         "standard": 5,
-        "deltas": 1,
-        "payers": 2
+        "deltas": 0,
+        "payers": 1
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -4061,60 +3926,47 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
         }
       ],
+      "payor_requirements": [],
       "requirement_counts": {
-        "applies": 4,
-        "answered": 1,
+        "applies": 0,
+        "answered": 0,
         "standard": 0,
-        "deltas": 1,
-        "payers": 1
+        "deltas": 0,
+        "payers": 0
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -4169,60 +4021,47 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
         }
       ],
+      "payor_requirements": [],
       "requirement_counts": {
-        "applies": 4,
-        "answered": 1,
+        "applies": 0,
+        "answered": 0,
         "standard": 0,
-        "deltas": 1,
-        "payers": 1
+        "deltas": 0,
+        "payers": 0
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -4277,32 +4116,41 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        }
+      ],
+      "payor_requirements": [
         {
           "predicate": "benefits.mental_health.community_bh_services",
           "label": "Community Behavioral Health Services (general/EI)",
@@ -4382,35 +4230,14 @@
           ],
           "has_standard": true,
           "deltas": []
-        },
-        {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
         }
       ],
       "requirement_counts": {
-        "applies": 9,
-        "answered": 6,
+        "applies": 5,
+        "answered": 5,
         "standard": 5,
-        "deltas": 1,
-        "payers": 2
+        "deltas": 0,
+        "payers": 1
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -4499,32 +4326,41 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        }
+      ],
+      "payor_requirements": [
         {
           "predicate": "benefits.mental_health.community_bh_services",
           "label": "Community Behavioral Health Services (general/EI)",
@@ -4604,35 +4440,14 @@
           ],
           "has_standard": true,
           "deltas": []
-        },
-        {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
         }
       ],
       "requirement_counts": {
-        "applies": 9,
-        "answered": 6,
+        "applies": 5,
+        "answered": 5,
         "standard": 5,
-        "deltas": 1,
-        "payers": 2
+        "deltas": 0,
+        "payers": 1
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -4687,60 +4502,47 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
         }
       ],
+      "payor_requirements": [],
       "requirement_counts": {
-        "applies": 4,
-        "answered": 1,
+        "applies": 0,
+        "answered": 0,
         "standard": 0,
-        "deltas": 1,
-        "payers": 1
+        "deltas": 0,
+        "payers": 0
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -5473,32 +5275,41 @@
         "classified_by": 4,
         "grouped_to": 48
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        }
+      ],
+      "payor_requirements": [
         {
           "predicate": "benefits.mental_health.inpatient_day_cap_under21_pregnant",
           "label": "Inpatient day cap \u2014 under 21 and pregnant adults (incl. behavioral health)",
@@ -5530,35 +5341,14 @@
           ],
           "has_standard": true,
           "deltas": []
-        },
-        {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
         }
       ],
       "requirement_counts": {
-        "applies": 6,
-        "answered": 3,
+        "applies": 2,
+        "answered": 2,
         "standard": 2,
-        "deltas": 1,
-        "payers": 2
+        "deltas": 0,
+        "payers": 1
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -5613,60 +5403,47 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
         },
         {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
         }
       ],
+      "payor_requirements": [],
       "requirement_counts": {
-        "applies": 4,
-        "answered": 1,
+        "applies": 0,
+        "answered": 0,
         "standard": 0,
-        "deltas": 1,
-        "payers": 1
+        "deltas": 0,
+        "payers": 0
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -5721,32 +5498,41 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        }
+      ],
+      "payor_requirements": [
         {
           "predicate": "benefits.fqhc.good_faith_contracting",
           "label": "FQHC/RHC/CHD good-faith contracting",
@@ -5794,35 +5580,14 @@
           ],
           "has_standard": true,
           "deltas": []
-        },
-        {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
         }
       ],
       "requirement_counts": {
-        "applies": 7,
-        "answered": 4,
+        "applies": 3,
+        "answered": 3,
         "standard": 3,
-        "deltas": 1,
-        "payers": 2
+        "deltas": 0,
+        "payers": 1
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -5877,32 +5642,41 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        }
+      ],
+      "payor_requirements": [
         {
           "predicate": "benefits.fqhc.good_faith_contracting",
           "label": "FQHC/RHC/CHD good-faith contracting",
@@ -5950,35 +5724,14 @@
           ],
           "has_standard": true,
           "deltas": []
-        },
-        {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
         }
       ],
       "requirement_counts": {
-        "applies": 7,
-        "answered": 4,
+        "applies": 3,
+        "answered": 3,
         "standard": 3,
-        "deltas": 1,
-        "payers": 2
+        "deltas": 0,
+        "payers": 1
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -6033,32 +5786,41 @@
         "classified_by": 0,
         "grouped_to": 0
       },
-      "payor_requirements": [
+      "exception_asks": [
         {
-          "predicate": "appeal.submission_channels",
-          "label": "Appeal submission channels",
-          "answers": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ],
-          "has_standard": false,
-          "deltas": [
-            {
-              "payer": "Aetna|FL|Medicaid",
-              "answer": "860-607-7894",
-              "resolves_from": "payor_delta",
-              "owner": "Fact Store (payor delta)",
-              "cert_status": "candidate",
-              "authority_level": null
-            }
-          ]
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "*",
+          "answer": null,
+          "statement": null
         },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Aetna|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "BBHC|FL|SAMH",
+          "answer": null,
+          "statement": null
+        },
+        {
+          "domain": "appeals",
+          "other_store": "Appeals agent",
+          "question": "For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so \u2014 that is an answer.",
+          "payer": "Sunshine Health|FL|Medicaid",
+          "answer": null,
+          "statement": null
+        }
+      ],
+      "payor_requirements": [
         {
           "predicate": "benefits.fqhc.good_faith_contracting",
           "label": "FQHC/RHC/CHD good-faith contracting",
@@ -6106,35 +5868,14 @@
           ],
           "has_standard": true,
           "deltas": []
-        },
-        {
-          "predicate": "appeal.deadline_days",
-          "label": "Appeal filing deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.required_docs",
-          "label": "Appeal required documents",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
-        },
-        {
-          "predicate": "appeal.resubmit_deadline_days",
-          "label": "Corrected-claim resubmit deadline",
-          "answers": [],
-          "has_standard": false,
-          "deltas": []
         }
       ],
       "requirement_counts": {
-        "applies": 7,
-        "answered": 4,
+        "applies": 3,
+        "answered": 3,
         "standard": 3,
-        "deltas": 1,
-        "payers": 2
+        "deltas": 0,
+        "payers": 1
       },
       "evidence_pages": 0,
       "evidence_sources": [],
@@ -6189,6 +5930,7 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "exception_asks": [],
       "payor_requirements": [
         {
           "predicate": "benefits.substance_abuse.intensive_outpatient_program",
@@ -6304,6 +6046,7 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "exception_asks": [],
       "payor_requirements": [
         {
           "predicate": "benefits.mental_health.partial_hospitalization_program",
@@ -6419,6 +6162,7 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "exception_asks": [],
       "payor_requirements": [
         {
           "predicate": "benefits.mental_health.emergency_bh_baker_act",
@@ -6524,6 +6268,7 @@
         "classified_by": 2,
         "grouped_to": 0
       },
+      "exception_asks": [],
       "payor_requirements": [
         {
           "predicate": "benefits.mental_health.emergency_bh_baker_act",
@@ -6982,6 +6727,7 @@
         "classified_by": 1,
         "grouped_to": 24
       },
+      "exception_asks": [],
       "payor_requirements": [
         {
           "predicate": "benefits.substance_abuse.detox_receiving_facility",
@@ -7097,6 +6843,7 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "exception_asks": [],
       "payor_requirements": [
         {
           "predicate": "benefits.mental_health.in_lieu_of_services",
@@ -7539,6 +7286,7 @@
         "classified_by": 1,
         "grouped_to": 24
       },
+      "exception_asks": [],
       "payor_requirements": [
         {
           "predicate": "benefits.substance_abuse.county_match_program_carveout",
@@ -8013,6 +7761,7 @@
         "classified_by": 1,
         "grouped_to": 24
       },
+      "exception_asks": [],
       "payor_requirements": [
         {
           "predicate": "benefits.substance_abuse.county_match_program_carveout",
@@ -9186,6 +8935,7 @@
         "classified_by": 8,
         "grouped_to": 72
       },
+      "exception_asks": [],
       "payor_requirements": [
         {
           "predicate": "benefits.mental_health.inpatient_day_cap_adult_emergency",
@@ -10362,6 +10112,7 @@
         "classified_by": 4,
         "grouped_to": 72
       },
+      "exception_asks": [],
       "payor_requirements": [
         {
           "predicate": "benefits.mental_health.emergency_bh_baker_act",

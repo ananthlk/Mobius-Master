@@ -48,7 +48,8 @@ An outpatient therapy line is `rendered_as` `H2019` + `HR`. An inpatient psych s
 | `source` | Provenance, including `held = false` for what we still need |
 | `linked_store` | Per domain: who holds the standard, what we own, and the question we ask them |
 | `line_predicate` | Which Fact Store predicates apply to a line |
-| `code_exception` | Code-axis exceptions reported back by the store that owns the standard |
+| `exception_answer` | One answer per (line, domain, payor): follows_standard or has_exception |
+| `code_exception` | Detail for a recorded exception, when one exists |
 | `standard_authority` | The regulatory sources we hold the standard from — AHCA, CMS |
 | `payor_conformance` | Whether a payor follows the standard or departs from it |
 
@@ -78,7 +79,15 @@ The *standard* therefore sits on different sides depending on which axis it vari
 
 Declared in `service_line.linked_store`, including the exact question the registry puts to each store. For appeals that question is: *"For this service code, does anything depart from your standard appeals process for this payer? If nothing, say so — that is an answer."*
 
-Code-axis exceptions reported back land in `service_line.code_exception`. `service_line.exception_asks` lists what is still unanswered.
+Where the standard is theirs, the registry stores **one answer per (line, payor)** in
+`service_line.exception_answer` — `follows_standard` or `has_exception` with a statement.
+Nothing more. Pulling their standard's details onto every line duplicates their store and
+manufactures permanently-unanswered rows; an earlier revision did exactly that with four
+`appeal.*` predicates per line, which surfaced a payer's appeals fax number as a service-line
+requirement. `service_line.exception_asks` lists what is still unanswered, per payor.
+
+`follows_standard` is a complete answer and closes the ask. Only `serve` lines are asked —
+we do not bill the declined ones, so appeals does not apply.
 
 ## Standard vs. payor delta
 
@@ -108,7 +117,7 @@ Service lines derive from AHCA's own 59G rule decomposition in `docs/ahca-manife
 ## Open
 
 - **Revenue codes and ICD-10-PCS not loaded** — both needed for facility and inpatient claims.
-- **Appeals has not answered for any line.** `exception_asks` shows 31 open — one per line. "Nothing differs" is a valid answer and closes the ask.
+- **Appeals has not answered for any line.** `exception_asks` shows 21 serve lines × 4 payor scopes open. "Nothing differs" is a valid answer and closes the ask.
 - **`payor_conformance` is empty.** Until a payor is recorded as conforming or differing, its requirements read as unsourced even where the standard would answer them.
 - **ICD block bindings are unadjudicated.** The chapter F blocks bound to inpatient/ED/CSU lines are clinically sound but not yet traced to a payer rule that says *this diagnosis makes this line payable*.
 - **Member eligibility** (SMI designation, age bands, CWSP) is on none of the axes and is not yet a declared exclusion.

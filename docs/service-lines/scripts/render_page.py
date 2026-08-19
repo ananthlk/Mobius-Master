@@ -219,6 +219,38 @@ function evidenceTable(l){
     }).join('')+'</tbody></table></div>';
 }
 
+function exceptionCard(l){
+  var A=l.exception_asks||[]; if(!A.length) return '';
+  var by={}; A.forEach(function(a){ (by[a.domain]=by[a.domain]||[]).push(a); });
+  return Object.keys(by).map(function(dom){
+    var rows=by[dom], store=rows[0].other_store, q=rows[0].question;
+    var open_=rows.filter(function(r){return !r.answer;}).length;
+    return '<div class="card"><div class="ch"><h3>'+esc(dom)+' — exceptions only</h3>'+
+      '<span class="pill '+(open_?'p-todo':'p-done')+'"><span class="d"></span>'+
+      (open_? open_+' unanswered' : 'all answered')+'</span>'+
+      '<span class="hint">'+esc(store)+' holds the standard · we hold only what differs</span></div>'+
+      '<div class="cb" style="border-bottom:1px solid var(--line);padding-bottom:12px">'+
+      '<div style="font-size:12.5px;color:var(--ink-2)"><em style="font-style:normal;'+
+      'font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;'+
+      'color:var(--ink-3);display:block;margin-bottom:3px">What we ask them</em>'+esc(q)+'</div></div>'+
+      '<div class="scroll"><table><thead><tr><th>Payor</th><th>Answer</th>'+
+      '<th>If different, what</th></tr></thead><tbody>'+
+      rows.map(function(r){
+        return '<tr><td class="c">'+esc(r.payer==='*'?'all payors':(r.payer||'').split('|')[0])+'</td>'+
+          '<td>'+(r.answer==='follows_standard'
+              ? '<span class="pill p-done"><span class="d"></span>follows standard</span>'
+              : r.answer==='has_exception'
+                ? '<span class="pill p-doing"><span class="d"></span>special process</span>'
+                : '<span class="pill p-todo"><span class="d"></span>not answered</span>')+'</td>'+
+          '<td style="font-size:11.5px;color:var(--ink-2)">'+
+            (r.statement? esc(r.statement)
+             : (r.answer==='follows_standard'? '<span style="color:var(--ink-3)">nothing — '+
+                 esc(store)+' has it</span>' : '<span style="color:var(--crit)">awaiting answer</span>'))+
+          '</td></tr>';
+      }).join('')+'</tbody></table></div></div>';
+  }).join('');
+}
+
 function requirementCard(l){
   var R=l.payor_requirements||[]; if(!R.length) return '';
   var c=l.requirement_counts||{};
@@ -343,7 +375,7 @@ function renderLine(l){
       '<span class="hint">what every module builds against</span></div>'+
       '<div class="cb">'+f.join('')+'</div>'+
       (l.scope==='serve' ? codeTable(l) : evidenceTable(l))+'</div>';
-  })()+ bindingCard(l) + requirementCard(l) +
+  })()+ bindingCard(l) + requirementCard(l) + exceptionCard(l) +
 
 
   '<div class="card"><div class="ch"><h3>Module completion</h3>'+

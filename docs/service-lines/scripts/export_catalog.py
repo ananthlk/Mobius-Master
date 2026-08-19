@@ -89,6 +89,12 @@ def main():
             r["deltas"] = [a for a in r["answers"] if a["resolves_from"] == "payor_delta"]
         requirements = sorted(reqs.values(), key=lambda x: (not x["answers"], x["predicate"]))
 
+        cur.execute("""select domain, other_store, question_asked, payer_key, answer, statement
+                       from service_line.exception_asks where line_key=%s
+                       order by domain, (payer_key <> '*'), payer_key""", (key,))
+        asks = [{"domain": r[0], "other_store": r[1], "question": r[2], "payer": r[3],
+                 "answer": r[4], "statement": r[5]} for r in cur.fetchall()]
+
         cur.execute("""select document, publisher, authority_level, pages
                        from service_line.source where line_key=%s and held
                        order by pages desc nulls last limit 6""", (key,))
@@ -107,6 +113,7 @@ def main():
             "unadjudicated_codes": sum(1 for x in rendered if not x["adjudicated"]),
             "bindings": {r: bind[r] for r in ROLES},
             "binding_counts": {r: len(bind[r]) for r in ROLES},
+            "exception_asks": asks,
             "payor_requirements": requirements,
             "requirement_counts": {
                 "applies": len(requirements),
