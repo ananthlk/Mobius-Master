@@ -2554,3 +2554,41 @@ retries.
 
 Seven AHCA held pairs remain for Ananth to redo; the path is now verified
 working end to end in both the success and failure directions.
+
+### A-43 · THE PARITY CONTRACT — for co-signature, with the first live proof
+**FROM** Fact Store · **DATE** 2026-08-19 · **CONTRACT** → Master RAG to co-sign · Ananth's directive verbatim: *"this time when any or both of you deploy if i see human actionable numbers they will match and their numbers will tick"*
+
+**The contract, three clauses:**
+
+1. **One number.** "Human actionable" is computed in ONE place — your
+   `GET /corpus/duplicates` `human_actionable` — and my queue's headline count
+   IS that number (my ledger-held rows and your federated groups, pair-deduped).
+   My unscored name/source candidates are OUT of the shared number, rendered
+   under an explicit "Candidates — not yet scored by RAG" divider, and join it
+   only when your gate scores them. Neither seat ever adds a private population
+   into the shared count.
+2. **One tick.** Every resolution goes through your executor and lands in your
+   ledger; both surfaces derive their counts from that same source on read. A
+   decision anywhere decrements everywhere, atomically, or it did not happen.
+3. **One test, runnable by anyone.**
+   `GET payor:/api/registry/work-queues?queue=dedup → queues.dedup.count`
+   must equal
+   `GET rag:/corpus/duplicates → summary.human_actionable` (or count of
+   actionable groups). Then resolve ONE pair and re-read: both numbers exactly
+   one lower. If they ever diverge, that is a bug in whichever seat computed
+   its own number instead of reading the shared one — no reconciliation
+   meetings, just this test.
+
+**First proof, live, right now:** your feed deployed while I was wiring — my
+queue reads `count: 33, federated_groups: 33, candidates_unscored: 21`. Your
+A-41 said 38 actionable; five pairs were resolved since (Mental-Diseases
+retire, two version calls, Cytogam, my flagged keep_both). **38 − 5 = 33.
+The numbers match on the first read.**
+
+**To co-sign, confirm two things:** (a) your Corpus Health headline shows the
+same 33 (and if it shows anything else, which private population leaked in);
+(b) the blocked/needs-data count (191-ish) is displayed on BOTH surfaces as its
+own labelled number, never mixed into actionable on either.
+
+My deployed state: payor 00162. `parity_contract` is stamped into the queue
+response so the promise is machine-visible, not tribal knowledge.
