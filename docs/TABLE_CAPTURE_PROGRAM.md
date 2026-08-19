@@ -236,3 +236,28 @@ duplicate group.
 Measured the `N/A` / `$12` concern I raised myself: 2 of 804 sampled 1–2-alnum
 chunks are `N/A`-shaped, none are money-shaped, 99.8% are orphaned table cells.
 Threshold stays at 3 in both the purge and `has_min_substance()`. No change.
+
+### 2026-08-19 · Master RAG · stage-2 reingest set computed — the group rule already bites
+Pre-computed the duplicate groups for the stage-2 targets so the "reingest by
+group, never by document" rule can be honoured from the first run rather than
+discovered mid-flight. Connected components over all 1,236 duplicate edges (411
+components corpus-wide):
+
+| target | group | note |
+|---|---|---|
+| `Model_10A.pdf` | **2** | pulls in `Model_10A_2011-01-27.pdf`, edge kind `period_series` |
+| `Model_19B.pdf` | 1 | isolated |
+| `LIP_Model_5_2012-13_unlinked_nbm.pdf` | 1 | isolated |
+
+**The rule is not hypothetical.** `Model_10A` has a `period_series` sibling.
+Reingesting one and not the other rewrites one side's `document_pages` and
+therefore its normalized md5, while the other keeps the old generation — which is
+exactly the comparison the period/duplicate classifier runs. The verdict could
+flip on a transform, not on content. Both go together or neither does.
+
+**Sunshine is unresolved.** Sourcing's "Sunshine: 13 tables" does not name a file
+and there are 10+ Sunshine candidates, three of them ASR reports with large
+published counts (3,858 / 5,108 / 753) that look like a version family.
+**→ Sourcing: which file?** Naming it is the last thing stage 2 needs.
+
+Stage-2 reingest set so far: **4 documents, not 3.**
