@@ -191,17 +191,22 @@ function codeTable(l){
   if(!l.codes.length) return '<div class="cb"><p style="margin:0;color:var(--ink-3);font-size:12.5px">'+
     'No codes loaded. '+esc(l.status.facts[1])+'</p></div>';
   return '<div class="scroll"><table><thead><tr>'+
-    '<th>Code</th><th>Modifier</th><th>Modifier means</th><th>Service definition</th>'+
-    '<th>Tele</th><th>Billing relations</th></tr></thead><tbody>'+
+    '<th>Code</th><th>Mod</th><th>Modifier means</th><th>Service definition</th>'+
+    '<th style="text-align:right">Standard rate</th><th>How paid</th><th>Tele</th>'+
+    '<th>Limits &amp; relations</th></tr></thead><tbody>'+
     l.codes.map(function(c){
       return '<tr><td class="c">'+c.code+'</td>'+
         '<td>'+(c.modifier?'<span class="mod">'+c.modifier+'</span>':'<span class="mod none">none</span>')+'</td>'+
         '<td style="font-size:11.5px;color:var(--ink-3)">'+(c.modifier?esc(modDef(c.modifier)):'—')+'</td>'+
         '<td>'+esc(c.definition)+(c.adjudicated?'':'<span class="flag" title="page cites '+
           c.rule_candidates.join(' and ')+'">unadjudicated</span>')+'</td>'+
+        '<td class="num">'+(c.standard_rate!=null?'$'+c.standard_rate.toFixed(2):'—')+'</td>'+
+        '<td style="font-size:11px;color:var(--ink-3)">'+esc(c.standard_rate_unit||'')+
+          (c.payment_basis?'<br><code style="font-size:10px">'+esc(c.payment_basis)+'</code>':'')+'</td>'+
         '<td class="c">'+(c.telemedicine?'Y':'')+'</td>'+
-        '<td>'+((c.relations||[]).length?(c.relations||[]).map(function(x){return '<span class="excl">'+esc(x)+'</span>';}).join('')
-                :'<span style="color:var(--ink-3)">—</span>')+'</td>'+
+        '<td>'+((c.general_rule||[]).map(function(x){return '<span class="lim">'+esc(x)+'</span>';}).join('')+
+                (c.relations||[]).map(function(x){return '<span class="excl">'+esc(x)+'</span>';}).join('')
+                || '<span style="color:var(--ink-3)">—</span>')+'</td>'+
       '</tr>';
     }).join('')+'</tbody></table></div>';
 }
@@ -217,6 +222,33 @@ function evidenceTable(l){
         '<td style="font-size:11.5px;color:var(--ink-3)">'+esc(e.authority||'unclassified')+'</td>'+
         '<td class="num">'+e.pages+'</td></tr>';
     }).join('')+'</tbody></table></div>';
+}
+
+function standardReqCard(l){
+  var R=l.standard_requirements||[]; if(!R.length) return '';
+  var c=l.standard_requirement_counts||{};
+  var LBL={provider_qualification:'Who may render', credentialing:'Credentialing',
+           supervision:'Supervision', prior_authorization:'Prior authorisation',
+           place_of_service:'Place of service', setting:'Setting', documentation:'Documentation',
+           age_population:'Population', coverage_criteria:'Coverage criteria',
+           referral_order:'Referral / order'};
+  var by={}; R.forEach(function(r){ (by[r.type]=by[r.type]||[]).push(r); });
+  return '<div class="card"><div class="ch"><h3>Standard requirements</h3>'+
+    '<span class="pill '+(c.unsourced?'p-doing':'p-done')+'"><span class="d"></span>'+
+    c.sourced+' sourced'+(c.unsourced?' · '+c.unsourced+' to extract':'')+'</span>'+
+    '<span class="hint">all vary by code, so all are ours · a payor may refine, a CMHC may exceed</span>'+
+    '</div><div class="scroll"><table><thead><tr><th>Requirement</th><th>Standard</th>'+
+    '<th>Source</th></tr></thead><tbody>'+
+    Object.keys(by).map(function(t){
+      return by[t].map(function(r,i){
+        return '<tr><td>'+(i===0?'<b>'+esc(LBL[t]||t)+'</b>':'')+'</td>'+
+          '<td'+(r.sourced?'':' style="color:var(--ink-3)"')+'>'+esc(r.statement)+
+            (r.qualifier?' <span class="mod">'+esc(r.qualifier)+'</span>':'')+'</td>'+
+          '<td style="font-size:11px">'+(r.sourced
+            ? '<span style="color:var(--ink-3)">'+esc((r.source||r.authority||'').slice(0,54))+'</span>'
+            : '<span class="pill p-todo"><span class="d"></span>to extract</span>')+'</td></tr>';
+      }).join('');
+    }).join('')+'</tbody></table></div></div>';
 }
 
 function exceptionCard(l){
@@ -257,7 +289,7 @@ function requirementCard(l){
   return '<div class="card"><div class="ch"><h3>Payor requirements</h3>'+
     '<span class="pill '+(c.answered===c.applies?'p-done':(c.answered?'p-doing':'p-todo'))+'">'+
     '<span class="d"></span>'+c.answered+' of '+c.applies+' answered</span>'+
-    '<span class="hint">registry holds the AHCA/CMS standard · Fact Store holds payor deltas</span></div>'+
+    '<span class="hint">a payor inherits everything above · these are only their refinements</span></div>'+
     '<div class="scroll"><table><thead><tr><th>Requirement</th><th>Predicate</th>'+
     '<th>On file</th><th>Held by</th><th>Answer</th></tr></thead><tbody>'+
     R.map(function(r){
@@ -323,9 +355,10 @@ function renderLine(l){
   return '<div class="ph"><div class="eyebrow">Service line · '+
     (l.rule?esc(l.rule):'no rule number')+'</div><h2>'+esc(l.name)+'</h2>'+
     '<p>'+(l.scope==='serve'
-      ? 'Defined by AHCA’s own rule decomposition. Codes, allowed modifiers and service '+
-        'definitions are read from the AHCA fee schedule, not authored here. Rates and unit '+
-        'limits are deliberately not held — those are Fact Store’s.'
+      ? 'This is the complete standard answer: what the service is, the codes and modifiers '+
+        'that constitute it, when and how it is paid, and the published standard rate. A payor '+
+        'inherits all of it and may only refine — never remove. Nothing here is inherited from '+
+        'a payor.'
       : 'A service CMHCs really run, named here on purpose. Mobius does not support its rules — '+
         'it is governed by '+esc(l.authority)+', outside the AHCA fee schedule. Naming it means '+
         'every module can decline it correctly instead of missing the question in silence.')+
@@ -344,6 +377,7 @@ function renderLine(l){
     add('Payment grain', '<code>'+esc(l.grain)+'</code>'+(l.grain==='code_modifier' ? ''
       : ' <span style="color:var(--warn)">— not code grain; cannot be priced or counted like the '+
         'fee-schedule lines</span>'));
+    if(l.payment_method) add('How it is paid', esc(l.payment_method));
     add('Rule', l.rule ? '<code>'+l.rule+'</code> — '+esc(l.name)
       : (l.scope==='serve'
          ? '<span style="color:var(--warn)">No rule number in the AHCA manifest — needs adjudication</span>'
@@ -372,10 +406,10 @@ function renderLine(l){
     }
 
     return '<div class="card"><div class="ch"><h3>Definition</h3>'+
-      '<span class="hint">what every module builds against</span></div>'+
+      '<span class="hint">the complete standard answer — no payor needed</span></div>'+
       '<div class="cb">'+f.join('')+'</div>'+
       (l.scope==='serve' ? codeTable(l) : evidenceTable(l))+'</div>';
-  })()+ bindingCard(l) + requirementCard(l) + exceptionCard(l) +
+  })()+ bindingCard(l) + standardReqCard(l) + requirementCard(l) + exceptionCard(l) +
 
 
   '<div class="card"><div class="ch"><h3>Module completion</h3>'+
@@ -402,8 +436,9 @@ function renderAll(){
     '<p>'+L.length+' service lines. The registry defines how Mobius names a service line and which '+
     'codes constitute it — nothing about any payor’s implementation, and nothing about any client. '+
     'A line binds codes three ways: <b>billed</b> (HCPCS you render), <b>Dx</b> (ICD-10-CM that '+
-    'classifies the encounter) and <b>DRG</b> (APR-DRG it groups to). No rates, weights or limits — '+
-    'those belong to Fact Store.</p></div>'+
+    'classifies the encounter) and <b>DRG</b> (APR-DRG it groups to). Each line answers completely '+
+    'on its own — definition, how it is paid, and the published AHCA/CMS standard rate. Payors '+
+    'inherit that and refine; the registry never inherits from a payor.</p></div>'+
 
   '<div class="card"><div class="cb" style="border-bottom:1px solid var(--line)">'+
     '<div class="roll"><span class="big">'+allDone+'</span><span class="of">of '+total+

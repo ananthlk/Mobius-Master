@@ -8,13 +8,45 @@ Schema `service_line.*` in `mobius_rag`. Migration: [`033_service_line_registry.
 
 Two deliberate exclusions. Both exist to stop the registry becoming a second copy of something that already has an owner.
 
+### The standard answer — everything the registry holds
+
+A line must answer completely on its own, with no payor involved:
+
+| | Where |
+|---|---|
+| Definition, aliases, clinical concept | `line`, spine |
+| Codes and allowed modifiers, with what each modifier means | `line_code`, `qualifier` |
+| Diagnoses that classify the encounter (ICD-10-CM) | `line_code` role `classified_by` |
+| Payment group it resolves to (APR-DRG + severity) | `line_code` role `grouped_to` |
+| **How and when it is paid** | `line.payment_method`, `line_code.payment_basis` |
+| **The published standard rate** | `line_code.standard_rate` + `rate_authority` |
+| Service limits and unit definition | `line_code.general_rule` |
+| Same-day exclusions and bundling | `code_relation` |
+| **Who may render** | `standard_requirement` type `provider_qualification` |
+| **Credentialing and certification to bill it** | `standard_requirement` type `credentialing` |
+| Supervision, prior authorisation, place of service, setting, documentation, population, coverage criteria, referral | `standard_requirement` |
+
+All of these vary by **service code**, never by payor. That is why they are ours.
+
+### What the registry does not hold
+
 | Not held | Owner | Why |
 |---|---|---|
-| Rates, fees, weights, DRG relative weights | `facts.*` (Fact Store) | Different clock — a rate changes when the payer publishes, the scope changes when we ship |
-| Payor-specific variation of any rule | `facts.*` (Fact Store) | Varies by payor, so it is not ours. See *What we own vs. what we source* |
-| Code dictionaries | `reference.*` | 74,719 ICD-10-CM, 8,725 HCPCS and 1,330 APR-DRG rows already exist. The registry records which codes *belong to a line*, not what a code means |
+| A *payor's* rate, PA or limit | `facts.*` (Fact Store) | Varies by payor |
+| The appeals process | Appeals agent | Varies by payer; we hold only the per-code exception |
+| What a CMHC chooses to do beyond the standard | Client configuration | A third layer, not ours at all |
+| Code dictionaries | `reference.*` | 74,719 ICD-10-CM, 8,725 HCPCS and 1,330 APR-DRG rows already exist |
 
-The registry **does** hold the service limit and unit definition stated by the state rule (`line_code.general_rule`) — that varies by code, not by payor. Never a dollar amount; the loader drops any statement containing one.
+### Inheritance runs one way
+
+```
+registry standard  ──►  payor answer = standard + refinements + payor-owned attributes
+                                       (appeals, PA, contacts)
+```
+
+The registry never inherits from a payor. A payor cannot remove a line from the standard — for
+Medicaid and Medicare the programme binds them, so "not offered by this payor" should not occur
+(`line.offered_by_default`).
 
 ## The binding role
 

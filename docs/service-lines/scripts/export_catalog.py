@@ -52,21 +52,28 @@ def main():
     modules = [{"key": k, "name": n, "role": r, "owes": owes.get(n, "")}
                for k, n, r in MODULES]
 
-    cur.execute("""select key, name, authority, payment_grain, scope, rule_ref
+    cur.execute("""select key, name, authority, payment_grain, scope, rule_ref, payment_method
                    from service_line.line
                    order by (scope <> 'serve'), payment_grain, key""")
     lines = []
-    for key, name, authority, grain, scope, rule in cur.fetchall():
+    for key, name, authority, grain, scope, rule, method in cur.fetchall():
         cur.execute("""select code_system, code, qualifier, binding_role, definition,
-                              adjudicated, rule_candidates, source_document, source_page
+                              adjudicated, rule_candidates, source_document, source_page,
+                              general_rule, standard_rate, standard_rate_unit, payment_basis,
+                              telemedicine, rate_authority
                        from service_line.line_code where line_key=%s
                        order by binding_role, code, qualifier""", (key,))
         bind = {r: [] for r in ROLES}
-        for cs, code, q, role, dfn, adj, cands, doc, page in cur.fetchall():
+        for (cs, code, q, role, dfn, adj, cands, doc, page,
+             grule, rate, runit, basis, tele, rauth) in cur.fetchall():
             bind[role].append({"code_system": cs, "code": code, "modifier": q,
                                "definition": dfn, "adjudicated": adj,
                                "rule_candidates": cands or [],
                                "relations": sorted(set(relations.get(code, []))) if role == "rendered_as" else [],
+                               "general_rule": grule or [],
+                               "standard_rate": float(rate) if rate is not None else None,
+                               "standard_rate_unit": runit, "payment_basis": basis,
+                               "telemedicine": tele, "rate_authority": rauth,
                                "cite": {"document": doc, "page": page}})
 
         cur.execute("""select module, status, evidence from service_line.module_obligation
@@ -89,6 +96,12 @@ def main():
             r["deltas"] = [a for a in r["answers"] if a["resolves_from"] == "payor_delta"]
         requirements = sorted(reqs.values(), key=lambda x: (not x["answers"], x["predicate"]))
 
+        cur.execute("""select requirement_type, statement, source_ref, sourced, authority, qualifier
+                       from service_line.standard_requirement where line_key=%s
+                       order by sourced desc, requirement_type, statement""", (key,))
+        std_reqs = [{"type": r[0], "statement": r[1], "source": r[2], "sourced": r[3],
+                     "authority": r[4], "qualifier": r[5]} for r in cur.fetchall()]
+
         cur.execute("""select domain, other_store, question_asked, payer_key, answer, statement
                        from service_line.exception_asks where line_key=%s
                        order by domain, (payer_key <> '*'), payer_key""", (key,))
@@ -104,6 +117,7 @@ def main():
         lines.append({
             "key": key, "name": name, "rule": rule, "authority": authority,
             "grain": grain, "scope": "serve" if scope == "serve" else "decline_well",
+            "payment_method": method,
             "fee_schedule_family": None,
             "source_documents": 0,
             "codes": rendered,
@@ -113,6 +127,11 @@ def main():
             "unadjudicated_codes": sum(1 for x in rendered if not x["adjudicated"]),
             "bindings": {r: bind[r] for r in ROLES},
             "binding_counts": {r: len(bind[r]) for r in ROLES},
+            "standard_requirements": std_reqs,
+            "standard_requirement_counts": {
+                "sourced": sum(1 for r in std_reqs if r["sourced"]),
+                "unsourced": sum(1 for r in std_reqs if not r["sourced"]),
+            },
             "exception_asks": asks,
             "payor_requirements": requirements,
             "requirement_counts": {
