@@ -1,0 +1,136 @@
+<title>Deep Research — live loop</title>
+<style>
+:root{--ink:#161a22;--ink-2:#4a5261;--ink-3:#79808f;--page:#f6f4f0;--card:#fffefc;
+--line:#e2ddd4;--acquire:#b3452b;--reindex:#a06a12;--refine:#2f6b8f;--escalate:#6b3f8f;
+--pass:#2c6e49;--fail:#b3452b;--accent:#2f6b8f;}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#eceaf0;--ink-2:#b3b8c4;
+--ink-3:#848b99;--page:#14161b;--card:#1b1e25;--line:#2c313b;--acquire:#e08a72;--reindex:#d9ab5c;
+--refine:#7fb4d4;--escalate:#b28fd4;--pass:#6fbf92;--fail:#e08a72;--accent:#7fb4d4;}}
+:root[data-theme="dark"]{--ink:#eceaf0;--ink-2:#b3b8c4;--ink-3:#848b99;--page:#14161b;
+--card:#1b1e25;--line:#2c313b;--acquire:#e08a72;--reindex:#d9ab5c;--refine:#7fb4d4;
+--escalate:#b28fd4;--pass:#6fbf92;--fail:#e08a72;--accent:#7fb4d4;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:16px/1.55 ui-serif,Georgia,"Iowan Old Style",serif}
+.wrap{max-width:1080px;margin:0 auto;padding:3rem 1.5rem 5rem}
+h1{font-size:2rem;margin:0 0 .3rem;letter-spacing:-.02em;text-wrap:balance}
+.lede{color:var(--ink-2);max-width:62ch;margin:0 0 2.5rem}
+h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-3);
+font-family:ui-sans-serif,system-ui,sans-serif;margin:3rem 0 1rem;padding-bottom:.5rem;
+border-bottom:1px solid var(--line)}
+.stats{display:flex;flex-wrap:wrap;gap:2.5rem;margin:0 0 1rem}
+.stat b{display:block;font-size:1.9rem;font-variant-numeric:tabular-nums;
+font-family:ui-sans-serif,system-ui,sans-serif;letter-spacing:-.02em}
+.stat span{font-size:.8rem;color:var(--ink-3);font-family:ui-sans-serif,system-ui,sans-serif}
+.queue{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+.repair{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--ink-3);
+border-radius:3px;padding:1.1rem 1.2rem}
+.repair.a-acquire{border-left-color:var(--acquire)}
+.repair.a-reindex{border-left-color:var(--reindex)}
+.repair.a-refine{border-left-color:var(--refine)}
+.repair.a-escalate{border-left-color:var(--escalate)}
+.repair header{display:flex;justify-content:space-between;align-items:baseline;gap:1rem}
+.verb{font-family:ui-sans-serif,system-ui,sans-serif;font-weight:640;font-size:.95rem}
+.rule{font-size:.76rem;color:var(--ink-3)}
+.gloss{margin:.15rem 0 .8rem;font-size:.83rem;color:var(--ink-3);font-style:italic}
+.subject{margin:0 0 .5rem;font-family:ui-monospace,SFMono-Regular,monospace;font-size:.76rem;color:var(--ink-2)}
+.step{margin:0;font-size:.9rem}
+.target{margin:.7rem 0 0;font-size:.76rem;color:var(--ink-2);font-family:ui-monospace,monospace;word-break:break-word}
+.url{display:inline-block;margin-top:.5rem;font-size:.78rem;color:var(--accent);font-family:ui-sans-serif,system-ui,sans-serif}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.86rem}
+th{text-align:left;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.7rem;text-transform:uppercase;
+letter-spacing:.08em;color:var(--ink-3);padding:.5rem .7rem;border-bottom:1px solid var(--line);font-weight:600}
+td{padding:.6rem .7rem;border-bottom:1px solid var(--line);vertical-align:top}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.subj{font-family:ui-monospace,monospace;font-size:.78rem}
+code{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.8em}
+.chip,.act{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.72rem;padding:.12rem .45rem;
+border-radius:2px;border:1px solid currentColor;white-space:nowrap}
+.chip{color:var(--fail)}.ok{color:var(--pass);font-size:.8rem}
+.none{color:var(--ink-3);font-size:.8rem;font-style:italic}
+.none{color:var(--ink-3);font-size:.8rem;font-style:italic}
+.act.a-acquire{color:var(--acquire)}.act.a-reindex{color:var(--reindex)}
+.act.a-refine{color:var(--refine)}.act.a-escalate{color:var(--escalate)}
+.verdicts{list-style:none;padding:0;margin:.8rem 0 0}
+.verdicts li{display:flex;gap:.9rem;align-items:baseline;padding:.42rem 0;border-bottom:1px solid var(--line);font-size:.83rem}
+.verdicts li::before{content:"\2717";color:var(--fail);width:1rem}
+.verdicts li.pass::before{content:"\2713";color:var(--pass)}
+.fname{font-family:ui-monospace,monospace;min-width:11rem}
+.issue{color:var(--ink-2);min-width:11rem;font-size:.79rem}
+.src{color:var(--ink-3);font-size:.74rem;font-family:ui-monospace,monospace}
+.sum{font-size:.85rem;color:var(--ink-2);margin:0}
+ol.ladder{counter-reset:s;list-style:none;padding:0;margin:0}
+ol.ladder li{counter-increment:s;padding:.6rem 0 .6rem 2.4rem;position:relative;border-bottom:1px solid var(--line)}
+ol.ladder li::before{content:counter(s);position:absolute;left:0;top:.6rem;
+font-family:ui-sans-serif,system-ui,sans-serif;font-size:.72rem;color:var(--ink-3);
+border:1px solid var(--line);border-radius:50%;width:1.5rem;height:1.5rem;display:grid;place-items:center}
+.ladder b{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.9rem;font-weight:620}
+.ladder span{display:block;color:var(--ink-2);font-size:.85rem}
+pre{background:var(--card);border:1px solid var(--line);border-radius:3px;padding:1rem 1.1rem;
+overflow-x:auto;font-size:.76rem;line-height:1.5;font-family:ui-monospace,SFMono-Regular,monospace;color:var(--ink-2)}
+footer{margin-top:3.5rem;padding-top:1.2rem;border-top:1px solid var(--line);font-size:.78rem;
+color:var(--ink-3);font-family:ui-sans-serif,system-ui,sans-serif}
+</style>
+<div class="wrap">
+<h1>Deep Research &mdash; the loop, live</h1>
+<p class="lede">Every fact is disbelieved field by field before the registry keeps it. When a
+turn fails, the database &mdash; not a model &mdash; decides what the repair is. This is the
+current state: what has been asked, what the critic did to it, and what has to happen next.</p>
+
+<div class="stats">
+  <div class="stat"><b>31</b><span>service lines</span></div>
+  <div class="stat"><b>343</b><span>codes bound</span></div>
+  <div class="stat"><b>2</b><span>facts sourced</span></div>
+  <div class="stat"><b>0</b><span>limits certified</span></div>
+  <div class="stat"><b>52</b><span>codes still prose-only</span></div>
+  <div class="stat"><b>2</b><span>open repairs</span></div>
+</div>
+
+<h2>The work queue &mdash; what has to happen next</h2>
+<div class="queue"><article class="repair a-acquire">
+  <header><span class="verb">Acquire</span><code class="rule">59G-4.310</code></header>
+  <p class="gloss">a document the corpus does not have</p>
+  <p class="subject">tcm_children/service_limit_T2023</p>
+  <p class="step">Acquire 59G-4.310 from AHCA and ingest it. Until it is in the corpus, every answer about tcm_children_at_risk is sourced from something else.</p>
+  <p class="target">59G-4.310 TCM for Children at Risk of Abuse and Neglect_Adoption.pdf</p>
+  <a class="url" href="https://ahca.myflorida.com/content/download/27075/file/59G-4.310%20TCM%20for%20Children%20at%20Risk%20of%20Abuse%20and%20Neglect_Adoption.pdf">published source &#8599;</a>
+</article>
+<article class="repair a-reindex">
+  <header><span class="verb">Re-index</span><code class="rule">59G-4.052</code></header>
+  <p class="gloss">chunked but never surfaces</p>
+  <p class="subject">bh_therapy/service_limit_H2019_HR</p>
+  <p class="step">fl_bh_therapy_services_59G-4.052.pdf is chunked but did not surface for this question. Re-tag and reindex it, then retry.</p>
+  
+  
+</article></div>
+
+<h2>Every subject that has run</h2>
+<div class="scroll"><table>
+<thead><tr><th>Subject</th><th>Rule</th><th>Turns</th><th>Docs seen</th><th>Why rejected</th><th>Next move</th></tr></thead>
+<tbody><tr><td class='subj'>tcm_children/service_limit_T2023</td><td><code>59G-4.310</code></td><td class='num'>1</td><td class='num'>20</td><td><span class="none">nothing extracted</span></td><td><span class="act a-acquire">Acquire</span></td></tr>
+<tr><td class='subj'>bh_therapy/service_limit_H2019_HR</td><td><code>59G-4.052</code></td><td class='num'>1</td><td class='num'>20</td><td><span class="chip">not_a_standard_source</span></td><td><span class="act a-reindex">Re-index</span></td></tr>
+<tr><td class='subj'>bh_assessment/place_of_service</td><td><code>59G-4.028</code></td><td class='num'>1</td><td class='num'>6</td><td><span class="none">nothing extracted</span></td><td>&mdash;</td></tr>
+<tr><td class='subj'>bh_therapy/place_of_service</td><td><code>59G-4.052</code></td><td class='num'>3</td><td class='num'>10</td><td><span class="none">nothing extracted</span></td><td>&mdash;</td></tr>
+<tr><td class='subj'>bh_therapy/provider_qualification</td><td><code>59G-4.052</code></td><td class='num'>3</td><td class='num'>11</td><td><span class="none">nothing extracted</span></td><td>&mdash;</td></tr>
+<tr><td class='subj'>bh_assessment/psych_eval_provider</td><td><code>59G-4.028</code></td><td class='num'>3</td><td class='num'>21</td><td><span class="ok">accepted</span></td><td><span class="act a-refine">Ask again</span></td></tr>
+<tr><td class='subj'>bh_therapy/provider_qualification_think</td><td><code>59G-4.052</code></td><td class='num'>1</td><td class='num'>14</td><td><span class="ok">accepted</span></td><td>&mdash;</td></tr></tbody></table></div>
+
+<h2>One turn, adjudicated field by field</h2>
+<p class='sum'>bh_assessment/psych_eval_provider &middot; turn 3 &mdash; 1 of 1 fields survived</p><ul class='verdicts'><li class="pass"><span class='fname'>practitioner_types</span><span class='issue'>none</span><span class='src'>59G-4.028.pdf</span></li></ul>
+
+<h2>What every value must survive</h2>
+<ol class="ladder"><li><b>Quote is verbatim</b><span>the sentence really appears in the answer, ignoring markdown</span></li><li><b>Document was cited</b><span>the source is one the answer actually listed</span></li><li><b>Source is identifiable</b><span>not an ingest artifact nobody can look up</span></li><li><b>Source is the authority</b><span>carries the governing 59G rule, not a payor manual</span></li><li><b>Quote supports the value</b><span>judged, one field at a time</span></li></ol>
+
+<h2>See it yourself</h2>
+<pre>psql "$MOBIUS_RAG_URL" -f mobius-skills/deep-research/sql/loop_state.sql
+
+-- or just the queue
+select action, gap_class, subject_id, next_step
+  from research.open_repairs;</pre>
+
+<footer>Read from mobius_rag at build time &mdash; service_line.*, research.* &mdash; nothing on
+this page is hand-entered. Two facts are sourced; limits certified is still 0 because neither is
+a benefit limit. bh_assessment took three turns: it filed the same repair twice, then answered
+from 59G-4.028 on the third &mdash; which is why a repeated diagnosis is not treated as a stalled
+loop. Repairs close when a later turn answers the question.</footer>
+</div>
