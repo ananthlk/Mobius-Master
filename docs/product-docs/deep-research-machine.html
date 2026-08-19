@@ -211,6 +211,82 @@ them into one score would hide exactly the case a caller needs to see.</p>
 <tr><td><b>Answered</b></td><td>every required field survived</td><td><code>request.status='sourced'</code></td><td><span class='tag have'>built</span></td></tr>
 <tr><td><b>Closed</b></td><td>output delivered to the caller</td><td>&mdash;</td><td><span class='tag need'>not built</span></td></tr></tbody></table></div>
 
+<h2>The judge &mdash; a bounded ReAct, not a chat</h2>
+<p>Yes: a single static call is too weak for the questions that decide a fact. But a judge with
+general reasoning and open tools is <em>worse</em> than a static call, because it can reason its
+way to &ldquo;close enough&rdquo; &mdash; the exact failure the extractor/critic split exists to
+prevent. The resolution is to constrain three things and leave the loop free inside them.</p>
+
+<pre class="mermaid">flowchart TB
+  F["one extracted field<br/>value + quote + document"] --> G1
+  subgraph GATES["Gates — deterministic, free, not negotiable"]
+    direction TB
+    G1["quote is verbatim"] --> G2["document was cited"]
+    G2 --> G3["source is identifiable"]
+    G3 --> G4["source is the authority"]
+  end
+  G1 -. fails .-> R["REJECT<br/>with issue class"]
+  G2 -. fails .-> R
+  G3 -. fails .-> R
+  G4 -. fails .-> R
+  G4 --> J
+
+  subgraph J["Judge — ReAct, bounded, refutation stance"]
+    direction TB
+    T["try to refute this value"] --> TOOL{"need evidence?"}
+    TOOL -- yes --> USE["call ONE verification tool"]
+    USE --> T
+    TOOL -- no --> V["verdict + the evidence it used"]
+  end
+
+  J --> R
+  J --> A["ACCEPT"]
+</pre>
+
+<h3>Three constraints that keep it a judge</h3>
+<div class="cards">
+  <div class="card k-in"><h4>Gates run first, outside the loop</h4>
+  <p>The mechanical checks are strings and set membership &mdash; free, certain, and not
+  arguable. A field that fails one never reaches the model, so there is no opportunity to
+  reason past a quote that simply is not there.</p></div>
+
+  <div class="card k-out"><h4>Tools return evidence, never verdicts</h4>
+  <p>A tool may say <em>59G-4.310 supersedes 59G-4.199 as of 2019-03-01</em>. No tool says
+  &ldquo;this field is fine.&rdquo; The judge alone concludes, and only into a closed
+  vocabulary of issue classes.</p></div>
+
+  <div class="card k-human"><h4>Refute, do not verify</h4>
+  <p>The loop&rsquo;s job is to find a reason to reject, and it may only reach for tools that
+  could produce one. &ldquo;Verify this&rdquo; makes a model agreeable; &ldquo;break
+  this&rdquo; makes it useful.</p></div>
+</div>
+
+<h3>The tools it gets</h3>
+<div class="scroll"><table>
+<thead><tr><th>Tool</th><th>Returns</th><th>Why it earns a place</th></tr></thead>
+<tbody><tr><td><code>read_source</code></td><td>open the cited document at the cited page</td><td><b>closes the hole.</b> Today the quote is checked against <em>chat&rsquo;s answer</em>, so a sentence chat invented and the extractor copied faithfully passes every check. Nothing currently reads the PDF.</td></tr>
+<tr><td><code>compute</code></td><td>arithmetic and unit coherence</td><td>&ldquo;4 per day&rdquo; and &ldquo;104 per state fiscal year&rdquo; are each quotable and may still contradict each other. Python decides that, not prose.</td></tr>
+<tr><td><code>rule_lookup</code></td><td>supersession, effective dates, authority tier</td><td>59G-4.199 against 59G-4.310 was a real conflict this loop hit and could not settle. A lookup settles it; a model guesses.</td></tr>
+<tr><td><code>code_lookup</code></td><td>does this code belong to this line at all</td><td>H2019/HR is a different service under Behavior Analysis than under CBH. Same code, different limits &mdash; the cross-line trap.</td></tr>
+<tr><td><code>prior_facts</code></td><td>what the store already holds for this subject</td><td>A new fact contradicting a certified one is the most expensive failure here, and nothing checks for it today.</td></tr>
+<tr><td><code>schema_diff</code></td><td>what is missing against required and optional</td><td>Deterministic, and it is what populates <code>coverage</code> rather than asking a model to count.</td></tr></tbody></table></div>
+
+<p>What it does <b>not</b> get: web search, chat, or the extractor. Every one of those can
+introduce a new claim, and a judge that can introduce claims is a second extractor with a
+veto. The tool list is closed by that rule, not by count &mdash; anything that only
+<em>checks</em> an existing claim is a candidate; anything that can produce one is not.</p>
+
+<h3>What it costs, and how that is paid</h3>
+<p>A ReAct per field is far more expensive than one call per field. Three things keep it
+bounded: the gates reject most bad fields for free before any model runs; the budget is
+<em>per field</em>, so one hard value cannot consume what the easy ones needed; and verdicts
+cache on <code>(value, quote, document)</code>, which recurs constantly because the same
+sentence grounds the same value across runs.</p>
+
+<p>One more thing changes with this: the judge must draw its model <em>independently</em> of
+the extractor. They share a wrapper today, so a bad draw can produce both the claim and its
+approval.</p>
+
 <h2>Who owns which repair</h2>
 <div class="scroll"><table>
 <thead><tr><th>Action</th><th>What it means</th><th>Owner</th></tr></thead>
