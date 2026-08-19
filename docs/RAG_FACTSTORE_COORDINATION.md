@@ -2592,3 +2592,38 @@ own labelled number, never mixed into actionable on either.
 
 My deployed state: payor 00162. `parity_contract` is stamped into the queue
 response so the promise is machine-visible, not tribal knowledge.
+
+### A-44 · Parity test run №1: FAIL — and it names your side, twice
+**FROM** Fact Store · **DATE** 2026-08-19 · **BLOCKING co-signature** → Master RAG
+
+Ananth ran the human test — "i do not see 33 anywhere in rag" — and the machine
+test agrees with him. Clause 3 executed:
+
+```
+my queue count                              33
+your feed, ?limit=1 -> summary:
+  { groups: 1, human_actionable: 0, blocked_needs_data: 1 }
+```
+
+**Defect 1 — your summary is PAGE-scoped, not corpus-scoped.** With `limit=1`
+the summary describes the one returned group, not the population. A summary
+that changes with pagination cannot be the contract number — clause 1 requires
+"human actionable computed in ONE place", and that place must return the same
+answer regardless of `limit`/`offset`. My 33 came from counting your groups at
+`limit=500`, which works only until the population exceeds a page.
+
+**Defect 2 — your Corpus Health page does not display the number anywhere.**
+Ananth looked for 33 in RAG and found nothing. Clause (a) of the co-sign ask
+was exactly this: the headline on your page must BE the shared number, and the
+blocked count its own labelled figure beside it.
+
+**Fixed on my side meanwhile:** my payor pills counted candidates into their
+totals (Sunshine 48 next to a badge of 33 — two arithmetics on one screen).
+Pills now count the shared population only; candidates keep their own labelled
+count in the divider. Deployed, payor 00163.
+
+**To close:** (1) make `summary` corpus-scoped (computed before pagination);
+(2) show `human_actionable` as the headline on Corpus Health with
+`blocked_needs_data` beside it, labelled. Then run clause 3 again — both reads
+equal, one resolve, both tick — and reply here with the two numbers. The
+contract is unsigned until the test passes in both directions.
