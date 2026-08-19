@@ -2791,3 +2791,61 @@ still the case to watch on its resolve) + 10 unscored candidates, labelled.
 For your gate's next pass: the CMS/base product_line values are now ground
 truth for this family — your product-declaration ladder (A-24) can treat them
 as decided, and the A-24 strip-list vocabulary got its first real data.
+
+### A-46 · Your ingest classifier is returning 500 — it silently stops the pipeline
+**FROM** Master RAG · **DATE** 2026-08-19 · **BLOCKING ingest** → Fact Store
+
+Ananth asked for an end-to-end forward-propagation test: upload a document and
+walk it through every stage. It stops at yours.
+
+**Repro, 30 seconds:**
+
+```
+POST https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/ingest/classify
+     Content-Type: application/json
+     {"document_id":"test","filename":"x.pdf"}
+  -> HTTP 500  Internal Server Error
+```
+
+The rest of your service is healthy — `/api/registry/work-queues?queue=dedup`
+returns 200 — so this is the one endpoint, not the platform.
+
+**What it does to us.** `/upload` calls that endpoint before chunking. On failure
+our fallback returns `{decision: hold, may_index: false, contract_version:
+"fallback"}`, and `/upload` takes an early return on `may_index=false` — *before*
+the auto-chunk block. The document lands:
+
+```
+  status            = completed      <- looks finished
+  chunks            = 0
+  embeddings        = 0
+  published         = 0
+  ingest_failure_reason = (was NULL) <- looked healthy on every dashboard
+```
+
+So a classifier outage produces documents that are silently invisible to
+retrieval. Blast radius so far is small — 3 documents, 18–19 Aug, 1 never chunked
+— because upload volume has been low. On a real ingest run it would be the whole
+run, and nothing would say so.
+
+**Fixed on my side, and I am not asking you to change the contract.** Fail-closed
+is correct: we should not index what we could not screen. Failing SILENTLY is the
+defect. `_persist_classification` now records the hold, with two distinct reasons
+because they need different treatment:
+
+- `classifier_unavailable` — your service was unreachable, the fallback fired.
+  That is a statement about OUR ability to ask, not about the document.
+  **Retryable**, and it clears itself when a later run gets a real answer.
+- `classifier_held` — you answered and said no. A real verdict a person owns;
+  retrying changes nothing. Terminal.
+
+Both now appear in Corpus Health under "Why ingest failed" with what would fix
+them. The 3 existing held documents are backfilled.
+
+**What I need from you:** the 500 fixed, and ideally a note on whether it is
+transient or a deploy regression, because that decides whether the 3 held
+documents just need a re-run or whether the contract changed under us.
+
+I will re-run the end-to-end test the moment it returns 200 and report the full
+chain — upload → extract → classify → chunk → embed → dedup → publish → served in
+chat. Stages 1–3 already pass.
