@@ -148,6 +148,17 @@ header p{margin:0;color:var(--ink-2);font-size:13.5px;max-width:74ch}
 .field{display:grid;grid-template-columns:104px minmax(0,1fr);gap:11px;font-size:12.5px;margin-top:7px}
 .field .k{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3)}
 blockquote{margin:0;padding-left:11px;border-left:2px solid var(--line-strong);color:var(--ink-2);font-size:12.5px}
+.work{border:1px solid var(--line);border-radius:9px;background:var(--surface);overflow:hidden}
+.work summary{list-style:none;cursor:pointer;padding:9px 13px;display:flex;align-items:center;
+  gap:10px;background:var(--surface-2)}
+.work summary::-webkit-details-marker{display:none}
+.work summary:hover{background:var(--line)}
+.work .sm{font-size:11.5px;color:var(--ink-3)}
+.work .steps{padding:9px 13px;max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:1px}
+.work .step{font-family:var(--mono);font-size:11px;color:var(--ink-3);padding:2px 0;
+  border-bottom:1px dotted var(--line)}
+.work .step:last-child{border-bottom:0}
+.work .step.hi{color:var(--ink-2);font-weight:600}
 .waiting{display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px dashed var(--line-strong);
    border-radius:8px;color:var(--ink-2);font-size:12.5px;background:var(--surface)}
 .note{font-size:12.5px;color:var(--ink-2);border-left:2px solid var(--accent-line);
@@ -189,6 +200,17 @@ def render(rows, req):
             + (f'<div class="sources" style="gap:6px">{chips}</div>' if chips else "")
             + (f'<div class="sources">{srcs}</div>' if srcs else "") +
             '</div></div>')
+
+        tl = a.get("thinking_log") or []
+        if tl:
+            steps = "".join(
+                f'<div class="step{" hi" if any(k in l for k in ("⚠", "Found", "Round 3/3", "escalat")) else ""}">'
+                f'{esc(l)}</div>' for l in tl)
+            out.append(
+                '<details class="work"><summary>'
+                f'<span class="pill p-mute"><span class="d"></span>working out</span>'
+                f'<span class="sm">{len(tl)} steps — how chat got there</span></summary>'
+                f'<div class="steps">{steps}</div></details>')
 
         got = bool(ev.get("extracted"))
         gap = ev.get("gap_class") or "none"
@@ -264,7 +286,10 @@ if __name__ == "__main__":
     cur = c.cursor(cursor_factory=RealDictCursor)
     cur.execute("""select id, consumer, subject_id, status, evaluator_prompt
                      from research.request
-                    where evaluator_prompt is not null order by id desc limit 1""")
+                    where evaluator_prompt is not null
+                      and id = coalesce(%(rid)s, (select max(id) from research.request
+                                                   where evaluator_prompt is not null))""",
+                {"rid": int(__import__("sys").argv[1]) if len(__import__("sys").argv) > 1 else None})
     req = cur.fetchone()
     cur.execute("""select t.id, t.n, t.query, t.status, t.feedback_kind, t.feedback_state,
                           t.feedback_ref
@@ -272,7 +297,8 @@ if __name__ == "__main__":
                 (req["id"],))
     turns = [dict(x) for x in cur.fetchall()]
     for t in turns:
-        cur.execute("""select answer_text, top_documents, evaluator_verdict, reason, model
+        cur.execute("""select answer_text, top_documents, evaluator_verdict, reason, model,
+                              thinking_log
                          from research.attempt where turn_id=%s order by id desc limit 1""",
                     (t["id"],))
         t["attempt"] = dict(cur.fetchone() or {}) or None
