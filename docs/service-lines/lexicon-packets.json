@@ -1,0 +1,3536 @@
+{
+ "purpose": "One packet per service line, mirroring every level of the registry page. Lexicon fills each `vernacular` array; the registry fills nothing there.",
+ "rules": [
+  "A modifier changes the service. H0031 is four different services at '', HN, HO and TS \u2014 never one alias set for the bare code.",
+  "TS is not 'established patient' globally. On H0032 it turns treatment plan DEVELOPMENT into REVIEW. Modifier meaning is per-code.",
+  "H0001 is the substance-use twin of H0031 with near-identical English. The SUD/MH split is carried by the code, not the words.",
+  "Lines with no bindings still need vernacular \u2014 that is where user language is strongest and our evidence weakest."
+ ],
+ "lines": [
+  {
+   "line_key": "behavior_analysis",
+   "identity": {
+    "canonical_name": "Behavior Analysis Services",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": null,
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "code_modifier",
+    "how_it_is_paid": "Fee-for-service against the published fee schedule: rate per (code, modifier), billed per unit or encounter as the unit definition states.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "bh_assessment",
+   "identity": {
+    "canonical_name": "Behavioral Health Assessment Services",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": "59G-4.028",
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "code_modifier",
+    "how_it_is_paid": "Fee-for-service against the published fee schedule: rate per (code, modifier), billed per unit or encounter as the unit definition states.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [
+    {
+     "code": "H0001",
+     "qualifier": "HO",
+     "qualifier_means": "Masters degree level",
+     "source_definition": "In-depth assessment, new patient, substance abuse",
+     "service_limits": [
+      "assessment Medicaid reimburses one in-depth assessment, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H0001",
+     "qualifier": "TS",
+     "qualifier_means": "Follow-up service",
+     "source_definition": "In-depth assessment, established patient, substance abuse",
+     "service_limits": [
+      "assessment Medicaid reimburses one in-depth assessment, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H0031",
+     "qualifier": "HN",
+     "qualifier_means": "Bachelors degree level",
+     "source_definition": "Bio-psychosocial Evaluation, mental health",
+     "service_limits": [
+      "assessment Medicaid reimburses one biopsychosocial evaluation, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H0031",
+     "qualifier": "HO",
+     "qualifier_means": "Masters degree level",
+     "source_definition": "In-depth assessment, new patient, mental health",
+     "service_limits": [
+      "assessment Medicaid reimburses one in-depth assessment, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H0031",
+     "qualifier": "TS",
+     "qualifier_means": "Follow-up service",
+     "source_definition": "In-depth assessment, established patient, mental health",
+     "service_limits": [
+      "assessment Medicaid reimburses one in-depth assessment, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2000",
+     "qualifier": "HO",
+     "qualifier_means": "Masters degree level",
+     "source_definition": "Psychiatric evaluation by a non- physician",
+     "service_limits": [
+      "evaluation Medicaid reimburses a maximum of two psychiatric evaluations per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2000",
+     "qualifier": "HP",
+     "qualifier_means": "Doctoral level",
+     "source_definition": "Psychiatric evaluation by a physician",
+     "service_limits": [
+      "evaluation Medicaid reimburses a maximum of two psychiatric evaluations per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2000",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Psychiatric review of records",
+     "service_limits": [
+      "review Medicaid reimburses a maximum of two psychiatric reviews of records, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2010",
+     "qualifier": "HO",
+     "qualifier_means": "Masters degree level",
+     "source_definition": "Brief behavioral health status exam",
+     "service_limits": [
+      "quarter hour There is a maximum daily limit of two quarter-hour units.",
+      "Medicaid reimburses for brief behavioral health status examinations a maximum of 10 quarter-hour units annually (2.5 hours), per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    }
+   ],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "provider_qualification",
+     "statement": "Rendering practitioner must be at Masters degree level when billed with modifier HO.",
+     "sourced": true
+    },
+    {
+     "requirement_type": "provider_qualification",
+     "statement": "Rendering practitioner must be at Doctoral level when billed with modifier HP.",
+     "sourced": true
+    },
+    {
+     "requirement_type": "provider_qualification",
+     "statement": "Rendering practitioner must be at Bachelors degree level when billed with modifier HN.",
+     "sourced": true
+    },
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "bh_community_support",
+   "identity": {
+    "canonical_name": "Behavioral Health Community Support Services",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": "59G-4.031",
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "code_modifier",
+    "how_it_is_paid": "Fee-for-service against the published fee schedule: rate per (code, modifier), billed per unit or encounter as the unit definition states.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [
+    {
+     "code": "H0020",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Medication-assisted treatment services",
+     "service_limits": [
+      "rate Medicaid reimburses medication assisted treatment services 52 times, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H0047",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Behavioral health-related medical services: verbal interaction, substance abuse",
+     "service_limits": [
+      "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H0048",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Behavioral health-related medical services: alcohol and other drug screening specimen",
+     "service_limits": [
+      "event Medicaid reimburses 52 behavioral health \u2013 related medical services: alcohol and other drug screening specimen collections, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2010",
+     "qualifier": "HE",
+     "qualifier_means": "Mental health program",
+     "source_definition": "Brief individual medical psychotherapy, mental health",
+     "service_limits": [
+      "quarter hour There is a maximum daily limit of two quarter-hour units.",
+      "Medicaid reimburses a maximum of 16 quarter-hour units (4 hours) of brief individual medical psychotherapy, per recipient, per state fiscal year.* Brief individual medical psychotherapy is not reimbursable on the same day, for the same recipient, as brief group medical therapy or medication management."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2010",
+     "qualifier": "HF",
+     "qualifier_means": "Substance abuse program",
+     "source_definition": "Brief individual medical psychotherapy, substance abuse",
+     "service_limits": [
+      "quarter hour There is a maximum daily limit of two quarter-hour units.",
+      "Medicaid reimburses a maximum of 16 quarter-hour units (4 hours) of brief individual medical psychotherapy, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2017",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Psychosocial rehabilitation services",
+     "service_limits": [
+      "quarter hour Medicaid reimburses a maximum of 1,920 quarter-hour units (480 hours) of psychosocial rehabilitation services, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2030",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Clubhouse services",
+     "service_limits": [
+      "quarter hour Medicaid reimburses a maximum of 1920 quarter-hour units (480 hours) annually, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "T1015",
+     "qualifier": "HE",
+     "qualifier_means": "Mental health program",
+     "source_definition": "Behavioral health-related medical services: medical procedures, mental health",
+     "service_limits": [
+      "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "T1015",
+     "qualifier": "HF",
+     "qualifier_means": "Substance abuse program",
+     "source_definition": "Behavioral health-related medical services: medical procedures, substance abuse",
+     "service_limits": [
+      "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    }
+   ],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "bh_intervention",
+   "identity": {
+    "canonical_name": "Behavioral Health Intervention Services",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": "59G-4.370",
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "code_modifier",
+    "how_it_is_paid": "Fee-for-service against the published fee schedule: rate per (code, modifier), billed per unit or encounter as the unit definition states.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [
+    {
+     "code": "H0040",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Florida Assertive Community Treatment",
+     "service_limits": [],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2010",
+     "qualifier": "HQ",
+     "qualifier_means": "Group setting",
+     "source_definition": "Brief group medical therapy",
+     "service_limits": [
+      "quarter hour There is a maximum daily limit of two quarter-hour units.",
+      "Medicaid reimburses a maximum of 18 quarter-hour units (4.5 hours) of group medical therapy, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2012",
+     "qualifier": "HF",
+     "qualifier_means": "Substance abuse program",
+     "source_definition": "Behavioral health day services, substance abuse",
+     "service_limits": [],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2012",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Behavioral health day services, mental health",
+     "service_limits": [],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2019",
+     "qualifier": "HM",
+     "qualifier_means": "Less than bachelor degree level",
+     "source_definition": "Therapeutic behavioral on-site services, therapeutic support",
+     "service_limits": [
+      "quarter hour Medicaid reimburses therapeutic behavioral on-site therapeutic support services for a maximum of 128 quarter-hour units per month (32 hours), per recipient."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2019",
+     "qualifier": "HN",
+     "qualifier_means": "Bachelors degree level",
+     "source_definition": "Therapeutic behavioral on-site services, behavior management",
+     "service_limits": [
+      "quarter hour Medicaid reimburses therapeutic behavioral on-site behavior management and therapeutic behavioral on-site therapy services for a maximum combined total of 36 15-minute units per month."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2019",
+     "qualifier": "HO",
+     "qualifier_means": "Masters degree level",
+     "source_definition": "Therapeutic behavioral on-site services, therapy",
+     "service_limits": [
+      "quarter hour Medicaid reimburses therapeutic behavioral on-site therapy services a maximum combined limit of a total of 36 15- minute units per month."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2019",
+     "qualifier": "HQ",
+     "qualifier_means": "Group setting",
+     "source_definition": "Group therapy",
+     "service_limits": [
+      "quarter hour Medicaid reimburses a maximum of 156 quarter-hour units (39 hours) of group therapy services, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2019",
+     "qualifier": "HR",
+     "qualifier_means": "Family/couple with client present",
+     "source_definition": "Individual and family therapy",
+     "service_limits": [
+      "quarter Medicaid reimburses a maximum of 104 quarter-hour units (26 hours) of individual and family therapy services, per recipient, per state fiscal year.",
+      "There is a maximum daily limit of four quarter-hour units (1 hour)."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    }
+   ],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "provider_qualification",
+     "statement": "Rendering practitioner must be at Bachelors degree level when billed with modifier HN.",
+     "sourced": true
+    },
+    {
+     "requirement_type": "provider_qualification",
+     "statement": "Rendering practitioner must be at Masters degree level when billed with modifier HO.",
+     "sourced": true
+    },
+    {
+     "requirement_type": "provider_qualification",
+     "statement": "Rendering practitioner must be at Less than bachelor degree level when billed with modifier HM.",
+     "sourced": true
+    },
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "bh_medication_mgmt",
+   "identity": {
+    "canonical_name": "Behavioral Health Medication Management Services",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": "59G-4.029",
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "code_modifier",
+    "how_it_is_paid": "Fee-for-service against the published fee schedule: rate per (code, modifier), billed per unit or encounter as the unit definition states.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [
+    {
+     "code": "H0001",
+     "qualifier": "HN",
+     "qualifier_means": "Bachelors degree level",
+     "source_definition": "Bio-psychosocial evaluation, substance abuse",
+     "service_limits": [
+      "assessment Medicaid reimburses one biopsychosocial evaluation, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H0001",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Limited functional assessment, substance abuse",
+     "service_limits": [
+      "assessment Medicaid reimburses a maximum of three limited functional assessments, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H0031",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Limited functional assessment, mental health",
+     "service_limits": [
+      "assessment Medicaid reimburses a maximum of three limited functional assessments, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H0032",
+     "qualifier": "TS",
+     "qualifier_means": "Follow-up service",
+     "source_definition": "Treatment plan review, mental health",
+     "service_limits": [
+      "event Medicaid reimburses a maximum of four treatment plan reviews, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H0032",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Treatment plan development, new and established patient, mental health",
+     "service_limits": [
+      "event Medicaid reimburses for the development of one treatment plan per provider, per state fiscal year.",
+      "Medicaid reimburses for a maximum total of two treatment plans per recipient per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H0046",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Behavioral health-related medical services: verbal interaction, mental health",
+     "service_limits": [
+      "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2019",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Psychological testing",
+     "service_limits": [
+      "quarter hour Medicaid reimburses a maximum of 40 quarter-hour units (10 hours) of psychological testing per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "T1007",
+     "qualifier": "TS",
+     "qualifier_means": "Follow-up service",
+     "source_definition": "Treatment plan review, substance abuse",
+     "service_limits": [
+      "event Medicaid reimburses a maximum of four treatment plan reviews, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "T1007",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Treatment plan development, new and established patient, substance abuse",
+     "service_limits": [
+      "event Medicaid reimburses for the development of one treatment plan per provider, per state fiscal year.",
+      "Medicaid reimburses for a maximum total of two treatment plans per recipient per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "T1015",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Medication management",
+     "service_limits": [
+      "event Medicaid reimburses medication management as medically necessary."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "T1023",
+     "qualifier": "HE",
+     "qualifier_means": "Mental health program",
+     "source_definition": "Behavioral health medical screening, mental health",
+     "service_limits": [
+      "event Medicaid reimburses two behavioral health medical screening services, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "T1023",
+     "qualifier": "HF",
+     "qualifier_means": "Substance abuse program",
+     "source_definition": "Behavioral health medical screening, substance abuse",
+     "service_limits": [
+      "event Medicaid reimburses two behavioral health medical screening services, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    }
+   ],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "provider_qualification",
+     "statement": "Rendering practitioner must be at Bachelors degree level when billed with modifier HN.",
+     "sourced": true
+    },
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "bh_overlay",
+   "identity": {
+    "canonical_name": "Behavioral Health Overlay Services",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": "59G-4.027",
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "code_modifier",
+    "how_it_is_paid": "Fee-for-service against the published fee schedule: rate per (code, modifier), billed per unit or encounter as the unit definition states.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "bh_therapy",
+   "identity": {
+    "canonical_name": "Behavioral Health Therapy Services",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": "59G-4.052",
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "code_modifier",
+    "how_it_is_paid": "Fee-for-service against the published fee schedule: rate per (code, modifier), billed per unit or encounter as the unit definition states.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [
+    {
+     "code": "H0020",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Medication-assisted treatment services",
+     "service_limits": [
+      "rate Medicaid reimburses medication assisted treatment services 52 times, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H0047",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Behavioral health-related medical services: verbal interaction, substance abuse",
+     "service_limits": [
+      "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H0048",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Behavioral health-related medical services: alcohol and other drug screening specimen",
+     "service_limits": [
+      "event Medicaid reimburses 52 behavioral health \u2013 related medical services: alcohol and other drug screening specimen collections, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2010",
+     "qualifier": "HE",
+     "qualifier_means": "Mental health program",
+     "source_definition": "Brief individual medical psychotherapy, mental health",
+     "service_limits": [
+      "quarter hour There is a maximum daily limit of two quarter-hour units.",
+      "Medicaid reimburses a maximum of 16 quarter-hour units (4 hours) of brief individual medical psychotherapy, per recipient, per state fiscal year.* Brief individual medical psychotherapy is not reimbursable on the same day, for the same recipient, as brief group medical therapy or medication management."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2010",
+     "qualifier": "HF",
+     "qualifier_means": "Substance abuse program",
+     "source_definition": "Brief individual medical psychotherapy, substance abuse",
+     "service_limits": [
+      "quarter hour There is a maximum daily limit of two quarter-hour units.",
+      "Medicaid reimburses a maximum of 16 quarter-hour units (4 hours) of brief individual medical psychotherapy, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2017",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Psychosocial rehabilitation services",
+     "service_limits": [
+      "quarter hour Medicaid reimburses a maximum of 1,920 quarter-hour units (480 hours) of psychosocial rehabilitation services, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2030",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Clubhouse services",
+     "service_limits": [
+      "quarter hour Medicaid reimburses a maximum of 1920 quarter-hour units (480 hours) annually, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "T1015",
+     "qualifier": "HE",
+     "qualifier_means": "Mental health program",
+     "source_definition": "Behavioral health-related medical services: medical procedures, mental health",
+     "service_limits": [
+      "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "T1015",
+     "qualifier": "HF",
+     "qualifier_means": "Substance abuse program",
+     "source_definition": "Behavioral health-related medical services: medical procedures, substance abuse",
+     "service_limits": [
+      "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    }
+   ],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "provider_qualification",
+     "statement": "Behavioral Health Therapy Services under Rule 59G-4.052 may be rendered by practitioners licensed under Chapters 458/459/490/491 F.S., psychiatric APRNs and nurses licensed under Chapter 464 F.S., master's level certified addiction professionals, master's level practitioners, bachelor's level practitioners (group therapy only), and certified addiction professionals (group therapy only), all of whom must be employed or contracted with a community behavioral health agency.",
+     "sourced": true
+    },
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "cbha",
+   "identity": {
+    "canonical_name": "Comprehensive Behavioral Health Assessment",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": null,
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "code_modifier",
+    "how_it_is_paid": "Fee-for-service against the published fee schedule: rate per (code, modifier), billed per unit or encounter as the unit definition states.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "chd_clinic",
+   "identity": {
+    "canonical_name": "County Health Department clinic services",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": "59G-4.055",
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "facility_pps_encounter",
+    "how_it_is_paid": "Prospective Payment System: a single per-encounter rate per visit, with a wrap payment reconciling to the PPS rate. Not paid per procedure code.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "FQHC/RHC/CHD designation and Medicaid enrolment as an encounter-billing site.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "evaluation_management",
+   "identity": {
+    "canonical_name": "Evaluation and Management (outpatient primary care)",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": "59G-4.087",
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "code_modifier",
+    "how_it_is_paid": "Fee-for-service against the published fee schedule: rate per (code, modifier), billed per unit or encounter as the unit definition states.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "fact",
+   "identity": {
+    "canonical_name": "Florida Assertive Community Treatment (FACT)",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": "59G-4.127",
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "code_modifier",
+    "how_it_is_paid": "Fee-for-service against the published fee schedule: rate per (code, modifier), billed per unit or encounter as the unit definition states.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [
+    {
+     "code": "H0040",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Florida Assertive Community Treatment",
+     "service_limits": [],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2010",
+     "qualifier": "HQ",
+     "qualifier_means": "Group setting",
+     "source_definition": "Brief group medical therapy",
+     "service_limits": [
+      "quarter hour There is a maximum daily limit of two quarter-hour units.",
+      "Medicaid reimburses a maximum of 18 quarter-hour units (4.5 hours) of group medical therapy, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2012",
+     "qualifier": "HF",
+     "qualifier_means": "Substance abuse program",
+     "source_definition": "Behavioral health day services, substance abuse",
+     "service_limits": [],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2012",
+     "qualifier": null,
+     "qualifier_means": null,
+     "source_definition": "Behavioral health day services, mental health",
+     "service_limits": [],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2019",
+     "qualifier": "HM",
+     "qualifier_means": "Less than bachelor degree level",
+     "source_definition": "Therapeutic behavioral on-site services, therapeutic support",
+     "service_limits": [
+      "quarter hour Medicaid reimburses therapeutic behavioral on-site therapeutic support services for a maximum of 128 quarter-hour units per month (32 hours), per recipient."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2019",
+     "qualifier": "HN",
+     "qualifier_means": "Bachelors degree level",
+     "source_definition": "Therapeutic behavioral on-site services, behavior management",
+     "service_limits": [
+      "quarter hour Medicaid reimburses therapeutic behavioral on-site behavior management and therapeutic behavioral on-site therapy services for a maximum combined total of 36 15-minute units per month."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2019",
+     "qualifier": "HO",
+     "qualifier_means": "Masters degree level",
+     "source_definition": "Therapeutic behavioral on-site services, therapy",
+     "service_limits": [
+      "quarter hour Medicaid reimburses therapeutic behavioral on-site therapy services a maximum combined limit of a total of 36 15- minute units per month."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2019",
+     "qualifier": "HQ",
+     "qualifier_means": "Group setting",
+     "source_definition": "Group therapy",
+     "service_limits": [
+      "quarter hour Medicaid reimburses a maximum of 156 quarter-hour units (39 hours) of group therapy services, per recipient, per state fiscal year."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    },
+    {
+     "code": "H2019",
+     "qualifier": "HR",
+     "qualifier_means": "Family/couple with client present",
+     "source_definition": "Individual and family therapy",
+     "service_limits": [
+      "quarter Medicaid reimburses a maximum of 104 quarter-hour units (26 hours) of individual and family therapy services, per recipient, per state fiscal year.",
+      "There is a maximum daily limit of four quarter-hour units (1 hour)."
+     ],
+     "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    }
+   ],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "provider_qualification",
+     "statement": "Rendering practitioner must be at Bachelors degree level when billed with modifier HN.",
+     "sourced": true
+    },
+    {
+     "requirement_type": "provider_qualification",
+     "statement": "Rendering practitioner must be at Masters degree level when billed with modifier HO.",
+     "sourced": true
+    },
+    {
+     "requirement_type": "provider_qualification",
+     "statement": "Rendering practitioner must be at Less than bachelor degree level when billed with modifier HM.",
+     "sourced": true
+    },
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "fqhc_encounter",
+   "identity": {
+    "canonical_name": "FQHC encounter \u2014 primary care and BH",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": "59G-4.100",
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "facility_pps_encounter",
+    "how_it_is_paid": "Prospective Payment System: a single per-encounter rate per visit, with a wrap payment reconciling to the PPS rate. Not paid per procedure code.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "FQHC/RHC/CHD designation and Medicaid enrolment as an encounter-billing site.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "mhtcm",
+   "identity": {
+    "canonical_name": "Mental Health Targeted Case Management",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": null,
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "code_modifier",
+    "how_it_is_paid": "Fee-for-service against the published fee schedule: rate per (code, modifier), billed per unit or encounter as the unit definition states.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "age_population",
+     "statement": "Certification tracks are stated separately for children's, adult and intensive adult MHTCM.",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Specialized Therapeutic Foster Care Provider Agency Self-Certification",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Agency Certification Children's Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Agency Certification Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Agency Certification Intensive Case Management Team Services Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Agency Certification Children\u2019s Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Agency Certification Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Agency Certification Intensive Case Management Team Services Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Comprehensive Behavioral Health Assessment Agency and Practitioner Self-Certification",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Case Manager Certification Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Children\u2019s Certification Children\u2019s Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Adult Certification Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Adult Certification Intensive Case Management Team Services Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Medicaid 30-Day Certification For Children\u2019s Or Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Certification of Eligibility",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Case Manager Certification Children\u2019s Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "supervision",
+     "statement": "Case Management Supervisor Certification Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "supervision",
+     "statement": "Case Management Supervisor Certification Children\u2019s Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "qrtp",
+   "identity": {
+    "canonical_name": "Qualified Residential Treatment Program Services",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": null,
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "facility_per_diem",
+    "how_it_is_paid": "Per-diem: one rate per day of service, absorbing services billed the same day.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "rhc_encounter",
+   "identity": {
+    "canonical_name": "Rural Health Clinic encounter",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": "59G-4.280",
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "facility_pps_encounter",
+    "how_it_is_paid": "Prospective Payment System: a single per-encounter rate per visit, with a wrap payment reconciling to the PPS rate. Not paid per procedure code.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "FQHC/RHC/CHD designation and Medicaid enrolment as an encounter-billing site.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "sipp",
+   "identity": {
+    "canonical_name": "Statewide Inpatient Psychiatric Program (SIPP)",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": "59G-4.120",
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "facility_per_diem",
+    "how_it_is_paid": "Per-diem: one rate per day of service, absorbing services billed the same day.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [
+    {
+     "block": "F20-F29",
+     "source_definition": "Schizophrenia, schizotypal, delusional and other psychotic disorders",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    },
+    {
+     "block": "F30-F39",
+     "source_definition": "Mood [affective] disorders",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    },
+    {
+     "block": "F40-F48",
+     "source_definition": "Anxiety, dissociative, stress-related, somatoform disorders",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    },
+    {
+     "block": "F90-F98",
+     "source_definition": "Behavioural and emotional disorders with onset in childhood/adolescence",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    }
+   ],
+   "grouped_to": [
+    {
+     "drg": "740",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "MENTAL ILLNESS DIAGNOSIS WITH O.R. PROCEDURE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "750",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "SCHIZOPHRENIA",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "751",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "MAJOR DEPRESSIVE DISORDERS AND OTHER OR UNSPECIFIED PSYCHOSES",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "752",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "DISORDERS OF PERSONALITY AND IMPULSE CONTROL",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "753",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "BIPOLAR DISORDERS",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "754",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "DEPRESSION EXCEPT MAJOR DEPRESSIVE DISORDER",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "755",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "ADJUSTMENT DISORDERS AND NEUROSES EXCEPT DEPRESSIVE DIAGNOSES",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "756",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "ACUTE ANXIETY AND DELIRIUM STATES",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "757",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "ORGANIC MENTAL HEALTH DISTURBANCES",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "758",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "BEHAVIORAL DISORDERS",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "759",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "EATING DISORDERS",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "760",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "OTHER MENTAL HEALTH DISORDERS",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    }
+   ],
+   "standard_requirements": [
+    {
+     "requirement_type": "age_population",
+     "statement": "Statewide Inpatient Psychiatric Program serves under-21 enrollees.",
+     "sourced": true
+    },
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "specialized_therapeutic",
+   "identity": {
+    "canonical_name": "Specialized Therapeutic Services",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": null,
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "code_modifier",
+    "how_it_is_paid": "Fee-for-service against the published fee schedule: rate per (code, modifier), billed per unit or encounter as the unit definition states.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "state_mental_health",
+   "identity": {
+    "canonical_name": "State Mental Health",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": "59G-4.300",
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "code_modifier",
+    "how_it_is_paid": "Fee-for-service against the published fee schedule: rate per (code, modifier), billed per unit or encounter as the unit definition states.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "tcm_child_health",
+   "identity": {
+    "canonical_name": "Child Health Services Targeted Case Management",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": "59G-8.700",
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "code_modifier",
+    "how_it_is_paid": "Fee-for-service against the published fee schedule: rate per (code, modifier), billed per unit or encounter as the unit definition states.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "age_population",
+     "statement": "Child health services population.",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Specialized Therapeutic Foster Care Provider Agency Self-Certification",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Agency Certification Children's Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Agency Certification Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Agency Certification Intensive Case Management Team Services Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Agency Certification Children\u2019s Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Agency Certification Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Agency Certification Intensive Case Management Team Services Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Comprehensive Behavioral Health Assessment Agency and Practitioner Self-Certification",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Case Manager Certification Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Children\u2019s Certification Children\u2019s Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Adult Certification Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Adult Certification Intensive Case Management Team Services Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Medicaid 30-Day Certification For Children\u2019s Or Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Certification of Eligibility",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Case Manager Certification Children\u2019s Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "supervision",
+     "statement": "Case Management Supervisor Certification Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "supervision",
+     "statement": "Case Management Supervisor Certification Children\u2019s Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "tcm_children_at_risk",
+   "identity": {
+    "canonical_name": "Targeted Case Management for Children at Risk of Abuse and Neglect",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": "59G-4.310",
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "code_modifier",
+    "how_it_is_paid": "Fee-for-service against the published fee schedule: rate per (code, modifier), billed per unit or encounter as the unit definition states.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [
+    {
+     "code": "T2023",
+     "qualifier": "HA",
+     "qualifier_means": "Child/adolescent program",
+     "source_definition": "Targeted case management for children at risk of abuse and neglect",
+     "service_limits": [
+      "Maximum 1 unit per month."
+     ],
+     "source": "TCM_for_Children_At-Risk_2022_Fee_Schedule.pdf",
+     "vernacular": [],
+     "needs": "What practitioners and intake forms call THIS service at THIS modifier. The modifier changes the service \u2014 do not write one alias set for the bare code."
+    }
+   ],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "age_population",
+     "statement": "Children at risk of abuse and neglect. Distinct certification track from adult MHTCM.",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Specialized Therapeutic Foster Care Provider Agency Self-Certification",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Agency Certification Children's Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Agency Certification Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Agency Certification Intensive Case Management Team Services Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Agency Certification Children\u2019s Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Agency Certification Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Agency Certification Intensive Case Management Team Services Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Comprehensive Behavioral Health Assessment Agency and Practitioner Self-Certification",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Case Manager Certification Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Children\u2019s Certification Children\u2019s Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Adult Certification Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Adult Certification Intensive Case Management Team Services Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Medicaid 30-Day Certification For Children\u2019s Or Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Certification of Eligibility",
+     "sourced": true
+    },
+    {
+     "requirement_type": "credentialing",
+     "statement": "Case Manager Certification Children\u2019s Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "supervision",
+     "statement": "Case Management Supervisor Certification Adult Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "supervision",
+     "statement": "Case Management Supervisor Certification Children\u2019s Mental Health Targeted Case Management",
+     "sourced": true
+    },
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "therapeutic_group_care",
+   "identity": {
+    "canonical_name": "Therapeutic Group Care Services",
+    "scope": "serve",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "AHCA 59G rule",
+    "rule_ref": "59G-4.295",
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "facility_per_diem",
+    "how_it_is_paid": "Per-diem: one rate per day of service, absorbing services billed the same day.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [
+    {
+     "requirement_type": "coverage_criteria",
+     "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "documentation",
+     "statement": "Documentation and record requirements are stated in the coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "place_of_service",
+     "statement": "Place-of-service set for this line is stated in its coverage policy; not yet extracted.",
+     "sourced": false
+    },
+    {
+     "requirement_type": "prior_authorization",
+     "statement": "Standard (state-level) prior authorisation for this line; not yet extracted. Payor-specific PA is Fact Store\u2019s.",
+     "sourced": false
+    }
+   ],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "baker_act_exam",
+   "identity": {
+    "canonical_name": "Baker Act involuntary examination",
+    "scope": "decline_well",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "FL Statute 394 (Baker Act)",
+    "rule_ref": null,
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "facility_per_diem",
+    "how_it_is_paid": "Per-diem: one rate per day of service, absorbing services billed the same day.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [],
+   "corpus_evidence": []
+  },
+  {
+   "line_key": "csu_baker_act",
+   "identity": {
+    "canonical_name": "Crisis Stabilization Unit / Baker Act receiving",
+    "scope": "decline_well",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "FL Statute 394 (Baker Act)",
+    "rule_ref": null,
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "facility_per_diem",
+    "how_it_is_paid": "Per-diem: one rate per day of service, absorbing services billed the same day.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [
+    {
+     "block": "F20-F29",
+     "source_definition": "Schizophrenia, schizotypal, delusional and other psychotic disorders",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    },
+    {
+     "block": "F30-F39",
+     "source_definition": "Mood [affective] disorders",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    }
+   ],
+   "grouped_to": [],
+   "standard_requirements": [],
+   "corpus_evidence": [
+    {
+     "document": "BBHC-Handbook-for-FY25-26-Version-9.03.pdf",
+     "publisher": "Bbhcflorida",
+     "pages": 18
+    },
+    {
+     "document": "ffs_psn_attachment_ii_redlined_january_2008.pdf",
+     "publisher": "AHCA",
+     "pages": 11
+    },
+    {
+     "document": "model_consolidated_hmo_contract_mar09.pdf",
+     "publisher": "AHCA",
+     "pages": 10
+    },
+    {
+     "document": "FINAL-BBHC-2025-Needs-Assessment-Sept-2025.pdf",
+     "publisher": "Bbhcflorida",
+     "pages": 10
+    },
+    {
+     "document": "model_consolidated_hmo_contract_jan08.pdf",
+     "publisher": "AHCA",
+     "pages": 10
+    },
+    {
+     "document": "Board-Meeting-Documents-1.pdf",
+     "publisher": "Bbhcflorida",
+     "pages": 9
+    }
+   ]
+  },
+  {
+   "line_key": "ed_behavioral",
+   "identity": {
+    "canonical_name": "Emergency Department behavioral health",
+    "scope": "decline_well",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "Hospital reimbursement (DRG/EAPG)",
+    "rule_ref": "59G-4.160",
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "hospital_eapg",
+    "how_it_is_paid": "EAPG: outpatient hospital grouping pays per ambulatory patient group rather than per procedure code.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [
+    {
+     "block": "F10-F19",
+     "source_definition": "Mental and behavioural disorders due to psychoactive substance use",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    },
+    {
+     "block": "F20-F29",
+     "source_definition": "Schizophrenia, schizotypal, delusional and other psychotic disorders",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    },
+    {
+     "block": "F30-F39",
+     "source_definition": "Mood [affective] disorders",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    },
+    {
+     "block": "F40-F48",
+     "source_definition": "Anxiety, dissociative, stress-related, somatoform disorders",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    }
+   ],
+   "grouped_to": [
+    {
+     "drg": "740",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "MENTAL ILLNESS DIAGNOSIS WITH O.R. PROCEDURE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "750",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "SCHIZOPHRENIA",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "751",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "MAJOR DEPRESSIVE DISORDERS AND OTHER OR UNSPECIFIED PSYCHOSES",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "752",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "DISORDERS OF PERSONALITY AND IMPULSE CONTROL",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "753",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "BIPOLAR DISORDERS",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "754",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "DEPRESSION EXCEPT MAJOR DEPRESSIVE DISORDER",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "755",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "ADJUSTMENT DISORDERS AND NEUROSES EXCEPT DEPRESSIVE DIAGNOSES",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "756",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "ACUTE ANXIETY AND DELIRIUM STATES",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "757",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "ORGANIC MENTAL HEALTH DISTURBANCES",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "758",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "BEHAVIORAL DISORDERS",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "759",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "EATING DISORDERS",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "760",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "OTHER MENTAL HEALTH DISORDERS",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "770",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "DRUG AND ALCOHOL ABUSE OR DEPENDENCE, LEFT AGAINST MEDICAL ADVICE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "772",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "ALCOHOL AND DRUG DEPENDENCE WITH REHABILITATION AND/OR DETOXIFICATION THERAPY",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "773",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "OPIOID ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "774",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "COCAINE ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "775",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "ALCOHOL ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "776",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "OTHER DRUG ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    }
+   ],
+   "standard_requirements": [],
+   "corpus_evidence": [
+    {
+     "document": "ccbhc-quality-measures-technical-specifications-manual.pdf",
+     "publisher": "Samhsa",
+     "pages": 31
+    },
+    {
+     "document": "Mar26_MedPAC_Report_To_Congress_SEC.pdf",
+     "publisher": "Medpac",
+     "pages": 25
+    },
+    {
+     "document": "tech-specs-for-bhcs-vol1.pdf",
+     "publisher": "Samhsa",
+     "pages": 21
+    },
+    {
+     "document": "MMA_DY13_Annual_Report_CMS20191002.pdf",
+     "publisher": "AHCA",
+     "pages": 20
+    },
+    {
+     "document": "FDDC_Data_Guide_update.pdf",
+     "publisher": "AHCA",
+     "pages": 19
+    },
+    {
+     "document": "Bookshelf_NBK109917.pdf",
+     "publisher": "Ncbi.nlm.nih",
+     "pages": 16
+    }
+   ]
+  },
+  {
+   "line_key": "inpatient_psych_adult",
+   "identity": {
+    "canonical_name": "Inpatient Psychiatric \u2014 adult, hospital",
+    "scope": "decline_well",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "Hospital reimbursement (DRG/EAPG)",
+    "rule_ref": "59G-4.150",
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "hospital_drg",
+    "how_it_is_paid": "APR-DRG: the encounter groups to a (DRG, severity) and pays the DRG relative weight times the hospital base rate. Not paid per procedure code.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [
+    {
+     "block": "F01-F09",
+     "source_definition": "Mental disorders due to known physiological conditions",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    },
+    {
+     "block": "F10-F19",
+     "source_definition": "Mental and behavioural disorders due to psychoactive substance use",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    },
+    {
+     "block": "F20-F29",
+     "source_definition": "Schizophrenia, schizotypal, delusional and other psychotic disorders",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    },
+    {
+     "block": "F30-F39",
+     "source_definition": "Mood [affective] disorders",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    },
+    {
+     "block": "F40-F48",
+     "source_definition": "Anxiety, dissociative, stress-related, somatoform disorders",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    },
+    {
+     "block": "F50-F59",
+     "source_definition": "Behavioural syndromes with physiological disturbances",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    },
+    {
+     "block": "F60-F69",
+     "source_definition": "Disorders of adult personality and behaviour",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    },
+    {
+     "block": "F90-F98",
+     "source_definition": "Behavioural and emotional disorders with onset in childhood/adolescence",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    }
+   ],
+   "grouped_to": [
+    {
+     "drg": "740",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "MENTAL ILLNESS DIAGNOSIS WITH O.R. PROCEDURE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "750",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "SCHIZOPHRENIA",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "751",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "MAJOR DEPRESSIVE DISORDERS AND OTHER OR UNSPECIFIED PSYCHOSES",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "752",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "DISORDERS OF PERSONALITY AND IMPULSE CONTROL",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "753",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "BIPOLAR DISORDERS",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "754",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "DEPRESSION EXCEPT MAJOR DEPRESSIVE DISORDER",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "755",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "ADJUSTMENT DISORDERS AND NEUROSES EXCEPT DEPRESSIVE DIAGNOSES",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "756",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "ACUTE ANXIETY AND DELIRIUM STATES",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "757",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "ORGANIC MENTAL HEALTH DISTURBANCES",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "758",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "BEHAVIORAL DISORDERS",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "759",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "EATING DISORDERS",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "760",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "OTHER MENTAL HEALTH DISORDERS",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "770",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "DRUG AND ALCOHOL ABUSE OR DEPENDENCE, LEFT AGAINST MEDICAL ADVICE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "772",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "ALCOHOL AND DRUG DEPENDENCE WITH REHABILITATION AND/OR DETOXIFICATION THERAPY",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "773",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "OPIOID ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "774",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "COCAINE ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "775",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "ALCOHOL ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "776",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "OTHER DRUG ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    }
+   ],
+   "standard_requirements": [],
+   "corpus_evidence": [
+    {
+     "document": "CL_07_070601_MH_Case_Mgmt_ver2_2.pdf",
+     "publisher": "AHCA",
+     "pages": 9
+    },
+    {
+     "document": "Exhibit_II-A_Managed_Medical_Assistance__MMA__Program_Oct_2025.pdf",
+     "publisher": "AHCA",
+     "pages": 9
+    },
+    {
+     "document": "Exhibit_II-A_-_Managed_Medical_Assistance__MMA__Program.pdf",
+     "publisher": "AHCA",
+     "pages": 9
+    },
+    {
+     "document": "59G_5020_Provider_General_REQUIREMENTS.pdf",
+     "publisher": "AHCA",
+     "pages": 8
+    },
+    {
+     "document": "model_consolidated_hmo_contract_jan08.pdf",
+     "publisher": "AHCA",
+     "pages": 8
+    },
+    {
+     "document": "model_consolidated_hmo_contract_mar09.pdf",
+     "publisher": "AHCA",
+     "pages": 8
+    }
+   ]
+  },
+  {
+   "line_key": "iop",
+   "identity": {
+    "canonical_name": "Intensive Outpatient Program (IOP)",
+    "scope": "decline_well",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "Plan benefit",
+    "rule_ref": null,
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "code_modifier",
+    "how_it_is_paid": "Fee-for-service against the published fee schedule: rate per (code, modifier), billed per unit or encounter as the unit definition states.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [],
+   "corpus_evidence": [
+    {
+     "document": "ccbhc-quality-measures-technical-specifications-manual.pdf",
+     "publisher": "Samhsa",
+     "pages": 26
+    },
+    {
+     "document": "tech-specs-for-bhcs-vol1.pdf",
+     "publisher": "Samhsa",
+     "pages": 25
+    },
+    {
+     "document": "SH-PRO-QI-HEDIS-QRG.pdf",
+     "publisher": "Sunshine Health",
+     "pages": 8
+    },
+    {
+     "document": "section-223-demonstration-ccbhc-state-collected-measures-webinar-slides.pdf",
+     "publisher": "Samhsa",
+     "pages": 6
+    },
+    {
+     "document": "MOL_MHPAEA_Annual_Analysis.pdf",
+     "publisher": "AHCA",
+     "pages": 5
+    },
+    {
+     "document": "SH-PRO-QI-HEDIS-BH.pdf",
+     "publisher": "Sunshine Health",
+     "pages": 4
+    }
+   ]
+  },
+  {
+   "line_key": "marchman_act",
+   "identity": {
+    "canonical_name": "Marchman Act services",
+    "scope": "decline_well",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "FL Statute 397 (Marchman Act)",
+    "rule_ref": null,
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "facility_per_diem",
+    "how_it_is_paid": "Per-diem: one rate per day of service, absorbing services billed the same day.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [
+    {
+     "block": "F10-F19",
+     "source_definition": "Mental and behavioural disorders due to psychoactive substance use",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    }
+   ],
+   "grouped_to": [
+    {
+     "drg": "770",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "DRUG AND ALCOHOL ABUSE OR DEPENDENCE, LEFT AGAINST MEDICAL ADVICE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "772",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "ALCOHOL AND DRUG DEPENDENCE WITH REHABILITATION AND/OR DETOXIFICATION THERAPY",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "773",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "OPIOID ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "774",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "COCAINE ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "775",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "ALCOHOL ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "776",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "OTHER DRUG ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    }
+   ],
+   "standard_requirements": [],
+   "corpus_evidence": [
+    {
+     "document": "BBHC-Standard-Operating-Procedures-FY-2025-2026.pdf",
+     "publisher": "Bbhcflorida",
+     "pages": 4
+    },
+    {
+     "document": "BBHC-Handbook-for-FY25-26-Version-9.03.pdf",
+     "publisher": "Bbhcflorida",
+     "pages": 3
+    },
+    {
+     "document": "Board-Meeting-Documents-6.16.2022.pdf",
+     "publisher": "Bbhcflorida",
+     "pages": 2
+    },
+    {
+     "document": "Baker Act/Marchman Act",
+     "publisher": null,
+     "pages": 2
+    },
+    {
+     "document": "Board-Meeting-Documents-1.pdf",
+     "publisher": "Bbhcflorida",
+     "pages": 2
+    },
+    {
+     "document": "CourseAccessInstructions.pdf",
+     "publisher": "AHCA",
+     "pages": 2
+    }
+   ]
+  },
+  {
+   "line_key": "mobile_response",
+   "identity": {
+    "canonical_name": "Mobile Response Team / crisis intervention",
+    "scope": "decline_well",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "DCF Managing Entity",
+    "rule_ref": null,
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "facility_per_diem",
+    "how_it_is_paid": "Per-diem: one rate per day of service, absorbing services billed the same day.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [],
+   "corpus_evidence": [
+    {
+     "document": "updated-ccbh-pps-guidance-02152024.pdf",
+     "publisher": "Medicaid",
+     "pages": 11
+    },
+    {
+     "document": "MED180_D50_MMA_Summative_Report_FINAL.pdf",
+     "publisher": "AHCA",
+     "pages": 10
+    },
+    {
+     "document": "PLAW-117publ328.pdf",
+     "publisher": "Congress",
+     "pages": 7
+    },
+    {
+     "document": "BILLS-117hr2617enr.pdf",
+     "publisher": "Congress",
+     "pages": 7
+    },
+    {
+     "document": "CAC-Meeting-4.13.2021.pdf",
+     "publisher": "Bbhcflorida",
+     "pages": 6
+    },
+    {
+     "document": "Board-of-Directors-Meeting-Documents-11.18.2021.pdf",
+     "publisher": "Bbhcflorida",
+     "pages": 6
+    }
+   ]
+  },
+  {
+   "line_key": "php",
+   "identity": {
+    "canonical_name": "Partial Hospitalization Program (PHP)",
+    "scope": "decline_well",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "Plan benefit",
+    "rule_ref": null,
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "code_modifier",
+    "how_it_is_paid": "Fee-for-service against the published fee schedule: rate per (code, modifier), billed per unit or encounter as the unit definition states.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [],
+   "grouped_to": [],
+   "standard_requirements": [],
+   "corpus_evidence": [
+    {
+     "document": "ccbhc-quality-measures-technical-specifications-manual.pdf",
+     "publisher": "Samhsa",
+     "pages": 23
+    },
+    {
+     "document": "tech-specs-for-bhcs-vol1.pdf",
+     "publisher": "Samhsa",
+     "pages": 20
+    },
+    {
+     "document": "som107c02.pdf",
+     "publisher": "Cms",
+     "pages": 6
+    },
+    {
+     "document": "section-223-demonstration-ccbhc-state-collected-measures-webinar-slides.pdf",
+     "publisher": "Samhsa",
+     "pages": 5
+    },
+    {
+     "document": "MOL_MHPAEA_Annual_Analysis.pdf",
+     "publisher": "AHCA",
+     "pages": 5
+    },
+    {
+     "document": "attachment_3-1-A.pdf",
+     "publisher": "AHCA",
+     "pages": 5
+    }
+   ]
+  },
+  {
+   "line_key": "sud_residential",
+   "identity": {
+    "canonical_name": "Substance Use Residential Treatment",
+    "scope": "decline_well",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "IMD 1115 demonstration",
+    "rule_ref": null,
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "facility_per_diem",
+    "how_it_is_paid": "Per-diem: one rate per day of service, absorbing services billed the same day.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [
+    {
+     "block": "F10-F19",
+     "source_definition": "Mental and behavioural disorders due to psychoactive substance use",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    }
+   ],
+   "grouped_to": [
+    {
+     "drg": "770",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "DRUG AND ALCOHOL ABUSE OR DEPENDENCE, LEFT AGAINST MEDICAL ADVICE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "772",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "ALCOHOL AND DRUG DEPENDENCE WITH REHABILITATION AND/OR DETOXIFICATION THERAPY",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "773",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "OPIOID ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "774",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "COCAINE ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "775",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "ALCOHOL ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "776",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "OTHER DRUG ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    }
+   ],
+   "standard_requirements": [],
+   "corpus_evidence": [
+    {
+     "document": "Board-of-Directors-Meeting-Documents-5.19.2021.pdf",
+     "publisher": "Bbhcflorida",
+     "pages": 13
+    },
+    {
+     "document": "cbe-3453-technical-specifications-manual.pdf",
+     "publisher": "Samhsa",
+     "pages": 12
+    },
+    {
+     "document": "BBHC-Handbook-for-FY25-26-Version-9.03.pdf",
+     "publisher": "Bbhcflorida",
+     "pages": 12
+    },
+    {
+     "document": "ResidentialPsychiatricTreatmentReportTemplate.xlsx",
+     "publisher": "AHCA",
+     "pages": 11
+    },
+    {
+     "document": "Residential_Psychiatric_Treatment_Report_2.28.2025.xlsx",
+     "publisher": "AHCA",
+     "pages": 11
+    },
+    {
+     "document": "FL_IMD_1115_Demonstration_FINAL.docx",
+     "publisher": "AHCA",
+     "pages": 9
+    }
+   ]
+  },
+  {
+   "line_key": "withdrawal_management",
+   "identity": {
+    "canonical_name": "Withdrawal Management / Detoxification",
+    "scope": "decline_well",
+    "vernacular": [],
+    "needs": "What a clinician, intake coordinator or CMHC director calls this service. Include the verb form people actually use ('Baker Acted', 'Marchman'd')."
+   },
+   "authority": {
+    "value": "DCF Managing Entity",
+    "rule_ref": null,
+    "vernacular": [],
+    "needs": "What people call the governing law or rule, not its citation."
+   },
+   "payment": {
+    "grain": "facility_per_diem",
+    "how_it_is_paid": "Per-diem: one rate per day of service, absorbing services billed the same day.",
+    "vernacular": [],
+    "needs": "How billing staff refer to this payment shape."
+   },
+   "rendered_as": [],
+   "classified_by": [
+    {
+     "block": "F10-F19",
+     "source_definition": "Mental and behavioural disorders due to psychoactive substance use",
+     "adjudicated": false,
+     "vernacular": [],
+     "needs": "How the presenting problem is described in referral and intake language."
+    }
+   ],
+   "grouped_to": [
+    {
+     "drg": "770",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "DRUG AND ALCOHOL ABUSE OR DEPENDENCE, LEFT AGAINST MEDICAL ADVICE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "772",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "ALCOHOL AND DRUG DEPENDENCE WITH REHABILITATION AND/OR DETOXIFICATION THERAPY",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "773",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "OPIOID ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "774",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "COCAINE ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "775",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "ALCOHOL ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    },
+    {
+     "drg": "776",
+     "severities": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "source_definition": "OTHER DRUG ABUSE AND DEPENDENCE",
+     "vernacular": [],
+     "needs": "How an admission for this is described in plain speech."
+    }
+   ],
+   "standard_requirements": [],
+   "corpus_evidence": [
+    {
+     "document": "BBHC-Provider-Invoice-Form-Version-3.4.47.xlsx",
+     "publisher": "Bbhcflorida",
+     "pages": 17
+    },
+    {
+     "document": "CCBHCImpFind.pdf",
+     "publisher": "Aspe.hhs",
+     "pages": 13
+    },
+    {
+     "document": "BBHC-Handbook-for-FY25-26-Version-9.03.pdf",
+     "publisher": "Bbhcflorida",
+     "pages": 12
+    },
+    {
+     "document": "Board-of-Directors-Meeting-Documents-5.19.2021.pdf",
+     "publisher": "Bbhcflorida",
+     "pages": 8
+    },
+    {
+     "document": "2017-00719.pdf",
+     "publisher": "Govinfo",
+     "pages": 8
+    },
+    {
+     "document": "ROSC-Meeting-5.20.2020.pdf",
+     "publisher": "Bbhcflorida",
+     "pages": 8
+    }
+   ]
+  }
+ ]
+}
