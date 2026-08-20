@@ -1,0 +1,584 @@
+{
+ "scope": {
+  "root": "https://ahca.myflorida.com",
+  "depth": 5,
+  "pages_fetched": 400
+ },
+ "flagged_parents": [
+  "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html",
+  "https://ahca.myflorida.com/medicaid/rules/historical-medicaid-reimbursement-schedules.html",
+  "https://ahca.myflorida.com/medicaid/statewide-medicaid-managed-care/rapid-whole-genome-sequencing-billing-guidance.html",
+  "https://ahca.myflorida.com/medicaid/prescribed-drugs/remittance-advice-provider-alerts.html"
+ ],
+ "suppressed_count": 142,
+ "suppressed": [
+  {
+   "url": "https://ahca.myflorida.com/content/download/28095/file/2026 Assistive Care Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26137/file/2025 Assistive Care Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28096/file/2026 BA Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26138/file/2025 Behavior Analysis Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28097/file/2026 BHOS Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26141/file/2025 Behavioral Health Overlay Services Fee.Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28098/file/2026 Birth Center Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26142/file/2025 Birth Center Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26143/file/2025 Birth Center Fee Schedule.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28150/file/2026 TCM Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/27266/file/TCM.Fee.Schedules.10012025.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26184/file/2025 Targeted Case Management Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28100/file/2026 CBSACM Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26146/file/2025 Community-Based Substance Abuse County Match Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28099/file/2026 CBH Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26145/file/2025 Community Behavoir Health Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26144/file/2025 CHB Fee Schedule.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28102/file/2026 County Health Department Certified Match Program Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26147/file/2025 County Health Department Certified Match Program Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/file/medicaid/2026 Dental Fee Schedule July 1 2026.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/file/medicaid/2026 Dental Fee Schedule July 1 2026.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28211/file/2026 Dental Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28212/file/2026 Dental Fee Schedule.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26148/file/2025 Dental Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26149/file/2025 Dental General Fee Schedule.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/file/medicaid/July 1 2026 DME Fee Schedule Finalized.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/file/medicaid/July 1 2026 DME Fee Schedule Finalized.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28258/file/HL 2026 Durable Medical Equipment and Medical Supplies Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28259/file/HL 2026 Durable Medical Equipment and Medical Supplies Fee Schedule.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26150/file/2025 Durable Medical Equipment and Medical Supplies Fee Schedule 04092025.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26151/file/2025 Durable Medical Equipment and Medical Supplies Fee Schedule Excel Version.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28108/file/2026 Early Interventions Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26448/file/2025 EIS fee schedule clean 05012025.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/file/medicaid/2026FHHAFS-july-update.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28109/file/2026 Family Home Health Aide Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26153/file/2025 Family Home Health Aide Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28656/file/2026 Hearing Services Fee Schdule 4.6.26.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28655/file/2026 Hearing Services Fee Schdule 4.6.26.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26154/file/Hearing Services Fee Schedule January 1, 2025.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26156/file/Hearing Services Fee Schedule January 1, 2025.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28115/file/2026 Home Health Visit Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26157/file/2025 Home Health Visit Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28117/file/2026 Hospice Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28389/file/2025 Hospice Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/file/medicaid/2026 Independent Laboratory Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/file/medicaid/2026 Independent Laboratory Fee Schedule.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28219/file/Independent Lab Fee Schedule - October 1, 2025.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28220/file/Independent Lab Fee Schedule - October 1, 2025.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/27170/file/Independent Lab Fee Schedule July 1, 2025.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/27171/file/Independent Lab Fee Schedule July 1, 2025.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26158/file/2025 Independent Lab Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26159/file/2025 Independent Lab Fee Schedule.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28122/file/2026 Licensed Midwife Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28124/file/2026 Licensed Midwife Fee Schedule.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26160/file/2025 Licensed Midwife Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26161/file/2025 Licensed Midwife Fee Schedulen.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28125/file/2026 Medicaid Certified School Match Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/27262/file/2025 Medicaid Certified School Match Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28126/file/2026 Medical Foster Care Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26163/file/2025 Medical Foster Care Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/27195/file/TCM Fee Schedules - October 1, 2025.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28128/file/2026 Occupational Therapy Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26164/file/Occupational Therapy Fee Schedule January 1, 2025.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28129/file/2026 Personal Care Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26165/file/2025 Personal Care Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28130/file/2026 Physical Therapy Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26166/file/Physical Therapy Services Fee Schedule January 1, 2025.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28131/file/2026 Physician Pediatric Surgery Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26167/file/2025 Physician Pediatric Surgery Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26168/file/2025 Physician Pediatric Surgery Fee Schedule.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28192/file/2026 Practitioner Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28193/file/2026 Practitioner Fee Schedule.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28225/file/Practitioner Fee Schedule October 1, 2025.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28226/file/Practitioner Fee Schedule October 1, 2025 - Rules.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26170/file/Practitioner Fee Schedule January 1, 2025.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26171/file/Practitioner Fee Schedule January 1, 2025.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/file/medicaid/2026 Practitioner Laboratory Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/file/medicaid/2026 Practitioner Laboratory Fee Schedule.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28221/file/Practitioner Lab Fee Schedule - October 1, 2025.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28222/file/Practitioner Lab Fee Schedule - October 1, 2025.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/27172/file/Practitioner Lab Fee Schedule July 1, 2025.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/27173/file/Practitioner Lab Fee Schedule July 1, 2025.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26172/file/2025 Practitioner Lab Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26173/file/2025 Practitioner Lab Fee Schedule.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/file/medicaid/PRESCRIBED_DRUGS_IMMUNIZATION_FEE_SCHEDULE_1.JANUARY_2026_UPDATED_06.16.2026.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/file/medicaid/PRESCRIBED_DRUGS_IMMUNIZATION_FEE_SCHEDULE_JAN-1-2026_UPDATED_JUN-16-2026.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26188/file/PRESCRIBED_DRUGS_IMMUNIZATION_FEE_SCHEDULE_1_JANUARY 2025.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26189/file/PRESCRIBED DRUGS IMMUNIZATION FEE SCHEDULE 1.JANUARY 2025.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/file/medicaid/PPEC Fee Schedule - 2026 edits.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28132/file/2026 PPEC Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26920/file/July 1 2025 PPEC Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26169/file/2025 PPEC Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28139/file/2026 Private Duty Nursing Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26174/file/2025 Private Duty Nursing Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28185/file/2026 Radiology Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28186/file/2026 Radiology Fee Schedule.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26539/file/2025 Radiology Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26176/file/2025 Radiology Fee Schedule.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28143/file/2026 RPICC Neonatal Servcies Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26178/file/2025 RPICC Neo Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26179/file/2025 RPICC Neo Fee Schedule.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28145/file/2026 RPICC Obstetrical Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26180/file/2025 RPICC Obstetrical Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26181/file/2025 RPICC Obstetrical Fee Schedule.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28142/file/2026 Respiratory Therapy Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26177/file/2025 Respiratory Therapy Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28149/file/2026 STS Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26825/file/Specialized Therapeutic Services - July 8, 2025.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26182/file/Specialized Therapeutic Services Fee Schedule January 1, 2025.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28148/file/2026 Speech Language Pathology Fee Schedule Clean.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26183/file/2025 Speech-Language Pathology Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/27265/file/TCM.Fee.Schedules.10012025.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28151/file/2026 Transportation Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26185/file/2025 Transportation Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28152/file/2026 Visual Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28153/file/2026 Visual Services Fee Schedule.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26186/file/2025 Visual Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26187/file/2025 Visual Services Fee Schedule.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28387/file/2.24.2026 County Health Department Billing Codes.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26126/file/2025 County Health Department Billing Codes.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28699/file/4.9.2026 Federally Qualified Health Center Billing Codes .pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26127/file/2025 Federally Qualified Health Center Billing Codes.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28116/file/2026 Hospice Services Billing Codes.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26125/file/2025 Hospice Services Fee Schedule.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28118/file/2026 Hospital Outpatient Services Billing Codes.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26128/file/2025 Hospital Outpatient Services Billing Codes.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28119/file/2026 ICF-IID Billing Codes.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26124/file/2025 ICF-IDD Billing Codes.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28127/file/2026 Nursing Facility Billing Codes.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26129/file/2025 Nursing Facility Billing Codes.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28137/file/2026 PRESCRIBED DRUGS PHYSICIAN ADMINISTERED BILLING CODES.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28138/file/2026 PRESCRIBED DRUGS PHYSICIAN ADMINISTERED BILLING CODES.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26130/file/Prescribed Drugs Physician Administered Billing Codes January 1, 2025.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26131/file/Prescribed Drugs Physician Administered Billing Codes January 1, 2025.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/27056/file/2025 PRESCRIBED DRUGS PHYSICIAN ADMINISTERED BILLING CODES_JULY UPDATE.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/27057/file/2025 PRESCRIBED DRUGS PHYSICIAN ADMINISTERED BILLING CODES_JULY UPDATE.xlsx",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28146/file/2026 Rural Health Center Billing Codes.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26190/file/2025 Rural Health Center Billing Codes.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/28147/file/2026 SIPP Billing Codes.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/26191/file/2025 SIPP Billing Codes.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/9125/file/SMMC_Provider_Plan_Contacts_External.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/prescribed-drugs/remittance-advice-provider-alerts.html"
+  },
+  {
+   "url": "https://ahca.myflorida.com/content/download/8681/file/PDL.pdf",
+   "linked_from": "https://ahca.myflorida.com/medicaid/prescribed-drugs/remittance-advice-provider-alerts.html"
+  }
+ ]
+}
