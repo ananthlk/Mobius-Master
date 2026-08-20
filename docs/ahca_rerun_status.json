@@ -1,16 +1,16 @@
 {
-  "generated_at": "2026-08-20T13:30:04+00:00",
-  "corpus_active": 9716,
-  "ahca_total": 1160,
+  "generated_at": "2026-08-20T18:59:42+00:00",
+  "corpus_active": 9719,
+  "ahca_total": 1163,
   "reingested": 13,
   "ahca_reingested": 0,
   "tables": 431,
   "table_rows": 16365,
   "breadcrumb_pages": 429,
-  "index_total": 1682590,
+  "index_total": 1680356,
   "index_junk": null,
   "index_junk_checked": false,
-  "classified_today": 8,
+  "classified_today": 11,
   "reingest_txns": {
     "created": 3
   },
@@ -18,7 +18,7 @@
     "active": 10,
     "retired": 161,
     "shelved": 441,
-    "unset": 9265
+    "unset": 9268
   },
   "gate_latest": {
     "ordering_unknown": 398,
@@ -31,7 +31,6 @@
   },
   "gate_last_run_at": "2026-08-19 16:58:18.919304+00:00",
   "chunking_jobs_12h": {
-    "completed": 6,
-    "processing": 1
+    "completed": 8
   }
 }

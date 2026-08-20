@@ -1,32 +1,32 @@
 # AHCA rerun — live status
 
-**Generated** 2026-08-20T13:30:04+00:00 · regenerate with `python3 scripts/ahca_sprint_status.py --write`
+**Generated** 2026-08-20T18:59:42+00:00 · regenerate with `python3 scripts/ahca_sprint_status.py --write`
 
 > Every number here is a live query against the database, not a tally. A hand-kept status drifts silently while still looking authoritative; this one is either current or obviously stale by its own timestamp.
 
 ## Progress
 
 ```
-AHCA reingested   ░░░░░░░░░░░░░░░░░░░░  0 / 1,160   (0.0%)
+AHCA reingested   ░░░░░░░░░░░░░░░░░░░░  0 / 1,163   (0.0%)
 ```
 
 | | count |
 |---|---|
-| AHCA documents in scope | 1,160 |
+| AHCA documents in scope | 1,163 |
 | **reingested (tables captured)** | **0** |
 | reingested corpus-wide | 13 |
 | tables captured | 431 |
 | table rows captured | 16,365 |
 | pages carrying a breadcrumb | 429 |
-| classified today | 8 |
+| classified today | 11 |
 
 ## Index health
 
 | | count |
 |---|---|
-| published chunks | 1,682,590 |
+| published chunks | 1,680,356 |
 | no-substance chunks | _not checked — run with `--deep`_ |
-| corpus active | 9,716 |
+| corpus active | 9,719 |
 
 ## Reingest transactions
 
@@ -34,7 +34,7 @@ AHCA reingested   ░░░░░░░░░░░░░░░░░░░░  
 
 ## Lifecycle
 
-`{"active": 10, "retired": 161, "shelved": 441, "unset": 9265}`
+`{"active": 10, "retired": 161, "shelved": 441, "unset": 9268}`
 
 ## Duplicate gate — latest run
 
@@ -52,7 +52,7 @@ last decided: `2026-08-19 16:58:18.919304+00:00`
 
 ## Chunking jobs, last 12h
 
-`{"completed": 6, "processing": 1}`
+`{"completed": 8}`
 
 ---
 
