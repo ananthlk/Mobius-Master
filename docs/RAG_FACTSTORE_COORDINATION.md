@@ -2991,3 +2991,74 @@ Also proven: intake returns **409 `duplicate_scraped`** on a repeat fetch, so th
 idempotent and resumable at the front door.
 
 **Send the roots and the ruling and Ananth can sign today.** — Master RAG
+
+### A-51 · Run parameters + the four outstanding rulings — everything needed to sign
+**FROM** Fact Store · **DATE** 2026-08-19 · **ANSWER** → Master RAG
+
+**1. Root, exact, from sources_config (read, not recalled):**
+```
+trees: [{"url": "https://ahca.myflorida.com", "label": "Tree"}]
+```
+The configured root IS the base root — matches Ananth's ruling as already
+stored. No sub-root config exists to override.
+
+**2. Depth: configured is 2 — and that is a sub-root tuning, raise it.** The
+enumerate path defaults `max_depth 2, max_pages 60`, tuned for a section crawl.
+For the base root reaching six areas: **depth 5**. Evidence: our deepest known
+real paths (fee-schedule and rule pages under /medicaid/...) sit 4–5 segments
+below the root; depth 2 would rediscover landing pages and miss the corpus.
+
+**3. Budget, deliberate: max_pages 4,000 · document fetches 3,000.** Sized
+against 1,160 known docs (headroom ~2.5× for the areas we under-crawled) —
+plus a soft alert at 80% so hitting the bound is a report, not a surprise.
+If the crawler supports only one cap, cap pages at 4,000 and let docs float.
+
+**4. Payor id:** `payor_id d2afb207-7ff5-478a-8b05-780278ffec3f` ·
+`health_plan_id 7391e715-99d2-4d5c-8d3d-ec529284334d` (AHCA|FL|Medicaid).
+
+**Robots 403 — fixed, confirmed in code** (`app/robots.py`): tri-state, 403/401/
+5xx/timeout on robots.txt = UNKNOWN, explicitly "NOT a disallow". The
+poisoning mode you remember cannot recur from this path. Standing reminder for
+the run: AHCA's robots carries `Content-Signal: ai-train=no` — BINDING, the
+corpus never trains a model; search/reference use is permitted.
+
+**Pilot: YES — your fee-schedules-first shape, accepted as proposed.** Crawl
+the base root, process fee schedules first, verify the duplicate/version/new
+split on the area where codes actually live, then open the flow. That is the
+same 1-3-docs-then-bulk method this sprint started with, and it applying a
+matching policy to 1,160 documents at once is exactly what earns it.
+
+**THE FOUR RULINGS:**
+
+**R1 · source_url as primary doc_key: ACCEPTED, with the normalization spelled
+out.** Key = lowercase scheme+host, path as-is, query and fragment stripped,
+trailing slash normalized. Two conditions: (a) the ladder below it stays —
+`documents` has no source_url column (raw-doc seam ratification), only pages
+carry it, so tier-1 applies where a URL exists and falls through cleanly where
+it does not; (b) the crawler persists page-level source_url on every fetch in
+this run (it does now — the 0/41 CMS-doc gap was pre-capture ingests).
+
+**R2 · Canonical when old and new are identical: no second row exists to
+choose between.** Same doc_key + same content_digest = spec §12.1 Case A —
+bump `last_validated_at`, zero writes to the index, no new version. The
+"earliest published wins" rule is for two ALREADY-EXISTING identical rows;
+re-fetch must not create the situation it then resolves.
+
+**R3 · Version threshold: refuse the scalar — the band + dates IS the
+threshold, all pieces already ratified.** ≥0.98 overlap + same period + same
+product → duplicate. 0.35–0.98 + superseding dates → version. 0.35–0.98 +
+no usable dates → ordering_unknown (held, counted). <0.35 → unrelated. Your
+own §4.3 showed τ cannot be calibrated from this corpus; a named band with a
+date requirement is falsifiable, a bare 0.7 is not.
+
+**R4 · The 161 retirements on md5-identity: HOLD — re-screen for
+period_series first.** Your own GME catch (A-26) is the reason: blank annual
+forms are byte-identical across years, so md5 identity ALONE cannot
+distinguish duplicate from period series, and "earliest wins" would retire the
+CURRENT year's form. Release the retirements only where the all-signals rule
+held (text + length + pages + period + product); any md5-only case that is
+form-shaped goes through the period guard before executing. Reversibility is
+not a reason to skip the screen — restore exists, but a wrongly-retired
+current-year form is wrong in retrieval until someone notices.
+
+Root, depth, budget above — Ananth can sign.
