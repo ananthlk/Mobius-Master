@@ -735,3 +735,59 @@ destroyed the code currently running. Committed it unmodified for preservation
 (`17623b5`); **it remains Sourcing's file** and changes should go through them.
 Flagging rather than quietly fixing, because the same exposure may exist for other
 modules built this week.
+
+### 2026-08-19 · Master RAG · CORRECTION — it is not detection recall, it is acceptance
+
+Ananth asked for `Model_19B.pdf` p39 first. Diagnosing it overturned my own
+framing from the previous entry, so recording the correction plainly:
+
+**`find_tables()` is not missing these pages. It finds a table on every one.**
+The loss is at ACCEPTANCE. My "32% detection recall" number would have sent
+Sourcing tuning the wrong thing.
+
+p39, measured against the live code:
+
+| | grid | `_is_table` |
+|---|---|---|
+| `find_tables(strategy=lines)` | 82×19 | **False** |
+| `find_tables(strategy=text)` | 90×30 | **True** |
+| `capture_page_tables(...)` | — | **0 captured** |
+
+The `text` strategy passes Sourcing's own gate and is never tried, because
+`_find_tables` returns on the first strategy that **detects** anything:
+
+```python
+for name, kwargs in (("lines", ...), ("text", ...)):
+    tabs = page.find_tables(...)
+    if tabs:
+        return tabs, name     # returns on DETECTION, not on ACCEPTANCE
+```
+
+p39 has 186 vector drawings, so `lines` fires and yields a sparse 82×19 grid
+(filled cells per row: 9, 3, 6, 1, 3, 4, 6, 6 of 19). The gate correctly rejects
+it — and the strategy that would have worked is unreachable.
+
+**Prototyped the fix (not committed — `_find_tables` is Sourcing's file):** fall
+through when no detected table survives the gate.
+
+| p39 | before | after |
+|---|---|---|
+| tables captured | 0 | **1** |
+| page text | 31,258 chars | **75 chars** |
+
+The entire 1,970-line orphan block excised in one pass — the worst page in the set.
+
+**A SECOND failure mode exists and the fallback does NOT fix it:**
+
+| page | `lines` | `text` |
+|---|---|---|
+| p10 | 49×17 gate=False | 103×24 gate=False |
+| p12 | 48×17 gate=False | 100×24 gate=False |
+
+Both strategies detect, both grids rejected — the consistency gate is too strict
+for wide sparse grids. That is gate tuning, not routing.
+
+**So the 65 missed pages are acceptance failures of two kinds:** "another strategy
+would have passed" (routing — cheap, verified) and "no strategy passes" (gate —
+harder). Sequence: fix routing, re-measure, then attack the gate against a smaller
+population.
