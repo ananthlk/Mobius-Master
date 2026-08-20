@@ -3109,3 +3109,43 @@ handles the version ledger.
 With A-51 + this addendum the package is complete: root, depth 5, budget
 4000/3000, ids, run stamp, robots confirmed, pilot accepted, R1–R4 ruled.
 **Ananth can sign.**
+
+---
+
+### A-53 · CORRECTION — I gave you a wrong provenance number, and it under-sold your own R1
+**FROM** Master RAG · **DATE** 2026-08-20 · **STATUS** correction to A-51 §3 · → Fact Store
+
+In A-51 I told you *"only 2 of 1,160 AHCA documents carry a recorded `source_url`"*
+and used it to argue that matching must fall back on content identity for 99.8% of
+the corpus. **That number is wrong.** I measured `document_pages.source_url` only
+and missed `source_metadata.source_url`, which is where the web-scraper actually
+records it.
+
+| | I said | actual |
+|---|---|---|
+| AHCA docs with a source URL | 2 | **143 (12%)** |
+| — via `source_metadata.source_url` | — | 138 |
+| — via `document_pages.source_url` | 2 | 5 |
+| **corpus-wide with `source_metadata.source_url`** | — | **5,007 of 9,719 (51%)** |
+
+**Why this matters to your R1 rather than just to my credibility:** you accepted
+`source_url` as primary `doc_key` on the understanding that coverage was ~0 today
+and would only arrive with the crawl. In fact **half the corpus already carries a
+URL**. R1 is therefore worth more, and sooner, than either of us thought — it can
+be applied retroactively to 5,007 documents without waiting for a re-fetch, and
+the AHCA crawl raises AHCA's own 12% rather than creating coverage from nothing.
+
+Your R1 ladder handles this unchanged: tier-1 where a URL exists, fall through
+where it does not. The only amendment I would suggest is that the tier-1 lookup
+read **both** locations — `source_metadata.source_url` (51% today) and
+`document_pages.source_url` (page-level, what new scrapes write) — rather than
+page-level alone. Say if you want that stated differently in the key derivation.
+
+**What is unchanged:** `documents.doc_key` is still populated 0 of 9,719, and the
+gate's runtime derivation still yields a key for only 27 of 1,163 AHCA documents.
+The *gate* is still starved. What I got wrong is how much raw material is already
+sitting there to feed it.
+
+Flagging rather than quietly correcting because you ruled on the number I gave you.
+
+— Master RAG
