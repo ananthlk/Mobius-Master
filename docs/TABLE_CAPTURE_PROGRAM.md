@@ -540,3 +540,57 @@ write path with no reader.
 
 **Next (mine):** persistence for `page_data["tables"]` at the six ingest paths,
 honouring both traps, then stage-2 reingest of the 4-document group.
+
+### 2026-08-19 · Master RAG · persistence BUILT · Sunshine picked · stage-2 set locked at 5
+
+**Sunshine file chosen — by evidence, not by preference.** Sourcing's "Sunshine:
+13 tables" was never narrowed and stage 2 could not wait on it, so I picked using
+the purge manifest: the document that bled the most junk chunks is by definition
+the most table-heavy.
+
+| junk chunks purged | document |
+|---|---|
+| **3,605** | **`Sunshine_State_Health_Plan__Inc.__CW_.pdf`** ← picked |
+| 2,584 | `1223_Issued_ASR_Report_-_..._SMI_` |
+| 2,564 | `Sunshine_State_Health_Plan__Inc.__SMI_.pdf` |
+| 22 | `1223_Issued_ASR_Report_-_Sunshine_State_Health_Plan.pdf` |
+
+For scale, the confirmed targets: `Model_10A_2011-01-27` 4,571 · `Model_19B`
+3,366 · `Model_10A` 2,584 · `LIP_Model_5` 123. The pick is the heaviest bleeder
+of the Sunshine family and on par with the LIP models. **Sourcing: correct me if
+you meant a different one** — it is one line to change.
+
+**STAGE-2 REINGEST SET LOCKED — 5 documents** (group rule applied):
+`Model_10A.pdf` + `Model_10A_2011-01-27.pdf` (one `period_series` group),
+`Model_19B.pdf`, `LIP_Model_5_2012-13_unlinked_nbm.pdf`,
+`Sunshine_State_Health_Plan__Inc.__CW_.pdf`.
+
+**PERSISTENCE BUILT** — `app/services/table_persist.py`, wired into **all six**
+PDF ingest paths after the page commit (the composite FK requires the pages to
+exist first). 18 tests; verified end-to-end against migration 050 in a rolled-back
+transaction.
+
+Both traps handled, and one more found while testing:
+
+**TRAP 3 (new) — a savepoint per insert is load-bearing.** Postgres aborts the
+*entire* transaction on an integrity error, so the obvious `try/except` around
+each insert does not isolate a bad table: it loses the good ones **and** leaves
+the caller's session unusable, which fails the whole document's ingest — the
+precise opposite of fail-open. Measured against the live schema:
+
+| | written | failed | session after |
+|---|---|---|---|
+| bare try/except | 0 | 2 | **poisoned** |
+| savepoint per insert | 1 | 1 | usable |
+
+**Partial replacement is deliberate.** The delete runs before the inserts, so a
+mid-way failure leaves the page with fewer tables than before. That is the right
+trade: the page text is rewritten with fresh breadcrumbs in the same ingest, so
+the old rows are already unreachable — rolling back would leave *every* breadcrumb
+unresolvable rather than *most* resolvable. What matters is visibility, so
+`failed` is returned and logged at every call site: `failed > 0` means breadcrumbs
+exist with no row behind them, and nothing downstream will ever complain about it.
+**Gate 2 asserts `failed == 0`.**
+
+**Still needed to run stage 2:** deploy (the hook is code, not yet serving), then
+reingest the 5-document group with `TABLE_CAPTURE=on`.
