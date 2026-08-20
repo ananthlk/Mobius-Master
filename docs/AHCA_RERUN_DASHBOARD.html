@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AHCA Rerun Sprint — Live Status</title>
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --success: #16a34a;
+      --warning: #d97706;
+      --blocked: #dc2626;
+      --neutral: #6b7280;
+      --bg: #f9fafb;
+      --surface: #ffffff;
+      --border: #e5e7eb;
+      --text: #111827;
+      --muted: #6b7280;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111827;
+        --surface: #1f2937;
+        --border: #374151;
+        --text: #f3f4f6;
+        --muted: #9ca3af;
+      }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 24px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .timestamp {
+      text-align: right;
+    }
+
+    .timestamp-value {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .freshness {
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      background: rgba(22, 163, 74, 0.1);
+      color: var(--success);
+    }
+
+    .freshness.stale {
+      background: rgba(217, 119, 6, 0.1);
+      color: var(--warning);
+    }
+
+    .main-metric {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 32px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .metric-label {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    .metric-value {
+      font-size: 56px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background: var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 16px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #6d28d9);
+      transition: width 0.3s ease;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    .card-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .card-detail {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    .status-blocked {
+      background: rgba(220, 38, 38, 0.1);
+      color: var(--blocked);
+    }
+
+    .status-running {
+      background: rgba(124, 58, 237, 0.1);
+      color: var(--primary);
+    }
+
+    .status-done {
+      background: rgba(22, 163, 74, 0.1);
+      color: var(--success);
+    }
+
+    .section {
+      margin-bottom: 32px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 20px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    .invariant {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .invariant-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .invariant-status {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--warning);
+    }
+
+    .invariant.unknown .invariant-status {
+      color: var(--neutral);
+    }
+
+    .invariant-note {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .verdict-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .verdict-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .verdict-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .verdict-count {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .blocker-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .blocker-item {
+      background: var(--surface);
+      border-left: 3px solid var(--blocked);
+      padding: 12px;
+      border-radius: 4px;
+    }
+
+    .blocker-title {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .blocker-status {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .gate-before {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>AHCA Rerun Sprint</h1>
+        <p class="subtitle">Full rerun: scrape → publish, 1,160 documents</p>
+      </div>
+      <div class="timestamp">
+        <div class="timestamp-value" id="generatedAt">Generated: —</div>
+        <div class="freshness" id="freshness">—</div>
+      </div>
+    </header>
+
+    <!-- Primary Metric -->
+    <div class="main-metric">
+      <div class="metric-label">Progress: AHCA Reingested</div>
+      <div class="metric-value" id="progressValue">0 / 1,160</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- Key Stats -->
+    <div class="grid">
+      <div class="card">
+        <div class="card-title">Tables Captured</div>
+        <div class="card-value" id="tablesCaptured">431</div>
+        <div class="card-detail" id="tableRowsDetail">16,365 rows</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Pages with Breadcrumb</div>
+        <div class="card-value" id="breadcrumbPages">429</div>
+        <div class="card-detail">from table excision</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Published Chunks</div>
+        <div class="card-value" id="indexTotal">1.69M</div>
+        <div class="card-detail" id="indexDetail">—</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Classified Today</div>
+        <div class="card-value" id="classifiedToday">8</div>
+        <div class="card-detail">during reingest</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Reingest Transactions</div>
+        <div class="card-value" id="reingestTxns">3</div>
+        <div class="card-detail">created</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Corpus Active</div>
+        <div class="card-value">9,716</div>
+        <div class="card-detail" id="corpusDetail">total documents</div>
+      </div>
+    </div>
+
+    <!-- Invariant: No-Substance Chunks -->
+    <div class="section">
+      <h3 class="section-title">Invariant Check</h3>
+      <div class="invariant unknown" id="invariantCard">
+        <div class="invariant-label">Chunks < 3 Alphanumerics</div>
+        <div class="invariant-status" id="invariantStatus">NOT CHECKED</div>
+        <div class="invariant-note">
+          ⚠️ Deep scan required. Run with <code>--deep</code> to verify no junk chunks remain (scans 1.7M rows, may timeout).
+        </div>
+      </div>
+    </div>
+
+    <!-- Blockers -->
+    <div class="section">
+      <h3 class="section-title">Blockers</h3>
+      <ul class="blocker-list">
+        <li class="blocker-item">
+          <div class="blocker-title">⛔ Eval BEFORE baseline</div>
+          <div class="blocker-status">Blocking the start — corpus will be invalidated after first extraction. Must be captured now.</div>
+          <div class="status-badge status-blocked">BLOCKED</div>
+        </li>
+        <li class="blocker-item">
+          <div class="blocker-title">Fact Store adjudication</div>
+          <div class="blocker-status">161 retirements rest on md5-identity proofs that re-extraction invalidates. Diff pending after reingest.</div>
+          <div class="status-badge status-running">PENDING</div>
+        </li>
+        <li class="blocker-item">
+          <div class="blocker-title">Trace verification</div>
+          <div class="blocker-status">Every change (tables, classify, dedup, breadcrumbs) must appear in both RAG and Chat traces.</div>
+          <div class="status-badge status-running">IN PROGRESS</div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Gate Verdicts -->
+    <div class="section">
+      <h3 class="section-title">Gate Verdicts (Before Snapshot)</h3>
+      <div class="gate-before">Captured: 2026-08-19 16:58 UTC · Run: b6284c3e · 1,204 pairs baseline</div>
+      <div class="verdict-grid" id="verdictGrid"></div>
+    </div>
+
+    <!-- Lifecycle Status -->
+    <div class="section">
+      <h3 class="section-title">Lifecycle Status</h3>
+      <div class="grid">
+        <div class="card">
+          <div class="card-title">Active</div>
+          <div class="card-value" id="lifecycleActive">10</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Retired</div>
+          <div class="card-value" id="lifecycleRetired">161</div>
+          <div class="card-detail">⚠️ Proofs at risk from reingest</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Shelved</div>
+          <div class="card-value" id="lifecycleShelved">441</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Unset</div>
+          <div class="card-value" id="lifecycleUnset">9,265</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function loadStatus() {
+      try {
+        // In production, this would fetch from the live JSON file
+        // For now, using inline data for demo — replace with:
+        // const response = await fetch('/docs/ahca_rerun_status.json');
+        // const data = await response.json();
+
+        const data = {
+          "generated_at": "2026-08-20T13:30:04+00:00",
+          "corpus_active": 9716,
+          "ahca_total": 1160,
+          "reingested": 13,
+          "ahca_reingested": 0,
+          "tables": 431,
+          "table_rows": 16365,
+          "breadcrumb_pages": 429,
+          "index_total": 1682590,
+          "index_junk": null,
+          "index_junk_checked": false,
+          "classified_today": 8,
+          "reingest_txns": {"created": 3},
+          "lifecycle": {
+            "active": 10,
+            "retired": 161,
+            "shelved": 441,
+            "unset": 9265
+          },
+          "gate_latest": {
+            "ordering_unknown": 398,
+            "period_series": 370,
+            "duplicate": 336,
+            "product_variant": 78,
+            "near_duplicate": 10,
+            "near_identical_review": 10,
+            "product_unknown": 2
+          }
+        };
+
+        // Update timestamp and freshness
+        const generated = new Date(data.generated_at);
+        const now = new Date();
+        const ageMinutes = Math.round((now - generated) / 60000);
+
+        document.getElementById('generatedAt').textContent = `Generated: ${generated.toLocaleTimeString()} UTC`;
+        const freshness = document.getElementById('freshness');
+        if (ageMinutes < 5) {
+          freshness.textContent = '✓ Fresh (< 5 min)';
+          freshness.classList.remove('stale');
+        } else if (ageMinutes < 30) {
+          freshness.textContent = `${ageMinutes} min ago`;
+          freshness.classList.add('stale');
+        } else {
+          freshness.textContent = `${ageMinutes} min ago — STALE`;
+          freshness.classList.add('stale');
+        }
+
+        // Update progress
+        const percent = (data.ahca_reingested / data.ahca_total) * 100;
+        document.getElementById('progressValue').textContent = `${data.ahca_reingested} / ${data.ahca_total}`;
+        document.getElementById('progressFill').style.width = percent + '%';
+
+        // Update cards
+        document.getElementById('tablesCaptured').textContent = data.tables.toLocaleString();
+        document.getElementById('tableRowsDetail').textContent = data.table_rows.toLocaleString() + ' rows';
+        document.getElementById('breadcrumbPages').textContent = data.breadcrumb_pages.toLocaleString();
+        document.getElementById('indexTotal').textContent = (data.index_total / 1000000).toFixed(2) + 'M';
+        document.getElementById('classifiedToday').textContent = data.classified_today;
+        document.getElementById('reingestTxns').textContent = data.reingest_txns.created;
+        document.getElementById('corpusDetail').textContent = data.corpus_active.toLocaleString() + ' documents';
+
+        // Update invariant
+        const invariantCard = document.getElementById('invariantCard');
+        if (data.index_junk_checked === true) {
+          invariantCard.classList.remove('unknown');
+          if (data.index_junk === 0) {
+            invariantCard.classList.add('success');
+            document.getElementById('invariantStatus').textContent = '✓ ZERO';
+            document.querySelector('.invariant-note').textContent = 'All junk chunks purged. Invariant holds.';
+          } else {
+            invariantCard.classList.add('warning');
+            document.getElementById('invariantStatus').textContent = data.index_junk.toLocaleString();
+            document.querySelector('.invariant-note').textContent = '⚠️ Junk chunks detected. Investigate.';
+          }
+        }
+
+        // Update lifecycle
+        document.getElementById('lifecycleActive').textContent = data.lifecycle.active;
+        document.getElementById('lifecycleRetired').textContent = data.lifecycle.retired;
+        document.getElementById('lifecycleShelved').textContent = data.lifecycle.shelved;
+        document.getElementById('lifecycleUnset').textContent = data.lifecycle.unset.toLocaleString();
+
+        // Update verdicts
+        const verdictGrid = document.getElementById('verdictGrid');
+        verdictGrid.innerHTML = '';
+        Object.entries(data.gate_latest)
+          .sort((a, b) => b[1] - a[1])
+          .forEach(([name, count]) => {
+            const item = document.createElement('div');
+            item.className = 'verdict-item';
+            item.innerHTML = `
+              <span class="verdict-name">${name}</span>
+              <span class="verdict-count">${count}</span>
+            `;
+            verdictGrid.appendChild(item);
+          });
+
+      } catch (error) {
+        console.error('Failed to load status:', error);
+      }
+    }
+
+    loadStatus();
+    // Refresh every 30 seconds (can be adjusted)
+    setInterval(loadStatus, 30000);
+  </script>
+</body>
+</html>
