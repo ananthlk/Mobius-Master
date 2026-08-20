@@ -193,31 +193,19 @@ def render_spec_reader(title, md_content):
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        # Serve index.html for root — fetch from git so updates are live (no rebuild needed)
+        # Serve index.html for root (always from local file in container)
         if self.path == '/' or self.path == '':
             try:
-                # Fetch from GitHub so changes are picked up without container rebuild
-                github_root = GITHUB_RAW.rsplit('/', 1)[0]  # Remove /docs, use base
-                index_url = f"{github_root}/specs-platform/index.html"
-                with urllib.request.urlopen(index_url, timeout=5) as r:
+                with open(os.path.join(SPEC_DIR, 'index.html'), 'rb') as f:
                     self.send_response(200)
                     self.send_header('Content-Type', 'text/html; charset=utf-8')
                     self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
                     self.end_headers()
-                    self.wfile.write(r.read())
+                    self.wfile.write(f.read())
                 return
-            except Exception as e:
-                # Fallback: serve local copy if git fetch fails
-                try:
-                    with open(os.path.join(SPEC_DIR, 'index.html'), 'rb') as f:
-                        self.send_response(200)
-                        self.send_header('Content-Type', 'text/html')
-                        self.end_headers()
-                        self.wfile.write(f.read())
-                    return
-                except:
-                    self.send_error(500)
-                    return
+            except:
+                self.send_error(500)
+                return
 
         # Serve specs with reader view
         if self.path.startswith('/specs/'):
