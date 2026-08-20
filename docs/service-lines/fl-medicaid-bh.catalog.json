@@ -204,6 +204,15 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "j_service_line": {
+        "query_phrases": [
+          "behavior analysis services",
+          "behavior analysis",
+          "applied behavior analysis",
+          "aba"
+        ],
+        "documents": []
+      },
       "lexicon_d": [
         {
           "d_code": "health_care_services.behavioral_health",
@@ -825,6 +834,18 @@
         "rendered_as": 9,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "j_service_line": {
+        "query_phrases": [
+          "behavioral health assessment services",
+          "behavioral health assessment"
+        ],
+        "documents": [
+          {
+            "document": "2025 Community Behavoir Health Fee Schedule.pdf",
+            "basis": "cited_source"
+          }
+        ]
       },
       "lexicon_d": [
         {
@@ -1597,6 +1618,18 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "j_service_line": {
+        "query_phrases": [
+          "behavioral health community support services",
+          "behavioral health community support"
+        ],
+        "documents": [
+          {
+            "document": "2025 Community Behavoir Health Fee Schedule.pdf",
+            "basis": "cited_source"
+          }
+        ]
+      },
       "lexicon_d": [
         {
           "d_code": "health_care_services.behavioral_health.cognitive_behavioral_therapy",
@@ -2325,6 +2358,18 @@
         "rendered_as": 9,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "j_service_line": {
+        "query_phrases": [
+          "behavioral health intervention services",
+          "behavioral health intervention"
+        ],
+        "documents": [
+          {
+            "document": "2025 Community Behavoir Health Fee Schedule.pdf",
+            "basis": "cited_source"
+          }
+        ]
       },
       "lexicon_d": [
         {
@@ -3231,6 +3276,18 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "j_service_line": {
+        "query_phrases": [
+          "behavioral health medication management services",
+          "behavioral health medication management"
+        ],
+        "documents": [
+          {
+            "document": "2025 Community Behavoir Health Fee Schedule.pdf",
+            "basis": "cited_source"
+          }
+        ]
+      },
       "lexicon_d": [
         {
           "d_code": "health_care_services.bio_psychosocial_evaluations",
@@ -3508,6 +3565,15 @@
         "rendered_as": 0,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "j_service_line": {
+        "query_phrases": [
+          "behavioral health overlay services",
+          "behavioral health overlay",
+          "bhos",
+          "overlay services"
+        ],
+        "documents": []
       },
       "lexicon_d": [
         {
@@ -4135,6 +4201,18 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "j_service_line": {
+        "query_phrases": [
+          "behavioral health therapy services",
+          "behavioral health therapy"
+        ],
+        "documents": [
+          {
+            "document": "2025 Community Behavoir Health Fee Schedule.pdf",
+            "basis": "cited_source"
+          }
+        ]
+      },
       "lexicon_d": [
         {
           "d_code": "health_care_services.behavioral_health.cognitive_behavioral_therapy",
@@ -4413,6 +4491,13 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "j_service_line": {
+        "query_phrases": [
+          "comprehensive behavioral health assessment",
+          "cbha"
+        ],
+        "documents": []
+      },
       "lexicon_d": [
         {
           "d_code": "health_care_services.comprehensive_assessment",
@@ -4577,6 +4662,14 @@
         "rendered_as": 0,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "j_service_line": {
+        "query_phrases": [
+          "evaluation and management",
+          "e&m",
+          "e/m"
+        ],
+        "documents": []
       },
       "lexicon_d": [
         {
@@ -5291,6 +5384,20 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "j_service_line": {
+        "query_phrases": [
+          "florida assertive community treatment",
+          "fact",
+          "assertive community treatment",
+          "act team"
+        ],
+        "documents": [
+          {
+            "document": "2025 Community Behavoir Health Fee Schedule.pdf",
+            "basis": "cited_source"
+          }
+        ]
+      },
       "lexicon_d": [
         {
           "d_code": "health_care_services.behavioral_health.on_site",
@@ -5592,6 +5699,15 @@
         "rendered_as": 0,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "j_service_line": {
+        "query_phrases": [
+          "mental health targeted case management",
+          "targeted case management",
+          "case management",
+          "tcm"
+        ],
+        "documents": []
       },
       "lexicon_d": [
         {
@@ -5975,6 +6091,13 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "j_service_line": {
+        "query_phrases": [
+          "specialized therapeutic services",
+          "specialized therapeutic"
+        ],
+        "documents": []
+      },
       "lexicon_d": [
         {
           "d_code": null,
@@ -6124,6 +6247,13 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "j_service_line": {
+        "query_phrases": [
+          "state mental health",
+          "state hospital"
+        ],
+        "documents": []
+      },
       "lexicon_d": [
         {
           "d_code": "health_care_services.behavioral_health",
@@ -6272,6 +6402,15 @@
         "rendered_as": 0,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "j_service_line": {
+        "query_phrases": [
+          "child health services targeted case management",
+          "targeted case management",
+          "case management",
+          "child health tcm"
+        ],
+        "documents": []
       },
       "lexicon_d": [
         {
@@ -6713,6 +6852,20 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "j_service_line": {
+        "query_phrases": [
+          "targeted case management for children at risk of abuse and neglect",
+          "targeted case management for children at risk",
+          "case management",
+          "tcm at risk"
+        ],
+        "documents": [
+          {
+            "document": "TCM_for_Children_At-Risk_2022_Fee_Schedule.pdf",
+            "basis": "cited_source"
+          }
+        ]
+      },
       "lexicon_d": [
         {
           "d_code": "care_management.general",
@@ -7094,6 +7247,14 @@
         "rendered_as": 0,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "j_service_line": {
+        "query_phrases": [
+          "qualified residential treatment program services",
+          "qualified residential treatment program",
+          "qrtp"
+        ],
+        "documents": []
       },
       "lexicon_d": [
         {
@@ -8250,6 +8411,14 @@
         "classified_by": 4,
         "grouped_to": 48
       },
+      "j_service_line": {
+        "query_phrases": [
+          "statewide inpatient psychiatric program",
+          "statewide inpatient psychiatric",
+          "sipp"
+        ],
+        "documents": []
+      },
       "lexicon_d": [
         {
           "d_code": "health_care_services.behavioral_health.depression_anxiety",
@@ -8472,6 +8641,14 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "j_service_line": {
+        "query_phrases": [
+          "therapeutic group care services",
+          "therapeutic group care",
+          "group care"
+        ],
+        "documents": []
+      },
       "lexicon_d": [
         {
           "d_code": "health_care_services.residential_care",
@@ -8620,6 +8797,15 @@
         "rendered_as": 0,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "j_service_line": {
+        "query_phrases": [
+          "county health department clinic services",
+          "county health department clinic",
+          "county health department",
+          "chd clinic"
+        ],
+        "documents": []
       },
       "lexicon_d": [
         {
@@ -8826,6 +9012,14 @@
         "rendered_as": 0,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "j_service_line": {
+        "query_phrases": [
+          "fqhc encounter",
+          "fqhc",
+          "federally qualified health center"
+        ],
+        "documents": []
       },
       "lexicon_d": [
         {
@@ -9041,6 +9235,14 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "j_service_line": {
+        "query_phrases": [
+          "rural health clinic encounter",
+          "rhc",
+          "rural health clinic"
+        ],
+        "documents": []
+      },
       "lexicon_d": [
         {
           "d_code": "health_care_services.clinic",
@@ -9255,6 +9457,14 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "j_service_line": {
+        "query_phrases": [
+          "intensive outpatient program",
+          "intensive outpatient",
+          "iop"
+        ],
+        "documents": []
+      },
       "lexicon_d": [
         {
           "d_code": "place_of_service.outpatient",
@@ -9399,6 +9609,14 @@
         "rendered_as": 0,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "j_service_line": {
+        "query_phrases": [
+          "partial hospitalization program",
+          "partial hospitalization",
+          "php"
+        ],
+        "documents": []
       },
       "lexicon_d": [
         {
@@ -9545,6 +9763,18 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "j_service_line": {
+        "query_phrases": [
+          "baker act involuntary examination",
+          "baker act",
+          "baker acted",
+          "baker-act",
+          "involuntary examination",
+          "involuntary exam",
+          "ex parte"
+        ],
+        "documents": []
+      },
       "lexicon_d": [
         {
           "d_code": "health_care_services.emergency_behavioral",
@@ -9683,6 +9913,17 @@
         "rendered_as": 0,
         "classified_by": 2,
         "grouped_to": 0
+      },
+      "j_service_line": {
+        "query_phrases": [
+          "crisis stabilization unit / baker act receiving",
+          "crisis stabilization unit",
+          "csu",
+          "baker act receiving",
+          "crisis stabilization",
+          "receiving facility"
+        ],
+        "documents": []
       },
       "lexicon_d": [
         {
@@ -10338,6 +10579,16 @@
         "classified_by": 1,
         "grouped_to": 24
       },
+      "j_service_line": {
+        "query_phrases": [
+          "marchman act services",
+          "marchman act",
+          "marchman",
+          "marchman acted",
+          "involuntary substance"
+        ],
+        "documents": []
+      },
       "lexicon_d": [
         {
           "d_code": "health_care_services.substance_use_disorders",
@@ -10482,6 +10733,16 @@
         "rendered_as": 0,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "j_service_line": {
+        "query_phrases": [
+          "mobile response team / crisis intervention",
+          "mobile response",
+          "mobile response team",
+          "mrt",
+          "crisis response"
+        ],
+        "documents": []
       },
       "lexicon_d": [
         {
@@ -11096,6 +11357,16 @@
         "rendered_as": 0,
         "classified_by": 1,
         "grouped_to": 24
+      },
+      "j_service_line": {
+        "query_phrases": [
+          "substance use residential treatment",
+          "residential treatment",
+          "substance use residential",
+          "sud residential",
+          "residential sud"
+        ],
+        "documents": []
       },
       "lexicon_d": [
         {
@@ -11758,6 +12029,16 @@
         "rendered_as": 0,
         "classified_by": 1,
         "grouped_to": 24
+      },
+      "j_service_line": {
+        "query_phrases": [
+          "withdrawal management / detoxification",
+          "withdrawal management",
+          "detox",
+          "detoxification",
+          "medically monitored withdrawal"
+        ],
+        "documents": []
       },
       "lexicon_d": [
         {
@@ -13441,6 +13722,15 @@
         "rendered_as": 0,
         "classified_by": 8,
         "grouped_to": 72
+      },
+      "j_service_line": {
+        "query_phrases": [
+          "inpatient psychiatric",
+          "inpatient psych",
+          "psychiatric admission",
+          "adult psych unit"
+        ],
+        "documents": []
       },
       "lexicon_d": [
         {
@@ -15143,6 +15433,15 @@
         "rendered_as": 0,
         "classified_by": 4,
         "grouped_to": 72
+      },
+      "j_service_line": {
+        "query_phrases": [
+          "emergency department behavioral health",
+          "psych ed",
+          "behavioral health emergency",
+          "ed psych"
+        ],
+        "documents": []
       },
       "lexicon_d": [
         {

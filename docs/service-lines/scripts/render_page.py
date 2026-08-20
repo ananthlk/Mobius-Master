@@ -224,6 +224,28 @@ function evidenceTable(l){
     }).join('')+'</tbody></table></div>';
 }
 
+function jServiceLineCard(l){
+  var j=l.j_service_line||{}; var ph=j.query_phrases||[], docs=j.documents||[];
+  if(!ph.length && !docs.length) return '';
+  return '<div class="card"><div class="ch"><h3>Routing — <code style="font-size:11px">j:service_line.'+
+    esc(l.key)+'</code></h3>'+
+    '<span class="pill '+(docs.length?'p-done':'p-doing')+'"><span class="d"></span>'+
+    (docs.length? docs.length+' document'+(docs.length===1?'':'s')+' assigned' : 'query-side only')+'</span>'+
+    '<span class="hint">Lexicon owns the axis · registry supplies the doc assignment</span></div>'+
+    '<div class="cb">'+
+    (ph.length? '<div class="field"><span class="l">Routes from</span><span class="v"><span class="chips">'+
+      ph.map(function(p){return '<span class="chip alias">'+esc(p)+'</span>';}).join('')+
+      '</span></span></div>' : '')+
+    (docs.length
+      ? '<div class="field"><span class="l">Assigned docs</span><span class="v">'+
+        docs.map(function(d){return '<div style="font-size:12px">'+esc(d.document)+
+          ' <span class="cite">'+esc(d.basis)+'</span></div>';}).join('')+'</span></div>'
+      : '<div class="field"><span class="l">Assigned docs</span><span class="v" '+
+        'style="color:var(--crit)">none yet — the governing document is not held, so this line '+
+        'routes by phrase but retrieves nothing line-specific</span></div>')+
+    '</div></div>';
+}
+
 function lexiconCard(l){
   var L=l.lexicon_d||[]; if(!L.length) return '';
   var c=l.lexicon_d_counts||{};
@@ -436,7 +458,7 @@ function renderLine(l){
       '<span class="hint">the complete standard answer — no payor needed</span></div>'+
       '<div class="cb">'+f.join('')+'</div>'+
       (l.scope==='serve' ? codeTable(l) : evidenceTable(l))+'</div>';
-  })()+ bindingCard(l) + lexiconCard(l) + standardReqCard(l) + requirementCard(l) + exceptionCard(l) +
+  })()+ bindingCard(l) + jServiceLineCard(l) + lexiconCard(l) + standardReqCard(l) + requirementCard(l) + exceptionCard(l) +
 
 
   '<div class="card"><div class="ch"><h3>Module completion</h3>'+

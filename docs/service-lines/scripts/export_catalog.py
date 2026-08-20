@@ -108,6 +108,19 @@ def main():
         asks = [{"domain": r[0], "other_store": r[1], "question": r[2], "payer": r[3],
                  "answer": r[4], "statement": r[5]} for r in cur.fetchall()]
 
+        cur.execute("""select spec->'query_expansion_phrases'
+                       from policy_lexicon_entries
+                       where kind='j' and active and code=%s""", ('service_line.' + key,))
+        _r = cur.fetchone()
+        jphrases = (_r[0] if _r else None) or []
+
+        cur.execute("""select d.filename, a.basis from (
+                         select distinct c.source_document fn, 'cited_source' basis
+                           from service_line.line_code c
+                          where c.line_key=%s and c.source_document is not null
+                       ) a join documents d on d.filename = a.fn and d.status='completed'""", (key,))
+        jdocs = [{"document": r[0], "basis": r[1]} for r in cur.fetchall()]
+
         cur.execute("""select d_code, relation, state, confidence, evidence, requested_concept
                        from service_line.line_lexicon_d where line_key=%s
                        order by state, confidence desc nulls last, d_code""", (key,))
@@ -134,6 +147,7 @@ def main():
             "unadjudicated_codes": sum(1 for x in rendered if not x["adjudicated"]),
             "bindings": {r: bind[r] for r in ROLES},
             "binding_counts": {r: len(bind[r]) for r in ROLES},
+            "j_service_line": {"query_phrases": jphrases, "documents": jdocs},
             "lexicon_d": lex,
             "lexicon_d_counts": {
                 "mapped": sum(1 for x in lex if x["d_code"]),

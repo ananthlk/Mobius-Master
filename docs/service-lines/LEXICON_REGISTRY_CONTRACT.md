@@ -91,6 +91,40 @@ is meant. `H0032` is the exact case rule 2 names.
 
 ---
 
+## 3.4 `j:service_line` — line-precise routing (agreed 2026-08-19)
+
+Concept tags alone cannot serve by line. Verified: the three lines sharing
+`substance_use_disorders` — `sud_residential`, `withdrawal_management`,
+`marchman_act` — carry **zero** `rendered_as` codes between them, so
+code+modifier cannot disambiguate exactly where the ambiguity is. More broadly
+**24 of 31 lines have no HCPCS code at all**, and **80 of 81 held AHCA policy
+documents contain no code**, so a code filter reaches the fee schedule that
+prints a code, never the policy that defines the service.
+
+Lexicon therefore built a `j:service_line` axis. Registry verified it live:
+**32 entries** (`service_line` container + 31 children), all 31 line keys
+present, none missing, none extra, `strong_phrases`/`aliases` empty so the
+corpus is untouched until doc-side assignment.
+
+| Side | Owner |
+|---|---|
+| The axis, query expansion, doc-side application | **Lexicon** |
+| The doc→line assignment seed | **Registry** |
+| Identity vernacular feeding query phrases | **Registry** (§1 level 1) |
+
+Two constraints, both written into Lexicon's spec:
+
+1. **Provenance in, not concept in.** An assignment must come from the
+   document's own provenance, never inferred from a concept tag — inference
+   would re-import the ambiguity the axis exists to remove.
+2. **Multi-valued.** A document may carry several line tags. The CBH fee
+   schedule is the cited source for **six** lines.
+
+Seed: [`service-line-doc-assignment.seed.json`](./service-line-doc-assignment.seed.json)
+— **20 assignments, 15 documents, 9 of 31 lines**, from two provenance bases:
+`rule_ref` (the document is the governing policy) and `cited_source` (the
+document is where the line's bindings were read from).
+
 ## 4. Open gaps
 
 | Gap | Owner | Note |
@@ -100,6 +134,7 @@ is meant. `H0032` is the exact case rule 2 names.
 | 66 `grouped_to` / DRG slots | Deep Research | DRG admission vernacular |
 | 3 collapsed modifier pairs (§3.3) | Lexicon | Rule 2 |
 | 857 short strong_phrases | Lexicon | §3.1 |
+| 22 of 31 lines have no assigned document | Deep Research | Route by phrase, retrieve nothing line-specific until the governing doc is held |
 
 **Structural finding, unresolved:** the `d` axis is condition-shaped, not
 service-shaped. Of 57 codes under `health_care_services.behavioral_health`, most

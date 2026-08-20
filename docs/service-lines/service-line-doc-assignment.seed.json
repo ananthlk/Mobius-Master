@@ -1,0 +1,102 @@
+[
+ {
+  "document_id": "708a4e7e-85c0-4bab-b758-63e8a684e8c9",
+  "line_key": "bh_assessment",
+  "basis": "cited_source"
+ },
+ {
+  "document_id": "bb843014-3d3c-450c-887a-b98491b6b234",
+  "line_key": "bh_assessment",
+  "basis": "59G-4.028"
+ },
+ {
+  "document_id": "15a8eab2-09ab-424e-adc3-732828acbe5f",
+  "line_key": "bh_community_support",
+  "basis": "59G-4.031"
+ },
+ {
+  "document_id": "708a4e7e-85c0-4bab-b758-63e8a684e8c9",
+  "line_key": "bh_community_support",
+  "basis": "cited_source"
+ },
+ {
+  "document_id": "db88c1f4-7c54-46d2-95f6-9008cabfb6f7",
+  "line_key": "bh_community_support",
+  "basis": "59G-4.031"
+ },
+ {
+  "document_id": "1f526799-fc8f-44ac-8070-8ad78edc46aa",
+  "line_key": "bh_intervention",
+  "basis": "59G-4.370"
+ },
+ {
+  "document_id": "708a4e7e-85c0-4bab-b758-63e8a684e8c9",
+  "line_key": "bh_intervention",
+  "basis": "cited_source"
+ },
+ {
+  "document_id": "708a4e7e-85c0-4bab-b758-63e8a684e8c9",
+  "line_key": "bh_medication_mgmt",
+  "basis": "cited_source"
+ },
+ {
+  "document_id": "708a4e7e-85c0-4bab-b758-63e8a684e8c9",
+  "line_key": "bh_therapy",
+  "basis": "cited_source"
+ },
+ {
+  "document_id": "8f46101d-b9f6-444e-ba2c-14ba4121c712",
+  "line_key": "bh_therapy",
+  "basis": "59G-4.052"
+ },
+ {
+  "document_id": "b2837bf6-072c-4008-95fa-1bb846984e1e",
+  "line_key": "ed_behavioral",
+  "basis": "59G-4.160"
+ },
+ {
+  "document_id": "229d11d8-a816-4e2f-b8e3-d4dd86061f10",
+  "line_key": "fact",
+  "basis": "59G-4.127"
+ },
+ {
+  "document_id": "708a4e7e-85c0-4bab-b758-63e8a684e8c9",
+  "line_key": "fact",
+  "basis": "cited_source"
+ },
+ {
+  "document_id": "c7b39fd0-0c47-4c04-a2ee-749d983113b2",
+  "line_key": "fact",
+  "basis": "59G-4.127"
+ },
+ {
+  "document_id": "517b8626-bb7d-4ab3-b02f-c98522b7be91",
+  "line_key": "inpatient_psych_adult",
+  "basis": "59G-4.150"
+ },
+ {
+  "document_id": "8c8d2b4a-d917-4c46-8b33-c9ac01b4b842",
+  "line_key": "inpatient_psych_adult",
+  "basis": "59G-4.150"
+ },
+ {
+  "document_id": "9f104e8e-56df-413d-aeb5-304fe113bafa",
+  "line_key": "inpatient_psych_adult",
+  "basis": "59G-4.150"
+ },
+ {
+  "document_id": "c3838335-86c6-4c45-8360-5eeda55b43e0",
+  "line_key": "inpatient_psych_adult",
+  "basis": "59G-4.150"
+ },
+ {
+  "document_id": "f35d4bff-1bd5-4f53-b10b-1f762b0733f6",
+  "line_key": "inpatient_psych_adult",
+  "basis": "59G-4.150"
+ },
+ {
+  "document_id": "90ac0e4c-0fab-4fa5-99fd-3774c4638f20",
+  "line_key": "tcm_children_at_risk",
+  "basis": "cited_source"
+ }
+]
