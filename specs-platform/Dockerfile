@@ -2,9 +2,9 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy catalog HTML and simple proxy server
-COPY index.html .
-COPY server.py .
+# Copy catalog HTML and simple proxy server from parent context
+COPY specs-platform/index.html .
+COPY specs-platform/server.py .
 
 EXPOSE 8080
 
