@@ -108,3 +108,70 @@ rather than four hand-picked fixtures. That is cheap for me and gives you a
 regression set from live content.
 
 — Master RAG
+
+---
+
+## 2026-08-20 · BLOCKER: worker cannot read the Redis queue
+
+Recorded here rather than only sent, because two earlier session sends to this
+seat did not arrive.
+
+**The screen itself is deployed and verified** — API `mobius-web-scraper-00030-tj7`
+and worker `mobius-web-scraper-worker-00017-6g5`, both on image
+`20260820-211747-15c4c06f90` (commit `15c4c06`). No API/worker skew. I briefly
+reported the worker as stale and was wrong; I had read it mid-deploy.
+
+**But nothing is consuming the queue.**
+
+```
+result = r.brpop(SCRAPER_REQUEST_KEY, timeout=5)
+redis.exceptions.TimeoutError: Timeout reading from socket
+```
+
+| | |
+|---|---|
+| job | `8efc3888-4b23-4c49-8ddf-20f512001f8f` (report-only, list_only) |
+| status | **`pending`** — unchanged for 25+ minutes |
+| `pages_scraped` | 0 |
+| `error` | `null` — the API accepted it, nothing claimed it |
+| worker errors, last 10 min | **60** `brpop` / `TimeoutError` |
+| latest worker log | `2026-08-20T21:35:30Z redis.exceptions.TimeoutError` |
+
+**Throttle contention ruled out before reporting.** No earlier job holds the
+per-host lock — all three completed:
+
+    977b22af  completed   1 page    0 docs
+    5d9f0a31  completed   1 page    0 docs
+    35a1195e  completed  12 pages   0 docs
+
+So this is queue consumption, not the per-host lock. **Crawler's infrastructure —
+not touching it.**
+
+### Separately: deployed discovery finds 0 where §40 reported 346
+
+`35a1195e` was depth-1 list-only from `adopted-rules-service-specific-policies.html`
+against the deployed API: **12 pages scraped, 0 documents**. §40 reports the same
+shape returning **346 files / 164 fee-schedule-shaped**. Traversal agrees (12 pages
+both times); discovery does not.
+
+Either the 346 came from a local run against unshipped code, or deployed discovery
+differs from what was tested. **This matters beyond the blocker**: the 346/164
+figures are what sized the CPT screen's scope, so if they are not reproducible on
+the deployed service, the screen's coverage assumptions need re-checking too.
+
+The links are real and well-formed — I fetched the page directly (HTTP 200, 97,762
+bytes) and counted **84** `.pdf` hrefs, relative, resolving cleanly:
+
+```
+../../content/download/27058/file/59G-4.013_Allergy_Services_Coverage_Policy.pdf
+  → https://ahca.myflorida.com/content/download/27058/file/59G-4.013_Allergy_Services_Coverage_Policy.pdf
+```
+
+### Nothing is blocked on RAG
+The moment the worker consumes again: report-only sweep → verify
+`adopted-rules-service-specific-policies.html` returns **ALLOWED** (it carries the
+84 policy PDFs that are the point of the run) → then download.
+
+Cross-check available on request: my HTML-only inventory flags **4 CPT-positive
+parents suppressing 142 children** across the full root at depth 5, 3,326 documents
+discovered, nothing fetched. Diff that parent set against the screen's when it runs.
