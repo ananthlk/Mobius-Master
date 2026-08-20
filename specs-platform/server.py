@@ -6,7 +6,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import unquote
 
 PORT = int(os.environ.get('PORT', '8080'))
-GITHUB_RAW = "https://raw.githubusercontent.com/ananthlk/Mobius-Master/main/docs"
+GITHUB_RAW = "https://raw.githubusercontent.com/ananthlk/Mobius-Master/service-line-registry/docs"
 SPEC_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def escape_html(text):
