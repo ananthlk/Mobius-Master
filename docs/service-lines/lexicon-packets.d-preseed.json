@@ -1,0 +1,2937 @@
+{
+ "purpose": "d: pre-seed for the Service Line Registry Lexicon packet. Non-authoritative SEED sourced from existing curated d: axis vernacular, with provenance. Gaps left empty for Deep Research sourcing. Nothing written to policy_lexicon_entries.",
+ "source_packet": "docs/service-lines/lexicon-packets.json",
+ "rules": [
+  "(code,modifier) granularity — never bare code",
+  "wrong alias worse than blank -> no clean match = empty",
+  "adjudicated:false diagnosis blocks carry concept vernacular only, no payability assertion",
+  "SUD/MH split carried per slot; disambiguation is consumer-side"
+ ],
+ "coverage": {
+  "total": 238,
+  "seeded": 45,
+  "seeded_identity": 8,
+  "gap": 193,
+  "seeded_rendered_as": 22,
+  "seeded_classified_by": 12,
+  "seeded_authority": 3
+ },
+ "lines": [
+  {
+   "line_key": "behavior_analysis",
+   "canonical_name": "Behavior Analysis Services",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [
+      "applied behavior analysis",
+      "aba",
+      "aba therapy",
+      "behavior analyst",
+      "bcba"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.aba_therapy",
+       "field": "strong_phrases"
+      },
+      {
+       "d_code": "d:health_care_services.behavior_analyst",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "split": null
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "bh_assessment",
+   "canonical_name": "Behavioral Health Assessment Services",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H0001,HO]",
+     "level": "rendered_as",
+     "source_definition": "In-depth assessment, new patient, substance abuse",
+     "split": "SUD",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "seed_note": "RULE-3: split=SUD; keyed at (code,modifier), never bare code."
+    },
+    {
+     "slot": "rendered_as[H0001,TS]",
+     "level": "rendered_as",
+     "source_definition": "In-depth assessment, established patient, substance abuse",
+     "split": "SUD",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "seed_note": "RULE-3: split=SUD; keyed at (code,modifier), never bare code."
+    },
+    {
+     "slot": "rendered_as[H0031,HN]",
+     "level": "rendered_as",
+     "source_definition": "Bio-psychosocial Evaluation, mental health",
+     "split": "MH",
+     "seeded_vernacular": [
+      "bio-psychosocial evaluations",
+      "psychiatric evaluations",
+      "bio-psychosocial evaluation",
+      "psychological evaluation",
+      "biopsychosocial evaluation"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.bio_psychosocial_evaluations",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "medium",
+     "seed_note": "RULE-3: split=MH; keyed at (code,modifier), never bare code."
+    },
+    {
+     "slot": "rendered_as[H0031,HO]",
+     "level": "rendered_as",
+     "source_definition": "In-depth assessment, new patient, mental health",
+     "split": "MH",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H0031,TS]",
+     "level": "rendered_as",
+     "source_definition": "In-depth assessment, established patient, mental health",
+     "split": "MH",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H2000,HO]",
+     "level": "rendered_as",
+     "source_definition": "Psychiatric evaluation by a non- physician",
+     "split": null,
+     "seeded_vernacular": [
+      "bio-psychosocial evaluations",
+      "psychiatric evaluations",
+      "bio-psychosocial evaluation",
+      "psychological evaluation",
+      "biopsychosocial evaluation"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.bio_psychosocial_evaluations",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "medium",
+     "seed_note": "RULE-3: split=None; keyed at (code,modifier), never bare code."
+    },
+    {
+     "slot": "rendered_as[H2000,HP]",
+     "level": "rendered_as",
+     "source_definition": "Psychiatric evaluation by a physician",
+     "split": null,
+     "seeded_vernacular": [
+      "bio-psychosocial evaluations",
+      "psychiatric evaluations",
+      "bio-psychosocial evaluation",
+      "psychological evaluation",
+      "biopsychosocial evaluation"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.bio_psychosocial_evaluations",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "medium",
+     "seed_note": "RULE-3: split=None; keyed at (code,modifier), never bare code."
+    },
+    {
+     "slot": "rendered_as[H2000,None]",
+     "level": "rendered_as",
+     "source_definition": "Psychiatric review of records",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H2010,HO]",
+     "level": "rendered_as",
+     "source_definition": "Brief behavioral health status exam",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "bh_community_support",
+   "canonical_name": "Behavioral Health Community Support Services",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H0020,None]",
+     "level": "rendered_as",
+     "source_definition": "Medication-assisted treatment services",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H0047,None]",
+     "level": "rendered_as",
+     "source_definition": "Behavioral health-related medical services: verbal interaction, substance abuse",
+     "split": "SUD",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "seed_note": "RULE-3: split=SUD; keyed at (code,modifier), never bare code."
+    },
+    {
+     "slot": "rendered_as[H0048,None]",
+     "level": "rendered_as",
+     "source_definition": "Behavioral health-related medical services: alcohol and other drug screening specimen",
+     "split": null,
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "seed_note": "RULE-3: split=None; keyed at (code,modifier), never bare code."
+    },
+    {
+     "slot": "rendered_as[H2010,HE]",
+     "level": "rendered_as",
+     "source_definition": "Brief individual medical psychotherapy, mental health",
+     "split": "MH",
+     "seeded_vernacular": [
+      "cognitive behavioral"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.cognitive_behavioral_therapy",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "medium",
+     "seed_note": "RULE-3: split=MH; keyed at (code,modifier), never bare code."
+    },
+    {
+     "slot": "rendered_as[H2010,HF]",
+     "level": "rendered_as",
+     "source_definition": "Brief individual medical psychotherapy, substance abuse",
+     "split": "SUD",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking",
+      "cognitive behavioral"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      },
+      {
+       "d_code": "d:health_care_services.behavioral_health.cognitive_behavioral_therapy",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "medium",
+     "seed_note": "RULE-3: split=SUD; keyed at (code,modifier), never bare code."
+    },
+    {
+     "slot": "rendered_as[H2017,None]",
+     "level": "rendered_as",
+     "source_definition": "Psychosocial rehabilitation services",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H2030,None]",
+     "level": "rendered_as",
+     "source_definition": "Clubhouse services",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[T1015,HE]",
+     "level": "rendered_as",
+     "source_definition": "Behavioral health-related medical services: medical procedures, mental health",
+     "split": "MH",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[T1015,HF]",
+     "level": "rendered_as",
+     "source_definition": "Behavioral health-related medical services: medical procedures, substance abuse",
+     "split": "SUD",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "seed_note": "RULE-3: split=SUD; keyed at (code,modifier), never bare code."
+    }
+   ]
+  },
+  {
+   "line_key": "bh_intervention",
+   "canonical_name": "Behavioral Health Intervention Services",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H0040,None]",
+     "level": "rendered_as",
+     "source_definition": "Florida Assertive Community Treatment",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H2010,HQ]",
+     "level": "rendered_as",
+     "source_definition": "Brief group medical therapy",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H2012,HF]",
+     "level": "rendered_as",
+     "source_definition": "Behavioral health day services, substance abuse",
+     "split": "SUD",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "seed_note": "RULE-3: split=SUD; keyed at (code,modifier), never bare code."
+    },
+    {
+     "slot": "rendered_as[H2012,None]",
+     "level": "rendered_as",
+     "source_definition": "Behavioral health day services, mental health",
+     "split": "MH",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H2019,HM]",
+     "level": "rendered_as",
+     "source_definition": "Therapeutic behavioral on-site services, therapeutic support",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H2019,HN]",
+     "level": "rendered_as",
+     "source_definition": "Therapeutic behavioral on-site services, behavior management",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H2019,HO]",
+     "level": "rendered_as",
+     "source_definition": "Therapeutic behavioral on-site services, therapy",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H2019,HQ]",
+     "level": "rendered_as",
+     "source_definition": "Group therapy",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H2019,HR]",
+     "level": "rendered_as",
+     "source_definition": "Individual and family therapy",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "bh_medication_mgmt",
+   "canonical_name": "Behavioral Health Medication Management Services",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H0001,HN]",
+     "level": "rendered_as",
+     "source_definition": "Bio-psychosocial evaluation, substance abuse",
+     "split": "SUD",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking",
+      "bio-psychosocial evaluations",
+      "psychiatric evaluations",
+      "bio-psychosocial evaluation",
+      "psychological evaluation",
+      "biopsychosocial evaluation"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      },
+      {
+       "d_code": "d:health_care_services.bio_psychosocial_evaluations",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "medium",
+     "seed_note": "RULE-3: split=SUD; keyed at (code,modifier), never bare code."
+    },
+    {
+     "slot": "rendered_as[H0001,None]",
+     "level": "rendered_as",
+     "source_definition": "Limited functional assessment, substance abuse",
+     "split": "SUD",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "seed_note": "RULE-3: split=SUD; keyed at (code,modifier), never bare code."
+    },
+    {
+     "slot": "rendered_as[H0031,None]",
+     "level": "rendered_as",
+     "source_definition": "Limited functional assessment, mental health",
+     "split": "MH",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H0032,TS]",
+     "level": "rendered_as",
+     "source_definition": "Treatment plan review, mental health",
+     "split": "MH",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H0032,None]",
+     "level": "rendered_as",
+     "source_definition": "Treatment plan development, new and established patient, mental health",
+     "split": "MH",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H0046,None]",
+     "level": "rendered_as",
+     "source_definition": "Behavioral health-related medical services: verbal interaction, mental health",
+     "split": "MH",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H2019,None]",
+     "level": "rendered_as",
+     "source_definition": "Psychological testing",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[T1007,TS]",
+     "level": "rendered_as",
+     "source_definition": "Treatment plan review, substance abuse",
+     "split": "SUD",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "seed_note": "RULE-3: split=SUD; keyed at (code,modifier), never bare code."
+    },
+    {
+     "slot": "rendered_as[T1007,None]",
+     "level": "rendered_as",
+     "source_definition": "Treatment plan development, new and established patient, substance abuse",
+     "split": "SUD",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "seed_note": "RULE-3: split=SUD; keyed at (code,modifier), never bare code."
+    },
+    {
+     "slot": "rendered_as[T1015,None]",
+     "level": "rendered_as",
+     "source_definition": "Medication management",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[T1023,HE]",
+     "level": "rendered_as",
+     "source_definition": "Behavioral health medical screening, mental health",
+     "split": "MH",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[T1023,HF]",
+     "level": "rendered_as",
+     "source_definition": "Behavioral health medical screening, substance abuse",
+     "split": "SUD",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "seed_note": "RULE-3: split=SUD; keyed at (code,modifier), never bare code."
+    }
+   ]
+  },
+  {
+   "line_key": "bh_overlay",
+   "canonical_name": "Behavioral Health Overlay Services",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "bh_therapy",
+   "canonical_name": "Behavioral Health Therapy Services",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H0020,None]",
+     "level": "rendered_as",
+     "source_definition": "Medication-assisted treatment services",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H0047,None]",
+     "level": "rendered_as",
+     "source_definition": "Behavioral health-related medical services: verbal interaction, substance abuse",
+     "split": "SUD",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "seed_note": "RULE-3: split=SUD; keyed at (code,modifier), never bare code."
+    },
+    {
+     "slot": "rendered_as[H0048,None]",
+     "level": "rendered_as",
+     "source_definition": "Behavioral health-related medical services: alcohol and other drug screening specimen",
+     "split": null,
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "seed_note": "RULE-3: split=None; keyed at (code,modifier), never bare code."
+    },
+    {
+     "slot": "rendered_as[H2010,HE]",
+     "level": "rendered_as",
+     "source_definition": "Brief individual medical psychotherapy, mental health",
+     "split": "MH",
+     "seeded_vernacular": [
+      "cognitive behavioral"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.cognitive_behavioral_therapy",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "medium",
+     "seed_note": "RULE-3: split=MH; keyed at (code,modifier), never bare code."
+    },
+    {
+     "slot": "rendered_as[H2010,HF]",
+     "level": "rendered_as",
+     "source_definition": "Brief individual medical psychotherapy, substance abuse",
+     "split": "SUD",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking",
+      "cognitive behavioral"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      },
+      {
+       "d_code": "d:health_care_services.behavioral_health.cognitive_behavioral_therapy",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "medium",
+     "seed_note": "RULE-3: split=SUD; keyed at (code,modifier), never bare code."
+    },
+    {
+     "slot": "rendered_as[H2017,None]",
+     "level": "rendered_as",
+     "source_definition": "Psychosocial rehabilitation services",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H2030,None]",
+     "level": "rendered_as",
+     "source_definition": "Clubhouse services",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[T1015,HE]",
+     "level": "rendered_as",
+     "source_definition": "Behavioral health-related medical services: medical procedures, mental health",
+     "split": "MH",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[T1015,HF]",
+     "level": "rendered_as",
+     "source_definition": "Behavioral health-related medical services: medical procedures, substance abuse",
+     "split": "SUD",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "seed_note": "RULE-3: split=SUD; keyed at (code,modifier), never bare code."
+    }
+   ]
+  },
+  {
+   "line_key": "cbha",
+   "canonical_name": "Comprehensive Behavioral Health Assessment",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "chd_clinic",
+   "canonical_name": "County Health Department clinic services",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "evaluation_management",
+   "canonical_name": "Evaluation and Management (outpatient primary care)",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "fact",
+   "canonical_name": "Florida Assertive Community Treatment (FACT)",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H0040,None]",
+     "level": "rendered_as",
+     "source_definition": "Florida Assertive Community Treatment",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H2010,HQ]",
+     "level": "rendered_as",
+     "source_definition": "Brief group medical therapy",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H2012,HF]",
+     "level": "rendered_as",
+     "source_definition": "Behavioral health day services, substance abuse",
+     "split": "SUD",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "seed_note": "RULE-3: split=SUD; keyed at (code,modifier), never bare code."
+    },
+    {
+     "slot": "rendered_as[H2012,None]",
+     "level": "rendered_as",
+     "source_definition": "Behavioral health day services, mental health",
+     "split": "MH",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H2019,HM]",
+     "level": "rendered_as",
+     "source_definition": "Therapeutic behavioral on-site services, therapeutic support",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H2019,HN]",
+     "level": "rendered_as",
+     "source_definition": "Therapeutic behavioral on-site services, behavior management",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H2019,HO]",
+     "level": "rendered_as",
+     "source_definition": "Therapeutic behavioral on-site services, therapy",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H2019,HQ]",
+     "level": "rendered_as",
+     "source_definition": "Group therapy",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[H2019,HR]",
+     "level": "rendered_as",
+     "source_definition": "Individual and family therapy",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "fqhc_encounter",
+   "canonical_name": "FQHC encounter — primary care and BH",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "mhtcm",
+   "canonical_name": "Mental Health Targeted Case Management",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "qrtp",
+   "canonical_name": "Qualified Residential Treatment Program Services",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "rhc_encounter",
+   "canonical_name": "Rural Health Clinic encounter",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "sipp",
+   "canonical_name": "Statewide Inpatient Psychiatric Program (SIPP)",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "classified_by[F20-F29]",
+     "level": "classified_by",
+     "block": "F20-F29",
+     "adjudicated": false,
+     "source_definition": "Schizophrenia, schizotypal, delusional and other psychotic disorders",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "no clean clinical-concept d: entry for this ICD block -> gap for DR."
+    },
+    {
+     "slot": "classified_by[F30-F39]",
+     "level": "classified_by",
+     "block": "F30-F39",
+     "adjudicated": false,
+     "source_definition": "Mood [affective] disorders",
+     "seeded_vernacular": [
+      "depression and anxiety",
+      "depression, anxiety",
+      "anxiety, depression",
+      "acute anxiety"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.depression_anxiety",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "medium",
+     "seed_note": "diagnosis-CONCEPT vernacular only; does NOT assert payability (adjudicated:false)."
+    },
+    {
+     "slot": "classified_by[F40-F48]",
+     "level": "classified_by",
+     "block": "F40-F48",
+     "adjudicated": false,
+     "source_definition": "Anxiety, dissociative, stress-related, somatoform disorders",
+     "seeded_vernacular": [
+      "gad"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.generalized_anxiety_disorder",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "medium",
+     "seed_note": "diagnosis-CONCEPT vernacular only; does NOT assert payability (adjudicated:false)."
+    },
+    {
+     "slot": "classified_by[F90-F98]",
+     "level": "classified_by",
+     "block": "F90-F98",
+     "adjudicated": false,
+     "source_definition": "Behavioural and emotional disorders with onset in childhood/adolescence",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "no clean clinical-concept d: entry for this ICD block -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[740]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[750]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[751]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[752]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[753]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[754]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[755]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[756]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[757]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[758]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[759]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[760]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    }
+   ]
+  },
+  {
+   "line_key": "specialized_therapeutic",
+   "canonical_name": "Specialized Therapeutic Services",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "state_mental_health",
+   "canonical_name": "State Mental Health",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "tcm_child_health",
+   "canonical_name": "Child Health Services Targeted Case Management",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "tcm_children_at_risk",
+   "canonical_name": "Targeted Case Management for Children at Risk of Abuse and Neglect",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "rendered_as[T2023,HA]",
+     "level": "rendered_as",
+     "source_definition": "Targeted case management for children at risk of abuse and neglect",
+     "split": null,
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "therapeutic_group_care",
+   "canonical_name": "Therapeutic Group Care Services",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "baker_act_exam",
+   "canonical_name": "Baker Act involuntary examination",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [
+      "emergency behavioral health",
+      "crisis intervention",
+      "baker act",
+      "24/7 crisis",
+      "baker",
+      "crisis behavioral",
+      "crisis use",
+      "civil commitment",
+      "commitment law"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.emergency_behavioral",
+       "field": "strong_phrases"
+      },
+      {
+       "d_code": "d:health_care_services.behavioral_health.civil_commitment",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "medium",
+     "split": null
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [
+      "emergency behavioral health",
+      "crisis intervention",
+      "baker act",
+      "24/7 crisis",
+      "baker",
+      "crisis behavioral",
+      "crisis use"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.emergency_behavioral",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "split": null
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "csu_baker_act",
+   "canonical_name": "Crisis Stabilization Unit / Baker Act receiving",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [
+      "emergency behavioral health",
+      "crisis intervention",
+      "baker act",
+      "24/7 crisis",
+      "baker",
+      "crisis behavioral",
+      "crisis use",
+      "crisis stabilization",
+      "csu"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.emergency_behavioral",
+       "field": "strong_phrases"
+      },
+      {
+       "d_code": "d:health_care_services.emergency_behavioral.crisis_stabilization",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "split": null
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [
+      "emergency behavioral health",
+      "crisis intervention",
+      "baker act",
+      "24/7 crisis",
+      "baker",
+      "crisis behavioral",
+      "crisis use"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.emergency_behavioral",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "split": null
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "classified_by[F20-F29]",
+     "level": "classified_by",
+     "block": "F20-F29",
+     "adjudicated": false,
+     "source_definition": "Schizophrenia, schizotypal, delusional and other psychotic disorders",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "no clean clinical-concept d: entry for this ICD block -> gap for DR."
+    },
+    {
+     "slot": "classified_by[F30-F39]",
+     "level": "classified_by",
+     "block": "F30-F39",
+     "adjudicated": false,
+     "source_definition": "Mood [affective] disorders",
+     "seeded_vernacular": [
+      "depression and anxiety",
+      "depression, anxiety",
+      "anxiety, depression",
+      "acute anxiety"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.depression_anxiety",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "medium",
+     "seed_note": "diagnosis-CONCEPT vernacular only; does NOT assert payability (adjudicated:false)."
+    }
+   ]
+  },
+  {
+   "line_key": "ed_behavioral",
+   "canonical_name": "Emergency Department behavioral health",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "classified_by[F10-F19]",
+     "level": "classified_by",
+     "block": "F10-F19",
+     "adjudicated": false,
+     "source_definition": "Mental and behavioural disorders due to psychoactive substance use",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "seed_note": "diagnosis-CONCEPT vernacular only; does NOT assert payability (adjudicated:false)."
+    },
+    {
+     "slot": "classified_by[F20-F29]",
+     "level": "classified_by",
+     "block": "F20-F29",
+     "adjudicated": false,
+     "source_definition": "Schizophrenia, schizotypal, delusional and other psychotic disorders",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "no clean clinical-concept d: entry for this ICD block -> gap for DR."
+    },
+    {
+     "slot": "classified_by[F30-F39]",
+     "level": "classified_by",
+     "block": "F30-F39",
+     "adjudicated": false,
+     "source_definition": "Mood [affective] disorders",
+     "seeded_vernacular": [
+      "depression and anxiety",
+      "depression, anxiety",
+      "anxiety, depression",
+      "acute anxiety"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.depression_anxiety",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "medium",
+     "seed_note": "diagnosis-CONCEPT vernacular only; does NOT assert payability (adjudicated:false)."
+    },
+    {
+     "slot": "classified_by[F40-F48]",
+     "level": "classified_by",
+     "block": "F40-F48",
+     "adjudicated": false,
+     "source_definition": "Anxiety, dissociative, stress-related, somatoform disorders",
+     "seeded_vernacular": [
+      "gad"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.generalized_anxiety_disorder",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "medium",
+     "seed_note": "diagnosis-CONCEPT vernacular only; does NOT assert payability (adjudicated:false)."
+    },
+    {
+     "slot": "grouped_to[740]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[750]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[751]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[752]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[753]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[754]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[755]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[756]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[757]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[758]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[759]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[760]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[770]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[772]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[773]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[774]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[775]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[776]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    }
+   ]
+  },
+  {
+   "line_key": "inpatient_psych_adult",
+   "canonical_name": "Inpatient Psychiatric — adult, hospital",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "classified_by[F01-F09]",
+     "level": "classified_by",
+     "block": "F01-F09",
+     "adjudicated": false,
+     "source_definition": "Mental disorders due to known physiological conditions",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "no clean clinical-concept d: entry for this ICD block -> gap for DR."
+    },
+    {
+     "slot": "classified_by[F10-F19]",
+     "level": "classified_by",
+     "block": "F10-F19",
+     "adjudicated": false,
+     "source_definition": "Mental and behavioural disorders due to psychoactive substance use",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "seed_note": "diagnosis-CONCEPT vernacular only; does NOT assert payability (adjudicated:false)."
+    },
+    {
+     "slot": "classified_by[F20-F29]",
+     "level": "classified_by",
+     "block": "F20-F29",
+     "adjudicated": false,
+     "source_definition": "Schizophrenia, schizotypal, delusional and other psychotic disorders",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "no clean clinical-concept d: entry for this ICD block -> gap for DR."
+    },
+    {
+     "slot": "classified_by[F30-F39]",
+     "level": "classified_by",
+     "block": "F30-F39",
+     "adjudicated": false,
+     "source_definition": "Mood [affective] disorders",
+     "seeded_vernacular": [
+      "depression and anxiety",
+      "depression, anxiety",
+      "anxiety, depression",
+      "acute anxiety"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.depression_anxiety",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "medium",
+     "seed_note": "diagnosis-CONCEPT vernacular only; does NOT assert payability (adjudicated:false)."
+    },
+    {
+     "slot": "classified_by[F40-F48]",
+     "level": "classified_by",
+     "block": "F40-F48",
+     "adjudicated": false,
+     "source_definition": "Anxiety, dissociative, stress-related, somatoform disorders",
+     "seeded_vernacular": [
+      "gad"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.generalized_anxiety_disorder",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "medium",
+     "seed_note": "diagnosis-CONCEPT vernacular only; does NOT assert payability (adjudicated:false)."
+    },
+    {
+     "slot": "classified_by[F50-F59]",
+     "level": "classified_by",
+     "block": "F50-F59",
+     "adjudicated": false,
+     "source_definition": "Behavioural syndromes with physiological disturbances",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "no clean clinical-concept d: entry for this ICD block -> gap for DR."
+    },
+    {
+     "slot": "classified_by[F60-F69]",
+     "level": "classified_by",
+     "block": "F60-F69",
+     "adjudicated": false,
+     "source_definition": "Disorders of adult personality and behaviour",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "no clean clinical-concept d: entry for this ICD block -> gap for DR."
+    },
+    {
+     "slot": "classified_by[F90-F98]",
+     "level": "classified_by",
+     "block": "F90-F98",
+     "adjudicated": false,
+     "source_definition": "Behavioural and emotional disorders with onset in childhood/adolescence",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "no clean clinical-concept d: entry for this ICD block -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[740]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[750]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[751]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[752]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[753]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[754]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[755]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[756]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[757]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[758]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[759]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[760]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[770]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[772]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[773]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[774]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[775]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[776]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    }
+   ]
+  },
+  {
+   "line_key": "iop",
+   "canonical_name": "Intensive Outpatient Program (IOP)",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "marchman_act",
+   "canonical_name": "Marchman Act services",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "split": "SUD"
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "split": "SUD"
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "classified_by[F10-F19]",
+     "level": "classified_by",
+     "block": "F10-F19",
+     "adjudicated": false,
+     "source_definition": "Mental and behavioural disorders due to psychoactive substance use",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "seed_note": "diagnosis-CONCEPT vernacular only; does NOT assert payability (adjudicated:false)."
+    },
+    {
+     "slot": "grouped_to[770]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[772]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[773]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[774]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[775]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[776]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    }
+   ]
+  },
+  {
+   "line_key": "mobile_response",
+   "canonical_name": "Mobile Response Team / crisis intervention",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [
+      "emergency behavioral health",
+      "crisis intervention",
+      "baker act",
+      "24/7 crisis",
+      "baker",
+      "crisis behavioral",
+      "crisis use"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.emergency_behavioral",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "split": null
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "php",
+   "canonical_name": "Partial Hospitalization Program (PHP)",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [
+      "php mental"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.partial_hospitalization_program",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "split": "MH"
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    }
+   ]
+  },
+  {
+   "line_key": "sud_residential",
+   "canonical_name": "Substance Use Residential Treatment",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "split": "SUD"
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "classified_by[F10-F19]",
+     "level": "classified_by",
+     "block": "F10-F19",
+     "adjudicated": false,
+     "source_definition": "Mental and behavioural disorders due to psychoactive substance use",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "seed_note": "diagnosis-CONCEPT vernacular only; does NOT assert payability (adjudicated:false)."
+    },
+    {
+     "slot": "grouped_to[770]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[772]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[773]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[774]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[775]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[776]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    }
+   ]
+  },
+  {
+   "line_key": "withdrawal_management",
+   "canonical_name": "Withdrawal Management / Detoxification",
+   "slots": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "seeded_vernacular": [
+      "withdrawal management",
+      "acute detoxification",
+      "alcohol withdrawal",
+      "detox admission"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders.withdrawal_management",
+       "field": "strong_phrases"
+      },
+      {
+       "d_code": "d:health_care_services.substance_use_disorders.acute_detoxification",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "split": "SUD"
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true
+    },
+    {
+     "slot": "classified_by[F10-F19]",
+     "level": "classified_by",
+     "block": "F10-F19",
+     "adjudicated": false,
+     "source_definition": "Mental and behavioural disorders due to psychoactive substance use",
+     "seeded_vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders",
+       "field": "strong_phrases"
+      }
+     ],
+     "match_confidence": "high",
+     "seed_note": "diagnosis-CONCEPT vernacular only; does NOT assert payability (adjudicated:false)."
+    },
+    {
+     "slot": "grouped_to[770]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[772]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[773]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[774]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[775]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    },
+    {
+     "slot": "grouped_to[776]",
+     "level": "grouped_to",
+     "seeded_vernacular": [],
+     "match_confidence": null,
+     "gap": true,
+     "seed_note": "DRG admission vernacular not held in d: -> gap for DR."
+    }
+   ]
+  }
+ ]
+}

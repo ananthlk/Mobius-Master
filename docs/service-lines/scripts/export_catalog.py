@@ -108,6 +108,13 @@ def main():
         asks = [{"domain": r[0], "other_store": r[1], "question": r[2], "payer": r[3],
                  "answer": r[4], "statement": r[5]} for r in cur.fetchall()]
 
+        cur.execute("""select d_code, relation, state, confidence, evidence, requested_concept
+                       from service_line.line_lexicon_d where line_key=%s
+                       order by state, confidence desc nulls last, d_code""", (key,))
+        lex = [{"d_code": r[0], "relation": r[1], "state": r[2],
+                "confidence": float(r[3]) if r[3] is not None else None,
+                "evidence": r[4], "requested_concept": r[5]} for r in cur.fetchall()]
+
         cur.execute("""select document, publisher, authority_level, pages
                        from service_line.source where line_key=%s and held
                        order by pages desc nulls last limit 6""", (key,))
@@ -127,6 +134,12 @@ def main():
             "unadjudicated_codes": sum(1 for x in rendered if not x["adjudicated"]),
             "bindings": {r: bind[r] for r in ROLES},
             "binding_counts": {r: len(bind[r]) for r in ROLES},
+            "lexicon_d": lex,
+            "lexicon_d_counts": {
+                "mapped": sum(1 for x in lex if x["d_code"]),
+                "confirmed": sum(1 for x in lex if x["state"] == "confirmed"),
+                "requested": sum(1 for x in lex if x["state"] == "requested"),
+            },
             "standard_requirements": std_reqs,
             "standard_requirement_counts": {
                 "sourced": sum(1 for r in std_reqs if r["sourced"]),

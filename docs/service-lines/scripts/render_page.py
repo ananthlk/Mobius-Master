@@ -224,6 +224,34 @@ function evidenceTable(l){
     }).join('')+'</tbody></table></div>';
 }
 
+function lexiconCard(l){
+  var L=l.lexicon_d||[]; if(!L.length) return '';
+  var c=l.lexicon_d_counts||{};
+  var REL={describes:'names the service', setting:'where it happens',
+           population:'who it serves', condition:'what it treats', payment:'how it is paid'};
+  var missing=L.filter(function(x){return !x.d_code;});
+  return '<div class="card"><div class="ch"><h3>Lexicon vocabulary</h3>'+
+    '<span class="pill '+(c.confirmed?'p-done':(missing.length?'p-todo':'p-doing'))+'">'+
+    '<span class="d"></span>'+(missing.length? 'no vocabulary yet'
+      : c.mapped+' d code'+(c.mapped===1?'':'s')+(c.confirmed?' · '+c.confirmed+' confirmed':' · proposed'))+
+    '</span><span class="hint">registry proposes with evidence · Lexicon decides</span></div>'+
+    (missing.length
+      ? '<div class="cb"><p style="margin:0;font-size:12.5px;color:var(--crit)">'+
+        'No active d code shares any phrase with this line. The vocabulary cannot express it yet — '+
+        'Lexicon needs to create one for <b>'+esc(missing[0].requested_concept||l.name)+'</b>.</p></div>'
+      : '<div class="scroll"><table><thead><tr><th>d code</th><th>Relation</th>'+
+        '<th style="text-align:right">Conf</th><th>Why proposed</th><th>State</th></tr></thead><tbody>'+
+        L.filter(function(x){return x.d_code;}).map(function(x){
+          return '<tr><td class="c" style="font-size:11.5px">'+esc(x.d_code)+'</td>'+
+            '<td style="font-size:11.5px;color:var(--ink-3)">'+esc(REL[x.relation]||x.relation)+'</td>'+
+            '<td class="num">'+(x.confidence!=null?x.confidence.toFixed(2):'—')+'</td>'+
+            '<td style="font-size:11.5px;color:var(--ink-2)">'+esc((x.evidence||'').slice(0,150))+'</td>'+
+            '<td><span class="pill '+(x.state==='confirmed'?'p-done':
+              x.state==='rejected'?'p-todo':'p-doing')+'"><span class="d"></span>'+
+              esc(x.state)+'</span></td></tr>';
+        }).join('')+'</tbody></table></div>')+'</div>';
+}
+
 function standardReqCard(l){
   var R=l.standard_requirements||[]; if(!R.length) return '';
   var c=l.standard_requirement_counts||{};
@@ -409,7 +437,7 @@ function renderLine(l){
       '<span class="hint">the complete standard answer — no payor needed</span></div>'+
       '<div class="cb">'+f.join('')+'</div>'+
       (l.scope==='serve' ? codeTable(l) : evidenceTable(l))+'</div>';
-  })()+ bindingCard(l) + standardReqCard(l) + requirementCard(l) + exceptionCard(l) +
+  })()+ bindingCard(l) + lexiconCard(l) + standardReqCard(l) + requirementCard(l) + exceptionCard(l) +
 
 
   '<div class="card"><div class="ch"><h3>Module completion</h3>'+
@@ -464,6 +492,8 @@ function renderAll(){
         '<td class="num">'+(l.binding_counts.rendered_as||'—')+'</td>'+
         '<td class="num">'+(l.binding_counts.classified_by||'—')+'</td>'+
         '<td class="num">'+(l.binding_counts.grouped_to||'—')+'</td>'+
+        '<td class="num" style="font-size:11px;color:'+((l.lexicon_d_counts&&l.lexicon_d_counts.mapped)?'inherit':'var(--crit)')+'">'+
+          ((l.lexicon_d_counts&&l.lexicon_d_counts.mapped)||'none')+'</td>'+
         '<td class="num" style="font-size:11px">'+((l.requirement_counts&&l.requirement_counts.applies)
           ? l.requirement_counts.answered+'/'+l.requirement_counts.applies : '—')+'</td>'+
         '<td class="c" style="font-size:10.5px;color:'+(l.grain==='code_modifier'?'var(--ink-3)':'var(--warn)')+'">'+

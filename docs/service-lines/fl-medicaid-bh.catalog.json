@@ -9,6 +9,14 @@
       "standard_held_by": "other"
     },
     {
+      "domain": "benefit",
+      "registry_owns": "Whether the standard covers the service, and how much of it \u2014 benefit category, coverage, and the quantitative limits as the state rule states them. Varies by service code.",
+      "other_store": "Fact Store (facts.payor_fact)",
+      "other_owns": "Payor benefit packages and carve-outs, and any limit a payor sets tighter or looser than the standard.",
+      "question_asked": "For this code, does your benefit coverage or limit differ from the state rule? If it does not, say so \u2014 that is an answer.",
+      "standard_held_by": "registry"
+    },
+    {
       "domain": "code_dictionary",
       "registry_owns": "Which codes belong to a line, and in what binding role.",
       "other_store": "reference.* (icd10cm, hcpcs_level2, apr_drg)",
@@ -43,7 +51,7 @@
   ],
   "catalog_version": "1.0.0",
   "status": "draft",
-  "generated": "2026-08-18",
+  "generated": "2026-08-19",
   "jurisdiction": {
     "state": "FL",
     "program": "Medicaid",
@@ -195,6 +203,21 @@
         "rendered_as": 0,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.53,
+          "evidence": "matched phrase \"behav\" against the line name and its code definitions; d code means: Behavioral Health",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 1,
+        "confirmed": 0,
+        "requested": 0
       },
       "standard_requirements": [
         {
@@ -802,6 +825,61 @@
         "rendered_as": 9,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.bio_psychosocial_evaluations",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.9,
+          "evidence": "matched phrase \"bio psychosocial evaluation\" against the line name and its code definitions; d code means: Comprehensive evaluations of biological, psychological, and social factors.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.82,
+          "evidence": "matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.health_assessment",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.82,
+          "evidence": "matched phrase \"health assessment\" against the line name and its code definitions; d code means: Evaluation of a patient's overall health status.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.substance_use_disorders",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.78,
+          "evidence": "matched phrase \"substance abuse\" against the line name and its code definitions; d code means: Substance Use Disorders",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.physician",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.62,
+          "evidence": "matched phrase \"physician\" against the line name and its code definitions; d code means: Physician Services",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.psychiatry",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.55,
+          "evidence": "matched phrase \"psychi\" against the line name and its code definitions; d code means: Medical specialty focused on the diagnosis, treatment, and prevention of mental, emotional",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 6,
+        "confirmed": 0,
+        "requested": 0
       },
       "standard_requirements": [
         {
@@ -1519,6 +1597,61 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "lexicon_d": [
+        {
+          "d_code": "program.health_community_support",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.9,
+          "evidence": "matched phrase \"health community support\" against the line name and its code definitions; d code means: Programs or services providing health-related support to communities.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.82,
+          "evidence": "matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.substance_use_disorders",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.78,
+          "evidence": "matched phrase \"substance abuse\" against the line name and its code definitions; d code means: Substance Use Disorders",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.therapy_services",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.75,
+          "evidence": "matched phrase \"rehabilitation\" against the line name and its code definitions; d code means: Therapy Services (General)",
+          "requested_concept": null
+        },
+        {
+          "d_code": "provider.healthsouth.rehab",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.53,
+          "evidence": "matched phrase \"rehab\" against the line name and its code definitions; d code means: Specific provider entity or organization: HealthSouth Rehabilitation.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "billing_codes.procedure_code",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.5,
+          "evidence": "matched phrase \"proc\" against the line name and its code definitions; d code means: Procedure Codes",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 6,
+        "confirmed": 0,
+        "requested": 0
+      },
       "standard_requirements": [
         {
           "type": "coverage_criteria",
@@ -2184,6 +2317,69 @@
         "rendered_as": 9,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "lexicon_d": [
+        {
+          "d_code": "care_management.behavioral_mgmt",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.88,
+          "evidence": "matched phrase \"behavior management\" against the line name and its code definitions; d code means: Behavioral Management",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.community_treatment",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.88,
+          "evidence": "matched phrase \"community treatment\" against the line name and its code definitions; d code means: Treatment services provided in a community setting, often for behavioral health.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.82,
+          "evidence": "matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.substance_use_disorders",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.78,
+          "evidence": "matched phrase \"substance abuse\" against the line name and its code definitions; d code means: Substance Use Disorders",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.behavioral_health.on_site",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.57,
+          "evidence": "matched phrase \"on site\" against the line name and its code definitions; d code means: Behavioral health services provided at a physical location.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.primary_care.on_site",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.57,
+          "evidence": "matched phrase \"on site\" against the line name and its code definitions; d code means: Primary care services delivered at a physical location, often within a facility.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.therapy_services",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.57,
+          "evidence": "matched phrase \"therapy\" against the line name and its code definitions; d code means: Therapy Services (General)",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 7,
+        "confirmed": 0,
+        "requested": 0
       },
       "standard_requirements": [
         {
@@ -3027,6 +3223,61 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.bio_psychosocial_evaluations",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.9,
+          "evidence": "matched phrase \"bio psychosocial evaluation\" against the line name and its code definitions; d code means: Comprehensive evaluations of biological, psychological, and social factors.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.functional_assessment",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.9,
+          "evidence": "matched phrase \"functional assessment\" against the line name and its code definitions; d code means: Evaluation of an individual's ability to perform daily activities and tasks.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.82,
+          "evidence": "matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.substance_use_disorders",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.78,
+          "evidence": "matched phrase \"substance abuse\" against the line name and its code definitions; d code means: Substance Use Disorders",
+          "requested_concept": null
+        },
+        {
+          "d_code": "care_management.care_plan",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.75,
+          "evidence": "matched phrase \"treatment plan\" against the line name and its code definitions; d code means: Documents outlining a member's assessed needs and the services to be provided.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.health_assessment",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.65,
+          "evidence": "matched phrase \"assessment\" against the line name and its code definitions; d code means: Evaluation of a patient's overall health status.",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 6,
+        "confirmed": 0,
+        "requested": 0
+      },
       "standard_requirements": [
         {
           "type": "provider_qualification",
@@ -3249,6 +3500,21 @@
         "rendered_as": 0,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.82,
+          "evidence": "matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 1,
+        "confirmed": 0,
+        "requested": 0
       },
       "standard_requirements": [
         {
@@ -3861,7 +4127,62 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.82,
+          "evidence": "matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.substance_use_disorders",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.78,
+          "evidence": "matched phrase \"substance abuse\" against the line name and its code definitions; d code means: Substance Use Disorders",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.therapy_services",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.75,
+          "evidence": "matched phrase \"rehabilitation\" against the line name and its code definitions; d code means: Therapy Services (General)",
+          "requested_concept": null
+        },
+        {
+          "d_code": "provider.healthsouth.rehab",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.53,
+          "evidence": "matched phrase \"rehab\" against the line name and its code definitions; d code means: Specific provider entity or organization: HealthSouth Rehabilitation.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "billing_codes.procedure_code",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.5,
+          "evidence": "matched phrase \"proc\" against the line name and its code definitions; d code means: Procedure Codes",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 5,
+        "confirmed": 0,
+        "requested": 0
+      },
       "standard_requirements": [
+        {
+          "type": "provider_qualification",
+          "statement": "Behavioral Health Therapy Services under Rule 59G-4.052 may be rendered by practitioners licensed under Chapters 458/459/490/491 F.S., psychiatric APRNs and nurses licensed under Chapter 464 F.S., master's level certified addiction professionals, master's level practitioners, bachelor's level practitioners (group therapy only), and certified addiction professionals (group therapy only), all of whom must be employed or contracted with a community behavioral health agency.",
+          "source": "fl_bh_therapy_services_59G-4.052.pdf",
+          "sourced": true,
+          "authority": "AHCA|FL|Medicaid",
+          "qualifier": null
+        },
         {
           "type": "coverage_criteria",
           "statement": "Medical-necessity and coverage criteria are stated in the coverage policy; not yet extracted.",
@@ -3896,7 +4217,7 @@
         }
       ],
       "standard_requirement_counts": {
-        "sourced": 0,
+        "sourced": 1,
         "unsourced": 4
       },
       "exception_asks": [
@@ -4076,6 +4397,37 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.82,
+          "evidence": "matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.health_assessment",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.82,
+          "evidence": "matched phrase \"health assessment\" against the line name and its code definitions; d code means: Evaluation of a patient's overall health status.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.comprehensive_assessment",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.62,
+          "evidence": "matched phrase \"comprehen\" against the line name and its code definitions; d code means: A thorough and in-depth evaluation of an individual's needs or condition.",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 3,
+        "confirmed": 0,
+        "requested": 0
+      },
       "standard_requirements": [
         {
           "type": "coverage_criteria",
@@ -4209,6 +4561,37 @@
         "rendered_as": 0,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "lexicon_d": [
+        {
+          "d_code": "billing_codes.evaluation_and_management",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.9,
+          "evidence": "matched phrase \"evaluation and management\" against the line name and its code definitions; d code means: ",
+          "requested_concept": null
+        },
+        {
+          "d_code": "place_of_service.outpatient",
+          "relation": "setting",
+          "state": "proposed",
+          "confidence": 0.65,
+          "evidence": "matched phrase \"outpatient\" against the line name and its code definitions; d code means: Outpatient",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.primary_care",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.5,
+          "evidence": "matched phrase \"prim\" against the line name and its code definitions; d code means: Primary Care",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 3,
+        "confirmed": 0,
+        "requested": 0
       },
       "standard_requirements": [
         {
@@ -4892,6 +5275,69 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "lexicon_d": [
+        {
+          "d_code": "care_management.behavioral_mgmt",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.88,
+          "evidence": "matched phrase \"behavior management\" against the line name and its code definitions; d code means: Behavioral Management",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.community_treatment",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.88,
+          "evidence": "matched phrase \"community treatment\" against the line name and its code definitions; d code means: Treatment services provided in a community setting, often for behavioral health.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.82,
+          "evidence": "matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.substance_use_disorders",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.78,
+          "evidence": "matched phrase \"substance abuse\" against the line name and its code definitions; d code means: Substance Use Disorders",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.behavioral_health.on_site",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.57,
+          "evidence": "matched phrase \"on site\" against the line name and its code definitions; d code means: Behavioral health services provided at a physical location.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.primary_care.on_site",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.57,
+          "evidence": "matched phrase \"on site\" against the line name and its code definitions; d code means: Primary care services delivered at a physical location, often within a facility.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.therapy_services",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.57,
+          "evidence": "matched phrase \"therapy\" against the line name and its code definitions; d code means: Therapy Services (General)",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 7,
+        "confirmed": 0,
+        "requested": 0
+      },
       "standard_requirements": [
         {
           "type": "provider_qualification",
@@ -5130,6 +5576,29 @@
         "rendered_as": 0,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "lexicon_d": [
+        {
+          "d_code": "care_management.general",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.78,
+          "evidence": "matched phrase \"case management\" against the line name and its code definitions; d code means: General Care Management",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.73,
+          "evidence": "matched phrase \"mental health\" against the line name and its code definitions; d code means: Behavioral Health",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 2,
+        "confirmed": 0,
+        "requested": 0
       },
       "standard_requirements": [
         {
@@ -5490,6 +5959,21 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "lexicon_d": [
+        {
+          "d_code": null,
+          "relation": "describes",
+          "state": "requested",
+          "confidence": null,
+          "evidence": "No active d code shares any phrase with this line's name or its code definitions. The vocabulary cannot currently express it.",
+          "requested_concept": "Specialized Therapeutic Services"
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 0,
+        "confirmed": 0,
+        "requested": 1
+      },
       "standard_requirements": [
         {
           "type": "coverage_criteria",
@@ -5624,6 +6108,21 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.73,
+          "evidence": "matched phrase \"mental health\" against the line name and its code definitions; d code means: Behavioral Health",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 1,
+        "confirmed": 0,
+        "requested": 0
+      },
       "standard_requirements": [
         {
           "type": "coverage_criteria",
@@ -5757,6 +6256,37 @@
         "rendered_as": 0,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "lexicon_d": [
+        {
+          "d_code": "care_management.general",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.78,
+          "evidence": "matched phrase \"case management\" against the line name and its code definitions; d code means: General Care Management",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.general",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.78,
+          "evidence": "matched phrase \"health services\" against the line name and its code definitions; d code means: General Health Services",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.child_health",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.7,
+          "evidence": "matched phrase \"child health\" against the line name and its code definitions; d code means: Child Health Check-Ups",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 3,
+        "confirmed": 0,
+        "requested": 0
       },
       "standard_requirements": [
         {
@@ -6167,6 +6697,29 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "lexicon_d": [
+        {
+          "d_code": "care_management.general",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.78,
+          "evidence": "matched phrase \"case management\" against the line name and its code definitions; d code means: General Care Management",
+          "requested_concept": null
+        },
+        {
+          "d_code": "responsibilities.abuse_neglect_reporting",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.53,
+          "evidence": "matched phrase \"abuse\" against the line name and its code definitions; d code means: Abuse/Neglect Reporting",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 2,
+        "confirmed": 0,
+        "requested": 0
+      },
       "standard_requirements": [
         {
           "type": "age_population",
@@ -6525,6 +7078,37 @@
         "rendered_as": 0,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.qualified_residential_treatment_program",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.9,
+          "evidence": "matched phrase \"qualified residential treatment program\" against the line name and its code definitions; d code means: Policies and services related to Qualified Residential Treatment Programs (QRTP).",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.residential_treatment",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.9,
+          "evidence": "matched phrase \"residential treatment\" against the line name and its code definitions; d code means: Treatment services provided in a residential setting.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.dental",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.53,
+          "evidence": "matched phrase \"denti\" against the line name and its code definitions; d code means: Dental Services",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 3,
+        "confirmed": 0,
+        "requested": 0
       },
       "standard_requirements": [
         {
@@ -7650,6 +8234,37 @@
         "classified_by": 4,
         "grouped_to": 48
       },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.68,
+          "evidence": "matched phrase \"psychiatric\" against the line name and its code definitions; d code means: Behavioral Health",
+          "requested_concept": null
+        },
+        {
+          "d_code": "place_of_service.inpatient",
+          "relation": "setting",
+          "state": "proposed",
+          "confidence": 0.62,
+          "evidence": "matched phrase \"inpatient\" against the line name and its code definitions; d code means: Inpatient",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.psychiatry",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.55,
+          "evidence": "matched phrase \"psychi\" against the line name and its code definitions; d code means: Medical specialty focused on the diagnosis, treatment, and prevention of mental, emotional",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 3,
+        "confirmed": 0,
+        "requested": 0
+      },
       "standard_requirements": [
         {
           "type": "age_population",
@@ -7825,6 +8440,21 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.residential_care",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.65,
+          "evidence": "matched phrase \"group care\" against the line name and its code definitions; d code means: ",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 1,
+        "confirmed": 0,
+        "requested": 0
+      },
       "standard_requirements": [
         {
           "type": "coverage_criteria",
@@ -7958,6 +8588,21 @@
         "rendered_as": 0,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.clinic",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.78,
+          "evidence": "matched phrase \"clinic services\" against the line name and its code definitions; d code means: Clinic Services",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 1,
+        "confirmed": 0,
+        "requested": 0
       },
       "standard_requirements": [
         {
@@ -8150,6 +8795,29 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.clinic",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.5,
+          "evidence": "matched phrase \"fqhc\" against the line name and its code definitions; d code means: Clinic Services",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.primary_care",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.5,
+          "evidence": "matched phrase \"prim\" against the line name and its code definitions; d code means: Primary Care",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 2,
+        "confirmed": 0,
+        "requested": 0
+      },
       "standard_requirements": [
         {
           "type": "coverage_criteria",
@@ -8340,6 +9008,29 @@
         "rendered_as": 0,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.rural_health_clinic",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.88,
+          "evidence": "matched phrase \"rural health clinic\" against the line name and its code definitions; d code means: Services provided in a Rural Health Clinic.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.clinic",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.55,
+          "evidence": "matched phrase \"clinic\" against the line name and its code definitions; d code means: Clinic Services",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 2,
+        "confirmed": 0,
+        "requested": 0
       },
       "standard_requirements": [
         {
@@ -8532,6 +9223,29 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.9,
+          "evidence": "matched phrase \"intensive outpatient\" against the line name and its code definitions; d code means: Behavioral Health",
+          "requested_concept": null
+        },
+        {
+          "d_code": "place_of_service.outpatient",
+          "relation": "setting",
+          "state": "proposed",
+          "confidence": 0.65,
+          "evidence": "matched phrase \"outpatient\" against the line name and its code definitions; d code means: Outpatient",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 2,
+        "confirmed": 0,
+        "requested": 0
+      },
       "standard_requirements": [],
       "standard_requirement_counts": {
         "sourced": 0,
@@ -8654,6 +9368,29 @@
         "classified_by": 0,
         "grouped_to": 0
       },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.behavioral_health.partial_hospitalization_program",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.9,
+          "evidence": "matched phrase \"partial hospitalization program\" against the line name and its code definitions; d code means: Policies and services related to Partial Hospitalization Programs (PHP) for mental health.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.hospital",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.6,
+          "evidence": "matched phrase \"hospital\" against the line name and its code definitions; d code means: Hospital Services",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 2,
+        "confirmed": 0,
+        "requested": 0
+      },
       "standard_requirements": [],
       "standard_requirement_counts": {
         "sourced": 0,
@@ -8775,6 +9512,21 @@
         "rendered_as": 0,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.emergency_behavioral",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.62,
+          "evidence": "matched phrase \"baker act\" against the line name and its code definitions; d code means: Emergency Behavioral Health",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 1,
+        "confirmed": 0,
+        "requested": 0
       },
       "standard_requirements": [],
       "standard_requirement_counts": {
@@ -8899,6 +9651,37 @@
         "rendered_as": 0,
         "classified_by": 2,
         "grouped_to": 0
+      },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.emergency_behavioral.crisis_stabilization",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.9,
+          "evidence": "matched phrase \"crisis stabilization\" against the line name and its code definitions; d code means: Services aimed at stabilizing individuals experiencing a behavioral health crisis.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "place_of_service.stabilization_unit",
+          "relation": "setting",
+          "state": "proposed",
+          "confidence": 0.85,
+          "evidence": "matched phrase \"stabilization unit\" against the line name and its code definitions; d code means: A facility or unit providing crisis stabilization services.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.emergency_behavioral",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.62,
+          "evidence": "matched phrase \"baker act\" against the line name and its code definitions; d code means: Emergency Behavioral Health",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 3,
+        "confirmed": 0,
+        "requested": 0
       },
       "standard_requirements": [],
       "standard_requirement_counts": {
@@ -9515,6 +10298,21 @@
         "classified_by": 1,
         "grouped_to": 24
       },
+      "lexicon_d": [
+        {
+          "d_code": null,
+          "relation": "describes",
+          "state": "requested",
+          "confidence": null,
+          "evidence": "No active d code shares any phrase with this line's name or its code definitions. The vocabulary cannot currently express it.",
+          "requested_concept": "Marchman Act services"
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 0,
+        "confirmed": 0,
+        "requested": 1
+      },
       "standard_requirements": [],
       "standard_requirement_counts": {
         "sourced": 0,
@@ -9636,6 +10434,21 @@
         "rendered_as": 0,
         "classified_by": 0,
         "grouped_to": 0
+      },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.emergency_behavioral",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.88,
+          "evidence": "matched phrase \"crisis intervention\" against the line name and its code definitions; d code means: Emergency Behavioral Health",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 1,
+        "confirmed": 0,
+        "requested": 0
       },
       "standard_requirements": [],
       "standard_requirement_counts": {
@@ -10235,6 +11048,29 @@
         "rendered_as": 0,
         "classified_by": 1,
         "grouped_to": 24
+      },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.residential_treatment",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.9,
+          "evidence": "matched phrase \"residential treatment\" against the line name and its code definitions; d code means: Treatment services provided in a residential setting.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.dental",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.53,
+          "evidence": "matched phrase \"denti\" against the line name and its code definitions; d code means: Dental Services",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 2,
+        "confirmed": 0,
+        "requested": 0
       },
       "standard_requirements": [],
       "standard_requirement_counts": {
@@ -10866,6 +11702,21 @@
         "rendered_as": 0,
         "classified_by": 1,
         "grouped_to": 24
+      },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.substance_use_disorders.withdrawal_management",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.9,
+          "evidence": "matched phrase \"withdrawal management\" against the line name and its code definitions; d code means: Services and policies related to managing withdrawal symptoms from substance use.",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 1,
+        "confirmed": 0,
+        "requested": 0
       },
       "standard_requirements": [],
       "standard_requirement_counts": {
@@ -12527,6 +13378,45 @@
         "classified_by": 8,
         "grouped_to": 72
       },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.68,
+          "evidence": "matched phrase \"psychiatric\" against the line name and its code definitions; d code means: Behavioral Health",
+          "requested_concept": null
+        },
+        {
+          "d_code": "place_of_service.inpatient",
+          "relation": "setting",
+          "state": "proposed",
+          "confidence": 0.62,
+          "evidence": "matched phrase \"inpatient\" against the line name and its code definitions; d code means: Inpatient",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.hospital",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.6,
+          "evidence": "matched phrase \"hospital\" against the line name and its code definitions; d code means: Hospital Services",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.psychiatry",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.55,
+          "evidence": "matched phrase \"psychi\" against the line name and its code definitions; d code means: Medical specialty focused on the diagnosis, treatment, and prevention of mental, emotional",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 4,
+        "confirmed": 0,
+        "requested": 0
+      },
       "standard_requirements": [],
       "standard_requirement_counts": {
         "sourced": 0,
@@ -14165,6 +15055,29 @@
         "rendered_as": 0,
         "classified_by": 4,
         "grouped_to": 72
+      },
+      "lexicon_d": [
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.82,
+          "evidence": "matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.emergency",
+          "relation": "describes",
+          "state": "proposed",
+          "confidence": 0.53,
+          "evidence": "matched phrase \"emerg\" against the line name and its code definitions; d code means: Emergency Services",
+          "requested_concept": null
+        }
+      ],
+      "lexicon_d_counts": {
+        "mapped": 2,
+        "confirmed": 0,
+        "requested": 0
       },
       "standard_requirements": [],
       "standard_requirement_counts": {
