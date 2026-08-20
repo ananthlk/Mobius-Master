@@ -66,7 +66,8 @@ historical only, and this run is what closes it.
 
 | # | from | needed | status |
 |---|---|---|---|
-| 1 | **Crawler** | base URL(s), depth, page budget, expected yield + wall-clock | asked |
+| 1 | **Fact Store** | **AHCA crawl roots from `sources_config`** — Ananth expects ~`ahca/medicaid` + `ahca/provider`; he approves what they send | **asked — this is now the blocker** |
+| 1b | ~~Crawler~~ | ~~base URL/depth~~ — superseded: A-50 says the roots are configured payor-side, not invented by the crawler | superseded |
 | 2 | **Fact Store** | matching rule, canonical policy, version threshold | asked |
 | 3 | **Fact Store** | run-attribution stamp (Ananth asked directly: today the answer is **no**, nothing stamps a Fact Store run id) | asked |
 | 4 | **Fact Store** | the 161 retirements — some may return from source as live | open |
@@ -128,3 +129,47 @@ were reingested, and Pool was already 86% of query wall-clock. Scaling that to
 Scope corrected from reingest to fresh scrape. Crawler asked for parameters,
 Fact Store asked for the matching/versioning ruling and run attribution. Eval's
 baseline is banked. Corpus deliberately untouched.
+
+### 2026-08-20 · Master RAG · Fact Store A-50 changes the shape of this
+
+Their reply (`docs/RAG_FACTSTORE_COORDINATION.md`, A-50) resolves where the crawl
+parameters live: **the roots are configured on their side**, in `sources_config`,
+and this run carries them *through* RAG's ingest. So Crawler does not need to
+invent a seed — Fact Store hands one over. Asked; Ananth approves what they send.
+His expectation is roughly `ahca/medicaid` + `ahca/provider`.
+
+**Scope question that falls out of that**, and it should be a decision rather than
+an accident: two roots would cover `medicaid` (497 docs) but plainly not
+`public-meetings` (246) or `health-quality-assurance` (164). In or out?
+
+**They independently confirmed the versioning point.** Their watch item: *"this is
+the FIRST corpus re-fetch since the versioning gate exists. Expect the ~16
+starving version pairs to become real … and ordering_unknown to start shrinking as
+fresh fetches carry dates."*
+
+I measured **why** they are starving, and it narrows the problem considerably:
+
+| | |
+|---|---|
+| AHCA docs deriving a `doc_key` | **27 of 1,160 (2%)** |
+| `documents.doc_key` populated | **0 of 9,716** |
+| derived keys namespaced | no — `None\|None\|…`, `payer`/`state` null |
+
+**The gate is not broken.** It correctly pairs `59G-4.130 …FINAL.pdf` with
+`59G-4.130 ….pdf`, and `2018-2024 Model Dental Plan Contract` with its base
+edition. What is missing is *key coverage*: `doc_key()` returns None unless the
+filename matches the rule or revisable pattern, so 1,133 documents have nothing to
+be grouped on.
+
+**PROPOSED, pending Fact Store's ruling: `source_url` becomes the primary
+`doc_key`, falling back to the current derivation.** A re-scrape of the same URL
+is the same document by definition — a far stronger lineage key than any filename
+pattern, and only available because we are scraping. This takes version detection
+from 2% coverage to near-total for everything the run touches.
+
+**This reframes the whole plan: the scrape is not a risk to versioning, it is the
+remedy for it.** My earlier framing was wrong and Ananth called it.
+
+**Also landed:** Eval banked the BEFORE baseline (`8fa802c`) — retriever **66.4%**,
+synthesis **42.6%**, CMHC 22q, portfolio/normal/auth=any. Product Awareness
+shipped the live dashboard (`1287cd2`).
