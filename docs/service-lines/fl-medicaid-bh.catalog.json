@@ -208,9 +208,9 @@
         {
           "d_code": "health_care_services.behavioral_health",
           "relation": "describes",
-          "state": "proposed",
+          "state": "rejected",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behav\" against the line name and its code definitions; d code means: Behavioral Health",
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behav\" against the line name and its code definitions; d code means: Behavioral Health || DROPPED by Lexicon as noise (verified by registry)",
           "requested_concept": null
         }
       ],
@@ -828,19 +828,27 @@
       },
       "lexicon_d": [
         {
-          "d_code": "health_care_services.behavioral_health",
+          "d_code": "health_care_services.bio_psychosocial_evaluations",
           "relation": "describes",
-          "state": "proposed",
+          "state": "confirmed",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health",
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
           "requested_concept": null
         },
         {
-          "d_code": "health_care_services.bio_psychosocial_evaluations",
+          "d_code": "health_care_services.psychiatry",
           "relation": "describes",
-          "state": "proposed",
+          "state": "confirmed",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"bio psychosocial evaluation\" against the line name and its code definitions; d code means: Comprehensive evaluations of biological, psychological, and social factors.",
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.substance_use_disorders",
+          "relation": "describes",
+          "state": "confirmed",
+          "confidence": null,
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
           "requested_concept": null
         },
         {
@@ -860,25 +868,17 @@
           "requested_concept": null
         },
         {
-          "d_code": "health_care_services.psychiatry",
+          "d_code": "health_care_services.behavioral_health",
           "relation": "describes",
-          "state": "proposed",
+          "state": "rejected",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"psychi\" against the line name and its code definitions; d code means: Medical specialty focused on the diagnosis, treatment, and prevention of mental, emotional",
-          "requested_concept": null
-        },
-        {
-          "d_code": "health_care_services.substance_use_disorders",
-          "relation": "describes",
-          "state": "proposed",
-          "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"substance abuse\" against the line name and its code definitions; d code means: Substance Use Disorders",
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health || DROPPED by Lexicon as noise (verified by registry)",
           "requested_concept": null
         }
       ],
       "lexicon_d_counts": {
         "mapped": 6,
-        "confirmed": 0,
+        "confirmed": 3,
         "requested": 0
       },
       "standard_requirements": [
@@ -1599,35 +1599,27 @@
       },
       "lexicon_d": [
         {
-          "d_code": "billing_codes.procedure_code",
+          "d_code": "health_care_services.behavioral_health.cognitive_behavioral_therapy",
           "relation": "describes",
-          "state": "proposed",
+          "state": "confirmed",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"proc\" against the line name and its code definitions; d code means: Procedure Codes",
-          "requested_concept": null
-        },
-        {
-          "d_code": "health_care_services.behavioral_health",
-          "relation": "describes",
-          "state": "proposed",
-          "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health",
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
           "requested_concept": null
         },
         {
           "d_code": "health_care_services.substance_use_disorders",
           "relation": "describes",
-          "state": "proposed",
+          "state": "confirmed",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"substance abuse\" against the line name and its code definitions; d code means: Substance Use Disorders",
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
           "requested_concept": null
         },
         {
           "d_code": "health_care_services.therapy_services",
           "relation": "describes",
-          "state": "proposed",
+          "state": "confirmed",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"rehabilitation\" against the line name and its code definitions; d code means: Therapy Services (General)",
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
           "requested_concept": null
         },
         {
@@ -1639,17 +1631,33 @@
           "requested_concept": null
         },
         {
+          "d_code": "billing_codes.procedure_code",
+          "relation": "describes",
+          "state": "rejected",
+          "confidence": null,
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"proc\" against the line name and its code definitions; d code means: Procedure Codes || DROPPED by Lexicon as noise (verified by registry)",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "rejected",
+          "confidence": null,
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health || DROPPED by Lexicon as noise (verified by registry)",
+          "requested_concept": null
+        },
+        {
           "d_code": "provider.healthsouth.rehab",
           "relation": "describes",
-          "state": "proposed",
+          "state": "rejected",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"rehab\" against the line name and its code definitions; d code means: Specific provider entity or organization: HealthSouth Rehabilitation.",
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"rehab\" against the line name and its code definitions; d code means: Specific provider entity or organization: HealthSouth Rehabilitation. || DROPPED by Lexicon as noise (verified by registry)",
           "requested_concept": null
         }
       ],
       "lexicon_d_counts": {
-        "mapped": 6,
-        "confirmed": 0,
+        "mapped": 7,
+        "confirmed": 3,
         "requested": 0
       },
       "standard_requirements": [
@@ -2320,35 +2328,43 @@
       },
       "lexicon_d": [
         {
-          "d_code": "care_management.behavioral_mgmt",
-          "relation": "describes",
-          "state": "proposed",
-          "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavior management\" against the line name and its code definitions; d code means: Behavioral Management",
-          "requested_concept": null
-        },
-        {
-          "d_code": "health_care_services.behavioral_health",
-          "relation": "describes",
-          "state": "proposed",
-          "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health",
-          "requested_concept": null
-        },
-        {
           "d_code": "health_care_services.behavioral_health.on_site",
           "relation": "describes",
-          "state": "proposed",
+          "state": "confirmed",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"on site\" against the line name and its code definitions; d code means: Behavioral health services provided at a physical location.",
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
           "requested_concept": null
         },
         {
           "d_code": "health_care_services.community_treatment",
           "relation": "describes",
+          "state": "confirmed",
+          "confidence": null,
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.substance_use_disorders",
+          "relation": "describes",
+          "state": "confirmed",
+          "confidence": null,
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.therapy_services",
+          "relation": "describes",
+          "state": "confirmed",
+          "confidence": null,
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
+          "requested_concept": null
+        },
+        {
+          "d_code": "care_management.behavioral_mgmt",
+          "relation": "describes",
           "state": "proposed",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"community treatment\" against the line name and its code definitions; d code means: Treatment services provided in a community setting, often for behavioral health.",
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavior management\" against the line name and its code definitions; d code means: Behavioral Management",
           "requested_concept": null
         },
         {
@@ -2360,25 +2376,17 @@
           "requested_concept": null
         },
         {
-          "d_code": "health_care_services.substance_use_disorders",
+          "d_code": "health_care_services.behavioral_health",
           "relation": "describes",
-          "state": "proposed",
+          "state": "rejected",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"substance abuse\" against the line name and its code definitions; d code means: Substance Use Disorders",
-          "requested_concept": null
-        },
-        {
-          "d_code": "health_care_services.therapy_services",
-          "relation": "describes",
-          "state": "proposed",
-          "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"therapy\" against the line name and its code definitions; d code means: Therapy Services (General)",
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health || DROPPED by Lexicon as noise (verified by registry)",
           "requested_concept": null
         }
       ],
       "lexicon_d_counts": {
         "mapped": 7,
-        "confirmed": 0,
+        "confirmed": 4,
         "requested": 0
       },
       "standard_requirements": [
@@ -3225,35 +3233,35 @@
       },
       "lexicon_d": [
         {
-          "d_code": "care_management.care_plan",
-          "relation": "describes",
-          "state": "proposed",
-          "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"treatment plan\" against the line name and its code definitions; d code means: Documents outlining a member's assessed needs and the services to be provided.",
-          "requested_concept": null
-        },
-        {
-          "d_code": "health_care_services.behavioral_health",
-          "relation": "describes",
-          "state": "proposed",
-          "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health",
-          "requested_concept": null
-        },
-        {
           "d_code": "health_care_services.bio_psychosocial_evaluations",
           "relation": "describes",
-          "state": "proposed",
+          "state": "confirmed",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"bio psychosocial evaluation\" against the line name and its code definitions; d code means: Comprehensive evaluations of biological, psychological, and social factors.",
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
           "requested_concept": null
         },
         {
           "d_code": "health_care_services.functional_assessment",
           "relation": "describes",
+          "state": "confirmed",
+          "confidence": null,
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.substance_use_disorders",
+          "relation": "describes",
+          "state": "confirmed",
+          "confidence": null,
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
+          "requested_concept": null
+        },
+        {
+          "d_code": "care_management.care_plan",
+          "relation": "describes",
           "state": "proposed",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"functional assessment\" against the line name and its code definitions; d code means: Evaluation of an individual's ability to perform daily activities and tasks.",
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"treatment plan\" against the line name and its code definitions; d code means: Documents outlining a member's assessed needs and the services to be provided.",
           "requested_concept": null
         },
         {
@@ -3265,17 +3273,17 @@
           "requested_concept": null
         },
         {
-          "d_code": "health_care_services.substance_use_disorders",
+          "d_code": "health_care_services.behavioral_health",
           "relation": "describes",
-          "state": "proposed",
+          "state": "rejected",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"substance abuse\" against the line name and its code definitions; d code means: Substance Use Disorders",
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health || DROPPED by Lexicon as noise (verified by registry)",
           "requested_concept": null
         }
       ],
       "lexicon_d_counts": {
         "mapped": 6,
-        "confirmed": 0,
+        "confirmed": 3,
         "requested": 0
       },
       "standard_requirements": [
@@ -3505,9 +3513,9 @@
         {
           "d_code": "health_care_services.behavioral_health",
           "relation": "describes",
-          "state": "proposed",
+          "state": "rejected",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health",
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health || DROPPED by Lexicon as noise (verified by registry)",
           "requested_concept": null
         }
       ],
@@ -4129,49 +4137,57 @@
       },
       "lexicon_d": [
         {
-          "d_code": "billing_codes.procedure_code",
+          "d_code": "health_care_services.behavioral_health.cognitive_behavioral_therapy",
           "relation": "describes",
-          "state": "proposed",
+          "state": "confirmed",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"proc\" against the line name and its code definitions; d code means: Procedure Codes",
-          "requested_concept": null
-        },
-        {
-          "d_code": "health_care_services.behavioral_health",
-          "relation": "describes",
-          "state": "proposed",
-          "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health",
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
           "requested_concept": null
         },
         {
           "d_code": "health_care_services.substance_use_disorders",
           "relation": "describes",
-          "state": "proposed",
+          "state": "confirmed",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"substance abuse\" against the line name and its code definitions; d code means: Substance Use Disorders",
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
           "requested_concept": null
         },
         {
           "d_code": "health_care_services.therapy_services",
           "relation": "describes",
-          "state": "proposed",
+          "state": "confirmed",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"rehabilitation\" against the line name and its code definitions; d code means: Therapy Services (General)",
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
+          "requested_concept": null
+        },
+        {
+          "d_code": "billing_codes.procedure_code",
+          "relation": "describes",
+          "state": "rejected",
+          "confidence": null,
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"proc\" against the line name and its code definitions; d code means: Procedure Codes || DROPPED by Lexicon as noise (verified by registry)",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "rejected",
+          "confidence": null,
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health || DROPPED by Lexicon as noise (verified by registry)",
           "requested_concept": null
         },
         {
           "d_code": "provider.healthsouth.rehab",
           "relation": "describes",
-          "state": "proposed",
+          "state": "rejected",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"rehab\" against the line name and its code definitions; d code means: Specific provider entity or organization: HealthSouth Rehabilitation.",
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"rehab\" against the line name and its code definitions; d code means: Specific provider entity or organization: HealthSouth Rehabilitation. || DROPPED by Lexicon as noise (verified by registry)",
           "requested_concept": null
         }
       ],
       "lexicon_d_counts": {
-        "mapped": 5,
-        "confirmed": 0,
+        "mapped": 6,
+        "confirmed": 3,
         "requested": 0
       },
       "standard_requirements": [
@@ -4399,14 +4415,6 @@
       },
       "lexicon_d": [
         {
-          "d_code": "health_care_services.behavioral_health",
-          "relation": "describes",
-          "state": "proposed",
-          "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health",
-          "requested_concept": null
-        },
-        {
           "d_code": "health_care_services.comprehensive_assessment",
           "relation": "describes",
           "state": "proposed",
@@ -4420,6 +4428,14 @@
           "state": "proposed",
           "confidence": null,
           "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"health assessment\" against the line name and its code definitions; d code means: Evaluation of a patient's overall health status.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "rejected",
+          "confidence": null,
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health || DROPPED by Lexicon as noise (verified by registry)",
           "requested_concept": null
         }
       ],
@@ -4564,14 +4580,6 @@
       },
       "lexicon_d": [
         {
-          "d_code": "billing_codes.evaluation_and_management",
-          "relation": "describes",
-          "state": "proposed",
-          "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"evaluation and management\" against the line name and its code definitions; d code means: ",
-          "requested_concept": null
-        },
-        {
           "d_code": "health_care_services.primary_care",
           "relation": "describes",
           "state": "proposed",
@@ -4585,6 +4593,14 @@
           "state": "proposed",
           "confidence": null,
           "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"outpatient\" against the line name and its code definitions; d code means: Outpatient",
+          "requested_concept": null
+        },
+        {
+          "d_code": "billing_codes.evaluation_and_management",
+          "relation": "describes",
+          "state": "rejected",
+          "confidence": null,
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"evaluation and management\" against the line name and its code definitions; d code means:  || DROPPED by Lexicon as noise (verified by registry)",
           "requested_concept": null
         }
       ],
@@ -5277,35 +5293,43 @@
       },
       "lexicon_d": [
         {
-          "d_code": "care_management.behavioral_mgmt",
-          "relation": "describes",
-          "state": "proposed",
-          "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavior management\" against the line name and its code definitions; d code means: Behavioral Management",
-          "requested_concept": null
-        },
-        {
-          "d_code": "health_care_services.behavioral_health",
-          "relation": "describes",
-          "state": "proposed",
-          "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health",
-          "requested_concept": null
-        },
-        {
           "d_code": "health_care_services.behavioral_health.on_site",
           "relation": "describes",
-          "state": "proposed",
+          "state": "confirmed",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"on site\" against the line name and its code definitions; d code means: Behavioral health services provided at a physical location.",
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
           "requested_concept": null
         },
         {
           "d_code": "health_care_services.community_treatment",
           "relation": "describes",
+          "state": "confirmed",
+          "confidence": null,
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.substance_use_disorders",
+          "relation": "describes",
+          "state": "confirmed",
+          "confidence": null,
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.therapy_services",
+          "relation": "describes",
+          "state": "confirmed",
+          "confidence": null,
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
+          "requested_concept": null
+        },
+        {
+          "d_code": "care_management.behavioral_mgmt",
+          "relation": "describes",
           "state": "proposed",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"community treatment\" against the line name and its code definitions; d code means: Treatment services provided in a community setting, often for behavioral health.",
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavior management\" against the line name and its code definitions; d code means: Behavioral Management",
           "requested_concept": null
         },
         {
@@ -5317,25 +5341,17 @@
           "requested_concept": null
         },
         {
-          "d_code": "health_care_services.substance_use_disorders",
+          "d_code": "health_care_services.behavioral_health",
           "relation": "describes",
-          "state": "proposed",
+          "state": "rejected",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"substance abuse\" against the line name and its code definitions; d code means: Substance Use Disorders",
-          "requested_concept": null
-        },
-        {
-          "d_code": "health_care_services.therapy_services",
-          "relation": "describes",
-          "state": "proposed",
-          "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"therapy\" against the line name and its code definitions; d code means: Therapy Services (General)",
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health || DROPPED by Lexicon as noise (verified by registry)",
           "requested_concept": null
         }
       ],
       "lexicon_d_counts": {
         "mapped": 7,
-        "confirmed": 0,
+        "confirmed": 4,
         "requested": 0
       },
       "standard_requirements": [
@@ -5589,9 +5605,9 @@
         {
           "d_code": "health_care_services.behavioral_health",
           "relation": "describes",
-          "state": "proposed",
+          "state": "rejected",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"mental health\" against the line name and its code definitions; d code means: Behavioral Health",
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"mental health\" against the line name and its code definitions; d code means: Behavioral Health || DROPPED by Lexicon as noise (verified by registry)",
           "requested_concept": null
         }
       ],
@@ -6112,9 +6128,9 @@
         {
           "d_code": "health_care_services.behavioral_health",
           "relation": "describes",
-          "state": "proposed",
+          "state": "rejected",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"mental health\" against the line name and its code definitions; d code means: Behavioral Health",
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"mental health\" against the line name and its code definitions; d code means: Behavioral Health || DROPPED by Lexicon as noise (verified by registry)",
           "requested_concept": null
         }
       ],
@@ -7081,14 +7097,6 @@
       },
       "lexicon_d": [
         {
-          "d_code": "health_care_services.dental",
-          "relation": "describes",
-          "state": "proposed",
-          "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"denti\" against the line name and its code definitions; d code means: Dental Services",
-          "requested_concept": null
-        },
-        {
           "d_code": "health_care_services.qualified_residential_treatment_program",
           "relation": "describes",
           "state": "proposed",
@@ -7102,6 +7110,14 @@
           "state": "proposed",
           "confidence": null,
           "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"residential treatment\" against the line name and its code definitions; d code means: Treatment services provided in a residential setting.",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.dental",
+          "relation": "describes",
+          "state": "rejected",
+          "confidence": null,
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"denti\" against the line name and its code definitions; d code means: Dental Services || DROPPED by Lexicon as noise (verified by registry)",
           "requested_concept": null
         }
       ],
@@ -8236,11 +8252,19 @@
       },
       "lexicon_d": [
         {
-          "d_code": "health_care_services.behavioral_health",
+          "d_code": "health_care_services.behavioral_health.depression_anxiety",
           "relation": "describes",
-          "state": "proposed",
+          "state": "confirmed",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"psychiatric\" against the line name and its code definitions; d code means: Behavioral Health",
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.behavioral_health.generalized_anxiety_disorder",
+          "relation": "describes",
+          "state": "confirmed",
+          "confidence": null,
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
           "requested_concept": null
         },
         {
@@ -8258,11 +8282,19 @@
           "confidence": null,
           "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"inpatient\" against the line name and its code definitions; d code means: Inpatient",
           "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "rejected",
+          "confidence": null,
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"psychiatric\" against the line name and its code definitions; d code means: Behavioral Health || DROPPED by Lexicon as noise (verified by registry)",
+          "requested_concept": null
         }
       ],
       "lexicon_d_counts": {
-        "mapped": 3,
-        "confirmed": 0,
+        "mapped": 5,
+        "confirmed": 2,
         "requested": 0
       },
       "standard_requirements": [
@@ -9225,19 +9257,19 @@
       },
       "lexicon_d": [
         {
-          "d_code": "health_care_services.behavioral_health",
-          "relation": "describes",
-          "state": "proposed",
-          "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"intensive outpatient\" against the line name and its code definitions; d code means: Behavioral Health",
-          "requested_concept": null
-        },
-        {
           "d_code": "place_of_service.outpatient",
           "relation": "setting",
           "state": "proposed",
           "confidence": null,
           "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"outpatient\" against the line name and its code definitions; d code means: Outpatient",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "rejected",
+          "confidence": null,
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"intensive outpatient\" against the line name and its code definitions; d code means: Behavioral Health || DROPPED by Lexicon as noise (verified by registry)",
           "requested_concept": null
         }
       ],
@@ -9654,6 +9686,14 @@
       },
       "lexicon_d": [
         {
+          "d_code": "health_care_services.behavioral_health.depression_anxiety",
+          "relation": "describes",
+          "state": "confirmed",
+          "confidence": null,
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
+          "requested_concept": null
+        },
+        {
           "d_code": "health_care_services.emergency_behavioral",
           "relation": "describes",
           "state": "proposed",
@@ -9679,8 +9719,8 @@
         }
       ],
       "lexicon_d_counts": {
-        "mapped": 3,
-        "confirmed": 0,
+        "mapped": 4,
+        "confirmed": 1,
         "requested": 0
       },
       "standard_requirements": [],
@@ -10300,6 +10340,14 @@
       },
       "lexicon_d": [
         {
+          "d_code": "health_care_services.substance_use_disorders",
+          "relation": "describes",
+          "state": "confirmed",
+          "confidence": null,
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
+          "requested_concept": null
+        },
+        {
           "d_code": null,
           "relation": "describes",
           "state": "requested",
@@ -10309,8 +10357,8 @@
         }
       ],
       "lexicon_d_counts": {
-        "mapped": 0,
-        "confirmed": 0,
+        "mapped": 1,
+        "confirmed": 1,
         "requested": 1
       },
       "standard_requirements": [],
@@ -11051,11 +11099,11 @@
       },
       "lexicon_d": [
         {
-          "d_code": "health_care_services.dental",
+          "d_code": "health_care_services.substance_use_disorders",
           "relation": "describes",
-          "state": "proposed",
+          "state": "confirmed",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"denti\" against the line name and its code definitions; d code means: Dental Services",
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
           "requested_concept": null
         },
         {
@@ -11065,11 +11113,19 @@
           "confidence": null,
           "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"residential treatment\" against the line name and its code definitions; d code means: Treatment services provided in a residential setting.",
           "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.dental",
+          "relation": "describes",
+          "state": "rejected",
+          "confidence": null,
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"denti\" against the line name and its code definitions; d code means: Dental Services || DROPPED by Lexicon as noise (verified by registry)",
+          "requested_concept": null
         }
       ],
       "lexicon_d_counts": {
-        "mapped": 2,
-        "confirmed": 0,
+        "mapped": 3,
+        "confirmed": 1,
         "requested": 0
       },
       "standard_requirements": [],
@@ -11705,6 +11761,14 @@
       },
       "lexicon_d": [
         {
+          "d_code": "health_care_services.substance_use_disorders",
+          "relation": "describes",
+          "state": "confirmed",
+          "confidence": null,
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
+          "requested_concept": null
+        },
+        {
           "d_code": "health_care_services.substance_use_disorders.withdrawal_management",
           "relation": "describes",
           "state": "proposed",
@@ -11714,8 +11778,8 @@
         }
       ],
       "lexicon_d_counts": {
-        "mapped": 1,
-        "confirmed": 0,
+        "mapped": 2,
+        "confirmed": 1,
         "requested": 0
       },
       "standard_requirements": [],
@@ -13380,11 +13444,27 @@
       },
       "lexicon_d": [
         {
-          "d_code": "health_care_services.behavioral_health",
+          "d_code": "health_care_services.behavioral_health.depression_anxiety",
           "relation": "describes",
-          "state": "proposed",
+          "state": "confirmed",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"psychiatric\" against the line name and its code definitions; d code means: Behavioral Health",
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.behavioral_health.generalized_anxiety_disorder",
+          "relation": "describes",
+          "state": "confirmed",
+          "confidence": null,
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.substance_use_disorders",
+          "relation": "describes",
+          "state": "confirmed",
+          "confidence": null,
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
           "requested_concept": null
         },
         {
@@ -13410,11 +13490,19 @@
           "confidence": null,
           "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"inpatient\" against the line name and its code definitions; d code means: Inpatient",
           "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.behavioral_health",
+          "relation": "describes",
+          "state": "rejected",
+          "confidence": null,
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"psychiatric\" against the line name and its code definitions; d code means: Behavioral Health || DROPPED by Lexicon as noise (verified by registry)",
+          "requested_concept": null
         }
       ],
       "lexicon_d_counts": {
-        "mapped": 4,
-        "confirmed": 0,
+        "mapped": 7,
+        "confirmed": 3,
         "requested": 0
       },
       "standard_requirements": [],
@@ -15058,25 +15146,49 @@
       },
       "lexicon_d": [
         {
+          "d_code": "health_care_services.behavioral_health.depression_anxiety",
+          "relation": "describes",
+          "state": "confirmed",
+          "confidence": null,
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.behavioral_health.generalized_anxiety_disorder",
+          "relation": "describes",
+          "state": "confirmed",
+          "confidence": null,
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
+          "requested_concept": null
+        },
+        {
+          "d_code": "health_care_services.substance_use_disorders",
+          "relation": "describes",
+          "state": "confirmed",
+          "confidence": null,
+          "evidence": "Authored by Lexicon, lexicon-line-mapping.reconciled.json (hybrid ownership, 2026-08-19)",
+          "requested_concept": null
+        },
+        {
           "d_code": "health_care_services.behavioral_health",
           "relation": "describes",
-          "state": "proposed",
+          "state": "rejected",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health",
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"behavioral health\" against the line name and its code definitions; d code means: Behavioral Health || DROPPED by Lexicon as noise (verified by registry)",
           "requested_concept": null
         },
         {
           "d_code": "health_care_services.emergency",
           "relation": "describes",
-          "state": "proposed",
+          "state": "rejected",
           "confidence": null,
-          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"emerg\" against the line name and its code definitions; d code means: Emergency Services",
+          "evidence": "LEXICAL MATCH ONLY, not a semantic mapping. matched phrase \"emerg\" against the line name and its code definitions; d code means: Emergency Services || DROPPED by Lexicon as noise (verified by registry)",
           "requested_concept": null
         }
       ],
       "lexicon_d_counts": {
-        "mapped": 2,
-        "confirmed": 0,
+        "mapped": 5,
+        "confirmed": 3,
         "requested": 0
       },
       "standard_requirements": [],

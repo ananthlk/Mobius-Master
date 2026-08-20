@@ -1,0 +1,3767 @@
+{
+ "purpose": "Reconciled Lexicon<->service-line mapping. HYBRID ownership (Ananth 2026-08-19): Registry authors identity/authority/payment; Lexicon authors rendered_as/classified_by/grouped_to from the d: axis. Supersedes the catalog fuzzy lexicon_d. Nothing written to policy_lexicon_entries.",
+ "ownership": {
+  "registry_authors": [
+   "authority",
+   "identity",
+   "payment"
+  ],
+  "lexicon_authors": [
+   "classified_by",
+   "grouped_to",
+   "rendered_as"
+  ]
+ },
+ "source_packet": "docs/service-lines/lexicon-packets.json",
+ "catalog_noise_dropped": [
+  "billing_codes.evaluation_and_management",
+  "billing_codes.procedure_code",
+  "health_care_services.behavioral_health",
+  "health_care_services.dental",
+  "health_care_services.emergency",
+  "provider.healthsouth.rehab"
+ ],
+ "coverage": {
+  "registry_slots": 93,
+  "lexicon_slots": 145,
+  "lexicon_authored": 52,
+  "lexicon_gap": 93
+ },
+ "catalog_reconciliation": [
+  {
+   "line_key": "behavior_analysis",
+   "dropped_noise": [
+    "health_care_services.behavioral_health"
+   ],
+   "kept": []
+  },
+  {
+   "line_key": "bh_assessment",
+   "dropped_noise": [
+    "health_care_services.behavioral_health"
+   ],
+   "kept": [
+    "health_care_services.bio_psychosocial_evaluations",
+    "health_care_services.health_assessment",
+    "health_care_services.physician",
+    "health_care_services.psychiatry",
+    "health_care_services.substance_use_disorders"
+   ]
+  },
+  {
+   "line_key": "bh_community_support",
+   "dropped_noise": [
+    "billing_codes.procedure_code",
+    "health_care_services.behavioral_health",
+    "provider.healthsouth.rehab"
+   ],
+   "kept": [
+    "health_care_services.substance_use_disorders",
+    "health_care_services.therapy_services",
+    "program.health_community_support"
+   ]
+  },
+  {
+   "line_key": "bh_intervention",
+   "dropped_noise": [
+    "health_care_services.behavioral_health"
+   ],
+   "kept": [
+    "care_management.behavioral_mgmt",
+    "health_care_services.behavioral_health.on_site",
+    "health_care_services.community_treatment",
+    "health_care_services.primary_care.on_site",
+    "health_care_services.substance_use_disorders",
+    "health_care_services.therapy_services"
+   ]
+  },
+  {
+   "line_key": "bh_medication_mgmt",
+   "dropped_noise": [
+    "health_care_services.behavioral_health"
+   ],
+   "kept": [
+    "care_management.care_plan",
+    "health_care_services.bio_psychosocial_evaluations",
+    "health_care_services.functional_assessment",
+    "health_care_services.health_assessment",
+    "health_care_services.substance_use_disorders"
+   ]
+  },
+  {
+   "line_key": "bh_overlay",
+   "dropped_noise": [
+    "health_care_services.behavioral_health"
+   ],
+   "kept": []
+  },
+  {
+   "line_key": "bh_therapy",
+   "dropped_noise": [
+    "billing_codes.procedure_code",
+    "health_care_services.behavioral_health",
+    "provider.healthsouth.rehab"
+   ],
+   "kept": [
+    "health_care_services.substance_use_disorders",
+    "health_care_services.therapy_services"
+   ]
+  },
+  {
+   "line_key": "cbha",
+   "dropped_noise": [
+    "health_care_services.behavioral_health"
+   ],
+   "kept": [
+    "health_care_services.comprehensive_assessment",
+    "health_care_services.health_assessment"
+   ]
+  },
+  {
+   "line_key": "evaluation_management",
+   "dropped_noise": [
+    "billing_codes.evaluation_and_management"
+   ],
+   "kept": [
+    "health_care_services.primary_care",
+    "place_of_service.outpatient"
+   ]
+  },
+  {
+   "line_key": "fact",
+   "dropped_noise": [
+    "health_care_services.behavioral_health"
+   ],
+   "kept": [
+    "care_management.behavioral_mgmt",
+    "health_care_services.behavioral_health.on_site",
+    "health_care_services.community_treatment",
+    "health_care_services.primary_care.on_site",
+    "health_care_services.substance_use_disorders",
+    "health_care_services.therapy_services"
+   ]
+  },
+  {
+   "line_key": "mhtcm",
+   "dropped_noise": [
+    "health_care_services.behavioral_health"
+   ],
+   "kept": [
+    "care_management.general"
+   ]
+  },
+  {
+   "line_key": "qrtp",
+   "dropped_noise": [
+    "health_care_services.dental"
+   ],
+   "kept": [
+    "health_care_services.qualified_residential_treatment_program",
+    "health_care_services.residential_treatment"
+   ]
+  },
+  {
+   "line_key": "sipp",
+   "dropped_noise": [
+    "health_care_services.behavioral_health"
+   ],
+   "kept": [
+    "health_care_services.psychiatry",
+    "place_of_service.inpatient"
+   ]
+  },
+  {
+   "line_key": "state_mental_health",
+   "dropped_noise": [
+    "health_care_services.behavioral_health"
+   ],
+   "kept": []
+  },
+  {
+   "line_key": "ed_behavioral",
+   "dropped_noise": [
+    "health_care_services.behavioral_health",
+    "health_care_services.emergency"
+   ],
+   "kept": []
+  },
+  {
+   "line_key": "inpatient_psych_adult",
+   "dropped_noise": [
+    "health_care_services.behavioral_health"
+   ],
+   "kept": [
+    "health_care_services.hospital",
+    "health_care_services.psychiatry",
+    "place_of_service.inpatient"
+   ]
+  },
+  {
+   "line_key": "iop",
+   "dropped_noise": [
+    "health_care_services.behavioral_health"
+   ],
+   "kept": [
+    "place_of_service.outpatient"
+   ]
+  },
+  {
+   "line_key": "sud_residential",
+   "dropped_noise": [
+    "health_care_services.dental"
+   ],
+   "kept": [
+    "health_care_services.residential_treatment"
+   ]
+  }
+ ],
+ "lines": [
+  {
+   "line_key": "behavior_analysis",
+   "canonical_name": "Behavior Analysis Services",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [
+      "applied behavior analysis",
+      "aba",
+      "aba therapy",
+      "behavior analyst",
+      "bcba"
+     ],
+     "suggestion_provenance": [
+      {
+       "d_code": "d:health_care_services.aba_therapy"
+      },
+      {
+       "d_code": "d:health_care_services.behavior_analyst"
+      }
+     ],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": []
+  },
+  {
+   "line_key": "bh_assessment",
+   "canonical_name": "Behavioral Health Assessment Services",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": [
+    {
+     "slot": "rendered_as[H0001,HO]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "In-depth assessment, new patient, substance abuse",
+     "split": "SUD",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "confidence": "high"
+    },
+    {
+     "slot": "rendered_as[H0001,TS]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "In-depth assessment, established patient, substance abuse",
+     "split": "SUD",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "confidence": "high"
+    },
+    {
+     "slot": "rendered_as[H0031,HN]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Bio-psychosocial Evaluation, mental health",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "bio-psychosocial evaluations",
+      "psychiatric evaluations",
+      "bio-psychosocial evaluation",
+      "psychological evaluation",
+      "biopsychosocial evaluation"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.bio_psychosocial_evaluations"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H0031,HO]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "In-depth assessment, new patient, mental health",
+     "split": "MH",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "rendered_as[H0031,TS]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "In-depth assessment, established patient, mental health",
+     "split": "MH",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "rendered_as[H2000,HO]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Psychiatric evaluation by a non- physician",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "bio-psychosocial evaluations",
+      "psychiatric evaluations",
+      "bio-psychosocial evaluation",
+      "psychological evaluation",
+      "biopsychosocial evaluation",
+      "psychiatry"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.bio_psychosocial_evaluations"
+      },
+      {
+       "d_code": "d:health_care_services.psychiatry"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2000,HP]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Psychiatric evaluation by a physician",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "bio-psychosocial evaluations",
+      "psychiatric evaluations",
+      "bio-psychosocial evaluation",
+      "psychological evaluation",
+      "biopsychosocial evaluation",
+      "psychiatry"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.bio_psychosocial_evaluations"
+      },
+      {
+       "d_code": "d:health_care_services.psychiatry"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2000,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Psychiatric review of records",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "psychiatry"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.psychiatry"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2010,HO]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Brief behavioral health status exam",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    }
+   ]
+  },
+  {
+   "line_key": "bh_community_support",
+   "canonical_name": "Behavioral Health Community Support Services",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": [
+    {
+     "slot": "rendered_as[H0020,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Medication-assisted treatment services",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "rendered_as[H0047,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Behavioral health-related medical services: verbal interaction, substance abuse",
+     "split": "SUD",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "confidence": "high"
+    },
+    {
+     "slot": "rendered_as[H0048,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Behavioral health-related medical services: alcohol and other drug screening specimen",
+     "split": "SUD",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "confidence": "high"
+    },
+    {
+     "slot": "rendered_as[H2010,HE]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Brief individual medical psychotherapy, mental health",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "cognitive behavioral"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.cognitive_behavioral_therapy"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2010,HF]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Brief individual medical psychotherapy, substance abuse",
+     "split": "SUD",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking",
+      "cognitive behavioral"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      },
+      {
+       "d_code": "d:health_care_services.behavioral_health.cognitive_behavioral_therapy"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2017,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Psychosocial rehabilitation services",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "therapy services",
+      "rehabilitative services",
+      "rehabilitation",
+      "health and rehab",
+      "rehab",
+      "therapy",
+      "restorative care",
+      "counseling session",
+      "therapi"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.therapy_services"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2030,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Clubhouse services",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "rendered_as[T1015,HE]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Behavioral health-related medical services: medical procedures, mental health",
+     "split": "MH",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "rendered_as[T1015,HF]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Behavioral health-related medical services: medical procedures, substance abuse",
+     "split": "SUD",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "confidence": "high"
+    }
+   ]
+  },
+  {
+   "line_key": "bh_intervention",
+   "canonical_name": "Behavioral Health Intervention Services",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": [
+    {
+     "slot": "rendered_as[H0040,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Florida Assertive Community Treatment",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "community treatment"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.community_treatment"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2010,HQ]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Brief group medical therapy",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "therapy services",
+      "rehabilitative services",
+      "rehabilitation",
+      "health and rehab",
+      "rehab",
+      "therapy",
+      "restorative care",
+      "counseling session",
+      "therapi"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.therapy_services"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2012,HF]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Behavioral health day services, substance abuse",
+     "split": "SUD",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "confidence": "high"
+    },
+    {
+     "slot": "rendered_as[H2012,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Behavioral health day services, mental health",
+     "split": "MH",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "rendered_as[H2019,HM]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Therapeutic behavioral on-site services, therapeutic support",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "behavioral on-site"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.on_site"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2019,HN]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Therapeutic behavioral on-site services, behavior management",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "behavioral on-site"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.on_site"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2019,HO]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Therapeutic behavioral on-site services, therapy",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "therapy services",
+      "rehabilitative services",
+      "rehabilitation",
+      "health and rehab",
+      "rehab",
+      "therapy",
+      "restorative care",
+      "counseling session",
+      "therapi",
+      "behavioral on-site"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.therapy_services"
+      },
+      {
+       "d_code": "d:health_care_services.behavioral_health.on_site"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2019,HQ]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Group therapy",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "therapy services",
+      "rehabilitative services",
+      "rehabilitation",
+      "health and rehab",
+      "rehab",
+      "therapy",
+      "restorative care",
+      "counseling session",
+      "therapi"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.therapy_services"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2019,HR]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Individual and family therapy",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "therapy services",
+      "rehabilitative services",
+      "rehabilitation",
+      "health and rehab",
+      "rehab",
+      "therapy",
+      "restorative care",
+      "counseling session",
+      "therapi"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.therapy_services"
+      }
+     ],
+     "confidence": "medium"
+    }
+   ]
+  },
+  {
+   "line_key": "bh_medication_mgmt",
+   "canonical_name": "Behavioral Health Medication Management Services",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": [
+    {
+     "slot": "rendered_as[H0001,HN]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Bio-psychosocial evaluation, substance abuse",
+     "split": "SUD",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking",
+      "bio-psychosocial evaluations",
+      "psychiatric evaluations",
+      "bio-psychosocial evaluation",
+      "psychological evaluation",
+      "biopsychosocial evaluation"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      },
+      {
+       "d_code": "d:health_care_services.bio_psychosocial_evaluations"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H0001,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Limited functional assessment, substance abuse",
+     "split": "SUD",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking",
+      "functional assessment",
+      "functional assessment rating",
+      "functional assessment rating scale",
+      "adl",
+      "iadl",
+      "adl score",
+      "fba",
+      "uas",
+      "change in hygiene",
+      "change in toileting"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      },
+      {
+       "d_code": "d:health_care_services.functional_assessment"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H0031,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Limited functional assessment, mental health",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "functional assessment",
+      "functional assessment rating",
+      "functional assessment rating scale",
+      "adl",
+      "iadl",
+      "adl score",
+      "fba",
+      "uas",
+      "change in hygiene",
+      "change in toileting"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.functional_assessment"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H0032,TS]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Treatment plan review, mental health",
+     "split": "MH",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "rendered_as[H0032,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Treatment plan development, new and established patient, mental health",
+     "split": "MH",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "rendered_as[H0046,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Behavioral health-related medical services: verbal interaction, mental health",
+     "split": "MH",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "rendered_as[H2019,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Psychological testing",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "rendered_as[T1007,TS]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Treatment plan review, substance abuse",
+     "split": "SUD",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "confidence": "high"
+    },
+    {
+     "slot": "rendered_as[T1007,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Treatment plan development, new and established patient, substance abuse",
+     "split": "SUD",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "confidence": "high"
+    },
+    {
+     "slot": "rendered_as[T1015,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Medication management",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "rendered_as[T1023,HE]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Behavioral health medical screening, mental health",
+     "split": "MH",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "rendered_as[T1023,HF]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Behavioral health medical screening, substance abuse",
+     "split": "SUD",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "confidence": "high"
+    }
+   ]
+  },
+  {
+   "line_key": "bh_overlay",
+   "canonical_name": "Behavioral Health Overlay Services",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": []
+  },
+  {
+   "line_key": "bh_therapy",
+   "canonical_name": "Behavioral Health Therapy Services",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [
+      "therapy services",
+      "rehabilitative services",
+      "rehabilitation",
+      "health and rehab",
+      "rehab",
+      "therapy",
+      "restorative care",
+      "counseling session",
+      "therapi"
+     ],
+     "suggestion_provenance": [
+      {
+       "d_code": "d:health_care_services.therapy_services"
+      }
+     ],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": [
+    {
+     "slot": "rendered_as[H0020,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Medication-assisted treatment services",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "rendered_as[H0047,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Behavioral health-related medical services: verbal interaction, substance abuse",
+     "split": "SUD",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "confidence": "high"
+    },
+    {
+     "slot": "rendered_as[H0048,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Behavioral health-related medical services: alcohol and other drug screening specimen",
+     "split": "SUD",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "confidence": "high"
+    },
+    {
+     "slot": "rendered_as[H2010,HE]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Brief individual medical psychotherapy, mental health",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "cognitive behavioral"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.cognitive_behavioral_therapy"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2010,HF]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Brief individual medical psychotherapy, substance abuse",
+     "split": "SUD",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking",
+      "cognitive behavioral"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      },
+      {
+       "d_code": "d:health_care_services.behavioral_health.cognitive_behavioral_therapy"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2017,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Psychosocial rehabilitation services",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "therapy services",
+      "rehabilitative services",
+      "rehabilitation",
+      "health and rehab",
+      "rehab",
+      "therapy",
+      "restorative care",
+      "counseling session",
+      "therapi"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.therapy_services"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2030,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Clubhouse services",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "rendered_as[T1015,HE]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Behavioral health-related medical services: medical procedures, mental health",
+     "split": "MH",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "rendered_as[T1015,HF]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Behavioral health-related medical services: medical procedures, substance abuse",
+     "split": "SUD",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "confidence": "high"
+    }
+   ]
+  },
+  {
+   "line_key": "cbha",
+   "canonical_name": "Comprehensive Behavioral Health Assessment",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [
+      "comprehensive assessment"
+     ],
+     "suggestion_provenance": [
+      {
+       "d_code": "d:health_care_services.comprehensive_assessment"
+      }
+     ],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": []
+  },
+  {
+   "line_key": "chd_clinic",
+   "canonical_name": "County Health Department clinic services",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": []
+  },
+  {
+   "line_key": "evaluation_management",
+   "canonical_name": "Evaluation and Management (outpatient primary care)",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": []
+  },
+  {
+   "line_key": "fact",
+   "canonical_name": "Florida Assertive Community Treatment (FACT)",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [
+      "community treatment"
+     ],
+     "suggestion_provenance": [
+      {
+       "d_code": "d:health_care_services.community_treatment"
+      }
+     ],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": [
+    {
+     "slot": "rendered_as[H0040,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Florida Assertive Community Treatment",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "community treatment"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.community_treatment"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2010,HQ]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Brief group medical therapy",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "therapy services",
+      "rehabilitative services",
+      "rehabilitation",
+      "health and rehab",
+      "rehab",
+      "therapy",
+      "restorative care",
+      "counseling session",
+      "therapi"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.therapy_services"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2012,HF]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Behavioral health day services, substance abuse",
+     "split": "SUD",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "confidence": "high"
+    },
+    {
+     "slot": "rendered_as[H2012,None]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Behavioral health day services, mental health",
+     "split": "MH",
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "rendered_as[H2019,HM]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Therapeutic behavioral on-site services, therapeutic support",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "behavioral on-site"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.on_site"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2019,HN]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Therapeutic behavioral on-site services, behavior management",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "behavioral on-site"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.on_site"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2019,HO]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Therapeutic behavioral on-site services, therapy",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "therapy services",
+      "rehabilitative services",
+      "rehabilitation",
+      "health and rehab",
+      "rehab",
+      "therapy",
+      "restorative care",
+      "counseling session",
+      "therapi",
+      "behavioral on-site"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.therapy_services"
+      },
+      {
+       "d_code": "d:health_care_services.behavioral_health.on_site"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2019,HQ]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Group therapy",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "therapy services",
+      "rehabilitative services",
+      "rehabilitation",
+      "health and rehab",
+      "rehab",
+      "therapy",
+      "restorative care",
+      "counseling session",
+      "therapi"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.therapy_services"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "rendered_as[H2019,HR]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Individual and family therapy",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [
+      "therapy services",
+      "rehabilitative services",
+      "rehabilitation",
+      "health and rehab",
+      "rehab",
+      "therapy",
+      "restorative care",
+      "counseling session",
+      "therapi"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.therapy_services"
+      }
+     ],
+     "confidence": "medium"
+    }
+   ]
+  },
+  {
+   "line_key": "fqhc_encounter",
+   "canonical_name": "FQHC encounter — primary care and BH",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": []
+  },
+  {
+   "line_key": "mhtcm",
+   "canonical_name": "Mental Health Targeted Case Management",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": []
+  },
+  {
+   "line_key": "qrtp",
+   "canonical_name": "Qualified Residential Treatment Program Services",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [
+      "residential treatment",
+      "prtf",
+      "centro de tratamiento residencial",
+      "de tratamiento residencial",
+      "tratamiento residencial"
+     ],
+     "suggestion_provenance": [
+      {
+       "d_code": "d:health_care_services.residential_treatment"
+      }
+     ],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": []
+  },
+  {
+   "line_key": "rhc_encounter",
+   "canonical_name": "Rural Health Clinic encounter",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": []
+  },
+  {
+   "line_key": "sipp",
+   "canonical_name": "Statewide Inpatient Psychiatric Program (SIPP)",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [
+      "psychiatry"
+     ],
+     "suggestion_provenance": [
+      {
+       "d_code": "d:health_care_services.psychiatry"
+      }
+     ],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": [
+    {
+     "slot": "classified_by[F20-F29]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F20-F29",
+     "adjudicated": false,
+     "source_definition": "Schizophrenia, schizotypal, delusional and other psychotic disorders",
+     "note": "no clean clinical-concept d: entry for this ICD block -> DR",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "classified_by[F30-F39]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F30-F39",
+     "adjudicated": false,
+     "source_definition": "Mood [affective] disorders",
+     "note": "diagnosis-concept vernacular only; no payability assertion",
+     "vernacular": [
+      "depression and anxiety",
+      "depression, anxiety",
+      "anxiety, depression",
+      "acute anxiety"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.depression_anxiety"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "classified_by[F40-F48]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F40-F48",
+     "adjudicated": false,
+     "source_definition": "Anxiety, dissociative, stress-related, somatoform disorders",
+     "note": "diagnosis-concept vernacular only; no payability assertion",
+     "vernacular": [
+      "gad"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.generalized_anxiety_disorder"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "classified_by[F90-F98]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F90-F98",
+     "adjudicated": false,
+     "source_definition": "Behavioural and emotional disorders with onset in childhood/adolescence",
+     "note": "no clean clinical-concept d: entry for this ICD block -> DR",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    }
+   ]
+  },
+  {
+   "line_key": "specialized_therapeutic",
+   "canonical_name": "Specialized Therapeutic Services",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": []
+  },
+  {
+   "line_key": "state_mental_health",
+   "canonical_name": "State Mental Health",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": []
+  },
+  {
+   "line_key": "tcm_child_health",
+   "canonical_name": "Child Health Services Targeted Case Management",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": []
+  },
+  {
+   "line_key": "tcm_children_at_risk",
+   "canonical_name": "Targeted Case Management for Children at Risk of Abuse and Neglect",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": [
+    {
+     "slot": "rendered_as[T2023,HA]",
+     "level": "rendered_as",
+     "owner": "lexicon",
+     "source_definition": "Targeted case management for children at risk of abuse and neglect",
+     "split": null,
+     "note": "keyed at (code,modifier), never bare code",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    }
+   ]
+  },
+  {
+   "line_key": "therapeutic_group_care",
+   "canonical_name": "Therapeutic Group Care Services",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": []
+  },
+  {
+   "line_key": "baker_act_exam",
+   "canonical_name": "Baker Act involuntary examination",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [
+      "emergency behavioral health",
+      "crisis intervention",
+      "baker act",
+      "24/7 crisis",
+      "baker",
+      "crisis behavioral",
+      "crisis use",
+      "civil commitment",
+      "commitment law"
+     ],
+     "suggestion_provenance": [
+      {
+       "d_code": "d:health_care_services.emergency_behavioral"
+      },
+      {
+       "d_code": "d:health_care_services.behavioral_health.civil_commitment"
+      }
+     ],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [
+      "emergency behavioral health",
+      "crisis intervention",
+      "baker act",
+      "24/7 crisis",
+      "baker",
+      "crisis behavioral",
+      "crisis use"
+     ],
+     "suggestion_provenance": [
+      {
+       "d_code": "d:health_care_services.emergency_behavioral"
+      }
+     ],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": []
+  },
+  {
+   "line_key": "csu_baker_act",
+   "canonical_name": "Crisis Stabilization Unit / Baker Act receiving",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [
+      "emergency behavioral health",
+      "crisis intervention",
+      "baker act",
+      "24/7 crisis",
+      "baker",
+      "crisis behavioral",
+      "crisis use",
+      "crisis stabilization",
+      "csu"
+     ],
+     "suggestion_provenance": [
+      {
+       "d_code": "d:health_care_services.emergency_behavioral"
+      },
+      {
+       "d_code": "d:health_care_services.emergency_behavioral.crisis_stabilization"
+      }
+     ],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [
+      "emergency behavioral health",
+      "crisis intervention",
+      "baker act",
+      "24/7 crisis",
+      "baker",
+      "crisis behavioral",
+      "crisis use"
+     ],
+     "suggestion_provenance": [
+      {
+       "d_code": "d:health_care_services.emergency_behavioral"
+      }
+     ],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": [
+    {
+     "slot": "classified_by[F20-F29]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F20-F29",
+     "adjudicated": false,
+     "source_definition": "Schizophrenia, schizotypal, delusional and other psychotic disorders",
+     "note": "no clean clinical-concept d: entry for this ICD block -> DR",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "classified_by[F30-F39]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F30-F39",
+     "adjudicated": false,
+     "source_definition": "Mood [affective] disorders",
+     "note": "diagnosis-concept vernacular only; no payability assertion",
+     "vernacular": [
+      "depression and anxiety",
+      "depression, anxiety",
+      "anxiety, depression",
+      "acute anxiety"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.depression_anxiety"
+      }
+     ],
+     "confidence": "medium"
+    }
+   ]
+  },
+  {
+   "line_key": "ed_behavioral",
+   "canonical_name": "Emergency Department behavioral health",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": [
+    {
+     "slot": "classified_by[F10-F19]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F10-F19",
+     "adjudicated": false,
+     "source_definition": "Mental and behavioural disorders due to psychoactive substance use",
+     "note": "diagnosis-concept vernacular only; no payability assertion",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "confidence": "high"
+    },
+    {
+     "slot": "classified_by[F20-F29]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F20-F29",
+     "adjudicated": false,
+     "source_definition": "Schizophrenia, schizotypal, delusional and other psychotic disorders",
+     "note": "no clean clinical-concept d: entry for this ICD block -> DR",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "classified_by[F30-F39]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F30-F39",
+     "adjudicated": false,
+     "source_definition": "Mood [affective] disorders",
+     "note": "diagnosis-concept vernacular only; no payability assertion",
+     "vernacular": [
+      "depression and anxiety",
+      "depression, anxiety",
+      "anxiety, depression",
+      "acute anxiety"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.depression_anxiety"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "classified_by[F40-F48]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F40-F48",
+     "adjudicated": false,
+     "source_definition": "Anxiety, dissociative, stress-related, somatoform disorders",
+     "note": "diagnosis-concept vernacular only; no payability assertion",
+     "vernacular": [
+      "gad"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.generalized_anxiety_disorder"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    }
+   ]
+  },
+  {
+   "line_key": "inpatient_psych_adult",
+   "canonical_name": "Inpatient Psychiatric — adult, hospital",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [
+      "psychiatry"
+     ],
+     "suggestion_provenance": [
+      {
+       "d_code": "d:health_care_services.psychiatry"
+      }
+     ],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": [
+    {
+     "slot": "classified_by[F01-F09]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F01-F09",
+     "adjudicated": false,
+     "source_definition": "Mental disorders due to known physiological conditions",
+     "note": "no clean clinical-concept d: entry for this ICD block -> DR",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "classified_by[F10-F19]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F10-F19",
+     "adjudicated": false,
+     "source_definition": "Mental and behavioural disorders due to psychoactive substance use",
+     "note": "diagnosis-concept vernacular only; no payability assertion",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "confidence": "high"
+    },
+    {
+     "slot": "classified_by[F20-F29]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F20-F29",
+     "adjudicated": false,
+     "source_definition": "Schizophrenia, schizotypal, delusional and other psychotic disorders",
+     "note": "no clean clinical-concept d: entry for this ICD block -> DR",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "classified_by[F30-F39]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F30-F39",
+     "adjudicated": false,
+     "source_definition": "Mood [affective] disorders",
+     "note": "diagnosis-concept vernacular only; no payability assertion",
+     "vernacular": [
+      "depression and anxiety",
+      "depression, anxiety",
+      "anxiety, depression",
+      "acute anxiety"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.depression_anxiety"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "classified_by[F40-F48]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F40-F48",
+     "adjudicated": false,
+     "source_definition": "Anxiety, dissociative, stress-related, somatoform disorders",
+     "note": "diagnosis-concept vernacular only; no payability assertion",
+     "vernacular": [
+      "gad"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.generalized_anxiety_disorder"
+      }
+     ],
+     "confidence": "medium"
+    },
+    {
+     "slot": "classified_by[F50-F59]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F50-F59",
+     "adjudicated": false,
+     "source_definition": "Behavioural syndromes with physiological disturbances",
+     "note": "no clean clinical-concept d: entry for this ICD block -> DR",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "classified_by[F60-F69]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F60-F69",
+     "adjudicated": false,
+     "source_definition": "Disorders of adult personality and behaviour",
+     "note": "no clean clinical-concept d: entry for this ICD block -> DR",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "classified_by[F90-F98]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F90-F98",
+     "adjudicated": false,
+     "source_definition": "Behavioural and emotional disorders with onset in childhood/adolescence",
+     "note": "no clean clinical-concept d: entry for this ICD block -> DR",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    }
+   ]
+  },
+  {
+   "line_key": "iop",
+   "canonical_name": "Intensive Outpatient Program (IOP)",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": []
+  },
+  {
+   "line_key": "marchman_act",
+   "canonical_name": "Marchman Act services",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "suggestion_provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "suggestion_provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": [
+    {
+     "slot": "classified_by[F10-F19]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F10-F19",
+     "adjudicated": false,
+     "source_definition": "Mental and behavioural disorders due to psychoactive substance use",
+     "note": "diagnosis-concept vernacular only; no payability assertion",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "confidence": "high"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    }
+   ]
+  },
+  {
+   "line_key": "mobile_response",
+   "canonical_name": "Mobile Response Team / crisis intervention",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [
+      "emergency behavioral health",
+      "crisis intervention",
+      "baker act",
+      "24/7 crisis",
+      "baker",
+      "crisis behavioral",
+      "crisis use"
+     ],
+     "suggestion_provenance": [
+      {
+       "d_code": "d:health_care_services.emergency_behavioral"
+      }
+     ],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": []
+  },
+  {
+   "line_key": "php",
+   "canonical_name": "Partial Hospitalization Program (PHP)",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [
+      "php mental"
+     ],
+     "suggestion_provenance": [
+      {
+       "d_code": "d:health_care_services.behavioral_health.partial_hospitalization_program"
+      }
+     ],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": []
+  },
+  {
+   "line_key": "sud_residential",
+   "canonical_name": "Substance Use Residential Treatment",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking",
+      "residential treatment",
+      "prtf",
+      "centro de tratamiento residencial",
+      "de tratamiento residencial",
+      "tratamiento residencial"
+     ],
+     "suggestion_provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      },
+      {
+       "d_code": "d:health_care_services.residential_treatment"
+      }
+     ],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": [
+    {
+     "slot": "classified_by[F10-F19]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F10-F19",
+     "adjudicated": false,
+     "source_definition": "Mental and behavioural disorders due to psychoactive substance use",
+     "note": "diagnosis-concept vernacular only; no payability assertion",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "confidence": "high"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    }
+   ]
+  },
+  {
+   "line_key": "withdrawal_management",
+   "canonical_name": "Withdrawal Management / Detoxification",
+   "registry_authored": [
+    {
+     "slot": "identity",
+     "level": "identity",
+     "owner": "registry",
+     "lexicon_suggestion": [
+      "withdrawal management",
+      "acute detoxification",
+      "alcohol withdrawal",
+      "detox admission"
+     ],
+     "suggestion_provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders.withdrawal_management"
+      },
+      {
+       "d_code": "d:health_care_services.substance_use_disorders.acute_detoxification"
+      }
+     ],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "authority",
+     "level": "authority",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    },
+    {
+     "slot": "payment",
+     "level": "payment",
+     "owner": "registry",
+     "lexicon_suggestion": [],
+     "suggestion_provenance": [],
+     "note": "Registry authors this slot (line/authority/payment identity). Suggestion is courtesy from d:."
+    }
+   ],
+   "lexicon_authored": [
+    {
+     "slot": "classified_by[F10-F19]",
+     "level": "classified_by",
+     "owner": "lexicon",
+     "block": "F10-F19",
+     "adjudicated": false,
+     "source_definition": "Mental and behavioural disorders due to psychoactive substance use",
+     "note": "diagnosis-concept vernacular only; no payability assertion",
+     "vernacular": [
+      "substance use disorders",
+      "substance abuse",
+      "sud",
+      "oud",
+      "addiction",
+      "alcohol use",
+      "abuso de sustancias",
+      "addiction treatment",
+      "etoh",
+      "trastornos de uso",
+      "uso de drogas",
+      "use issues",
+      "aod use",
+      "addictions",
+      "able to stop drinking"
+     ],
+     "provenance": [
+      {
+       "d_code": "d:health_care_services.substance_use_disorders"
+      }
+     ],
+     "confidence": "high"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    },
+    {
+     "slot": "grouped_to[None]",
+     "level": "grouped_to",
+     "owner": "lexicon",
+     "vernacular": [],
+     "confidence": null,
+     "gap": true,
+     "gap_owner": "deep_research",
+     "note": "DRG admission vernacular not in d: -> DR"
+    }
+   ]
+  }
+ ]
+}
