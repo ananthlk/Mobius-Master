@@ -3,8 +3,8 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copy catalog HTML and simple proxy server
-COPY specs-platform/index.html .
-COPY specs-platform/server.py .
+COPY index.html .
+COPY server.py .
 
 EXPOSE 8080
 
