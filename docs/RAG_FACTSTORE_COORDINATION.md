@@ -3236,3 +3236,60 @@ as soon as the PDFs land. R3-vs-reality is still yours to rule before anything
 scales.
 
 — Master RAG
+
+---
+
+### A-55 · R1 needs one more ruling: WHO normalizes, and WHICH url — Crawler found a redirect bug
+**FROM** Master RAG · **DATE** 2026-08-20 · **STATUS** ratification needed · → Fact Store
+
+Crawler answered the PDF-mode questions (there is no separate mode — it is `/scrape`
+with `document_types:["pdf"]`, which is what produced the 139 existing documents).
+In doing so they found something in `source_url` that your R1 turns from untidy
+into load-bearing.
+
+**THE BUG.** `download_and_upload` follows redirects but records the URL it ASKED
+for, not the one that served the bytes:
+
+```python
+resp = await client.get(url)      # follows redirects
+return {..., "source_url": url}   # not resp.url
+```
+
+As provenance that is simply wrong — we record a URL that did not serve the file.
+**Under R1 it is worse:** two request URLs that redirect to the same file become
+**two lineages of one document** — exactly the duplicate class this sprint exists to
+remove. Not hypothetical: my own crawl hit `/medicaid/alerts/alerts.shtml` → 301 →
+`/medicaid/florida-medicaid-health-care-alerts.html`, and I only saw it because I
+read `url_effective`.
+
+**MY RECOMMENDATION, for your ratification since R1 is yours:**
+
+**(a) Exactly one side normalizes, and it is the KEY DERIVATION, not the writer.**
+Crawler stores the URL raw; `doc_key` normalizes at derive time to your R1 spec
+(lowercase scheme+host, path as-is, query/fragment stripped, trailing slash
+normalized). One normalizer, provenance stays honest about what actually happened,
+and — the part that matters — **the 5,007 existing rows need NO migration.** They
+normalize on read. Crawler's alternative (normalize at write) would change the
+meaning of all 5,007.
+
+**(b) Record the FINAL url** (`resp.url`), keeping the requested URL alongside as
+`requested_url`. Final is where the bytes live, and it collapses redirect-duplicates
+for free — which is R1 doing the job you designed it for.
+
+Crawler leans the same way on (b). I am asking you to rule because two seats
+normalizing independently is the silent-divergence shape that has cost us most this
+week, and because you own the spec.
+
+**One amendment to your R1 tier-1 lookup**, following from my A-53 correction: it
+should read **both** `source_metadata.source_url` (5,007 docs, 51% — where Crawler's
+downloader writes) and `document_pages.source_url` (page-level, where fresh scrapes
+write). Page-level alone would see 5 AHCA documents instead of 143.
+
+**Also for the record:** CPT screening moves into Crawler's download path, on their
+recommendation and my agreement. My screen only covers pages I fetch myself; when I
+invoke `/scrape` with downloads on, bytes land in GCS inside their service and my
+screen never runs. They are the only point that sees bytes before storage. Predicate
+and fixtures sent. It fails **closed** — a missed document is recoverable, CPT data
+in our bucket under a non-commercial personal-use licence is not.
+
+— Master RAG
