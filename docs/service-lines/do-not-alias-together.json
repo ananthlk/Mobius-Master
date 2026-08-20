@@ -1,0 +1,150 @@
+{
+ "H0001": [
+  [
+   "",
+   "Limited functional assessment, substance abuse"
+  ],
+  [
+   "HN",
+   "Bio-psychosocial evaluation, substance abuse"
+  ],
+  [
+   "HO",
+   "In-depth assessment, new patient, substance abuse"
+  ],
+  [
+   "TS",
+   "In-depth assessment, established patient, substance abuse"
+  ]
+ ],
+ "H0031": [
+  [
+   "",
+   "Limited functional assessment, mental health"
+  ],
+  [
+   "HN",
+   "Bio-psychosocial Evaluation, mental health"
+  ],
+  [
+   "HO",
+   "In-depth assessment, new patient, mental health"
+  ],
+  [
+   "TS",
+   "In-depth assessment, established patient, mental health"
+  ]
+ ],
+ "H2000": [
+  [
+   "",
+   "Psychiatric review of records"
+  ],
+  [
+   "HO",
+   "Psychiatric evaluation by a non- physician"
+  ],
+  [
+   "HP",
+   "Psychiatric evaluation by a physician"
+  ]
+ ],
+ "H2010": [
+  [
+   "HE",
+   "Brief individual medical psychotherapy, mental health"
+  ],
+  [
+   "HF",
+   "Brief individual medical psychotherapy, substance abuse"
+  ],
+  [
+   "HO",
+   "Brief behavioral health status exam"
+  ],
+  [
+   "HQ",
+   "Brief group medical therapy"
+  ]
+ ],
+ "T1015": [
+  [
+   "",
+   "Medication management"
+  ],
+  [
+   "HE",
+   "Behavioral health-related medical services: medical procedures, mental health"
+  ],
+  [
+   "HF",
+   "Behavioral health-related medical services: medical procedures, substance abuse"
+  ]
+ ],
+ "H2012": [
+  [
+   "",
+   "Behavioral health day services, mental health"
+  ],
+  [
+   "HF",
+   "Behavioral health day services, substance abuse"
+  ]
+ ],
+ "H2019": [
+  [
+   "",
+   "Psychological testing"
+  ],
+  [
+   "HM",
+   "Therapeutic behavioral on-site services, therapeutic support"
+  ],
+  [
+   "HN",
+   "Therapeutic behavioral on-site services, behavior management"
+  ],
+  [
+   "HO",
+   "Therapeutic behavioral on-site services, therapy"
+  ],
+  [
+   "HQ",
+   "Group therapy"
+  ],
+  [
+   "HR",
+   "Individual and family therapy"
+  ]
+ ],
+ "H0032": [
+  [
+   "",
+   "Treatment plan development, new and established patient, mental health"
+  ],
+  [
+   "TS",
+   "Treatment plan review, mental health"
+  ]
+ ],
+ "T1007": [
+  [
+   "",
+   "Treatment plan development, new and established patient, substance abuse"
+  ],
+  [
+   "TS",
+   "Treatment plan review, substance abuse"
+  ]
+ ],
+ "T1023": [
+  [
+   "HE",
+   "Behavioral health medical screening, mental health"
+  ],
+  [
+   "HF",
+   "Behavioral health medical screening, substance abuse"
+  ]
+ ]
+}
