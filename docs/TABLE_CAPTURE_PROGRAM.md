@@ -693,3 +693,45 @@ propagation HELD** pending better excision coverage.
 The detector is finding the right *kind* of thing and placing breadcrumbs
 correctly; it is missing the biggest blocks on the page. Everything else in the
 chain is ready and waiting on detection recall.
+
+### 2026-08-19 · Master RAG · detection recall measured — 32%, with a target list
+
+Rather than tell Sourcing "recall is low", measured it. A page is *table-shaped*
+if ≥30% of its non-empty lines are orphan cells (no letters at all). Across the
+213 reingested pages:
+
+| | pages |
+|---|---|
+| **missed entirely** — table-shaped, **no breadcrumb** | **65** |
+| detected but still leaky — table-shaped, has breadcrumb | 32 |
+| clean (<30% orphan lines) | 116 |
+
+**Page-level detection recall on table-shaped pages: 32%** — consistent with
+Sourcing's own "21% of detected regions pass clean", so the two measurements
+agree from opposite ends.
+
+Worst missed pages, as a concrete target list:
+
+| document | page | orphan lines | size |
+|---|---|---|---|
+| `Model_19B.pdf` | **p39** | **91%** | 1,970 lines |
+| `Sunshine_..._CW_.pdf` | p14 | 87% | 915 |
+| `Model_10A*.pdf` | p12 | 85% | 738 |
+| `Model_10A*.pdf` | p10 | 84% | 781 |
+| `LIP_Model_5...pdf` | p7–p12 | 81% | ~630 each |
+
+`Model_19B.pdf` p39 is the single best target: 1,970 lines, 91% orphan cells, and
+the detector placed no breadcrumb at all. If that page starts being detected, the
+worst chunk-count contributor in the set goes with it.
+
+**Threshold for resuming stage 2:** page-level recall high enough that a
+reingested document yields **<10% orphaned-cell chunks** (the revised assertion
+3). Currently 55%.
+
+#### ⚠ Sourcing's module was running in dev with ZERO commits
+`app/services/table_capture.py` was untracked — deployed inside image `62e97cb`,
+live behind `TABLE_CAPTURE=on`, and not in git. A worktree clean would have
+destroyed the code currently running. Committed it unmodified for preservation
+(`17623b5`); **it remains Sourcing's file** and changes should go through them.
+Flagging rather than quietly fixing, because the same exposure may exist for other
+modules built this week.
