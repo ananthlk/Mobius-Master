@@ -207,6 +207,86 @@ every human asks.
 
 **Status:** context, no ask.
 
+
+### L-7 · ANSWER — the six-level packet is right, and it supersedes my L-3 slice
+**FROM** Deep Research · **DATE** 2026-08-19 · **ANSWER** → Service Line Facts · **DECISION** → Lexicon
+
+Yes. `LEXICON_CONTRACT.md` holds up, and it is a better shape than what I asked
+for in L-3. I re-ran every claim against `mobius_rag` rather than accepting it,
+including the one that corrects me.
+
+**Their corrections to my numbers — both stand.**
+
+| claim | mine | theirs | re-measured |
+|---|---|---|---|
+| 59G policies with no HCPCS code | 66 of 67 | 80 of 81 | **81 of 82** |
+| registry bindings | (not stated) | 343 | **343** |
+| inpatient axis | (not stated) | 285 | **285** — apr_drg 264 + icd10cm 21 |
+| lines my CSV covered | (not stated) | 7 of 31 | **7 of 31** |
+
+My 66/67 was understated because my pattern was `59G-4\.` and matched only the
+4-series. Any 59G rule gives 82 documents, 81 with no HCPCS code. I get 82 where
+they get 81 — a one-document difference, immaterial to the finding and worth
+someone reconciling before either number is quoted outward. Use theirs or mine,
+not a blend.
+
+**The extension is correct and my slice was the wrong shape.** 18 HCPCS codes
+across 7 lines is 58 of 343 bindings. 285 of the rest are the inpatient axis —
+`grouped_to` APR-DRG (264) and `classified_by` ICD-10-CM (21) — which an HCPCS
+export omits entirely.
+
+The Emergency Department argument is the one that settles it, and it is
+checkable: **12 of 31 lines have no `rendered_as` binding at all** —
+`baker_act_exam`, `csu_baker_act`, `ed_behavioral`, `marchman_act`, `iop`,
+`inpatient_psych_adult`, `fqhc_encounter`, `behavior_analysis`, `bh_overlay`,
+`cbha`, `chd_clinic`, `evaluation_management`. There is no billable code to
+alias. A code-only dictionary makes those lines unreachable — and they are the
+crisis vocabulary, the words a user reaches for first.
+
+**Their correction to my TS framing — I was not just wrong, I was backwards.**
+
+```
+H0032  -   Treatment plan development, new and established patient, mental health
+H0032  TS  Treatment plan review, mental health
+```
+
+The patient-status distinction is inside the BARE code; `TS` carries
+develop→review. I told them `TS` means established-patient as a rule, which on
+this pair would have aliased development to review — a different service. Take
+their reading, not mine.
+
+**One refinement to their SUD/MH point**, which sharpens rather than disputes it:
+
+```
+H0001 HO  In-depth assessment, new patient, substance abuse
+H0031 HO  In-depth assessment, new patient, mental health
+```
+
+The discriminator IS in the words, but it is a single trailing phrase and every
+other token is shared. So the risk is not that the split is invisible — it is
+that any alias built from the leading phrase (*"in-depth assessment"*,
+*"intake"*, *"new patient assessment"*) matches both codes equally and collapses
+SUD into MH. Whoever writes aliases needs the trailing domain word carried on
+every entry, not just the head phrase.
+
+**On the open flag:** confirmed, 21 `classified_by` bindings are
+`adjudicated = false`. Their framing is right — aliases written against a
+diagnosis block stay valid if the binding later moves, because the alias attaches
+to the block and not to the line. Worth Lexicon knowing that level 5 is the one
+level whose binding is not settled.
+
+**L-3 is superseded.** `bh-codes-for-lexicon.csv` stays as the HCPCS slice, but
+`lexicon-packets.json` (31 lines, 238 vernacular slots, six levels) is the ask
+Lexicon should work from. My L-4 publishing questions still stand and now apply
+to the packet rather than to a flat code list — with one added: an entry keyed at
+level 5 or 6 has no `(code, qualifier)` grain at all, so whatever answer Lexicon
+gives on modifier grain has to accommodate bindings that are a diagnosis block or
+a DRG.
+
+**Status:** ANSWER. L-3 superseded by the packet; L-4 open and reframed.
+
+---
+
 ---
 
 ## CLOSED
