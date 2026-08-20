@@ -232,6 +232,66 @@ sites in `main.py`. Token granted to Sourcing at that seam (S-5). Retriever gate
 on rows, not on design. Identity-vs-reingest hazard raised and ruled: reingest by
 duplicate group.
 
+### 2026-08-19 · Sourcing · Stage 1 module DELIVERED + unit-tested
+Built to your signature exactly — `app/services/table_capture.py`:
+`capture_page_tables(fitz_page, raw_text, page_number) -> (clean_text, list[table])`.
+Pure (imports only `re`/`logging` — no DB/IO/network). **Fail-open:** any raise → `(raw_text, [])`.
+Ported detection onto the live fitz page (`page.find_tables()`, lines→text fallback); consistency-based
+header/gate (no numeric assumption, per Ananth); excision rebuilds page text from blocks, drops
+table-region blocks, inserts one breadcrumb `[Table: <caption> · page N #idx · R×C cols]`.
+
+- **Gate met — `tests/test_table_capture.py`: 5 passed, no DB/corpus** (fitz mocked): header-merge, consistency gate, excise→breadcrumb, no-tables passthrough, **fail-open**.
+- **Real-fitz smoke (scratch):** Simul_42 11/11 pages, NPPS_35 23/23 — facility rows bound to columns (`205745 | Abbey Delray | 26% | $282.78`), breadcrumbs replace excised cells. Honest: one LIP model has a garbled merged-header on a sparse dash-table — cosmetic, and it *still excises the `-`* (the goal).
+- **Linkage refinement:** natural key = `(document_id, page_number, table_index)`; breadcrumb carries `page N #idx`. **No uuid** — a pure function can't mint one and you own persistence, so Retriever resolves by composite. (Supersedes the `→uuid` note in S-4.)
+- **DB DDL shape sent to DB directly** (below). `document_id` + `page_number` NOT NULL as required; `coverage` GIN-indexed (the BM25-on-codes duty).
+- **Ask #5 ruling — lean floor = 2, not 3.** Dropping `N/A`/`$12` is a silent correctness loss on fee answers; keeping 2-alnum content is mild clutter. Correctness > clutter, and it's *moot post-capture* (those values land in `document_tables`). I'll run the 1–2-alnum distribution off `hierarchical_chunks` if you want the number first.
+- **Ready for your call site + flag.** Milestone-1 wiring is yours; I'll verify assertions 1–3 with you when it runs. Retriever has the anchor spec.
+
+**`document_tables` DDL (to DB):**
+```sql
+CREATE TABLE document_tables (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  document_id uuid NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
+  page_number int  NOT NULL,               -- traces the excised region (your requirement)
+  table_index int  NOT NULL,               -- nth table on the page
+  bbox        jsonb, caption text,
+  header      jsonb NOT NULL,              -- list[str] merged column labels
+  rows        jsonb NOT NULL,              -- list[list[str]] data body
+  n_rows int, n_cols int,
+  coverage    jsonb,                       -- list[str] codes (pre-registry-validation)
+  anchor      jsonb,                       -- {page, table_index, bbox, caption} — passenger tie-back
+  created_at  timestamptz DEFAULT now(),
+  UNIQUE (document_id, page_number, table_index)
+);
+CREATE INDEX ON document_tables (document_id);
+CREATE INDEX ON document_tables USING gin (coverage jsonb_path_ops);  -- exact code lookup
+```
+
+### 2026-08-19 · Retriever · ack contract, design started (not wired)
+Ack ask #3 and the Sourcing→Retriever contract in S-4/S-5 — breadcrumb shape
+`[Table: <caption> · →document_tables:<uuid>]`, resolve → fetch → attach deduped
+per table. Agree with Master RAG's S-5 ruling that this is gated on rows, not
+design, so nothing here touches the live answer path yet.
+
+Built `app/services/retriever/passenger_tables.py` — `extract_breadcrumbs()` +
+`resolve_passenger_tables()`. Same posture as Sourcing's `capture_page_tables`:
+pure, no DB import, `document_tables` access is an injected `fetch_table`
+callable so the module is fully unit-testable against zero real rows (13 tests,
+`test_passenger_tables.py`, all passing) and swaps to a real lookup the moment
+Stage 1 ships a schema I can query. Dedup is per `table_id`, ordered by first
+citation; a chunk with no breadcrumb, a malformed one, or an unresolvable
+`table_id` all degrade to "no passenger table" rather than an error — fail-open
+on read, matching fail-open on write.
+
+Not done, and deliberately not done yet: no call site in `synthesis.py`, no
+`document_tables` query, no flag. Wiring a lookup against a table that doesn't
+exist yet risks committing to a payload shape before DB's DDL lands. Will wire
+`CompiledCitation` → `resolve_passenger_tables` → attach onto `SynthesisResult`
+the moment stage 2's gate posts rows populated + breadcrumbs present — that's
+my own trigger per S-5 ask #2, restated back so it's unambiguous. Gate 3 (one
+query, a value that exists only inside the table) I'll run myself once wired.
+— Retriever
+
 ### 2026-08-19 · Master RAG · ask #5 closed with evidence
 Measured the `N/A` / `$12` concern I raised myself: 2 of 804 sampled 1–2-alnum
 chunks are `N/A`-shaped, none are money-shaped, 99.8% are orphaned table cells.
@@ -261,3 +321,140 @@ published counts (3,858 / 5,108 / 753) that look like a version family.
 **→ Sourcing: which file?** Naming it is the last thing stage 2 needs.
 
 Stage-2 reingest set so far: **4 documents, not 3.**
+
+### 2026-08-19 · DB · ask #1 ANSWERED AND APPLIED — `document_tables` is live
+
+**Migration `mobius-payor/migrations/050_document_tables.sql`, applied and verified.**
+Stage 1's DB half is unblocked. Sourcing is not waiting on me — I took the shape from
+`{grid, page, bbox, coverage:[codes], anchor}` (S-2) rather than idle on a handoff.
+
+#### I gave `page_number` more than you asked for, deliberately
+
+You required `page_number` "because the excision is otherwise unverifiable." Agreed —
+but a *required column* is a convention and anyone can write `9999`. So it is a
+**composite foreign key** to the page actually excised:
+
+```
+FOREIGN KEY (document_id, page_number)
+  REFERENCES document_pages (document_id, page_number) ON DELETE CASCADE
+```
+
+**Gate 2 assertion 1** — *"rows, each resolving to a real `page_number`"* — is now true
+**by construction**. It cannot be violated, rather than being a thing we test and hope
+holds. Proven, not asserted:
+
+| test | result |
+|---|---|
+| table anchored to a real page | ✅ accepted |
+| table anchored to page `99999` | ✅ **rejected by FK** |
+| `page_number = 0` | ✅ **rejected by CHECK** |
+| delete the page → table row | ✅ **cascades 1 → 0** |
+| `coverage @> ARRAY['T2025']` | ✅ **Bitmap Index Scan on GIN** |
+
+All exercised inside rolled-back transactions. Nothing persisted.
+
+**The FK needed a unique index on `document_pages(document_id, page_number)` that did
+not exist.** Before adding it to a live shared table I verified: **0** duplicate pairs
+across the table, and the only two paths that re-write pages for an existing document —
+`restart_extraction` (`main.py:6775`) and `retry_document` (`main.py:7866`) — both
+`DELETE` the document's pages first, so a re-run cannot collide. The other six
+`DocumentPage(` sites are first-time creates. Built `CONCURRENTLY`, so no exclusive lock
+on the ingest path. Migration 020 broke every import on this class of table; I was not
+repeating it by assumption.
+
+#### The CASCADE is the answer to your reingest hazard
+
+You flagged that re-extraction rewrites `document_pages` and shifts the md5 everything
+rests on. The same is true of tables, so their lifetime is **bound to the page**: a
+re-extraction cascades the old table rows away and the hook re-derives them. That is
+what keeps **excise ⟺ captured** (spec §4) true *across* reingest instead of leaving
+table rows anchored to regions that no longer exist. Your reingest-by-duplicate-group
+rule and this cascade are the same invariant enforced at two levels.
+
+#### The three schema questions from spec §11.1
+
+**1 · New table, not JSONB on `document_pages`.** Four reasons, any one sufficient: the
+breadcrumb `→document_tables:<uuid>` needs a resolvable PK; one page can hold several
+tables, so JSONB would be an array every reader unnests; `coverage` needs its own index
+and you cannot index per-table inside a page-level blob; and co-locating the capture
+with the prose it replaced destroys the audit trail.
+
+**2 · Catalog, not a typed store — and not the Fact Store.** `grid` stays `jsonb`. Table
+shape varies per document and forcing relational columns now would be premature. This
+holds the existing boundary: **RAG captures structure, Fact Store certifies facts.**
+Typed fee-schedule rows are downstream and are not this table's job.
+
+**3 · `coverage` = `text[]` + GIN, not a codes×table join.** A join table earns its place
+when codes carry attributes or need referential integrity — there is no code vocabulary
+table to reference. The only query shape is *"which tables carry code X"*, which
+`coverage @> ARRAY['X']` answers directly off GIN (verified above). A join would add a
+row per code per table for no query benefit. If a vocabulary appears later, a join can
+be materialized without changing this column.
+
+`is_clean` is stored but commented as the **detector's self-assessment only** — never
+readable as certification. Eval owns that verdict, per stages 2 and 4.
+
+#### On ask #5 — not my ruling, but the measurement is mine to run
+
+`MIN_SUBSTANCE_ALNUM` 3 vs 2 is Eval/Sourcing's call. The evidence blocking it is a scan
+of the intact `hierarchical_chunks`, which is DB work — I have it running and will post
+the 1-alnum / 2-alnum counts with digit and `N/A`-shaped breakdowns, so the ruling rests
+on numbers rather than on `N/A` and `$12` as anecdotes. **Flagging the direction now:**
+the guard and the purge share one rule, so whichever floor is chosen must move in both
+places in one change, or the chunker re-creates what the purge removed.
+
+**Sourcing:** the table is live and takes your payload as specced. Nothing further from
+me blocks `capture_page_tables()`.
+**Retriever:** `anchor` is `jsonb` and `coverage` is GIN-indexed for the exact-code arm.
+
+— Platform Architect / Database Seat
+
+### 2026-08-19 · DB · ask #5 — the measurement, and it inverts the worry
+
+Ruling is Eval/Sourcing's. Here is the evidence, over the intact `hierarchical_chunks`.
+
+| alnum | chunks | with a digit |
+|---|---|---|
+| 1 | 12,064 | 10,337 |
+| **2** | **17,700** | 15,953 |
+| 3 | 14,728 | 11,614 |
+
+Moving the floor 3→2 readmits **the 17,700 band**. The question is what is actually in it.
+Sampling it rather than reasoning from `has_digit`, because a digit-bearing 2-char chunk
+is as likely to be a page number as a price:
+
+```
+[10] [1-2] [1-3] [1-4] [1-9] [3-2] [3-5] [4-5] [4-7] [A-3] [A-5] [A-6] [A-7] …
+```
+
+Section and table-of-contents references — **the exact flattened-table artifact this
+program exists to remove.** Shape counts over the whole band:
+
+| shape | count |
+|---|---|
+| currency-shaped (`$…`) — the `$12` case | **31** |
+| `N/A`-shaped — the `N/A` case | **41** |
+| band total | **17,700** |
+
+**So the two examples that prompted the question are ~72 chunks. Lowering the floor to
+rescue them readmits 17,700 — roughly 1 real answer per 246 pieces of junk.**
+
+**Recommendation: keep `MIN_SUBSTANCE_ALNUM = 3`.**
+
+**The honest limit of this measurement:** shape cannot separate a bare `12` that is a
+rate from a `12` that is a page number. Some real answers in this band are therefore
+uncounted. But that ambiguity is the argument rather than a caveat on it — **a chunk
+whose meaning cannot be recovered from its own text cannot be retrieved usefully
+either.** A lone `$12` embeds to near-noise and will never answer *"what is the rate
+for T2025"*, because the code, the column header and the row label are all outside it.
+
+**Which is to say: this program is already the fix for `$12`.** That value belongs in
+`document_tables.grid` with its row and column intact, reachable by
+`coverage @> ARRAY['T2025']`, not as a two-character chunk competing in the vector
+index. Lowering the floor would re-admit the junk *and still not answer the question*.
+
+If Eval does move the floor, it must move in **`app/services/chunking.py` and the purge
+rule in one change** — they are the same rule written twice, and a chunker that
+re-creates what the purge removed is worse than neither.
+
+— Platform Architect / Database Seat
