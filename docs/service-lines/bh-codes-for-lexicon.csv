@@ -1,0 +1,59 @@
+code,qualifier,definition,line_key,line_name,rule_ref,code_system,binding_role
+H0001,,"Limited functional assessment, substance abuse",bh_medication_mgmt,Behavioral Health Medication Management Services,59G-4.029,hcpcs,rendered_as
+H0001,HN,"Bio-psychosocial evaluation, substance abuse",bh_medication_mgmt,Behavioral Health Medication Management Services,59G-4.029,hcpcs,rendered_as
+H0001,HO,"In-depth assessment, new patient, substance abuse",bh_assessment,Behavioral Health Assessment Services,59G-4.028,hcpcs,rendered_as
+H0001,TS,"In-depth assessment, established patient, substance abuse",bh_assessment,Behavioral Health Assessment Services,59G-4.028,hcpcs,rendered_as
+H0020,,Medication-assisted treatment services,bh_community_support,Behavioral Health Community Support Services,59G-4.031,hcpcs,rendered_as
+H0020,,Medication-assisted treatment services,bh_therapy,Behavioral Health Therapy Services,59G-4.052,hcpcs,rendered_as
+H0031,,"Limited functional assessment, mental health",bh_medication_mgmt,Behavioral Health Medication Management Services,59G-4.029,hcpcs,rendered_as
+H0031,HN,"Bio-psychosocial Evaluation, mental health",bh_assessment,Behavioral Health Assessment Services,59G-4.028,hcpcs,rendered_as
+H0031,HO,"In-depth assessment, new patient, mental health",bh_assessment,Behavioral Health Assessment Services,59G-4.028,hcpcs,rendered_as
+H0031,TS,"In-depth assessment, established patient, mental health",bh_assessment,Behavioral Health Assessment Services,59G-4.028,hcpcs,rendered_as
+H0032,,"Treatment plan development, new and established patient, mental health",bh_medication_mgmt,Behavioral Health Medication Management Services,59G-4.029,hcpcs,rendered_as
+H0032,TS,"Treatment plan review, mental health",bh_medication_mgmt,Behavioral Health Medication Management Services,59G-4.029,hcpcs,rendered_as
+H0040,,Florida Assertive Community Treatment,bh_intervention,Behavioral Health Intervention Services,59G-4.370,hcpcs,rendered_as
+H0040,,Florida Assertive Community Treatment,fact,Florida Assertive Community Treatment (FACT),59G-4.127,hcpcs,rendered_as
+H0046,,"Behavioral health-related medical services: verbal interaction, mental health",bh_medication_mgmt,Behavioral Health Medication Management Services,59G-4.029,hcpcs,rendered_as
+H0047,,"Behavioral health-related medical services: verbal interaction, substance abuse",bh_therapy,Behavioral Health Therapy Services,59G-4.052,hcpcs,rendered_as
+H0047,,"Behavioral health-related medical services: verbal interaction, substance abuse",bh_community_support,Behavioral Health Community Support Services,59G-4.031,hcpcs,rendered_as
+H0048,,Behavioral health-related medical services: alcohol and other drug screening specimen,bh_therapy,Behavioral Health Therapy Services,59G-4.052,hcpcs,rendered_as
+H0048,,Behavioral health-related medical services: alcohol and other drug screening specimen,bh_community_support,Behavioral Health Community Support Services,59G-4.031,hcpcs,rendered_as
+H2000,,Psychiatric review of records,bh_assessment,Behavioral Health Assessment Services,59G-4.028,hcpcs,rendered_as
+H2000,HO,Psychiatric evaluation by a non- physician,bh_assessment,Behavioral Health Assessment Services,59G-4.028,hcpcs,rendered_as
+H2000,HP,Psychiatric evaluation by a physician,bh_assessment,Behavioral Health Assessment Services,59G-4.028,hcpcs,rendered_as
+H2010,HE,"Brief individual medical psychotherapy, mental health",bh_community_support,Behavioral Health Community Support Services,59G-4.031,hcpcs,rendered_as
+H2010,HE,"Brief individual medical psychotherapy, mental health",bh_therapy,Behavioral Health Therapy Services,59G-4.052,hcpcs,rendered_as
+H2010,HF,"Brief individual medical psychotherapy, substance abuse",bh_therapy,Behavioral Health Therapy Services,59G-4.052,hcpcs,rendered_as
+H2010,HF,"Brief individual medical psychotherapy, substance abuse",bh_community_support,Behavioral Health Community Support Services,59G-4.031,hcpcs,rendered_as
+H2010,HO,Brief behavioral health status exam,bh_assessment,Behavioral Health Assessment Services,59G-4.028,hcpcs,rendered_as
+H2010,HQ,Brief group medical therapy,fact,Florida Assertive Community Treatment (FACT),59G-4.127,hcpcs,rendered_as
+H2010,HQ,Brief group medical therapy,bh_intervention,Behavioral Health Intervention Services,59G-4.370,hcpcs,rendered_as
+H2012,,"Behavioral health day services, mental health",fact,Florida Assertive Community Treatment (FACT),59G-4.127,hcpcs,rendered_as
+H2012,,"Behavioral health day services, mental health",bh_intervention,Behavioral Health Intervention Services,59G-4.370,hcpcs,rendered_as
+H2012,HF,"Behavioral health day services, substance abuse",bh_intervention,Behavioral Health Intervention Services,59G-4.370,hcpcs,rendered_as
+H2012,HF,"Behavioral health day services, substance abuse",fact,Florida Assertive Community Treatment (FACT),59G-4.127,hcpcs,rendered_as
+H2017,,Psychosocial rehabilitation services,bh_therapy,Behavioral Health Therapy Services,59G-4.052,hcpcs,rendered_as
+H2017,,Psychosocial rehabilitation services,bh_community_support,Behavioral Health Community Support Services,59G-4.031,hcpcs,rendered_as
+H2019,,Psychological testing,bh_medication_mgmt,Behavioral Health Medication Management Services,59G-4.029,hcpcs,rendered_as
+H2019,HM,"Therapeutic behavioral on-site services, therapeutic support",fact,Florida Assertive Community Treatment (FACT),59G-4.127,hcpcs,rendered_as
+H2019,HM,"Therapeutic behavioral on-site services, therapeutic support",bh_intervention,Behavioral Health Intervention Services,59G-4.370,hcpcs,rendered_as
+H2019,HN,"Therapeutic behavioral on-site services, behavior management",fact,Florida Assertive Community Treatment (FACT),59G-4.127,hcpcs,rendered_as
+H2019,HN,"Therapeutic behavioral on-site services, behavior management",bh_intervention,Behavioral Health Intervention Services,59G-4.370,hcpcs,rendered_as
+H2019,HO,"Therapeutic behavioral on-site services, therapy",bh_intervention,Behavioral Health Intervention Services,59G-4.370,hcpcs,rendered_as
+H2019,HO,"Therapeutic behavioral on-site services, therapy",fact,Florida Assertive Community Treatment (FACT),59G-4.127,hcpcs,rendered_as
+H2019,HQ,Group therapy,fact,Florida Assertive Community Treatment (FACT),59G-4.127,hcpcs,rendered_as
+H2019,HQ,Group therapy,bh_intervention,Behavioral Health Intervention Services,59G-4.370,hcpcs,rendered_as
+H2019,HR,Individual and family therapy,bh_intervention,Behavioral Health Intervention Services,59G-4.370,hcpcs,rendered_as
+H2019,HR,Individual and family therapy,fact,Florida Assertive Community Treatment (FACT),59G-4.127,hcpcs,rendered_as
+H2030,,Clubhouse services,bh_community_support,Behavioral Health Community Support Services,59G-4.031,hcpcs,rendered_as
+H2030,,Clubhouse services,bh_therapy,Behavioral Health Therapy Services,59G-4.052,hcpcs,rendered_as
+T1007,,"Treatment plan development, new and established patient, substance abuse",bh_medication_mgmt,Behavioral Health Medication Management Services,59G-4.029,hcpcs,rendered_as
+T1007,TS,"Treatment plan review, substance abuse",bh_medication_mgmt,Behavioral Health Medication Management Services,59G-4.029,hcpcs,rendered_as
+T1015,,Medication management,bh_medication_mgmt,Behavioral Health Medication Management Services,59G-4.029,hcpcs,rendered_as
+T1015,HE,"Behavioral health-related medical services: medical procedures, mental health",bh_therapy,Behavioral Health Therapy Services,59G-4.052,hcpcs,rendered_as
+T1015,HE,"Behavioral health-related medical services: medical procedures, mental health",bh_community_support,Behavioral Health Community Support Services,59G-4.031,hcpcs,rendered_as
+T1015,HF,"Behavioral health-related medical services: medical procedures, substance abuse",bh_community_support,Behavioral Health Community Support Services,59G-4.031,hcpcs,rendered_as
+T1015,HF,"Behavioral health-related medical services: medical procedures, substance abuse",bh_therapy,Behavioral Health Therapy Services,59G-4.052,hcpcs,rendered_as
+T1023,HE,"Behavioral health medical screening, mental health",bh_medication_mgmt,Behavioral Health Medication Management Services,59G-4.029,hcpcs,rendered_as
+T1023,HF,"Behavioral health medical screening, substance abuse",bh_medication_mgmt,Behavioral Health Medication Management Services,59G-4.029,hcpcs,rendered_as
+T2023,HA,Targeted case management for children at risk of abuse and neglect,tcm_children_at_risk,Targeted Case Management for Children at Risk of Abuse and Neglect,59G-4.310,hcpcs,rendered_as
