@@ -52,6 +52,9 @@ def main():
     modules = [{"key": k, "name": n, "role": r, "owes": owes.get(n, "")}
                for k, n, r in MODULES]
 
+    cur.execute("select filename from documents where status='completed'")
+    _held = {r[0] for r in cur.fetchall()}
+
     cur.execute("""select key, name, authority, payment_grain, scope, rule_ref, payment_method
                    from service_line.line
                    order by (scope <> 'serve'), payment_grain, key""")
@@ -63,6 +66,16 @@ def main():
                               telemedicine, rate_authority
                        from service_line.line_code where line_key=%s
                        order by binding_role, code, qualifier""", (key,))
+        def provenance(src):
+            """Three states, never two. 'sourced' means we can open the document."""
+            if not src:
+                return ("asserted", "Registry judgement — no document cited.")
+            if src in _held:
+                return ("sourced", "Cites a document in the corpus.")
+            if "NOT yet sourced" in src or "not yet" in src.lower():
+                return ("asserted", "Registry judgement — " + src)
+            return ("unheld", "Read from a real document we do NOT hold: " + src)
+
         bind = {r: [] for r in ROLES}
         for (cs, code, q, role, dfn, adj, cands, doc, page,
              grule, rate, runit, basis, tele, rauth) in cur.fetchall():
@@ -74,6 +87,8 @@ def main():
                                "standard_rate": float(rate) if rate is not None else None,
                                "standard_rate_unit": runit, "payment_basis": basis,
                                "telemedicine": tele, "rate_authority": rauth,
+                               "provenance": provenance(doc)[0],
+                               "provenance_note": provenance(doc)[1],
                                "cite": {"document": doc, "page": page}})
 
         cur.execute("""select module, status, evidence from service_line.module_obligation
@@ -121,6 +136,16 @@ def main():
                        ) a join documents d on d.filename = a.fn and d.status='completed'""", (key,))
         jdocs = [{"document": r[0], "basis": r[1]} for r in cur.fetchall()]
 
+        # Three stages, read from the index rather than assumed. A seeded
+        # assignment retrieves NOTHING until Lexicon applies it and the tag
+        # propagates to published chunks.
+        cur.execute("""select count(*) from document_tags
+                        where j_tags::text like %s""", ('%service_line.' + key + '%',))
+        tagged_docs = cur.fetchone()[0]
+        cur.execute("""select count(*) from rag_published_embeddings
+                        where chunk_j_tags::text like %s""", ('%service_line.' + key + '%',))
+        tagged_chunks = cur.fetchone()[0]
+
         cur.execute("""select d_code, relation, state, confidence, evidence, requested_concept
                        from service_line.line_lexicon_d where line_key=%s
                        order by state, confidence desc nulls last, d_code""", (key,))
@@ -147,7 +172,19 @@ def main():
             "unadjudicated_codes": sum(1 for x in rendered if not x["adjudicated"]),
             "bindings": {r: bind[r] for r in ROLES},
             "binding_counts": {r: len(bind[r]) for r in ROLES},
-            "j_service_line": {"query_phrases": jphrases, "documents": jdocs},
+            "provenance_counts": {
+                r: {"sourced": sum(1 for x in bind[r] if x["provenance"] == "sourced"),
+                    "unheld": sum(1 for x in bind[r] if x["provenance"] == "unheld"),
+                    "asserted": sum(1 for x in bind[r] if x["provenance"] == "asserted")}
+                for r in ROLES},
+            "registry_asserted": [
+                {"field": "authority", "value": authority},
+                {"field": "payment grain", "value": grain},
+                {"field": "how it is paid", "value": method},
+            ],
+            "j_service_line": {"query_phrases": jphrases, "documents": jdocs,
+                               "seeded": len(jdocs), "tagged_documents": tagged_docs,
+                               "retrievable_chunks": tagged_chunks},
             "lexicon_d": lex,
             "lexicon_d_counts": {
                 "mapped": sum(1 for x in lex if x["d_code"]),

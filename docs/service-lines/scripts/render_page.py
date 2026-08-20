@@ -120,7 +120,12 @@ td.c{font-family:var(--mono);white-space:nowrap}
 .p-done{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-line)}.p-done .d{background:var(--ok)}
 .p-doing{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-line)}.p-doing .d{background:var(--warn)}
 .p-todo{background:var(--crit-bg);color:var(--crit);border-color:var(--crit-line)}.p-todo .d{background:var(--crit)}
-.p-na{background:var(--surface-2);color:var(--ink-3);border-color:var(--line)}.p-na .d{background:var(--ink-3)}
+.p-na{background:var(--surface-2);color:var(--ink-3);border-color:var(--line)}
+.prov{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.06em;
+      text-transform:uppercase;padding:1px 5px;border-radius:3px;white-space:nowrap}
+.pv-sourced{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+.pv-unheld{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-line)}
+.pv-asserted{background:var(--crit-bg);color:var(--crit);border:1px solid var(--crit-line)}.p-na .d{background:var(--ink-3)}
 .k-na{background:var(--surface-2);border-color:var(--line)}
 .scope{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;
        letter-spacing:.07em;text-transform:uppercase;padding:2px 8px;border-radius:4px}
@@ -204,6 +209,7 @@ function codeTable(l){
         '<td style="font-size:11px;color:var(--ink-3)">'+esc(c.standard_rate_unit||'')+
           (c.payment_basis?'<br><code style="font-size:10px">'+esc(c.payment_basis)+'</code>':'')+'</td>'+
         '<td class="c">'+(c.telemedicine?'Y':'')+'</td>'+
+        '<td>'+provBadge(c.provenance,c.provenance_note)+'</td>'+
         '<td>'+((c.general_rule||[]).map(function(x){return '<span class="lim">'+esc(x)+'</span>';}).join('')+
                 (c.relations||[]).map(function(x){return '<span class="excl">'+esc(x)+'</span>';}).join('')
                 || '<span style="color:var(--ink-3)">—</span>')+'</td>'+
@@ -224,20 +230,46 @@ function evidenceTable(l){
     }).join('')+'</tbody></table></div>';
 }
 
+var PROV={sourced:['pv-sourced','sourced'], unheld:['pv-unheld','doc not held'],
+          asserted:['pv-asserted','asserted']};
+function provBadge(p, note){
+  var v=PROV[p]||PROV.asserted;
+  return '<span class="prov '+v[0]+'" title="'+esc(note||'')+'">'+v[1]+'</span>';
+}
+function provSummary(l){
+  var t={sourced:0,unheld:0,asserted:0}, pc=l.provenance_counts||{};
+  Object.keys(pc).forEach(function(r){ Object.keys(t).forEach(function(k){ t[k]+=pc[r][k]||0; }); });
+  var n=t.sourced+t.unheld+t.asserted; if(!n) return '';
+  return '<div class="note" style="border-left-color:'+(t.sourced===n?'var(--ok)':'var(--warn)')+'">'+
+    '<b>What is actually sourced.</b> Of '+n+' code bindings on this line: '+
+    '<b>'+t.sourced+'</b> cite a document in the corpus, '+
+    '<b>'+t.unheld+'</b> were read from a real document we do <b>not</b> hold, and '+
+    '<b>'+t.asserted+'</b> are registry judgement with no document behind them. '+
+    'Everything below carries its own marker — nothing is cited that is not sourced.</div>';
+}
+
 function jServiceLineCard(l){
   var j=l.j_service_line||{}; var ph=j.query_phrases||[], docs=j.documents||[];
   if(!ph.length && !docs.length) return '';
   return '<div class="card"><div class="ch"><h3>Routing — <code style="font-size:11px">j:service_line.'+
     esc(l.key)+'</code></h3>'+
-    '<span class="pill '+(docs.length?'p-done':'p-doing')+'"><span class="d"></span>'+
-    (docs.length? docs.length+' document'+(docs.length===1?'':'s')+' assigned' : 'query-side only')+'</span>'+
+    '<span class="pill '+(j.retrievable_chunks?'p-done':(docs.length?'p-doing':'p-todo'))+'">'+
+    '<span class="d"></span>'+(j.retrievable_chunks? j.retrievable_chunks+' chunks retrievable'
+      : (docs.length? 'seeded, not yet retagged' : 'query-side only'))+'</span>'+
     '<span class="hint">Lexicon owns the axis · registry supplies the doc assignment</span></div>'+
     '<div class="cb">'+
     (ph.length? '<div class="field"><span class="l">Routes from</span><span class="v"><span class="chips">'+
       ph.map(function(p){return '<span class="chip alias">'+esc(p)+'</span>';}).join('')+
       '</span></span></div>' : '')+
+    '<div class="field"><span class="l">Pipeline</span><span class="v" style="font-size:12px">'+
+      '<span class="pill '+(j.seeded?'p-done':'p-todo')+'"><span class="d"></span>seeded '+(j.seeded||0)+'</span> &rarr; '+
+      '<span class="pill '+(j.tagged_documents?'p-done':'p-todo')+'"><span class="d"></span>tagged '+(j.tagged_documents||0)+'</span> &rarr; '+
+      '<span class="pill '+(j.retrievable_chunks?'p-done':'p-todo')+'"><span class="d"></span>retrievable '+(j.retrievable_chunks||0)+'</span>'+
+      (j.retrievable_chunks? '' : '<div style="margin-top:5px;color:var(--crit)">Routes by phrase today. '+
+        'Retrieves nothing line-specific until Lexicon applies the tag and it propagates to published chunks.</div>')+
+      '</span></div>'+
     (docs.length
-      ? '<div class="field"><span class="l">Assigned docs</span><span class="v">'+
+      ? '<div class="field"><span class="l">Seeded docs</span><span class="v">'+
         docs.map(function(d){return '<div style="font-size:12px">'+esc(d.document)+
           ' <span class="cite">'+esc(d.basis)+'</span></div>';}).join('')+'</span></div>'
       : '<div class="field"><span class="l">Assigned docs</span><span class="v" '+
@@ -372,12 +404,13 @@ function bindingCard(l){
     out+='<div class="card"><div class="ch"><h3>'+r[1]+'</h3>'+
       '<span class="hint">'+r[2]+'</span></div><div class="scroll"><table><thead><tr>'+
       '<th>Code</th><th>'+(r[0]==='grouped_to'?'Severity':'Block')+'</th><th>Definition</th>'+
-      '<th>Source</th></tr></thead><tbody>'+
+      '<th>Provenance</th><th>Source</th></tr></thead><tbody>'+
       Object.keys(base).sort().map(function(k){
         var g=base[k], q=g.map(function(x){return x.modifier;}).filter(Boolean).sort();
         return '<tr><td class="c">'+esc(k)+'</td>'+
           '<td class="c" style="font-size:11px">'+(q.length?q.join(' '):'—')+'</td>'+
           '<td>'+esc(g[0].definition||'')+'</td>'+
+          '<td>'+provBadge(g[0].provenance,g[0].provenance_note)+'</td>'+
           '<td style="font-size:11px;color:var(--ink-3)">'+esc(g[0].cite.document||'')+'</td></tr>';
       }).join('')+'</tbody></table></div></div>';
   });
@@ -458,7 +491,7 @@ function renderLine(l){
       '<span class="hint">the complete standard answer — no payor needed</span></div>'+
       '<div class="cb">'+f.join('')+'</div>'+
       (l.scope==='serve' ? codeTable(l) : evidenceTable(l))+'</div>';
-  })()+ bindingCard(l) + jServiceLineCard(l) + lexiconCard(l) + standardReqCard(l) + requirementCard(l) + exceptionCard(l) +
+  })()+ provSummary(l) + bindingCard(l) + jServiceLineCard(l) + lexiconCard(l) + standardReqCard(l) + requirementCard(l) + exceptionCard(l) +
 
 
   '<div class="card"><div class="ch"><h3>Module completion</h3>'+
