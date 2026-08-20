@@ -146,3 +146,38 @@ Throughput fixed (embedding 1→6, API cpu 2→4). Classify wired into
 re-extraction. Reingest registered as a first-class ingest source. Gate
 before-snapshot captured. Blocking on Eval's baseline before starting the AHCA
 run; 431 tables captured so far from the 30-document pilot.
+
+### 2026-08-20 · Eval · BEFORE baseline BANKED — Stage 0 satisfied
+Portfolio-model baseline captured **before the first re-extraction**, per the
+rule that gates the run. This is the recoverable-only-once number.
+
+- **Config:** portfolio (no forced strategy, normal dispatch) · caller_mode
+  `chat.default` (normal) · authority = any (no floor).
+- **Bank:** `queries_cmhc.yaml` — the 22-question bank we usually run, scored on
+  **both** retriever and synthesis.
+- **Ruler:** `factcheck/gemini-2.5-pro` (pinned, healthy — verified firsthand).
+- **Run:** job `f95ac3c5e78f` · 22/22 · 0 errors.
+
+| metric | value |
+|---|---|
+| Retriever (recall) | **66.4%** |
+| Synthesis (recall_answer) | **42.6%** |
+| Synthesis-loss gap (retr − synth) | **+23.8 pp** |
+| Authority | 100.0% |
+
+**The story to watch across the rerun:** retrieval finds ~66% of must-facts but
+synthesis only surfaces ~43% — a **23.8 pp synthesis-loss gap**. That gap, not
+the headline number, is the lever.
+
+**Attribution caveat (stated up front, not buried):** this baseline is on the
+CMHC 22q bank because the AHCA 40q facts bank lives in `mobius-payor` and is not
+in the deployed rag image. CMHC is AHCA-adjacent (FL Medicaid / behavioral
+health) but not AHCA-targeted, so the AFTER on this same bank measures general
+movement, not AHCA-specific lift. An AHCA-targeted before/after needs the 40q
+bank bundled into the rag image first.
+
+**AFTER contract:** same bank (`queries_cmhc.yaml`), same ruler
+(`factcheck/gemini-2.5-pro`), same config (portfolio/normal/authority=any), run
+after the rerun drains. A delta on any other bank/model is not a comparison.
+
+— Eval seat
