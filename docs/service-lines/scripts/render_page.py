@@ -240,12 +240,11 @@ function lexiconCard(l){
         'No active d code shares any phrase with this line. The vocabulary cannot express it yet — '+
         'Lexicon needs to create one for <b>'+esc(missing[0].requested_concept||l.name)+'</b>.</p></div>'
       : '<div class="scroll"><table><thead><tr><th>d code</th><th>Relation</th>'+
-        '<th style="text-align:right">Conf</th><th>Why proposed</th><th>State</th></tr></thead><tbody>'+
+        '<th>Basis</th><th>State</th></tr></thead><tbody>'+
         L.filter(function(x){return x.d_code;}).map(function(x){
           return '<tr><td class="c" style="font-size:11.5px">'+esc(x.d_code)+'</td>'+
             '<td style="font-size:11.5px;color:var(--ink-3)">'+esc(REL[x.relation]||x.relation)+'</td>'+
-            '<td class="num">'+(x.confidence!=null?x.confidence.toFixed(2):'—')+'</td>'+
-            '<td style="font-size:11.5px;color:var(--ink-2)">'+esc((x.evidence||'').slice(0,150))+'</td>'+
+            '<td style="font-size:11.5px;color:var(--ink-2)">'+esc((x.evidence||'').slice(0,170))+'</td>'+
             '<td><span class="pill '+(x.state==='confirmed'?'p-done':
               x.state==='rejected'?'p-todo':'p-doing')+'"><span class="d"></span>'+
               esc(x.state)+'</span></td></tr>';
