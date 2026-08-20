@@ -791,3 +791,76 @@ for wide sparse grids. That is gate tuning, not routing.
 would have passed" (routing — cheap, verified) and "no strategy passes" (gate —
 harder). Sequence: fix routing, re-measure, then attack the gate against a smaller
 population.
+
+### 2026-08-19 · Master RAG · Ananth: attach tables by DOCUMENT reference, not only by breadcrumb — measured, and it unblocks stage 3
+
+Ananth raised two things: explore other mechanisms for the extraction problem,
+and — on the retrieval side — if a chunk is just numbers, consider passing the
+document's tables whenever the document was referenced at all.
+
+**The instinct is right, and the data makes it better than as stated.**
+
+#### "All tables when the doc is referenced" — not viable literally
+
+| document | tables | cost if all attached |
+|---|---|---|
+| `LIP_Model_5` | 45 | 177,404 chars (**~44,000 tokens**) |
+| `Model_10A` | 25 | 127,922 (~32,000) |
+| `Model_19B` | 27 | 83,644 (~21,000) |
+| `Sunshine CW` | 16 | 55,874 (~14,000) |
+
+One document would consume the whole context budget.
+
+#### PAGE-scoped attachment is the same idea, and it is cheap
+
+**136 of 137 table-bearing pages hold exactly one table.**
+
+| | |
+|---|---|
+| attach cost, page-scoped | **avg ~1,045 tokens**, worst ~3,141 |
+| `page_number` populated on published chunks | **20,288 / 20,288 = 100%** |
+
+Every published chunk already carries `page_number`. So a retrieved chunk can
+resolve its page's table **with no breadcrumb, no anchor, and no dependency on
+excision quality** — a plain join on `(document_id, page_number)`.
+
+#### The failure mode becomes the feature
+
+| numeric-only chunks in table-bearing documents | 14,446 |
+|---|---|
+| **of those, a table exists on the SAME page** | **10,566 (73%)** |
+
+A chunk that is just `28,050,177` is not noise to be suppressed — it is a
+**pointer to a page that has the structured table**. The orphaned cells we have
+been trying to eliminate are, at retrieval time, a signal that the answer is
+tabular. That is exactly Ananth's point.
+
+#### What this changes: STAGE 3 IS NO LONGER BLOCKED ON SOURCING
+
+I gated Retriever on excision quality because breadcrumb resolution needs good
+excision. Page-proximity attachment does not. Retriever can build and prove the
+passenger model **now**, against 138 real tables, while Sourcing works acceptance
+recall in parallel. The two paths are complementary, not sequential:
+
+| path | precision | robustness | needs |
+|---|---|---|---|
+| breadcrumb → `document_tables.id` | exact | fails if excision misses | good acceptance recall |
+| **page proximity `(document_id, page_number)`** | page-level | **works regardless of excision** | nothing beyond today |
+
+**Recommended: implement both, breadcrumb first, page-proximity as fallback.**
+A numeric-only chunk with no breadcrumb triggers the page lookup; dedup per table
+id so a page's table attaches once no matter how many of its cells were retrieved
+(important — 73% of 14,446 numeric chunks map onto only 137 pages).
+
+#### Other extraction mechanisms (→ Sourcing)
+PyMuPDF itself emits `"Consider using the pymupdf_layout package for a greatly
+improved page layout analysis"` on these very pages. Worth a look alongside the
+routing fix, since the p10/p12 mode (both strategies rejected) is a layout-analysis
+problem rather than a routing one.
+
+**Coverage codes are not currently a usable selector:** only **17 of 138** tables
+carry any, and the values are `00000` / `20127` / `00125` — provider IDs picked up
+by the code regex, not HCPCS. These LIP documents are financial models, not fee
+schedules. The GIN index on `coverage` will earn its keep on fee schedules; it
+cannot rank tables here. → Sourcing: the code regex is matching bare 5-digit
+numbers.
