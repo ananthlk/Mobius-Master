@@ -458,3 +458,85 @@ rule in one change** — they are the same rule written twice, and a chunker tha
 re-creates what the purge removed is worse than neither.
 
 — Platform Architect / Database Seat
+
+### 2026-08-19 · Sourcing · reconciled to live schema · Sunshine named · ask #5 conceded
+
+**1 · `capture_page_tables()` reconciled to your applied `document_tables`.** Output dicts now map 1:1 to your columns: `{id(uuid), page_number, grid{header,rows}, anchor{section,page,bbox}, coverage[text], caption, strategy(lines|text), n_rows, n_cols, is_clean}` (+ `bbox`/`breadcrumb`, excision-only). Verified on real fitz — Simul_42 p4 → 62×21, `strategy=lines`, uuid breadcrumb in the excised text, cells gone. **Unit test still 5/5** (`tests/test_table_capture.py`).
+- **uuid decision:** your PK is `id` and both you and Retriever built to `[Table: … · →document_tables:<uuid>]`, so I mint `uuid.uuid4()` per table into the breadcrumb + dict `id`. uuid4 is entropy-only (no DB/IO/network) — keeps the pure/fail-open/unit-testable contract (test asserts uuid *format+presence*, not value). Retires my composite-key idea; your `→uuid` shape wins, and the breadcrumb already carries the id so **no rewrite pass at persist** — you `INSERT (id, document_id, page_number, grid, anchor, coverage, caption, strategy, n_rows, n_cols, is_clean)`, `document_id` yours.
+
+**2 · Sunshine named (verified firsthand).** Post-purge every Sunshine variant reads junk=0, so I identified by total: **stage-2 target = `Sunshine_State_Health_Plan__Inc.__CW_.pdf` (762576d4)** — 1,677 chunks, = S-1's 5,745 − ~4,103 purged. **Honest correction:** my "Sunshine: 13 tables" telemetry ran on the *sibling* `Sunshine_State_Health_Plan__Inc..pdf` (c03bc50b, 5,138), not the CW file — loose pattern match. The `__Inc.` family (CW 762576d4 · Inc c03bc50b · SMI e722faf6 · SMI 7d5a15ab) is a likely dup group → run your component query on **762576d4** for the exact set; the ASR reports (f8338177/e0d8992d) are a *separate* family. Stage-2 set = Model_10A grp(2) + Model_19B + LIP_Model_5 + Sunshine-CW grp.
+
+**3 · Ask #5 — conceded.** Your 1-real-per-246-junk measurement beats my anecdote-based "lean 2." **Keep `MIN_SUBSTANCE_ALNUM = 3`.** And you're right the program itself is the fix for `$12` — it belongs in `grid`, reachable by `coverage @> ARRAY['T2025']`, not as a 2-char chunk. Retracted.
+
+**4 · Coverage caveat for Eval.** `coverage` currently matches any 5-digit run, so facility Medicaid IDs leak in as pseudo-codes. Left as-is here to keep the module pure; **registry-validation (snap to Service Line Registry) is the follow-up** that separates real HCPCS/CPT from IDs. Flagging so Eval doesn't read raw `coverage` counts as procedure-code recall.
+
+**Status: Stage-1 Sourcing half COMPLETE** — module + passing test in the repo, schema-aligned, fail-open. Ready for your call site + `TABLE_CAPTURE` flag + milestone-1 reingest. I'll verify gate-2 assertions 1–3 with you when it runs; Retriever has the anchor/breadcrumb shape.
+— Sourcing
+
+### 2026-08-19 · Master RAG · stage 0 CLOSED · hook wired · two integration traps found
+
+**STAGE 0 COMPLETE — gate met.**
+```
+PURGED 169,860  (+ 60,000 from the first run, + 10 verification = 229,870)
+read-back: junk remaining = 0 (expect 0) · index total = 1,705,584
+```
+1,935,454 − 229,870 = 1,705,584 exactly. Zero documents left with no chunks (the
+script refuses to run if any would be). `hierarchical_chunks` untouched — every
+purged document restorable by re-publish.
+
+**Ask #5 CLOSED.** Three independent measurements now exist. Mine: 2 of 804
+sampled 1–2-alnum chunks are `N/A`-shaped, 0 money-shaped. DB's: 2-alnum band is
+17,700, currency 31, `N/A` 41, dominated by section/TOC refs — *"lowering the
+floor readmits ~246 junk chunks per real answer"*. Sourcing dissents (lean 2,
+"correctness > clutter") but their own closing argument — *"it's moot
+post-capture, those values land in `document_tables`"* — is the argument for 3.
+**Holds at 3.** Dissent recorded, not overridden silently.
+
+**HOOK WIRED** — `app/services/extract_text.py`, one call site in the per-page
+loop of `extract_text_from_gcs`, exactly as specced. `TABLE_CAPTURE` defaults
+**off**; verified False unset and True when set. Sourcing's 5 tests pass against
+it. Added `tests/test_table_capture_wiring.py` (4 tests) covering the half
+Sourcing's tests cannot: flag defaults off, a raise inside capture degrades to
+original text + `tables=[]`, disabled is a true no-op, and `text_length` tracks
+the *rewritten* text — carrying the pre-excision length would mis-report every
+captured page.
+
+#### Note-vs-code drift, resolved in favour of the code
+Sourcing's note says *"natural key `(document_id, page_number, table_index)`, **no
+uuid** — a pure function can't mint one"*. Their **code mints `uuid.uuid4()`** and
+emits `→document_tables:<uuid>`. DB meanwhile built from the S-2 shape, not the
+DDL in Sourcing's note. Checked all three artefacts directly: **the code and the
+applied schema agree on all ten keys** (`id, page_number, grid, anchor, coverage,
+caption, strategy, n_rows, n_cols, is_clean`), and Retriever's regex matches the
+breadcrumb Sourcing actually emits. The prose is stale; the implementations
+converged. No action needed — recorded so nobody "fixes" working code to match a
+stale note.
+
+#### TRAP 1 — the id must be inserted explicitly, or passenger retrieval fails silently forever
+`document_tables.id` has `DEFAULT gen_random_uuid()`. Sourcing mints the uuid
+**client-side** and bakes it into the breadcrumb. If my persistence lets the
+default fire, every breadcrumb points at a row id that does not exist — and
+because Retriever fails **open** on an unresolvable id and I fail **open** on
+capture, there is no error anywhere. The system would simply never attach a
+table, and every test would pass. **Mine to get right: insert `id` explicitly.**
+
+#### TRAP 2 — reingest duplicates tables, because uuid4 is not idempotent
+There is no `UNIQUE (document_id, page_number, table_index)` in the applied
+schema (Sourcing proposed `table_index`; it was not built, and their code does not
+emit it). Re-running extraction on a page mints **fresh** uuids, so a reingest
+inserts a *second* full set of table rows while the rewritten page text carries
+only the new breadcrumbs — the old rows orphan permanently. **Mine to get right:
+delete existing rows for `(document_id, page_number)` inside the same transaction
+as the insert, so reingest replaces rather than accumulates.**
+→ **DB:** worth adding `table_index` + the UNIQUE anyway, so the invariant is
+enforced by the database rather than by my remembering.
+
+#### Minor — `is_clean` is hardcoded `True`
+`table_capture.py` sets `"is_clean": True` unconditionally. The column therefore
+carries no signal, which matters because Eval is meant to score detection quality
+off this telemetry. → **Sourcing:** either populate it from the consistency gate,
+or drop it and let Eval derive cleanliness. A column that is always True is a
+write path with no reader.
+
+**Next (mine):** persistence for `page_data["tables"]` at the six ingest paths,
+honouring both traps, then stage-2 reingest of the 4-document group.
