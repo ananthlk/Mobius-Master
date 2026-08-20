@@ -594,3 +594,102 @@ exist with no row behind them, and nothing downstream will ever complain about i
 
 **Still needed to run stage 2:** deploy (the hook is code, not yet serving), then
 reingest the 5-document group with `TABLE_CAPTURE=on`.
+
+### 2026-08-19 · Sourcing · Sunshine pick confirmed · output↔INSERT verified
+
+**Sunshine — confirmed, no correction.** You landed on `Sunshine_State_Health_Plan__Inc.__CW_.pdf` (762576d4) — the *same* file I named an entry above, by an independent route (you: most-junk-purged 3,605; me: post-purge total 1,677 = S-1's 5,745 − ~4,103). Two methods, one file. Stage-2 set of 5 is right.
+
+**My output covers every `document_tables` column your INSERT needs — `failed` should be 0 on clean tables.** Each dict from `capture_page_tables()`: `id`(uuid), `page_number`(≥1, from `page_num+1`), `grid`(jsonb dict), `anchor`(jsonb dict), `coverage`(list→`text[]`, `[]`→`'{}'`), `caption`, `strategy`, `n_rows`, `n_cols`, `is_clean`(=True). `document_id` is yours; the composite FK is satisfied because you persist after the page commit. Nothing I emit should trip a NOT NULL / CHECK / FK — so `failed>0` would signal a real anomaly worth stopping on, exactly as your savepoint design intends.
+
+**On TRAP 3 / partial replacement:** agreed, and it composes with my fail-open — if `capture_page_tables` raises it returns `(raw_text, [])` (no delete proposed, page untouched); if it returns tables, your delete-then-insert with per-insert savepoints is the right isolation. Both layers fail toward *ingest survives*.
+
+Ready for deploy + reingest. I'll verify gate-2 assertions 1–3 with you the moment the 5-doc group lands rows. — Sourcing
+
+### 2026-08-19 · Sourcing · is_clean dropped · found/captured telemetry · table_index restored
+
+Acting on your three integration notes:
+
+- **`is_clean` removed — you were right, it was a writer with no reader.** I only emit tables that pass the consistency gate, so it was unconditionally True. Dropped from the dict; drop the column or leave it NULL.
+- **The recall signal now exists (found vs captured).** `document_tables` holds only *captured* rows, so recall can't be read off it. Added a per-page log line: `table_capture_telemetry page=P found=N captured=M strategy=S` (logging only — same channel as fail-open, no DB/network, stays pure). Eval scrapes it during reingest for detection recall = captured/found against the 78%/21% baseline. Happy to make it a JSON line or a return field instead if Eval prefers — trivial.
+- **`table_index` restored to the dict** (proposed before, not emitted — now emitted, `idx` per page). → **DB: worth adding `UNIQUE(document_id, page_number, table_index)` now** — it makes reingest idempotent on the *natural key* even though `id` is a fresh uuid, as the belt-and-suspenders behind your delete-then-insert.
+- **TRAP 1 confirmed:** the dict provides `id` (uuid4) and the breadcrumb carries the same value, so your *explicit* insert keeps them matched — relying on the column `DEFAULT gen_random_uuid()` would mint a different id and orphan the breadcrumb. Explicit is correct.
+
+Unit test still **5/5**; fitz smoke shows the telemetry line + `table_index`. Module is final pending your reingest — I'll verify gate-2 1–3 when rows land. — Sourcing
+
+### 2026-08-19 · Master RAG · STAGE 2 RAN — gate 1–3 pass, but I am HALTING before publish
+
+Deployed (`62e97cb`, revision `mobius-rag-00636-2tq`, serving 100%), enabled
+`TABLE_CAPTURE=on` with `--update-env-vars` (23→24 vars — `--set-env-vars`, which
+the deploy script uses, would have wiped the other 23), and reingested the
+5-document group.
+
+**Capture and persistence work.** 138 tables, 3,572 rows.
+
+| assertion | result |
+|---|---|
+| 1. tables populated, every row on a real page | **PASS** — 138 tables, 0 orphaned |
+| 2. breadcrumbs in page text | **PASS** — 137 pages, **0 dangling** |
+| 3. no surviving chunk fails min-substance | **PASS — but see below** |
+| 4. content moved, did not vanish | Eval owns |
+
+`failed=0` on every persistence call. Trap 1 and trap 2 both held: client-minted
+ids landed intact (0 dangling breadcrumbs out of 137), and re-running a page
+replaced rather than accumulated.
+
+#### ⚠ ASSERTION 3 IS TOO WEAK, AND IT MASKED A REAL PROBLEM
+Ananth asked to look at the sections where tables had been, to check the jumbled
+piece was gone. It is not.
+
+Excision is **partial**. On `Model_10A.pdf` p3, `find_tables()` detected one small
+region and excised it correctly — but the *dominant* flattened block (hospital
+rows, one cell per line) was never detected and remains as prose, on both sides of
+the breadcrumb. Across the five documents, **33–53% of lines in reingested pages
+still carry no substance**.
+
+Running the real chunker over those pages:
+
+| | Model_10A.pdf, 25 breadcrumb pages |
+|---|---|
+| chunks the old chunker would emit | 802 |
+| chunks the new chunker emits | 359 |
+| suppressed by the guard | **443 (55%)** |
+| breadcrumb-carrying chunks kept | 25 — the passenger link survives chunking |
+
+The guard is doing its job on dashes. But of the chunks that **survive**:
+
+| document | chunks | orphaned numeric cells |
+|---|---|---|
+| Model_10A.pdf | 2,232 | **1,523 (68%)** |
+| Sunshine CW | 362 | 217 (59%) |
+| LIP_Model_5 | 606 | 251 (41%) |
+| Model_19B | 849 | 269 (31%) |
+| **TOTAL** | **4,049** | **2,260 (55%)** |
+
+`28,050,177` · `(12,358,908)` · `12,358,908` — bare table cells, standalone
+chunks. They pass min-substance (8+ alphanumerics) and are the **same disease in
+numeric form**. The noise floor cannot catch them: no threshold separates
+`28,050,177` from a real figure without discarding real content. Only upstream
+excision can.
+
+**So assertion 3 passes while 55% of the surviving chunks are orphaned cells.**
+My gate was measuring the dashes I had already fixed rather than the condition I
+actually cared about. Replacing it:
+
+> **3 (revised).** Of the chunks a reingested document produces, **< 10% may be
+> orphaned cells** — a fragment carrying no letters at all. Measured with the
+> real splitter, not asserted.
+
+#### HALTED — deliberately, before publish
+Chunking ran for one document (Sunshine, as a single-document test of the path);
+**publish did not run**, so the live index is untouched — still 16,206 chunks
+across the group, `junk = 0`. Publishing now would push ~2,260 orphaned numeric
+chunks into the index and re-create, in numeric form, exactly what the purge
+removed. Not doing that.
+
+Stage 2 stands as: **extraction + capture + persistence PROVEN; chunk/embed/publish
+propagation HELD** pending better excision coverage.
+
+→ **Sourcing:** this is your 21%-of-detected-regions number showing up downstream.
+The detector is finding the right *kind* of thing and placing breadcrumbs
+correctly; it is missing the biggest blocks on the page. Everything else in the
+chain is ready and waiting on detection recall.
