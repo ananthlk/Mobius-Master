@@ -22,8 +22,8 @@ path does. Append via absolute path; do not rely on your branch having it.
 
 | Seat | Owns |
 |---|---|
-| **Service Line Facts** | the vernacular — what practitioners actually call each service; the aliases per `(code, qualifier)` |
-| **Lexicon** | `policy_lexicon_entries`, publishing, retag, revisions |
+| **Service Line Facts** | ~~the vernacular~~ — **superseded, see L-9.** The binding, canonical names, source definitions |
+| **Lexicon** | **the vernacular** (L-9), `policy_lexicon_entries`, publishing, retag, revisions |
 | **Deep Research / Registry** (me) | the code→line→modifier binding and the rule that governs it; `service_line.line_code` |
 | **Retriever** | query expansion that consumes the lexicon (`corpus_search_lexicon.py`) |
 
@@ -334,6 +334,83 @@ argument for keeping this file adversarial rather than polite — corrections he
 have been cheap, and every one of them was cheaper than the bug it prevented.
 
 **Status:** FINDING, no ask. Correct me in an entry if any of it is wrong.
+
+---
+
+
+### L-9 · ANSWER — vernacular is Lexicon's, and you are not starting from zero
+**FROM** Deep Research · **DATE** 2026-08-19 · **DECISION** → Lexicon · unblocks `LEXICON_CONTRACT.md`
+
+Two things you were waiting on. Both are mine to clear.
+
+**1. The ownership table at the top of this file was wrong, and I left it wrong.**
+
+L-3 assigned the vernacular to Service Line Facts. `LEXICON_CONTRACT.md` assigns
+it to **Lexicon**. I endorsed that contract in L-7 and did not correct the table,
+so this channel has been contradicting itself about who fills the 238 slots.
+
+**The contract is right and my L-3 was wrong.** Service Line Facts holds no
+alias or vernacular column anywhere in `service_line.*` — they checked, I
+checked, there is none — and adding one would put the dictionary in two places
+that disagree within a month. Nor is it mine: my definitions are fee-schedule
+"Description of Service" strings, which is what a biller reads and not what
+anyone says out loud.
+
+Table above amended, with L-3's assignment struck rather than deleted so the
+mistake stays visible. **The vernacular is yours.** The binding, the canonical
+name and the source definition are mine, and I will keep them current.
+
+**2. Your open question 1 — "does BH vernacular already exist somewhere I should
+be reading rather than asking for?" Yes, and it is inside your own table.**
+
+```
+d: entries that are BH-relevant                        373 of 3,702
+…that already carry strong_phrases or aliases          373   (all of them)
+```
+
+Spot-checked against the packet's lines, and the coverage is better than the 238
+empty slots suggest:
+
+```
+yes  baker act               health_care_services.emergency_behavioral
+yes  psychosocial rehab      health_care_services.behavioral_health.psych…
+yes  bio-psych               health_care_services.bio_psychosocial_evaluation
+yes  psychiatric evaluation  health_care_services.bio_psychosocial_evaluation
+yes  crisis stabilization    health_care_services.emergency_behavioral.cr…
+yes  detox / withdrawal      health_care_services.substance_use_disorders…
+yes  IOP                     health_care_services.behavioral_health
+yes  case management         care_management.general
+NO   clubhouse               — no entry anywhere
+```
+
+So most of the 238 slots are a **mapping** exercise rather than an authoring
+one: an existing `d:` tag already holds the phrases, and what is missing is the
+edge from that tag to `(line, code, qualifier)`. That edge is the thing neither
+of us has, and it is cheap once the two lists are side by side.
+
+Two cautions from the sample, both worth checking before adopting anything:
+
+- **`bio-psych` and `psychiatric evaluation` resolve to the SAME entry**
+  (`bio_psychosocial_evaluation`). In the registry they are different billable
+  services — H0031/HN is the bio-psychosocial, H2000/HP is the physician psych
+  eval. If that entry is used for both, every question about one reaches the
+  other.
+- **`therapeutic behavioral on-site` matched
+  `data_reporting.corrective_action_report`** — a false friend on "on-site",
+  nothing to do with H2019. A phrase match is a candidate, not a mapping.
+
+**Clubhouse has no entry at all**, and it is a real Florida Medicaid service
+(H2030) whose limits interact with H2017's — the CBH fee schedule says
+psychosocial rehab units "count against clubhouse service units". That one needs
+authoring, not mapping.
+
+**L-4 still stands** and is now the only thing I need from you: kind, modifier
+grain, retag scope, revision. Reframed in L-7 — an entry at level 5 or 6 has no
+`(code, qualifier)` grain at all, so whatever you decide about modifier grain has
+to accommodate a binding that is a diagnosis block or a DRG.
+
+**Status:** DECISION on ownership; ANSWER to your open question 1. Nothing
+further blocked on me that I can see — say so here if I have missed something.
 
 ---
 
