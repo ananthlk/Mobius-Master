@@ -1,0 +1,233 @@
+<title>CARC 197 — the interaction</title>
+<style>
+:root{--ink:#1a1d24;--ink-2:#4d5462;--ink-3:#838a98;--page:#f7f5f2;--card:#fffefd;
+--line:#e5e0d8;--rail:#ded8ce;
+--req:#2f6b8f;--pb:#6b3f8f;--draft:#5b5470;--asm:#8a5a1f;--judge:#8a5a1f;--arb:#2c6e49;
+--res:#6b3f8f;--rec:#4d5462;--ok:#2c6e49;--warn:#a06a12;--no:#b3452b;}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#edeaf1;
+--ink-2:#b5bac6;--ink-3:#888f9d;--page:#15171c;--card:#1c1f26;--line:#2e333d;--rail:#333944;
+--req:#7fb4d4;--pb:#b28fd4;--draft:#a99fc4;--asm:#d9ab5c;--judge:#d9ab5c;--arb:#6fbf92;
+--res:#b28fd4;--rec:#b5bac6;--ok:#6fbf92;--warn:#d9ab5c;--no:#e08a72;}}
+:root[data-theme="dark"]{--ink:#edeaf1;--ink-2:#b5bac6;--ink-3:#888f9d;--page:#15171c;
+--card:#1c1f26;--line:#2e333d;--rail:#333944;--req:#7fb4d4;--pb:#b28fd4;--draft:#a99fc4;
+--asm:#d9ab5c;--judge:#d9ab5c;--arb:#6fbf92;--res:#b28fd4;--rec:#b5bac6;--ok:#6fbf92;
+--warn:#d9ab5c;--no:#e08a72;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:16px/1.6 ui-serif,Georgia,serif}
+.wrap{max-width:940px;margin:0 auto;padding:2.6rem 1.4rem 5rem}
+h1{font-size:1.85rem;margin:0 0 .3rem;letter-spacing:-.02em}
+.lede{color:var(--ink-2);max-width:63ch;margin:0 0 .8rem}
+.case{font-family:ui-monospace,monospace;font-size:.75rem;color:var(--ink-3);
+border:1px solid var(--line);border-radius:3px;padding:.45rem .75rem;display:inline-block;
+margin-bottom:1.6rem;background:var(--card)}
+h2{font-size:.73rem;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-3);
+font-family:ui-sans-serif,system-ui,sans-serif;margin:2.6rem 0 1.1rem;padding-bottom:.4rem;
+border-bottom:1px solid var(--line)}
+p{max-width:66ch}
+/* transcript */
+.t{border-left:2px solid var(--rail);margin-left:.6rem;padding-left:1.5rem;position:relative}
+.turn{position:relative;margin:0 0 1.5rem}
+.turn::before{content:"";position:absolute;left:-1.83rem;top:.5rem;width:9px;height:9px;
+border-radius:50%;background:var(--rail);border:2px solid var(--page)}
+.turn.a-req::before{background:var(--req)}.turn.a-pb::before{background:var(--pb)}
+.turn.a-draft::before{background:var(--draft)}.turn.a-asm::before{background:var(--asm)}
+.turn.a-judge::before{background:var(--judge)}.turn.a-arb::before{background:var(--arb)}
+.turn.a-res::before{background:var(--res)}.turn.a-rec::before{background:var(--rec)}
+.who{display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap;margin-bottom:.35rem}
+.badge{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.68rem;font-weight:700;
+letter-spacing:.09em;text-transform:uppercase;border:1px solid currentColor;border-radius:2px;
+padding:.1rem .42rem}
+.a-req .badge{color:var(--req)}.a-pb .badge{color:var(--pb)}.a-draft .badge{color:var(--draft)}
+.a-asm .badge{color:var(--asm)}.a-judge .badge{color:var(--judge)}.a-arb .badge{color:var(--arb)}
+.a-res .badge{color:var(--res)}.a-rec .badge{color:var(--rec)}
+.seat{font-size:.74rem;color:var(--ink-3);font-family:ui-sans-serif,system-ui,sans-serif}
+.lbl{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.66rem;letter-spacing:.1em;
+text-transform:uppercase;color:var(--ink-3);margin:.7rem 0 .25rem}
+pre{background:var(--card);border:1px solid var(--line);border-radius:3px;
+padding:.75rem .9rem;overflow-x:auto;font-size:.755rem;line-height:1.5;
+font-family:ui-monospace,SFMono-Regular,monospace;color:var(--ink-2);margin:.2rem 0}
+.say{background:var(--card);border:1px solid var(--line);border-radius:3px;
+padding:.75rem .9rem;font-size:.9rem;margin:.2rem 0}
+.say p{margin:0 0 .45rem}.say p:last-child{margin:0}
+code{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.84em}
+.gate{border:1px dashed var(--rail);border-radius:3px;padding:.6rem .9rem;margin:1.6rem 0;
+font-family:ui-sans-serif,system-ui,sans-serif;font-size:.78rem;color:var(--ink-2);
+background:var(--card)}
+.gate b{color:var(--ink)}
+.yes{color:var(--ok);font-weight:650}.no{color:var(--no);font-weight:650}
+.part{color:var(--warn);font-weight:650}
+.rule{margin:2.2rem 0;border:0;border-top:1px solid var(--line)}
+.pass{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.7rem;letter-spacing:.14em;
+text-transform:uppercase;color:var(--ink-3);margin:2.4rem 0 .2rem}
+.note{border-left:2px solid var(--arb);padding:.15rem 0 .15rem 1rem;margin:1rem 0;
+color:var(--ink-2);font-size:.88rem}
+.note b{color:var(--ink);font-family:ui-sans-serif,system-ui,sans-serif;font-size:.87rem;
+display:block;margin-bottom:.1rem}
+footer{margin-top:3rem;padding-top:1.1rem;border-top:1px solid var(--line);font-size:.76rem;
+color:var(--ink-3);font-family:ui-sans-serif,system-ui,sans-serif}
+</style>
+<div class="wrap">
+<h1>The interaction, played out</h1>
+<p class="lede">Every handoff in one case, with the instruction each actor receives and what it
+returns. Two passes: the first gathers evidence, the second resolves. No appeal is filed —
+which is the right answer, and the machine has to be able to reach it.</p>
+<p class="case">CARC 197 · H2017 · Sunshine Health FL Medicaid · DOS 2026-05-14 ·
+denied 2026-06-02 · 12 appeal days remain</p>
+
+<h2>Pass 1 — open → gathering evidence</h2>
+<div class="t"><div class="turn a-req">
+  <div class="who"><span class="badge">Requester</span><span class="seat">auth module → POST /case</span></div>
+  <p class="lbl">sends</p><pre>{
+  &quot;requester&quot;: &quot;auth_module&quot;,
+  &quot;case_id&quot;:   &quot;CLM-8841203&quot;,
+  &quot;trigger&quot;:   { &quot;carc&quot;: &quot;197&quot;, &quot;denied_on&quot;: &quot;2026-06-02&quot; },
+  &quot;claim&quot;:     { &quot;payer&quot;: &quot;Sunshine Health|FL|Medicaid&quot;, &quot;member&quot;: &quot;…&quot;,
+                 &quot;code&quot;: &quot;H2017&quot;, &quot;modifier&quot;: null, &quot;dos&quot;: &quot;2026-05-14&quot;,
+                 &quot;billed&quot;: 1104.00, &quot;units&quot;: 128 },
+  &quot;playbook&quot;:  &quot;appeals.carc_197.fl_medicaid@v4&quot;,
+  &quot;priors&quot;:    &quot;propensity.v3&quot;,
+  &quot;clock&quot;:     { &quot;appeal_deadline&quot;: &quot;2026-08-31&quot;, &quot;days_remaining&quot;: 12 },
+  &quot;bar&quot;:       { &quot;policy&quot;: &quot;confidence&quot;, &quot;min&quot;: &quot;medium&quot; }
+}</pre><p class="lbl">note</p><div class="say"><p>The Requester names a <b>playbook version</b>, not a question. That is the whole difference between this and the fact loop — the branch set is an input, so the run is reproducible and auditable against a specific edition.</p></div></div><div class="turn a-pb">
+  <div class="who"><span class="badge">Playbook</span><span class="seat">appeals.carc_197.fl_medicaid@v4</span></div>
+  <p class="lbl">supplies — fixed, authored before the claim existed</p><pre>B1  auth_obtained_not_attached   holds if: an approved auth exists for (member, code, DOS)
+                                 needs:   auth_system.lookup(member, code, dos)
+                                 action:  corrected claim — NOT an appeal
+
+B2  retro_window_open            holds if: payer permits retro request within N days of DOS
+                                 needs:   payer retro-auth policy · days_since_dos
+                                 action:  retro-authorization request
+
+B3  emergency_exempt             holds if: presenting condition was emergency / Baker Act
+                                 needs:   admission_type · presenting_dx · statute exemption
+                                 action:  appeal citing exemption
+
+B4  retroactive_eligibility      holds if: eligibility granted after DOS
+                                 needs:   eligibility.effective_date vs dos
+                                 action:  appeal with eligibility explanation
+
+B5  no_defensible_basis          holds if: B1–B4 all close
+                                 needs:   —
+                                 action:  write off · provider education</pre></div><div class="turn a-draft">
+  <div class="who"><span class="badge">Drafter</span><span class="seat">chat / ReAct — instantiate and weight</span></div>
+  <p class="lbl">instruction</p><pre>For THIS claim, and for EACH branch in the set above:
+  · does it plausibly apply, and on what reading of the case
+  · a weight from the priors for (payer, service, denial type)
+
+You may not add a branch. If you believe one is missing, return it under
+playbook_gap — it will be filed against the playbook, not executed.
+Answer in prose. Do not format.</pre><p class="lbl">returns</p><div class="say"><p><b>B1</b> is the first thing to rule out: 128 units of psychosocial rehab is a standing authorization pattern, and this provider bills it monthly — a missing attachment is more likely than a missing authorization.</p><p><b>B3</b> deserves weight. H2017 following a crisis episode is common, and Florida exempts emergency behavioral health from prior authorization.</p><p><b>B2</b> may apply but I cannot see Sunshine's retro-authorization terms in what I retrieved.</p><p><b>B4</b> looks unlikely — the member has claims history predating this date of service.</p></div><p class="lbl">weights, from priors</p><pre>B1 0.34   B3 0.28   B2 0.21   B4 0.09   B5 0.08</pre></div><div class="turn a-asm">
+  <div class="who"><span class="badge">Assembler</span><span class="seat">extractor — per branch, what it would take to decide</span></div>
+  <p class="lbl">instruction</p><pre>For each branch the Drafter marked plausible, list the data items required to
+DECIDE it — not to argue it — and where each item comes from. One item per row.
+Each carries its own source. Nothing inferred.</pre><p class="lbl">returns</p><pre>B1  auth_system.lookup(member, H2017, 2026-05-14)      → internal, available
+B1  claim.attachments[]                                  → internal, available
+B2  Sunshine retro-auth policy — section + quote          → corpus, NOT HELD
+B2  days_since_dos = 97                                   → computed from claim
+B3  encounter.admission_type                              → clinical record, partial
+B3  encounter.presenting_dx                               → clinical record, partial
+B3  FL emergency BH exemption — statute cite              → corpus, held
+B4  eligibility.effective_date                            → internal, available</pre></div><div class="turn a-judge">
+  <div class="who"><span class="badge">Judge</span><span class="seat">critic — two questions per branch, never collapsed</span></div>
+  <p class="lbl">instruction</p><pre>Per branch, answer separately:
+  ACCURATE  — does the playbook&#x27;s precondition match what the rulebook says?
+              Quote the rulebook. If you cannot, say unverifiable.
+  PROVEN    — does the evidence we hold satisfy that precondition?
+              Refuted is a verdict, not a failure.
+
+You may reject or abstain. You may not repair, and you may not rank.
+Priors are withheld from you deliberately.</pre><p class="lbl">returns</p><pre>B1  accurate      · proven          auth_system: no record for (member, H2017, 2026-05-14)
+                                        → precondition NOT met. B1 closes.
+B2  unverifiable  · —               retro-auth policy not in corpus; cannot check
+                                        the precondition against any rulebook we hold
+B3  accurate      · partial         statute exemption quoted; admission_type present,
+                                        presenting_dx missing from the record we hold
+B4  accurate      · REFUTED         eligibility.effective_date 2024-11-01 precedes DOS
+B5  —             · —               not evaluated; B5 holds only if 1–4 all close</pre></div><div class="turn a-arb">
+  <div class="who"><span class="badge">Arbiter</span><span class="seat">diagnose — the only actor that sees weights AND the clock</span></div>
+  <p class="lbl">decides</p><pre>B1  CLOSE      proven and not met — no auth exists. Recorded with the lookup.
+B4  CLOSE      refuted. Recorded, so nobody re-argues it next pass.
+B3  ADVANCE    accurate, partially proven → fetch presenting_dx (clinical record)
+B2  DISPATCH   unverifiable → Locator: Sunshine retro-auth policy under the
+               provider manual. 12 days left, so this outranks other research.
+B5  HOLD       B2 and B3 are live; B5 is not yet reachable.
+
+state: open → gathering_evidence
+no appeal filed this pass — nothing is executable yet, and filing on a
+branch that has not been proven burns an appeal level we get once.</pre><p class="lbl">dispatches</p><pre>→ Locator   need: Sunshine retro-auth policy · deadline: 3 days (clock-ranked)
+→ Requester need: encounter.presenting_dx for 2026-05-14</pre></div></div>
+
+<div class="gate"><b>State change.</b> The case does not end here and it does not restart.
+It waits on two dispatches, and each returning piece of evidence is a transition.</div>
+
+<h2>Pass 2 — gathering evidence → resolved</h2>
+<div class="t"><div class="turn a-res">
+  <div class="who"><span class="badge">Locator</span><span class="seat">Retriever seat — returns, 2 days later</span></div>
+  <p class="lbl">returns</p><pre>Sunshine Health Provider Manual, retro-authorization section, p41:
+  &quot;Requests for retroactive authorization must be received within 90 days
+   of the date of service.&quot;
+document_id 7c1f… · payer=Sunshine Health · authenticated</pre></div><div class="turn a-req">
+  <div class="who"><span class="badge">Requester</span><span class="seat">auth module — returns</span></div>
+  <p class="lbl">returns</p><pre>encounter.presenting_dx = F20.9 (schizophrenia, unspecified)
+admission_type = elective</pre></div><div class="turn a-draft">
+  <div class="who"><span class="badge">Drafter</span><span class="seat">chat / ReAct — re-entry, with everything already established</span></div>
+  <p class="lbl">instruction — note what is included</p><pre>Same claim. Same branch set. PLUS:
+  · the branch table as it stands, with B1 and B4 closed and why
+  · the Judge&#x27;s verdicts from pass 1
+  · the two evidence items that have since arrived
+
+Re-read the live branches against the new evidence. Do not re-argue a closed
+branch — if you believe a closure was wrong, say so as a challenge, with the
+evidence that changed.</pre><p class="lbl">returns</p><div class="say"><p><b>B2 now closes.</b> The retro window is 90 days from date of service and we are at 97. It is not open, and it never was — this branch was dead before the case reached us.</p><p><b>B3 is now the case.</b> Admission type is elective and the presenting diagnosis is F20.9. An elective admission is not an emergency, so the exemption does not apply on these facts.</p></div><p class="lbl">re-weighted</p><pre>B3 0.11   B5 0.89     ← the priors moved because the evidence moved</pre></div><div class="turn a-judge">
+  <div class="who"><span class="badge">Judge</span><span class="seat">critic — pass 2</span></div>
+  <p class="lbl">returns</p><pre>B2  accurate  · REFUTED    &quot;within 90 days of the date of service&quot; (p41, quoted)
+                              vs days_since_dos = 97. Closes on arithmetic.
+B3  accurate  · REFUTED    exemption requires emergency admission; admission_type
+                              is elective. Precondition not met.
+B5  accurate  · proven     B1–B4 are all closed, each with its evidence.</pre></div><div class="turn a-arb">
+  <div class="who"><span class="badge">Arbiter</span><span class="seat">diagnose — pass 2</span></div>
+  <p class="lbl">decides</p><pre>Every appealable branch is closed, and each closure is evidenced.
+
+B5 executes: write off · provider education — the auth was genuinely
+never obtained and no exemption applies.
+
+state: gathering_evidence → resolved (no_defensible_basis)
+appeal levels consumed: 0
+days remaining when resolved: 10</pre><p class="lbl">brings forth</p><div class="say"><p>To a human, with the branch table as the reason — not because the machine is unsure, but because a write-off is a decision someone owns. The table is the case for it: four branches, four closures, each with the record that closed it.</p></div></div><div class="turn a-rec">
+  <div class="who"><span class="badge">Recorder</span><span class="seat">commits</span></div>
+  <p class="lbl">writes</p><pre>case CLM-8841203 · resolved no_defensible_basis
+  B1 closed  auth_system lookup, no record
+  B2 closed  provider manual p41, 90-day window, 97 days elapsed
+  B3 closed  admission_type elective, exemption inapplicable
+  B4 closed  eligibility effective 2024-11-01, predates DOS
+  B5 executed
++ playbook feedback: B2 was decidable from the claim alone (days_since_dos)
+  before any retrieval. Propose a cheap precondition gate on the branch.</pre></div></div>
+
+<h2>What the shape of this run demonstrates</h2>
+
+<div class="note"><b>The machine's best answer was "do not appeal".</b>
+Every branch closed on evidence, zero appeal levels were consumed, and it finished with 10
+days to spare. A system that can only produce appeals would have filed one — on B3, at 0.28,
+against facts that refute it.</div>
+
+<div class="note"><b>Closures accumulate; the Drafter cannot re-argue them.</b>
+Pass 2 explicitly forbids reopening a closed branch except as a <em>challenge with new
+evidence</em>. Without that rule the same model re-litigates B1 every pass and the case never
+converges.</div>
+
+<div class="note"><b>B2 was decidable from the claim alone, and we paid for retrieval anyway.</b>
+97 &gt; 90 needed no document — only the rulebook's number, which we did not hold. The
+Recorder files that as playbook feedback: a cheap precondition gate would have closed B2 in
+pass 1 and saved a dispatch. <b>The loop improving the playbook is the same loop.</b></div>
+
+<div class="note"><b>The Judge never saw a weight, and the Arbiter never saw a quote it had
+not been given.</b> B3 carried the second-highest prior and was refuted on a single field.
+Had the Judge known it was favoured, "partial" would have been under pressure to read as
+"proven".</div>
+
+<footer>The 90-day retro window, the manual page and the appeal deadline are drawn from
+Sunshine Health facts this loop sourced and its critic accepted; the claim, the member, the
+weights and the clinical fields are illustrative. Companion to the branch schematic — this
+page is the same case at instruction level.</footer>
+</div>
