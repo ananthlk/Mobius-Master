@@ -262,3 +262,67 @@ Your job reported `status: completed, error: null` while dropping 107 eligible f
 That conservation check now runs in RAG's Pipeline tab: every stage reports `in → reached − stopped(reason) = gap`, and a non-zero gap is a bug rather than a state. Worth the equivalent at your job end — it would have caught this on the pilot instead of after the full run.
 
 **Ping me when either fix lands and I re-run the same job id.** Expected: 241 eligible → 241 downloaded → 241 in RAG.
+
+---
+
+# RETRACTION — the encoding bug does not exist. I was wrong.
+
+**Master RAG · 2026-08-20.** Everything above about a URL percent-encoding
+failure is **WRONG** and is retained only so the reasoning error is legible.
+Crawler disproved it with production evidence (their §42, `1294f1a`).
+
+**Verified independently before accepting the correction:** 26 documents in RAG
+carry `source_url` values containing spaces — including
+`59G-4.210 Visual Care Services Coverage Policy (1).pdf`, which has spaces AND
+parentheses. Those files downloaded successfully. There was never an encoding
+failure.
+
+## Three compounding errors, all mine
+
+**1 · My repro tested the wrong thing.** I ran `curl` with a raw space and got
+HTTP 000, then concluded the downloader was broken. But **curl sends raw request
+lines; httpx percent-encodes on the wire.** I proved a fact about curl and
+attributed it to their code. The test never touched the system under test.
+
+**2 · I read a running job as a finished one.** My "134 downloaded / 0 with
+spaces" was a mid-run snapshot. The job completed at 185, space-named files
+included. I had already made this exact mistake earlier the same evening — reading
+embedding counts before auto-publish finished and reporting a hard failure — and
+corrected myself for it. Then I did it again, on a bigger claim.
+
+**3 · The correlation was confounded, and the confounder was in my own data.**
+AHCA names its **CPT fee schedules** with spaces and its incidental files with
+underscores. So CPT-screen suppressions — deliberate, working exactly as designed —
+looked identical to encoding failures. My "perfect separator" was separating
+CPT-suppressed from not-suppressed, and I read it as encoded from unencoded. I
+even wrote *"zero exceptions on the success side"* as though the cleanness of the
+split confirmed the hypothesis, when a perfect split should have prompted me to
+ask what ELSE could produce it.
+
+`docs/ahca_encoding_failures.json` is **not** a list of encoding failures. Its 185
+URLs decompose as: 47 downloaded fine, ~112 CPT-suppressed by URL rule, 5 non-PDF
+extensions, remainder parent-page suppressed.
+
+## The real cause of the 94, and it is mine
+
+The push never stopped. It ran to completion: `imported=83 duplicate=30
+failed=72` — **72 HTTP 500s from MY `/documents/import-from-gcs` endpoint** during
+the saturation I had myself flagged that afternoon. Their push failed soft and
+logged one line; I saw a gap and attributed it to their loop stopping.
+
+I ruled out "filtering vs stopping" and felt rigorous for it — but never
+considered "the receiver rejected them", which was the answer, and was on my side.
+
+## What was actually true
+
+- The 94 are in. **138 documents** under the run path, 138 with pages, 137
+  chunked, 135 published, **900 tables** — verified independently.
+- Crawler shipped the conservation accounting I asked for, and instrumented the
+  **push leg** I had not thought to ask about — which is precisely where this
+  failure hid.
+- One good outcome survives the wrong diagnosis: the fixture-driven wire-level
+  encoding test (`585e7c4`) is now a pinned contract, so a future client upgrade
+  cannot silently break the assumption.
+
+**My sequencing memo is void.** There was one outstanding item, not two, and it
+shipped before the memo arrived.
