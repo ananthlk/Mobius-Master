@@ -1,0 +1,195 @@
+<title>CARC 197 — the machine refuses itself</title>
+<style>
+:root{--ink:#191c22;--ink-2:#4c5462;--ink-3:#858c9a;--page:#f6f4f1;--card:#fffefd;
+--sunk:#efece7;--line:#e2ddd5;--acc:#2f6b8f;--ok:#2c6e49;--warn:#a06a12;--no:#b3452b;
+--draft:#5b5470;--asm:#8a5a1f;--judge:#8a5a1f;--arb:#2c6e49;}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#eceaf0;
+--ink-2:#b4b9c5;--ink-3:#8a919e;--page:#14161b;--card:#1b1e25;--sunk:#101216;--line:#2f343e;
+--acc:#7fb4d4;--ok:#6fbf92;--warn:#d9ab5c;--no:#e08a72;--draft:#a99fc4;--asm:#d9ab5c;
+--judge:#d9ab5c;--arb:#6fbf92;}}
+:root[data-theme="dark"]{--ink:#eceaf0;--ink-2:#b4b9c5;--ink-3:#8a919e;--page:#14161b;
+--card:#1b1e25;--sunk:#101216;--line:#2f343e;--acc:#7fb4d4;--ok:#6fbf92;--warn:#d9ab5c;
+--no:#e08a72;--draft:#a99fc4;--asm:#d9ab5c;--judge:#d9ab5c;--arb:#6fbf92;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);
+font:15px/1.55 ui-sans-serif,system-ui,-apple-system,sans-serif}
+.wrap{max-width:1020px;margin:0 auto;padding:2rem 1.2rem 4rem}
+.mock{font-size:.67rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+border:1px solid var(--line);border-radius:2px;padding:.15rem .45rem;display:inline-block}
+h1{font:600 1.5rem/1.25 ui-sans-serif,system-ui,sans-serif;margin:.7rem 0 .3rem}
+.sub{color:var(--ink-2);margin:0 0 1.4rem;font-size:.92rem;max-width:62ch}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.ph{padding:.75rem 1rem;border-bottom:1px solid var(--line);display:flex;
+justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+.ph h2{margin:0;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.req{padding:.9rem 1rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:.85rem}
+.fld b{display:block;font-size:.63rem;letter-spacing:.09em;text-transform:uppercase;
+color:var(--ink-3);margin-bottom:.12rem}
+.fld span{font-size:.85rem;word-break:break-word}
+.mono{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.79rem}
+button{font:inherit;font-size:.82rem;padding:.4rem .9rem;border-radius:4px;cursor:pointer;
+border:1px solid var(--line);background:var(--card);color:var(--ink)}
+button.go{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+button:disabled{opacity:.45;cursor:default}
+.act{border-bottom:1px solid var(--line)}
+.act:last-child{border-bottom:0}
+.ah{display:grid;grid-template-columns:8.6rem 1fr auto;gap:.8rem;align-items:baseline;
+padding:.7rem 1rem;cursor:pointer}
+.ah:hover{background:var(--sunk)}
+.who{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.a-draft .who{color:var(--draft)}.a-asm .who{color:var(--asm)}
+.a-judge .who{color:var(--judge)}.a-arb .who{color:var(--arb)}.a-req .who{color:var(--acc)}
+.did{font-size:.87rem;color:var(--ink-2)}
+.did b{color:var(--ink);font-weight:600}
+.tick{font-size:.72rem;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.body{display:none;padding:0 1rem 1rem;background:var(--sunk)}
+.act.open .body{display:block}
+.log{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.735rem;line-height:1.62;
+color:var(--ink-2);max-height:280px;overflow-y:auto;border:1px solid var(--line);
+border-radius:3px;background:var(--card);padding:.6rem .7rem;margin:.5rem 0 0}
+.log div{white-space:pre-wrap;word-break:break-word}
+.ans{background:var(--card);border:1px solid var(--line);border-radius:3px;padding:.7rem .8rem;
+font:15px/1.55 Georgia,ui-serif,serif;margin:.5rem 0 0}
+table{width:100%;border-collapse:collapse;font-size:.8rem;margin:.5rem 0 0;background:var(--card);
+border:1px solid var(--line);border-radius:3px}
+th{text-align:left;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;
+color:var(--ink-3);padding:.42rem .55rem;border-bottom:1px solid var(--line)}
+td{padding:.45rem .55rem;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+.fn{font-family:ui-monospace,monospace;font-size:.75rem;white-space:nowrap}
+.q{font-family:Georgia,serif;font-style:italic;color:var(--ink-2)}
+.pass{color:var(--ok);font-weight:600}.fail{color:var(--no);font-weight:600}
+.chip{font-size:.64rem;letter-spacing:.05em;text-transform:uppercase;border:1px solid currentColor;
+border-radius:2px;padding:.04rem .34rem;white-space:nowrap}
+.chip.present{color:var(--ok)}.chip.not_checkable{color:var(--warn)}.chip.no_document_id{color:var(--no)}
+.stages{display:flex;gap:.35rem;padding:.6rem 1rem;background:var(--sunk);
+border-bottom:1px solid var(--line);flex-wrap:wrap}
+.stg{font-size:.72rem;color:var(--ink-3);border:1px solid transparent;border-radius:3px;padding:.14rem .45rem}
+.stg.on{color:var(--acc);border-color:var(--acc)}.stg.done{color:var(--ok)}
+.notes{margin-top:2rem}
+.notes h3{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+margin:0 0 .6rem;padding-bottom:.35rem;border-bottom:1px solid var(--line)}
+.nt{border-left:2px solid var(--acc);padding:.1rem 0 .1rem .9rem;margin:.8rem 0;
+color:var(--ink-2);font-size:.87rem;max-width:66ch}
+.nt b{color:var(--ink);display:block}
+
+.did b.fail{color:var(--no)}
+</style>
+<div class="wrap">
+<span class="mock">live run · nothing staged but the animation</span>
+<h1>CARC 197 — sourcing the playbook</h1>
+<p class="sub">The denial loop is not built, but a playbook is only this loop&rsquo;s output at
+class level. So I pointed the built machine at the class-level question and asked it to source
+the branch set. It refused &mdash; and the branches it refused were correct.</p>
+
+<div class="panel">
+  <div class="ph"><h2>Request</h2><button id="go" class="go" onclick="run()">Run</button></div>
+  <div class="req">
+    <div class="fld"><b>consumer</b><span class="mono">appeals_playbook</span></div>
+    <div class="fld"><b>subject</b><span class="mono">carc_197/branch_set</span></div>
+    <div class="fld"><b>authority</b><span>any_cited</span></div>
+    <div class="fld"><b>bar</b><span>completeness</span></div>
+    <div class="fld"><b>required</b><span class="mono">denial_code · branches</span></div>
+  </div>
+  <div class="stages">
+    <span class="stg">requester</span><span class="stg">drafter</span>
+    <span class="stg">assembler</span><span class="stg">judge</span><span class="stg">arbiter</span>
+  </div>
+  <div id="out" style="display:none"><div id="acts"></div></div>
+</div>
+
+<div class="notes">
+<h3>What happened, and why it is the result I wanted</h3>
+
+<div class="nt"><b>Chat proposed three grounds and cited zero documents.</b>
+<code>auth_obtained_not_linked</code>, <code>emergency_urgent_care_auth_exemption</code>,
+<code>retroactive_auth_provider_error</code>. It searched, found nothing usable, and answered
+anyway &mdash; from model knowledge, fluently, at 1,391 characters.</div>
+
+<div class="nt"><b>The grounds are substantively right, and every one was refused.</b>
+They match the branch set I drew by hand yesterday almost exactly. The Judge refused all three
+at gate 2: <code>document_not_cited</code> &mdash; &ldquo;(none)&rdquo; is not among the
+documents the answer cited. Being correct is not the bar. Being <em>sourced</em> is.</div>
+
+<div class="nt"><b>Which indicts my own drawing.</b>
+The five branches in the CARC 197 schematic came from the same place chat&rsquo;s came from
+&mdash; plausible domain knowledge, no citation. Had I fed that drawing in as a playbook, the
+machine would have executed against real claims on a branch set with no rulebook behind it.
+The refusal applies to me.</div>
+
+<div class="nt"><b>The Arbiter wrote no playbook and filed an acquisition.</b>
+<code>not_in_corpus &rarr; acquire</code>. That is the honest state: we do not hold a document
+describing the grounds for disputing a CARC 197 under Florida Medicaid, and until we do, the
+denial loop has nothing legitimate to run on.</div>
+
+<div class="nt"><b>It also crashed, and the crash was mine.</b>
+The acquire path assumed a manifest URL and threw <code>KeyError: 'url'</code> after the chat
+call had already been spent. An acquire with no known target is still an acquire &mdash; the
+loop knows a source is missing and does not know which one. Guarded.</div>
+</div>
+</div>
+<script>
+const D = {"trace": ["◌ Thinking…", "✓ PHI check — no patient info detected", "↺ Personalization not applied (no_profile)", "↺ Carrying forward: Medicaid · Florida", "I'm breaking down your question and choosing the right source…", "(Up to 10 reasoning rounds — agentic: more tool passes when needed.)", "◌ Checking FL Medicaid playbook…", "✓ FL Medicaid playbook: ?d deadline · portal", "Round 1/10 — search — confidence bar not met — keep gathering evidence", "Reasoning round 1/10…", "Evidence review: no chunks marked relevant from the last result", "→ Round 1: The `appeals_get_playbook` tool provided specific guidance and questions related to disputing CARC 197 denials for Florida Medicaid, which directly addresses the user's request for recognized grounds, what must be true, and what each requires. I will use this information to formulate the answer.", "Round 2/11 — search — confidence bar not met — keep gathering evidence", "Reasoning round 2/11…", "Evidence review: no chunks marked relevant from the last result", "Gaps open: ['recognised grounds on which a provider can dispute or resolve CARC 197 denial for Florida Medicaid', 'what must be true for each ground', 'what each ground requires']", "→ Round 2: LEARNED: The `appeals_get_playbook` tool provided a general playbook for CARC 197 for 'FL Medicaid', including appeal levels and some guidance. However, the `_completion_critic` noted that the guidance still contained references to 'Sunshine Health', implying a lack of general Florida Medicaid applicability. More importantly, the playbook's 'guidance' and 'questions' are not explicitly structured as 'recognised grounds on which a provider can dispute or resolve that denial, what must be true for each, and what does each require' as requested by the user. RESTRATEGIZE: I need to find more explicit and structured appeal rules that directly address the 'grounds' for dispute, what 'must be true', and 'what each requires' for CARC 197 across Florida Medicaid. The `appeals_lookup_rules` tool is designed for this purpose. NEXT: I will call `appeals_lookup_rules` for CARC 197 and specify 'FL Medicaid' as the payor to get the detailed appeal rules.", "Using appeals_lookup_rules…", "◌ Looking up CARC 197 rules…", "✓ 5 rules for CARC 197", "Round 3/11 — search — confidence bar not met — keep gathering evidence", "Reasoning round 3/11…", "Evidence review: keeping chunks [1, 2, 3, 4, 5] from call 3 (9304→9304 chars)", "⚠ Thin evidence: 0 chunk(s), 0 chars — hedge required", "Running answer: There are several recognized grounds to dispute a **CARC 197** denial for Florida Medicaid. These include **retroactive prior authorization for documented provider error or system failure**, **authorization obtained but not linked**, and **emergency/urgent care prior authorization exemption**.", "Gaps closed: ['recognised grounds on which a provider can dispute or resolve CARC 197 denial for Florida Medicaid', 'what must be true for each ground', 'what each ground requires']", "→ Round 3: The `appeals_lookup_rules` tool successfully identified five distinct grounds for disputing or resolving a CARC 197 denial for Florida Medicaid, along with the conditions that must be true and the specific documentation required for each. This directly addresses the user's request. The `appeals_get_playbook` provided general context but was noted as being too specific to a single MCO (Sunshine Health) rather than Florida Medicaid broadly, so I will focus on the rules from `appeals_lookup_rules` which are explicitly for 'FL Medicaid'.", "Synthesizing answer…", "Gemini Flash · 4.95s", "Composing answer…", "(Integrator: turning reasoning + tool output into your answer card.)", "(Integrator: turning reasoning + tool output into your answer card.)", "{'signal': 'turn_completed', 'correlation_id': '7b7b2cd9-01f5-4952-b823-49e10228b16e', 'step_id': 'turn_complete', 'data': {'rounds_used': 3, 'tools_used': [], 'final_signal': 'corpus_only', 'duration_ms': 56793, 'total_llm_tokens': 0, 'total_cost_usd': 0.0, 'integrator_mode': 'P'}, 'note': '✓ Turn completed in 3 round(s), 56793ms', 'thread_id': '2cdc2a25-9dcd-42cf-8227-fb3f7116ec6c', 'timestamp_ms': 1787348897090, 'source_module': 'chat', 'report_to_task_manager': True, 'task_type': 'info', 'task_severity': 'low'}"], "answer": "**Florida Medicaid** claims denied with **CARC 197** (precertification/authorization/notification absent) can be disputed on several recognized grounds:\n\n*   **Retroactive Prior Authorization for Documented Provider Error or System Failure**: This applies if the lack of authorization was due to a documented administrative error by the provider or a verifiable system malfunction, and the service was medically necessary. Requires medical records, documentation of the error/failure, original claim, denial notice, and a written explanation.\n*   **Authorization Obtained But Not Linked**: This applies if a valid authorization was obtained prior to the date of service but was not recognized during claims processing. Requires a copy of the approved authorization (with number, date, services), proof of submission/approval date, original claim details, and relevant medical records.\n*   **Emergency/Urgent Care Prior Authorization Exemption**: Emergency services for an emergency medical condition are exempt from prior authorization. Requires medical records substantiating the emergency, documentation of notification to the MediPass provider (if applicable), and reference to Florida Medicaid's definition of 'emergency' or 'urgent services'.\n\n→ Next step: Review the specific circumstances of the denial against these grounds and gather all required documentation to support an appeal.", "docs_seen": 0, "fields": [{"name": "denial_code", "value": "197", "document": "(none)"}, {"name": "payer_scope", "value": "Florida Medicaid", "document": "(none)"}, {"name": "branches", "value": "[{\"ground\":\"retroactive_auth_provider_error_system_failure\",\"precondition\":\"This applies if the lack of authorization was due to a documented administrative error by the provider o", "document": "(none)"}], "verdicts": [{"name": "denial_code", "supported": false, "issue": "document_not_cited", "check": "mechanical", "reason": "'(none)' is not among the documents the answer cited"}, {"name": "payer_scope", "supported": false, "issue": "document_not_cited", "check": "mechanical", "reason": "'(none)' is not among the documents the answer cited"}, {"name": "branches", "supported": false, "issue": "document_not_cited", "check": "mechanical", "reason": "'(none)' is not among the documents the answer cited"}], "summary": "0 of 3 fields survived; missing required: denial_code, branches", "branches": [{"ground": "retroactive_auth_provider_error_system_failure", "precondition": "This applies if the lack of authorization was due to a documented administrative error by the provider or a verifiable system malfunction, and the service was medically necessary.", "evidence_required": "Requires medical records, documentation of the error/failure, original claim, denial notice, and a written explanation.", "action": "appeal", "is_appeal": true}, {"ground": "auth_obtained_not_linked", "precondition": "This applies if a valid authorization was obtained prior to the date of service but was not recognized during claims processing.", "evidence_required": "Requires a copy of the approved authorization (with number, date, services), proof of submission/approval date, original claim details, and relevant medical records.", "action": "appeal", "is_appeal": true}, {"ground": "emergency_urgent_care_auth_exemption", "precondition": "Emergency services for an emergency medical condition are exempt from prior authorization.", "evidence_required": "Requires medical records substantiating the emergency, documentation of notification to the MediPass provider (if applicable), and reference to Florida Medicaid's definition of 'emergency' or 'urgent services'.", "action": "appeal", "is_appeal": true}]};
+const esc = s => String(s==null?"":s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+
+function branchTable(){
+  return `<table><tr><th>ground chat proposed</th><th>precondition</th><th>appeal?</th></tr>` +
+  (D.branches||[]).map(b=>`<tr><td class="fn">${esc(b.ground)}</td>
+    <td>${esc(String(b.precondition).slice(0,150))}</td>
+    <td>${b.is_appeal===true||b.is_appeal==="true"?"yes":"no"}</td></tr>`).join("") + `</table>`;
+}
+function fieldsTable(){
+  return `<table><tr><th>field</th><th>value</th><th>document it cited</th></tr>` +
+  D.fields.map(f=>`<tr><td class="fn">${esc(f.name)}</td>
+    <td class="mono">${esc(f.value.slice(0,80))}</td>
+    <td class="fail">${esc(f.document||"(none)")}</td></tr>`).join("") + `</table>`;
+}
+function verdictTable(){
+  return `<table><tr><th>field</th><th></th><th>gate</th><th>why</th></tr>` +
+  D.verdicts.map(v=>`<tr><td class="fn">${esc(v.name)}</td>
+    <td class="${v.supported?'pass':'fail'}">${v.supported?'kept':'refused'}</td>
+    <td class="mono">${esc(v.issue)}</td>
+    <td>${esc(v.reason)}</td></tr>`).join("") + `</table>`;
+}
+const ACTS = [
+ {k:"req", who:"Requester", tick:"class level",
+  did:`asked for the <b>branch set</b> for CARC 197 — not about any one claim`,
+  body:()=>`<div class="ans">A Florida Medicaid claim was denied with CARC 197 —
+    precertification, authorization or notification absent. What are the recognised grounds on
+    which a provider can dispute or resolve that denial, what must be true for each, and what
+    does each require?</div>`},
+ {k:"draft", who:"Drafter", tick:"chat, agentic",
+  did:`answered · <b class="fail">${D.docs_seen} documents</b> · ${D.trace.length} reasoning steps`,
+  body:()=>`<div class="ans">${esc((D.answer||"").slice(0,760))}</div>
+    <div class="log">${D.trace.map(t=>`<div>${esc(t)}</div>`).join("")}</div>`},
+ {k:"asm", who:"Assembler", tick:"gemini-2.5-flash",
+  did:`pulled <b>${D.fields.length}</b> fields — every one citing <b class="fail">(none)</b>`,
+  body:()=>fieldsTable()+branchTable()},
+ {k:"judge", who:"Judge", tick:"gate 2 of 6",
+  did:`<b class="fail">${esc(D.summary)}</b>`, body:verdictTable},
+ {k:"arb", who:"Arbiter", tick:"no playbook produced",
+  did:`<b>not_in_corpus → acquire</b> · filed repair 12`,
+  body:()=>`<div class="ans">Nothing in the corpus answered this. Identify and acquire a
+    source for it.<br><br>No branch set was written. A playbook assembled from an uncited
+    answer would be executed against real claims with no rulebook behind it.</div>`},
+];
+function render(){
+  document.getElementById("acts").innerHTML = ACTS.map((a,i)=>`
+    <div class="act a-${a.k}" id="a${i}">
+      <div class="ah" onclick="tog(${i})"><span class="who">${a.who}</span>
+      <span class="did">${a.did}</span><span class="tick">${esc(a.tick)}</span></div>
+      <div class="body">${a.body()}</div></div>`).join("");
+}
+function tog(i){document.getElementById("a"+i).classList.toggle("open")}
+async function run(){
+  const b=document.getElementById("go"); b.disabled=true; b.textContent="running…";
+  const st=[...document.querySelectorAll(".stg")];
+  for(let i=0;i<st.length;i++){
+    st.forEach((e,j)=>e.className="stg"+(j<i?" done":j===i?" on":""));
+    await new Promise(r=>setTimeout(r,600));
+  }
+  st.forEach(e=>e.className="stg done");
+  document.getElementById("out").style.display="block";
+  b.textContent="run again"; b.disabled=false; render();
+}
+</script>
