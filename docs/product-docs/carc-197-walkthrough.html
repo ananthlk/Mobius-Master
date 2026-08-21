@@ -1,162 +1,168 @@
-<title>CARC 197 — the same machine</title>
+<title>CARC 197 — branches, not a plan</title>
 <style>
 :root{--ink:#1a1d24;--ink-2:#4e5563;--ink-3:#828997;--page:#f7f5f2;--card:#fffefd;
---line:#e5e0d8;--req:#2f6b8f;--draft:#5b5470;--asm:#8a5a1f;--judge:#8a5a1f;
---arb:#2c6e49;--res:#6b3f8f;--rec:#4e5563;
---ok:#2c6e49;--warn:#a06a12;--no:#b3452b;}
+--line:#e5e0d8;--pb:#6b3f8f;--req:#2f6b8f;--draft:#5b5470;--asm:#8a5a1f;--judge:#8a5a1f;
+--arb:#2c6e49;--res:#6b3f8f;--rec:#4e5563;--ok:#2c6e49;--warn:#a06a12;--no:#b3452b;}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#edeaf1;
---ink-2:#b6bbc7;--ink-3:#878e9c;--page:#15171c;--card:#1c1f26;--line:#2e333d;
---req:#7fb4d4;--draft:#a99fc4;--asm:#d9ab5c;--judge:#d9ab5c;--arb:#6fbf92;
---res:#b28fd4;--rec:#b6bbc7;--ok:#6fbf92;--warn:#d9ab5c;--no:#e08a72;}}
+--ink-2:#b6bbc7;--ink-3:#878e9c;--page:#15171c;--card:#1c1f26;--line:#2e333d;--pb:#b28fd4;
+--req:#7fb4d4;--draft:#a99fc4;--asm:#d9ab5c;--judge:#d9ab5c;--arb:#6fbf92;--res:#b28fd4;
+--rec:#b6bbc7;--ok:#6fbf92;--warn:#d9ab5c;--no:#e08a72;}}
 :root[data-theme="dark"]{--ink:#edeaf1;--ink-2:#b6bbc7;--ink-3:#878e9c;--page:#15171c;
---card:#1c1f26;--line:#2e333d;--req:#7fb4d4;--draft:#a99fc4;--asm:#d9ab5c;
---judge:#d9ab5c;--arb:#6fbf92;--res:#b28fd4;--rec:#b6bbc7;--ok:#6fbf92;
---warn:#d9ab5c;--no:#e08a72;}
+--card:#1c1f26;--line:#2e333d;--pb:#b28fd4;--req:#7fb4d4;--draft:#a99fc4;--asm:#d9ab5c;
+--judge:#d9ab5c;--arb:#6fbf92;--res:#b28fd4;--rec:#b6bbc7;--ok:#6fbf92;--warn:#d9ab5c;--no:#e08a72;}
 *{box-sizing:border-box}
-body{margin:0;background:var(--page);color:var(--ink);
-font:16px/1.6 ui-serif,Georgia,"Iowan Old Style",serif}
-.wrap{max-width:1040px;margin:0 auto;padding:2.6rem 1.5rem 5rem}
+body{margin:0;background:var(--page);color:var(--ink);font:16px/1.6 ui-serif,Georgia,serif}
+.wrap{max-width:1060px;margin:0 auto;padding:2.6rem 1.5rem 5rem}
 h1{font-size:1.9rem;margin:0 0 .3rem;letter-spacing:-.02em}
 .lede{color:var(--ink-2);max-width:64ch;margin:0 0 .8rem}
-.case{font-family:ui-monospace,monospace;font-size:.78rem;color:var(--ink-3);
+.case{font-family:ui-monospace,monospace;font-size:.77rem;color:var(--ink-3);
 border:1px solid var(--line);border-radius:3px;padding:.5rem .8rem;display:inline-block;
 margin-bottom:2rem;background:var(--card)}
 h2{font-size:.75rem;text-transform:uppercase;letter-spacing:.13em;color:var(--ink-3);
 font-family:ui-sans-serif,system-ui,sans-serif;margin:2.8rem 0 1rem;padding-bottom:.45rem;
 border-bottom:1px solid var(--line)}
-h3{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.95rem;margin:1.6rem 0 .4rem}
-p{max-width:66ch}
-table{width:100%;border-collapse:collapse;font-size:.83rem;margin:.4rem 0}
-th{text-align:left;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.66rem;
-text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);padding:.42rem .55rem;
+p{max-width:67ch}
+table{width:100%;border-collapse:collapse;font-size:.82rem;margin:.4rem 0}
+th{text-align:left;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.65rem;
+text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);padding:.42rem .5rem;
 border-bottom:1px solid var(--line);font-weight:600}
-td{padding:.5rem .55rem;border-bottom:1px solid var(--line);vertical-align:top}
+td{padding:.55rem .5rem;border-bottom:1px solid var(--line);vertical-align:top}
 .scroll{overflow-x:auto}
-.role{font-family:ui-sans-serif,system-ui,sans-serif;font-weight:640;white-space:nowrap}
-.role.req{color:var(--req)}.role.draft{color:var(--draft)}.role.asm{color:var(--asm)}
-.role.judge{color:var(--judge)}.role.arb{color:var(--arb)}.role.res{color:var(--res)}
-.role.rec{color:var(--rec)}
-.seat{font-size:.78rem;color:var(--ink-3);font-family:ui-sans-serif,system-ui,sans-serif}
-.why{color:var(--ink-2);font-size:.81rem}
-.flow{display:grid;gap:.8rem;margin:1rem 0}
-.lane{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--line);
-border-radius:3px;padding:.85rem 1rem}
-.lane.req{border-left-color:var(--req)}.lane.draft{border-left-color:var(--draft)}
-.lane.asm{border-left-color:var(--asm)}.lane.judge{border-left-color:var(--judge)}
-.lane.arb{border-left-color:var(--arb)}
-.lane h4{margin:0 0 .15rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.72rem;
-text-transform:uppercase;letter-spacing:.09em}
-.lane.req h4{color:var(--req)}.lane.draft h4{color:var(--draft)}
-.lane.asm h4{color:var(--asm)}.lane.judge h4{color:var(--judge)}.lane.arb h4{color:var(--arb)}
-.lane p{margin:.35rem 0 0;font-size:.9rem}
-.lane .sub{font-size:.76rem;color:var(--ink-3);font-family:ui-sans-serif,system-ui,sans-serif;margin:0}
+.role{font-family:ui-sans-serif,system-ui,sans-serif;font-weight:640}
+.role.pb{color:var(--pb)}.role.req{color:var(--req)}.role.draft{color:var(--draft)}
+.role.asm{color:var(--asm)}.role.judge{color:var(--judge)}.role.arb{color:var(--arb)}
+.role.res{color:var(--res)}.role.rec{color:var(--rec)}
+.seat{font-size:.77rem;color:var(--ink-3);font-family:ui-sans-serif,system-ui,sans-serif}
+.why{color:var(--ink-2);font-size:.8rem}
+.bid{font-family:ui-monospace,monospace;font-weight:700;color:var(--ink-2)}
 .yes{color:var(--ok);font-weight:650}.no{color:var(--no);font-weight:650}
 .part{color:var(--warn);font-weight:650}
-.st{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.68rem;letter-spacing:.05em;
-text-transform:uppercase;border:1px solid currentColor;border-radius:2px;padding:.06rem .4rem;
-white-space:nowrap}
-.st.executable{color:var(--ok)}.st.blocked{color:var(--warn)}.st.dropped{color:var(--no)}
+.w{font-variant-numeric:tabular-nums;font-family:ui-sans-serif,system-ui,sans-serif;
+font-size:.82rem;color:var(--ink-3)}
+.lane{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--line);
+border-radius:3px;padding:.85rem 1rem;margin:.7rem 0}
+.lane.pb{border-left-color:var(--pb)}.lane.draft{border-left-color:var(--draft)}
+.lane.asm{border-left-color:var(--asm)}.lane.judge{border-left-color:var(--judge)}
+.lane.arb{border-left-color:var(--arb)}
+.lane h4{margin:0 0 .15rem;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.71rem;
+text-transform:uppercase;letter-spacing:.09em}
+.lane.pb h4{color:var(--pb)}.lane.draft h4{color:var(--draft)}.lane.asm h4{color:var(--asm)}
+.lane.judge h4{color:var(--judge)}.lane.arb h4{color:var(--arb)}
+.lane p{margin:.3rem 0 0;font-size:.89rem}
+.lane .sub{font-size:.755rem;color:var(--ink-3);font-family:ui-sans-serif,system-ui,sans-serif;margin:0}
 code{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.83em;background:var(--card);
 border:1px solid var(--line);border-radius:2px;padding:.05rem .3rem}
-.note{border-left:2px solid var(--arb);padding:.2rem 0 .2rem 1rem;margin:1.2rem 0;
-color:var(--ink-2)}
+.note{border-left:2px solid var(--arb);padding:.2rem 0 .2rem 1rem;margin:1.2rem 0;color:var(--ink-2)}
 .note b{color:var(--ink);font-family:ui-sans-serif,system-ui,sans-serif;font-size:.9rem;
 display:block;margin-bottom:.15rem}
+.cycle{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:.7rem;margin:1rem 0}
+.cy{background:var(--card);border:1px solid var(--line);border-radius:3px;padding:.75rem .85rem}
+.cy b{display:block;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.78rem;margin-bottom:.2rem}
+.cy span{font-size:.79rem;color:var(--ink-2)}
 footer{margin-top:3rem;padding-top:1.1rem;border-top:1px solid var(--line);font-size:.77rem;
 color:var(--ink-3);font-family:ui-sans-serif,system-ui,sans-serif}
 </style>
 <div class="wrap">
-<h1>CARC 197, through the same machine</h1>
-<p class="lede">A denial for absent authorization. The output is not a fact — it is a
-<b>call list</b>, and every step is something that will actually happen. Same seven roles,
-same contracts, one boundary that moves.</p>
-<p class="case">CARC 197 · precertification/authorization absent · H2017 psychosocial rehab ·
-Sunshine Health FL Medicaid · DOS 2026-05-14 · EOP 2026-06-02</p>
+<h1>CARC 197 — branches, not a plan</h1>
+<p class="lede">An authorization denial has a small number of ways it can be true, and they
+are known in advance. So the machine does not draft a sequence of steps — it evaluates the
+<b>whole branch set at once</b> and asks which one the evidence supports.</p>
+<p class="case">CARC 197 · authorization absent · H2017 · Sunshine Health FL Medicaid ·
+DOS 2026-05-14 · EOP 2026-06-02 · 12 of 90 appeal days remain</p>
 
-<h2>The roles, and who plays them</h2>
-<p>A role is not a seat. The <b>Locator</b> role is played by the Retriever seat; keeping those
-words apart is what stopped the Arbiter doing retrieval and picking the wrong document.</p>
+<h2>The roles</h2>
 <div class="scroll"><table>
 <thead><tr><th>role</th><th>played by</th><th>contract</th></tr></thead>
-<tbody><tr><td class='role req'>Requester</td><td class='seat'>auth module</td><td class='why'>the ask, the criteria, the bar, the clock</td></tr><tr><td class='role draft'>Drafter</td><td class='seat'>chat / ReAct (custom)</td><td class='why'>produces the draft — an answer, or a plan</td></tr><tr><td class='role asm'>Assembler</td><td class='seat'>extractor</td><td class='why'>draft → typed pieces, each with its own evidence</td></tr><tr><td class='role judge'>Judge</td><td class='seat'>critic</td><td class='why'>disbelieves each piece; may only reject or abstain</td></tr><tr><td class='role arb'>Arbiter</td><td class='seat'>diagnose</td><td class='why'>decides the next state and who acts</td></tr><tr><td class='role res'>Locator</td><td class='seat'>Retriever seat</td><td class='why'>which artifact a reference names, which editions exist</td></tr><tr><td class='role res'>Acquirer</td><td class='seat'>RAG seat</td><td class='why'>fetch and ingest</td></tr><tr><td class='role res'>Indexer</td><td class='seat'>Curation seat</td><td class='why'>retag, reindex</td></tr><tr><td class='role res'>Glossarist</td><td class='seat'>Lexicon seat</td><td class='why'>vernacular, aliases, publish</td></tr><tr><td class='role rec'>Recorder</td><td class='seat'>—</td><td class='why'>commits accepted output</td></tr></tbody></table></div>
+<tbody><tr><td class='role pb'>Playbook</td><td class='seat'>appeals rulebook</td><td class='why'>owns the BRANCH SET per denial type. Nothing may be executed that it does not contain.</td></tr><tr><td class='role req'>Requester</td><td class='seat'>auth module</td><td class='why'>the claim, the playbook, the propensity table, the clock</td></tr><tr><td class='role draft'>Drafter</td><td class='seat'>chat / ReAct</td><td class='why'>instantiates each branch against THIS claim and weights it from priors. Does not invent branches.</td></tr><tr><td class='role asm'>Assembler</td><td class='seat'>extractor</td><td class='why'>per branch: the data required to execute it, and where each item would come from</td></tr><tr><td class='role judge'>Judge</td><td class='seat'>critic</td><td class='why'>per branch: is the claim accurate, is the evidence real, is the precondition met</td></tr><tr><td class='role arb'>Arbiter</td><td class='seat'>diagnose</td><td class='why'>which branches can execute NOW, which need evidence, what state we move to</td></tr><tr><td class='role res'>Locator / Acquirer / Indexer / Glossarist</td><td class='seat'>Retriever · RAG · Curation · Lexicon</td><td class='why'>fetch what a branch is missing</td></tr><tr><td class='role rec'>Recorder</td><td class='seat'>—</td><td class='why'>commits the outcome and the evidence that produced it</td></tr></tbody></table></div>
 
 <h2>The run</h2>
-<div class="flow">
 
-<div class="lane req"><h4>Requester — auth module</h4>
-<p class="sub">three inputs, three different kinds — and the difference decides who may see them</p>
-<p><b>Claim</b> — fact. <b>Appeals rulebook</b> — authority, quotable as evidence.
-<b>Propensity table</b> — a prior. Not evidence, and it does not reach the Judge.</p></div>
+<div class="lane pb"><h4>Playbook — owns the branch set</h4>
+<p class="sub">the scenarios are authored, not discovered</p>
+<p>CARC 197 has five branches. They exist before the claim arrives, they are the same for
+every 197, and <b>nothing outside this set may be executed</b>. That constraint is what makes
+the Judge's job possible: it validates a branch against its stated precondition rather than
+grading free prose.</p></div>
 
-<div class="lane draft"><h4>Drafter — ReAct, custom</h4>
-<p class="sub">produces a plan in prose, never asked to format</p>
-<p>“Confirm no auth is on file. If the retro-authorization window is open, request retro
-review. Otherwise file a provider claim dispute within 90 calendar days of the EOP, using the
-Provider Claim Dispute Request Form, with the clinical record attached.”</p></div>
+<div class="lane draft"><h4>Drafter — instantiates and weights</h4>
+<p class="sub">against THIS claim, using priors — and it may not add a sixth branch</p>
+<p>For each branch: does it plausibly apply here, and what is the prior probability given
+payer, service and denial history? The Drafter's contribution is the reading of the case, not
+the invention of options. If it proposes something the playbook lacks, that is a
+<b>playbook gap</b> to file — not a step to run.</p></div>
 
-<div class="lane asm"><h4>Assembler</h4>
-<p class="sub">plan → typed steps, each with action, actor, precondition, deadline, evidence</p>
-<p>Five steps. One quote per step — no step borrows another's grounding, exactly as no field
-borrows another's quote.</p></div>
+<div class="lane asm"><h4>Assembler — the data each branch would need</h4>
+<p class="sub">per branch, the required items and where each would come from</p>
+<p>B1 needs an auth record. B3 needs admission type and presenting diagnosis. This is what
+turns a scenario into something answerable — and it is computed per branch, in parallel, not
+as a sequence.</p></div>
 
-<div class="lane judge"><h4>Judge — four skills the fact loop does not have</h4>
-<p class="sub">a fact needs support; a step needs support <b>and</b> satisfiability</p>
-<p><code>authority_for_step</code> is it in the rulebook, or invented ·
-<code>precondition_satisfiable</code> do we hold what it needs ·
-<code>deadline_still_open</code> is the clock live ·
-<code>step_ordering</code> does it depend on an earlier outcome</p></div>
+<div class="lane judge"><h4>Judge — accuracy per branch</h4>
+<p class="sub">two independent questions, and they must not be collapsed</p>
+<p><b>Is the branch stated accurately</b> — does the playbook's precondition match what the
+rulebook actually says? And <b>is the evidence real</b> — does the cited record support it?
+A branch can be accurately stated and unproven (B2), or well-evidenced and refuted (B4).</p></div>
 
-<div class="lane arb"><h4>Arbiter</h4>
-<p class="sub">verdicts in, call list out — and this is where propensity finally applies</p>
-<p>Supported <em>and</em> satisfiable → executable, ordered. Supported but missing data →
-dispatch to fetch it first. Unsupported → dropped. Deadline gone → human, no calls.</p></div>
+<div class="lane arb"><h4>Arbiter — which can execute, and what state we move to</h4>
+<p class="sub">the only actor that reads the weights</p>
+<p>Executable now → run it. Accurate but unproven → dispatch to fetch the missing evidence.
+Refuted → close the branch and record why. Nothing executable and nothing fetchable →
+bring it forth to a human, with the branch table as the reason.</p></div>
 
+<h2>The branch table — what the Judge returned</h2>
+<div class="scroll"><table>
+<thead><tr><th></th><th>branch</th><th>evidence it needs</th><th>have it</th>
+<th>verdict</th><th>prior</th><th>arbiter</th></tr></thead>
+<tbody><tr><td class='bid'>B1</td><td><b>Auth was obtained — just not attached to the claim</b><div class='why'>holds if: an approved auth exists for (member, H2017, DOS)</div></td><td class='why'>auth system record · auth number</td><td><span class='yes'>yes</span></td><td><span class='yes'>accurate</span></td><td class='w'>0.34</td><td class='why'><b>EXECUTE</b> — corrected claim, not an appeal</td></tr><tr><td class='bid'>B2</td><td><b>Retro-authorization window is open</b><div class='why'>holds if: payer permits retro request within N days of DOS</div></td><td class='why'>Sunshine retro-auth policy · days since DOS</td><td><span class='no'>no</span></td><td><span class='part'>unverifiable</span></td><td class='w'>0.21</td><td class='why'><b>GET EVIDENCE</b> — dispatch Locator</td></tr><tr><td class='bid'>B3</td><td><b>Emergency — authorization not required</b><div class='why'>holds if: presenting condition was an emergency / Baker Act</div></td><td class='why'>admission type · presenting dx · statute exemption</td><td><span class='part'>partial</span></td><td><span class='yes'>accurate</span></td><td class='w'>0.28</td><td class='why'><b>GET EVIDENCE</b> — clinical record</td></tr><tr><td class='bid'>B4</td><td><b>Extenuating — retroactive eligibility</b><div class='why'>holds if: member eligibility was granted after DOS</div></td><td class='why'>eligibility effective date vs DOS</td><td><span class='yes'>yes</span></td><td><span class='no'>refuted</span></td><td class='w'>0.09</td><td class='why'><b>CLOSE</b> — eligibility predates DOS</td></tr><tr><td class='bid'>B5</td><td><b>No defensible basis</b><div class='why'>holds if: every other branch fails</div></td><td class='why'>—</td><td><span class='why'>—</span></td><td><span class='why'>—</span></td><td class='w'>0.08</td><td class='why'><b>HOLD</b> — only if 1–4 all close</td></tr></tbody></table></div>
+
+<p class="why">B4 is the one worth reading twice: evidence was available, the Judge checked
+it, and it <b>refuted</b> the branch — eligibility predates the date of service. A closed
+branch is a result, not a failure, and closing it early is what stops an appeal being filed
+on a basis the payer would disprove in a sentence.</p>
+
+<h2>The part that makes it a machine rather than a report</h2>
+<p>A case does not finish in one pass. It moves through states, and each state change
+re-enters the loop <b>with everything already established</b>.</p>
+
+<div class="cycle">
+<div class="cy"><b>1 · state changes</b><span>the auth record comes back, or the Locator finds
+the retro policy</span></div>
+<div class="cy"><b>2 · case returns to Drafter</b><span>with the claim, the branch table, and
+every prior verdict — not a fresh start</span></div>
+<div class="cy"><b>3 · re-weight</b><span>branches close, priors shift, one may become
+executable that was not</span></div>
+<div class="cy"><b>4 · Arbiter moves state</b><span>execute, dispatch again, or bring it
+forth</span></div>
 </div>
 
-<h2>What the Judge returned — available vs not</h2>
-<div class="scroll"><table>
-<thead><tr><th>#</th><th>step and its source</th><th>needs</th><th>in rulebook</th>
-<th>satisfiable</th><th>clock</th><th></th></tr></thead>
-<tbody><tr><td>1</td><td>Confirm no authorization exists<div class='why'>auth system · (member, H2017, DOS 2026-05-14)</div></td><td class='why'>auth-system read access</td><td><span class='yes'>yes</span></td><td><span class='yes'>yes</span></td><td class='why'>—</td><td><span class='st executable'>executable</span></td></tr><tr><td>2</td><td>Check whether the retro-auth window is open<div class='why'>Sunshine provider manual · retro-auth policy</div></td><td class='why'>the manual&#x27;s retro-auth section</td><td><span class='no'>no</span></td><td><span class='why'>—</span></td><td class='why'>—</td><td><span class='st blocked'>blocked</span></td></tr><tr><td>3</td><td>File provider claim dispute — 90 calendar days from EOP<div class='why'>Sunshine Provider Manual p6</div></td><td class='why'>EOP date 2026-06-02 · 78 of 90 days used</td><td><span class='yes'>yes</span></td><td><span class='yes'>yes</span></td><td class='why'>12 days left</td><td><span class='st executable'>executable</span></td></tr><tr><td>4</td><td>Attach Provider Claim Dispute Request Form<div class='why'>Sunshine Provider Manual p123</div></td><td class='why'>the form, and the clinical record</td><td><span class='yes'>yes</span></td><td><span class='part'>partial</span></td><td class='why'>—</td><td><span class='st executable'>executable</span></td></tr><tr><td>5</td><td>Escalate to Medicaid fair hearing if upheld<div class='why'>not in the rulebook we hold</div></td><td class='why'>—</td><td><span class='no'>no</span></td><td><span class='why'>—</span></td><td class='why'>—</td><td><span class='st dropped'>dropped</span></td></tr></tbody></table></div>
+<p>So the Drafter is asked the same question repeatedly against a growing evidence set, and
+the branch table is the memory. That is why the branches must be authored: a set that changed
+shape every pass could not accumulate anything.</p>
 
-<h2>The call list the Arbiter produced</h2>
-<div class="scroll"><table>
-<thead><tr><th>order</th><th>call</th><th>actor</th><th>gated on</th></tr></thead>
-<tbody>
-<tr><td>1</td><td>Read auth system for (member, H2017, 2026-05-14)</td><td>auth module</td>
-<td class='why'>nothing — run now</td></tr>
-<tr><td>2</td><td><b>Locate</b> Sunshine's retro-authorization policy</td>
-<td class='role res'>Locator</td>
-<td class='why'>step 2 is blocked without it; this is the only thing standing between a
-4-step plan and a 5-step one</td></tr>
-<tr><td>3</td><td>File provider claim dispute + Dispute Request Form</td><td>auth module</td>
-<td class='why'>step 1 returns “no auth on file” · <b>12 days of 90 remain</b></td></tr>
-<tr><td>—</td><td><s>Escalate to Medicaid fair hearing</s></td><td>—</td>
-<td class='why'>dropped: not in the rulebook we hold. Real in Florida, and we cannot cite it,
-so it is not a step — it is a gap to source.</td></tr>
-</tbody></table></div>
+<h2>Four boundaries this makes sharp</h2>
 
-<h2>Three things this case shows that the fact case never did</h2>
+<div class="note"><b>The playbook owns the branches; chat may not add one.</b>
+An invented scenario has nothing to validate against, so the Judge would have to grade prose
+and the Arbiter would execute on a model's suggestion. A proposal outside the set is a gap to
+file against the playbook.</div>
 
-<div class="note"><b>The propensity table must not reach the Judge.</b>
-“82% overturn” grounds nothing about whether a step is permitted. A judge that accepts it
-approves a well-scored step the rulebook does not allow. It belongs to the Arbiter, where it
-does its real work — ordering the list and deciding whether the effort is worth it. Support
-first, then rank.</div>
+<div class="note"><b>Priors reach the Arbiter, never the Judge.</b>
+A 0.34 prior says nothing about whether B1 is <em>true</em>. If the Judge saw it, a
+well-scored branch would start to look verified. It belongs where it does real work: ordering
+what to try, and deciding whether the effort is worth the remaining days.</div>
 
-<div class="note"><b>Satisfiability is a gate, not a note.</b>
-The output is executable. A step that is correct and un-actionable is worse than no step,
-because it reads as progress while the clock runs. Step 2 is perfectly good advice and cannot
-be performed — so it becomes a dispatch, not a call.</div>
+<div class="note"><b>"Accurate" and "proven" are separate verdicts.</b>
+B2 is stated correctly and cannot be verified because we do not hold the retro-auth policy.
+Collapsing those into one column would either execute an unproven branch or discard a good
+one — and the second failure is invisible.</div>
 
-<div class="note"><b>A dropped step is a sourcing gap, not a mistake.</b>
-Medicaid fair hearing is a real right in Florida. The Drafter proposed it, the Judge refused
-it because nothing we hold says so, and the Arbiter dropped it. That refusal is the correct
-behaviour <em>and</em> a work item: it names a document the rulebook is missing. The same
-verdict that protects the caller feeds the queue.</div>
+<div class="note"><b>A branch that cannot be evaluated is a sourcing gap with a deadline.</b>
+B2 is blocked on a document, and there are 12 days left. That is not a research task queued
+behind others — the clock ranks it, and the Arbiter is the only actor that can see both.</div>
 
-<footer>The 90-calendar-day deadline, the EOP anchor, the Dispute Request Form and the page
-numbers are facts this loop sourced and its critic accepted earlier today, from the Sunshine
-Health provider manual. The claim, the dates and the propensity table are illustrative — the
-rulebook evidence is not.</footer>
+<footer>The 90-calendar-day window and the EOP anchor are facts this loop sourced and its
+critic accepted, from the Sunshine Health provider manual. The claim, the branch weights and
+the auth records are illustrative. Supersedes the linear five-step version of this page:
+that drawing had chat inventing a plan, which is the thing this architecture exists to
+prevent.</footer>
 </div>
