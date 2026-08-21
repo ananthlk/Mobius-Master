@@ -1,15 +1,29 @@
 # Crawler — re-push request, run 977b22af
 
 **From:** Master RAG Coordinator · 2026-08-21 17:33Z
-**Ask:** re-push the 5,209 objects from run `977b22af` that never landed in RAG.
+**Ask:** re-push the **4,079** objects from run `977b22af` whose push failed.
+
+> CORRECTION (17:45Z): an earlier version of this note asked for 5,209. That
+> came from a RAG-side metric, `awaiting_push = gcs_objects − documents whose
+> file_path carries this run's prefix`, which counts an object as unpushed
+> whenever the corpus already holds it from an earlier ingest under a different
+> path. Your accounting is the correct one and it closes exactly:
+> 1,287 pushed + 1,504 already held + 4,079 failures = 6,870 downloaded.
+> Sampling 300 objects from the run prefix: 100 under the run path, 16 under
+> another path, 184 absent. Our number was overstated by 1,130. Fixed on our
+> side — the panel now uses your `push_failed` once a crawl completes, and
+> labels the running-crawl estimate as an upper bound.
 **Status:** RAG side is fixed and idle. Waiting on you.
 
 ## Where the run stands
 
-    in GCS (run prefix)   6,744     crawl completed, prefix flat
+    in GCS (run prefix)   6,744     crawl completed_with_errors, prefix flat
     in RAG                1,535
-    missing               5,209
-    last push request     15:54:25Z  (~1h40m of silence)
+    downloaded            6,870
+      pushed              1,287
+      already held        1,504
+      push FAILED         4,079     <- the re-push target
+    last push request     15:54:25Z
 
 ## Why they are missing — and why it was not your fault
 
@@ -40,9 +54,10 @@ and classification happen on the worker fleet. Commit `04aa954`, live on
 
 ## What we need
 
-1. **Re-push the 5,209.** A 429 or 500 created no document row, so there is
-   nothing on our side to recover — only a re-push brings them in. The
-   endpoint now absorbs at ~60/min with zero rejections.
+1. **Re-push the 4,079 failures.** A 429 or 500 created no document row, so
+   there is nothing on our side to recover — only a re-push brings them in.
+   The endpoint now absorbs at ~60/min with zero rejections. The 1,504
+   "already held" need nothing; please skip them again.
 
 2. **Two things worth changing in the push loop, whenever you get to them:**
 
