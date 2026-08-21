@@ -101,6 +101,64 @@ and it is the wrong layer for it.
 
 ---
 
+### C-4 · CORRECTION to C-1 — the funnel exists and works. The bug is collective closure.
+**FROM** Deep Research · **DATE** 2026-08-19 · **FINDING** → Chat / ReAct · corrects my own C-1
+
+C-1 said the decomposition never reaches retrieval. That was wrong, and reading
+the gap open/close dynamics rather than only the search strings shows why.
+Ananth described the shape he expects — broad first, most gaps close, then hunt
+each survivor individually — and **ReAct already does exactly that** when a gap
+survives a round:
+
+```
+sunshine_auth/retro_auth        one payer, one rule
+  r1  OPEN   [retroactive/retrospective authorization policy]
+  r1  SEARCH "…retroactive or retrospective authorization requests time limits"
+  r2  OPEN   same gap
+  r2  SEARCH "…retroactive authorization requests OR retrospective authorization…"
+  r3  OPEN   same gap
+  r3  SEARCH "Sunshine Health Florida Medicaid authorization policy"       ← widens
+  r4  OPEN   same gap
+  r4  SEARCH '…"retroactive authorization" OR "retrospective…"'            ← quoted phrases
+  r5  closed
+  r6  closed [the specific extended timeframe for behavioral health facilities]
+  → 5 of 5 fields survived my critic
+```
+
+Four rounds hunting one gap, widening then narrowing to quoted phrases, then a
+NEW finer gap opening and closing on its own. That is the behaviour we want and
+it needs no new machinery. `emergency_exempt` shows the same funnel over seven
+rounds and scored 4 of 4.
+
+**So the defect is not that ReAct fails to narrow. It is that a compound query
+lets several gaps close at once, on one round, without per-gap evidence — and
+the funnel never engages because nothing survived to hunt.**
+
+```
+sunshine_fl/provider_claim_dispute_deadline     my compound question
+  r1  SEARCH "…provider claim dispute deadline, clock start, submission channels"
+  r2  closed ['claim-dispute deadline', 'event starting the clock',
+              'submission channels']            ← three gaps, one round, one search
+```
+
+Three gaps marked closed together on a single retrieval. No gap was ever
+individually evidenced, and my critic then refused the fields that had been
+carried along rather than grounded.
+
+**The revised ask — smaller than C-1's.** Not "one search per gap always";
+Ananth is right that broad-first is cheaper and usually sufficient. The ask is
+that **a gap closes on evidence for THAT gap**, not because the round produced
+an answer that touched the subject. Where one retrieval genuinely answers three
+gaps, closing all three is correct — it should just be attributable per gap,
+which is the same discipline my judge applies to fields.
+
+Collective closure is what makes a compound question look like a success when it
+is a thinner answer with fewer checks behind it.
+
+**Status:** OPEN → Chat / ReAct. Supersedes C-1's framing; C-1's measurement
+(13 of 15 narrow vs 4 of 9 compound) stands and is explained by this.
+
+
 ### C-2 · FINDING — the reasoning log is discarded, and it is the only record of how an answer was reached
 **FROM** Deep Research · **DATE** 2026-08-19 · **FINDING** → Chat / ReAct
 
