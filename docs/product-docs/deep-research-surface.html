@@ -1,0 +1,165 @@
+<title>Deep Research — one question</title>
+<style>
+:root{--ink:#1a1d24;--ink-2:#4e5563;--ink-3:#818897;--page:#f7f5f2;--card:#fffefd;
+--line:#e5e0d8;--ask:#2f6b8f;--chat:#4e5563;--judge:#8a5a1f;--next:#2c6e49;
+--fail:#b3452b;--pass:#2c6e49;--built:#2c6e49;--partial:#a06a12;--missing:#b3452b;}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#edeaf1;
+--ink-2:#b6bbc7;--ink-3:#868d9b;--page:#15171c;--card:#1c1f26;--line:#2e333d;
+--ask:#7fb4d4;--chat:#b6bbc7;--judge:#d9ab5c;--next:#6fbf92;--fail:#e08a72;
+--pass:#6fbf92;--built:#6fbf92;--partial:#d9ab5c;--missing:#e08a72;}}
+:root[data-theme="dark"]{--ink:#edeaf1;--ink-2:#b6bbc7;--ink-3:#868d9b;--page:#15171c;
+--card:#1c1f26;--line:#2e333d;--ask:#7fb4d4;--chat:#b6bbc7;--judge:#d9ab5c;
+--next:#6fbf92;--fail:#e08a72;--pass:#6fbf92;--built:#6fbf92;--partial:#d9ab5c;--missing:#e08a72;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);
+font:16px/1.6 ui-serif,Georgia,"Iowan Old Style",serif}
+.wrap{max-width:1020px;margin:0 auto;padding:2.6rem 1.5rem 5rem}
+h1{font-size:1.9rem;margin:0 0 .3rem;letter-spacing:-.02em}
+.lede{color:var(--ink-2);max-width:62ch;margin:0 0 2rem}
+h2{font-size:.75rem;text-transform:uppercase;letter-spacing:.13em;color:var(--ink-3);
+font-family:ui-sans-serif,system-ui,sans-serif;margin:2.8rem 0 1rem;
+padding-bottom:.45rem;border-bottom:1px solid var(--line)}
+.stats{display:flex;flex-wrap:wrap;gap:2.2rem;margin-bottom:.5rem}
+.stat b{display:block;font-size:1.7rem;font-variant-numeric:tabular-nums;
+font-family:ui-sans-serif,system-ui,sans-serif;letter-spacing:-.02em}
+.stat span{font-size:.76rem;color:var(--ink-3);font-family:ui-sans-serif,system-ui,sans-serif}
+/* the surface */
+.step{border-left:2px solid var(--line);padding:0 0 1.6rem 1.4rem;margin-left:.5rem;position:relative}
+.step:last-child{padding-bottom:0}
+.step::before{content:"";position:absolute;left:-5px;top:.45rem;width:8px;height:8px;
+border-radius:50%;background:var(--line)}
+.step.s-ask::before{background:var(--ask)}.step.s-chat::before{background:var(--chat)}
+.step.s-judge::before{background:var(--judge)}.step.s-next::before{background:var(--next)}
+.step h3{margin:0 0 .1rem;font-family:ui-sans-serif,system-ui,sans-serif;
+font-size:.74rem;text-transform:uppercase;letter-spacing:.1em}
+.s-ask h3{color:var(--ask)}.s-chat h3{color:var(--chat)}
+.s-judge h3{color:var(--judge)}.s-next h3{color:var(--next)}
+.step .who{font-size:.73rem;color:var(--ink-3);font-family:ui-sans-serif,system-ui,sans-serif;
+margin:0 0 .6rem}
+.bubble{background:var(--card);border:1px solid var(--line);border-radius:4px;
+padding:.9rem 1.05rem;margin:.2rem 0}
+.bubble p{margin:0 0 .5rem}.bubble p:last-child{margin:0}
+.q{font-size:1.02rem}
+.docs{font-size:.74rem;color:var(--ink-3);font-family:ui-monospace,monospace;
+margin-top:.6rem;word-break:break-word}
+table{width:100%;border-collapse:collapse;font-size:.83rem;margin:.3rem 0}
+th{text-align:left;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.67rem;
+text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);padding:.4rem .6rem;
+border-bottom:1px solid var(--line);font-weight:600}
+td{padding:.5rem .6rem;border-bottom:1px solid var(--line);vertical-align:top}
+.scroll{overflow-x:auto}
+.fname{font-family:ui-monospace,monospace;font-size:.79rem;white-space:nowrap}
+.mark{font-weight:700}.mark.no{color:var(--fail)}.mark.yes{color:var(--pass)}
+.why{color:var(--ink-2);font-size:.79rem}
+code{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.83em;
+background:var(--card);border:1px solid var(--line);border-radius:2px;padding:.05rem .3rem}
+.ev{list-style:none;padding:0;margin:.5rem 0 0}
+.ev li{font-size:.8rem;color:var(--ink-2);padding:.2rem 0 .2rem 1rem;position:relative}
+.ev li::before{content:"·";position:absolute;left:.2rem;color:var(--ink-3)}
+.act{display:inline-block;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.7rem;
+letter-spacing:.05em;text-transform:uppercase;border:1px solid currentColor;
+border-radius:2px;padding:.1rem .45rem;color:var(--next)}
+.owner{font-size:.73rem;color:var(--ink-3);font-family:ui-sans-serif,system-ui,sans-serif}
+.tag{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.67rem;padding:.08rem .4rem;
+border-radius:2px;border:1px solid currentColor;white-space:nowrap}
+.built{color:var(--built)}.partial{color:var(--partial)}.missing{color:var(--missing)}
+.blocked{color:var(--missing)}
+footer{margin-top:3rem;padding-top:1.1rem;border-top:1px solid var(--line);
+font-size:.77rem;color:var(--ink-3);font-family:ui-sans-serif,system-ui,sans-serif}
+</style>
+<div class="wrap">
+<h1>One question, end to end</h1>
+<p class="lede">The surface a person would actually use: ask, watch chat answer, watch the
+judge disbelieve it field by field, and get a next step with a name on it. Everything below
+is a real run against the live corpus — nothing here is illustrative.</p>
+
+<div class="stats">
+  <div class="stat"><b>11</b><span>judge skills built</span></div>
+  <div class="stat"><b>31</b><span>requests run</span></div>
+  <div class="stat"><b>3</b><span>facts sourced</span></div>
+  <div class="stat"><b>8</b><span>open repairs</span></div>
+  <div class="stat"><b>0</b><span>limits certified</span></div>
+</div>
+
+<h2>The surface</h2>
+
+<div class="step s-ask">
+  <h3>Canonical question</h3>
+  <p class="who">caller · service_line_registry · authority=standard · bar=completeness</p>
+  <div class="bubble q">For Florida Medicaid Community Behavioral Health, procedure code H2017 is psychosocial rehabilitation services. What is the unit definition and what limits apply to how much may be billed?</div>
+</div>
+
+<div class="step s-chat">
+  <h3>Chat answers</h3>
+  <p class="who">agentic · 2 reasoning rounds · prose, never asked to format</p>
+  <div class="bubble"><p><b>HCPCS code H2017 for psychosocial rehabilitation services in Florida Medicaid Community Behavioral Health is defined in 15-minute increments.</b></p><p>• The billing limit for these services is <b>1,920 quarter-hour units (</b>480 hours<b>)</b> per state fiscal year.</p><p>• H2017 is a Medicaid-only code and is not covered by Medicare.</p><p>• Psychosocial rehabilitation aims to help individuals with severe and persistent mental illness develop functional skills for independent living and community participation.</p>
+    <div class="docs">cited: 59G-4.031.pdf, abhfl_medicaid_comprehensive_ltc_provider_manual.pdf, attachment_3-1-A.pdf</div>
+  </div>
+</div>
+
+<div class="step s-judge">
+  <h3>Extract — prose into fields, each with its own quote</h3>
+  <p class="who">judge · outside chat, so the check is not verifying text written to satisfy it</p>
+  <div class="scroll"><table>
+  <thead><tr><th>field</th><th>value</th><th>quote it stands on</th></tr></thead>
+  <tbody><tr><td class='fname'>code</td><td>H2017</td><td class='why'>“HCPCS code H2017 for psychosocial rehabilitation services in Florida Medicaid Community Be”</td></tr><tr><td class='fname'>modifier</td><td>None</td><td class='why'>“”</td></tr><tr><td class='fname'>limits[0].limit_type</td><td>units</td><td class='why'>“The billing limit for these services is 1,920 quarter-hour units (480 hours) per state fis”</td></tr><tr><td class='fname'>limits[0].amount</td><td>1920</td><td class='why'>“The billing limit for these services is 1,920 quarter-hour units (480 hours) per state fis”</td></tr><tr><td class='fname'>limits[0].unit_definition</td><td>15-minute increments</td><td class='why'>“HCPCS code H2017 for psychosocial rehabilitation services in Florida Medicaid Community Be”</td></tr></tbody></table></div>
+</div>
+
+<div class="step s-judge">
+  <h3>Judge — every field disbelieved on its own</h3>
+  <p class="who">0 of 5 fields survived (4 not stated); missing required: code, unit_definition</p>
+  <div class="scroll"><table>
+  <thead><tr><th>field</th><th></th><th>issue</th><th>why</th></tr></thead>
+  <tbody><tr><td class='fname'>code</td><td class='mark no'>refused</td><td><code>not_a_standard_source</code></td><td class='why'>&#x27;Florida Medicaid Community Behavioral Health Fee S&#x27; carries no rule number — it is not the published standard. A payor&#x27;</td></tr><tr><td class='fname'>modifier</td><td class='mark no'>refused</td><td><code>not_stated</code></td><td class='why'>answer did not state this field</td></tr><tr><td class='fname'>limits[0].limit_type</td><td class='mark no'>refused</td><td><code>not_a_standard_source</code></td><td class='why'>&#x27;Florida Medicaid Community Behavioral Health Fee S&#x27; carries no rule number — it is not the published standard. A payor&#x27;</td></tr><tr><td class='fname'>limits[0].amount</td><td class='mark no'>refused</td><td><code>not_a_standard_source</code></td><td class='why'>&#x27;Florida Medicaid Community Behavioral Health Fee S&#x27; carries no rule number — it is not the published standard. A payor&#x27;</td></tr><tr><td class='fname'>limits[0].unit_definition</td><td class='mark no'>refused</td><td><code>not_a_standard_source</code></td><td class='why'>&#x27;Florida Medicaid Community Behavioral Health Fee S&#x27; carries no rule number — it is not the published standard. A payor&#x27;</td></tr><tr><td class='fname'>limits[0].period</td><td class='mark no'>refused</td><td><code>not_a_standard_source</code></td><td class='why'>&#x27;Florida Medicaid Community Behavioral Health Fee S&#x27; carries no rule number — it is not the published standard. A payor&#x27;</td></tr><tr><td class='fname'>limits[0].per_whom</td><td class='mark no'>refused</td><td><code>not_stated</code></td><td class='why'>answer did not state this field</td></tr><tr><td class='fname'>limits[0].unlimited</td><td class='mark no'>refused</td><td><code>not_stated</code></td><td class='why'>answer did not state this field</td></tr><tr><td class='fname'>limits[0].exceedable_by</td><td class='mark no'>refused</td><td><code>not_stated</code></td><td class='why'>answer did not state this field</td></tr></tbody></table></div>
+</div>
+
+<div class="step s-next">
+  <h3>Diagnose — the database decides what the repair is</h3>
+  <p class="who">gap class <code>reference_followable</code></p>
+  <div class="bubble">
+    <p>fl_bh_therapy_services_59G-4.052.pdf defers to 59G-4.002, and the corpus already holds it: 2025 Community Behavoir Health Fee Schedule.pdf states H2017 on page 3. Ask again against that document.</p>
+    <ul class="ev"><li>corpus has fl_bh_therapy_services_59G-4.052.pdf</li><li>fl_bh_therapy_services_59G-4.052.pdf defers to 59G-4.002: &quot;incorporated by reference in Rule 59G-4.002&quot;</li><li>followed it: H2017 is in 2025 Community Behavoir Health Fee Schedule.pdf p3</li></ul>
+  </div>
+</div>
+
+<div class="step s-next">
+  <h3>Next step</h3>
+  <p class="who">this is the whole product — a named repair with an owner</p>
+  <div class="bubble">
+    <p><span class="act">refine</span></p>
+    <p>Re-ask against <b>2025 Community Behavoir Health Fee Schedule.pdf</b>, page 3 — the document
+    59G-4.002 publishes, which the coverage policy forwards to.</p>
+    <p class="owner">owner: the loop itself · in-loop, another turn, needs nobody else</p>
+  </div>
+</div>
+
+<h2>Built vs not</h2>
+<div class="scroll"><table>
+<thead><tr><th>piece</th><th></th><th></th></tr></thead>
+<tbody><tr><td><b>The loop</b></td><td class='why'>ask → extract → judge → diagnose → dispatch</td><td><span class='tag built'>built</span></td></tr><tr><td><b>Judge, 11 skills</b></td><td class='why'>gates free-first, then judged; every one abstains rather than passing</td><td><span class='tag built'>built</span></td></tr><tr><td><b>Diagnosis ladder</b></td><td class='why'>7 gap classes, each resolving to one owner</td><td><span class='tag built'>built</span></td></tr><tr><td><b>follow_reference</b></td><td class='why'>resolves a deferral by content — which document contains the code</td><td><span class='tag built'>built</span></td></tr><tr><td><b>Repair queue</b></td><td class='why'>research.diagnosis + open_repairs, ordered by what blocks most</td><td><span class='tag built'>built</span></td></tr><tr><td><b>Fact rows</b></td><td class='why'>one row per field with quote, document_id, page, six check results</td><td><span class='tag built'>built</span></td></tr><tr><td><b>Structured output</b></td><td class='why'>schema-constrained extraction on Vertex</td><td><span class='tag built'>built</span></td></tr><tr><td><b>Caller policy</b></td><td class='why'>authority standard|any_cited; bar completeness|confidence</td><td><span class='tag partial'>partial</span></td></tr><tr><td><b>Resume</b></td><td class='why'>a landed repair wakes the turn waiting on it</td><td><span class='tag missing'>missing</span></td></tr><tr><td><b>Deadline</b></td><td class='why'>needed_by, and a sweep that ends a wait</td><td><span class='tag missing'>missing</span></td></tr><tr><td><b>Owner + claim</b></td><td class='why'>two poller consumers cannot claim the same repair</td><td><span class='tag missing'>missing</span></td></tr><tr><td><b>Delivery</b></td><td class='why'>the caller is told; today the answer just lands in a table</td><td><span class='tag missing'>missing</span></td></tr><tr><td><b>code↔prose</b></td><td class='why'>36 of 40 billable services have no lexicon language</td><td><span class='tag blocked'>blocked</span></td></tr></tbody></table></div>
+
+<h2>What I would build next, in this order</h2>
+<div class="scroll"><table>
+<thead><tr><th>#</th><th>next</th><th>why this order</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><b>This surface, for real</b></td><td class='why'>everything above exists as a
+terminal trace and a SQL view. One page that poses a question and shows this is the cheapest
+way to make the loop reviewable by someone who is not reading logs.</td></tr>
+<tr><td>2</td><td><b>Sweep the stale queue</b></td><td class='why'>4 of 8 open repairs were
+filed under logic that has since been superseded — three <code>reindex</code> against policies
+that defer by reference, one <code>question_incoherent</code> already fixed. A queue with
+stale rows stops being read.</td></tr>
+<tr><td>3</td><td><b>Resume</b></td><td class='why'>a landed repair does not wake the turn
+waiting on it, so the queue is write-only. Least visible item, biggest difference between a
+queue and a log.</td></tr>
+<tr><td>4</td><td><b>Deadline</b></td><td class='why'>the only bound that can end a wait on
+someone else's repair.</td></tr>
+<tr><td>5</td><td><b>Owner + claim</b></td><td class='why'>RAG and Curation both pull from one
+queue and nothing stops them racing.</td></tr>
+</tbody></table></div>
+
+<footer>Run: <code>bh_therapy/service_limit_H2017</code>, turn 1, gemini profile, against mobius_rag.
+The judge refused a correct answer here — chat found the right number in the right document,
+and the authority gate refused it because the request asked for the AHCA standard and the fee
+schedule was not yet recognised as one. The diagnosis is what recovered it.</footer>
+</div>
