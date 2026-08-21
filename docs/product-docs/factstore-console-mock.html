@@ -1,0 +1,207 @@
+<title>Fact Store console</title>
+<style>
+:root{--ink:#191c22;--ink-2:#4c5462;--ink-3:#858c9a;--page:#f6f4f1;--card:#fffefd;
+--sunk:#efece7;--line:#e2ddd5;--acc:#2f6b8f;--ok:#2c6e49;--warn:#a06a12;--no:#b3452b;}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#eceaf0;
+--ink-2:#b4b9c5;--ink-3:#8a919e;--page:#14161b;--card:#1b1e25;--sunk:#101216;
+--line:#2f343e;--acc:#7fb4d4;--ok:#6fbf92;--warn:#d9ab5c;--no:#e08a72;}}
+:root[data-theme="dark"]{--ink:#eceaf0;--ink-2:#b4b9c5;--ink-3:#8a919e;--page:#14161b;
+--card:#1b1e25;--sunk:#101216;--line:#2f343e;--acc:#7fb4d4;--ok:#6fbf92;--warn:#d9ab5c;--no:#e08a72;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);
+font:15px/1.55 ui-sans-serif,system-ui,-apple-system,sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:2rem 1.2rem 4rem}
+.mock{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+border:1px solid var(--line);border-radius:2px;padding:.15rem .45rem;display:inline-block}
+h1{font:600 1.5rem/1.25 ui-sans-serif,system-ui,sans-serif;margin:.7rem 0 .3rem;letter-spacing:-.01em}
+.sub{color:var(--ink-2);margin:0 0 1.5rem;font-size:.92rem}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.ph{padding:.8rem 1rem;border-bottom:1px solid var(--line);display:flex;
+justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+.ph h2{margin:0;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.req{padding:1rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.9rem}
+.fld{min-width:0}
+.fld b{display:block;font-size:.65rem;letter-spacing:.09em;text-transform:uppercase;
+color:var(--ink-3);margin-bottom:.15rem}
+.fld span{font-size:.86rem;word-break:break-word}
+.mono{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.8rem}
+button{font:inherit;font-size:.83rem;padding:.42rem .95rem;border-radius:4px;cursor:pointer;
+border:1px solid var(--line);background:var(--card);color:var(--ink)}
+button.go{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+button:disabled{opacity:.45;cursor:default}
+button.ghost{color:var(--ink-2)}
+.stages{display:flex;gap:.4rem;padding:.7rem 1rem;background:var(--sunk);
+border-bottom:1px solid var(--line);flex-wrap:wrap}
+.stg{font-size:.73rem;color:var(--ink-3);border:1px solid transparent;border-radius:3px;
+padding:.16rem .5rem}
+.stg.on{color:var(--acc);border-color:var(--acc)}
+.stg.done{color:var(--ok);border-color:transparent}
+.rows{padding:.4rem 0}
+.row{border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.rh{display:grid;grid-template-columns:1.5fr 1.6fr auto auto;gap:.7rem;align-items:center;
+padding:.62rem 1rem;cursor:pointer}
+.rh:hover{background:var(--sunk)}
+.fn{font-family:ui-monospace,monospace;font-size:.79rem}
+.vl{font-size:.85rem;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip{font-size:.66rem;letter-spacing:.05em;text-transform:uppercase;border:1px solid currentColor;
+border-radius:2px;padding:.06rem .38rem;white-space:nowrap}
+.chip.present{color:var(--ok)}.chip.not_checkable{color:var(--warn)}
+.chip.no_document_id{color:var(--no)}
+.pg{font-size:.75rem;color:var(--ink-3);font-variant-numeric:tabular-nums;min-width:2.6rem;
+text-align:right}
+.ev{display:none;padding:.1rem 1rem 1rem 1rem;background:var(--sunk)}
+.row.open .ev{display:block}
+.ev dl{display:grid;grid-template-columns:7.2rem 1fr;gap:.3rem .9rem;margin:.4rem 0 0}
+.ev dt{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding-top:.15rem}
+.ev dd{margin:0;font-size:.84rem;word-break:break-word}
+.q{font-family:Georgia,ui-serif,serif;font-style:italic;color:var(--ink-2)}
+.gates{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.2rem}
+.g{font-size:.66rem;border:1px solid var(--line);border-radius:2px;padding:.04rem .35rem;color:var(--ink-3)}
+.g.pass{color:var(--ok);border-color:currentColor}
+.g.fail{color:var(--no);border-color:currentColor}
+.foot{padding:.85rem 1rem;border-top:1px solid var(--line);display:flex;gap:.6rem;
+align-items:center;flex-wrap:wrap;background:var(--sunk)}
+.tally{font-size:.83rem;color:var(--ink-2);margin-right:auto}
+.tally b{color:var(--ink)}
+.norm{margin:1.2rem 0 0;padding:.8rem 1rem;background:var(--card);border:1px solid var(--line);
+border-radius:5px;font-size:.86rem;color:var(--ink-2)}
+.norm code{font-family:ui-monospace,monospace;font-size:.8rem;color:var(--ink)}
+.notes{margin-top:2rem}
+.notes h3{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+margin:0 0 .6rem;padding-bottom:.35rem;border-bottom:1px solid var(--line)}
+.nt{border-left:2px solid var(--acc);padding:.1rem 0 .1rem .9rem;margin:.8rem 0;
+color:var(--ink-2);font-size:.88rem;max-width:66ch}
+.nt b{color:var(--ink);display:block;font-size:.87rem}
+.toast{font-size:.83rem;color:var(--ok)}
+</style>
+<div class="wrap">
+<span class="mock">prototype · not built</span>
+<h1>Fact Store — source a predicate</h1>
+<p class="sub">UC-1 as an operator would use it. One request, the rows that come back, and the
+evidence behind each. Real data from a real run.</p>
+
+<div class="panel">
+  <div class="ph">
+    <h2>Request</h2>
+    <button id="go" class="go" onclick="run()">Run</button>
+  </div>
+  <div class="req">
+    <div class="fld"><b>payer</b><span class="mono">Sunshine Health|FL|Medicaid</span></div>
+    <div class="fld"><b>predicate</b><span class="mono">appeal.deadline_days</span></div>
+    <div class="fld"><b>authority</b><span>any_cited</span></div>
+    <div class="fld"><b>bar</b><span>completeness</span></div>
+    <div class="fld"><b>required</b><span class="mono">amount_verbatim · unit_verbatim · anchor_event</span></div>
+    <div class="fld"><b>needed by</b><span>2026-08-26</span></div>
+  </div>
+  <div class="stages">
+    <span class="stg">asking chat</span><span class="stg">assembling</span><span class="stg">judging</span><span class="stg">arbiter</span>
+  </div>
+  <div id="results" style="display:none">
+    <div id="rows" class="rows"></div>
+    <div class="foot">
+      <span class="tally" id="tally"></span>
+      <span class="toast" id="toast"></span>
+      <button class="ghost" onclick="document.querySelectorAll('.row').forEach(r=>r.classList.add('open'))">Expand all</button>
+      <button class="go" onclick="write()">Write candidates</button>
+    </div>
+  </div>
+</div>
+
+<div class="norm"><b>Normalisation, done visibly at write:</b>
+<code>90 days</code> —
+<code>90 calendar days = 90 days</code>. The verbatim value stays
+<code>"90" / "calendar days"</code>. A store that holds only the normalised number cannot be
+audited, and a wrong conversion in a deadlines domain is unrecoverable.</div>
+
+<div class="notes">
+<h3>What this screen is for</h3>
+
+<div class="nt"><b>The evidence is one click from the value, not in a log.</b>
+Every row opens to its quote, its document, its page, and which of the six checks it passed.
+An operator deciding whether to accept a fact should not have to trust a summary — the reason
+is right there.</div>
+
+<div class="nt"><b>Three rows cannot be written, and the screen says so rather than hiding it.</b>
+They cite &ldquo;Provider Dispute Form&rdquo;, which chat named in its reasoning log but never
+returned in <code>sources</code> — so it has a name and no id. A name cannot be joined back to
+the corpus, and that is how a store ends up with facts it cannot trace.</div>
+
+<div class="nt"><b>&ldquo;Not checkable&rdquo; is a third state, deliberately.</b>
+<code>calendar days</code> and the anchor event carry no code or number to look for, so the
+in-source check has nothing to test. That is not a pass and not a failure. Collapsing it into
+either would either certify something unverified or discard something good.</div>
+
+<div class="nt"><b>Prototype, not build.</b>
+The rows, quotes, pages and check results are real output from the Sunshine Health run. The
+staging animation is theatre — the real run takes minutes and would arrive by poll.</div>
+</div>
+</div>
+<script>
+const ROWS = [{"payer_key": "Sunshine Health|FL|Medicaid", "predicate": "payer_key", "field": "payer_key", "value_verbatim": "Sunshine Health|FL|Medicaid", "quote": "For Sunshine Health Florida Medicaid, the provider claim-dispute deadline is 90 calendar days.", "source_document_id": "d9721756-d1b1-4cf4-845b-f44652c5fcf9", "source_document_name": "Sunshine Provider Manual", "page": null, "authority_tier": null, "checks": {"quote_verbatim": true, "document_cited": true, "source_identifiable": true, "authority": "unchecked", "quote_supports_value": true, "present_in_source": "not_checkable"}, "missing_tokens": []}, {"payer_key": "Sunshine Health|FL|Medicaid", "predicate": "deadline.amount_verbatim", "field": "deadline.amount_verbatim", "value_verbatim": "90", "quote": "For Sunshine Health Florida Medicaid, the provider claim-dispute deadline is 90 calendar days.", "source_document_id": "d9721756-d1b1-4cf4-845b-f44652c5fcf9", "source_document_name": "Sunshine Provider Manual", "page": 6, "authority_tier": null, "checks": {"quote_verbatim": true, "document_cited": true, "source_identifiable": true, "authority": "unchecked", "quote_supports_value": true, "present_in_source": "present"}, "missing_tokens": []}, {"payer_key": "Sunshine Health|FL|Medicaid", "predicate": "deadline.unit_verbatim", "field": "deadline.unit_verbatim", "value_verbatim": "calendar days", "quote": "For Sunshine Health Florida Medicaid, the provider claim-dispute deadline is 90 calendar days.", "source_document_id": "d9721756-d1b1-4cf4-845b-f44652c5fcf9", "source_document_name": "Sunshine Provider Manual", "page": null, "authority_tier": null, "checks": {"quote_verbatim": true, "document_cited": true, "source_identifiable": true, "authority": "unchecked", "quote_supports_value": true, "present_in_source": "not_checkable"}, "missing_tokens": []}, {"payer_key": "Sunshine Health|FL|Medicaid", "predicate": "deadline.anchor_event", "field": "deadline.anchor_event", "value_verbatim": "date of the original Explanation of Payment (EOP) or denial notification", "quote": "The clock starts from the date of the original Explanation of Payment (EOP) or denial notification.", "source_document_id": "d9721756-d1b1-4cf4-845b-f44652c5fcf9", "source_document_name": "Sunshine Provider Manual", "page": null, "authority_tier": null, "checks": {"quote_verbatim": true, "document_cited": true, "source_identifiable": true, "authority": "unchecked", "quote_supports_value": true, "present_in_source": "not_checkable"}, "missing_tokens": []}, {"payer_key": "Sunshine Health|FL|Medicaid", "predicate": "deadline.day_type", "field": "deadline.day_type", "value_verbatim": "calendar", "quote": "For Sunshine Health Florida Medicaid, the provider claim-dispute deadline is 90 calendar days.", "source_document_id": "d9721756-d1b1-4cf4-845b-f44652c5fcf9", "source_document_name": "Sunshine Provider Manual", "page": null, "authority_tier": null, "checks": {"quote_verbatim": true, "document_cited": true, "source_identifiable": true, "authority": "unchecked", "quote_supports_value": true, "present_in_source": "not_checkable"}, "missing_tokens": []}, {"payer_key": "Sunshine Health|FL|Medicaid", "predicate": "submission_channels", "field": "submission_channels", "value_verbatim": {"party": "Sunshine Health", "value": "PO Box 3070, Farmington, MO 63640-3823", "channel": "mail"}, "quote": "Mail the form to Sunshine Health, PO Box 3070, Farmington, MO 63640-3823.", "source_document_id": "d9721756-d1b1-4cf4-845b-f44652c5fcf9", "source_document_name": "Sunshine Provider Manual", "page": 123, "authority_tier": null, "checks": {"quote_verbatim": true, "document_cited": true, "source_identifiable": true, "authority": "unchecked", "quote_supports_value": true, "present_in_source": "present"}, "missing_tokens": []}, {"payer_key": "Sunshine Health|FL|Medicaid", "predicate": "submission_channels", "field": "submission_channels", "value_verbatim": {"value": "1-844-477-8313", "channel": "phone"}, "quote": "You can also call 1-844-477-8313 for assistance or to file a dispute verbally.", "source_document_id": "d9721756-d1b1-4cf4-845b-f44652c5fcf9", "source_document_name": "Sunshine Provider Manual", "page": 10, "authority_tier": null, "checks": {"quote_verbatim": true, "document_cited": true, "source_identifiable": true, "authority": "unchecked", "quote_supports_value": true, "present_in_source": "present"}, "missing_tokens": []}, {"payer_key": "Sunshine Health|FL|Medicaid", "predicate": "required_docs", "field": "required_docs", "value_verbatim": {"document": "written dispute form"}, "quote": "Disputes can be submitted via a written dispute form (Provider Claim Dispute Request Form or Provider Claim Adjustment Request Form).", "source_document_id": null, "source_document_name": "Provider Dispute Form", "page": null, "authority_tier": null, "checks": {"quote_verbatim": true, "document_cited": true, "source_identifiable": true, "authority": "unchecked", "quote_supports_value": true, "present_in_source": "no_document_id"}, "missing_tokens": []}, {"payer_key": "Sunshine Health|FL|Medicaid", "predicate": "required_docs", "field": "required_docs", "value_verbatim": {"document": "Provider Claim Dispute Request Form"}, "quote": "Disputes can be submitted via a written dispute form (Provider Claim Dispute Request Form or Provider Claim Adjustment Request Form).", "source_document_id": null, "source_document_name": "Provider Dispute Form", "page": null, "authority_tier": null, "checks": {"quote_verbatim": true, "document_cited": true, "source_identifiable": true, "authority": "unchecked", "quote_supports_value": true, "present_in_source": "no_document_id"}, "missing_tokens": []}, {"payer_key": "Sunshine Health|FL|Medicaid", "predicate": "required_docs", "field": "required_docs", "value_verbatim": {"document": "Provider Claim Adjustment Request Form"}, "quote": "Disputes can be submitted via a written dispute form (Provider Claim Dispute Request Form or Provider Claim Adjustment Request Form).", "source_document_id": null, "source_document_name": "Provider Dispute Form", "page": null, "authority_tier": null, "checks": {"quote_verbatim": true, "document_cited": true, "source_identifiable": true, "authority": "unchecked", "quote_supports_value": true, "present_in_source": "no_document_id"}, "missing_tokens": []}];
+const STAGES = ["asking chat","assembling","judging","arbiter"];
+let ran = false, sel = new Set();
+
+function chip(v){return `<span class="chip ${v}">${v.replace(/_/g," ")}</span>`}
+function gates(c){
+  const order=[["quote_verbatim","quote"],["document_cited","cited"],
+    ["source_identifiable","identifiable"],["authority","authority"],
+    ["quote_supports_value","supports"],["present_in_source","in source"]];
+  return order.map(([k,lbl])=>{
+    const v=c[k]; let cls="";
+    if(v===true||v==="present") cls="pass";
+    else if(v===false||v==="no_document_id") cls="fail";
+    return `<span class="g ${cls}">${lbl}</span>`;
+  }).join("");
+}
+function render(){
+  document.getElementById("rows").innerHTML = ROWS.map((r,i)=>`
+    <div class="row" id="r${i}">
+      <div class="rh" onclick="toggle(${i})">
+        <span class="fn">${r.field}</span>
+        <span class="vl">${typeof r.value_verbatim==="object"
+          ? JSON.stringify(r.value_verbatim) : r.value_verbatim}</span>
+        ${chip(r.checks.present_in_source)}
+        <span class="pg">${r.page?("p"+r.page):"—"}</span>
+      </div>
+      <div class="ev">
+        <dl>
+          <dt>quote</dt><dd class="q">&ldquo;${(r.quote||"—")}&rdquo;</dd>
+          <dt>document</dt><dd class="mono">${r.source_document_name||"—"}</dd>
+          <dt>document id</dt><dd class="mono">${r.source_document_id||
+            '<span style="color:var(--no)">none — cannot be written</span>'}</dd>
+          <dt>checks</dt><dd><div class="gates">${gates(r.checks)}</div></dd>
+          ${r.missing_tokens&&r.missing_tokens.length
+            ?`<dt>missing</dt><dd class="mono">${r.missing_tokens.join(", ")}</dd>`:""}
+        </dl>
+      </div>
+    </div>`).join("");
+  tally();
+}
+function toggle(i){document.getElementById("r"+i).classList.toggle("open")}
+function tally(){
+  const w = ROWS.filter(r=>r.source_document_id).length;
+  const h = ROWS.length - w;
+  document.getElementById("tally").innerHTML =
+    ran ? `<b>${w}</b> writable · <b>${h}</b> held — no document id`
+        : `${ROWS.length} rows pending`;
+}
+async function run(){
+  const btn=document.getElementById("go"); btn.disabled=true; btn.textContent="running…";
+  for(let s=0;s<STAGES.length;s++){
+    document.querySelectorAll(".stg").forEach((e,i)=>{
+      e.className="stg"+(i<s?" done":i===s?" on":"");
+    });
+    await new Promise(r=>setTimeout(r,620));
+  }
+  document.querySelectorAll(".stg").forEach(e=>e.className="stg done");
+  ran=true; document.getElementById("results").style.display="block";
+  btn.textContent="run again"; btn.disabled=false; render();
+}
+function write(){
+  const w = ROWS.filter(r=>r.source_document_id).length;
+  document.getElementById("toast").textContent =
+    `${w} rows written as cert_status='candidate'. 3 held — a document name cannot be joined back.`;
+}
+render();
+</script>
