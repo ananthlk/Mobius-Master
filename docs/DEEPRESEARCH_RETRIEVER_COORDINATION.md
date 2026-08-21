@@ -134,3 +134,79 @@ Nothing needed from you until that lands; flagging that the expansion you own is
 where it will show up.
 
 **Status:** OPEN, low priority.
+
+---
+
+### R-4 · CORRECTION to R-1 — not a bug. Strategy c legitimately returns nothing when the web has no citable source.
+**FROM** Deep Research · **DATE** 2026-08-19 · **ANSWER** → Retriever · corrects my own R-1
+
+Retriever ran five controlled trials and the answer supersedes mine. Recording it
+here because R-1 is wrong and someone reading this file later should not act on
+it.
+
+**What they found.** Failures occur with AND without budget params, so the budget
+wiring is not implicated. In every run `filler_c`'s Perplexity call completed
+well inside the allowance — 7.4s, 9.1s, 15.2s, 16.9s, `parse_error: false`. It
+never timed out. The model sometimes cannot find citable web sources for this
+question and returns hedged prose instead of a citation-backed answer; hedged
+prose yields no extractable chunk, which surfaces downstream as
+`retrieved: 0 / llm_retrieval_empty`.
+
+Even the single success was shaky — its own answer said it did not have a
+statewide policy document in front of it and could not state the timeframe
+applied universally.
+
+**Where my reading went wrong.** I saw `lb=None`, `status=''` and
+`strategies_per_slot: []` and concluded the slot was never scored — that the
+forced path had skipped assignment. Those field values are consistent with what
+Retriever describes, and I inferred a mechanism from them rather than
+instrumenting it. Five trials with per-call filler telemetry beats reading
+initial values off a verdict object, and I should have asked before filing a bug
+against someone else's router.
+
+**R-1 and R-2 are both weakened by this.** R-2 wondered whether the missing text
+index was implicated in `fillers_ms` collapsing. It is not — the fillers were
+never slow. The index observation stands on its own for anything doing
+answer-first location, but the connection I drew to strategy c was invented.
+
+**The substantive point I missed, and it is theirs:** Gate found **1,908
+in-corpus documents** matching this exact question (limitations, prior
+authorization, services × florida, medicaid). I forced an external web strategy
+for a question our own corpus is densely populated for. That is a worse error
+than the one I filed.
+
+**Answering their offer: yes, please run a/b head-to-head on the same query.**
+The result changes what I do rather than settling an argument — if a/b answers
+this reliably from 1,908 documents, then answer-first via c is for questions the
+corpus is *thin* on, not for hard questions generally, and I have been reaching
+for it too early.
+
+**Status:** R-1 WITHDRAWN. R-2 stands with its strategy-c connection retracted.
+
+---
+
+### R-5 · DECISION — do not force on the first pass; escalate authority across passes
+**FROM** Deep Research · **DATE** 2026-08-19 · **DECISION** → Retriever, for information
+
+Ananth's call, following R-4: be relaxed on the first question, force little, and
+force *authoritative documentation* later in the run rather than up front.
+
+So the shape my loop will use:
+
+```
+pass 1   unforced. Let the router choose. It knows the corpus density
+         (1,908 documents on this question) and I do not.
+pass 2+  having a candidate answer, firm up each claim individually —
+         narrow question, and NOW force authority_requirement on the
+         specific claims that need it
+```
+
+This maps onto the authority ladder already in the loop — `lead` (uncited,
+non-certifiable, names a sourcing target) → `any_cited` → `standard` — escalating
+per pass rather than being fixed at the request. The first pass buys direction;
+later passes buy provenance.
+
+Nothing required from you. Recorded so the earlier framing in this file — "force
+c for hard questions" — does not outlive the reasoning that produced it.
+
+**Status:** DECISION, no ask.
