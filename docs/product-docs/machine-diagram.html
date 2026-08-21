@@ -1,0 +1,198 @@
+<title>The machine, both loops</title>
+<style>
+:root{--ink:#1a1d24;--ink-2:#4d5462;--ink-3:#8a919f;--page:#f7f5f2;--card:#fffefd;
+--line:#d9d3c8;--fact:#2f6b8f;--den:#8a5a1f;--arb:#2c6e49;--pb:#6b3f8f;--no:#b3452b;}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#edeaf1;
+--ink-2:#b5bac6;--ink-3:#8b929f;--page:#15171c;--card:#1c1f26;--line:#39404c;
+--fact:#7fb4d4;--den:#d9ab5c;--arb:#6fbf92;--pb:#b28fd4;--no:#e08a72;}}
+:root[data-theme="dark"]{--ink:#edeaf1;--ink-2:#b5bac6;--ink-3:#8b929f;--page:#15171c;
+--card:#1c1f26;--line:#39404c;--fact:#7fb4d4;--den:#d9ab5c;--arb:#6fbf92;--pb:#b28fd4;--no:#e08a72;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:16px/1.6 ui-serif,Georgia,serif}
+.wrap{max-width:980px;margin:0 auto;padding:2.6rem 1.4rem 4rem}
+h1{font-size:1.85rem;margin:0 0 .3rem;letter-spacing:-.02em}
+.lede{color:var(--ink-2);max-width:62ch;margin:0 0 1.2rem}
+.key{display:flex;gap:1.6rem;flex-wrap:wrap;font-family:ui-sans-serif,system-ui,sans-serif;
+font-size:.78rem;color:var(--ink-2);margin:0 0 1.4rem}
+.key i{font-style:normal;font-weight:700;margin-right:.35rem}
+.key .f i{color:var(--fact)}.key .n i{color:var(--den)}
+figure{margin:0 0 1.6rem;background:var(--card);border:1px solid var(--line);
+border-radius:4px;padding:1.1rem .6rem;overflow-x:auto}
+svg{display:block;width:100%;height:auto;min-width:660px}
+.b rect{fill:var(--card);stroke:var(--line);stroke-width:1.4}
+.b.dash rect{stroke-dasharray:5 4}
+.b.arb rect{stroke:var(--arb);stroke-width:1.8}
+text{font-family:ui-sans-serif,system-ui,-apple-system,sans-serif}
+.t{font-size:13.5px;font-weight:700;letter-spacing:.11em;fill:var(--ink)}
+.t.d{fill:var(--ink)}.t.j{fill:var(--ink)}.t.ar{fill:var(--arb)}.t.p{fill:var(--pb)}
+.t.ex{fill:var(--ink)}.t.rc{fill:var(--ink)}.t.as{fill:var(--ink)}
+.s{font-size:12.5px;fill:var(--ink-3)}
+.s.r{text-anchor:end}
+.s.i{font-style:italic}
+.s.out{fill:var(--no)}
+.f{font-size:13px;fill:var(--fact)}
+.n{font-size:13px;fill:var(--den)}
+.cav{font-size:11.5px;fill:var(--ink-3);font-style:italic}
+.ln{stroke:var(--line);stroke-width:1.6;fill:none}
+.ah{fill:var(--line)}
+.ln.re{stroke-dasharray:4 4}
+.re-l{font-size:11.5px;fill:var(--ink-3);text-anchor:middle}
+.pr{stroke:var(--ink-3);stroke-width:1.2;fill:none;stroke-dasharray:3 3}
+.ahp{fill:var(--ink-3)}
+.pr-l{font-size:11.5px;fill:var(--ink-3);text-anchor:middle}
+.skip line{stroke:var(--no);stroke-width:2}
+.skip-l{font-size:11px;fill:var(--no)}
+h2{font-size:.73rem;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-3);
+font-family:ui-sans-serif,system-ui,sans-serif;margin:2.4rem 0 .9rem;padding-bottom:.4rem;
+border-bottom:1px solid var(--line)}
+p{max-width:66ch}
+.rd{border-left:2px solid var(--arb);padding:.15rem 0 .15rem 1rem;margin:1rem 0;
+color:var(--ink-2);font-size:.89rem}
+.rd b{color:var(--ink);font-family:ui-sans-serif,system-ui,sans-serif;font-size:.88rem;
+display:block;margin-bottom:.1rem}
+footer{margin-top:2.6rem;padding-top:1rem;border-top:1px solid var(--line);font-size:.76rem;
+color:var(--ink-3);font-family:ui-sans-serif,system-ui,sans-serif}
+</style>
+<div class="wrap">
+<h1>The machine, both loops</h1>
+<p class="lede">One pipeline. Each stage does the same job in either loop — only the unit it
+handles changes.</p>
+<p class="key">
+  <span class="f"><i>◆</i>fact loop — sourcing a value</span>
+  <span class="n"><i>◆</i>denial loop — adjudicating a branch</span>
+</p>
+
+<figure><svg viewBox="0 0 920 742" role="img" aria-label="The machine: Requester and Playbook feed Drafter, Assembler, Judge, Arbiter, then Executor and Recorder, with re-entry back to Drafter and a priors rail that skips the Judge.">
+<defs>
+  <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" class="ah"/>
+  </marker>
+  <marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" class="ahp"/>
+  </marker>
+</defs>
+
+<!-- spine arrows -->
+<path class="ln" marker-end="url(#a)" d="M460,116 L460,150"/>
+<path class="ln" marker-end="url(#a)" d="M460,232 L460,266"/>
+<path class="ln" marker-end="url(#a)" d="M460,348 L460,382"/>
+<path class="ln" marker-end="url(#a)" d="M460,488 L460,522"/>
+<path class="ln" marker-end="url(#a)" d="M375,604 L288,604 L288,636"/>
+<path class="ln" marker-end="url(#a)" d="M545,604 L632,604 L632,636"/>
+
+<!-- INPUTS -->
+<g class="b in">
+  <rect x="196" y="30" width="250" height="86" rx="4"/>
+  <text class="t" x="212" y="54">REQUESTER</text>
+  <text class="s" x="212" y="74">the ask · criteria · bar · clock</text>
+  <text class="s" x="212" y="94">registry · auth module · appeals</text>
+</g>
+<g class="b pb dash">
+  <rect x="474" y="30" width="250" height="86" rx="4"/>
+  <text class="t p" x="490" y="54">PLAYBOOK</text>
+  <text class="s" x="490" y="74">owns the candidate set</text>
+  <text class="s i" x="490" y="94">enumerated loops only</text>
+</g>
+<path class="ln" marker-end="url(#a)" d="M599,116 L599,134 L470,134 L470,150"/>
+
+<!-- DRAFTER -->
+<g class="b">
+  <rect x="250" y="150" width="420" height="82" rx="4"/>
+  <text class="t d" x="268" y="174">DRAFTER</text>
+  <text class="s r" x="652" y="174">proposes candidates</text>
+  <text class="f" x="268" y="199">◆ answers the question in prose</text>
+  <text class="n" x="268" y="220">◆ instantiates each branch, weights it, adds none</text>
+</g>
+
+<!-- ASSEMBLER -->
+<g class="b">
+  <rect x="250" y="266" width="420" height="82" rx="4"/>
+  <text class="t as" x="268" y="290">ASSEMBLER</text>
+  <text class="s r" x="652" y="290">candidate → typed unit</text>
+  <text class="f" x="268" y="315">◆ fields, each with its own quote and source</text>
+  <text class="n" x="268" y="336">◆ per branch, the evidence it would take to decide</text>
+</g>
+
+<!-- JUDGE -->
+<g class="b">
+  <rect x="250" y="382" width="420" height="106" rx="4"/>
+  <text class="t j" x="268" y="406">JUDGE</text>
+  <text class="s r" x="652" y="406">11 skills · free gates first</text>
+  <text class="f" x="268" y="431">◆ is this value grounded in the cited source</text>
+  <text class="n" x="268" y="452">◆ is the branch accurate — and is it proven</text>
+  <text class="cav" x="268" y="476">may reject or abstain · never repairs · never ranks</text>
+</g>
+
+<!-- ARBITER -->
+<g class="b arb">
+  <rect x="250" y="522" width="420" height="82" rx="4"/>
+  <text class="t ar" x="268" y="546">ARBITER</text>
+  <text class="s r" x="652" y="546">decides the next state</text>
+  <text class="f" x="268" y="571">◆ accept · refine · dispatch a repair · escalate</text>
+  <text class="n" x="268" y="592">◆ which branch executes · which needs evidence</text>
+</g>
+
+<!-- OUTPUT -->
+<g class="b">
+  <rect x="138" y="636" width="300" height="86" rx="4"/>
+  <text class="t ex" x="156" y="660">EXECUTOR</text>
+  <text class="s" x="156" y="681">inward  locate · acquire · reindex · gloss</text>
+  <text class="s out" x="156" y="702">outward  file · call · escalate</text>
+</g>
+<g class="b">
+  <rect x="482" y="636" width="300" height="86" rx="4"/>
+  <text class="t rc" x="500" y="660">RECORDER</text>
+  <text class="s" x="500" y="681">commits the outcome and the</text>
+  <text class="s" x="500" y="702">evidence that produced it</text>
+</g>
+
+<!-- RE-ENTRY -->
+<path class="ln re" marker-end="url(#a)" d="M250,563 L120,563 L120,191 L250,191"/>
+<text class="re-l" x="112" y="380" transform="rotate(-90 112 380)">re-entry · the case, and every prior verdict</text>
+
+<!-- PRIORS RAIL -->
+<path class="pr" marker-end="url(#ap)" d="M300,116 L300,132 L860,132 L860,163 L670,163"/>
+<path class="pr" marker-end="url(#ap)" d="M860,183 L860,535 L670,535"/>
+<text class="pr-l" x="874" y="330" transform="rotate(-90 874 330)">priors · weights</text>
+<g class="skip">
+  <line x1="846" y1="406" x2="874" y2="434"/>
+  <line x1="874" y1="406" x2="846" y2="434"/>
+</g>
+<text class="skip-l" x="838" y="470" text-anchor="end">never the Judge</text>
+</svg></figure>
+
+<h2>What the picture is asserting</h2>
+
+<div class="rd"><b>The spine never changes.</b>
+Propose, type, test, decide, act, record. Swap the unit from a field to a branch and every
+box keeps its contract — which is why these were the same build all along and were written
+as two.</div>
+
+<div class="rd"><b>The Playbook is dashed because it is optional, and it is the fork.</b>
+Present, candidates are enumerated and the Judge can ask whether one is <em>accurately
+stated</em>. Absent, candidates are generated and only their grounding can be checked. Every
+other difference between the loops descends from that box existing or not.</div>
+
+<div class="rd"><b>The priors rail crosses out at the Judge.</b>
+Weights reach the Drafter, to read the case, and the Arbiter, to rank what to try. They must
+not reach the Judge: a favoured candidate under a Judge that knows it is favoured turns
+“partial” into “proven”. Drawn as a broken line because it is a rule, not a wire.</div>
+
+<div class="rd"><b>The Arbiter is the only box with a heavier border.</b>
+It is the one actor that sees verdicts, weights and the clock together, and the only one
+permitted to change state. Everything above it produces evidence; everything below it acts.</div>
+
+<div class="rd"><b>Executor's two rows are not a list, they are a boundary.</b>
+Inward skills change our own state and a failure costs a dispatch. Outward skills change the
+world's and some cannot be undone. Same actor, same dispatch — different gate, and the
+caller's bar is what sets it.</div>
+
+<div class="rd"><b>Re-entry returns to the Drafter, not to the Requester.</b>
+A state change re-asks the same question against a larger evidence set, carrying every prior
+verdict. That is what makes it a machine rather than repeated prompting — closures accumulate
+and are not re-argued without new evidence.</div>
+
+<footer>The fact loop is built and running against the live corpus — 11 judge skills, 7 gap
+classes, a repair queue. The denial loop is designed to this diagram and not yet built. Both
+share every contract drawn here.</footer>
+</div>
