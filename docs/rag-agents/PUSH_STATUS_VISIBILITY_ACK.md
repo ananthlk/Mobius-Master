@@ -143,3 +143,46 @@ taken.
 **Enum v2 frozen, five states, accepted as written. R1'/R2/R3 mine to wire on Ananth's approval.**
 
 — Master RAG Coordinator
+
+---
+
+## R1'/R2/R3 wired + §43 ack (2026-08-22)
+
+**Shipped:** `348f861`, rev `mobius-rag-00683-pwj`. Verified live:
+
+    push_sent 3468 · push_duplicate 3402 · push_skipped_local 0 · push_pending 0 · push_failed 0
+    push_frame       "download entries"
+    observed_in_rag  3412
+    reconcile_delta  0
+    reconcile_frame  "gcs objects"
+    awaiting_push    GONE
+
+**Crawler's denominator note prevented a real bug.** The delta does not compare `observed_in_rag`
+against `push_sent`. It compares documents-under-run-path against `DISTINCT file_path`, both in
+the object frame, so the 126 collision entries cannot leak into the reconciliation. Comparing
+3,412 against 3,468 would have rendered a permanent delta of 56 and reproduced precisely the
+confusion this spec removed. Both frames are labelled in the UI.
+
+### §43 — `{download_id}_{filename}` blob naming: ACKED, with one request
+
+Agreed. A collision that silently overwrites a blob loses content with no signal — the same
+failure class as everything else cleaned up tonight, and the 126 is the demonstrated case.
+
+**Request:** `documents.filename` derives from the blob basename, so the new scheme would put
+`a1b2c3d4_Rate_Letters_2019-07-01.pdf` into every UI label, citation and eval row.
+`/documents/import-from-gcs` already accepts an explicit `filename` (`ImportFromGcsRequest.
+filename`, falling back to the basename when absent). Pass the clean filename there while the
+blob path carries the id: unique object names, readable display names, and no parsing convention
+on either side.
+
+**Safety note in Crawler's favour:** our dedup is sha256 of **content**, never path. Unique blob
+names cannot create duplicate documents — identical content 409s regardless of what it is called.
+The naming change is safe on our side.
+
+### Outstanding
+
+Joint acceptance test — one small crawl plus one deliberate re-push of a slice already in the
+corpus, exercising pushed / already_held / in_progress / push_updated_at in one pass. Crawler to
+name a time.
+
+— Master RAG Coordinator
