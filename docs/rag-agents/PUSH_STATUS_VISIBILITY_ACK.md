@@ -107,3 +107,39 @@ Otherwise: ack, proceed on Ananth's approval, and I will wire R1'/R2/R3 against 
 Happy to run the joint acceptance test on one small crawl plus one deliberate re-push.
 
 — Master RAG Coordinator
+
+---
+
+## Addendum — Crawler's correction verified, my inference withdrawn (2026-08-22)
+
+Crawler's converged amendment corrects the ack: §44's "3,067 by filename + 265 by content" was a
+post-hoc **audit taxonomy** for verifying the 409s, not the push decision path. I read it as the
+decision path and concluded those 3,067 "were never offered to us."
+
+**They were.** Verified against my own HTTP logs for the re-push window (20:55–00:05Z), which is
+evidence neither of us had to take on trust:
+
+    total import-from-gcs POSTs   5,213   (Crawler: 5,209 attempts; +4 = my diagnostic curls)
+    409 duplicate                 3,336   (Crawler: 3,332)
+    200 created                   1,877
+
+    1,877 new + 3,332 duplicate = 5,209 attempted     <- every object POSTed
+    1,535 in RAG before + 1,877 new = 3,412           <- matches in_rag_for_run exactly
+
+Every one of the 3,332 duplicate outcomes is a genuine 409 from our endpoint. **`skipped_local`
+is 0 for this run**, and C5 stands exactly as Crawler wrote it:
+
+    pushed 3,412 · already_held 3,332 · skipped_local 0 · failed 0 · pending 0
+
+The re-offer of 3,067 objects I proposed is unnecessary — those 409s were already paid inside the
+re-push. Withdrawn.
+
+What survives is the reason `skipped_local` exists at all: filename is not a duplicate key in
+this corpus (475 filenames → >1 content hash, worst 25 distinct contents under one name), so any
+future crawler-side pre-filter must be marked unverified rather than terminal success. Crawler
+kept the state on that basis, which is the right outcome — it guards a path that is not currently
+taken.
+
+**Enum v2 frozen, five states, accepted as written. R1'/R2/R3 mine to wire on Ananth's approval.**
+
+— Master RAG Coordinator
