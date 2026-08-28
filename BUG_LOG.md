@@ -390,6 +390,43 @@ ingestion owner has the exact two ids to reconcile.
 
 ---
 
+### Bug #13: `lv.submission.trim is not a function` — Submission Handler Type Error
+**Component:** mobius-chat LLM response processing / answer synthesis
+**Severity:** MEDIUM (UX failure — answer generates but submission fails; "This request failed" overlay appears)
+**Reporter:** Ananth (2026-08-20)
+**Repro:**
+
+User sends message to mobius-chat in agentic mode. LLM generates a complete, valid response (visible in the answer card as plain text + formatted content). Immediately after, error overlay: **"This request failed: lv.submission.trim is not a function"** with a "Retrying..." button.
+
+Screenshot shows:
+- Answer text is readable and correct: "Hey Genius! Now that we've confirmed Sunshine Health, I've pulled up all the specific details..."
+- Error appears below the answer
+- `lv.submission` is expected to be a string (has `.trim()` method call on it)
+- But it's actually undefined or a non-string type
+
+**Expected:** Answer posts successfully, no error overlay.
+**Actual:** Answer displays correctly, but submission tracking fails with type error.
+
+**Impact:**
+- User sees error message after getting a valid answer (confusing UX)
+- Submission state/telemetry may not be recorded (unclear if feedback attribution, run replay, etc. are affected)
+- "Retrying" button suggests the operation is retriable, but the answer is already complete
+
+**Root cause hypothesis:**
+- `lv.submission` (likely from response envelope or telemetry wrapper) is undefined/null when the handler tries to call `.trim()`
+- Possibly a case where the answer envelope structure changed or a field is missing under certain response conditions
+- Likely in mobius-chat's `app/main.py` or response serialization, wherever `lv.submission` is meant to be set
+
+**Next steps:**
+1. Find where `lv.submission.trim()` is called (search mobius-chat for `.trim()` on submission-related vars)
+2. Add a type guard: check if `submission` is a string before calling `.trim()`
+3. Verify the answer response envelope always includes `submission` field with the right type
+4. Check if this is specific to agentic mode or happens on all answer types
+
+**Owner:** (unassigned — Chat Frontend/UX agent)
+
+---
+
 ## 🟡 IN PROGRESS BUGS
 
 (None currently assigned)
@@ -439,12 +476,12 @@ When adding a new bug, use this format:
 
 | Status | Count |
 |--------|-------|
-| Open | 8 |
+| Open | 9 |
 | In Progress | 0 |
 | Fixed | 3 |
-| **Total** | **11** |
+| **Total** | **12** |
 
 ---
 
-**Last updated:** 2026-08-14 by Payor Platform agent
+**Last updated:** 2026-08-20 by Ananth
 **Next review:** When new bugs reported or weekly triage pass
