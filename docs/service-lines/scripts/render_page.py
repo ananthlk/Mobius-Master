@@ -99,6 +99,16 @@ td.c{font-family:var(--mono);white-space:nowrap}
 .mod.none{background:var(--surface-2);border-color:var(--line);color:var(--ink-3)}
 .excl{display:block;margin-top:3px;font-size:11px;color:var(--crit)}
 .lim{display:block;margin-top:2px;font-size:11px;color:var(--ink-3)}
+.lgrp{display:block;margin-bottom:6px}.lgrp:last-child{margin-bottom:0}
+.lim .per{color:var(--ink-3);font-weight:400}
+.lim.nocap{background:#eef7f0;color:#2b6b45;border-color:transparent}
+.lim.prose{background:transparent;color:var(--ink-3);border:1px dashed var(--line)}
+.udef{display:block;font-size:10.5px;color:var(--ink-3);margin-top:2px}
+.foot{margin:0;font-size:11px;color:var(--ink-3);line-height:1.55}
+.said-c{max-width:340px}
+.said2{display:block;font-size:11px;color:var(--ink-3);font-style:italic;margin-bottom:4px}
+.said2:last-child{margin-bottom:0}
+tr.gaprow td{background:#fdf6ec}
 .flag{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;
       text-transform:uppercase;padding:1px 5px;border-radius:3px;background:var(--warn-bg);
       color:var(--warn);border:1px solid var(--warn-line);margin-left:5px}
@@ -332,6 +342,72 @@ function standardReqCard(l){
     }).join('')+'</tbody></table></div></div>';
 }
 
+function limitCard(l){
+  var L=l.benefit_limits||[], G=l.benefit_limit_gap||[], c=l.benefit_limit_counts||{};
+  if(!L.length && !G.length) return '';
+
+  // A code with a daily cap AND an annual cap is one fact with two halves.
+  // Splitting them across rows is how the prose lost the pairing in the first
+  // place, so group by (code, modifier) and keep the caps together.
+  var by={}, order=[];
+  L.forEach(function(x){
+    var k=x.code+' '+(x.modifier||'');
+    if(!by[k]){by[k]=[]; order.push(k);}
+    by[k].push(x);
+  });
+
+  var rows = order.map(function(k){
+    var g=by[k], code=g[0].code, mod=g[0].modifier;
+    return '<tr><td class="c">'+esc(code)+'</td>'+
+      '<td>'+(mod?'<span class="mod">'+esc(mod)+'</span>'
+                 :'<span class="mod none">none</span>')+'</td>'+
+      '<td>'+g.map(function(x){
+        return '<div class="lgrp">'+
+          (x.unlimited
+            ? '<span class="lim nocap">no numeric cap</span>'
+            : '<span class="lim"><b>'+x.amount+'</b> '+esc(x.limit_type)+
+              (x.period?' <span class="per">per '+esc(x.period.replace(/_/g,' '))+'</span>':'')+
+              (x.per_whom?' <span class="per">per '+esc(x.per_whom.replace(/_/g,' '))+'</span>':'')+
+              '</span>')+
+          (x.unit_definition?'<span class="udef">1 '+esc(x.limit_type.replace(/s$/,''))+
+             ' = '+esc(x.unit_definition)+'</span>':'')+
+          '</div>';
+      }).join('')+'</td>'+
+      '<td class="said-c">'+g.map(function(x){
+        return '<span class="said2">'+esc(x.statement)+'</span>';}).join('')+'</td>'+
+      '<td>'+provBadge(g[0].sourced?'sourced':'asserted',
+        g[0].sourced ? 'Cites a document in the corpus: '+(g[0].source||'')
+                     : 'No document cited.')+'</td></tr>';
+  }).join('');
+
+  // Prose that was read and deliberately NOT structured. Showing it as an empty
+  // row would read as "no limit"; showing why it was refused is the whole point.
+  var gap = G.map(function(x){
+    return '<tr class="gaprow"><td class="c">'+esc(x.code)+'</td>'+
+      '<td>'+(x.modifier?'<span class="mod">'+esc(x.modifier)+'</span>':'<span class="mod none">none</span>')+'</td>'+
+      '<td><span class="lim prose">not computable</span>'+
+        '<span class="udef">states an amount but never defines the unit</span></td>'+
+      '<td class="said-c">'+(x.prose||[]).map(function(t){
+        return '<span class="said2">'+esc(t)+'</span>';}).join('')+'</td>'+
+      '<td><span class="pill p-todo"><span class="d"></span>prose only</span></td></tr>';
+  }).join('');
+
+  return '<div class="card"><div class="ch"><h3>Service limits</h3>'+
+    '<span class="pill '+(c.prose_only?'p-doing':'p-done')+'"><span class="d"></span>'+
+      c.limits+' computable across '+c.codes+' codes'+
+      (c.prose_only?' &middot; '+c.prose_only+' still prose':'')+'</span>'+
+    '<span class="hint">how much of it &mdash; the registry owns this because a limit '+
+      'varies by service code &middot; a payor capping tighter is a delta, not this</span>'+
+    '</div><div class="scroll"><table><thead><tr>'+
+    '<th>Code</th><th>Mod</th><th>Limit</th><th>Limit text, as we hold it</th>'+
+    '<th>Provenance</th></tr></thead><tbody>'+rows+gap+'</tbody></table></div></div>'+
+    '<div class="cb"><p class="foot">Every limit above was read from the sentence '+
+    'beside it by hand, never parsed out by pattern. A leading <code>quarter hour</code> '+
+    'or <code>event</code> is the fee schedule&rsquo;s unit column caught by our '+
+    'extraction &mdash; it is shown rather than trimmed so the text matches what is '+
+    'stored, but it is ours, not AHCA&rsquo;s wording.</p></div></div>';
+}
+
 function exceptionCard(l){
   var A=l.exception_asks||[]; if(!A.length) return '';
   var by={}; A.forEach(function(a){ (by[a.domain]=by[a.domain]||[]).push(a); });
@@ -491,7 +567,7 @@ function renderLine(l){
       '<span class="hint">the complete standard answer — no payor needed</span></div>'+
       '<div class="cb">'+f.join('')+'</div>'+
       (l.scope==='serve' ? codeTable(l) : evidenceTable(l))+'</div>';
-  })()+ provSummary(l) + bindingCard(l) + jServiceLineCard(l) + lexiconCard(l) + standardReqCard(l) + requirementCard(l) + exceptionCard(l) +
+  })()+ provSummary(l) + bindingCard(l) + jServiceLineCard(l) + lexiconCard(l) + standardReqCard(l) + limitCard(l) + requirementCard(l) + exceptionCard(l) +
 
 
   '<div class="card"><div class="ch"><h3>Module completion</h3>'+

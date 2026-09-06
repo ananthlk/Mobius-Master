@@ -153,6 +153,25 @@ def main():
                 "confidence": float(r[3]) if r[3] is not None else None,
                 "evidence": r[4], "requested_concept": r[5]} for r in cur.fetchall()]
 
+        # Limits, and what is still prose. The gap is exported alongside the
+        # answer deliberately — a card that shows only the structured rows reads
+        # as if the prose ones do not exist.
+        cur.execute("""select code, qualifier, limit_type, reads_as, amount,
+                              unit_definition, period, per_whom, unlimited,
+                              exceedable_by, statement, source_ref, sourced
+                       from service_line.benefit_limit_answer where line_key=%s
+                       order by code, qualifier nulls first, period, limit_type""", (key,))
+        limits = [{"code": r[0], "modifier": r[1], "limit_type": r[2], "reads_as": r[3],
+                   "amount": float(r[4]) if r[4] is not None else None,
+                   "unit_definition": r[5], "period": r[6], "per_whom": r[7],
+                   "unlimited": r[8], "exceedable_by": r[9], "statement": r[10],
+                   "source": r[11], "sourced": r[12]} for r in cur.fetchall()]
+
+        cur.execute("""select code, qualifier, general_rule
+                       from service_line.benefit_limit_gap where line_key=%s
+                       order by code, qualifier""", (key,))
+        limit_gap = [{"code": r[0], "modifier": r[1], "prose": r[2] or []} for r in cur.fetchall()]
+
         cur.execute("""select document, publisher, authority_level, pages
                        from service_line.source where line_key=%s and held
                        order by pages desc nulls last limit 6""", (key,))
@@ -190,6 +209,15 @@ def main():
                 "mapped": sum(1 for x in lex if x["d_code"]),
                 "confirmed": sum(1 for x in lex if x["state"] == "confirmed"),
                 "requested": sum(1 for x in lex if x["state"] == "requested"),
+            },
+            "benefit_limits": limits,
+            "benefit_limit_gap": limit_gap,
+            "benefit_limit_counts": {
+                "limits": len(limits),
+                "codes": len({(x["code"], x["modifier"]) for x in limits}),
+                "unlimited": sum(1 for x in limits if x["unlimited"]),
+                "sourced": sum(1 for x in limits if x["sourced"]),
+                "prose_only": len(limit_gap),
             },
             "standard_requirements": std_reqs,
             "standard_requirement_counts": {

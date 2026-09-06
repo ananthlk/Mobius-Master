@@ -51,7 +51,7 @@
   ],
   "catalog_version": "1.0.0",
   "status": "draft",
-  "generated": "2026-08-19",
+  "generated": "2026-09-06",
   "jurisdiction": {
     "state": "FL",
     "program": "Medicaid",
@@ -236,12 +236,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "behavior analysis services",
-          "behavior analysis",
-          "applied behavior analysis",
-          "aba"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -261,6 +256,15 @@
         "mapped": 1,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -937,10 +941,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "behavioral health assessment services",
-          "behavioral health assessment"
-        ],
+        "query_phrases": [],
         "documents": [
           {
             "document": "2025 Community Behavoir Health Fee Schedule.pdf",
@@ -948,8 +949,8 @@
           }
         ],
         "seeded": 1,
-        "tagged_documents": 0,
-        "retrievable_chunks": 0
+        "tagged_documents": 1,
+        "retrievable_chunks": 29
       },
       "lexicon_d": [
         {
@@ -1005,6 +1006,166 @@
         "mapped": 6,
         "confirmed": 3,
         "requested": 0
+      },
+      "benefit_limits": [
+        {
+          "code": "H0001",
+          "modifier": "HO",
+          "limit_type": "evaluations",
+          "reads_as": "1 evaluations (one in-depth assessment) per state_fiscal_year per recipient",
+          "amount": 1.0,
+          "unit_definition": "one in-depth assessment",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "assessment Medicaid reimburses one in-depth assessment, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H0001",
+          "modifier": "TS",
+          "limit_type": "evaluations",
+          "reads_as": "1 evaluations (one in-depth assessment) per state_fiscal_year per recipient",
+          "amount": 1.0,
+          "unit_definition": "one in-depth assessment",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "assessment Medicaid reimburses one in-depth assessment, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H0031",
+          "modifier": "HN",
+          "limit_type": "evaluations",
+          "reads_as": "1 evaluations (one biopsychosocial evaluation) per state_fiscal_year per recipient",
+          "amount": 1.0,
+          "unit_definition": "one biopsychosocial evaluation",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "assessment Medicaid reimburses one biopsychosocial evaluation, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H0031",
+          "modifier": "HO",
+          "limit_type": "evaluations",
+          "reads_as": "1 evaluations (one in-depth assessment) per state_fiscal_year per recipient",
+          "amount": 1.0,
+          "unit_definition": "one in-depth assessment",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "assessment Medicaid reimburses one in-depth assessment, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H0031",
+          "modifier": "TS",
+          "limit_type": "evaluations",
+          "reads_as": "1 evaluations (one in-depth assessment) per state_fiscal_year per recipient",
+          "amount": 1.0,
+          "unit_definition": "one in-depth assessment",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "assessment Medicaid reimburses one in-depth assessment, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2000",
+          "modifier": null,
+          "limit_type": "evaluations",
+          "reads_as": "2 evaluations (one psychiatric review of records) per state_fiscal_year per recipient",
+          "amount": 2.0,
+          "unit_definition": "one psychiatric review of records",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "review Medicaid reimburses a maximum of two psychiatric reviews of records, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2000",
+          "modifier": "HO",
+          "limit_type": "evaluations",
+          "reads_as": "2 evaluations (one psychiatric evaluation) per state_fiscal_year per recipient",
+          "amount": 2.0,
+          "unit_definition": "one psychiatric evaluation",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "evaluation Medicaid reimburses a maximum of two psychiatric evaluations per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2000",
+          "modifier": "HP",
+          "limit_type": "evaluations",
+          "reads_as": "2 evaluations (one psychiatric evaluation) per state_fiscal_year per recipient",
+          "amount": 2.0,
+          "unit_definition": "one psychiatric evaluation",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "evaluation Medicaid reimburses a maximum of two psychiatric evaluations per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2010",
+          "modifier": "HO",
+          "limit_type": "units",
+          "reads_as": "2 units (15 minutes (quarter-hour unit)) per day",
+          "amount": 2.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "day",
+          "per_whom": null,
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour There is a maximum daily limit of two quarter-hour units.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2010",
+          "modifier": "HO",
+          "limit_type": "units",
+          "reads_as": "10 units (15 minutes (quarter-hour unit)) per state_fiscal_year per recipient",
+          "amount": 10.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "Medicaid reimburses for brief behavioral health status examinations a maximum of 10 quarter-hour units annually (2.5 hours), per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        }
+      ],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 10,
+        "codes": 9,
+        "unlimited": 0,
+        "sourced": 10,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -1790,10 +1951,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "behavioral health community support services",
-          "behavioral health community support"
-        ],
+        "query_phrases": [],
         "documents": [
           {
             "document": "2025 Community Behavoir Health Fee Schedule.pdf",
@@ -1801,8 +1959,8 @@
           }
         ],
         "seeded": 1,
-        "tagged_documents": 0,
-        "retrievable_chunks": 0
+        "tagged_documents": 1,
+        "retrievable_chunks": 86
       },
       "lexicon_d": [
         {
@@ -1866,6 +2024,181 @@
         "mapped": 7,
         "confirmed": 3,
         "requested": 0
+      },
+      "benefit_limits": [
+        {
+          "code": "H0020",
+          "modifier": null,
+          "limit_type": "encounters",
+          "reads_as": "52 encounters (one medication assisted treatment service) per state_fiscal_year per recipient",
+          "amount": 52.0,
+          "unit_definition": "one medication assisted treatment service",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "rate Medicaid reimburses medication assisted treatment services 52 times, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H0047",
+          "modifier": null,
+          "limit_type": "encounters",
+          "reads_as": "52 encounters (one behavioral health-related medical service (medical procedure)) per state_fiscal_year per recipient",
+          "amount": 52.0,
+          "unit_definition": "one behavioral health-related medical service (medical procedure)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H0048",
+          "modifier": null,
+          "limit_type": "encounters",
+          "reads_as": "52 encounters (one alcohol and other drug screening specimen collection) per state_fiscal_year per recipient",
+          "amount": 52.0,
+          "unit_definition": "one alcohol and other drug screening specimen collection",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "event Medicaid reimburses 52 behavioral health \u2013 related medical services: alcohol and other drug screening specimen collections, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2010",
+          "modifier": "HE",
+          "limit_type": "units",
+          "reads_as": "2 units (15 minutes (quarter-hour unit)) per day",
+          "amount": 2.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "day",
+          "per_whom": null,
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour There is a maximum daily limit of two quarter-hour units.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2010",
+          "modifier": "HE",
+          "limit_type": "units",
+          "reads_as": "16 units (15 minutes (quarter-hour unit)) per state_fiscal_year per recipient",
+          "amount": 16.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "Medicaid reimburses a maximum of 16 quarter-hour units (4 hours) of brief individual medical psychotherapy, per recipient, per state fiscal year.* Brief individual medical psychotherapy is not reimbursable on the same day, for the same recipient, as brief group medical therapy or medication management.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2010",
+          "modifier": "HF",
+          "limit_type": "units",
+          "reads_as": "2 units (15 minutes (quarter-hour unit)) per day",
+          "amount": 2.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "day",
+          "per_whom": null,
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour There is a maximum daily limit of two quarter-hour units.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2010",
+          "modifier": "HF",
+          "limit_type": "units",
+          "reads_as": "16 units (15 minutes (quarter-hour unit)) per state_fiscal_year per recipient",
+          "amount": 16.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "Medicaid reimburses a maximum of 16 quarter-hour units (4 hours) of brief individual medical psychotherapy, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2017",
+          "modifier": null,
+          "limit_type": "units",
+          "reads_as": "1920 units (15 minutes (quarter-hour unit)) per state_fiscal_year per recipient",
+          "amount": 1920.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour Medicaid reimburses a maximum of 1,920 quarter-hour units (480 hours) of psychosocial rehabilitation services, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2030",
+          "modifier": null,
+          "limit_type": "units",
+          "reads_as": "1920 units (15 minutes (quarter-hour unit)) per state_fiscal_year per recipient",
+          "amount": 1920.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour Medicaid reimburses a maximum of 1920 quarter-hour units (480 hours) annually, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "T1015",
+          "modifier": "HE",
+          "limit_type": "encounters",
+          "reads_as": "52 encounters (one behavioral health-related medical service (medical procedure)) per state_fiscal_year per recipient",
+          "amount": 52.0,
+          "unit_definition": "one behavioral health-related medical service (medical procedure)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "T1015",
+          "modifier": "HF",
+          "limit_type": "encounters",
+          "reads_as": "52 encounters (one behavioral health-related medical service (medical procedure)) per state_fiscal_year per recipient",
+          "amount": 52.0,
+          "unit_definition": "one behavioral health-related medical service (medical procedure)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        }
+      ],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 11,
+        "codes": 9,
+        "unlimited": 0,
+        "sourced": 11,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -2601,10 +2934,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "behavioral health intervention services",
-          "behavioral health intervention"
-        ],
+        "query_phrases": [],
         "documents": [
           {
             "document": "2025 Community Behavoir Health Fee Schedule.pdf",
@@ -2612,8 +2942,8 @@
           }
         ],
         "seeded": 1,
-        "tagged_documents": 0,
-        "retrievable_chunks": 0
+        "tagged_documents": 2,
+        "retrievable_chunks": 20
       },
       "lexicon_d": [
         {
@@ -2677,6 +3007,136 @@
         "mapped": 7,
         "confirmed": 4,
         "requested": 0
+      },
+      "benefit_limits": [
+        {
+          "code": "H2010",
+          "modifier": "HQ",
+          "limit_type": "units",
+          "reads_as": "2 units (15 minutes (quarter-hour unit)) per day",
+          "amount": 2.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "day",
+          "per_whom": null,
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour There is a maximum daily limit of two quarter-hour units.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2010",
+          "modifier": "HQ",
+          "limit_type": "units",
+          "reads_as": "18 units (15 minutes (quarter-hour unit)) per state_fiscal_year per recipient",
+          "amount": 18.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "Medicaid reimburses a maximum of 18 quarter-hour units (4.5 hours) of group medical therapy, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2019",
+          "modifier": "HM",
+          "limit_type": "units",
+          "reads_as": "128 units (15 minutes (quarter-hour unit)) per month per recipient",
+          "amount": 128.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "month",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour Medicaid reimburses therapeutic behavioral on-site therapeutic support services for a maximum of 128 quarter-hour units per month (32 hours), per recipient.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2019",
+          "modifier": "HN",
+          "limit_type": "units",
+          "reads_as": "36 units (15 minutes) per month",
+          "amount": 36.0,
+          "unit_definition": "15 minutes",
+          "period": "month",
+          "per_whom": null,
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour Medicaid reimburses therapeutic behavioral on-site behavior management and therapeutic behavioral on-site therapy services for a maximum combined total of 36 15-minute units per month.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2019",
+          "modifier": "HO",
+          "limit_type": "units",
+          "reads_as": "36 units (15 minutes) per month",
+          "amount": 36.0,
+          "unit_definition": "15 minutes",
+          "period": "month",
+          "per_whom": null,
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour Medicaid reimburses therapeutic behavioral on-site therapy services a maximum combined limit of a total of 36 15- minute units per month.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2019",
+          "modifier": "HQ",
+          "limit_type": "units",
+          "reads_as": "156 units (15 minutes (quarter-hour unit)) per state_fiscal_year per recipient",
+          "amount": 156.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour Medicaid reimburses a maximum of 156 quarter-hour units (39 hours) of group therapy services, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2019",
+          "modifier": "HR",
+          "limit_type": "units",
+          "reads_as": "4 units (15 minutes (quarter-hour unit)) per day",
+          "amount": 4.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "day",
+          "per_whom": null,
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "There is a maximum daily limit of four quarter-hour units (1 hour).",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2019",
+          "modifier": "HR",
+          "limit_type": "units",
+          "reads_as": "104 units (15 minutes (quarter-hour unit)) per state_fiscal_year per recipient",
+          "amount": 104.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter Medicaid reimburses a maximum of 104 quarter-hour units (26 hours) of individual and family therapy services, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        }
+      ],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 8,
+        "codes": 6,
+        "unlimited": 0,
+        "sourced": 8,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -3600,10 +4060,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "behavioral health medication management services",
-          "behavioral health medication management"
-        ],
+        "query_phrases": [],
         "documents": [
           {
             "document": "2025 Community Behavoir Health Fee Schedule.pdf",
@@ -3611,8 +4068,8 @@
           }
         ],
         "seeded": 1,
-        "tagged_documents": 0,
-        "retrievable_chunks": 0
+        "tagged_documents": 1,
+        "retrievable_chunks": 6
       },
       "lexicon_d": [
         {
@@ -3668,6 +4125,226 @@
         "mapped": 6,
         "confirmed": 3,
         "requested": 0
+      },
+      "benefit_limits": [
+        {
+          "code": "H0001",
+          "modifier": null,
+          "limit_type": "evaluations",
+          "reads_as": "3 evaluations (one limited functional assessment) per state_fiscal_year per recipient",
+          "amount": 3.0,
+          "unit_definition": "one limited functional assessment",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "assessment Medicaid reimburses a maximum of three limited functional assessments, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H0001",
+          "modifier": "HN",
+          "limit_type": "evaluations",
+          "reads_as": "1 evaluations (one biopsychosocial evaluation) per state_fiscal_year per recipient",
+          "amount": 1.0,
+          "unit_definition": "one biopsychosocial evaluation",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "assessment Medicaid reimburses one biopsychosocial evaluation, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H0031",
+          "modifier": null,
+          "limit_type": "evaluations",
+          "reads_as": "3 evaluations (one limited functional assessment) per state_fiscal_year per recipient",
+          "amount": 3.0,
+          "unit_definition": "one limited functional assessment",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "assessment Medicaid reimburses a maximum of three limited functional assessments, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H0032",
+          "modifier": null,
+          "limit_type": "encounters",
+          "reads_as": "2 encounters (one treatment plan) per state_fiscal_year per recipient",
+          "amount": 2.0,
+          "unit_definition": "one treatment plan",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "Medicaid reimburses for a maximum total of two treatment plans per recipient per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H0032",
+          "modifier": null,
+          "limit_type": "encounters",
+          "reads_as": "1 encounters (development of one treatment plan) per state_fiscal_year per recipient_per_provider",
+          "amount": 1.0,
+          "unit_definition": "development of one treatment plan",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient_per_provider",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "event Medicaid reimburses for the development of one treatment plan per provider, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H0032",
+          "modifier": "TS",
+          "limit_type": "encounters",
+          "reads_as": "4 encounters (one treatment plan review) per state_fiscal_year per recipient",
+          "amount": 4.0,
+          "unit_definition": "one treatment plan review",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "event Medicaid reimburses a maximum of four treatment plan reviews, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H0046",
+          "modifier": null,
+          "limit_type": "encounters",
+          "reads_as": "52 encounters (one behavioral health-related medical service (medical procedure)) per state_fiscal_year per recipient",
+          "amount": 52.0,
+          "unit_definition": "one behavioral health-related medical service (medical procedure)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2019",
+          "modifier": null,
+          "limit_type": "units",
+          "reads_as": "40 units (15 minutes (quarter-hour unit)) per state_fiscal_year",
+          "amount": 40.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "state_fiscal_year",
+          "per_whom": null,
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour Medicaid reimburses a maximum of 40 quarter-hour units (10 hours) of psychological testing per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "T1007",
+          "modifier": null,
+          "limit_type": "encounters",
+          "reads_as": "1 encounters (development of one treatment plan) per state_fiscal_year per recipient_per_provider",
+          "amount": 1.0,
+          "unit_definition": "development of one treatment plan",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient_per_provider",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "event Medicaid reimburses for the development of one treatment plan per provider, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "T1007",
+          "modifier": null,
+          "limit_type": "encounters",
+          "reads_as": "2 encounters (one treatment plan) per state_fiscal_year per recipient",
+          "amount": 2.0,
+          "unit_definition": "one treatment plan",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "Medicaid reimburses for a maximum total of two treatment plans per recipient per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "T1007",
+          "modifier": "TS",
+          "limit_type": "encounters",
+          "reads_as": "4 encounters (one treatment plan review) per state_fiscal_year per recipient",
+          "amount": 4.0,
+          "unit_definition": "one treatment plan review",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "event Medicaid reimburses a maximum of four treatment plan reviews, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "T1015",
+          "modifier": null,
+          "limit_type": "encounters",
+          "reads_as": "no limit stated",
+          "amount": null,
+          "unit_definition": null,
+          "period": null,
+          "per_whom": null,
+          "unlimited": true,
+          "exceedable_by": null,
+          "statement": "event Medicaid reimburses medication management as medically necessary.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "T1023",
+          "modifier": "HE",
+          "limit_type": "encounters",
+          "reads_as": "2 encounters (one behavioral health medical screening service) per state_fiscal_year per recipient",
+          "amount": 2.0,
+          "unit_definition": "one behavioral health medical screening service",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "event Medicaid reimburses two behavioral health medical screening services, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "T1023",
+          "modifier": "HF",
+          "limit_type": "encounters",
+          "reads_as": "2 encounters (one behavioral health medical screening service) per state_fiscal_year per recipient",
+          "amount": 2.0,
+          "unit_definition": "one behavioral health medical screening service",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "event Medicaid reimburses two behavioral health medical screening services, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        }
+      ],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 14,
+        "codes": 12,
+        "unlimited": 1,
+        "sourced": 14,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -3924,12 +4601,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "behavioral health overlay services",
-          "behavioral health overlay",
-          "bhos",
-          "overlay services"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -3949,6 +4621,15 @@
         "mapped": 1,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -4629,10 +5310,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "behavioral health therapy services",
-          "behavioral health therapy"
-        ],
+        "query_phrases": [],
         "documents": [
           {
             "document": "2025 Community Behavoir Health Fee Schedule.pdf",
@@ -4640,8 +5318,8 @@
           }
         ],
         "seeded": 1,
-        "tagged_documents": 0,
-        "retrievable_chunks": 0
+        "tagged_documents": 2,
+        "retrievable_chunks": 24
       },
       "lexicon_d": [
         {
@@ -4697,6 +5375,181 @@
         "mapped": 6,
         "confirmed": 3,
         "requested": 0
+      },
+      "benefit_limits": [
+        {
+          "code": "H0020",
+          "modifier": null,
+          "limit_type": "encounters",
+          "reads_as": "52 encounters (one medication assisted treatment service) per state_fiscal_year per recipient",
+          "amount": 52.0,
+          "unit_definition": "one medication assisted treatment service",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "rate Medicaid reimburses medication assisted treatment services 52 times, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H0047",
+          "modifier": null,
+          "limit_type": "encounters",
+          "reads_as": "52 encounters (one behavioral health-related medical service (medical procedure)) per state_fiscal_year per recipient",
+          "amount": 52.0,
+          "unit_definition": "one behavioral health-related medical service (medical procedure)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H0048",
+          "modifier": null,
+          "limit_type": "encounters",
+          "reads_as": "52 encounters (one alcohol and other drug screening specimen collection) per state_fiscal_year per recipient",
+          "amount": 52.0,
+          "unit_definition": "one alcohol and other drug screening specimen collection",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "event Medicaid reimburses 52 behavioral health \u2013 related medical services: alcohol and other drug screening specimen collections, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2010",
+          "modifier": "HE",
+          "limit_type": "units",
+          "reads_as": "2 units (15 minutes (quarter-hour unit)) per day",
+          "amount": 2.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "day",
+          "per_whom": null,
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour There is a maximum daily limit of two quarter-hour units.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2010",
+          "modifier": "HE",
+          "limit_type": "units",
+          "reads_as": "16 units (15 minutes (quarter-hour unit)) per state_fiscal_year per recipient",
+          "amount": 16.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "Medicaid reimburses a maximum of 16 quarter-hour units (4 hours) of brief individual medical psychotherapy, per recipient, per state fiscal year.* Brief individual medical psychotherapy is not reimbursable on the same day, for the same recipient, as brief group medical therapy or medication management.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2010",
+          "modifier": "HF",
+          "limit_type": "units",
+          "reads_as": "2 units (15 minutes (quarter-hour unit)) per day",
+          "amount": 2.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "day",
+          "per_whom": null,
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour There is a maximum daily limit of two quarter-hour units.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2010",
+          "modifier": "HF",
+          "limit_type": "units",
+          "reads_as": "16 units (15 minutes (quarter-hour unit)) per state_fiscal_year per recipient",
+          "amount": 16.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "Medicaid reimburses a maximum of 16 quarter-hour units (4 hours) of brief individual medical psychotherapy, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2017",
+          "modifier": null,
+          "limit_type": "units",
+          "reads_as": "1920 units (15 minutes (quarter-hour unit)) per state_fiscal_year per recipient",
+          "amount": 1920.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour Medicaid reimburses a maximum of 1,920 quarter-hour units (480 hours) of psychosocial rehabilitation services, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2030",
+          "modifier": null,
+          "limit_type": "units",
+          "reads_as": "1920 units (15 minutes (quarter-hour unit)) per state_fiscal_year per recipient",
+          "amount": 1920.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour Medicaid reimburses a maximum of 1920 quarter-hour units (480 hours) annually, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "T1015",
+          "modifier": "HE",
+          "limit_type": "encounters",
+          "reads_as": "52 encounters (one behavioral health-related medical service (medical procedure)) per state_fiscal_year per recipient",
+          "amount": 52.0,
+          "unit_definition": "one behavioral health-related medical service (medical procedure)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "T1015",
+          "modifier": "HF",
+          "limit_type": "encounters",
+          "reads_as": "52 encounters (one behavioral health-related medical service (medical procedure)) per state_fiscal_year per recipient",
+          "amount": 52.0,
+          "unit_definition": "one behavioral health-related medical service (medical procedure)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        }
+      ],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 11,
+        "codes": 9,
+        "unlimited": 0,
+        "sourced": 11,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -4953,10 +5806,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "comprehensive behavioral health assessment",
-          "cbha"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -4992,6 +5842,15 @@
         "mapped": 3,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -5159,11 +6018,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "evaluation and management",
-          "e&m",
-          "e/m"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -5199,6 +6054,15 @@
         "mapped": 3,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -5950,12 +6814,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "florida assertive community treatment",
-          "fact",
-          "assertive community treatment",
-          "act team"
-        ],
+        "query_phrases": [],
         "documents": [
           {
             "document": "2025 Community Behavoir Health Fee Schedule.pdf",
@@ -5963,8 +6822,8 @@
           }
         ],
         "seeded": 1,
-        "tagged_documents": 0,
-        "retrievable_chunks": 0
+        "tagged_documents": 1,
+        "retrievable_chunks": 134
       },
       "lexicon_d": [
         {
@@ -6028,6 +6887,136 @@
         "mapped": 7,
         "confirmed": 4,
         "requested": 0
+      },
+      "benefit_limits": [
+        {
+          "code": "H2010",
+          "modifier": "HQ",
+          "limit_type": "units",
+          "reads_as": "2 units (15 minutes (quarter-hour unit)) per day",
+          "amount": 2.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "day",
+          "per_whom": null,
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour There is a maximum daily limit of two quarter-hour units.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2010",
+          "modifier": "HQ",
+          "limit_type": "units",
+          "reads_as": "18 units (15 minutes (quarter-hour unit)) per state_fiscal_year per recipient",
+          "amount": 18.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "Medicaid reimburses a maximum of 18 quarter-hour units (4.5 hours) of group medical therapy, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2019",
+          "modifier": "HM",
+          "limit_type": "units",
+          "reads_as": "128 units (15 minutes (quarter-hour unit)) per month per recipient",
+          "amount": 128.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "month",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour Medicaid reimburses therapeutic behavioral on-site therapeutic support services for a maximum of 128 quarter-hour units per month (32 hours), per recipient.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2019",
+          "modifier": "HN",
+          "limit_type": "units",
+          "reads_as": "36 units (15 minutes) per month",
+          "amount": 36.0,
+          "unit_definition": "15 minutes",
+          "period": "month",
+          "per_whom": null,
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour Medicaid reimburses therapeutic behavioral on-site behavior management and therapeutic behavioral on-site therapy services for a maximum combined total of 36 15-minute units per month.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2019",
+          "modifier": "HO",
+          "limit_type": "units",
+          "reads_as": "36 units (15 minutes) per month",
+          "amount": 36.0,
+          "unit_definition": "15 minutes",
+          "period": "month",
+          "per_whom": null,
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour Medicaid reimburses therapeutic behavioral on-site therapy services a maximum combined limit of a total of 36 15- minute units per month.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2019",
+          "modifier": "HQ",
+          "limit_type": "units",
+          "reads_as": "156 units (15 minutes (quarter-hour unit)) per state_fiscal_year per recipient",
+          "amount": 156.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter hour Medicaid reimburses a maximum of 156 quarter-hour units (39 hours) of group therapy services, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2019",
+          "modifier": "HR",
+          "limit_type": "units",
+          "reads_as": "4 units (15 minutes (quarter-hour unit)) per day",
+          "amount": 4.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "day",
+          "per_whom": null,
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "There is a maximum daily limit of four quarter-hour units (1 hour).",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        },
+        {
+          "code": "H2019",
+          "modifier": "HR",
+          "limit_type": "units",
+          "reads_as": "104 units (15 minutes (quarter-hour unit)) per state_fiscal_year per recipient",
+          "amount": 104.0,
+          "unit_definition": "15 minutes (quarter-hour unit)",
+          "period": "state_fiscal_year",
+          "per_whom": "recipient",
+          "unlimited": false,
+          "exceedable_by": null,
+          "statement": "quarter Medicaid reimburses a maximum of 104 quarter-hour units (26 hours) of individual and family therapy services, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "sourced": true
+        }
+      ],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 8,
+        "codes": 6,
+        "unlimited": 0,
+        "sourced": 8,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -6300,12 +7289,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "mental health targeted case management",
-          "targeted case management",
-          "case management",
-          "tcm"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -6333,6 +7317,15 @@
         "mapped": 2,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -6725,10 +7718,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "specialized therapeutic services",
-          "specialized therapeutic"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -6748,6 +7738,15 @@
         "mapped": 0,
         "confirmed": 0,
         "requested": 1
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -6915,10 +7914,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "state mental health",
-          "state hospital"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -6938,6 +7934,15 @@
         "mapped": 1,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -7105,12 +8110,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "child health services targeted case management",
-          "targeted case management",
-          "case management",
-          "child health tcm"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -7146,6 +8146,15 @@
         "mapped": 3,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -7592,12 +8601,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "targeted case management for children at risk of abuse and neglect",
-          "targeted case management for children at risk",
-          "case management",
-          "tcm at risk"
-        ],
+        "query_phrases": [],
         "documents": [
           {
             "document": "TCM_for_Children_At-Risk_2022_Fee_Schedule.pdf",
@@ -7606,7 +8610,7 @@
         ],
         "seeded": 1,
         "tagged_documents": 0,
-        "retrievable_chunks": 0
+        "retrievable_chunks": 2
       },
       "lexicon_d": [
         {
@@ -7630,6 +8634,23 @@
         "mapped": 2,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [
+        {
+          "code": "T2023",
+          "modifier": "HA",
+          "prose": [
+            "Maximum 1 unit per month."
+          ]
+        }
+      ],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 1
       },
       "standard_requirements": [
         {
@@ -8022,11 +9043,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "qualified residential treatment program services",
-          "qualified residential treatment program",
-          "qrtp"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -8062,6 +9079,15 @@
         "mapped": 3,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -9323,11 +10349,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "statewide inpatient psychiatric program",
-          "statewide inpatient psychiatric",
-          "sipp"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -9379,6 +10401,15 @@
         "mapped": 5,
         "confirmed": 2,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -9587,11 +10618,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "therapeutic group care services",
-          "therapeutic group care",
-          "group care"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -9611,6 +10638,15 @@
         "mapped": 1,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -9778,12 +10814,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "county health department clinic services",
-          "county health department clinic",
-          "county health department",
-          "chd clinic"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -9803,6 +10834,15 @@
         "mapped": 1,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -10027,11 +11067,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "fqhc encounter",
-          "fqhc",
-          "federally qualified health center"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -10059,6 +11095,15 @@
         "mapped": 2,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -10283,11 +11328,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "rural health clinic encounter",
-          "rhc",
-          "rural health clinic"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -10315,6 +11356,15 @@
         "mapped": 2,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [
         {
@@ -10539,11 +11589,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "intensive outpatient program",
-          "intensive outpatient",
-          "iop"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -10571,6 +11617,15 @@
         "mapped": 2,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [],
       "standard_requirement_counts": {
@@ -10726,11 +11781,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "partial hospitalization program",
-          "partial hospitalization",
-          "php"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -10758,6 +11809,15 @@
         "mapped": 2,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [],
       "standard_requirement_counts": {
@@ -10913,15 +11973,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "baker act involuntary examination",
-          "baker act",
-          "baker acted",
-          "baker-act",
-          "involuntary examination",
-          "involuntary exam",
-          "ex parte"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -10941,6 +11993,15 @@
         "mapped": 1,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [],
       "standard_requirement_counts": {
@@ -11102,14 +12163,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "crisis stabilization unit / baker act receiving",
-          "crisis stabilization unit",
-          "csu",
-          "baker act receiving",
-          "crisis stabilization",
-          "receiving facility"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -11153,6 +12207,15 @@
         "mapped": 4,
         "confirmed": 1,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [],
       "standard_requirement_counts": {
@@ -11851,13 +12914,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "marchman act services",
-          "marchman act",
-          "marchman",
-          "marchman acted",
-          "involuntary substance"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -11885,6 +12942,15 @@
         "mapped": 1,
         "confirmed": 1,
         "requested": 1
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [],
       "standard_requirement_counts": {
@@ -12040,13 +13106,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "mobile response team / crisis intervention",
-          "mobile response",
-          "mobile response team",
-          "mrt",
-          "crisis response"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -12066,6 +13126,15 @@
         "mapped": 1,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [],
       "standard_requirement_counts": {
@@ -12748,13 +13817,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "substance use residential treatment",
-          "residential treatment",
-          "substance use residential",
-          "sud residential",
-          "residential sud"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -12790,6 +13853,15 @@
         "mapped": 3,
         "confirmed": 1,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [],
       "standard_requirement_counts": {
@@ -13504,13 +14576,7 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "withdrawal management / detoxification",
-          "withdrawal management",
-          "detox",
-          "detoxification",
-          "medically monitored withdrawal"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -13538,6 +14604,15 @@
         "mapped": 2,
         "confirmed": 1,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [],
       "standard_requirement_counts": {
@@ -15391,16 +16466,11 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "inpatient psychiatric",
-          "inpatient psych",
-          "psychiatric admission",
-          "adult psych unit"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
-        "retrievable_chunks": 0
+        "retrievable_chunks": 270
       },
       "lexicon_d": [
         {
@@ -15464,6 +16534,15 @@
         "mapped": 7,
         "confirmed": 3,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [],
       "standard_requirement_counts": {
@@ -17288,16 +18367,11 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [
-          "emergency department behavioral health",
-          "psych ed",
-          "behavioral health emergency",
-          "ed psych"
-        ],
+        "query_phrases": [],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
-        "retrievable_chunks": 0
+        "retrievable_chunks": 20
       },
       "lexicon_d": [
         {
@@ -17345,6 +18419,15 @@
         "mapped": 5,
         "confirmed": 3,
         "requested": 0
+      },
+      "benefit_limits": [],
+      "benefit_limit_gap": [],
+      "benefit_limit_counts": {
+        "limits": 0,
+        "codes": 0,
+        "unlimited": 0,
+        "sourced": 0,
+        "prose_only": 0
       },
       "standard_requirements": [],
       "standard_requirement_counts": {
