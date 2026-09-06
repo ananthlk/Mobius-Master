@@ -342,49 +342,71 @@ function standardReqCard(l){
     }).join('')+'</tbody></table></div></div>';
 }
 
-function limitCard(l){
-  var L=l.benefit_limits||[], G=l.benefit_limit_gap||[], c=l.benefit_limit_counts||{};
-  if(!L.length && !G.length) return '';
+function benefitCard(l){
+  var COV=l.benefit_coverage||[], L=l.benefit_limits||[], G=l.benefit_limit_gap||[];
+  var bc=l.benefit_counts||{}, lc=l.benefit_limit_counts||{};
 
-  // A code with a daily cap AND an annual cap is one fact with two halves.
-  // Splitting them across rows is how the prose lost the pairing in the first
-  // place, so group by (code, modifier) and keep the caps together.
-  var by={}, order=[];
-  L.forEach(function(x){
-    var k=x.code+' '+(x.modifier||'');
-    if(!by[k]){by[k]=[]; order.push(k);}
-    by[k].push(x);
-  });
+  // A line with no coverage answer still gets the card. An absent card reads as
+  // "not applicable"; a card saying we hold nothing reads as what it is.
+  if(!COV.length && !L.length && !G.length){
+    if(l.scope!=='serve' && !(l.evidence_sources||[]).length) return '';
+    return '<div class="card"><div class="ch"><h3>Benefit</h3>'+
+      '<span class="pill p-todo"><span class="d"></span>no coverage answer</span>'+
+      '<span class="hint">covered, and how much &mdash; the registry owns the standard</span>'+
+      '</div><div class="cb"><p class="foot">No code is bound to this line and no '+
+      'document behind it is held, so nothing states whether Florida Medicaid covers '+
+      'it or caps it. That is an unsourced gap, <b>not</b> a finding that the service '+
+      'is uncovered.</p></div></div>';
+  }
 
-  var rows = order.map(function(k){
-    var g=by[k], code=g[0].code, mod=g[0].modifier;
-    return '<tr><td class="c">'+esc(code)+'</td>'+
-      '<td>'+(mod?'<span class="mod">'+esc(mod)+'</span>'
-                 :'<span class="mod none">none</span>')+'</td>'+
-      '<td>'+g.map(function(x){
-        return '<div class="lgrp">'+
-          (x.unlimited
-            ? '<span class="lim nocap">no numeric cap</span>'
-            : '<span class="lim"><b>'+x.amount+'</b> '+esc(x.limit_type)+
-              (x.period?' <span class="per">per '+esc(x.period.replace(/_/g,' '))+'</span>':'')+
-              (x.per_whom?' <span class="per">per '+esc(x.per_whom.replace(/_/g,' '))+'</span>':'')+
-              '</span>')+
-          (x.unit_definition?'<span class="udef">1 '+esc(x.limit_type.replace(/s$/,''))+
-             ' = '+esc(x.unit_definition)+'</span>':'')+
-          '</div>';
-      }).join('')+'</td>'+
-      '<td class="said-c">'+g.map(function(x){
-        return '<span class="said2">'+esc(x.statement)+'</span>';}).join('')+'</td>'+
-      '<td>'+provBadge(g[0].sourced?'sourced':'asserted',
-        g[0].sourced ? 'Cites a document in the corpus: '+(g[0].source||'')
-                     : 'No document cited.')+'</td></tr>';
+  // Index the limits by (code, modifier) so each covered code carries its own caps.
+  var byCode={};
+  L.forEach(function(x){ var k=x.code+' '+(x.modifier||''); (byCode[k]=byCode[k]||[]).push(x); });
+
+  function limitCell(k){
+    var g=byCode[k];
+    if(!g) return '<span class="lim prose">no limit held</span>';
+    return g.map(function(x){
+      return '<div class="lgrp">'+
+        (x.unlimited
+          ? '<span class="lim nocap">no numeric cap</span>'
+          : '<span class="lim"><b>'+x.amount+'</b> '+esc(x.limit_type)+
+            (x.period?' <span class="per">per '+esc(x.period.replace(/_/g,' '))+'</span>':'')+
+            (x.per_whom?' <span class="per">per '+esc(x.per_whom.replace(/_/g,' '))+'</span>':'')+
+            '</span>')+
+        (x.unit_definition?'<span class="udef">1 '+esc(x.limit_type.replace(/s$/,''))+
+           ' = '+esc(x.unit_definition)+'</span>':'')+'</div>';
+    }).join('');
+  }
+
+  var rows = COV.map(function(cv){
+    var k=cv.code+' '+(cv.modifier||'');
+    var g=byCode[k]||[];
+    var texts=[cv.statement].concat(g.map(function(x){return x.statement;}));
+    // Both halves cite the same document; do not print it twice.
+    var seen={}; texts=texts.filter(function(t){ if(!t||seen[t])return false; seen[t]=1; return true; });
+    return '<tr><td class="c">'+esc(cv.code)+'</td>'+
+      '<td>'+(cv.modifier?'<span class="mod">'+esc(cv.modifier)+'</span>'
+                        :'<span class="mod none">none</span>')+'</td>'+
+      '<td>'+(cv.covered?'<span class="pill p-done"><span class="d"></span>covered</span>'
+                       :'<span class="pill p-todo"><span class="d"></span>not covered</span>')+
+        (cv.population?'<span class="udef">'+esc(cv.population)+' only</span>':'')+
+        '<span class="udef">'+(cv.basis==='quoted'?'stated in the rule'
+                                                  :'read from a published rate')+'</span></td>'+
+      '<td>'+limitCell(k)+'</td>'+
+      '<td class="said-c">'+texts.map(function(t){
+        return '<span class="said2">'+esc(t)+'</span>';}).join('')+'</td>'+
+      '<td>'+provBadge(cv.sourced?'sourced':'asserted',
+        cv.sourced?'Cites a document in the corpus: '+(cv.source||'')
+                  :'No document cited.')+'</td></tr>';
   }).join('');
 
-  // Prose that was read and deliberately NOT structured. Showing it as an empty
-  // row would read as "no limit"; showing why it was refused is the whole point.
+  // Prose that was read and deliberately NOT structured. An empty row would read
+  // as "no limit"; saying why it was refused is the point.
   var gap = G.map(function(x){
     return '<tr class="gaprow"><td class="c">'+esc(x.code)+'</td>'+
       '<td>'+(x.modifier?'<span class="mod">'+esc(x.modifier)+'</span>':'<span class="mod none">none</span>')+'</td>'+
+      '<td><span class="udef">covered, above</span></td>'+
       '<td><span class="lim prose">not computable</span>'+
         '<span class="udef">states an amount but never defines the unit</span></td>'+
       '<td class="said-c">'+(x.prose||[]).map(function(t){
@@ -392,20 +414,26 @@ function limitCard(l){
       '<td><span class="pill p-todo"><span class="d"></span>prose only</span></td></tr>';
   }).join('');
 
-  return '<div class="card"><div class="ch"><h3>Service limits</h3>'+
-    '<span class="pill '+(c.prose_only?'p-doing':'p-done')+'"><span class="d"></span>'+
-      c.limits+' computable across '+c.codes+' codes'+
-      (c.prose_only?' &middot; '+c.prose_only+' still prose':'')+'</span>'+
-    '<span class="hint">how much of it &mdash; the registry owns this because a limit '+
-      'varies by service code &middot; a payor capping tighter is a delta, not this</span>'+
+  return '<div class="card"><div class="ch"><h3>Benefit</h3>'+
+    '<span class="pill p-done"><span class="d"></span>'+bc.covered+' covered</span>'+
+    '<span class="pill '+(lc.prose_only?'p-doing':'p-done')+'"><span class="d"></span>'+
+      lc.limits+' limits computable'+(lc.prose_only?' &middot; '+lc.prose_only+' still prose':'')+'</span>'+
+    (bc.category?'<span class="src">'+esc(bc.category)+'</span>':'')+
+    '<span class="hint">covered, and how much &mdash; ours because both vary by service '+
+      'code &middot; a payor covering less or capping tighter is a delta, not this</span>'+
     '</div><div class="scroll"><table><thead><tr>'+
-    '<th>Code</th><th>Mod</th><th>Limit</th><th>Limit text, as we hold it</th>'+
-    '<th>Provenance</th></tr></thead><tbody>'+rows+gap+'</tbody></table></div></div>'+
-    '<div class="cb"><p class="foot">Every limit above was read from the sentence '+
-    'beside it by hand, never parsed out by pattern. A leading <code>quarter hour</code> '+
-    'or <code>event</code> is the fee schedule&rsquo;s unit column caught by our '+
-    'extraction &mdash; it is shown rather than trimmed so the text matches what is '+
-    'stored, but it is ours, not AHCA&rsquo;s wording.</p></div></div>';
+    '<th>Code</th><th>Mod</th><th>Covered</th><th>Limit</th>'+
+    '<th>Text, as we hold it</th><th>Provenance</th></tr></thead><tbody>'+rows+gap+'</tbody></table></div>'+
+    '<div class="cb"><p class="foot">'+
+    (bc.rate_listed?'<b>'+bc.quoted+'</b> of these are covered because the rule says so in '+
+      'words; <b>'+bc.rate_listed+'</b> because AHCA publishes a reimbursement rate for the '+
+      'pair and we read the table row. Both are sourced, they are not equal evidence, and '+
+      'the row says which. '
+     :'Every coverage answer here is a sentence in the rule, quoted. ')+
+    'Limits were read from the sentence beside them by hand, never parsed out by pattern. '+
+    'A leading <code>quarter hour</code> or <code>event</code> is the fee schedule&rsquo;s '+
+    'unit column caught by our extraction &mdash; shown rather than trimmed so the text '+
+    'matches what is stored, but it is ours, not AHCA&rsquo;s wording.</p></div></div>';
 }
 
 function exceptionCard(l){
@@ -567,7 +595,7 @@ function renderLine(l){
       '<span class="hint">the complete standard answer — no payor needed</span></div>'+
       '<div class="cb">'+f.join('')+'</div>'+
       (l.scope==='serve' ? codeTable(l) : evidenceTable(l))+'</div>';
-  })()+ provSummary(l) + bindingCard(l) + jServiceLineCard(l) + lexiconCard(l) + standardReqCard(l) + limitCard(l) + requirementCard(l) + exceptionCard(l) +
+  })()+ provSummary(l) + bindingCard(l) + jServiceLineCard(l) + lexiconCard(l) + standardReqCard(l) + benefitCard(l) + requirementCard(l) + exceptionCard(l) +
 
 
   '<div class="card"><div class="ch"><h3>Module completion</h3>'+

@@ -257,6 +257,16 @@
         "confirmed": 0,
         "requested": 0
       },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
+      },
       "benefit_limits": [],
       "benefit_limit_gap": [],
       "benefit_limit_counts": {
@@ -1006,6 +1016,125 @@
         "mapped": 6,
         "confirmed": 3,
         "requested": 0
+      },
+      "benefit_coverage": [
+        {
+          "code": "H0001",
+          "modifier": "HO",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "assessment Medicaid reimburses one in-depth assessment, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 1,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H0001",
+          "modifier": "TS",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "assessment Medicaid reimburses one in-depth assessment, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 1,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H0031",
+          "modifier": "HN",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "assessment Medicaid reimburses one biopsychosocial evaluation, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 1,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H0031",
+          "modifier": "HO",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "assessment Medicaid reimburses one in-depth assessment, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 1,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H0031",
+          "modifier": "TS",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "assessment Medicaid reimburses one in-depth assessment, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 1,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2000",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "review Medicaid reimburses a maximum of two psychiatric reviews of records, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 1,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2000",
+          "modifier": "HO",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "evaluation Medicaid reimburses a maximum of two psychiatric evaluations per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 1,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2000",
+          "modifier": "HP",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "evaluation Medicaid reimburses a maximum of two psychiatric evaluations per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 1,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2010",
+          "modifier": "HO",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "Medicaid reimburses for brief behavioral health status examinations a maximum of 10 quarter-hour units annually (2.5 hours), per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 1,
+          "sourced": true,
+          "basis": "quoted"
+        }
+      ],
+      "benefit_counts": {
+        "covered": 9,
+        "codes": 9,
+        "quoted": 9,
+        "rate_listed": 0,
+        "sourced": 9,
+        "category": "Community Behavioral Health",
+        "population": []
       },
       "benefit_limits": [
         {
@@ -2025,6 +2154,125 @@
         "confirmed": 3,
         "requested": 0
       },
+      "benefit_coverage": [
+        {
+          "code": "H0020",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "rate Medicaid reimburses medication assisted treatment services 52 times, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 3,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H0047",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 3,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H0048",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "event Medicaid reimburses 52 behavioral health \u2013 related medical services: alcohol and other drug screening specimen collections, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 3,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2010",
+          "modifier": "HE",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "Medicaid reimburses a maximum of 16 quarter-hour units (4 hours) of brief individual medical psychotherapy, per recipient, per state fiscal year.* Brief individual medical psychotherapy is not reimbursable on the same day, for the same recipient, as brief group medical therapy or medication management.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 3,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2010",
+          "modifier": "HF",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "Medicaid reimburses a maximum of 16 quarter-hour units (4 hours) of brief individual medical psychotherapy, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 3,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2017",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "quarter hour Medicaid reimburses a maximum of 1,920 quarter-hour units (480 hours) of psychosocial rehabilitation services, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 3,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2030",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "quarter hour Medicaid reimburses a maximum of 1920 quarter-hour units (480 hours) annually, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 3,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "T1015",
+          "modifier": "HE",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 3,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "T1015",
+          "modifier": "HF",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 3,
+          "sourced": true,
+          "basis": "quoted"
+        }
+      ],
+      "benefit_counts": {
+        "covered": 9,
+        "codes": 9,
+        "quoted": 9,
+        "rate_listed": 0,
+        "sourced": 9,
+        "category": "Community Behavioral Health",
+        "population": []
+      },
       "benefit_limits": [
         {
           "code": "H0020",
@@ -3007,6 +3255,125 @@
         "mapped": 7,
         "confirmed": 4,
         "requested": 0
+      },
+      "benefit_coverage": [
+        {
+          "code": "H0040",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "Listed on the Community Behavioral Health fee schedule at $31.55 per day for H0040 with no modifier (Florida Assertive Community Treatment). AHCA publishes a reimbursement rate for this pair, which is the state paying for the service; the schedule states no coverage sentence for it.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 4,
+          "sourced": true,
+          "basis": "rate_listed"
+        },
+        {
+          "code": "H2010",
+          "modifier": "HQ",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "Medicaid reimburses a maximum of 18 quarter-hour units (4.5 hours) of group medical therapy, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 4,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2012",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "Listed on the Community Behavioral Health fee schedule at $12.61 per hour for H2012 with no modifier (Behavioral health day services, mental health). AHCA publishes a reimbursement rate for this pair, which is the state paying for the service; the schedule states no coverage sentence for it.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 4,
+          "sourced": true,
+          "basis": "rate_listed"
+        },
+        {
+          "code": "H2012",
+          "modifier": "HF",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "Listed on the Community Behavioral Health fee schedule at $12.61 per hour for H2012 with modifier HF (Behavioral health day services, substance abuse). AHCA publishes a reimbursement rate for this pair, which is the state paying for the service; the schedule states no coverage sentence for it.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 4,
+          "sourced": true,
+          "basis": "rate_listed"
+        },
+        {
+          "code": "H2019",
+          "modifier": "HM",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "quarter hour Medicaid reimburses therapeutic behavioral on-site therapeutic support services for a maximum of 128 quarter-hour units per month (32 hours), per recipient.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 4,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2019",
+          "modifier": "HN",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "quarter hour Medicaid reimburses therapeutic behavioral on-site behavior management and therapeutic behavioral on-site therapy services for a maximum combined total of 36 15-minute units per month.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 4,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2019",
+          "modifier": "HO",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "quarter hour Medicaid reimburses therapeutic behavioral on-site therapy services a maximum combined limit of a total of 36 15- minute units per month.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 4,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2019",
+          "modifier": "HQ",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "quarter hour Medicaid reimburses a maximum of 156 quarter-hour units (39 hours) of group therapy services, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 4,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2019",
+          "modifier": "HR",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "quarter Medicaid reimburses a maximum of 104 quarter-hour units (26 hours) of individual and family therapy services, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 4,
+          "sourced": true,
+          "basis": "quoted"
+        }
+      ],
+      "benefit_counts": {
+        "covered": 9,
+        "codes": 9,
+        "quoted": 6,
+        "rate_listed": 3,
+        "sourced": 9,
+        "category": "Community Behavioral Health",
+        "population": []
       },
       "benefit_limits": [
         {
@@ -4126,6 +4493,161 @@
         "confirmed": 3,
         "requested": 0
       },
+      "benefit_coverage": [
+        {
+          "code": "H0001",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "assessment Medicaid reimburses a maximum of three limited functional assessments, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 2,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H0001",
+          "modifier": "HN",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "assessment Medicaid reimburses one biopsychosocial evaluation, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 2,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H0031",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "assessment Medicaid reimburses a maximum of three limited functional assessments, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 2,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H0032",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "event Medicaid reimburses for the development of one treatment plan per provider, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 2,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H0032",
+          "modifier": "TS",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "event Medicaid reimburses a maximum of four treatment plan reviews, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 2,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H0046",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 2,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2019",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "quarter hour Medicaid reimburses a maximum of 40 quarter-hour units (10 hours) of psychological testing per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 2,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "T1007",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "event Medicaid reimburses for the development of one treatment plan per provider, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 2,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "T1007",
+          "modifier": "TS",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "event Medicaid reimburses a maximum of four treatment plan reviews, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 2,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "T1015",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "event Medicaid reimburses medication management as medically necessary.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 2,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "T1023",
+          "modifier": "HE",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "event Medicaid reimburses two behavioral health medical screening services, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 2,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "T1023",
+          "modifier": "HF",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "event Medicaid reimburses two behavioral health medical screening services, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 2,
+          "sourced": true,
+          "basis": "quoted"
+        }
+      ],
+      "benefit_counts": {
+        "covered": 12,
+        "codes": 12,
+        "quoted": 12,
+        "rate_listed": 0,
+        "sourced": 12,
+        "category": "Community Behavioral Health",
+        "population": []
+      },
       "benefit_limits": [
         {
           "code": "H0001",
@@ -4621,6 +5143,16 @@
         "mapped": 1,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
       },
       "benefit_limits": [],
       "benefit_limit_gap": [],
@@ -5376,6 +5908,125 @@
         "confirmed": 3,
         "requested": 0
       },
+      "benefit_coverage": [
+        {
+          "code": "H0020",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "rate Medicaid reimburses medication assisted treatment services 52 times, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 3,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H0047",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 3,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H0048",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "event Medicaid reimburses 52 behavioral health \u2013 related medical services: alcohol and other drug screening specimen collections, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 3,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2010",
+          "modifier": "HE",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "Medicaid reimburses a maximum of 16 quarter-hour units (4 hours) of brief individual medical psychotherapy, per recipient, per state fiscal year.* Brief individual medical psychotherapy is not reimbursable on the same day, for the same recipient, as brief group medical therapy or medication management.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 3,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2010",
+          "modifier": "HF",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "Medicaid reimburses a maximum of 16 quarter-hour units (4 hours) of brief individual medical psychotherapy, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 3,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2017",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "quarter hour Medicaid reimburses a maximum of 1,920 quarter-hour units (480 hours) of psychosocial rehabilitation services, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 3,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2030",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "quarter hour Medicaid reimburses a maximum of 1920 quarter-hour units (480 hours) annually, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 3,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "T1015",
+          "modifier": "HE",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 3,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "T1015",
+          "modifier": "HF",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "event Medicaid reimburses 52 behavioral health-related medical services: medical procedures, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 3,
+          "sourced": true,
+          "basis": "quoted"
+        }
+      ],
+      "benefit_counts": {
+        "covered": 9,
+        "codes": 9,
+        "quoted": 9,
+        "rate_listed": 0,
+        "sourced": 9,
+        "category": "Community Behavioral Health",
+        "population": []
+      },
       "benefit_limits": [
         {
           "code": "H0020",
@@ -5843,6 +6494,16 @@
         "confirmed": 0,
         "requested": 0
       },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
+      },
       "benefit_limits": [],
       "benefit_limit_gap": [],
       "benefit_limit_counts": {
@@ -6054,6 +6715,16 @@
         "mapped": 3,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
       },
       "benefit_limits": [],
       "benefit_limit_gap": [],
@@ -6888,6 +7559,125 @@
         "confirmed": 4,
         "requested": 0
       },
+      "benefit_coverage": [
+        {
+          "code": "H0040",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "Listed on the Community Behavioral Health fee schedule at $31.55 per day for H0040 with no modifier (Florida Assertive Community Treatment). AHCA publishes a reimbursement rate for this pair, which is the state paying for the service; the schedule states no coverage sentence for it.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 4,
+          "sourced": true,
+          "basis": "rate_listed"
+        },
+        {
+          "code": "H2010",
+          "modifier": "HQ",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "Medicaid reimburses a maximum of 18 quarter-hour units (4.5 hours) of group medical therapy, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 4,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2012",
+          "modifier": null,
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "Listed on the Community Behavioral Health fee schedule at $12.61 per hour for H2012 with no modifier (Behavioral health day services, mental health). AHCA publishes a reimbursement rate for this pair, which is the state paying for the service; the schedule states no coverage sentence for it.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 4,
+          "sourced": true,
+          "basis": "rate_listed"
+        },
+        {
+          "code": "H2012",
+          "modifier": "HF",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "Listed on the Community Behavioral Health fee schedule at $12.61 per hour for H2012 with modifier HF (Behavioral health day services, substance abuse). AHCA publishes a reimbursement rate for this pair, which is the state paying for the service; the schedule states no coverage sentence for it.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 4,
+          "sourced": true,
+          "basis": "rate_listed"
+        },
+        {
+          "code": "H2019",
+          "modifier": "HM",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "quarter hour Medicaid reimburses therapeutic behavioral on-site therapeutic support services for a maximum of 128 quarter-hour units per month (32 hours), per recipient.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 4,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2019",
+          "modifier": "HN",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "quarter hour Medicaid reimburses therapeutic behavioral on-site behavior management and therapeutic behavioral on-site therapy services for a maximum combined total of 36 15-minute units per month.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 4,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2019",
+          "modifier": "HO",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "quarter hour Medicaid reimburses therapeutic behavioral on-site therapy services a maximum combined limit of a total of 36 15- minute units per month.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 4,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2019",
+          "modifier": "HQ",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "quarter hour Medicaid reimburses a maximum of 156 quarter-hour units (39 hours) of group therapy services, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 4,
+          "sourced": true,
+          "basis": "quoted"
+        },
+        {
+          "code": "H2019",
+          "modifier": "HR",
+          "covered": true,
+          "population": null,
+          "category": "Community Behavioral Health",
+          "statement": "quarter Medicaid reimburses a maximum of 104 quarter-hour units (26 hours) of individual and family therapy services, per recipient, per state fiscal year.",
+          "source": "2025 Community Behavoir Health Fee Schedule.pdf",
+          "page": 4,
+          "sourced": true,
+          "basis": "quoted"
+        }
+      ],
+      "benefit_counts": {
+        "covered": 9,
+        "codes": 9,
+        "quoted": 6,
+        "rate_listed": 3,
+        "sourced": 9,
+        "category": "Community Behavioral Health",
+        "population": []
+      },
       "benefit_limits": [
         {
           "code": "H2010",
@@ -7318,6 +8108,16 @@
         "confirmed": 0,
         "requested": 0
       },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
+      },
       "benefit_limits": [],
       "benefit_limit_gap": [],
       "benefit_limit_counts": {
@@ -7739,6 +8539,16 @@
         "confirmed": 0,
         "requested": 1
       },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
+      },
       "benefit_limits": [],
       "benefit_limit_gap": [],
       "benefit_limit_counts": {
@@ -7934,6 +8744,16 @@
         "mapped": 1,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
       },
       "benefit_limits": [],
       "benefit_limit_gap": [],
@@ -8146,6 +8966,16 @@
         "mapped": 3,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
       },
       "benefit_limits": [],
       "benefit_limit_gap": [],
@@ -8635,6 +9465,31 @@
         "confirmed": 0,
         "requested": 0
       },
+      "benefit_coverage": [
+        {
+          "code": "T2023",
+          "modifier": "HA",
+          "covered": true,
+          "population": "Child/adolescent",
+          "category": "Targeted Case Management, Children At-Risk",
+          "statement": "Listed on the Targeted Case Management, Children At-Risk fee schedule at $407.60 per unit for T2023 with modifier HA (Targeted case management for children at risk of abuse and neglect). AHCA publishes a reimbursement rate for this pair, which is the state paying for the service; the schedule states no coverage sentence for it.",
+          "source": "TCM_for_Children_At-Risk_2022_Fee_Schedule.pdf",
+          "page": 1,
+          "sourced": true,
+          "basis": "rate_listed"
+        }
+      ],
+      "benefit_counts": {
+        "covered": 1,
+        "codes": 1,
+        "quoted": 0,
+        "rate_listed": 1,
+        "sourced": 1,
+        "category": "Targeted Case Management, Children At-Risk",
+        "population": [
+          "Child/adolescent"
+        ]
+      },
       "benefit_limits": [],
       "benefit_limit_gap": [
         {
@@ -9079,6 +9934,16 @@
         "mapped": 3,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
       },
       "benefit_limits": [],
       "benefit_limit_gap": [],
@@ -10402,6 +11267,16 @@
         "confirmed": 2,
         "requested": 0
       },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
+      },
       "benefit_limits": [],
       "benefit_limit_gap": [],
       "benefit_limit_counts": {
@@ -10639,6 +11514,16 @@
         "confirmed": 0,
         "requested": 0
       },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
+      },
       "benefit_limits": [],
       "benefit_limit_gap": [],
       "benefit_limit_counts": {
@@ -10834,6 +11719,16 @@
         "mapped": 1,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
       },
       "benefit_limits": [],
       "benefit_limit_gap": [],
@@ -11096,6 +11991,16 @@
         "confirmed": 0,
         "requested": 0
       },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
+      },
       "benefit_limits": [],
       "benefit_limit_gap": [],
       "benefit_limit_counts": {
@@ -11356,6 +12261,16 @@
         "mapped": 2,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
       },
       "benefit_limits": [],
       "benefit_limit_gap": [],
@@ -11618,6 +12533,16 @@
         "confirmed": 0,
         "requested": 0
       },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
+      },
       "benefit_limits": [],
       "benefit_limit_gap": [],
       "benefit_limit_counts": {
@@ -11810,6 +12735,16 @@
         "confirmed": 0,
         "requested": 0
       },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
+      },
       "benefit_limits": [],
       "benefit_limit_gap": [],
       "benefit_limit_counts": {
@@ -11993,6 +12928,16 @@
         "mapped": 1,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
       },
       "benefit_limits": [],
       "benefit_limit_gap": [],
@@ -12207,6 +13152,16 @@
         "mapped": 4,
         "confirmed": 1,
         "requested": 0
+      },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
       },
       "benefit_limits": [],
       "benefit_limit_gap": [],
@@ -12943,6 +13898,16 @@
         "confirmed": 1,
         "requested": 1
       },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
+      },
       "benefit_limits": [],
       "benefit_limit_gap": [],
       "benefit_limit_counts": {
@@ -13126,6 +14091,16 @@
         "mapped": 1,
         "confirmed": 0,
         "requested": 0
+      },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
       },
       "benefit_limits": [],
       "benefit_limit_gap": [],
@@ -13853,6 +14828,16 @@
         "mapped": 3,
         "confirmed": 1,
         "requested": 0
+      },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
       },
       "benefit_limits": [],
       "benefit_limit_gap": [],
@@ -14604,6 +15589,16 @@
         "mapped": 2,
         "confirmed": 1,
         "requested": 0
+      },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
       },
       "benefit_limits": [],
       "benefit_limit_gap": [],
@@ -16535,6 +17530,16 @@
         "confirmed": 3,
         "requested": 0
       },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
+      },
       "benefit_limits": [],
       "benefit_limit_gap": [],
       "benefit_limit_counts": {
@@ -18419,6 +19424,16 @@
         "mapped": 5,
         "confirmed": 3,
         "requested": 0
+      },
+      "benefit_coverage": [],
+      "benefit_counts": {
+        "covered": 0,
+        "codes": 0,
+        "quoted": 0,
+        "rate_listed": 0,
+        "sourced": 0,
+        "category": null,
+        "population": []
       },
       "benefit_limits": [],
       "benefit_limit_gap": [],

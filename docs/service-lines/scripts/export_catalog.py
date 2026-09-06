@@ -153,6 +153,20 @@ def main():
                 "confidence": float(r[3]) if r[3] is not None else None,
                 "evidence": r[4], "requested_concept": r[5]} for r in cur.fetchall()]
 
+        # Coverage — is this a covered benefit under the standard, and on what
+        # evidence. A row exists only where a held document supports it.
+        cur.execute("""select code, qualifier, covered, population, benefit_category,
+                              statement, source_ref, source_page, sourced
+                       from service_line.benefit where line_key=%s
+                       order by code, qualifier nulls first""", (key,))
+        cov = [{"code": r[0], "modifier": r[1], "covered": r[2], "population": r[3],
+                "category": r[4], "statement": r[5], "source": r[6], "page": r[7],
+                "sourced": r[8],
+                # A quoted sentence and a read table row are not equal evidence,
+                # and the card must be able to say which it is standing on.
+                "basis": "quoted" if "Medicaid reimburses" in (r[5] or "") else "rate_listed"}
+               for r in cur.fetchall()]
+
         # Limits, and what is still prose. The gap is exported alongside the
         # answer deliberately — a card that shows only the structured rows reads
         # as if the prose ones do not exist.
@@ -209,6 +223,16 @@ def main():
                 "mapped": sum(1 for x in lex if x["d_code"]),
                 "confirmed": sum(1 for x in lex if x["state"] == "confirmed"),
                 "requested": sum(1 for x in lex if x["state"] == "requested"),
+            },
+            "benefit_coverage": cov,
+            "benefit_counts": {
+                "covered": sum(1 for x in cov if x["covered"]),
+                "codes": len({(x["code"], x["modifier"]) for x in cov}),
+                "quoted": sum(1 for x in cov if x["basis"] == "quoted"),
+                "rate_listed": sum(1 for x in cov if x["basis"] == "rate_listed"),
+                "sourced": sum(1 for x in cov if x["sourced"]),
+                "category": (cov[0]["category"] if cov else None),
+                "population": sorted({x["population"] for x in cov if x["population"]}),
             },
             "benefit_limits": limits,
             "benefit_limit_gap": limit_gap,
