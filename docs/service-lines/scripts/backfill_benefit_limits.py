@@ -28,7 +28,8 @@ such rather than buried:
                            recipient, which the paired sentence ("a maximum total
                            of two treatment plans per recipient") contradicts.
   T1015 medication mgmt    "as medically necessary" is a real sourced answer of
-                           NO numeric cap: unlimited=true. It must not read the
+                           NO numeric cap: unlimited=true, and limit_type null
+                           because nothing is being counted. It must not read the
                            same as a limit we never sourced.
 
 And one sentence is deliberately REFUSED:
@@ -104,8 +105,11 @@ READING = {
    ("encounters", 2, "one behavioral health medical screening service", SFY, "recipient"),
  "rate Medicaid reimburses medication assisted treatment services 52 times, per recipient, per state fiscal year.":
    ("encounters", 52, "one medication assisted treatment service", SFY, "recipient"),
+ # limit_type is null, not 'encounters'. There is no cap, so there is no unit
+ # being counted; 052 relaxed the constraint that had forced a word here. The
+ # machine extractor returned null on this sentence and was right.
  "event Medicaid reimburses medication management as medically necessary.":
-   ("encounters", UNLIMITED, None, None, None),
+   (None, UNLIMITED, None, None, None),
 }
 
 # Read, and deliberately not structured. Keeping the reason next to the sentence

@@ -21,8 +21,15 @@ they change what the number means:
      than whether my reading was right. The H0032 "per provider" call would
      agree for the wrong reason. A fair grade needs a second schedule nobody has
      hand-read.
-  2. The prompt is never shown the expected answer. It receives the sentence,
+  2. The prompt is never shown the expected answer. It receives the sentences,
      the enums and the completeness rule — nothing else.
+
+The unit of work is ONE BILLABLE SERVICE, not one sentence. Grading the
+per-sentence version showed that was the design error behind its worst
+disagreement: on H0032 the model read "one treatment plan per provider"
+literally, because the sentence capping treatment plans "per recipient" was in a
+different call. Sentences on the same (code, modifier) constrain each other and
+have to be read together.
 
     python3 extract_benefit_limits.py [--limit N] [--verbose]
 """
@@ -55,51 +62,74 @@ PERIODS = ["per_service", "day", "week", "month", "quarter", "state_fiscal_year"
            "calendar_year", "episode", "admission", "lifetime"]
 PER_WHOM = ["recipient", "recipient_per_provider", "provider", "episode", "admission"]
 
-PROMPT = """You are turning one sentence from a state Medicaid fee schedule into a
-structured service limit. Read ONLY the sentence. Do not use outside knowledge of
-Medicaid, and do not complete anything the sentence leaves unsaid.
+PROMPT = """You are turning a state Medicaid fee schedule's service-limit text into
+structured limits for ONE billable service. Read ONLY what is given. Do not use
+outside knowledge of Medicaid, and do not complete anything left unsaid.
 
-SENTENCE:
-{sentence}
+SERVICE: {code}{mod}
+
+The schedule states the following about it. They are given together on purpose:
+a later sentence often constrains an earlier one, and a sentence read alone can
+mean something the pair does not.
+
+{sentences}
+
+One service may carry SEVERAL limits on different axes — commonly a daily cap
+and an annual cap. Return every limit stated, not just the largest.
 
 Return ONLY JSON:
 {{
-  "states_a_limit": true|false,
-  "limit_type": one of {limit_types},
-  "amount": number, or null if the sentence states no numeric cap,
-  "unit_definition": "what ONE of that thing is, in the sentence's own terms", or null,
-  "period": one of {periods}, or null,
-  "per_whom": one of {per_whom}, or null,
-  "unlimited": true only if the sentence affirmatively says there is no numeric cap,
-  "reason": "if states_a_limit is false, why"
+  "limits": [
+    {{
+      "from_sentence": "the sentence this limit came from, first 60 chars",
+      "limit_type": one of {limit_types}, or null if unlimited,
+      "amount": number, or null if no numeric cap is stated,
+      "unit_definition": "what ONE of that thing is, in the text's own terms", or null,
+      "period": one of {periods}, or null,
+      "per_whom": one of {per_whom}, or null,
+      "unlimited": true only if the text affirmatively says there is no numeric cap
+    }}
+  ],
+  "not_limits": [
+    {{"sentence": "first 60 chars", "reason": "why this states no usable limit"}}
+  ]
 }}
 
 Rules, applied strictly:
-- A number with no stated unit is INCOMPLETE. If the sentence says "1 unit" and
-  never says what a unit is, set unit_definition to null and say so — do not
-  infer that a unit is a month, a visit, or anything else.
+- A number with no stated unit is INCOMPLETE. If the text says "1 unit" and never
+  says what a unit is, put it in not_limits — do not infer that a unit is a
+  month, a visit, or anything else.
 - "as medically necessary" is a real answer of NO numeric cap: amount null,
-  unlimited true.
+  unlimited true, limit_type null. Nothing is being counted.
 - period is the window the cap applies over. "per state fiscal year" is
   state_fiscal_year; "daily" is day; "per month" is month.
-- per_whom is WHOSE allowance is capped, and only if the sentence says. "per
-  recipient" is recipient. "per provider" for a per-recipient service is
-  recipient_per_provider. If the sentence does not say, use null — do not guess.
-- A sentence may state a cap on a DIFFERENT axis than you expect. Report the one
-  the sentence actually states.
-- If the sentence is not a limit at all, states_a_limit false.
+- per_whom is WHOSE allowance is capped, and only if the text says. "per
+  recipient" is recipient. If the text does not say, use null — do not guess.
+- USE THE SENTENCES AGAINST EACH OTHER. If one says a thing is capped "per
+  provider" and another caps the same thing "per recipient", the first is a
+  per-recipient-per-provider cap, not a cap on the provider's whole panel.
+- limit_type: prefer the coarse category over inventing a word. A billable
+  service occurrence is "encounters". A timed increment is "units". A
+  diagnostic write-up is "evaluations". Never return a word outside the list.
 """
 
 
-def ask(sentence: str, tries: int = 3) -> dict:
-    """LLMManager retries the transport now; this retries a model that returns
-    something unparseable, which is a different failure and still ours to absorb.
-    A grading run that dies on one bad response grades nothing."""
-    prompt = PROMPT.format(sentence=sentence, limit_types=LIMIT_TYPES,
+
+def ask(code: str, mod: str | None, sentences: list[str], tries: int = 3) -> dict:
+    """One call per billable service, not per sentence.
+
+    Grading the per-sentence version showed the unit of work was wrong: on H0032
+    the model read "one treatment plan per provider" literally, because the
+    paired sentence capping treatment plans "per recipient" was never in the
+    prompt. Neither reading is available from one sentence alone.
+    """
+    numbered = "\n".join(f"  {i}. {t}" for i, t in enumerate(sentences, 1))
+    prompt = PROMPT.format(code=code, mod=f" with modifier {mod}" if mod else " (no modifier)",
+                           sentences=numbered, limit_types=LIMIT_TYPES,
                            periods=PERIODS, per_whom=PER_WHOM)
     for attempt in range(tries):
         try:
-            raw, usage = generate_sync(prompt, stage="parser", max_tokens=600, parser=True)
+            raw, usage = generate_sync(prompt, stage="parser", max_tokens=1500, parser=True)
             break
         except Exception as e:
             if attempt == tries - 1:
@@ -140,15 +170,40 @@ def admissible(d: dict) -> tuple[bool, str]:
 
 
 def norm_unit(u):
-    """15 minutes, quarter-hour unit and 15-minute unit are the same unit."""
+    """Compare what the unit IS, not how it was worded.
+
+    "15 minutes", "quarter-hour unit" and "15-minute unit" name one thing. So do
+    "one biopsychosocial evaluation" and "biopsychosocial evaluation" — a leading
+    article is grammar, not a different unit, and scoring it as a disagreement
+    flatters nothing and hides the real ones.
+    """
     if not u:
         return None
     s = re.sub(r"[^a-z0-9]+", " ", u.lower()).strip()
-    if "15" in s and "min" in s:
+    if ("15" in s and "min" in s) or ("quarter" in s and "hour" in s):
         return "15min"
-    if "quarter" in s and "hour" in s:
-        return "15min"
+    s = re.sub(r"^(one|a|an|the)\s+", "", s)
     return s
+
+
+def canon(t):
+    """A reading, comparable regardless of who produced it."""
+    ltype, amount, unit, period, whom = t
+    unlimited = amount == "UNLIMITED"
+    return (None if unlimited else ltype,
+            None if unlimited else float(amount),
+            norm_unit(unit), period, whom, unlimited)
+
+
+def canon_machine(d):
+    unlimited = bool(d.get("unlimited"))
+    amt = d.get("amount")
+    return (None if unlimited else (d.get("limit_type") or None),
+            None if unlimited else (float(amt) if amt is not None else None),
+            norm_unit(d.get("unit_definition")),
+            d.get("period") or None,
+            d.get("per_whom") or None,
+            unlimited)
 
 
 def main():
@@ -160,87 +215,91 @@ def main():
     c = psycopg2.connect(DB)
     c.autocommit = True
     cur = c.cursor()
-    cur.execute("""select distinct s from (select unnest(general_rule) s
-                     from service_line.line_code where general_rule is not null) t
-                   order by s""")
-    sentences = [r[0] for r in cur.fetchall()]
+    cur.execute("""select code, qualifier, general_rule
+                     from service_line.line_code
+                    where general_rule is not null and general_rule <> '{}'
+                    order by code, qualifier""")
+
+    # Many bindings share an identical sentence set (H0032 and T1007 carry the
+    # same pair). Group by the set so the grade counts distinct problems, not
+    # duplicated rows.
+    groups: dict[tuple, dict] = {}
+    for code, qual, rules in cur.fetchall():
+        key = (code, qual or None, tuple(rules))
+        groups.setdefault(key, {"code": code, "mod": qual or None,
+                                "sentences": list(rules)})
+    work = list(groups.values())
     if a.limit:
-        sentences = sentences[:a.limit]
+        work = work[:a.limit]
 
-    print(f"sentences: {len(sentences)}  (hand-read table holds "
-          f"{len(READING)} accepted + {len(REFUSED)} refused)\n")
+    print(f"billable services: {len(work)}  "
+          f"(hand table holds {len(READING)} accepted + {len(REFUSED)} refused sentences)\n")
 
-    agree = disagree = errors = 0
-    admit_match = 0
-    field_hits = {k: 0 for k in ("limit_type", "amount", "unit_definition", "period", "per_whom", "unlimited")}
-    field_seen = dict(field_hits)
-    rows = []
+    exact = partial = wrong = errors = 0
+    refuse_right = refuse_seen = 0
+    limits_expected = limits_matched = 0
 
-    for i, s in enumerate(sentences, 1):
-        got = ask(s)
+    for i, g in enumerate(work, 1):
+        got = ask(g["code"], g["mod"], g["sentences"])
+        label = f"{g['code']} {g['mod'] or ''}".strip()
         if got.get("_error"):
             errors += 1
-            print(f"[{i}/{len(sentences)}] ERROR  {got['_error']}")
-            continue
-        ok, why = admissible(got)
-        exp = READING.get(s)
-        exp_admissible = exp is not None
-
-        # Did the machine make the same ACCEPT / REFUSE call as the hand?
-        if ok == exp_admissible:
-            admit_match += 1
-
-        status = "ok" if ok else "refused"
-        if not exp_admissible:
-            # Hand refused it. The machine agreeing to refuse is the win here.
-            same = (not ok)
-            rows.append((s, status, "REFUSED (hand)", same, why))
-            agree += same
-            disagree += (not same)
-            print(f"[{i}/{len(sentences)}] {'MATCH ' if same else 'DIFFER'} "
-                  f"machine={status}, hand=refused" + (f" · {why}" if why else ""))
+            print(f"[{i}/{len(work)}] ERROR  {label}: {got['_error']}")
             continue
 
-        e_type, e_amount, e_unit, e_period, e_whom = exp
-        e_unlimited = (e_amount == "UNLIMITED")
-        checks = {
-            "limit_type": got.get("limit_type") == e_type,
-            "amount": (got.get("amount") is None) if e_unlimited
-                      else (got.get("amount") is not None and float(got["amount"]) == float(e_amount)),
-            "unit_definition": norm_unit(got.get("unit_definition")) == norm_unit(e_unit),
-            "period": (got.get("period") or None) == e_period,
-            "per_whom": (got.get("per_whom") or None) == e_whom,
-            "unlimited": bool(got.get("unlimited")) == e_unlimited,
-        }
-        for k, v in checks.items():
-            field_seen[k] += 1
-            field_hits[k] += bool(v)
-        same = ok and all(checks.values())
-        agree += same
-        disagree += (not same)
-        bad = [k for k, v in checks.items() if not v]
-        rows.append((s, status, exp, same, ", ".join(bad)))
-        print(f"[{i}/{len(sentences)}] {'MATCH ' if same else 'DIFFER'}"
-              + (f" · {', '.join(bad)}" if bad else "")
-              + ("" if ok else f" · machine refused: {why}"))
-        if a.verbose and not same:
-            print(f"     sentence: {s[:110]}")
-            print(f"     hand:    {exp}")
-            print(f"     machine: type={got.get('limit_type')} amount={got.get('amount')} "
-                  f"unit={got.get('unit_definition')!r} period={got.get('period')} "
-                  f"whom={got.get('per_whom')} unlimited={got.get('unlimited')}")
+        expected, hand_refused = [], []
+        for sent in g["sentences"]:
+            if sent in READING:
+                expected.append(canon(READING[sent]))
+            else:
+                hand_refused.append(sent)
 
-    n = len(sentences) - errors
-    if errors:
-        print(f"\n{errors} sentence(s) never got a usable response and are "
-              f"excluded from the grade rather than counted as disagreement.")
+        machine = []
+        for d in (got.get("limits") or []):
+            ok, why = admissible({**d, "states_a_limit": True})
+            if ok:
+                machine.append(canon_machine(d))
+        # A sentence the hand refused should land in not_limits, not in limits.
+        refuse_seen += len(hand_refused)
+        n_not = len(got.get("not_limits") or [])
+        refuse_right += min(n_not, len(hand_refused))
+
+        limits_expected += len(expected)
+        rem = list(machine)
+        hit = 0
+        for e in expected:
+            if e in rem:
+                rem.remove(e)
+                hit += 1
+        limits_matched += hit
+
+        if hit == len(expected) and not rem:
+            exact += 1
+            verdict = "MATCH "
+        elif hit:
+            partial += 1
+            verdict = "PARTIAL"
+        else:
+            wrong += 1
+            verdict = "MISS  "
+        print(f"[{i}/{len(work)}] {verdict} {label:<10} "
+              f"{hit}/{len(expected)} limits" + (f", {len(rem)} extra" if rem else ""))
+        if a.verbose and (hit != len(expected) or rem):
+            for e in expected:
+                print(f"     hand:    {e}")
+            for m_ in machine:
+                print(f"     machine: {m_}")
+
+    n = len(work) - errors
     print(f"\n{'='*66}")
-    print(f"full-reading agreement   {agree}/{n}  ({agree/n:.0%})")
-    print(f"accept/refuse agreement  {admit_match}/{n}  ({admit_match/n:.0%})")
-    print("\nper field, on the sentences the hand accepted:")
-    for k in field_hits:
-        if field_seen[k]:
-            print(f"  {k:<18}{field_hits[k]:>3}/{field_seen[k]:<3} ({field_hits[k]/field_seen[k]:.0%})")
+    print(f"services graded          {n}" + (f"  ({errors} errored, excluded)" if errors else ""))
+    print(f"  exact                  {exact}/{n}  ({exact/n:.0%})")
+    print(f"  partial                {partial}/{n}")
+    print(f"  missed entirely        {wrong}/{n}")
+    print(f"individual limits        {limits_matched}/{limits_expected}  "
+          f"({limits_matched/limits_expected:.0%})")
+    if refuse_seen:
+        print(f"hand-refused sentences   {refuse_right}/{refuse_seen} also refused by the machine")
     print("\nNOT a blind eval: the same author wrote the hand table and this prompt.")
     print("A fair grade needs a fee schedule nobody has hand-read.")
 
