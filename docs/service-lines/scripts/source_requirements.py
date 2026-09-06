@@ -264,10 +264,50 @@ def prior_attempt(cur, req_id: int) -> dict | None:
     return dict(r) if r else None
 
 
+class DB_:
+    """A cursor that reconnects when the dev proxy drops the connection.
+
+    An 87-question run takes hours, and cloud-sql-proxy on 5433 is known to drop
+    long-lived connections. The first run died after 4 questions on
+    OperationalError with 3 already sourced — the work was safe (autocommit), the
+    process was not. Every statement goes through here so a drop costs one retry
+    instead of the whole run.
+    """
+
+    def __init__(self, dsn: str):
+        self.dsn = dsn
+        self._connect()
+
+    def _connect(self) -> None:
+        self.conn = psycopg2.connect(self.dsn)
+        self.conn.autocommit = True
+        self.cur = self.conn.cursor(cursor_factory=RealDictCursor)
+
+    def execute(self, sql, args=None):
+        for attempt in range(3):
+            try:
+                return self.cur.execute(sql, args)
+            except psycopg2.OperationalError as e:
+                if attempt == 2:
+                    raise
+                print(f"        !! database connection lost ({str(e).strip()[:60]}); "
+                      f"reconnecting", flush=True)
+                time.sleep(3 * (attempt + 1))
+                try:
+                    self.conn.close()
+                except Exception:
+                    pass
+                self._connect()
+
+    def fetchone(self):
+        return self.cur.fetchone()
+
+    def fetchall(self):
+        return self.cur.fetchall()
+
+
 def run(rounds: int, rtype: str | None, limit: int | None) -> None:
-    conn = psycopg2.connect(DB)
-    conn.autocommit = True
-    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur = DB_(DB)
 
     for rnd in range(1, rounds + 1):
         todo = open_requirements(cur, rtype, limit)
