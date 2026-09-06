@@ -225,20 +225,20 @@ def _norm(s: str) -> str:
     return re.sub(r"\s+", " ", (s or "")).strip().lower()
 
 
-def validate(ext: dict, answer: str, docs: list[str]) -> tuple[bool, str]:
+def validate(ext: dict, answer: str, docs: list[str]) -> tuple[bool, str, str]:
     """Grounding is verified here, not taken on faith."""
     if not ext.get("answered"):
-        return False, ext.get("reason") or "not answered"
+        return False, ext.get("reason") or "not answered", "not_answered"
     if not docs:
-        return False, "chat cited no documents"
+        return False, "chat cited no documents", "no_retrieval"
     quote, doc = ext.get("quote") or "", ext.get("document") or ""
     if not quote or _norm(quote)[:80] not in _norm(answer):
-        return False, "quote not present verbatim in chat's answer"
+        return False, "quote not present verbatim in chat's answer", "ungrounded"
     if not any(_norm(doc) in _norm(d) or _norm(d) in _norm(doc) for d in docs):
-        return False, f"cited document '{doc[:60]}' is not one chat returned"
+        return False, f"cited document '{doc[:60]}' is not one chat returned", "ungrounded"
     if not (ext.get("statement") or "").strip():
-        return False, "empty statement"
-    return True, ""
+        return False, "empty statement", "not_answered"
+    return True, "", "extracted"
 
 
 # ── loop ────────────────────────────────────────────────────────────────────
@@ -333,7 +333,7 @@ def run(rounds: int, rtype: str | None, limit: int | None) -> None:
                     outcome, reason = "no_retrieval", "chat returned no sources"
                 else:
                     ext = extract(req, q, answer, docs)
-                    ok, why = validate(ext, answer, docs)
+                    ok, why, code = validate(ext, answer, docs)
                     if ok:
                         outcome, reason = "extracted", ""
                         cur.execute("""update service_line.standard_requirement
@@ -342,8 +342,16 @@ def run(rounds: int, rtype: str | None, limit: int | None) -> None:
                                     (ext["statement"], ext["document"], req["id"]))
                         extracted += 1
                     else:
-                        outcome = ("ungrounded" if "quote" in why or "document" in why
-                                   else "not_answered")
+                        # The outcome comes from validate(), which knows WHICH check
+                        # failed. It used to be guessed by looking for "quote" or
+                        # "document" in the reason text, and that was wrong 38 times
+                        # out of 44: the extractor says "not stated in the retrieved
+                        # documents" when the corpus is silent, and the substring
+                        # "document" turned every one of those into "ungrounded".
+                        # An absent fact and a fabricated one were being filed under
+                        # the same label, which is exactly the distinction the whole
+                        # gate exists to make.
+                        outcome = code
                         reason = why
                     ext_saved = ext
             cur.execute("""insert into service_line.sourcing_attempt
