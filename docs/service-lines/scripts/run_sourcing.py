@@ -18,10 +18,9 @@ Registry stores the run, its membership and its own events. Turns, attempts, ver
 and diagnoses stay in research.* and are read live — never copied.
 """
 import argparse
-import json
+from contextlib import ExitStack
 import sys
 import traceback
-import uuid
 
 import psycopg2
 from psycopg2.extras import Json, RealDictCursor
@@ -147,97 +146,17 @@ def targets(cur, line_key, only_unsourced=True, limit=None):
     return [dict(r) for r in cur.fetchall()]
 
 
-def run(line_key, requested_by, limit=None, dry=False, max_rounds=2,
-        existing_run=None, profile=None):
-    conn, cur = db()
-    cur.execute("select key, name from service_line.line where key=%s", (line_key,))
-    line = cur.fetchone()
-    if not line:
-        sys.exit(f"no such service line: {line_key}")
+def _source_all(cur, run_id, line, line_key, gov, reqs, profile, max_rounds):
+    """Ask one question per requirement, in order, recording every step.
 
-    reqs = targets(cur, line_key, limit=limit)
-    if not reqs:
-        sys.exit(f"{line_key}: nothing unsourced to source")
+    Extracted from run(), which had grown to 192 lines doing four unrelated jobs:
+    resolving the line, opening the run, pinning the model, and driving the questions.
+    Only the last one is the work; the rest is setup, and setup that long hides the
+    part a reader needs to check.
+    """
+    from deep_research.runner import perform_turn                     # noqa: E402
 
-    if existing_run:
-        # The API already created the run and emitted run_started when it queued it.
-        # Making a second row here would orphan the run_id the surface is streaming.
-        run_id = existing_run
-        cur.execute("""update service_line.sourcing_run set task_count=%s,
-                          model_profile=coalesce(model_profile,%s) where id=%s""",
-                    (len(reqs), profile, run_id))
-        cur.execute("select model_profile from service_line.sourcing_run where id=%s", (run_id,))
-        profile = (cur.fetchone() or {}).get("model_profile") or profile
-    else:
-        cur.execute("""insert into service_line.sourcing_run
-                         (line_key, requested_by, task_count, model_profile)
-                       values (%s,%s,%s,%s) returning id""",
-                    (line_key, requested_by, len(reqs), profile))
-        run_id = cur.fetchone()["id"]
-
-    gov = governing(cur, line_key)
-    if not existing_run:
-        emit(cur, run_id, "run_started",
-             {"line_key": line_key, "line_name": line["name"], "task_count": len(reqs),
-              "requested_by": requested_by},
-             f"Sourcing {len(reqs)} requirements for {line['name']}.")
-    emit(cur, run_id, "model_profile", {"profile": profile},
-         f"Asking under the {profile} model profile." if profile
-         else "Asking under the worker's default model profile.")
-    emit(cur, run_id, "governing_resolved", gov,
-         (f"Governing rule {gov['rule_ref']} is held — {gov['chunks']} sections readable."
-          if gov["resolvable"] else
-          f"Governing rule {gov.get('rule_ref') or '(none recorded)'}: {gov['why']}."))
-
-    print(f"run {run_id}  {line['name']}  {len(reqs)} requirements")
-    print(f"  governing: {gov}")
-    PROFILE_NOTE = profile or "worker default"
-    if dry:
-        cur.execute("""update service_line.sourcing_run
-                          set status='cancelled', finished_at=now(),
-                              note='dry run — nothing asked' where id=%s""", (run_id,))
-        print("  (dry run — nothing asked)")
-        return run_id
-
-    # perform_turn, not service.open_and_run. Both ask, extract, judge and record — but
-    # open_and_run calls ask_chat_streaming(q, chat_mode) with no profile, so a run takes
-    # whatever model the worker instance happens to be set to. That is not a choice
-    # anybody made, and it is how three runs died on Anthropic today while
-    # /chat/admin/model-profile reported "gemini": the GET reads one of four Cloud Run
-    # instances and the worker answering may be another. runner.perform_turn threads the
-    # profile through to the request, where it cannot fragment.
-    #
-    # This uses Deep Research's public entry points and mints the turn the way work()
-    # expects to find one. Nothing in their module is modified.
-    from deep_research.runner import perform_turn                       # noqa: E402
-
-    # TWO different LLM uses happen inside perform_turn, and only one of them is a
-    # chat request:
-    #
-    #   1. the ASK — ask_chat_streaming() hits the chat SERVICE, which searches the
-    #      corpus and answers. `profile` travels with that request and works.
-    #   2. the EXTRACTOR and JUDGE — extract()/critique() run IN THIS PROCESS via
-    #      llm_manager.generate_sync(stage="parser"). They turn the prose answer into
-    #      the typed slots `expects` asked for, and check each field. generate_sync
-    #      takes no profile argument, so #2 kept drawing Anthropic and dying on credits
-    #      while #1 was happily answering on Gemini.
-    #
-    # profile_override sets a ContextVar the router reads, so it covers the in-process
-    # half too. Without it, choosing a profile in the UI would silently steer only the
-    # ask and leave the extraction on whatever the pool drew.
-    from contextlib import ExitStack                                    # noqa: E402
-    stack = ExitStack()
-    if profile:
-        try:
-            from app.services.model_profile import profile_override     # noqa: E402
-            stack.enter_context(profile_override(profile))
-            print(f"  in-process extraction pinned to profile: {profile}")
-        except Exception as exc:
-            # Say so rather than running the extractor on an unintended model and
-            # reporting the result as if the profile had been honoured.
-            emit(cur, run_id, "error", {"profile": profile, "error": str(exc)[:300]},
-                 f"Could not pin the extractor to {profile}; it will use the default pool.")
-            print(f"  WARNING: extractor not pinned ({exc})")
+    profile_note = profile or "worker default"
 
     for seq, r in enumerate(reqs, 1):
         rtype = r["requirement_type"]
@@ -276,7 +195,7 @@ def run(line_key, requested_by, limit=None, dry=False, max_rounds=2,
               "model_profile": profile},
              None, seq)
         print(f"  [{seq}/{len(reqs)}] {rtype}{' ' + r['code'] if r['code'] else ''} "
-              f"(profile: {PROFILE_NOTE}) …", flush=True)
+              f"(profile: {profile_note}) …", flush=True)
 
         state, note, q, rounds = None, None, question, 0
         for n in range(1, max_rounds + 1):
@@ -328,7 +247,111 @@ def run(line_key, requested_by, limit=None, dry=False, max_rounds=2,
         print(f"        -> {state} in {rounds} turn(s)"
               f"{' — ' + note[:80] if note else ''}", flush=True)
 
-    stack.close()
+
+
+class NothingToSource(Exception):
+    """The line exists and has no unsourced requirements. Not an error for a worker."""
+
+
+def run(line_key, requested_by, limit=None, dry=False, max_rounds=2,
+        existing_run=None, profile=None):
+    conn, cur = db()
+    cur.execute("select key, name from service_line.line where key=%s", (line_key,))
+    line = cur.fetchone()
+    # RAISE, never sys.exit. SystemExit inherits from BaseException, so serve()'s
+    # `except Exception` does not catch it — a queued run for a line whose requirements
+    # were sourced between the queue and the claim would have killed the worker outright.
+    if not line:
+        raise NothingToSource(f"no such service line: {line_key}")
+
+    reqs = targets(cur, line_key, limit=limit)
+    if not reqs:
+        raise NothingToSource(f"{line_key}: nothing unsourced to source")
+
+    if existing_run:
+        # The API already created the run and emitted run_started when it queued it.
+        # Making a second row here would orphan the run_id the surface is streaming.
+        run_id = existing_run
+        cur.execute("""update service_line.sourcing_run set task_count=%s,
+                          model_profile=coalesce(model_profile,%s) where id=%s""",
+                    (len(reqs), profile, run_id))
+        cur.execute("select model_profile from service_line.sourcing_run where id=%s", (run_id,))
+        profile = (cur.fetchone() or {}).get("model_profile") or profile
+    else:
+        cur.execute("""insert into service_line.sourcing_run
+                         (line_key, requested_by, task_count, model_profile)
+                       values (%s,%s,%s,%s) returning id""",
+                    (line_key, requested_by, len(reqs), profile))
+        run_id = cur.fetchone()["id"]
+
+    gov = governing(cur, line_key)
+    if not existing_run:
+        emit(cur, run_id, "run_started",
+             {"line_key": line_key, "line_name": line["name"], "task_count": len(reqs),
+              "requested_by": requested_by},
+             f"Sourcing {len(reqs)} requirements for {line['name']}.")
+    emit(cur, run_id, "model_profile", {"profile": profile},
+         f"Asking under the {profile} model profile." if profile
+         else "Asking under the worker's default model profile.")
+    emit(cur, run_id, "governing_resolved", gov,
+         (f"Governing rule {gov['rule_ref']} is held — {gov['chunks']} sections readable."
+          if gov["resolvable"] else
+          f"Governing rule {gov.get('rule_ref') or '(none recorded)'}: {gov['why']}."))
+
+    print(f"run {run_id}  {line['name']}  {len(reqs)} requirements")
+    print(f"  governing: {gov}")
+    if dry:
+        cur.execute("""update service_line.sourcing_run
+                          set status='cancelled', finished_at=now(),
+                              note='dry run — nothing asked' where id=%s""", (run_id,))
+        print("  (dry run — nothing asked)")
+        return run_id
+
+    # perform_turn, not service.open_and_run. Both ask, extract, judge and record — but
+    # open_and_run calls ask_chat_streaming(q, chat_mode) with no profile, so a run takes
+    # whatever model the worker instance happens to be set to. That is not a choice
+    # anybody made, and it is how three runs died on Anthropic today while
+    # /chat/admin/model-profile reported "gemini": the GET reads one of four Cloud Run
+    # instances and the worker answering may be another. runner.perform_turn threads the
+    # profile through to the request, where it cannot fragment.
+    #
+    # This uses Deep Research's public entry points and mints the turn the way work()
+    # expects to find one. Nothing in their module is modified.
+
+    # TWO different LLM uses happen inside perform_turn, and only one of them is a
+    # chat request:
+    #
+    #   1. the ASK — ask_chat_streaming() hits the chat SERVICE, which searches the
+    #      corpus and answers. `profile` travels with that request and works.
+    #   2. the EXTRACTOR and JUDGE — extract()/critique() run IN THIS PROCESS via
+    #      llm_manager.generate_sync(stage="parser"). They turn the prose answer into
+    #      the typed slots `expects` asked for, and check each field. generate_sync
+    #      takes no profile argument, so #2 kept drawing Anthropic and dying on credits
+    #      while #1 was happily answering on Gemini.
+    #
+    # profile_override sets a ContextVar the router reads, so it covers the in-process
+    # half too. Without it, choosing a profile in the UI would silently steer only the
+    # ask and leave the extraction on whatever the pool drew.
+    # ExitStack was closed only on the success path. profile_override sets a ContextVar,
+    # and serve() catches run()'s exceptions and keeps going — so one failed run left the
+    # override set and the NEXT run silently inherited it. A run recorded as
+    # model_profile='anthropic' could have executed under gemini, with the provenance
+    # trail asserting the opposite. try/finally, always.
+    with ExitStack() as stack:
+        if profile:
+            try:
+                from app.services.model_profile import profile_override  # noqa: E402
+                stack.enter_context(profile_override(profile))
+                print(f"  in-process extraction pinned to profile: {profile}")
+            except Exception as exc:
+                # Say so rather than running the extractor on an unintended model and
+                # reporting the result as if the profile had been honoured.
+                emit(cur, run_id, "error", {"profile": profile, "error": str(exc)[:300]},
+                     f"Could not pin the extractor to {profile}; it will use the "
+                     f"default pool.")
+                print(f"  WARNING: extractor not pinned ({exc})")
+        _source_all(cur, run_id, line, line_key, gov, reqs, profile, max_rounds)
+
     cur.execute("""update service_line.sourcing_run set status='finished', finished_at=now()
                     where id=%s""", (run_id,))
     cur.execute("""select coalesce(f.finding,'undiagnosed') k, count(*) from (
@@ -349,8 +372,13 @@ def serve(poll_s=5, who=None):
     same second would otherwise both see 'requested' and both drive the same run,
     asking every question twice and interleaving their steps in one stream.
     """
-    import socket, time
-    who = who or f"worker@{socket.gethostname()}"
+    import os, socket, time
+    # Identity must be PROCESS-unique, not host-unique. With a bare worker@host, a
+    # restarted worker is indistinguishable from the one that died mid-run: its heartbeat
+    # looks current, so the abandoned-run check sees a live owner and the orphaned run is
+    # never reclaimed. The pid and start time make a restart a different worker, which is
+    # what it actually is.
+    who = who or f"worker@{socket.gethostname()}#{os.getpid()}"
     conn, cur = db()
     print(f"worker {who} — polling every {poll_s}s, Ctrl-C to stop")
     seen_idle = False
@@ -370,6 +398,13 @@ def serve(poll_s=5, who=None):
                     (who, claimed_n, note))
 
     beat("started")
+    # A worker that died mid-run left its run at 'running' with nothing behind it, and
+    # request_run() then refused to queue another for that line — one killed worker
+    # locking a service line out of sourcing permanently. Clear those on the way in.
+    cur.execute("select service_line.reclaim_abandoned_runs()")
+    freed = cur.fetchone()["reclaim_abandoned_runs"]
+    if freed:
+        print(f"  reclaimed {freed} run(s) abandoned by a worker that stopped")
     while True:
         cur.execute("""update service_line.sourcing_run
                           set status='running', claimed_at=now(), claimed_by=%s
@@ -396,6 +431,15 @@ def serve(poll_s=5, who=None):
             run(row["line_key"], row["requested_by"], row["requested_limit"],
                 False, row["max_rounds"], existing_run=row["id"],
                 profile=row["model_profile"])
+        except NothingToSource as why:
+            # Not a failure. The requirements were sourced between the queue and the
+            # claim, or the line was renamed. Marking it 'failed' would put a red run on
+            # the surface for a question that no longer needed asking, and a red state
+            # nobody can act on is how people learn to ignore the colour.
+            print(f"  nothing to do: {why}")
+            cur.execute("""update service_line.sourcing_run
+                              set status='cancelled', finished_at=now(), note=%s
+                            where id=%s""", (str(why)[:400], row["id"]))
         except Exception as exc:
             traceback.print_exc()
             cur.execute("""update service_line.sourcing_run
