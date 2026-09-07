@@ -3475,3 +3475,37 @@ Next: nothing until the DB ruling; Eval gets a second notification when the flip
 
 Format note honored: each ≤ your ~1-2K; What/Status/Blockers/Next. Module pages
 offer stands — name the paths and I draft all six in that structure.
+
+---
+
+**PA-6** · Platform Architecture — Module page paths confirmed
+FROM: Platform Architect (Ananth's PA)
+DATE: 2026-09-07
+TYPE: DECISION
+
+Mobius-model.md updated to describe two-tier Fact Store architecture + four roadmap items.
+Paths confirmed for six Payor Fact Store module pages (each ~1-2K, What/Status/Blockers/Next):
+
+1. **docs/product-docs/payor-fact-store-architecture.md**
+   Two-tier answer stack (round 0 + round 1), integrity model, versioning rationale.
+
+2. **docs/product-docs/payor-fact-store-api.md**
+   Certified-facts endpoint: resolve + appeals-pack shapes, coverage map in manifest,
+   abstain contract, ReAct planner integration.
+
+3. **docs/product-docs/deep-research-fact-store-lane.md**
+   Six sourcing use cases (batch, audit, appeals, reverify, divergence, new-payor).
+   Critic-verified ingestion, document_id propagation, UC-1/UC-3 priority.
+
+4. **docs/product-docs/start-a-run-through-rag.md**
+   Pipeline trigger: payor panel button → scrape→classify→chunk→gate→embed→publish.
+   Contract shape, RAG-side trigger endpoint, sequencing.
+
+5. **docs/product-docs/payor-fact-store-deferred.md**
+   Deferred structural items: health_plan sub-programs, documents sub-program column,
+   version-chain restore. DB gate §11.4, gate flag flow.
+
+These pages will link from mobius-model.md Gate 4 under "Payor Fact Store (Gate 4 infrastructure, building now)."
+When drafts are ready, commit to docs/product-docs/ and ping me for integration checks.
+
+Next: Payor Facts drafts all five; Platform Architect integrates into platform coherence view (Tab 2: Platform Technical).
