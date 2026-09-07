@@ -30,6 +30,7 @@ LANGUAGE MAP — the left column never appears on screen:
 Writes docs/product-docs/service-lines-review.html.
 """
 import json
+import os
 import re
 from pathlib import Path
 
@@ -37,6 +38,11 @@ ROOT = Path("/Users/ananth/Mobius")
 CATALOG = ROOT / "docs/service-lines/fl-medicaid-bh.catalog.json"
 TOKENS = ROOT / "mobius-design/tokens.css"
 OUT = ROOT / "docs/product-docs/service-lines-review.html"
+
+# Where the Source button posts. A published page cannot reach a laptop, so when this
+# is unreachable the panel says what to run instead of failing silently — the surface
+# must never imply a run started when nothing did.
+API = os.environ.get("MOBIUS_PAYOR_URL", "https://mobius-payor-ortabkknqa-uc.a.run.app")
 
 LOGO = (
     '<svg viewBox="0 0 100 100" width="24" height="24" aria-hidden="true">'
@@ -199,6 +205,7 @@ def build():
                         for m in cat["modules"]],
             "attempts": l.get("sourcing_attempts", []),
             "machine": l.get("state_machine", []),
+            "runs": l.get("runs", []),
             "terms": (l.get("lexicon_d_counts") or {}),
             "chunks": (l.get("j_service_line") or {}).get("retrievable_chunks", 0),
             "groupings": groupings,
@@ -213,7 +220,7 @@ def build():
 
     data = json.dumps({"lines": lines}, separators=(",", ":"))
     OUT.write_text(PAGE.replace("__TOKENS__", tokens).replace("__LOGO__", LOGO)
-                       .replace("__DATA__", data))
+                       .replace("__DATA__", data).replace("__API__", API))
     ready = sum(1 for x in lines if x["ready"])
     print(f"wrote {OUT}  ({OUT.stat().st_size // 1024} KB)")
     print(f"  {len(lines)} services · {ready} ready · {len(lines)-ready} awaiting sources")
@@ -413,6 +420,24 @@ td.cd small{display:block;font-weight:400;color:var(--mobius-text-muted)}
 .note{padding:var(--mobius-space-base) var(--mobius-space-md);
   border-top:1px solid var(--mobius-border);color:var(--mobius-text-muted);
   font-size:var(--mobius-text-xs)}
+
+  /* A run and its steps. Deliberately quiet: this lives inside Technical details,
+     which a reviewer opens only when they want to know how an answer was reached. */
+  .throw{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .btn-src{font:inherit;font-size:12px;padding:5px 11px;border-radius:8px;
+    border:1px solid var(--mobius-border);background:var(--mobius-surface);
+    color:var(--mobius-text);cursor:pointer}
+  .btn-src:hover{border-color:var(--mobius-violet);color:var(--mobius-violet)}
+  .run{margin-top:12px;padding-top:12px;border-top:1px dashed var(--mobius-border)}
+  .run:first-of-type{border-top:0}
+  .steps{list-style:none;margin:8px 0 0;padding:0;font-size:12px}
+  .steps li{display:flex;gap:8px;padding:3px 0;align-items:baseline}
+  .ts{color:var(--mobius-text-muted);font-variant-numeric:tabular-nums;flex:0 0 auto}
+  .sk{flex:0 0 auto;min-width:150px}
+  .sx{color:var(--mobius-text-muted);overflow:hidden;text-overflow:ellipsis;
+    white-space:nowrap;min-width:0}
+  .quote{margin-top:4px;padding-left:9px;border-left:2px solid var(--mobius-border);
+    color:var(--mobius-text-muted);font-size:12px}
 </style>
 
 <div class="app">
@@ -638,22 +663,13 @@ function draw(){
           (m.why?'<div class="hint2">'+esc(m.why)+'</div>':'')+'</dd>';
       }).join("")+'</dl></div>'+
     '<div class="pad" style="border-top:1px solid var(--mobius-border)">'+
-      '<h3 class="th">Sourcing runs</h3>'+
-      (l.attempts.length
-        ? '<dl class="tech">'+l.attempts.map(function(a){
-            return '<dt>'+esc(OUTCOME[a.outcome]||a.outcome.replace(/_/g," "))+
-              '</dt><dd>'+a.n+' &middot; last '+esc(a.last||"—")+'</dd>';
-          }).join("")+'</dl>'
-        : '<p class="hint2">No sourcing has been attempted for this service.</p>')+
-    '</div>'+
-    '<div class="pad" style="border-top:1px solid var(--mobius-border)">'+
-      '<h3 class="th">Automated sourcing</h3>'+
-      (l.machine.length
-        ? '<dl class="tech">'+l.machine.map(function(m){
-            return '<dt>'+esc(m.about)+'</dt><dd>'+esc(MSTATE[m.state]||m.state)+
-              (m.rounds? ' after '+m.rounds+' round'+(m.rounds===1?"":"s") : '')+'</dd>';
-          }).join("")+'</dl>'
-        : '<p class="hint2">Nothing queued for automated sourcing.</p>')+
+      '<div class="throw"><h3 class="th">Sourcing</h3>'+
+        '<button class="btn-src" data-src="'+esc(l.id)+'">Source this service</button></div>'+
+      '<div id="srcnote" class="hint2"></div>'+
+      (l.runs.length ? l.runs.map(runBlock).join("")
+        : '<p class="hint2">This service has not been sourced yet. '+
+          'Starting a run asks the policy documents for each missing answer, '+
+          'and every step is recorded below.</p>')+
     '</div>'+
     '<div class="pad" style="border-top:1px solid var(--mobius-border)">'+
       '<h3 class="th">Search terms</h3><dl class="tech">'+
@@ -662,10 +678,73 @@ function draw(){
       '</dl></div>';
   h += card("Technical details", behind? behind+" modules behind" : "", tech, true);
 
+
+/* One run, rendered the same way whether it is happening now or happened last week.
+   Contract §7: live is a tail of the stream, replay is the same rows read again, and
+   they must render identically — otherwise the audit log is not evidence of what the
+   viewer saw. */
+var API = "__API__";
+var FIND = {stated:["Answered","c-ok"], none_applies:["No requirement","c-ok"],
+            silent:["Document is silent","c-ok"], unresolved:["Could not answer","c-need"],
+            unknown_class:["Unrecognised result","c-need"]};
+var STEP = {run_started:"Run started", governing_resolved:"Governing document checked",
+            request_opened:"Question sent", turn_running:"Searching",
+            turn_complete:"Search finished", attempt:"Answer assessed",
+            diagnosis:"Result classified", request_settled:"Question settled",
+            repair_filed:"Handed to another team", run_finished:"Run finished",
+            error:"Failed", stream_closed:"Stream closed"};
+var RSTAT = {running:["Running","c-warn"], finished:["Finished","c-ok"],
+             failed:["Failed","c-need"], cancelled:["Cancelled","c-mute"]};
+
+function runBlock(r){
+  var st = RSTAT[r.status] || [r.status,"c-mute"];
+  var items = (r.items||[]).map(function(t){
+    var f = FIND[t.finding] || (t.finding? [t.finding,"c-mute"] : ["Not settled","c-mute"]);
+    return '<dt>'+esc(t.about)+(t.code? " "+esc(t.code):"")+'</dt><dd>'+
+      '<span class="chip '+f[1]+'">'+f[0]+'</span>'+
+      (t.owner? '<div class="hint2">Waiting on '+esc(t.owner.replace(/_/g," "))+'</div>':'')+
+      (t.quote? '<div class="quote">'+esc(t.quote)+'</div>':'')+
+      (t.document? '<div class="hint2">'+esc(t.document)+'</div>':'')+'</dd>';
+  }).join("");
+  var steps = (r.events||[]).map(function(e){
+    return '<li><span class="ts">'+esc(e.at||"")+'</span>'+
+      '<span class="sk">'+esc(STEP[e.kind]||e.kind.replace(/_/g," "))+'</span>'+
+      (e.text? '<span class="sx">'+esc(e.text)+'</span>':'')+'</li>';
+  }).join("");
+  return '<div class="run" id="run-'+esc(r.id)+'">'+
+    '<div class="throw"><strong>'+esc(r.started)+'</strong>'+
+      '<span class="chip '+st[1]+'">'+st[0]+'</span></div>'+
+    '<div class="hint2">'+r.tasks+' question'+(r.tasks===1?"":"s")+
+      ' &middot; started by '+esc(r.by)+(r.note? ' &middot; '+esc(r.note):'')+'</div>'+
+    (items? '<dl class="tech">'+items+'</dl>':'')+
+    '<ol class="steps">'+steps+'</ol></div>';
+}
+
+function startRun(lineId){
+  var note = document.getElementById("srcnote");
+  note.textContent = "Starting…";
+  fetch(API+"/api/service-line/runs?line="+encodeURIComponent(lineId))
+    .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+    .then(function(d){
+      /* Reading works; starting does not. Registry exposes the run and its stream, but
+         a run is driven by the sourcing script, not by this service — so say exactly
+         that rather than pretending a click did something. */
+      note.innerHTML = 'Runs are started from the sourcing script, not from this page yet. '+
+        'Run <code>python3 docs/service-lines/scripts/run_sourcing.py '+esc(lineId)+'</code> '+
+        'and this panel will show every step.';
+    })
+    .catch(function(e){
+      note.textContent = "The registry service is not reachable from here ("+e.message+
+        "). The steps below are the last recorded run.";
+    });
+}
+
   document.getElementById("main").innerHTML = h;
 }
 
 document.getElementById("main").addEventListener("click", function(e){
+  var sb = e.target.closest && e.target.closest("[data-src]");
+  if (sb) { startRun(sb.getAttribute("data-src")); return; }
   var hd = e.target.closest(".card > h2");
   if(!hd) return;
   var c = hd.parentElement, shut = c.classList.toggle("shut");

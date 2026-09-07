@@ -292,10 +292,14 @@
         {
           "ref": 2,
           "state": "open",
-          "about": "behavior_analysis",
-          "rounds": 1
+          "about": "",
+          "rounds": 1,
+          "gap": null,
+          "finding": null,
+          "owner": null
         }
       ],
+      "runs": [],
       "review": [
         {
           "kind": "standard_requirement",
@@ -1412,13 +1416,129 @@
           "ref": 1,
           "state": "escalated",
           "about": "place of service",
-          "rounds": 0
+          "rounds": 0,
+          "gap": null,
+          "finding": null,
+          "owner": null
         },
         {
           "ref": 18,
           "state": "sourced",
           "about": "psych eval provider",
-          "rounds": 3
+          "rounds": 3,
+          "gap": "wrong_source_chosen",
+          "finding": "unresolved",
+          "owner": "deep_research"
+        }
+      ],
+      "runs": [
+        {
+          "id": "6b2c521e-6a76-4e43-bc52-73b4978e7eb3",
+          "by": "ananth",
+          "status": "failed",
+          "tasks": 2,
+          "started": "2026-09-07 15:05",
+          "finished": "2026-09-07 15:12",
+          "note": "killed: chat LLM path failing on Anthropic credit balance",
+          "events": [
+            {
+              "at": "15:05:58",
+              "source": "registry",
+              "kind": "run_started",
+              "seq": null,
+              "text": "Sourcing 2 requirements for Behavioral Health Assessment Services.",
+              "data": {
+                "line_key": "bh_assessment",
+                "line_name": "Behavioral Health Assessment Services",
+                "task_count": 2,
+                "requested_by": "ananth"
+              }
+            },
+            {
+              "at": "15:05:58",
+              "source": "registry",
+              "kind": "governing_resolved",
+              "seq": null,
+              "text": "Governing rule 59G-4.028 is held \u2014 23 sections readable.",
+              "data": {
+                "chunks": 23,
+                "document": "59G-4.028.pdf",
+                "rule_ref": "59G-4.028",
+                "resolvable": true,
+                "document_id": "bb843014-3d3c-450c-887a-b98491b6b234"
+              }
+            },
+            {
+              "at": "15:05:58",
+              "source": "registry",
+              "kind": "request_opened",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "code": null,
+                "expects": [
+                  "pos_codes",
+                  "settings",
+                  "telehealth_allowed"
+                ],
+                "question": "For Florida Medicaid: In which place-of-service settings may Behavioral Health Assessment Services be delivered and billed? The governing rule is 59G-4.028. Quote the governing policy text and name the source document.",
+                "requirement_id": 62,
+                "requirement_type": "place_of_service"
+              }
+            }
+          ],
+          "items": [
+            {
+              "seq": 1,
+              "about": "place of service",
+              "code": null,
+              "finding": null,
+              "gap": null,
+              "owner": null,
+              "quote": null,
+              "document": null,
+              "confidence": null
+            }
+          ]
+        },
+        {
+          "id": "efdd4aee-7243-4ba6-b9fe-b21acf517042",
+          "by": "registry",
+          "status": "cancelled",
+          "tasks": 2,
+          "started": "2026-09-07 15:05",
+          "finished": "2026-09-07 15:09",
+          "note": "dry run \u2014 nothing asked",
+          "events": [
+            {
+              "at": "15:05:43",
+              "source": "registry",
+              "kind": "run_started",
+              "seq": null,
+              "text": "Sourcing 2 requirements for Behavioral Health Assessment Services.",
+              "data": {
+                "line_key": "bh_assessment",
+                "line_name": "Behavioral Health Assessment Services",
+                "task_count": 2,
+                "requested_by": "registry"
+              }
+            },
+            {
+              "at": "15:05:44",
+              "source": "registry",
+              "kind": "governing_resolved",
+              "seq": null,
+              "text": "Governing rule 59G-4.028 is held \u2014 23 sections readable.",
+              "data": {
+                "chunks": 23,
+                "document": "59G-4.028.pdf",
+                "rule_ref": "59G-4.028",
+                "resolvable": true,
+                "document_id": "bb843014-3d3c-450c-887a-b98491b6b234"
+              }
+            }
+          ],
+          "items": []
         }
       ],
       "review": [
@@ -3130,6 +3250,7 @@
         }
       ],
       "state_machine": [],
+      "runs": [],
       "review": [
         {
           "kind": "standard_requirement",
@@ -4713,9 +4834,22 @@
           "ref": 42,
           "state": "sourced",
           "about": "service limit H2019 HR",
-          "rounds": 2
+          "rounds": 2,
+          "gap": "not_retrievable",
+          "finding": "unresolved",
+          "owner": "retriever"
+        },
+        {
+          "ref": 75,
+          "state": "open",
+          "about": "service limit H2019 HR",
+          "rounds": 1,
+          "gap": "open",
+          "finding": null,
+          "owner": "deep_research"
         }
       ],
+      "runs": [],
       "review": [
         {
           "kind": "standard_requirement",
@@ -6610,15 +6744,22 @@
           "ref": 64,
           "state": "open",
           "about": "place of service",
-          "rounds": 1
+          "rounds": 1,
+          "gap": "open",
+          "finding": null,
+          "owner": "deep_research"
         },
         {
           "ref": 66,
           "state": "escalated",
           "about": "prior authorization",
-          "rounds": 1
+          "rounds": 1,
+          "gap": "exhausted",
+          "finding": "unresolved",
+          "owner": "deep_research"
         }
       ],
+      "runs": [],
       "review": [
         {
           "kind": "standard_requirement",
@@ -7589,16 +7730,23 @@
         {
           "ref": 3,
           "state": "open",
-          "about": "bh_overlay",
-          "rounds": 1
+          "about": "",
+          "rounds": 1,
+          "gap": null,
+          "finding": null,
+          "owner": null
         },
         {
           "ref": 67,
           "state": "open",
           "about": "place of service",
-          "rounds": 1
+          "rounds": 1,
+          "gap": "open",
+          "finding": null,
+          "owner": "deep_research"
         }
       ],
+      "runs": [],
       "review": [
         {
           "kind": "standard_requirement",
@@ -8739,33 +8887,58 @@
           "ref": 14,
           "state": "escalated",
           "about": "place of service",
-          "rounds": 3
+          "rounds": 3,
+          "gap": null,
+          "finding": null,
+          "owner": null
         },
         {
           "ref": 15,
           "state": "escalated",
           "about": "provider qualification",
-          "rounds": 3
+          "rounds": 3,
+          "gap": null,
+          "finding": null,
+          "owner": null
         },
         {
           "ref": 16,
           "state": "sourced",
           "about": "provider qualification think",
-          "rounds": 1
+          "rounds": 1,
+          "gap": null,
+          "finding": null,
+          "owner": null
         },
         {
           "ref": 17,
           "state": "sourced",
           "about": "service limit H2019 HR",
-          "rounds": 2
+          "rounds": 2,
+          "gap": "question_incoherent",
+          "finding": "unresolved",
+          "owner": "registry"
         },
         {
           "ref": 36,
           "state": "escalated",
           "about": "service limit H2017",
-          "rounds": 1
+          "rounds": 1,
+          "gap": "wrong_source_chosen",
+          "finding": "unresolved",
+          "owner": "deep_research"
+        },
+        {
+          "ref": 74,
+          "state": "open",
+          "about": "service limit H2017",
+          "rounds": 1,
+          "gap": "open",
+          "finding": null,
+          "owner": "deep_research"
         }
       ],
+      "runs": [],
       "review": [
         {
           "kind": "standard_requirement",
@@ -9619,6 +9792,7 @@
         }
       ],
       "state_machine": [],
+      "runs": [],
       "review": [
         {
           "kind": "standard_requirement",
@@ -9937,15 +10111,22 @@
           "ref": 69,
           "state": "sourced",
           "about": "coverage criteria",
-          "rounds": 1
+          "rounds": 1,
+          "gap": "corroborated",
+          "finding": "stated",
+          "owner": null
         },
         {
           "ref": 70,
           "state": "open",
           "about": "place of service",
-          "rounds": 1
+          "rounds": 1,
+          "gap": "open",
+          "finding": null,
+          "owner": "deep_research"
         }
       ],
+      "runs": [],
       "review": [
         {
           "kind": "standard_requirement",
@@ -11106,6 +11287,7 @@
         }
       ],
       "state_machine": [],
+      "runs": [],
       "review": [
         {
           "kind": "standard_requirement",
@@ -11936,6 +12118,7 @@
       },
       "sourcing_attempts": [],
       "state_machine": [],
+      "runs": [],
       "review": [],
       "review_counts": {
         "total": 0,
@@ -12197,6 +12380,7 @@
         }
       ],
       "state_machine": [],
+      "runs": [],
       "review": [
         {
           "kind": "standard_requirement",
@@ -12982,6 +13166,7 @@
       },
       "sourcing_attempts": [],
       "state_machine": [],
+      "runs": [],
       "review": [],
       "review_counts": {
         "total": 0,
@@ -13243,10 +13428,14 @@
         {
           "ref": 5,
           "state": "open",
-          "about": "specialized_therapeutic",
-          "rounds": 1
+          "about": "",
+          "rounds": 1,
+          "gap": null,
+          "finding": null,
+          "owner": null
         }
       ],
+      "runs": [],
       "review": [
         {
           "kind": "standard_requirement",
@@ -13545,6 +13734,7 @@
         }
       ],
       "state_machine": [],
+      "runs": [],
       "review": [
         {
           "kind": "standard_requirement",
@@ -13859,6 +14049,7 @@
         }
       ],
       "state_machine": [],
+      "runs": [],
       "review": [
         {
           "kind": "standard_requirement",
@@ -14742,6 +14933,199 @@
         }
       ],
       "state_machine": [],
+      "runs": [
+        {
+          "id": "d0c0dde0-1088-4a44-b32f-133d44b19603",
+          "by": "ananth",
+          "status": "running",
+          "tasks": 1,
+          "started": "2026-09-07 15:12",
+          "finished": null,
+          "note": null,
+          "events": [
+            {
+              "at": "15:08:18",
+              "source": "deep_research",
+              "kind": "turn_running",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "n": 1,
+                "note": null,
+                "query": "For Florida Medicaid: In which place-of-service settings may Targeted Case Management for Children at Risk of Abuse and Neglect be delivered and billed? The governing rule is 59G-4.310. Quote the governing policy text and name the source document.",
+                "next_query": null,
+                "extract_state": "pending"
+              }
+            },
+            {
+              "at": "15:12:53",
+              "source": "registry",
+              "kind": "run_started",
+              "seq": null,
+              "text": "Sourcing 1 requirements for Targeted Case Management for Children at Risk of Abuse and Neglect.",
+              "data": {
+                "line_key": "tcm_children_at_risk",
+                "line_name": "Targeted Case Management for Children at Risk of Abuse and Neglect",
+                "task_count": 1,
+                "requested_by": "ananth"
+              }
+            },
+            {
+              "at": "15:12:53",
+              "source": "registry",
+              "kind": "governing_resolved",
+              "seq": null,
+              "text": "Governing rule 59G-4.310 is held \u2014 191 sections readable.",
+              "data": {
+                "chunks": 191,
+                "document": "59G-4.310_TCM_for_Children_at_Risk_of_Abuse_and_Neglect_Adoption.pdf",
+                "rule_ref": "59G-4.310",
+                "resolvable": true,
+                "document_id": "546687a8-1b79-41b6-88eb-2685cf367dbe"
+              }
+            },
+            {
+              "at": "15:12:53",
+              "source": "registry",
+              "kind": "request_opened",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "code": null,
+                "expects": [
+                  "pos_codes",
+                  "settings",
+                  "telehealth_allowed"
+                ],
+                "question": "For Florida Medicaid: In which place-of-service settings may Targeted Case Management for Children at Risk of Abuse and Neglect be delivered and billed? The governing rule is 59G-4.310. Quote the governing policy text and name the source document.",
+                "request_id": 77,
+                "requirement_id": 74,
+                "requirement_type": "place_of_service"
+              }
+            }
+          ],
+          "items": [
+            {
+              "seq": 1,
+              "about": "place of service",
+              "code": null,
+              "finding": null,
+              "gap": null,
+              "owner": null,
+              "quote": null,
+              "document": null,
+              "confidence": null
+            }
+          ]
+        },
+        {
+          "id": "cb137279-a192-40a0-ac99-c6931854c4bb",
+          "by": "ananth",
+          "status": "finished",
+          "tasks": 1,
+          "started": "2026-09-07 15:08",
+          "finished": "2026-09-07 15:09",
+          "note": null,
+          "events": [
+            {
+              "at": "15:08:17",
+              "source": "registry",
+              "kind": "run_started",
+              "seq": null,
+              "text": "Sourcing 1 requirements for Targeted Case Management for Children at Risk of Abuse and Neglect.",
+              "data": {
+                "line_key": "tcm_children_at_risk",
+                "line_name": "Targeted Case Management for Children at Risk of Abuse and Neglect",
+                "task_count": 1,
+                "requested_by": "ananth"
+              }
+            },
+            {
+              "at": "15:08:17",
+              "source": "registry",
+              "kind": "governing_resolved",
+              "seq": null,
+              "text": "Governing rule 59G-4.310 is held \u2014 191 sections readable.",
+              "data": {
+                "chunks": 191,
+                "document": "59G-4.310_TCM_for_Children_at_Risk_of_Abuse_and_Neglect_Adoption.pdf",
+                "rule_ref": "59G-4.310",
+                "resolvable": true,
+                "document_id": "546687a8-1b79-41b6-88eb-2685cf367dbe"
+              }
+            },
+            {
+              "at": "15:08:17",
+              "source": "registry",
+              "kind": "request_opened",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "code": null,
+                "expects": [
+                  "pos_codes",
+                  "settings",
+                  "telehealth_allowed"
+                ],
+                "question": "For Florida Medicaid: In which place-of-service settings may Targeted Case Management for Children at Risk of Abuse and Neglect be delivered and billed? The governing rule is 59G-4.310. Quote the governing policy text and name the source document.",
+                "request_id": 77,
+                "requirement_id": 74,
+                "requirement_type": "place_of_service"
+              }
+            },
+            {
+              "at": "15:08:18",
+              "source": "deep_research",
+              "kind": "turn_running",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "n": 1,
+                "note": null,
+                "query": "For Florida Medicaid: In which place-of-service settings may Targeted Case Management for Children at Risk of Abuse and Neglect be delivered and billed? The governing rule is 59G-4.310. Quote the governing policy text and name the source document.",
+                "next_query": null,
+                "extract_state": "pending"
+              }
+            },
+            {
+              "at": "15:09:58",
+              "source": "registry",
+              "kind": "error",
+              "seq": 1,
+              "text": "place_of_service failed to run.",
+              "data": {
+                "error": "Anthropic API error 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CepHrndhGoxPcwncyyqw1\"}",
+                "requirement_id": 74
+              }
+            },
+            {
+              "at": "15:09:58",
+              "source": "registry",
+              "kind": "run_finished",
+              "seq": null,
+              "text": null,
+              "data": {
+                "counts": {
+                  "undiagnosed": 1
+                }
+              }
+            }
+          ],
+          "items": [
+            {
+              "seq": 1,
+              "about": "place of service",
+              "code": null,
+              "finding": null,
+              "gap": null,
+              "owner": null,
+              "quote": null,
+              "document": null,
+              "confidence": null
+            }
+          ]
+        }
+      ],
       "review": [
         {
           "kind": "standard_requirement",
@@ -15549,6 +15933,7 @@
       },
       "sourcing_attempts": [],
       "state_machine": [],
+      "runs": [],
       "review": [],
       "review_counts": {
         "total": 0,
@@ -15821,6 +16206,7 @@
       },
       "sourcing_attempts": [],
       "state_machine": [],
+      "runs": [],
       "review": [
         {
           "kind": "line_code",
@@ -16645,6 +17031,7 @@
       },
       "sourcing_attempts": [],
       "state_machine": [],
+      "runs": [],
       "review": [
         {
           "kind": "line_code",
@@ -17263,6 +17650,7 @@
       },
       "sourcing_attempts": [],
       "state_machine": [],
+      "runs": [],
       "review": [],
       "review_counts": {
         "total": 0,
@@ -17541,9 +17929,13 @@
           "ref": 72,
           "state": "sourced",
           "about": "place of service",
-          "rounds": 1
+          "rounds": 1,
+          "gap": "sourced",
+          "finding": "stated",
+          "owner": null
         }
       ],
+      "runs": [],
       "review": [
         {
           "kind": "standard_requirement",
@@ -18971,10 +19363,14 @@
         {
           "ref": 4,
           "state": "open",
-          "about": "sipp",
-          "rounds": 1
+          "about": "",
+          "rounds": 1,
+          "gap": null,
+          "finding": null,
+          "owner": null
         }
       ],
+      "runs": [],
       "review": [
         {
           "kind": "standard_requirement",
@@ -20636,6 +21032,7 @@
       },
       "sourcing_attempts": [],
       "state_machine": [],
+      "runs": [],
       "review": [
         {
           "kind": "line_code",
@@ -21297,6 +21694,7 @@
         }
       ],
       "state_machine": [],
+      "runs": [],
       "review": [
         {
           "kind": "standard_requirement",
@@ -22114,6 +22512,7 @@
       },
       "sourcing_attempts": [],
       "state_machine": [],
+      "runs": [],
       "review": [
         {
           "kind": "line_code",
@@ -22768,9 +23167,13 @@
           "ref": 68,
           "state": "sourced",
           "about": "prior authorization",
-          "rounds": 1
+          "rounds": 1,
+          "gap": "sourced",
+          "finding": "stated",
+          "owner": null
         }
       ],
+      "runs": [],
       "review": [
         {
           "kind": "standard_requirement",
@@ -23148,9 +23551,13 @@
           "ref": 71,
           "state": "escalated",
           "about": "place of service",
-          "rounds": 1
+          "rounds": 1,
+          "gap": "exhausted",
+          "finding": "unresolved",
+          "owner": "deep_research"
         }
       ],
+      "runs": [],
       "review": [
         {
           "kind": "standard_requirement",
@@ -23529,6 +23936,7 @@
         }
       ],
       "state_machine": [],
+      "runs": [],
       "review": [
         {
           "kind": "standard_requirement",
@@ -25613,6 +26021,7 @@
       },
       "sourcing_attempts": [],
       "state_machine": [],
+      "runs": [],
       "review": [
         {
           "kind": "line_code",
@@ -28757,6 +29166,7 @@
       },
       "sourcing_attempts": [],
       "state_machine": [],
+      "runs": [],
       "review": [
         {
           "kind": "line_code",

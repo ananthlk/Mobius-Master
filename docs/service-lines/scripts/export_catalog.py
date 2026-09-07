@@ -195,15 +195,59 @@ def main():
         attempts = [{"outcome": r[0], "n": r[1], "last": str(r[2])[:16] if r[2] else None}
                     for r in cur.fetchall()]
 
-        cur.execute("""select r.id, r.status, r.subject_id,
-                              (select count(*) from research.turn t where t.request_id = r.id)
+        # Route through sourcing_link, not a LIKE on subject_id. The old convention
+        # packed the line into a composite string ('bh_therapy/place_of_service'), which
+        # is exactly what contract §4.5 is about: 0 of 9 such requests could be joined
+        # to a requirement. New runs send the requirement id as the subject, so a
+        # prefix match would silently stop finding them.
+        cur.execute("""select r.id, r.status,
+                              coalesce(sl.requirement_type,
+                                       split_part(r.subject_id, '/', 2), r.subject_id) about,
+                              (select count(*) from research.turn t where t.request_id = r.id),
+                              d.gap_class,
+                              service_line.finding_of(d.gap_class) finding,
+                              service_line.repair_owner(d.gap_class, d.action) owner
                          from research.request r
-                        where r.consumer = 'service_line_registry'
-                          and r.subject_id like %s
-                        order by r.id""", (key + "%",))
-        machine = [{"ref": r[0], "state": r[1],
-                    "about": (r[2].split("/", 1)[1].replace("_", " ") if "/" in r[2] else r[2]),
-                    "rounds": r[3]} for r in cur.fetchall()]
+                         left join service_line.sourcing_link sl on sl.request_id = r.id
+                         left join lateral (select * from research.diagnosis d2
+                                             where d2.request_id = r.id
+                                             order by d2.created_at desc limit 1) d on true
+                        where sl.line_key = %s
+                           or (sl.line_key is null and r.consumer = 'service_line_registry'
+                               and r.subject_id like %s)
+                        order by r.id""", (key, key + "%"))
+        machine = [{"ref": r[0], "state": r[1], "about": (r[2] or "").replace("_", " "),
+                    "rounds": r[3], "gap": r[4], "finding": r[5], "owner": r[6]}
+                   for r in cur.fetchall()]
+
+        # Runs: what a button started, and every step it produced. This is the object
+        # the surface streams live and replays afterwards — contract §7, one renderer
+        # for both. Registry's own events plus the state machine's turns, attempts and
+        # diagnoses, already unioned and ordered by service_line.run_stream.
+        cur.execute("""select id, requested_by, status, task_count, started_at, finished_at, note
+                         from service_line.sourcing_run where line_key = %s
+                        order by started_at desc limit 10""", (key,))
+        runs = []
+        for rr in cur.fetchall():
+            cur.execute("""select at, source, kind, seq, text, data
+                             from service_line.run_stream where run_id = %s
+                            order by at, source, seq nulls first, kind""", (rr[0],))
+            events = [{"at": str(e[0])[11:19], "source": e[1], "kind": e[2],
+                       "seq": e[3], "text": e[4], "data": e[5]} for e in cur.fetchall()]
+            cur.execute("""select m.seq, m.requirement_type, m.code, p.finding, p.gap_class,
+                                  p.repair_owner, p.quote, p.source_document, p.confidence
+                             from service_line.sourcing_run_member m
+                             left join service_line.requirement_provenance p
+                                    on p.request_id = m.request_id
+                            where m.run_id = %s order by m.seq""", (rr[0],))
+            tasks = [{"seq": t[0], "about": (t[1] or "").replace("_", " "), "code": t[2],
+                      "finding": t[3], "gap": t[4], "owner": t[5], "quote": t[6],
+                      "document": t[7],
+                      "confidence": float(t[8]) if t[8] is not None else None}
+                     for t in cur.fetchall()]
+            runs.append({"id": str(rr[0]), "by": rr[1], "status": rr[2], "tasks": rr[3],
+                         "started": str(rr[4])[:16], "finished": str(rr[5])[:16] if rr[5] else None,
+                         "note": rr[6], "events": events, "items": tasks})
 
         # The review queue for this line: every reviewable fact, its origin, and
         # what a person has decided about it. origin says how the value came to
@@ -282,6 +326,7 @@ def main():
             },
             "sourcing_attempts": attempts,
             "state_machine": machine,
+            "runs": runs,
             "review": review,
             "review_counts": {
                 "total": len(review),
