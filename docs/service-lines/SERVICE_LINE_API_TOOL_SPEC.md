@@ -2,7 +2,7 @@
 
 **From:** Service Line Registry · **For:** Chat Master / ReAct
 **Service:** `mobius-payor` · **Prefix:** `/api/service-line` · all GET, no auth beyond the service's own
-**Status:** built, 19/19 endpoint tests green against live data, **not yet deployed** — see §6
+**Status:** built, 22/22 endpoint tests green against live data, **not yet deployed** — see §6
 
 ---
 
@@ -82,10 +82,19 @@ What a HCPCS/CPT code actually is: every `(code, modifier)` pair, its definition
 rate, payment basis, telemedicine flag, coverage and limits.
 
 > **A bare code is not one service.** `H0031` is four billable services at ``,
-> `HN`, `HO`, `TS` — four definitions, four rates, four rules. The response
-> returns `pair_count` and `modifiers`. If the user did not give a modifier and
-> `pair_count > 1`, present the alternatives or ask; never answer for the bare
-> code.
+> `HN`, `HO`, `TS` — four definitions, four rates, four rules.
+>
+> **Key off `modifier_ambiguous`, and never derive this from `pair_count`.**
+> `pair_count` counts rows, and rows are (line × modifier). Six of the eighteen
+> codes in the registry sit on two lines with exactly one modifier between them,
+> so `pair_count > 1` would ask the user to choose a modifier that does not
+> exist — on a third of all codes.
+>
+> `modifier_ambiguous: true` → present the alternatives from `modifiers`, or ask.
+> `false` → do **not** ask for a modifier. Either way pass `modifier_note`
+> through: it also covers the case where everything we hold for a code carries
+> one specific modifier (T2023 is only ever `HA`), which the answer must say out
+> loud rather than leave implicit.
 
 ### `service_line_limits(code, modifier?)`
 `GET /api/service-line/codes/{code}/limits`
@@ -153,8 +162,15 @@ supervision, credentialing, prior authorisation, provider qualification.
 What the registry does *not* know: lines with no coverage answer (24 of 31),
 limits that stayed prose (1), requirements unsourced (~64).
 
-> Call this before telling a user something is not covered. All three are gaps
-> in what we hold, not findings about the benefit.
+> **Conditional, not a blanket pre-check.** `gaps()` is registry-wide, so calling
+> it on every coverage question spends ~650 tokens to learn nothing code-specific.
+> Call it only when `coverage()` returns `unknown`, then check whether that code's
+> line appears in `lines_without_coverage`:
+> * **present** → we hold no coverage document for that line at all (24 of 31).
+> * **absent** → the line *is* sourced and this specific code is not in it, which
+>   is a much stronger signal.
+>
+> All three lists are gaps in what we hold, not findings about the benefit.
 
 ## 4. Suggested routing
 
@@ -166,7 +182,7 @@ limits that stayed prose (1), requirements unsourced (~64).
 | "what can I bill for psychosocial rehab" | `search` → `code_lookup` |
 | "what do I need to bill bh_assessment" | `requirements` |
 | "do you do partial hospitalisation" | `detail` (check `scope`) |
-| any "is X not covered" | `gaps` first |
+| any "is X not covered" | `coverage` first; call `gaps` **only if** it returns `unknown` |
 
 ## 5. Worked example — the whole point
 
