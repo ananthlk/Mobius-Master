@@ -35,6 +35,42 @@ different facts, and a naive API makes them identical.
 Each payload also carries a `note` written for the model. It is not decoration —
 it states the trap for that specific endpoint. Put it in the tool result.
 
+## 2a. Which tool can return which status — measured, not assumed
+
+The original spec said every response carries `status` and never said which
+tools could return which values. Chat Master reasonably read four of them as
+having no meaningful status and planned to hardcode their signal; two of those
+four vary, and one varies on a third of its traffic. That was a spec gap, so
+here is the matrix, produced by calling each endpoint rather than by reading the
+code.
+
+| Tool | Can return |
+|---|---|
+| `service_line_code_lookup` | `found` · `unknown` |
+| `service_line_limits` | `found` · `known_absent` · `unknown` |
+| `service_line_coverage` | `found` · `unknown` |
+| `service_line_search` | `found` · `unknown` |
+| `service_line_detail` | `found` · `unknown` |
+| `service_line_requirements` | `found` · `unknown` |
+| `service_line_gaps` | `found` only |
+
+**Six of seven vary. Only `gaps` is safe to hardcode.** Route every other tool's
+signal through the status.
+
+Two cases worth knowing because they are common, not edge:
+
+* `service_line_detail` returns `unknown` for any of the **24 of 31 lines** with
+  nothing held. That is not a rare path.
+* `service_line_limits` is the only tool that returns `known_absent` — the
+  schedule states a limit and never defines its unit. It is a *sourced* answer
+  and must not carry a no-sources signal, or the model may escalate back to
+  retrieval and answer from the fee-schedule table instead.
+
+An empty list from `limits`, `benefits` or `requirements` returns `unknown`, not
+`found` with zero rows, and the note says whether the filter named a line that
+does not exist or a real line holding nothing. Those are different problems and
+a caller cannot act on them the same way.
+
 ## 3. Tools to register
 
 Seven tools over eleven endpoints. Names are suggestions; shapes are not.
