@@ -6757,9 +6757,126 @@
           "gap": "exhausted",
           "finding": "unresolved",
           "owner": "deep_research"
+        },
+        {
+          "ref": 83,
+          "state": "open",
+          "about": "documentation",
+          "rounds": 1,
+          "gap": null,
+          "finding": null,
+          "owner": null
         }
       ],
-      "runs": [],
+      "runs": [
+        {
+          "id": "02a9b0be-4d08-4bb6-9d03-0c5ef1ffc700",
+          "by": "ananth",
+          "status": "finished",
+          "tasks": 1,
+          "started": "2026-09-07 18:00",
+          "finished": "2026-09-07 18:01",
+          "note": null,
+          "events": [
+            {
+              "at": "18:00:23",
+              "source": "registry",
+              "kind": "run_started",
+              "seq": null,
+              "text": "Queued 1 question for Behavioral Health Medication Management Services.",
+              "data": {
+                "queued": true,
+                "line_key": "bh_medication_mgmt",
+                "line_name": "Behavioral Health Medication Management Services",
+                "task_count": 1,
+                "requested_by": "ananth"
+              }
+            },
+            {
+              "at": "18:00:33",
+              "source": "registry",
+              "kind": "governing_resolved",
+              "seq": null,
+              "text": "Governing rule 59G-4.029 is held \u2014 15 sections readable.",
+              "data": {
+                "chunks": 15,
+                "document": "59G-4.029.pdf",
+                "rule_ref": "59G-4.029",
+                "resolvable": true,
+                "document_id": "168b798d-0652-46ed-8134-60e29e5386c7"
+              }
+            },
+            {
+              "at": "18:00:34",
+              "source": "registry",
+              "kind": "request_opened",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "code": null,
+                "expects": [
+                  "elements",
+                  "retention_period"
+                ],
+                "question": "For Florida Medicaid: What documentation must be in the record to support billing Behavioral Health Medication Management Services? The governing rule is 59G-4.029. Quote the governing policy text and name the source document.",
+                "request_id": 83,
+                "requirement_id": 65,
+                "requirement_type": "documentation"
+              }
+            },
+            {
+              "at": "18:00:34",
+              "source": "deep_research",
+              "kind": "turn_running",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "n": 1,
+                "note": null,
+                "query": "For Florida Medicaid: What documentation must be in the record to support billing Behavioral Health Medication Management Services? The governing rule is 59G-4.029. Quote the governing policy text and name the source document.",
+                "next_query": null,
+                "extract_state": "pending"
+              }
+            },
+            {
+              "at": "18:01:38",
+              "source": "registry",
+              "kind": "error",
+              "seq": 1,
+              "text": "documentation failed to run.",
+              "data": {
+                "error": "Anthropic API error 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CepWx2UnXFgY9obs1hhzQ\"}",
+                "requirement_id": 65
+              }
+            },
+            {
+              "at": "18:01:38",
+              "source": "registry",
+              "kind": "run_finished",
+              "seq": null,
+              "text": null,
+              "data": {
+                "counts": {
+                  "undiagnosed": 1
+                }
+              }
+            }
+          ],
+          "items": [
+            {
+              "seq": 1,
+              "about": "documentation",
+              "code": null,
+              "finding": null,
+              "gap": null,
+              "owner": null,
+              "quote": null,
+              "document": null,
+              "citation": "uncited"
+            }
+          ]
+        }
+      ],
       "review": [
         {
           "kind": "standard_requirement",

@@ -147,7 +147,7 @@ def targets(cur, line_key, only_unsourced=True, limit=None):
     return [dict(r) for r in cur.fetchall()]
 
 
-def run(line_key, requested_by, limit=None, dry=False, max_rounds=2):
+def run(line_key, requested_by, limit=None, dry=False, max_rounds=2, existing_run=None):
     conn, cur = db()
     cur.execute("select key, name from service_line.line where key=%s", (line_key,))
     line = cur.fetchone()
@@ -158,15 +158,23 @@ def run(line_key, requested_by, limit=None, dry=False, max_rounds=2):
     if not reqs:
         sys.exit(f"{line_key}: nothing unsourced to source")
 
-    cur.execute("""insert into service_line.sourcing_run (line_key, requested_by, task_count)
-                   values (%s,%s,%s) returning id""", (line_key, requested_by, len(reqs)))
-    run_id = cur.fetchone()["id"]
+    if existing_run:
+        # The API already created the run and emitted run_started when it queued it.
+        # Making a second row here would orphan the run_id the surface is streaming.
+        run_id = existing_run
+        cur.execute("update service_line.sourcing_run set task_count=%s where id=%s",
+                    (len(reqs), run_id))
+    else:
+        cur.execute("""insert into service_line.sourcing_run (line_key, requested_by, task_count)
+                       values (%s,%s,%s) returning id""", (line_key, requested_by, len(reqs)))
+        run_id = cur.fetchone()["id"]
 
     gov = governing(cur, line_key)
-    emit(cur, run_id, "run_started",
-         {"line_key": line_key, "line_name": line["name"], "task_count": len(reqs),
-          "requested_by": requested_by},
-         f"Sourcing {len(reqs)} requirements for {line['name']}.")
+    if not existing_run:
+        emit(cur, run_id, "run_started",
+             {"line_key": line_key, "line_name": line["name"], "task_count": len(reqs),
+              "requested_by": requested_by},
+             f"Sourcing {len(reqs)} requirements for {line['name']}.")
     emit(cur, run_id, "governing_resolved", gov,
          (f"Governing rule {gov['rule_ref']} is held — {gov['chunks']} sections readable."
           if gov["resolvable"] else
@@ -274,12 +282,59 @@ def run(line_key, requested_by, limit=None, dry=False, max_rounds=2):
     return run_id
 
 
+def serve(poll_s=5, who=None):
+    """Drain the queue the surface writes to. Ctrl-C to stop.
+
+    The claim is a conditional UPDATE, not a read-then-write: two workers polling the
+    same second would otherwise both see 'requested' and both drive the same run,
+    asking every question twice and interleaving their steps in one stream.
+    """
+    import socket, time
+    who = who or f"worker@{socket.gethostname()}"
+    conn, cur = db()
+    print(f"worker {who} — polling every {poll_s}s, Ctrl-C to stop")
+    seen_idle = False
+    while True:
+        cur.execute("""update service_line.sourcing_run
+                          set status='running', claimed_at=now(), claimed_by=%s
+                        where id = (select id from service_line.sourcing_run
+                                     where status='requested'
+                                     order by started_at limit 1
+                                     for update skip locked)
+                    returning id, line_key, requested_by, requested_limit, max_rounds""",
+                    (who,))
+        row = cur.fetchone()
+        if not row:
+            if not seen_idle:
+                print("  idle — waiting for a request from the surface")
+                seen_idle = True
+            time.sleep(poll_s)
+            continue
+        seen_idle = False
+        print(f"\nclaimed {row['id']} ({row['line_key']}) requested by {row['requested_by']}")
+        try:
+            run(row["line_key"], row["requested_by"], row["requested_limit"],
+                False, row["max_rounds"], existing_run=row["id"])
+        except Exception as exc:
+            traceback.print_exc()
+            cur.execute("""update service_line.sourcing_run
+                              set status='failed', finished_at=now(), note=%s
+                            where id=%s""", (str(exc)[:400], row["id"]))
+
+
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("line_key")
+    p.add_argument("line_key", nargs="?", help="omit with --serve")
+    p.add_argument("--serve", action="store_true",
+                   help="drain runs requested from the review surface")
     p.add_argument("--by", default="registry")
     p.add_argument("--limit", type=int)
     p.add_argument("--rounds", type=int, default=2)
     p.add_argument("--dry", action="store_true")
     a = p.parse_args()
-    print(run(a.line_key, a.by, a.limit, a.dry, a.rounds))
+    if a.serve:
+        serve()
+    elif a.line_key:
+        print(run(a.line_key, a.by, a.limit, a.dry, a.rounds))
+    else:
+        p.error("give a line_key, or --serve to take requests from the surface")

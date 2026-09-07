@@ -436,6 +436,9 @@ td.cd small{display:block;font-weight:400;color:var(--mobius-text-muted)}
   .sk{flex:0 0 auto;min-width:150px}
   .sx{color:var(--mobius-text-muted);overflow:hidden;text-overflow:ellipsis;
     white-space:nowrap;min-width:0}
+  .steps.live{max-height:280px;overflow-y:auto;margin-top:var(--mobius-space-sm);
+    padding:var(--mobius-space-sm);background:var(--mobius-bg-secondary);
+    border-radius:var(--mobius-radius-base)}
   .quote{margin-top:4px;padding-left:9px;border-left:2px solid var(--mobius-border);
     color:var(--mobius-text-muted);font-size:12px}
 </style>
@@ -666,6 +669,7 @@ function draw(){
       '<div class="throw"><h3 class="th">Sourcing</h3>'+
         '<button class="btn-src" data-src="'+esc(l.id)+'">Source this service</button></div>'+
       '<div id="srcnote" class="hint2"></div>'+
+      '<ol class="steps live" id="srclive" hidden></ol>'+
       (l.runs.length ? l.runs.map(runBlock).join("")
         : '<p class="hint2">This service has not been sourced yet. '+
           'Starting a run asks the policy documents for each missing answer, '+
@@ -737,21 +741,65 @@ function runBlock(r){
 
 function startRun(lineId){
   var note = document.getElementById("srcnote");
-  note.textContent = "Starting…";
-  fetch(API+"/api/service-line/runs?line="+encodeURIComponent(lineId))
-    .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
-    .then(function(d){
-      /* Reading works; starting does not. Registry exposes the run and its stream, but
-         a run is driven by the sourcing script, not by this service — so say exactly
-         that rather than pretending a click did something. */
-      note.innerHTML = 'Runs are started from the sourcing script, not from this page yet. '+
-        'Run <code>python3 docs/service-lines/scripts/run_sourcing.py '+esc(lineId)+'</code> '+
-        'and this panel will show every step.';
-    })
-    .catch(function(e){
-      note.textContent = "The registry service is not reachable from here ("+e.message+
-        "). The steps below are the last recorded run.";
-    });
+  var live = document.getElementById("srclive");
+  var btn  = document.querySelector("[data-src]");
+  if (btn) { btn.disabled = true; btn.textContent = "Starting\u2026"; }
+  note.textContent = "";
+  live.innerHTML = "";
+  live.hidden = false;
+
+  fetch(API+"/api/service-line/lines/"+encodeURIComponent(lineId)+"/source", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({requested_by:"surface"})
+  })
+  .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+  .then(function(d){
+    note.textContent = d.answer || "";
+    var id = d.data && d.data.run_id;
+    if (!id) { done(); return; }
+    /* A queued run needs a worker on someone's machine — open_and_run lives in
+       mobius-skills and cannot run in the hosted service. Say so rather than
+       spinning forever on a stream that will never produce a step. */
+    if (d.data.worker_recently_active === false) {
+      note.innerHTML = esc(d.answer) +
+        '<br>Start one with <code>python3 docs/service-lines/scripts/run_sourcing.py --serve</code>'+
+        ' and the steps will appear here.';
+    }
+    follow(id);
+  })
+  .catch(function(e){
+    note.textContent = "Could not reach the registry service ("+e.message+
+      "). The runs below are the last recorded ones.";
+    done();
+  });
+
+  function done(){
+    if (btn) { btn.disabled = false; btn.textContent = "Source this service"; }
+  }
+
+  function follow(id){
+    if (btn) btn.textContent = "Running\u2026";
+    var es = new EventSource(API+"/api/service-line/runs/"+id+"/stream");
+    es.onmessage = function(ev){
+      var e;
+      try { e = JSON.parse(ev.data); } catch (err) { return; }
+      if (e.kind === "stream_closed" || e.kind === "stream_timeout") {
+        es.close(); done();
+        note.textContent += "  Run "+((e.data&&e.data.status)||"finished")+
+          ". Re-open this service to see it recorded below.";
+        return;
+      }
+      var row = document.createElement("li");
+      row.innerHTML = '<span class="ts">'+esc((e.at||"").substr(11,8))+'</span>'+
+        '<span class="sk">'+esc(STEP[e.kind]||e.kind.replace(/_/g," "))+'</span>'+
+        (e.text? '<span class="sx">'+esc(e.text)+'</span>':'');
+      live.appendChild(row);
+      live.scrollTop = live.scrollHeight;
+    };
+    es.onerror = function(){ es.close(); done();
+      note.textContent += "  Lost the live connection; the run keeps going and is "
+        + "recorded either way."; };
+  }
 }
 
   document.getElementById("main").innerHTML = h;
