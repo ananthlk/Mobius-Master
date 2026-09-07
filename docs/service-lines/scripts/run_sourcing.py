@@ -237,16 +237,23 @@ def _source_all(cur, run_id, line, line_key, gov, reqs, profile, max_rounds):
         cur.execute("""insert into research.request
                          (consumer, subject_type, subject_id, question, evaluator_prompt,
                           extraction_schema, jurisdiction, max_rounds, invoker, status,
-                          expects)
+                          expects, authority)
                        values ('service_line_registry','standard_requirement',%s,%s,%s,%s,%s,%s,
-                               'service_line_registry','open',%s)
+                               'service_line_registry','open',%s,%s)
                        on conflict (consumer, subject_type, subject_id) do update
                          set question=excluded.question, status='open',
                              extraction_schema=excluded.extraction_schema,
-                             expects=excluded.expects
+                             expects=excluded.expects,
+                             authority=excluded.authority
                        returning id""",
                     (subject_id, question, EVAL, Json(SLOTS[rtype]), JURISDICTION,
-                     max_rounds, ", ".join(SLOTS[rtype])))
+                     max_rounds, ", ".join(SLOTS[rtype]),
+                     # Contract §14: authority is the CALLER's policy and it travels on
+                     # the request. The registry asks about STATE rules, so a payor
+                     # manual is inadmissible here however well it answers — twice now a
+                     # Molina manual has been kept as the source for an AHCA rule. The
+                     # Payor Fact Store asks the opposite question and will send its own.
+                     "standard"))
         pre_id = cur.fetchone()["id"]
 
         cur.execute("""insert into service_line.sourcing_link
