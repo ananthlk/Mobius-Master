@@ -49,6 +49,10 @@ SERVED = ROOT / "mobius-payor/app/static/service-lines-review.html"
 # is unreachable the panel says what to run instead of failing silently — the surface
 # must never imply a run started when nothing did.
 API = os.environ.get("MOBIUS_PAYOR_URL", "https://mobius-payor-ortabkknqa-uc.a.run.app")
+# Deep Research's research console — the one view of what the machine did. Overridable
+# because they own the URL contract, not us.
+TRACE = os.environ.get("MOBIUS_RESEARCH_CONSOLE",
+                       "https://mobius-payor-ortabkknqa-uc.a.run.app/research-console")
 
 LOGO = (
     '<svg viewBox="0 0 100 100" width="24" height="24" aria-hidden="true">'
@@ -226,7 +230,7 @@ def build():
 
     data = json.dumps({"lines": lines}, separators=(",", ":"))
     OUT.write_text(PAGE.replace("__TOKENS__", tokens).replace("__LOGO__", LOGO)
-                       .replace("__DATA__", data).replace("__API__", API))
+                       .replace("__DATA__", data).replace("__API__", API).replace("__TRACE__", TRACE))
     SERVED.parent.mkdir(parents=True, exist_ok=True)
     SERVED.write_text(OUT.read_text())
     print(f"wrote {SERVED}  (served same-origin at /service-lines)")
@@ -629,6 +633,10 @@ function itemRow(it){
    outbound fetch/XHR, so no base URL makes the button work there. */
 var API = /(^|\.)claudeusercontent\.com$|(^|\.)claude\.(ai|site)$/.test(location.hostname)
   ? "__API__" : location.origin;
+/* Deep Research's console. Absolute, because the trace is served from their surface,
+   not ours — and it must work from the published copy too, where a link is the only
+   thing that CAN work (an artifact page cannot fetch, but it can link). */
+var TRACE_BASE = "__TRACE__";
 var FIND = {stated:["Answered","c-ok"], none_applies:["No requirement","c-ok"],
             silent:["Document is silent","c-ok"], unresolved:["Could not answer","c-need"],
             unknown_class:["Unrecognised result","c-need"]};
@@ -654,80 +662,6 @@ var CITE = {verbatim:["In the document","c-ok"],
             unverified:["","c-mute"], uncited:["No source given","c-need"]};
 
 
-/* The whole record for one question, fetched on demand — the reasoning log and answer
-   text are large and only wanted when someone opens one. */
-function loadTrace(runId, seq, host){
-  host.hidden = false;
-  host.innerHTML = '<p class="hint2">Loading…</p>';
-  fetch(API+"/api/service-line/runs/"+runId+"/tasks/"+seq)
-    .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
-    .then(function(d){ host.innerHTML = traceHtml(d.data); })
-    .catch(function(e){ host.innerHTML = '<p class="hint2">Could not load the detail ('+
-      esc(e.message)+').</p>'; });
-}
-
-function traceHtml(d){
-  var h = '';
-  if (d.question) h += '<div class="tsec"><b>What we asked</b><div class="quote">'+
-    esc(d.question)+'</div>'+
-    (d.expects && d.expects.length ? '<div class="hint2">Answers wanted for: '+
-      d.expects.map(esc).join(', ')+'</div>' : '')+
-    (d.model_profile ? '<div class="hint2">Answered using '+
-      esc(PROFILE_SAID[d.model_profile]||d.model_profile)+'</div>' : '')+'</div>';
-
-  (d.rounds||[]).forEach(function(r, i){
-    h += '<div class="tsec"><b>Attempt '+(r.round||i+1)+'</b>'+
-      '<div class="hint2">'+esc(r.model||'')+
-        (r.extractor_model && r.extractor_model!==r.model?
-          ' · read by '+esc(r.extractor_model):'')+
-        ' · '+(r.documents||[]).length+' document'+((r.documents||[]).length===1?'':'s')+
-        ' considered</div>';
-
-    if ((r.documents||[]).length)
-      h += '<ul class="docs">'+r.documents.map(function(x){
-        return '<li>'+esc(x)+'</li>'; }).join('')+'</ul>';
-
-    /* Each field separately: what was pulled out, from which sentence, and whether the
-       judge kept it — plus OUR corpus verdict on whether the citation can be followed,
-       which is the check a reviewer would otherwise have to do by hand. */
-    if ((r.fields||[]).length) {
-      h += '<div class="th" style="margin-top:10px">What it pulled out</div>';
-      h += r.fields.map(function(f){
-        var c = CITE[f.citation];
-        return '<div class="fld'+(f.judge==="dropped"?" drop":"")+'">'+
-          '<div class="throw"><span><b>'+esc(f.name||'')+'</b>'+
-            (f.value!=null? ' &middot; '+esc(typeof f.value==='object'?
-              JSON.stringify(f.value):String(f.value)) : '')+'</span>'+
-            '<span class="chip '+(f.judge==="kept"?"c-ok":"c-need")+'">'+
-              (f.judge==="kept"?"Accepted":"Rejected")+'</span></div>'+
-          (f.reason? '<div class="hint2">'+esc(f.reason)+'</div>':'')+
-          (f.quote? '<div class="quote">'+esc(f.quote)+'</div>':'')+
-          (f.document? '<div class="hint2">'+esc(f.document)+
-            (c&&c[0]? ' &middot; <span class="chip '+c[1]+'">'+c[0]+'</span>':'')+'</div>':'')+
-          '</div>';
-      }).join('');
-    }
-    if (r.judge_summary) h += '<div class="hint2">'+esc(r.judge_summary)+'</div>';
-
-    if ((r.reasoning||[]).length)
-      h += '<details class="ev"><summary>Its reasoning ('+r.reasoning.length+' steps)</summary>'+
-        '<ol class="steps think">'+r.reasoning.map(function(x){
-          return '<li>'+esc(x)+'</li>'; }).join('')+'</ol></details>';
-    if (r.answer)
-      h += '<details class="ev"><summary>The full answer ('+
-        r.answer.length.toLocaleString()+' characters)</summary>'+
-        '<div class="quote long">'+esc(r.answer)+'</div></details>';
-    h += '</div>';
-  });
-
-  (d.diagnosis||[]).forEach(function(g){
-    h += '<div class="tsec"><b>Why it stopped</b><div class="hint2">'+
-      esc(g.gap_class||'')+(g.action? ' &middot; '+esc(g.action):'')+'</div>'+
-      (g.next_step? '<div class="quote">'+esc(g.next_step)+'</div>':'')+'</div>';
-  });
-  return h || '<p class="hint2">Nothing was recorded for this question.</p>';
-}
-
 function runBlock(r){
   var st = RSTAT[r.status] || [r.status,"c-mute"];
   var items = (r.items||[]).map(function(t){
@@ -745,9 +679,14 @@ function runBlock(r){
          character answer, eight documents and seven separately judged fields. A
          reviewer confirming a value needs what it was drawn from and why the judge
          kept it, or confirming is a formality. */
-      (openable? '<div><button class="linky" data-trace="'+esc(r.id)+'" '+
-        'data-seq="'+t.seq+'">Show everything this question did</button>'+
-        '<div class="trace" id="tr-'+esc(r.id)+'-'+t.seq+'" hidden></div></div>' : '')+
+      /* The full trace — turns, the judge in its own words, the reasoning — lives in
+         Deep Research's research console, which renders it from research.* directly.
+         We link rather than re-render: one view of the machine's own record, owned by
+         whoever owns the record. Rendering our own thinner copy is how two views of one
+         thing drift, which this project has already paid for twice today. */
+      (t.request? '<div><a class="linky" target="_blank" rel="noopener" href="'+
+        esc(TRACE_BASE)+'#request-'+t.request+
+        '">See everything that happened &rarr;</a></div>' : '')+
       '</dd>';
   }).join("");
   var steps = (r.events||[]).map(function(e){
@@ -1009,14 +948,6 @@ function draw(){
 document.getElementById("main").addEventListener("click", function(e){
   var sb = e.target.closest && e.target.closest("[data-src]");
   if (sb) { startRun(sb.getAttribute("data-src")); return; }
-  var tb = e.target.closest && e.target.closest("[data-trace]");
-  if (tb) {
-    var id = tb.getAttribute("data-trace"), sq = tb.getAttribute("data-seq");
-    var host = document.getElementById("tr-"+id+"-"+sq);
-    if (host.hidden) { loadTrace(id, sq, host); tb.textContent = "Hide the detail"; }
-    else { host.hidden = true; tb.textContent = "Show everything this question did"; }
-    return;
-  }
   var hd = e.target.closest(".card > h2");
   if(!hd) return;
   var c = hd.parentElement, shut = c.classList.toggle("shut");
