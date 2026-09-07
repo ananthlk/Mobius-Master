@@ -579,16 +579,33 @@ ungradable quotes were counted as failures. Measured against
 `service_line.citation_resolves()` with `document_tables` searched and unit counts
 extracted:
 
+**Corrected twice more after that**, both times because the grader was wrong rather than
+the data. Final, against `citation_resolves()` with token-based document resolution:
+
 | | citations | followable | not followable | no checkable claim |
 |---|---|---|---|---|
-| **kept by the judge** | 101 | 8 | **31** | 62 |
-| **dropped by the judge** | 50 | 14 | 22 | 14 |
+| **kept by the judge** | 101 | 9 | **27** | 65 |
+| **dropped by the judge** | 50 | 15 | 15 | 20 |
 
-Of the 39 kept citations that make a checkable claim, 31 cannot be followed. Bad, and
-less than half what I said.
+Of the 36 kept citations that make a checkable claim, 27 cannot be followed.
 
-**What stands unchanged is the inversion**, which is the finding that mattered:
-**14 followable citations were dropped while 31 unfollowable were kept.**
+The sequence of my own reported number was **88 → 31 → 27**, and every step down was a
+defect in my check, not in the producer's data:
+
+1. counting ungradable quotes as failures
+2. searching only `hierarchical_chunks` and not `document_tables`
+3. resolving a cited document by substring, so a document held under a different
+   filename read as absent — *"Community Behavioral Health Fee Schedule"* is held as
+   `Community_Behavioral_Health_Services_Fee_Schedule_2022_JULY.pdf`, and
+   *"Provider Dispute Form"* as `Provider-dispute-form-011719.pdf`. Both were being
+   reported to a reviewer as not on file.
+
+A false absence is the worse error here: it sends someone to acquire a document already
+in the corpus, which is the wasted errand §0 opens with. I reproduced it in the code
+written to detect it.
+
+**What stands through all three corrections is the inversion**, which is the finding
+that mattered: **15 followable citations were dropped while 27 unfollowable were kept.**
 
 The grader now calls the SQL function rather than reimplementing it, so the two cannot
 drift again. That drift is the same defect this contract exists to prevent — two

@@ -105,6 +105,18 @@ td.c{font-family:var(--mono);white-space:nowrap}
 .lim.prose{background:transparent;color:var(--ink-3);border:1px dashed var(--line)}
 .udef{display:block;font-size:10.5px;color:var(--ink-3);margin-top:2px}
 .foot{margin:0;font-size:11px;color:var(--ink-3);line-height:1.55}
+.og{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;padding:1px 6px;border-radius:3px;white-space:nowrap;cursor:help}
+.og-parsed{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+.og-interp{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-line)}
+.og-assert{background:var(--crit-bg);color:var(--crit);border:1px solid var(--crit-line)}
+.og-human{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-line)}
+.ogsum{display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:12px}
+.ogsum b{margin-left:5px;font-variant-numeric:tabular-nums}
+td.rvw{white-space:nowrap}
+.rb{font-family:var(--sans);font-size:11px;padding:3px 9px;margin-right:4px;border-radius:5px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);cursor:pointer}
+.rb:disabled{opacity:.45;cursor:not-allowed}
+.rb.ok:not(:disabled):hover{border-color:var(--ok-line);color:var(--ok)}
+.rb.no:not(:disabled):hover{border-color:var(--crit-line);color:var(--crit)}
 .said-c{max-width:340px}
 .said2{display:block;font-size:11px;color:var(--ink-3);font-style:italic;margin-bottom:4px}
 .said2:last-child{margin-bottom:0}
@@ -195,12 +207,20 @@ var total=L.reduce(function(a,l){return a+req(l);},0), allDone=L.reduce(function
 
 function railBtn(l){return '<button data-v="'+l.key+'"><span class="t">'+esc(l.name)+
   '</span><span class="s">'+score(l)+'/'+req(l)+'</span></button>';}
-var served=L.filter(function(l){return l.scope==='serve';});
-var declined=L.filter(function(l){return l.scope!=='serve';});
+// Every line is in scope (054). What varies is whether we HOLD anything, so the
+// rail groups on that. Grouping by scope used to put ten behavioural-health
+// lines under "Named, not served" — one of them carrying 80 code bindings.
+function isSourced(l){return (l.benefit_counts&&l.benefit_counts.covered)||l.code_count;}
+var sourced=L.filter(isSourced);
+var unsourced=L.filter(function(l){return !isSourced(l);});
+var outOfScope=L.filter(function(l){return l.scope!=='serve';});
 rail.innerHTML='<button class="all" data-v="all"><span class="t">All service lines</span>'+
   '<span class="s">'+allDone+'/'+total+'</span></button>'+
-  '<div class="railgrp">Serving · '+served.length+'</div>'+served.map(railBtn).join('')+
-  '<div class="railgrp">Named, not served · '+declined.length+'</div>'+declined.map(railBtn).join('');
+  '<div class="railgrp">Sourced · '+sourced.length+'</div>'+sourced.map(railBtn).join('')+
+  '<div class="railgrp">In scope, not sourced · '+unsourced.length+'</div>'+
+  unsourced.map(railBtn).join('')+
+  (outOfScope.length?'<div class="railgrp">Out of scope · '+outOfScope.length+'</div>'+
+   outOfScope.map(railBtn).join(''):'');
 
 function codeTable(l){
   if(!l.codes.length) return '<div class="cb"><p style="margin:0;color:var(--ink-3);font-size:12.5px">'+
@@ -535,19 +555,70 @@ function modifierCard(l){
     }).join('')+'</tbody></table></div></div>';
 }
 
+function originBadge(o){
+  var M={parsed:['og-parsed','parsed','read straight from a document — spot-check it'],
+         interpreted:['og-interp','interpreted','a judgement about what a document MEANS — read it properly'],
+         asserted:['og-assert','asserted','registry judgement, no document behind it — needs sourcing, not approval'],
+         human:['og-human','entered by a person','someone believed it; that is not evidence']};
+  var m=M[o]||M.asserted;
+  return '<span class="og '+m[0]+'" title="'+m[2]+'">'+m[1]+'</span>';
+}
+
+function reviewCard(l){
+  var R=l.review||[], c=l.review_counts||{};
+  if(!R.length) return '';
+  var byOrigin=c.by_origin||{};
+  var pending=c.unreviewed||0;
+
+  var rows=R.map(function(x){
+    var st=x.state==='approve'?['p-done','approved']
+          :x.state==='reject' ?['p-todo','rejected']
+          :x.state==='correct'?['p-doing','corrected']
+          :['p-todo','unreviewed'];
+    return '<tr><td class="c">'+esc(x.kind.replace(/_/g,' '))+'</td>'+
+      '<td class="c">'+esc(x.code||'—')+(x.modifier?' <span class="mod">'+esc(x.modifier)+'</span>':'')+'</td>'+
+      '<td>'+originBadge(x.origin)+'</td>'+
+      '<td class="said-c"><span class="said2">'+esc((x.value||'').slice(0,190))+'</span>'+
+        (x.source?'<span class="udef">'+esc(x.source)+'</span>':
+                  '<span class="udef" style="color:var(--crit)">no document cited</span>')+'</td>'+
+      '<td><span class="pill '+st[0]+'"><span class="d"></span>'+st[1]+'</span>'+
+        (x.actor?'<span class="udef">'+esc(x.actor)+'</span>':'')+'</td>'+
+      '<td class="rvw"><button class="rb ok" disabled>Approve</button>'+
+        '<button class="rb no" disabled>Reject</button>'+
+        '<button class="rb ed" disabled>Edit</button></td></tr>';
+  }).join('');
+
+  return '<div class="card"><div class="ch"><h3>Review</h3>'+
+    '<span class="pill '+(pending?'p-doing':'p-done')+'"><span class="d"></span>'+
+      (c.total-pending)+' of '+c.total+' reviewed</span>'+
+    '<span class="hint">approving never changes where a value came from &mdash; '+
+      'a person agreeing and a document saying it are different facts</span>'+
+    '</div><div class="cb"><div class="ogsum">'+
+    ['parsed','interpreted','asserted','human'].filter(function(o){return byOrigin[o];})
+      .map(function(o){return originBadge(o)+'<b>'+byOrigin[o]+'</b>';}).join('')+
+    '</div></div>'+
+    '<div class="scroll"><table><thead><tr><th>What</th><th>Code</th><th>Origin</th>'+
+    '<th>Value</th><th>Review</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<div class="cb"><p class="foot">Controls are inert in this preview. They activate when '+
+    'the page is served from mobius-payor, which is the only place a review can be written '+
+    '&mdash; a static export cannot record who approved what.</p></div></div>';
+}
+
 function renderLine(l){
   var d=score(l), g=M.filter(function(m){return l.status[m.key][0]==='doing';}).length, rq=req(l);
   var src=l.codes.length?l.codes[0].cite.document:null;
   return '<div class="ph"><div class="eyebrow">Service line · '+
     (l.rule?esc(l.rule):'no rule number')+'</div><h2>'+esc(l.name)+'</h2>'+
-    '<p>'+(l.scope==='serve'
-      ? 'This is the complete standard answer: what the service is, the codes and modifiers '+
-        'that constitute it, when and how it is paid, and the published standard rate. A payor '+
-        'inherits all of it and may only refine — never remove. Nothing here is inherited from '+
-        'a payor.'
-      : 'A service CMHCs really run, named here on purpose. Mobius does not support its rules — '+
-        'it is governed by '+esc(l.authority)+', outside the AHCA fee schedule. Naming it means '+
-        'every module can decline it correctly instead of missing the question in silence.')+
+    '<p>'+(l.scope!=='serve'
+      ? 'Outside what Mobius covers. Named so every module can decline it correctly rather '+
+        'than missing the question in silence.'
+      : (l.codes.length||((l.benefit_counts||{}).covered)
+        ? 'The complete standard answer: what the service is, the codes and modifiers that '+
+          'constitute it, when and how it is paid, and the published standard rate. A payor '+
+          'inherits all of it and may only refine — never remove.'
+        : 'In scope and NOT YET SOURCED. We hold no fee schedule, coverage document or codes '+
+          'for it. That is a gap in what we have gathered — not a finding that the service is '+
+          'unavailable, and not a decision that we will not support it.'))+
     '</p></div>'+
 
   (function(){
@@ -556,18 +627,17 @@ function renderLine(l){
       '</span><span class="v">'+val+'</span></div>');}
 
     add('Scope', l.scope==='serve'
-      ? '<span class="scope sc-serve">Serving</span>'
-      : '<span class="scope sc-decline">Named, not served</span> <span style="color:var(--ink-3)">'+
-        '— modules must decline correctly, not stay silent</span>');
+      ? '<span class="scope sc-serve">In scope</span>'+
+        (l.codes.length||((l.benefit_counts||{}).covered) ? ''
+          : ' <span class="scope sc-decline">not yet sourced</span>')
+      : '<span class="scope sc-decline">Out of scope</span>');
     add('Authority', esc(l.authority));
     add('Payment grain', '<code>'+esc(l.grain)+'</code>'+(l.grain==='code_modifier' ? ''
       : ' <span style="color:var(--warn)">— not code grain; cannot be priced or counted like the '+
         'fee-schedule lines</span>'));
     if(l.payment_method) add('How it is paid', esc(l.payment_method));
     add('Rule', l.rule ? '<code>'+l.rule+'</code> — '+esc(l.name)
-      : (l.scope==='serve'
-         ? '<span style="color:var(--warn)">No rule number in the AHCA manifest — needs adjudication</span>'
-         : '<span style="color:var(--ink-3)">Not an AHCA rule — governed by '+esc(l.authority)+'</span>'));
+      : '<span style="color:var(--warn)">No rule number in the AHCA manifest — needs adjudication</span>');
 
     if(l.scope==='serve'){
       add('Fee schedule', (l.fee_schedule_family?esc(l.fee_schedule_family):'none identified')+
@@ -595,7 +665,7 @@ function renderLine(l){
       '<span class="hint">the complete standard answer — no payor needed</span></div>'+
       '<div class="cb">'+f.join('')+'</div>'+
       (l.scope==='serve' ? codeTable(l) : evidenceTable(l))+'</div>';
-  })()+ provSummary(l) + bindingCard(l) + jServiceLineCard(l) + lexiconCard(l) + standardReqCard(l) + benefitCard(l) + requirementCard(l) + exceptionCard(l) +
+  })()+ provSummary(l) + bindingCard(l) + jServiceLineCard(l) + lexiconCard(l) + standardReqCard(l) + benefitCard(l) + reviewCard(l) + requirementCard(l) + exceptionCard(l) +
 
 
   '<div class="card"><div class="ch"><h3>Module completion</h3>'+

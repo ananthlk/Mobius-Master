@@ -160,6 +160,48 @@ Current: **32 confirmed · 42 proposed · 23 rejected · 2 requested**.
 
 ---
 
+## 5.1 Change 2026-09-07 — `j:service_line` axis erased by rebuilds (Lexicon)
+
+Registry flagged (verified independently by Lexicon against the live DB) that the
+axis recorded live in §3.4 is **gone**, while its doc-side tags partly remain —
+the contract had stopped matching the world. State at 2026-09-07:
+
+| | §3.4 (2026-08-20) | now |
+|---|---|---|
+| `policy_lexicon_entries` `service_line*` (RAG, any state) | 32 | **0** (deleted) |
+| same in QA | (never added) | **0** |
+| `policy_paragraphs` with a `service_line` j_tag | 592 | **39** |
+| `document_tags` with a `service_line` j_tag | 15 | **3** |
+| `rag_published_embeddings` chunk `service_line` tags | 591 | **562** (inert — no vocabulary reaches them) |
+| lexicon revision | 2442 | 3213 |
+
+**Root cause — two mechanisms, both Lexicon's error, not a deliberate removal:**
+
+1. **Query-side entries wiped by the nightly.** The 32 entries were written to the
+   **RAG** lexicon only, never synced to **QA**. The nightly rebuilds RAG-lexicon
+   *from QA*, so the first rebuild dropped them. (The thin-pool *phrases* were
+   synced to QA; the `service_line` *entries* were not — the §2.4 "incorporate to
+   QA" rule, half-applied.)
+2. **Source tags wiped by `retag-in-place`.** That pipeline regenerates
+   `policy_paragraphs`/`document_tags` tags from lexicon *phrase-matching*.
+   `j:service_line` is an **explicit** assignment with empty `strong_phrases`, so
+   every retag recomputes those tables without it. An explicit doc→line assignment
+   never survives a phrase-derived regeneration.
+
+**The design lesson:** `j:service_line` should never have lived in the
+phrase-derived tag store. `j:doc_type` got this right with a dedicated
+`document_doc_type` **column** the retag/rebuild pipelines do not touch. The
+durable fix is the same shape for service lines, plus persisting the query-side
+entries in QA. **Pending Ananth's sign-off on the schema change** (it needs
+Retriever's read-side to read the new column). Until then the 562 chunks are inert
+but harmless; Registry's chat-API path (certified rows, 6/6 live) does not depend
+on the axis.
+
+Interim: neither restored nor stripped yet — awaiting the architecture decision so
+the fix is done once, durably, rather than re-applied into the same erasure.
+
+---
+
 ## 6. Sign-off
 
 | Party | Position |
