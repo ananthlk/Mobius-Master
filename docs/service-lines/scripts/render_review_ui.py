@@ -126,20 +126,62 @@ def build():
             k = key(x["code"], x.get("modifier"))
             if k in codes:
                 codes[k]["limits"].append(say_limit(x))
-        common = []
+
+        # DEFECT 1 — the same sentence rendered three times on one code, because
+        # the coverage answer and the limit were sourced from one fee-schedule
+        # sentence and the code definition sat beside them unlabelled. One row
+        # per distinct wording now, carrying every fact it establishes.
+        LABEL = {"benefit": "Covered", "benefit_limit": "Limit",
+                 "line_code": "What the code means",
+                 "standard_requirement": "Requirement"}
+
+        def fold(rows):
+            out, seen = [], {}
+            for r in rows:
+                t = r["what"]
+                if t in seen:
+                    if r["label"] not in seen[t]["labels"]:
+                        seen[t]["labels"].append(r["label"])
+                    if r["state"] == "unreviewed":
+                        seen[t]["state"] = "unreviewed"
+                    continue
+                r["labels"] = [r["label"]]
+                seen[t] = r
+                out.append(r)
+            return out
+
+        common, groupings = [], []
         for r in l.get("review", []):
             item = {
                 "what": human(r.get("value") or "")[:220],
                 "verbatim": (r.get("value") or "")[:400],
                 "origin": r.get("origin"), "source": r.get("source"),
                 "state": r.get("state"),
-                "kind": (r.get("kind") or "").replace("_", " "),
+                "label": LABEL.get(r.get("kind"), r.get("kind") or ""),
+                # DEFECT 3 — four APR-DRG severities rendered as four identical
+                # rows. Severity is the only thing telling them apart.
+                "sev": r.get("modifier") if r.get("role") == "grouped_to" else "",
             }
+            role = r.get("role")
             k = key(r.get("code"), r.get("modifier"))
-            if r.get("code") and k in codes:
+            if role == "rendered_as" and k in codes:
                 codes[k]["items"].append(item)
+            elif role in ("classified_by", "grouped_to"):
+                # DEFECT 2 — these are diagnosis and DRG bindings. They answer
+                # "what places this encounter", not "what may I bill", and 285
+                # of them were drowning the service-wide section.
+                item["what"] = (item["what"] + (" · severity " + item["sev"]
+                                                if item["sev"] else ""))
+                item["label"] = ("Diagnosis" if role == "classified_by"
+                                 else "Hospital grouping")
+                groupings.append(item)
             else:
                 common.append(item)
+
+        for c in codes.values():
+            c["items"] = fold(c["items"])
+        common = fold(common)
+        groupings = fold(groupings)
 
         lines.append({
             "id": l["key"],                       # DOM handle only, never displayed
@@ -148,10 +190,24 @@ def build():
             "ready": bool(codes or bc.get("covered")),
             "codes": list(codes.values()),
             "common": common,
+            "search": " ".join([l["name"]] + [c["code"] for c in l.get("codes", [])]).lower(),
             "covered": bc.get("covered", 0),
             "sources": sorted({r["source"] for r in l.get("review", []) if r.get("source")}),
             "grain": l.get("grain"), "authority": l.get("authority"),
-            "toCheck": rc.get("unreviewed", 0),
+            "modules": [{"name": m["name"], "state": (l.get("status") or {}).get(m["key"], ["todo",""])[0],
+                         "why": (l.get("status") or {}).get(m["key"], ["todo",""])[1]}
+                        for m in cat["modules"]],
+            "attempts": l.get("sourcing_attempts", []),
+            "machine": l.get("state_machine", []),
+            "terms": (l.get("lexicon_d_counts") or {}),
+            "chunks": (l.get("j_service_line") or {}).get("retrievable_chunks", 0),
+            "groupings": groupings,
+            "toCheck": sum(1 for x in ([i for c in codes.values() for i in c["items"]]
+                                       + common + groupings)
+                           if x["state"] == "unreviewed" and x["origin"] != "asserted"),
+            "toSource": sum(1 for x in ([i for c in codes.values() for i in c["items"]]
+                                        + common + groupings)
+                            if x["origin"] == "asserted"),
             "checked": (rc.get("total", 0) - rc.get("unreviewed", 0)),
         })
 
@@ -232,6 +288,22 @@ button{font:inherit;color:inherit}
 .dot{width:6px;height:6px;border-radius:var(--mobius-radius-full);flex:none;
   background:var(--mobius-success)}
 .dot.wait{background:var(--mobius-border-medium)}
+/* Collapsed, the dot becomes the service's initials — nine identical dots told
+   a reader nothing. */
+.rail .dot{width:24px;height:24px;border-radius:var(--mobius-radius-sm);
+  background:var(--mobius-bg-tertiary);display:grid;place-items:center;
+  font-size:10px;font-weight:600;color:var(--mobius-text-muted)}
+.rail .dot::after{content:attr(data-ini)}
+.rail .dot.wait{background:var(--mobius-bg-secondary);
+  color:var(--mobius-border-medium)}
+.nav i.src{color:var(--mobius-warning)}
+.nav i.non{color:var(--mobius-border-medium)}
+.lbl{display:inline-block;font-size:var(--mobius-text-xs);font-weight:500;
+  color:var(--mobius-text-muted);background:var(--mobius-bg-tertiary);
+  border-radius:var(--mobius-radius-sm);padding:1px 6px;margin-right:6px;
+  vertical-align:1px}
+.item.needs{border-left:2px solid var(--mobius-warning);border-radius:0
+  var(--mobius-radius-base) var(--mobius-radius-base) 0}
 
 .main{overflow-y:auto;padding:var(--mobius-space-xl);display:flex;flex-direction:column;
   gap:var(--mobius-space-md);min-width:0}
@@ -315,6 +387,9 @@ td.cd small{display:block;font-weight:400;color:var(--mobius-text-muted)}
 .tech dd{margin:0;word-break:break-word}
 @media (max-width:640px){.tech{grid-template-columns:1fr;gap:var(--mobius-space-xs)}
   .tech dd{margin-bottom:var(--mobius-space-sm)}}
+.th{margin:0 0 var(--mobius-space-sm);font-size:var(--mobius-text-xs);
+  text-transform:uppercase;letter-spacing:.04em;color:var(--mobius-text-muted);font-weight:500}
+.hint2{color:var(--mobius-text-muted);font-size:var(--mobius-text-xs);margin-top:2px}
 .lead{margin:0 0 var(--mobius-space-md);font-size:var(--mobius-text-md);
   color:var(--mobius-text-primary)}
 .items{display:flex;flex-direction:column;gap:var(--mobius-space-sm);
@@ -389,22 +464,44 @@ function checkLabel(s){
        :                 ["Not checked","c-mute"];
 }
 
+/* DEFECT 7 — six of seven ready services begin "Behavioral Health", so
+   truncation removed exactly the distinguishing part. Drop the shared prefix in
+   the rail; the full name stays in the tooltip and the heading. */
+function shortName(n){
+  return n.replace(/^Behavioral Health\s+/, "")
+          .replace(/^Targeted Case Management for\s+/, "TCM · ");
+}
+/* DEFECT 6 — at 48px every service was an identical dot. */
+function initials(n){
+  var w = n.replace(/[^A-Za-z ]/g," ").split(/\s+/).filter(Boolean);
+  return ((w[0]||"?")[0] + (w[1]||"")[0||0] || "").toUpperCase().slice(0,2);
+}
+
 function drawNav(){
   var q = filter.toLowerCase();
-  var hit = LINES.filter(function(l){return !q || l.name.toLowerCase().indexOf(q)>=0;});
+  /* DEFECT 9 — a billing user arrives with the code on the claim, not the
+     service name. */
+  var hit = LINES.filter(function(l){return !q || l.search.indexOf(q)>=0;});
   var ready = hit.filter(function(l){return l.ready;});
   var wait  = hit.filter(function(l){return !l.ready;});
   function grp(title, arr){
     if(!arr.length) return "";
     return '<div class="grp">'+title+' · '+arr.length+'</div>' + arr.map(function(l){
-      return '<button data-id="'+l.id+'" aria-current="'+(l.id===cur)+'">'+
-        '<span class="dot'+(l.ready?"":" wait")+'"></span><b>'+esc(l.name)+'</b>'+
-        (l.toCheck?'<i>'+l.toCheck+'</i>':'')+'</button>';
+      /* DEFECT 5 — four services hold nothing at all and the rail gave no hint
+         that opening them was pointless. */
+      var n = l.toCheck || l.toSource;
+      var tag = l.toCheck ? '<i>'+l.toCheck+'</i>'
+              : l.toSource ? '<i class="src">'+l.toSource+'</i>'
+              : '<i class="non">—</i>';
+      return '<button data-id="'+l.id+'" aria-current="'+(l.id===cur)+'" '+
+        'title="'+esc(l.name)+(n?"":" — nothing recorded yet")+'">'+
+        '<span class="dot'+(l.ready?"":" wait")+'" data-ini="'+esc(initials(l.name))+'"></span>'+
+        '<b>'+esc(shortName(l.name))+'</b>'+tag+'</button>';
     }).join("");
   }
   var html = grp("Ready", ready) + grp("Awaiting sources", wait);
   document.getElementById("nav").innerHTML = html ||
-    '<div class="empty"><span>No services match “'+esc(filter)+'”</span></div>';
+    '<div class="empty"><span>Nothing matches \u201c'+esc(filter)+'\u201d</span></div>';
 }
 
 function evidence(it){
@@ -419,6 +516,14 @@ function evidence(it){
     '<dt>Exact wording</dt><dd class="vb">'+esc(it.verbatim)+'</dd>'+
     '</dl></details>';
 }
+/* Even an operator panel obeys §7. These are our pipeline's words, not English. */
+var OUTCOME={extracted:"Found and recorded",
+  ungrounded:"Answer could not be traced back to a document",
+  not_answered:"Nothing in our documents answered it",
+  no_retrieval:"No documents came back",
+  error:"The run failed"};
+var MSTATE={sourced:"Found",escalated:"Handed to a person",
+  open:"Waiting",in_progress:"Running"};
 function sourceWhy(o){
   return o==="parsed"      ? "Read straight out of the published fee schedule."
        : o==="interpreted" ? "Taken from the wording of the policy and written into a "+
@@ -430,35 +535,59 @@ function sourceWhy(o){
 
 function itemRow(it){
   var src = sourceLabel(it.origin), st = checkLabel(it.state);
-  return '<div class="item"><div class="itop">'+
-    '<span class="itxt">'+esc(it.what)+'</span>'+
+  /* Nothing sits behind this yet, so confirming it would only approve our own
+     wording. The action is to find a source, not to agree. */
+  var noDoc = it.origin === "asserted";
+  var acts = noDoc
+    ? '<button class="btn pri" disabled>Find a source</button>'+
+      '<button class="btn" disabled>Edit</button>'
+    : '<button class="btn pri" disabled>Confirm</button>'+
+      '<button class="btn" disabled>Flag</button>'+
+      '<button class="btn" disabled>Edit</button>';
+  return '<div class="item'+(noDoc?" needs":"")+'"><div class="itop">'+
+    '<span class="itxt">'+(it.labels||[it.label]).map(function(x){
+      return '<span class="lbl">'+esc(x)+'</span>';}).join("")+
+    esc(it.what)+'</span>'+
     '<span class="chip '+src[1]+'">'+src[0]+'</span>'+
-    '<span class="chip '+st[1]+'">'+st[0]+'</span>'+
-    '<span class="acts"><button class="btn pri" disabled>Confirm</button>'+
-    '<button class="btn" disabled>Flag</button>'+
-    '<button class="btn" disabled>Edit</button></span></div>'+
+    (noDoc?'':'<span class="chip '+st[1]+'">'+st[0]+'</span>')+
+    '<span class="acts">'+acts+'</span></div>'+
     evidence(it)+'</div>';
 }
 
 function draw(){
   var l = LINES.filter(function(x){return x.id===cur;})[0];
-  if(!l) return;
+  if(!l) return drawQueue();
   var h = '<div><h1>'+esc(l.name)+'</h1><p class="sub">'+
     (l.ready
       ? 'Florida Medicaid behavioral health'+(l.rule?' · Rule '+esc(l.rule):'')
       : 'We have not gathered the fee schedule or coverage documents for this service yet.')+
     '</p></div>';
 
+  var behindN = l.modules.filter(function(m){
+    return m.state!=="done" && m.state!=="complete" && m.state!=="na" &&
+           m.state!=="not_applicable";}).length;
   h += '<div class="kpis">'+
     '<div class="kpi"><span>Billable codes</span><b>'+l.codes.length+'</b></div>'+
-    '<div class="kpi"><span>Covered</span><b>'+l.covered+'</b></div>'+
-    '<div class="kpi"><span>To check</span><b>'+l.toCheck+'</b></div></div>';
+    '<div class="kpi"><span>To check</span><b>'+l.toCheck+'</b></div>'+
+    '<div class="kpi"><span>Needs a source</span><b>'+l.toSource+'</b></div>'+
+    '<div class="kpi"><span>Modules behind</span><b>'+behindN+'</b></div></div>';
 
-  /* Applies to the whole service, before any individual code. */
-  if(l.common.length){
-    h += card("Applies to the whole service", l.common.length+" items",
-      '<div class="pad items">'+l.common.map(itemRow).join("")+'</div>');
-  }
+  /* Where the service comes from. NOT technical — a reviewer needs the rule and
+     the documents in front of them, which is why they moved out of the folded
+     panel and up here, open. */
+  h += card("About this service", l.rule ? "Rule "+l.rule : "no rule recorded",
+    '<div class="pad"><dl class="tech">'+
+    '<dt>Governing rule</dt><dd>'+(l.rule?esc(l.rule):
+      '<span style="color:var(--mobius-warning)">none recorded yet</span>')+'</dd>'+
+    '<dt>Set by</dt><dd>'+esc(l.authority||"—")+'</dd>'+
+    '<dt>How it is paid</dt><dd>'+esc((l.grain||"—").replace(/_/g," "))+'</dd>'+
+    '<dt>Documents behind this</dt><dd>'+
+      (l.sources.length? l.sources.map(esc).join("<br>")
+        : '<span style="color:var(--mobius-error)">none held yet</span>')+'</dd>'+
+    '</dl></div>'+
+    (l.common.length?'<div class="pad items" style="border-top:1px solid var(--mobius-border)">'+
+      '<p class="lead" style="font-size:var(--mobius-text-sm);color:var(--mobius-text-muted)">'+
+      'Applies to every code below.</p>'+l.common.map(itemRow).join("")+'</div>':''));
 
   /* One card per code. Everything about that code is inside it — what it is,
      what it pays, its caps, and each thing waiting to be checked. */
@@ -477,6 +606,14 @@ function draw(){
     h += card(title, pending? pending+" to check" : "checked", inner, true);
   });
 
+  if(l.groupings.length){
+    h += card("Diagnosis and hospital grouping codes", l.groupings.length+" codes",
+      '<div class="pad"><p class="lead" style="font-size:var(--mobius-text-sm);'+
+      'color:var(--mobius-text-muted)">These place an encounter for hospital billing. '+
+      'They are not codes you bill directly.</p>'+
+      '<div class="items">'+l.groupings.map(itemRow).join("")+'</div></div>', true);
+  }
+
   if(!l.ready){
     h += '<section class="card"><div class="empty">'+
       '<svg viewBox="0 0 100 100" width="24" height="24" fill="none" stroke="currentColor" '+
@@ -486,16 +623,44 @@ function draw(){
       '</div></section>';
   }
 
-  var tech = '<div class="pad"><dl class="tech">'+
-    '<dt>Governing rule</dt><dd>'+(l.rule?esc(l.rule):"none recorded")+'</dd>'+
-    '<dt>Authority</dt><dd>'+esc(l.authority||"—")+'</dd>'+
-    '<dt>How it is paid</dt><dd>'+esc((l.grain||"—").replace(/_/g," "))+'</dd>'+
-    '<dt>Documents behind this</dt><dd>'+
-      (l.sources.length? l.sources.map(esc).join("<br>") : "none held")+'</dd>'+
-    '<dt>Items on file</dt><dd>'+(l.checked+l.toCheck)+' — '+l.checked+' checked, '+
-      l.toCheck+' still to check</dd>'+
-    '</dl></div>';
-  h += card("Technical details", "", tech, true);
+  /* System state, not domain fact. How this service was sourced, whether the
+     machinery is still working on it, and whether the other modules have caught
+     up — the questions an operator asks, never a reviewer. */
+  var MOD={done:["In sync","c-ok"],complete:["In sync","c-ok"],
+           doing:["Working","c-warn"],in_progress:["Working","c-warn"],
+           na:["Not needed","c-mute"],not_applicable:["Not needed","c-mute"]};
+  var behind = l.modules.filter(function(m){return (MOD[m.state]||["Not started"])[0]==="Not started";}).length;
+  var tech =
+    '<div class="pad"><h3 class="th">Other modules</h3><dl class="tech">'+
+      l.modules.map(function(m){
+        var v = MOD[m.state] || ["Not started","c-need"];
+        return '<dt>'+esc(m.name)+'</dt><dd><span class="chip '+v[1]+'">'+v[0]+'</span>'+
+          (m.why?'<div class="hint2">'+esc(m.why)+'</div>':'')+'</dd>';
+      }).join("")+'</dl></div>'+
+    '<div class="pad" style="border-top:1px solid var(--mobius-border)">'+
+      '<h3 class="th">Sourcing runs</h3>'+
+      (l.attempts.length
+        ? '<dl class="tech">'+l.attempts.map(function(a){
+            return '<dt>'+esc(OUTCOME[a.outcome]||a.outcome.replace(/_/g," "))+
+              '</dt><dd>'+a.n+' &middot; last '+esc(a.last||"—")+'</dd>';
+          }).join("")+'</dl>'
+        : '<p class="hint2">No sourcing has been attempted for this service.</p>')+
+    '</div>'+
+    '<div class="pad" style="border-top:1px solid var(--mobius-border)">'+
+      '<h3 class="th">Automated sourcing</h3>'+
+      (l.machine.length
+        ? '<dl class="tech">'+l.machine.map(function(m){
+            return '<dt>'+esc(m.about)+'</dt><dd>'+esc(MSTATE[m.state]||m.state)+
+              (m.rounds? ' after '+m.rounds+' round'+(m.rounds===1?"":"s") : '')+'</dd>';
+          }).join("")+'</dl>'
+        : '<p class="hint2">Nothing queued for automated sourcing.</p>')+
+    '</div>'+
+    '<div class="pad" style="border-top:1px solid var(--mobius-border)">'+
+      '<h3 class="th">Search terms</h3><dl class="tech">'+
+      '<dt>Agreed terms</dt><dd>'+(l.terms.confirmed||0)+' of '+(l.terms.mapped||0)+'</dd>'+
+      '<dt>Passages reachable</dt><dd>'+l.chunks+'</dd>'+
+      '</dl></div>';
+  h += card("Technical details", behind? behind+" modules behind" : "", tech, true);
 
   document.getElementById("main").innerHTML = h;
 }
@@ -525,9 +690,30 @@ document.getElementById("toggle").addEventListener("click", function(){
   b.setAttribute("aria-label", railed ? "Expand sidebar" : "Collapse sidebar");
   b.setAttribute("title", railed ? "Expand sidebar" : "Collapse sidebar");
 });
+/* DEFECT 10 — the button said "show everything to check" and jumped to one
+   service. A reviewer wants one queue across all of them. */
+function drawQueue(){
+  var rows = [];
+  LINES.forEach(function(l){
+    var items = [].concat(l.common, l.groupings);
+    l.codes.forEach(function(c){ items = items.concat(c.items); });
+    items.filter(function(i){return i.state==="unreviewed" && i.origin!=="asserted";})
+         .forEach(function(i){ rows.push({svc:l.name, id:l.id, it:i}); });
+  });
+  var by = {};
+  rows.forEach(function(r){ (by[r.svc]=by[r.svc]||[]).push(r); });
+  var h = '<div><h1>Everything to check</h1><p class="sub">'+rows.length+
+    ' items across '+Object.keys(by).length+' services, oldest sources first.</p></div>';
+  Object.keys(by).forEach(function(svc){
+    h += card(svc, by[svc].length+" items",
+      '<div class="pad items">'+by[svc].map(function(r){return itemRow(r.it);}).join("")+
+      '</div>', true);
+  });
+  if(!rows.length) h = '<div class="empty"><span>Nothing is waiting to be checked.</span></div>';
+  document.getElementById("main").innerHTML = h;
+}
 document.getElementById("expand").addEventListener("click", function(){
-  var first = LINES.filter(function(l){return l.toCheck;})[0];
-  if(first){ cur = first.id; drawNav(); draw(); }
+  cur = null; drawNav(); drawQueue();
 });
 drawNav(); draw();
 </script>

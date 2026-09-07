@@ -1,8 +1,22 @@
 # Service Lines review surface — defect list
 
 **Found:** 2026-09-07, walking the page against real data rather than eyeballing.
-**Status:** logged, not fixed. Ananth: *"just mark all the bugs and we will fix
-them once for all."*
+**Status:** ALL TEN FIXED, 2026-09-07. Each entry keeps its original description
+so the reasoning survives; the fix is recorded under it.
+
+| # | Fix |
+|---|---|
+| 1 | One row per distinct wording, carrying every fact it establishes. H0001/HO went from 3 rows to 2, the shared sentence labelled `Covered` + `Limit`. 616 rows → 559. |
+| 2 | Diagnosis and DRG bindings moved to their own collapsed card, "Diagnosis and hospital grouping codes", with a line saying they are not billed directly. Adult inpatient psych: 80 rows out of the service-wide section, which is now empty for that line because it genuinely has no service-wide requirements. |
+| 3 | Severity of illness is on the row — `MENTAL ILLNESS DIAGNOSIS WITH O.R. PROCEDURE · severity 1`. Needed migration 056: `review_queue` exposed neither `binding_role` nor `code_system`, so the UI had been inferring "is this billable" from list membership. |
+| 4 | An item with no document behind it offers **Find a source**, not Confirm, and carries no check status. Counts split: `toCheck` (has a source, needs a person) vs `toSource` (has nothing). A warning stripe marks the row. |
+| 5 | Services holding nothing show `—` in the rail and a tooltip saying nothing is recorded yet. |
+| 6 | The collapsed rail shows each service's initials in a tile instead of nine identical dots. |
+| 7 | The shared "Behavioral Health" prefix is dropped in the rail so the distinguishing words survive; the full name stays in the tooltip and the heading. |
+| 8 | "Covered" tile removed — it duplicated the billable-code count on every ready service. Replaced by "Needs a source" and "Modules behind", both of which vary. |
+| 9 | Search matches codes as well as names. A billing user arrives with the code on the claim. |
+| 10 | "Show everything to check" opens a real cross-service queue grouped by service, rather than jumping to the first one. |
+
 
 Ordered by what a reviewer hits first, not by effort. Each one names how it was
 measured so nobody has to re-derive it.

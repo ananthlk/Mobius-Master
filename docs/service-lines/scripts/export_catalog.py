@@ -186,6 +186,43 @@ def main():
                        order by code, qualifier""", (key,))
         limit_gap = [{"code": r[0], "modifier": r[1], "prose": r[2] or []} for r in cur.fetchall()]
 
+        # System state, not domain fact: how this line got sourced, whether the
+        # state machine is still working on it, and whether the other modules
+        # have caught up. This is what "technical details" should mean.
+        cur.execute("""select outcome, count(*), max(attempted_at)
+                         from service_line.sourcing_attempt where line_key=%s
+                        group by 1 order by 2 desc""", (key,))
+        attempts = [{"outcome": r[0], "n": r[1], "last": str(r[2])[:16] if r[2] else None}
+                    for r in cur.fetchall()]
+
+        cur.execute("""select r.id, r.status, r.subject_id,
+                              (select count(*) from research.turn t where t.request_id = r.id)
+                         from research.request r
+                        where r.consumer = 'service_line_registry'
+                          and r.subject_id like %s
+                        order by r.id""", (key + "%",))
+        machine = [{"ref": r[0], "state": r[1],
+                    "about": (r[2].split("/", 1)[1].replace("_", " ") if "/" in r[2] else r[2]),
+                    "rounds": r[3]} for r in cur.fetchall()]
+
+        # The review queue for this line: every reviewable fact, its origin, and
+        # what a person has decided about it. origin says how the value came to
+        # exist; review_state says what a human concluded. Approving an
+        # interpreted value never makes it parsed — the UI must not merge them.
+        cur.execute("""select subject_kind, subject_id, code, qualifier, origin,
+                              sourced, source_ref, value_text, binding_role,
+                              code_system, review_state, actor, decided_at
+                         from service_line.review_queue
+                        where line_key = %s
+                        order by (origin <> 'asserted'), subject_kind,
+                                 code nulls first, subject_id""", (key,))
+        review = [{"kind": r[0], "id": r[1], "code": r[2], "modifier": r[3],
+                   "origin": r[4], "sourced": r[5], "source": r[6],
+                   "value": r[7], "role": r[8], "system": r[9],
+                   "state": r[10], "actor": r[11],
+                   "decided_at": str(r[12]) if r[12] else None}
+                  for r in cur.fetchall()]
+
         cur.execute("""select document, publisher, authority_level, pages
                        from service_line.source where line_key=%s and held
                        order by pages desc nulls last limit 6""", (key,))
@@ -194,7 +231,7 @@ def main():
         rendered = bind["rendered_as"]
         lines.append({
             "key": key, "name": name, "rule": rule, "authority": authority,
-            "grain": grain, "scope": "serve" if scope == "serve" else "decline_well",
+            "grain": grain, "scope": scope,
             "payment_method": method,
             "fee_schedule_family": None,
             "source_documents": 0,
@@ -242,6 +279,17 @@ def main():
                 "unlimited": sum(1 for x in limits if x["unlimited"]),
                 "sourced": sum(1 for x in limits if x["sourced"]),
                 "prose_only": len(limit_gap),
+            },
+            "sourcing_attempts": attempts,
+            "state_machine": machine,
+            "review": review,
+            "review_counts": {
+                "total": len(review),
+                "unreviewed": sum(1 for x in review if x["state"] == "unreviewed"),
+                "approved": sum(1 for x in review if x["state"] == "approve"),
+                "rejected": sum(1 for x in review if x["state"] == "reject"),
+                "by_origin": {o: sum(1 for x in review if x["origin"] == o)
+                              for o in ("parsed", "interpreted", "asserted", "human")},
             },
             "standard_requirements": std_reqs,
             "standard_requirement_counts": {
