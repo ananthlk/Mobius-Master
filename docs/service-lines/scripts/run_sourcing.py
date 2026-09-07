@@ -212,6 +212,13 @@ def run(line_key, requested_by, limit=None, dry=False, max_rounds=2):
                        returning id""",
                     (subject_id, question, EVAL, Json(SLOTS[rtype]), JURISDICTION, max_rounds))
         pre_id = cur.fetchone()["id"]
+        cur.execute("""insert into service_line.sourcing_link
+                       (request_id, requirement_id, line_key, requirement_type, code,
+                        qualifier, origin)
+                       values (%s,%s,%s,%s,%s,%s,'declared')
+                       on conflict (request_id) do update
+                         set requirement_id=excluded.requirement_id, origin='declared'""",
+                    (pre_id, r["id"], line_key, rtype, r["code"], r["qualifier"]))
 
         cur.execute("""insert into service_line.sourcing_run_member
                        (run_id, request_id, requirement_id, requirement_type, code, qualifier, seq)
@@ -246,13 +253,6 @@ def run(line_key, requested_by, limit=None, dry=False, max_rounds=2):
                  "was following; live steps for this task were not captured.", seq)
             cur.execute("""update service_line.sourcing_run_member set request_id=%s
                             where run_id=%s and seq=%s""", (rid, run_id, seq))
-        cur.execute("""insert into service_line.sourcing_link
-                       (request_id, requirement_id, line_key, requirement_type, code, qualifier, origin)
-                       values (%s,%s,%s,%s,%s,%s,'declared')
-                       on conflict (request_id) do update
-                         set requirement_id=excluded.requirement_id, origin='declared'""",
-                    (rid, r["id"], line_key, rtype, r["code"], r["qualifier"]))
-
         emit(cur, run_id, "request_settled",
              {"requirement_id": r["id"], "request_id": rid, "status": res.get("status"),
               "turns": res.get("turns_run"), "gap_class": res.get("gap_class"),
