@@ -674,7 +674,13 @@ function loadProfiles(){
           esc(PROFILE_SAID[p] || p)+'</option>';
       }).join("");
     })
-    .catch(function(){ /* leave the single Standard option */ });
+    .catch(function(e){
+      // A picker silently stuck on "Standard" looks like a service that offers one
+      // profile. Say the list could not be loaded, and from where.
+      var n = document.getElementById("srcnote");
+      if (n) n.innerHTML = "Could not load the model list from <code>"+
+        esc(location.origin)+"</code> ("+esc(e.message)+").";
+    });
 }
 
 function startRun(lineId){
@@ -706,8 +712,10 @@ function startRun(lineId){
     follow(id);
   })
   .catch(function(e){
-    note.textContent = "Could not reach the registry service ("+e.message+
-      "). The runs below are the last recorded ones.";
+    note.innerHTML = "Could not reach the registry service ("+esc(e.message)+
+      ") from <code>"+esc(location.origin)+"</code>. If that origin is not allowed by "+
+      "the service, the browser blocks the call before it is sent and nothing reaches "+
+      "the server log. The runs below are the last recorded ones.";
     done();
   });
 
