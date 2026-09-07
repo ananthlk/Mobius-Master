@@ -139,9 +139,37 @@ def ask(q, tries=2):
 
 
 def direct_answer(raw):
-    """The card is JSON; the graded surface is what the user actually reads."""
+    """The headline the user reads."""
     m = re.search(r'"direct_answer":\s*"(.*?)(?<!\\)"', raw, re.S)
     return (m.group(1) if m else raw).replace("\\n", " ")
+
+
+# Machinery that must NEVER reach a user, wherever in the card it lands.
+#
+# This check exists because the harness scored 5 of 6 on a build whose UI was
+# rendering the entire synthesis scaffolding — the instruction block, the line
+# reading "MUST OBEY — DO NOT QUOTE TO USER", and a raw JSON dump of the
+# registry response — under "First pass". Every graded case passed, because I
+# graded `direct_answer` and the scaffolding was in `react_draft`.
+#
+# A harness that inspects one field certifies one field. The user sees the card.
+SCAFFOLDING = [
+    "synthesis requirement",
+    "must obey",
+    "do not quote to user",
+    "quote this sentence verbatim",
+    "full registry data",
+    "[material]",
+    "[blocking]",
+    '"caveats":',
+    '"distinct_readings":',
+]
+
+
+def scaffolding_in_card(raw):
+    """Anything model-facing that leaked into the rendered card, any field."""
+    low = (raw or "").lower()
+    return [m for m in SCAFFOLDING if m in low]
 
 
 def main():
@@ -164,16 +192,22 @@ def main():
 
         missing = [grp for grp in c["require"] if not any(norm(x) in n for x in grp)]
         present = [f for f in c["forbid"] if norm(f) in n]
+        leaked = scaffolding_in_card(r["message"])
 
-        if a.verbose or missing or present:
+        if a.verbose or missing or present or leaked:
             print(f"    A: {ans[:400]}")
+        if leaked:
+            print(f"    FAIL — model-facing scaffolding rendered in the card: {leaked}")
+            print("           This is graded across the WHOLE card, not direct_answer. "
+                  "A build once scored 5/6 here while showing the user the instruction "
+                  "block, 'MUST OBEY — DO NOT QUOTE TO USER', and a raw JSON dump.")
         if missing:
             print(f"    FAIL — missing: {['/'.join(g) for g in missing]}")
             print(f"           registry holds: {c['truth']}")
         if present:
             print(f"    FAIL — contains forbidden: {present}")
             print(f"           {c['why_forbid']}")
-        if not missing and not present:
+        if not missing and not present and not leaked:
             print("    PASS")
             passed += 1
         else:
