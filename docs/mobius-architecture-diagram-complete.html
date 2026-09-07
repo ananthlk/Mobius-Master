@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobius Architecture: 7 Layers + Deep Research</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0f0f11;
+      color: #f1f0ee;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    h1 { font-size: 28px; margin-bottom: 8px; font-weight: 700; }
+    .subtitle { color: rgba(255,255,255,0.6); margin-bottom: 40px; font-size: 14px; }
+
+    .architecture {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border: 1px solid rgba(124, 58, 237, 0.3);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .layer {
+      padding: 20px;
+      border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+      background: #1a1a1e;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: grid;
+      grid-template-columns: 80px 1fr 20px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .layer:hover { background: #252529; border-bottom-color: rgba(124, 58, 237, 0.4); }
+    .layer:last-child { border-bottom: none; }
+    .layer.expanded { background: #0f0f11; }
+
+    .layer-num {
+      font-size: 32px;
+      font-weight: 700;
+      color: #7c3aed;
+      line-height: 1;
+    }
+
+    .layer-header {
+      flex: 1;
+    }
+
+    .layer-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #f1f0ee;
+    }
+
+    .layer-tagline {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .layer-expand { color: rgba(255,255,255,0.3); font-size: 12px; }
+    .layer.expanded .layer-expand { transform: rotate(180deg); display: inline-block; }
+
+    .layer-details {
+      display: none;
+      grid-column: 1 / -1;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .layer.expanded .layer-details { display: block; }
+
+    .details-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 8px;
+    }
+
+    .detail-item {
+      background: rgba(124, 58, 237, 0.1);
+      border: 0.5px solid rgba(124, 58, 237, 0.2);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #a78bfa;
+      font-weight: 500;
+    }
+
+    .detail-description {
+      grid-column: 1 / -1;
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.5;
+    }
+
+    .deep-research {
+      border: 2px solid #7c3aed;
+      border-radius: 8px;
+      padding: 16px;
+      background: rgba(124, 58, 237, 0.05);
+    }
+
+    .deep-research-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #a78bfa;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dr-dot {
+      width: 8px;
+      height: 8px;
+      background: #7c3aed;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .deep-research-item {
+      font-size: 11px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 8px;
+      padding-left: 8px;
+      border-left: 2px solid rgba(124, 58, 237, 0.3);
+    }
+
+    .flow-section {
+      background: #1a1a1e;
+      border: 0.5px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 40px;
+    }
+
+    .flow-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #f1f0ee;
+    }
+
+    .flow-step {
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+
+    .flow-num {
+      background: #7c3aed;
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .flow-text .label {
+      font-weight: 600;
+      color: #f1f0ee;
+      margin-bottom: 2px;
+    }
+
+    .flow-text .detail {
+      color: rgba(255,255,255,0.5);
+      font-size: 12px;
+    }
+
+    .gates-section {
+      background: #1a1a1e;
+      border: 0.5px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    .gates-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .gates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+
+    .gate-card {
+      background: #252529;
+      border: 0.5px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 12px;
+    }
+
+    .gate-num { font-weight: 700; color: #7c3aed; font-size: 13px; }
+    .gate-name { font-weight: 600; color: #f1f0ee; margin: 4px 0; }
+    .gate-status { font-size: 10px; color: rgba(255,255,255,0.5); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Mobius Architecture: 7 Layers + Deep Research</h1>
+    <p class="subtitle">The complete system. Click any layer to expand.</p>
+
+    <div class="architecture">
+      <div class="stack">
+        <div class="layer" onclick="this.classList.toggle('expanded')">
+          <div class="layer-num">1</div>
+          <div class="layer-header">
+            <div class="layer-title">Surfaces</div>
+            <div class="layer-tagline">Chat, API, Chrome extension, mobile, dashboard</div>
+          </div>
+          <div class="layer-expand">▾</div>
+          <div class="layer-details">
+            <div class="detail-description">How operators enter the system. Multiple surfaces, one backend.</div>
+            <div class="details-list">
+              <div class="detail-item">Chat</div>
+              <div class="detail-item">API</div>
+              <div class="detail-item">Chrome Extension</div>
+              <div class="detail-item">Mobile App</div>
+              <div class="detail-item">Dashboard</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="layer" onclick="this.classList.toggle('expanded')">
+          <div class="layer-num">2</div>
+          <div class="layer-header">
+            <div class="layer-title">Router & Optimizer</div>
+            <div class="layer-tagline">Modular prompting, mode selection, strategy choice</div>
+          </div>
+          <div class="layer-expand">▾</div>
+          <div class="layer-details">
+            <div class="detail-description">Decides HOW to answer. Composes prompts from blocks. Selects reasoning mode. Chooses strategy. Learns what works.</div>
+            <div class="details-list">
+              <div class="detail-item">Prompt Composer</div>
+              <div class="detail-item">Mode Selector (direct, few-shot, chain-of-thought, debate)</div>
+              <div class="detail-item">Strategy Selector (Facts, RAG, Web, Reasoning)</div>
+              <div class="detail-item">Bandit Optimizer</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="layer" onclick="this.classList.toggle('expanded')">
+          <div class="layer-num">3</div>
+          <div class="layer-header">
+            <div class="layer-title">Platform Agents</div>
+            <div class="layer-tagline">Infrastructure supporting the system itself</div>
+          </div>
+          <div class="layer-expand">▾</div>
+          <div class="layer-details">
+            <div class="detail-description">Agents that solve Mobius problems, not RCM problems. Keep the system healthy and coherent.</div>
+            <div class="details-list">
+              <div class="detail-item">Product Awareness</div>
+              <div class="detail-item">Feedback</div>
+              <div class="detail-item">User Manager</div>
+              <div class="detail-item">Org Agent</div>
+              <div class="detail-item">Eval Command Center</div>
+              <div class="detail-item">Technical Review</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="layer" onclick="this.classList.toggle('expanded')">
+          <div class="layer-num">4</div>
+          <div class="layer-header">
+            <div class="layer-title">Domain Agents</div>
+            <div class="layer-tagline">Specialists in RCM problems</div>
+          </div>
+          <div class="layer-expand">▾</div>
+          <div class="layer-details">
+            <div class="detail-description">Own specific pieces of the revenue cycle. Access Router, Skills, Intelligence. Coordinate with each other.</div>
+            <div class="details-list">
+              <div class="detail-item">Credentialing</div>
+              <div class="detail-item">Strategy</div>
+              <div class="detail-item">Roster</div>
+              <div class="detail-item">Prior Auth</div>
+              <div class="detail-item">Engagement</div>
+              <div class="detail-item">Appeals</div>
+              <div class="detail-item">Sourcing</div>
+              <div class="detail-item">Curation</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="layer" onclick="this.classList.toggle('expanded')">
+          <div class="layer-num">5</div>
+          <div class="layer-header">
+            <div class="layer-title">Skills</div>
+            <div class="layer-tagline">Discrete tools agents call</div>
+          </div>
+          <div class="layer-expand">▾</div>
+          <div class="layer-details">
+            <div class="detail-description">Reusable capabilities. Modular and composable. Agents call skills in sequence.</div>
+            <div class="details-list">
+              <div class="detail-item">Email</div>
+              <div class="detail-item">Tasks</div>
+              <div class="detail-item">Download</div>
+              <div class="detail-item">Feedback</div>
+              <div class="detail-item">Vault</div>
+              <div class="detail-item">Deep Research</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="layer" onclick="this.classList.toggle('expanded')">
+          <div class="layer-num">6</div>
+          <div class="layer-header">
+            <div class="layer-title">Intelligence</div>
+            <div class="layer-tagline">Two-tier knowledge: Fact Store + RAG Corpus</div>
+          </div>
+          <div class="layer-expand">▾</div>
+          <div class="layer-details">
+            <div class="detail-description">Where knowledge lives. Facts are certified and instant. RAG is rich and searchable. Never guesses.</div>
+            <div class="details-list">
+              <div class="detail-item">Fact Store (certified)</div>
+              <div class="detail-item">RAG Corpus (rich)</div>
+              <div class="detail-item">Embeddings</div>
+              <div class="detail-item">Vector Index</div>
+              <div class="detail-item">Citation Engine</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="layer" onclick="this.classList.toggle('expanded')">
+          <div class="layer-num">7</div>
+          <div class="layer-header">
+            <div class="layer-title">Evaluation & Feedback</div>
+            <div class="layer-tagline">Grades answers. Signals gaps. Trains the system.</div>
+          </div>
+          <div class="layer-expand">▾</div>
+          <div class="layer-details">
+            <div class="detail-description">Every answer is graded. Feeds back to Router, Sourcing, Product. The system learns.</div>
+            <div class="details-list">
+              <div class="detail-item">Accuracy Grading</div>
+              <div class="detail-item">Coverage Analysis</div>
+              <div class="detail-item">Latency Tracking</div>
+              <div class="detail-item">Clarity Assessment</div>
+              <div class="detail-item">Gap Signaling</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="deep-research">
+        <div class="deep-research-title">
+          <div class="dr-dot"></div>
+          Deep Research
+        </div>
+        <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 12px;">Parallel learning system</p>
+        <div class="deep-research-item">📍 <strong>Runs in background</strong><br>Asynchronous, doesn't block queries</div>
+        <div class="deep-research-item">🔍 <strong>Digs deeper</strong><br>Researches gaps from Eval</div>
+        <div class="deep-research-item">✓ <strong>Verifies</strong><br>Critic-checks findings</div>
+        <div class="deep-research-item">↩️ <strong>Feeds back</strong><br>→ Fact Store or RAG</div>
+        <div class="deep-research-item">🌐 <strong>Cross-domain</strong><br>Works on any RCM problem</div>
+      </div>
+    </div>
+
+    <div class="flow-section">
+      <div class="flow-title">How a Real Question Flows Through All 7 Layers</div>
+
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-text">
+          <div class="label">Operator asks (Layer 1)</div>
+          <div class="detail">"Can FL Medicaid deny for audio-only ADHD telehealth?"</div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-text">
+          <div class="label">Router decides (Layer 2)</div>
+          <div class="detail">Modular prompt + chain-of-thought mode + Facts→RAG strategy</div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-text">
+          <div class="label">Platform Agents coordinate (Layer 3)</div>
+          <div class="detail">Eval checks if this type of question is in scope</div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-text">
+          <div class="label">Domain Agent handles (Layer 4)</div>
+          <div class="detail">Prior Auth Agent retrieves relevant rules</div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-num">5</div>
+        <div class="flow-text">
+          <div class="label">Skills invoked (Layer 5)</div>
+          <div class="detail">Download Skill fetches latest payor policy PDFs</div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-num">6</div>
+        <div class="flow-text">
+          <div class="label">Intelligence answers (Layer 6)</div>
+          <div class="detail">Facts: No exact match. RAG: Finds 3 policies + 2 addenda. Chains them with reasoning.</div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-num">7</div>
+        <div class="flow-text">
+          <div class="label">Eval grades (Layer 7)</div>
+          <div class="detail">✓ Correct. ✓ Good citations. ✓ Fast. Router learns: strategy wins.</div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-num">∞</div>
+        <div class="flow-text">
+          <div class="label">Deep Research (Parallel)</div>
+          <div class="detail">Notices gap. Researches. Verifies. Adds finding to Fact Store for next operator.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="gates-section">
+      <div class="gates-title">The 8 RCM Gates: What Mobius Unlocks</div>
+      <div class="gates-grid">
+        <div class="gate-card">
+          <div class="gate-num">1</div>
+          <div class="gate-name">Claim Closure</div>
+          <div class="gate-status">✅ Live</div>
+        </div>
+        <div class="gate-card">
+          <div class="gate-num">2</div>
+          <div class="gate-name">Denial Management</div>
+          <div class="gate-status">✅ Live</div>
+        </div>
+        <div class="gate-card">
+          <div class="gate-num">3</div>
+          <div class="gate-name">Eligibility</div>
+          <div class="gate-status">✅ Live</div>
+        </div>
+        <div class="gate-card">
+          <div class="gate-num">4</div>
+          <div class="gate-name">Payor Policies</div>
+          <div class="gate-status">✅ Live</div>
+        </div>
+        <div class="gate-card">
+          <div class="gate-num">5</div>
+          <div class="gate-name">Credentialing</div>
+          <div class="gate-status">✅ Live</div>
+        </div>
+        <div class="gate-card">
+          <div class="gate-num">6</div>
+          <div class="gate-name">Appeals / Auth</div>
+          <div class="gate-status">🔨 Building</div>
+        </div>
+        <div class="gate-card">
+          <div class="gate-num">7</div>
+          <div class="gate-name">Coding & Claims</div>
+          <div class="gate-status">🔨 Building</div>
+        </div>
+        <div class="gate-card">
+          <div class="gate-num">8</div>
+          <div class="gate-name">Network Effects</div>
+          <div class="gate-status">📋 Roadmap</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
