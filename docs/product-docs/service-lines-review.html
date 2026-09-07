@@ -296,7 +296,9 @@ td.cd small{display:block;font-weight:400;color:var(--mobius-text-muted)}
   /* A run and its steps. Deliberately quiet: this lives inside Technical details,
      which a reviewer opens only when they want to know how an answer was reached. */
   .throw{display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .srcbar{display:flex;align-items:center;gap:6px}
+  .srccard{border-color:color-mix(in srgb,var(--mobius-accent) 35%,var(--mobius-border))}
+  .srcbar{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+  .srccard .throw{gap:var(--mobius-space-md);flex-wrap:wrap}
   .mini{font-size:var(--mobius-text-xs);color:var(--mobius-text-muted)}
   .sel{font:inherit;font-size:12px;padding:4px 6px;border-radius:8px;
     border:1px solid var(--mobius-border);background:var(--mobius-bg-card);
@@ -629,6 +631,32 @@ function draw(){
     '<div class="kpi"><span>Needs a source</span><b>'+l.toSource+'</b></div>'+
     '<div class="kpi"><span>Modules behind</span><b>'+behindN+'</b></div></div>';
 
+  /* Starting a run is the PRIMARY action for a service that still has unsourced
+     requirements, so it sits here — above the fold, nothing to expand. It was inside
+     Technical details, collapsed, below 2,000px of cards; the button rendered but
+     offsetParent was null, which is a control that exists and cannot be found.
+     The step HISTORY stays in Technical details. Doing the work and reviewing what the
+     work did are different jobs. */
+  h += '<section class="card srccard">'+
+    '<div class="pad">'+
+      '<div class="throw">'+
+        '<div><strong>'+(l.toSource
+            ? l.toSource+' requirement'+(l.toSource===1?'':'s')+' with no source yet'
+            : 'Every requirement here has a source')+'</strong>'+
+          '<div class="hint2">'+(l.toSource
+            ? 'Ask the policy documents for the missing answers. Every step is recorded.'
+            : 'You can still re-ask to check the answers against the documents again.')+
+          '</div></div>'+
+        '<span class="srcbar">'+
+          '<label class="mini" for="srcprof">Answer using</label>'+
+          '<select class="sel" id="srcprof"></select>'+
+          '<button class="btn-src btn pri" data-src="'+esc(l.id)+'">Source this service</button>'+
+        '</span>'+
+      '</div>'+
+      '<div id="srcnote" class="hint2"></div>'+
+      '<ol class="steps live" id="srclive" hidden></ol>'+
+    '</div></section>';
+
   /* Where the service comes from. NOT technical — a reviewer needs the rule and
      the documents in front of them, which is why they moved out of the folded
      panel and up here, open. */
@@ -695,18 +723,10 @@ function draw(){
           (m.why?'<div class="hint2">'+esc(m.why)+'</div>':'')+'</dd>';
       }).join("")+'</dl></div>'+
     '<div class="pad" style="border-top:1px solid var(--mobius-border)">'+
-      '<div class="throw"><h3 class="th">Sourcing</h3>'+
-        '<span class="srcbar">'+
-          '<label class="mini" for="srcprof">Answer using</label>'+
-          '<select class="sel" id="srcprof"></select>'+
-          '<button class="btn-src" data-src="'+esc(l.id)+'">Source this service</button>'+
-        '</span></div>'+
-      '<div id="srcnote" class="hint2"></div>'+
-      '<ol class="steps live" id="srclive" hidden></ol>'+
+      '<h3 class="th">Sourcing history</h3>'+
       (l.runs.length ? l.runs.map(runBlock).join("")
-        : '<p class="hint2">This service has not been sourced yet. '+
-          'Starting a run asks the policy documents for each missing answer, '+
-          'and every step is recorded below.</p>')+
+        : '<p class="hint2">No runs yet. Use <em>Source this service</em> at the top of '+
+          'this page; every step will be recorded here.</p>')+
     '</div>'+
     '<div class="pad" style="border-top:1px solid var(--mobius-border)">'+
       '<h3 class="th">Search terms</h3><dl class="tech">'+
