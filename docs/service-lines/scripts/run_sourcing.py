@@ -354,6 +354,22 @@ def serve(poll_s=5, who=None):
     conn, cur = db()
     print(f"worker {who} — polling every {poll_s}s, Ctrl-C to stop")
     seen_idle = False
+    claimed_n = 0
+
+    def beat(note=None):
+        """Say we are alive on every poll, not only when we take work.
+
+        The API used to infer a listening worker from sourcing_run.claimed_at, so an
+        idle worker — the healthiest state there is — reported as absent and the surface
+        told the user to start one that was already running.
+        """
+        cur.execute("""insert into service_line.worker_heartbeat (worker, beat_at, claimed, note)
+                       values (%s, now(), %s, %s)
+                       on conflict (worker) do update
+                         set beat_at=now(), claimed=excluded.claimed, note=excluded.note""",
+                    (who, claimed_n, note))
+
+    beat("started")
     while True:
         cur.execute("""update service_line.sourcing_run
                           set status='running', claimed_at=now(), claimed_by=%s
@@ -366,12 +382,15 @@ def serve(poll_s=5, who=None):
                     (who,))
         row = cur.fetchone()
         if not row:
+            beat("idle")
             if not seen_idle:
                 print("  idle — waiting for a request from the surface")
                 seen_idle = True
             time.sleep(poll_s)
             continue
         seen_idle = False
+        claimed_n += 1
+        beat(f"running {row['line_key']}")
         print(f"\nclaimed {row['id']} ({row['line_key']}) requested by {row['requested_by']}")
         try:
             run(row["line_key"], row["requested_by"], row["requested_limit"],
@@ -382,6 +401,7 @@ def serve(poll_s=5, who=None):
             cur.execute("""update service_line.sourcing_run
                               set status='failed', finished_at=now(), note=%s
                             where id=%s""", (str(exc)[:400], row["id"]))
+        beat("idle")
 
 
 if __name__ == "__main__":
