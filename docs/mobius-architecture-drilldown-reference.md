@@ -68,6 +68,88 @@
 
 ---
 
+### Interact (Web-Interaction Engine & Demos)
+- **What it is** — Reusable instruction schema for guided demos (show-me walkthroughs) + RPA on external sites (future)
+- **Status** — 🔒 FROZEN (design-only, interact.v1)
+- **Owner** — Interact Agent (not yet kicked off)
+- **Links to:**
+  - **Spec** → `docs/interact-agent-spec.md` (complete design, P1-P4 phases)
+  - **Code** → `mobius-interact/` (awaiting agent kickoff)
+- **What It Does:**
+  - **Guided demos (P1-P3)** — Product-awareness feeds show-me-how scripts → Interact runs them step-by-step (find → highlight → click → type → wait → read)
+  - **Modes:** `guide` (user performs actions), `narrate` (engine performs with captions), `auto` (full speed, returns data)
+  - **RPA on external sites (P4, gated)** — Same schema, executed on payor portals (e.g., check prior-auth on Sunshine)
+- **Schema (interact.v1):**
+  ```yaml
+  script:
+    schema: interact.v1
+    id: chat:upload-a-document          # namespace:slug
+    title: Upload a document to chat
+    mode: guide                         # guide | narrate | auto
+    surface: mobius-chat                # target app
+    permissions: []                     # empty for guide; required for auto+external
+    preconditions:
+      - selector: "[data-tour-id=composer-input]"
+    steps:
+      - find: "[data-tour-id=composer-attach]"    # anchor via data-tour-id first
+        action: highlight
+        caption: "This paperclip attaches a document"
+      - find: "[data-tour-id=composer-attach]"
+        action: click
+        wait_for: "[data-tour-id=composer-attachment-chip]"
+  
+  interact_runs (PG):
+  ├── id (UUID)
+  ├── script_id
+  ├── mode (guide|narrate|auto)
+  ├── surface
+  ├── status (completed|failed|aborted)
+  ├── per_step_outcomes (JSONB)
+  ├── duration_ms
+  ├── run_at
+  
+  scripts (PG):
+  ├── id (namespace:slug)
+  ├── title
+  ├── schema_version (interact.v1)
+  ├── mode
+  ├── surface
+  ├── steps (JSONB)
+  ├── permissions (ARRAY)
+  ├── published_by
+  ├── published_at
+  ├── updated_at
+  ```
+- **API:**
+  ```
+  GET /scripts/{id}              → fetch validated script
+  POST /scripts                  → publish script (product-awareness, later payor-registry)
+  POST /validate                 → validate schema
+  Runtimes:
+    - In-page runner (interact-runner.js, <10KB, no deps)
+    - External driver (Playwright, later, P4 gated)
+  ```
+- **Why It's Frozen:**
+  - Design phase only (P1-P3 stable, P4 awaiting PHI gate contract)
+  - Awaiting Interact Agent kickoff (not yet started)
+  - Depends on Chat v2 refactor for full integration
+- **Phases to Ship:**
+  - **P1:** Validator + schema tests → done
+  - **P2:** In-page runner + first demo (upload-a-document) → chat integration
+  - **P3:** Five demand-ranked demos + narrate mode → anchor audit
+  - **P4 (gated):** auto mode + external driver → Sunshine prior-auth (requires PHI gate)
+- **Known Issues:**
+  - No code yet (design-only)
+  - External RPA hard-disabled until enablement
+  - P4 requires PHI gate contract before build
+- **Roadmap:**
+  - Agent kickoff: estimated Q4 2026
+  - P1 acceptance: schema + validator
+  - P2 acceptance: demo runs end-to-end
+  - P3-P4: demand-ranked, phased
+
+---
+
 ## **LAYER 2: ROUTER & OPTIMIZER**
 
 ### Prompt Composer
