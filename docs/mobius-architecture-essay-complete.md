@@ -13,7 +13,28 @@ A network of 34 independent healthcare organizations processes $1B+ in claims an
 
 ---
 
-## The Architecture: 7 Layers + Deep Research
+## The Architecture: 7 Layers + Sourcing Pipeline + Deep Research
+
+### **Pre-Layer 0: Sourcing & Ingestion Pipeline**
+
+*How knowledge gets into the system.*
+
+The sourcing pipeline is the foundation. Raw documents flow through this pipeline to become indexed intelligence:
+
+1. **Sourcing Agent** — Web scraping payor websites, regulatory PDFs, provider manuals. Classifies documents by type (fee schedule, policy, manual, addendum).
+2. **Extraction** — Tables and sections parsed from PDFs. Table capture identifies structure; section parsing extracts semantic blocks.
+3. **Chunking & Curation** — Documents split into chunks with preserved context. Metadata enrichment (payor, service line, doc type, temporal validity).
+4. **Tagging with Lexicon** — Chunks tagged using controlled vocabulary. Service-line taxonomy, coverage codes, precedence rules. Tag-selectivity loop ensures balanced coverage.
+5. **Embedding & Indexing** — Chunks embedded (768-dim, text-embedding-004). Vectors indexed in pgvector for semantic search.
+6. **Publishing** — Chunks published to RAG corpus + Fact Store candidates. Deep Research feeds verified facts into Fact Store.
+
+**Key Component: Lexicon Module**
+- Service-line taxonomy (BH/integrated care/RCM)
+- Tag vocabulary (coverage, timing, provider type, etc.)
+- Tag-selectivity metrics (ensure no tag has > N chunks)
+- Service-line axis (j:service_line tag per chunk)
+
+This pipeline FEEDS INTO Layer 6 (Intelligence). No intelligence exists without sourcing.
 
 ### **Layer 1: Surfaces**
 
@@ -229,9 +250,18 @@ Surfaces, agents, skills are all independent. Add a new surface, agent, or skill
 
 Each layer enables gates:
 
-- **Tiers A–B (Gates 1–5):** Live today. Chat + RAG answering policy questions. Denials detected. Claims closed faster.
-- **Tier B→C (Gates 6–7):** Building now. Appeals automated. Coding standardized.
-- **Tier C (Gate 8):** Roadmap. Collective rate negotiation. 34 centers operating as one.
+- **Tiers A–B (Gates 1–5):** ✅ Live today. Chat + RAG answering policy questions. Denials detected. Claims closed faster. Observer running since 2026-07-26.
+- **Tier B→C (Gates 6–7):** 🔨 Building now. Appeals automation (active refactoring). Coding standardization in progress.
+- **Tier C (Gate 8):** 📋 Roadmap. Collective rate negotiation. 34 centers operating as one.
+
+---
+
+## **Status Clarifications**
+
+- **Observer Agent:** ✅ Live and running (not blocked on calibration as previously stated). Drives production grading.
+- **instant-rag:** ⏸️ Deprecated (2026-07-09). Decommissioning in progress. Phasing out from specs.
+- **Vault:** Split into Skill (✅ Live) and Service carve-out (🔨 Building standalone deployment).
+- **Answer Cache:** 📋 Planned (Phase 0 design only, not yet deployed).
 
 ---
 

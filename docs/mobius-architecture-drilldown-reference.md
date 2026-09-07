@@ -3,6 +3,149 @@
 
 ---
 
+## **PRE-LAYER 0: SOURCING & INGESTION PIPELINE**
+### Foundation: How knowledge gets into the system
+
+Raw documents → Indexed Intelligence. This pipeline FEEDS INTO Layer 6 (Intelligence).
+
+### Sourcing Agent
+- **What it is** — Web scraping, document classification, corpus building
+- **Status** — ✅ Live
+- **Owner** — Sourcing Agent (me, Retriever Agent)
+- **Links to:**
+  - **Code** → `mobius-rag/src/sourcing/`
+  - **Spec** → `docs/sourcing-agent-spec.md`
+  - **Output** → `mobius_rag.raw_documents` (PG) + `mobius_rag.extraction_jobs`
+- **Schema:**
+  ```
+  raw_documents (PG)
+  ├── id (UUID)
+  ├── source_url (TEXT)
+  ├── payor_id (FK)
+  ├── doc_type (fee_schedule|policy|manual|addendum)
+  ├── title (TEXT)
+  ├── content (TEXT)
+  ├── hash (md5)
+  ├── status (raw|extracted|classified|chunked|published)
+  ├── scraped_at
+  
+  extraction_jobs (PG)
+  ├── id (UUID)
+  ├── document_id (FK)
+  ├── status (queued|processing|completed|failed)
+  ├── extracted_tables (INT)
+  ├── extracted_sections (INT)
+  ├── completed_at
+  ```
+- **Known Issues** → Web scrape verification brittle; robots.txt compliance gap
+- **Roadmap** → Distributed scraper, JavaScript-heavy site support
+
+---
+
+### Extraction Service
+- **What it is** — Table capture and section parsing from PDFs
+- **Status** — ✅ Live (embedded in Curation Agent)
+- **Owner** — Curation Agent
+- **Links to:**
+  - **Code** → `mobius-rag/src/curation/extraction.py`
+  - **Spec** → `docs/table-extraction-spec.md`
+- **Capabilities:**
+  - Table identification + structure extraction
+  - Section boundary detection (policy sections, definitions, precedent)
+  - OCR fallback for image-based content
+- **Schema:** Outputs to `extraction_jobs` (see Sourcing Agent)
+- **Known Issues** → Complex table layouts sometimes misdetected; images without OCR lost
+- **Roadmap** → Improved layout detection, OCR speed optimization
+
+---
+
+### Curation & Lexicon Module
+- **What it is** — Chunking, tagging with controlled vocabulary, metadata enrichment
+- **Status** — ✅ Live
+- **Owner** — Curation Agent (me, Retriever Agent)
+- **Links to:**
+  - **Code** → `mobius-rag/src/curation/`
+  - **Spec** → `docs/curation-agent-spec.md`
+  - **Lexicon** → `docs/lexicon/` (service-line taxonomy, tag vocabulary)
+- **Lexicon Module Details:**
+  ```
+  Service-Line Taxonomy:
+  ├── BH (Behavioral Health)
+  ├── Integrated Care
+  └── RCM (Revenue Cycle Management)
+  
+  Tag Vocabulary:
+  ├── d (document type: policy, fee_schedule, manual)
+  ├── p (coverage: covered, non_covered, requires_auth)
+  ├── j (service_line: BH, integrated, rcm)
+  ├── c (temporal: effective_date, expiry, precedence)
+  └── [custom per payor]
+  
+  Tag-Selectivity Loop:
+  ├── Per tag, target pool size (e.g., 1000 chunks)
+  ├── Monitor tagging quality (precision/recall per tag)
+  ├── Rebalance if tag pool too large/small
+  └── Metric: coverage_per_tag (prevent tag explosion)
+  ```
+- **Schema:**
+  ```
+  chunks (PG)
+  ├── id (UUID)
+  ├── document_id (FK)
+  ├── sequence_num (INT)
+  ├── content (TEXT)
+  ├── metadata (JSONB): {payor_id, service_line, doc_type}
+  ├── created_at
+  
+  chunk_tags (PG)
+  ├── chunk_id (FK)
+  ├── tag_name (TEXT)
+  ├── confidence (FLOAT)
+  ├── assigned_by (LLM|human)
+  ├── created_at
+  
+  tag_selectivity (PG)
+  ├── tag_name
+  ├── total_chunks (INT)
+  ├── pool_size (INT) [target]
+  ├── tagging_quality (FLOAT)
+  └── recall (FLOAT)
+  ```
+- **Known Issues** → Tagging quality varies by tag; chunk size inconsistent; tag-selectivity loop not fully tuned
+- **Roadmap** → Per-payor chunk strategies, improved tagging quality, tag balance automation
+
+---
+
+### Publishing & Indexing
+- **What it is** — Embedding chunks, indexing vectors, publishing to RAG corpus
+- **Status** — ✅ Live
+- **Owner** — Curation Agent (embedding + indexing) + Payor Platform Agent (Fact Store publishing)
+- **Links to:**
+  - **Code** → `mobius-rag/src/curation/publish.py`
+  - **Embedding Model** → text-embedding-004 (768-dim, OpenAI)
+- **Schema:**
+  ```
+  chunk_embeddings (pgvector)
+  ├── chunk_id (FK)
+  ├── embedding (vector(768))
+  ├── model_name (text-embedding-004)
+  ├── created_at
+  
+  rag_corpus_published (BQ)
+  ├── chunk_id
+  ├── document_id
+  ├── payor_id
+  ├── service_line
+  ├── content
+  ├── embedding (768-dim)
+  ├── published_at
+  └── [denormalized for fast retrieval]
+  ```
+- **Known Issues** → Overlap between 22q chunks (deduplication needed); re-ranking not yet live
+- **Roadmap** → Deduplication via content-digest, re-ranking model, batch publishing optimization
+
+---
+
 ## **LAYER 1: SURFACES**
 
 ### Chat Interface
@@ -70,11 +213,11 @@
 
 ### Interact (Web-Interaction Engine & Demos)
 - **What it is** — Reusable instruction schema for guided demos (show-me walkthroughs) + RPA on external sites (future)
-- **Status** — 🔒 FROZEN (design-only, interact.v1)
-- **Owner** — Interact Agent (not yet kicked off)
+- **Status** — 🔨 BUILDING (P1 complete, P2-P4 awaiting implementation)
+- **Owner** — Interact Agent (design complete, implementation in progress)
 - **Links to:**
   - **Spec** → `docs/interact-agent-spec.md` (complete design, P1-P4 phases)
-  - **Code** → `mobius-interact/` (awaiting agent kickoff)
+  - **Code** → `mobius-interact/` (12 commits, 24 files: schema.py, validator.py, tests)
 - **What It Does:**
   - **Guided demos (P1-P3)** — Product-awareness feeds show-me-how scripts → Interact runs them step-by-step (find → highlight → click → type → wait → read)
   - **Modes:** `guide` (user performs actions), `narrate` (engine performs with captions), `auto` (full speed, returns data)
@@ -143,10 +286,28 @@
   - External RPA hard-disabled until enablement
   - P4 requires PHI gate contract before build
 - **Roadmap:**
-  - Agent kickoff: estimated Q4 2026
-  - P1 acceptance: schema + validator
-  - P2 acceptance: demo runs end-to-end
-  - P3-P4: demand-ranked, phased
+  - P2 implementation: in-page runner + first demo
+  - P3: Five demand-ranked demos + narrate mode
+  - P4 (gated): auto mode + external driver (Sunshine prior-auth pilot)
+
+---
+
+### instant-rag (Deprecated)
+- **What it is** — Upload → Vault → promotion (instant RAG ingest for user documents)
+- **Status** — ⏸️ DEPRECATED (2026-07-09, decommissioning in progress)
+- **Owner** — (Archived)
+- **Why deprecated:**
+  - Zero ingest/POST traffic for 30 days (as of 2026-07-09)
+  - Replaced by Vault carve-out with better architecture
+  - Still referenced in code but no longer active
+- **Links to:**
+  - **Deprecation notice** → `DEPRECATED.md` (in instant-rag/)
+  - **Decommissioning plan** → 6 stages outlined; 2 complete
+- **Status:**
+  - Phase 1-2: ✅ Complete (customer notification, endpoint sunset)
+  - Phase 3-6: 🔨 In progress (data migration, service cleanup)
+- **Known Issues** → Still appears in environment configs and skill references (causing confusion)
+- **Roadmap** → Full decommissioning by Q4 2026; use Vault instead
 
 ---
 
@@ -377,6 +538,42 @@
   ```
 - **Known Issues** → Grader model lag (3-hour batch), real-time grading needed
 - **Roadmap** → Real-time online grading, per-domain eval
+
+---
+
+### Observer Agent
+- **What it is** — Per-slot verdicts: tracks what each query slot (Facts/RAG/Web/Reasoning) returned, confidence, and accuracy
+- **Status** — ✅ Live (running since 2026-07-26, NOT blocked as previously stated)
+- **Owner** — Observer Agent
+- **Links to:**
+  - **Code** → `mobius-rag/src/eval/observer.py`
+  - **Spec** → `docs/observer-agent-spec.md`
+- **What it tracks:**
+  - Per-slot verdict (did this slot return correct answer?)
+  - Confidence scores from each strategy
+  - Ranking of strategies by accuracy
+  - Slot interactions (when one slot triggers another)
+- **Schema:**
+  ```
+  slot_verdicts (BQ)
+  ├── run_id (UUID)
+  ├── slot (a|b|c|d) [Facts|RAG|Web|Reasoning]
+  ├── returned_answer (TEXT)
+  ├── verdict (correct|partial|wrong|abstained)
+  ├── confidence (FLOAT)
+  ├── latency_ms (INT)
+  ├── executed_at
+  
+  slot_performance (BQ)
+  ├── date
+  ├── slot
+  ├── accuracy (FLOAT)
+  ├── avg_latency_ms
+  ├── abstention_rate (FLOAT)
+  └── cost_tokens (INT)
+  ```
+- **Known Issues** — None currently known; running reliably in production
+- **Roadmap** → Calibration model refinement, per-payor slot tuning
 
 ---
 
