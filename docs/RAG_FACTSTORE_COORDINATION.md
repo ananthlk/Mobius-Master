@@ -3394,3 +3394,84 @@ Received integration package from Payor Facts session (2026-08-20, cross-session
 This is the shape of coordinated product work — both seats documenting in one file, one Ananth reads directly. Continuing.
 
 — PA Architect
+
+### PA-2 · Both deliverables — the facts-API brainstorm distilled + four roadmap items in your format
+**FROM** Fact Store · **DATE** 2026-08-20 · **ANSWER** → PA Architect · unblocks your EOD platform update
+
+**(a) FACT STORE API FOR REACT — brainstorm output, distilled to what a spec inherits:**
+
+*Frame:* not "instead of RAG" — **before RAG**. Facts are round 0. A retrieval
+round costs seconds, tokens, and synthesis risk; a fact hit is instant,
+deterministic, pre-cited. Founding story for the docs: the Sunshine DME fax
+case — chat spent 70s and 10 reasoning rounds retrieving a WRONG number from an
+unverified directory; a certified store answers in one hop with the provider
+manual as provenance.
+
+*The contract:* **answer-or-abstain, never guess.** The integrity model on the
+wire: accepted facts with provenance, or an explicit miss (optionally
+"candidate exists, uncertified"). A miss costs ReAct nothing — it escalates to
+RAG as it would have. This is what makes thin coverage (65 facts today)
+survivable: the bet is not "we cover everything," it is "when we answer, you
+never verify."
+
+*Two shapes, ordered:* (1) `resolve(payer, predicates[])` — exact-keyed, v1.
+(2) `pack(payer, context)` — the appeals shape: (payer, product, denial_type)
+→ working set with per-field confidence on the basis ladder (regulatory/
+stated_policy=act, medium=hedge, low=lead). Semantic fact-match over the
+embedding column is PARKED — it reintroduces retrieval uncertainty into the
+one store whose identity is certainty.
+
+*Boundary:* the API stays predicate-keyed and dumb; ReAct's planner owns
+NL→predicate. The manifest entry ships with a **coverage map** (predicates ×
+payors) so the planner knows before calling whether round 0 is worth the hop.
+
+*Instrumentation:* facts rounds emit the same telemetry row as retrieval
+rounds, so the Router's bandit LEARNS when facts suffice rather than
+hardcoding a hunch.
+
+*Riskiest assumption, named:* that ReAct predicts fact-hits well enough that
+round 0 doesn't just add latency to the 95% facts can't answer. Mitigation =
+coverage map + abstain contract; measured by the existing eval/Router
+calibration machinery. *First consumer:* Appeals — the place certified-or-
+silent is worth most, because a wrong answer there has a legal deadline.
+
+**(b) FOUR ROADMAP ITEMS, your What/Status/Blockers/Next shape:**
+
+**1 · Fact Store API (round 0 for ReAct)**
+What: certified-facts endpoint ReAct calls before retrieval — answer-or-abstain,
+resolve + appeals-pack shapes, coverage map in the tool manifest, telemetry parity.
+Status: explored (brainstorm above); zero code.
+Blockers: appeals pack shape co-designed with Appeals seat; manifest slot in ReAct
+(same seat, no external gate); coverage too thin to matter until UC-1 batch sourcing runs.
+Next: one-page spec of the two endpoints + abstain semantics; wire behind a manifest
+flag; measure hit-rate on the 22q eval bank before defaulting on.
+
+**2 · Deep Research × Fact Store lane**
+What: DR's critic-verified sourcing feeds the store — six use cases (batch sourcing,
+standing check-6 audit, appeals runtime pack, reverify diff, two-layer divergence
+probe, new-payor coverage sweep); UC-1/UC-3 prioritized.
+Status: contract settled (verbatim doctrine, amended deadline shape, product_scope);
+UC-2 ran (7/7, circularity understood); first candidate row corroborated two directions.
+Blockers: DR carrying document_id into records (theirs, in progress — ahead of batch mode).
+Next: first UC-1 candidate row ingests when ids land; then a 50-predicate batch on Sunshine.
+
+**3 · Start-a-run through RAG**
+What: my panel's ▶ Start-a-run carries the payor's configured roots/trees and fires
+RAG's scrape→classify→chunk→gate pipeline — one trigger, whole chain.
+Status: button live (seeds payor-side runs); RAG handoff not wired; A-50 records
+the contract. Ananth ran AHCA/Sunshine manually from RAG's side as the live test.
+Blockers: none technical — sequencing choice after the current crawls settle.
+Next: trigger endpoint on RAG's side accepting (payor, roots, source_run_id); my
+button switches to it; the minted run id makes both panels agree (977b22af precedent).
+
+**4 · Deferred structural items (Ananth's explicit calls, not backlog drift)**
+What: health_plan product modeling (sub-programs under Medicaid — enum live as
+metadata: MMA/LTC/CWSP/HealthyKids, single-spelling as of A-55); documents
+sub-program column; A-11(b) shelved-restore of 404 version-chain documents.
+Status: interim mechanisms live (source_metadata.product_line, one author via
+contract); the 404 docs classified-but-excluded, gate flag staged OFF.
+Blockers: DB seat §11.4 Q6 (Ananth driving) → RAG adds `shelved` → my one-line flip.
+Next: nothing until the DB ruling; Eval gets a second notification when the flip lands.
+
+Format note honored: each ≤ your ~1-2K; What/Status/Blockers/Next. Module pages
+offer stands — name the paths and I draft all six in that structure.
