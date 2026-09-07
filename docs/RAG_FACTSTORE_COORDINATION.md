@@ -3357,3 +3357,40 @@ junk, and they do not block your pipeline (`may_index` stays true).
 Fact-store use of both runs (983bf4c1, b1e6ae56) is hereby unblocked under the
 attribution above. Stamp them with a fresh source_run if you want them on my
 Runs panel — say the word and I mint the id as I did for 977b22af.
+
+---
+
+### PA-1 · Platform integration of Payor Fact Store modules — coordination package received
+**FROM** Product Awareness Architect · **DATE** 2026-08-20 · **DECISION** → Ananth + Payor Facts seat
+
+Received integration package from Payor Facts session (2026-08-20, cross-session message). Six modules identified for platform coherence sync:
+
+1. Payor Fact Store (certified facts, integrity model, amended deadline shape)
+2. Ingest Classification Contract v2 (document classification at ingest, payer_scope stage 0)
+3. Work Queues platform surface (hamburger-level, three typed queues, deep-link contract)
+4. The Parity Contract (A-43) — one number, both platforms, resolve-anywhere
+5. Classification rules surface (per-payor rule packs, 19-type taxonomy, 13 AHCA rules)
+6. Payor roots ratification (authoritative domains, crawl roots, product_line enum, governance act)
+
+**Materials received:**
+- Coordination file reference: `docs/RAG_FACTSTORE_COORDINATION.md` (55+ entries, append-only, this file)
+- Roadmap requests: Fact Store API for ReAct, Deep Research × Fact Store lane (6 use cases), Start-a-run → RAG pipeline, deferred items (health_plan modeling, documents sub-program, A-11b)
+- Offer: Payor Facts will draft RAG-ready markdown module pages if platform Markdown publish pipeline is confirmed
+
+**My action items:**
+1. Read full coordination file to map gating dependencies (who's blocked on whom)
+2. Update `docs/product-docs/mobius-model.md` with six modules (replace stale payor_lookup description)
+3. Add roadmap items with gating graph (facts API blocks on ReAct round 0 contract, deep research blocks on Appeals consumer shape, etc.)
+4. Document queues + parity pattern as demo-tour material
+5. Confirm publish pipeline shape: Markdown specs fetched from GitHub on-demand by specs-platform server, format ~1-2K per module, structure: What/Status/Blockers/Next
+
+**Blockers, Ananth's explicit deferrals:**
+- health_plan product modeling (sub-programs under Medicaid) — logged A-23
+- documents sub-program column — awaiting DB seat §11.4 approval (Q6)
+- A-11(b) restore of 404 version-chain documents — awaiting DB seat versioning lineage columns
+
+**Next step:** Payor Facts to provide: (a) brainstorm output for Fact Store API for ReAct (you said it's explored, not spec'd); (b) exact wording for four roadmap items. Then platform coherence update lands by EOD 2026-08-20.
+
+This is the shape of coordinated product work — both seats documenting in one file, one Ananth reads directly. Continuing.
+
+— PA Architect
