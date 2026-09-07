@@ -146,6 +146,74 @@ def targets(cur, line_key, only_unsourced=True, limit=None):
     return [dict(r) for r in cur.fetchall()]
 
 
+def file_finding(cur, requirement_id, request_id):
+    """Write the answer back into the registry. Without this, sourcing sources nothing.
+
+    Every run so far produced findings and left them in research.*: four requirements on
+    bh_overlay still read sourced=False, origin='asserted' — our own placeholder wording —
+    after two of them came back `stated` with fifteen judge-kept fields citing 59G-4.027
+    itself. The stream said the work happened; the registry, which is the thing anyone
+    actually queries, had never heard of it.
+
+    Refuses to overwrite a value a person has already decided on. A human review is the
+    one input a re-run must not silently discard.
+    """
+    # The column is `state`; `review_state` is the view's name, not a column in it.
+    # Written against the wrong shape first, which would have thrown on every filing —
+    # the guard protecting human decisions must not be the thing that breaks.
+    cur.execute("""select state from service_line.review_state
+                    where subject_kind='requirement' and subject_id=%s""",
+                (str(requirement_id),))
+    seen = cur.fetchone()
+    if seen and (seen.get("state") or "unreviewed") != "unreviewed":
+        return "held: a person has already decided this one"
+
+    cur.execute("""select outcome, evaluator_verdict, source_document, source_page
+                     from research.attempt
+                    where request_id=%s and outcome='extracted'
+                    order by round desc, id desc limit 1""", (request_id,))
+    a = cur.fetchone()
+    if not a:
+        return None
+    v = a["evaluator_verdict"] or {}
+    kept = ((v.get("critique") or {}).get("kept") or [])
+    if not kept:
+        return None
+
+    # The statement a person reads. Values, in the order the extractor found them,
+    # deduplicated — several fields commonly quote one sentence.
+    seen_v, parts = set(), []
+    for f in kept:
+        val = f.get("value")
+        if isinstance(val, bool) or str(val).lower() in ("true", "false"):
+            # A bare "true" is not a statement anybody can review. The slot name says
+            # what the boolean is ABOUT, and the quote says it in the document's words —
+            # prior_authorization filed as the single word "true" is the value, not the
+            # finding.
+            said = f.get("name", "").replace("_", " ")
+            yes = str(val).lower() == "true"
+            txt = (f.get("quote") or "").strip() or \
+                  f"{said.capitalize()} is {'required' if yes else 'not required'}."
+        elif isinstance(val, list):
+            txt = ", ".join(str(x) for x in val)
+        else:
+            txt = str(val)
+        txt = (txt or "").strip()
+        if txt and txt not in seen_v:
+            seen_v.add(txt)
+            parts.append(txt)
+    statement = "; ".join(parts)[:4000]
+    doc = next((f.get("document") for f in kept if f.get("document")), a["source_document"])
+
+    cur.execute("""update service_line.standard_requirement
+                      set statement=%s, sourced=true, source_ref=%s,
+                          -- a model read this out of a policy: interpreted, never
+                          -- 'parsed', which means it came from a structured source
+                          origin='interpreted'
+                    where id=%s""", (statement, doc, requirement_id))
+    return f"filed {len(kept)} field(s) from {doc}"
+
+
 def _source_all(cur, run_id, line, line_key, gov, reqs, profile, max_rounds):
     """Ask one question per requirement, in order, recording every step.
 
@@ -239,13 +307,17 @@ def _source_all(cur, run_id, line, line_key, gov, reqs, profile, max_rounds):
         elif state != "error":
             cur.execute("update research.request set status='escalated' where id=%s", (pre_id,))
 
+        filed = file_finding(cur, r["id"], pre_id) if state == "extracted" else None
+        if filed:
+            print(f"        {filed}", flush=True)
         cur.execute("""select outcome, source_document from research.attempt
                         where request_id=%s order by round desc, id desc limit 1""", (pre_id,))
         last = cur.fetchone() or {}
         emit(cur, run_id, "request_settled",
              {"requirement_id": r["id"], "request_id": pre_id, "state": state,
               "turns": rounds, "outcome": last.get("outcome"),
-              "document": last.get("source_document"), "model_profile": profile},
+              "document": last.get("source_document"), "model_profile": profile,
+              "filed": filed},
              note, seq)
         print(f"        -> {state} in {rounds} turn(s)"
               f"{' — ' + note[:80] if note else ''}", flush=True)
