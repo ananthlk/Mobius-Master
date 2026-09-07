@@ -235,7 +235,7 @@ def main():
             events = [{"at": str(e[0])[11:19], "source": e[1], "kind": e[2],
                        "seq": e[3], "text": e[4], "data": e[5]} for e in cur.fetchall()]
             cur.execute("""select m.seq, m.requirement_type, m.code, p.finding, p.gap_class,
-                                  p.repair_owner, p.quote, p.source_document, p.confidence
+                                  p.repair_owner, p.quote, p.source_document, p.citation
                              from service_line.sourcing_run_member m
                              left join service_line.requirement_provenance p
                                     on p.request_id = m.request_id
@@ -243,7 +243,11 @@ def main():
             tasks = [{"seq": t[0], "about": (t[1] or "").replace("_", " "), "code": t[2],
                       "finding": t[3], "gap": t[4], "owner": t[5], "quote": t[6],
                       "document": t[7],
-                      "confidence": float(t[8]) if t[8] is not None else None}
+                      # Registry's own corpus verdict on the citation, never the
+                      # producer's word for it. 88 of 97 kept field quotes point at
+                      # something a reviewer cannot follow; the surface must say so
+                      # beside the quote rather than presenting it as evidence.
+                      "citation": t[8]}
                      for t in cur.fetchall()]
             runs.append({"id": str(rr[0]), "by": rr[1], "status": rr[2], "tasks": rr[3],
                          "started": str(rr[4])[:16], "finished": str(rr[5])[:16] if rr[5] else None,

@@ -1497,7 +1497,7 @@
               "owner": null,
               "quote": null,
               "document": null,
-              "confidence": null
+              "citation": null
             }
           ]
         },
@@ -14932,31 +14932,27 @@
           "last": "2026-09-07 00:35"
         }
       ],
-      "state_machine": [],
+      "state_machine": [
+        {
+          "ref": 77,
+          "state": "open",
+          "about": "place of service",
+          "rounds": 1,
+          "gap": null,
+          "finding": null,
+          "owner": null
+        }
+      ],
       "runs": [
         {
           "id": "d0c0dde0-1088-4a44-b32f-133d44b19603",
           "by": "ananth",
-          "status": "running",
+          "status": "finished",
           "tasks": 1,
           "started": "2026-09-07 15:12",
-          "finished": null,
+          "finished": "2026-09-07 15:14",
           "note": null,
           "events": [
-            {
-              "at": "15:08:18",
-              "source": "deep_research",
-              "kind": "turn_running",
-              "seq": 1,
-              "text": null,
-              "data": {
-                "n": 1,
-                "note": null,
-                "query": "For Florida Medicaid: In which place-of-service settings may Targeted Case Management for Children at Risk of Abuse and Neglect be delivered and billed? The governing rule is 59G-4.310. Quote the governing policy text and name the source document.",
-                "next_query": null,
-                "extract_state": "pending"
-              }
-            },
             {
               "at": "15:12:53",
               "source": "registry",
@@ -15002,6 +14998,29 @@
                 "requirement_id": 74,
                 "requirement_type": "place_of_service"
               }
+            },
+            {
+              "at": "15:14:52",
+              "source": "registry",
+              "kind": "error",
+              "seq": 1,
+              "text": "place_of_service failed to run.",
+              "data": {
+                "error": "Anthropic API error 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CepJEUbrFpdDrd9WfVDar\"}",
+                "requirement_id": 74
+              }
+            },
+            {
+              "at": "15:14:52",
+              "source": "registry",
+              "kind": "run_finished",
+              "seq": null,
+              "text": null,
+              "data": {
+                "counts": {
+                  "undiagnosed": 1
+                }
+              }
             }
           ],
           "items": [
@@ -15014,7 +15033,7 @@
               "owner": null,
               "quote": null,
               "document": null,
-              "confidence": null
+              "citation": "uncited"
             }
           ]
         },
@@ -15121,7 +15140,7 @@
               "owner": null,
               "quote": null,
               "document": null,
-              "confidence": null
+              "citation": "uncited"
             }
           ]
         }

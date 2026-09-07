@@ -695,6 +695,14 @@ var STEP = {run_started:"Run started", governing_resolved:"Governing document ch
             error:"Failed", stream_closed:"Stream closed"};
 var RSTAT = {running:["Running","c-warn"], finished:["Finished","c-ok"],
              failed:["Failed","c-need"], cancelled:["Cancelled","c-mute"]};
+/* Whether a person can actually follow the citation to the sentence. Checked against
+   our own corpus, not taken from the answer. A quote a reviewer cannot check is not
+   evidence, and confirming against one manufactures confidence rather than earning it. */
+var CITE = {verbatim:["In the document","c-ok"],
+            composed:["Summarised from the document","c-warn"],
+            misdirected:["Not found in that document","c-need"],
+            unresolvable:["That document is not on file","c-need"],
+            unverified:["Not checkable","c-mute"], uncited:["No source given","c-need"]};
 
 function runBlock(r){
   var st = RSTAT[r.status] || [r.status,"c-mute"];
@@ -704,7 +712,9 @@ function runBlock(r){
       '<span class="chip '+f[1]+'">'+f[0]+'</span>'+
       (t.owner? '<div class="hint2">Waiting on '+esc(t.owner.replace(/_/g," "))+'</div>':'')+
       (t.quote? '<div class="quote">'+esc(t.quote)+'</div>':'')+
-      (t.document? '<div class="hint2">'+esc(t.document)+'</div>':'')+'</dd>';
+      (t.document? '<div class="hint2">'+esc(t.document)+
+        (CITE[t.citation]? ' &middot; <span class="chip '+CITE[t.citation][1]+'">'+
+          CITE[t.citation][0]+'</span>' : '')+'</div>':'')+'</dd>';
   }).join("");
   var steps = (r.events||[]).map(function(e){
     return '<li><span class="ts">'+esc(e.at||"")+'</span>'+
