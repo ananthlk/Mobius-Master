@@ -8624,6 +8624,55 @@
       ],
       "runs": [
         {
+          "id": "9dc95689-6655-4e06-b31a-3f1f4da4154f",
+          "by": "registry",
+          "status": "cancelled",
+          "tasks": 1,
+          "started": "2026-09-07 20:25",
+          "finished": "2026-09-07 20:25",
+          "note": "dry run \u2014 nothing asked",
+          "events": [
+            {
+              "at": "20:25:56",
+              "source": "registry",
+              "kind": "run_started",
+              "seq": null,
+              "text": "Sourcing 1 requirements for Behavioral Health Overlay Services.",
+              "data": {
+                "line_key": "bh_overlay",
+                "line_name": "Behavioral Health Overlay Services",
+                "task_count": 1,
+                "requested_by": "registry"
+              }
+            },
+            {
+              "at": "20:25:56",
+              "source": "registry",
+              "kind": "model_profile",
+              "seq": null,
+              "text": "Asking under the worker's default model profile.",
+              "data": {
+                "profile": null
+              }
+            },
+            {
+              "at": "20:25:56",
+              "source": "registry",
+              "kind": "governing_resolved",
+              "seq": null,
+              "text": "Governing rule 59G-4.027 is held \u2014 153 sections readable.",
+              "data": {
+                "chunks": 153,
+                "document": "59G-4.027_Behavioral_Health_Overlay_Services_Coverage_and_Limitations_Handbook_Adoption.pdf",
+                "rule_ref": "59G-4.027",
+                "resolvable": true,
+                "document_id": "58bd52d2-6ee0-4ba5-8610-9e6eed797099"
+              }
+            }
+          ],
+          "items": []
+        },
+        {
           "id": "fe236ea4-db64-4ce4-9488-e110307489a7",
           "by": "ananth",
           "status": "finished",
@@ -11060,8 +11109,612 @@
           "last": "2026-09-06 23:50"
         }
       ],
-      "state_machine": [],
+      "state_machine": [
+        {
+          "ref": 91,
+          "state": "sourced",
+          "about": "coverage criteria",
+          "rounds": 1,
+          "gap": null,
+          "finding": null,
+          "owner": null
+        }
+      ],
       "runs": [
+        {
+          "id": "ec235cf7-490c-4a9e-8543-fcf3831d1e48",
+          "by": "review2",
+          "status": "finished",
+          "tasks": 1,
+          "started": "2026-09-07 20:28",
+          "finished": "2026-09-07 20:31",
+          "note": null,
+          "events": [
+            {
+              "at": "20:28:51",
+              "source": "registry",
+              "kind": "run_started",
+              "seq": null,
+              "text": "Queued 1 question for Comprehensive Behavioral Health Assessment.",
+              "data": {
+                "queued": true,
+                "line_key": "cbha",
+                "line_name": "Comprehensive Behavioral Health Assessment",
+                "task_count": 1,
+                "requested_by": "review2",
+                "model_profile": "gemini"
+              }
+            },
+            {
+              "at": "20:28:54",
+              "source": "registry",
+              "kind": "model_profile",
+              "seq": null,
+              "text": "Asking under the gemini model profile.",
+              "data": {
+                "profile": "gemini"
+              }
+            },
+            {
+              "at": "20:28:54",
+              "source": "registry",
+              "kind": "governing_resolved",
+              "seq": null,
+              "text": "Governing rule (none recorded): the service line has no governing rule recorded.",
+              "data": {
+                "why": "the service line has no governing rule recorded",
+                "chunks": 0,
+                "rule_ref": null,
+                "resolvable": false,
+                "document_id": null
+              }
+            },
+            {
+              "at": "20:28:54",
+              "source": "registry",
+              "kind": "request_opened",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "code": null,
+                "expects": [
+                  "criteria",
+                  "diagnosis_required"
+                ],
+                "question": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for Comprehensive Behavioral Health Assessment? Quote the governing policy text and name the source document.",
+                "request_id": 91,
+                "model_profile": "gemini",
+                "requirement_id": 137,
+                "requirement_type": "coverage_criteria"
+              }
+            },
+            {
+              "at": "20:28:55",
+              "source": "deep_research",
+              "kind": "turn_running",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "n": 1,
+                "note": "4 of 4 fields survived",
+                "query": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for Comprehensive Behavioral Health Assessment? Quote the governing policy text and name the source document.",
+                "next_query": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for Comprehensive Behavioral Health Assessment? Quote the governing policy text and name the source document.\n\nQuote the sentence that states each value.",
+                "extract_state": "extracted"
+              }
+            },
+            {
+              "at": "20:30:52",
+              "source": "deep_research",
+              "kind": "attempt",
+              "seq": 1,
+              "text": "4 of 4 fields survived",
+              "data": {
+                "model": "gemini-2.5-flash",
+                "quote": null,
+                "round": 1,
+                "outcome": "extracted",
+                "verdict": {
+                  "extract": {
+                    "prose": "For Florida Medicaid, a Comprehensive Behavioral Health Assessment is covered if it is medically necessary, used for the screening and identification of mental health or substance use disorders, and the recipient is enrolled in the program on the date of service and requires medically necessary behavioral health assessment services.",
+                    "_model": "gemini-2.5-flash",
+                    "fields": [
+                      {
+                        "name": "criteria",
+                        "quote": "For Florida Medicaid, a Comprehensive Behavioral Health Assessment is covered if it is medically necessary and used for the screening and identification of mental health or substance use disorders [3].",
+                        "scope": "Florida Medicaid, Comprehensive Behavioral Health Assessment",
+                        "value": "medically necessary",
+                        "document": "Medicaid_Health_Plan_Application_JULY_2011.pdf"
+                      },
+                      {
+                        "name": "criteria",
+                        "quote": "For Florida Medicaid, a Comprehensive Behavioral Health Assessment is covered if it is medically necessary and used for the screening and identification of mental health or substance use disorders [3].",
+                        "scope": "Florida Medicaid, Comprehensive Behavioral Health Assessment",
+                        "value": "used for the screening and identification of mental health or substance use disorders",
+                        "document": "Medicaid_Health_Plan_Application_JULY_2011.pdf"
+                      },
+                      {
+                        "name": "criteria",
+                        "quote": "The recipient must be enrolled in the Florida Medicaid program on the date of service and require medically necessary behavioral health assessment services [4].",
+                        "scope": "recipient, Florida Medicaid program, behavioral health assessment services",
+                        "value": "enrolled in the Florida Medicaid program on the date of service",
+                        "document": "UNITED_MHPAEA_2025.pdf"
+                      },
+                      {
+                        "name": "criteria",
+                        "quote": "The recipient must be enrolled in the Florida Medicaid program on the date of service and require medically necessary behavioral health assessment services [4].",
+                        "scope": "recipient, Florida Medicaid program, behavioral health assessment services",
+                        "value": "require medically necessary behavioral health assessment services",
+                        "document": "UNITED_MHPAEA_2025.pdf"
+                      }
+                    ]
+                  },
+                  "critique": {
+                    "kept": [
+                      {
+                        "name": "criteria",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "For Florida Medicaid, a Comprehensive Behavioral Health Assessment is covered if it is medically necessary and used for the screening and identification of mental health or substance use disorders [3].",
+                        "value": "medically necessary",
+                        "reason": "The quote explicitly states that a Comprehensive Behavioral Health Assessment is covered 'if it is medically necessary', directly matching the provided value.",
+                        "document": "Medicaid_Health_Plan_Application_JULY_2011.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "fb82ce6c-ea60-4434-a732-4a7ebd0d5ad0"
+                      },
+                      {
+                        "name": "criteria",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "For Florida Medicaid, a Comprehensive Behavioral Health Assessment is covered if it is medically necessary and used for the screening and identification of mental health or substance use disorders [3].",
+                        "value": "used for the screening and identification of mental health or substance use disorders",
+                        "reason": "The value is an exact match and directly stated within the provided quote.",
+                        "document": "Medicaid_Health_Plan_Application_JULY_2011.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "fb82ce6c-ea60-4434-a732-4a7ebd0d5ad0"
+                      },
+                      {
+                        "name": "criteria",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "The recipient must be enrolled in the Florida Medicaid program on the date of service and require medically necessary behavioral health assessment services [4].",
+                        "value": "enrolled in the Florida Medicaid program on the date of service",
+                        "reason": "The quote explicitly states, 'The recipient must be enrolled in the Florida Medicaid program on the date of service,' which perfectly matches the provided value.",
+                        "document": "UNITED_MHPAEA_2025.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "e6a56bd8-5e4d-4385-8986-42018e6e96da"
+                      },
+                      {
+                        "name": "criteria",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "The recipient must be enrolled in the Florida Medicaid program on the date of service and require medically necessary behavioral health assessment services [4].",
+                        "value": "require medically necessary behavioral health assessment services",
+                        "reason": "The value 'require medically necessary behavioral health assessment services' is an exact phrase found within the provided quote.",
+                        "document": "UNITED_MHPAEA_2025.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "e6a56bd8-5e4d-4385-8986-42018e6e96da"
+                      }
+                    ],
+                    "leads": [],
+                    "record": {
+                      "criteria": [
+                        "medically necessary",
+                        "used for the screening and identification of mental health or substance use disorders",
+                        "enrolled in the Florida Medicaid program on the date of service",
+                        "require medically necessary behavioral health assessment services"
+                      ]
+                    },
+                    "dropped": [],
+                    "summary": "4 of 4 fields survived",
+                    "accepted": true,
+                    "verdicts": [
+                      {
+                        "name": "criteria",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "For Florida Medicaid, a Comprehensive Behavioral Health Assessment is covered if it is medically necessary and used for the screening and identification of mental health or substance use disorders [3].",
+                        "value": "medically necessary",
+                        "reason": "The quote explicitly states that a Comprehensive Behavioral Health Assessment is covered 'if it is medically necessary', directly matching the provided value.",
+                        "document": "Medicaid_Health_Plan_Application_JULY_2011.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "fb82ce6c-ea60-4434-a732-4a7ebd0d5ad0"
+                      },
+                      {
+                        "name": "criteria",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "For Florida Medicaid, a Comprehensive Behavioral Health Assessment is covered if it is medically necessary and used for the screening and identification of mental health or substance use disorders [3].",
+                        "value": "used for the screening and identification of mental health or substance use disorders",
+                        "reason": "The value is an exact match and directly stated within the provided quote.",
+                        "document": "Medicaid_Health_Plan_Application_JULY_2011.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "fb82ce6c-ea60-4434-a732-4a7ebd0d5ad0"
+                      },
+                      {
+                        "name": "criteria",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "The recipient must be enrolled in the Florida Medicaid program on the date of service and require medically necessary behavioral health assessment services [4].",
+                        "value": "enrolled in the Florida Medicaid program on the date of service",
+                        "reason": "The quote explicitly states, 'The recipient must be enrolled in the Florida Medicaid program on the date of service,' which perfectly matches the provided value.",
+                        "document": "UNITED_MHPAEA_2025.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "e6a56bd8-5e4d-4385-8986-42018e6e96da"
+                      },
+                      {
+                        "name": "criteria",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "The recipient must be enrolled in the Florida Medicaid program on the date of service and require medically necessary behavioral health assessment services [4].",
+                        "value": "require medically necessary behavioral health assessment services",
+                        "reason": "The value 'require medically necessary behavioral health assessment services' is an exact phrase found within the provided quote.",
+                        "document": "UNITED_MHPAEA_2025.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "e6a56bd8-5e4d-4385-8986-42018e6e96da"
+                      }
+                    ],
+                    "certifiable": true,
+                    "authority_mode": "any_cited",
+                    "missing_required": []
+                  }
+                },
+                "document": null,
+                "documents": [
+                  "document",
+                  "59G-4.028.pdf",
+                  "Medicaid_Health_Plan_Application_JULY_2011.pdf",
+                  "UNITED_MHPAEA_2025.pdf",
+                  "MOL_MHPAEA_Annual_Analysis.pdf",
+                  "FL.UM.27.pdf",
+                  "Sunshine Health Behavioral Health Clinical Policy",
+                  "CP.BH.124.pdf"
+                ],
+                "statement": "For Florida Medicaid, a Comprehensive Behavioral Health Assessment is covered if it is medically necessary, used for the screening and identification of mental health or substance use disorders, and the recipient is enrolled in the program on the date of service and requires medically necessary behavioral health assessment services.",
+                "confidence": null
+              }
+            },
+            {
+              "at": "20:31:23",
+              "source": "registry",
+              "kind": "request_settled",
+              "seq": 1,
+              "text": "4 of 4 fields survived",
+              "data": {
+                "state": "extracted",
+                "turns": 1,
+                "outcome": "extracted",
+                "document": null,
+                "request_id": 91,
+                "model_profile": "gemini",
+                "requirement_id": 137
+              }
+            },
+            {
+              "at": "20:31:24",
+              "source": "registry",
+              "kind": "run_finished",
+              "seq": null,
+              "text": null,
+              "data": {
+                "counts": {
+                  "undiagnosed": 1
+                }
+              }
+            }
+          ],
+          "items": [
+            {
+              "seq": 1,
+              "about": "coverage criteria",
+              "code": null,
+              "finding": "stated",
+              "gap": null,
+              "owner": null,
+              "quote": null,
+              "document": null,
+              "citation": "uncited"
+            }
+          ]
+        },
+        {
+          "id": "5cbaf47c-d5ca-4314-b4d6-1cba6a8e64ed",
+          "by": "review",
+          "status": "failed",
+          "tasks": 1,
+          "started": "2026-09-07 20:27",
+          "finished": "2026-09-07 20:27",
+          "note": "name 'PROFILE_NOTE' is not defined",
+          "events": [
+            {
+              "at": "20:27:44",
+              "source": "registry",
+              "kind": "run_started",
+              "seq": null,
+              "text": "Queued 1 question for Comprehensive Behavioral Health Assessment.",
+              "data": {
+                "queued": true,
+                "line_key": "cbha",
+                "line_name": "Comprehensive Behavioral Health Assessment",
+                "task_count": 1,
+                "requested_by": "review",
+                "model_profile": "gemini"
+              }
+            },
+            {
+              "at": "20:27:50",
+              "source": "registry",
+              "kind": "model_profile",
+              "seq": null,
+              "text": "Asking under the gemini model profile.",
+              "data": {
+                "profile": "gemini"
+              }
+            },
+            {
+              "at": "20:27:50",
+              "source": "registry",
+              "kind": "governing_resolved",
+              "seq": null,
+              "text": "Governing rule (none recorded): the service line has no governing rule recorded.",
+              "data": {
+                "why": "the service line has no governing rule recorded",
+                "chunks": 0,
+                "rule_ref": null,
+                "resolvable": false,
+                "document_id": null
+              }
+            },
+            {
+              "at": "20:27:50",
+              "source": "registry",
+              "kind": "request_opened",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "code": null,
+                "expects": [
+                  "criteria",
+                  "diagnosis_required"
+                ],
+                "question": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for Comprehensive Behavioral Health Assessment? Quote the governing policy text and name the source document.",
+                "request_id": 91,
+                "model_profile": "gemini",
+                "requirement_id": 137,
+                "requirement_type": "coverage_criteria"
+              }
+            },
+            {
+              "at": "20:28:55",
+              "source": "deep_research",
+              "kind": "turn_running",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "n": 1,
+                "note": "4 of 4 fields survived",
+                "query": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for Comprehensive Behavioral Health Assessment? Quote the governing policy text and name the source document.",
+                "next_query": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for Comprehensive Behavioral Health Assessment? Quote the governing policy text and name the source document.\n\nQuote the sentence that states each value.",
+                "extract_state": "extracted"
+              }
+            },
+            {
+              "at": "20:30:52",
+              "source": "deep_research",
+              "kind": "attempt",
+              "seq": 1,
+              "text": "4 of 4 fields survived",
+              "data": {
+                "model": "gemini-2.5-flash",
+                "quote": null,
+                "round": 1,
+                "outcome": "extracted",
+                "verdict": {
+                  "extract": {
+                    "prose": "For Florida Medicaid, a Comprehensive Behavioral Health Assessment is covered if it is medically necessary, used for the screening and identification of mental health or substance use disorders, and the recipient is enrolled in the program on the date of service and requires medically necessary behavioral health assessment services.",
+                    "_model": "gemini-2.5-flash",
+                    "fields": [
+                      {
+                        "name": "criteria",
+                        "quote": "For Florida Medicaid, a Comprehensive Behavioral Health Assessment is covered if it is medically necessary and used for the screening and identification of mental health or substance use disorders [3].",
+                        "scope": "Florida Medicaid, Comprehensive Behavioral Health Assessment",
+                        "value": "medically necessary",
+                        "document": "Medicaid_Health_Plan_Application_JULY_2011.pdf"
+                      },
+                      {
+                        "name": "criteria",
+                        "quote": "For Florida Medicaid, a Comprehensive Behavioral Health Assessment is covered if it is medically necessary and used for the screening and identification of mental health or substance use disorders [3].",
+                        "scope": "Florida Medicaid, Comprehensive Behavioral Health Assessment",
+                        "value": "used for the screening and identification of mental health or substance use disorders",
+                        "document": "Medicaid_Health_Plan_Application_JULY_2011.pdf"
+                      },
+                      {
+                        "name": "criteria",
+                        "quote": "The recipient must be enrolled in the Florida Medicaid program on the date of service and require medically necessary behavioral health assessment services [4].",
+                        "scope": "recipient, Florida Medicaid program, behavioral health assessment services",
+                        "value": "enrolled in the Florida Medicaid program on the date of service",
+                        "document": "UNITED_MHPAEA_2025.pdf"
+                      },
+                      {
+                        "name": "criteria",
+                        "quote": "The recipient must be enrolled in the Florida Medicaid program on the date of service and require medically necessary behavioral health assessment services [4].",
+                        "scope": "recipient, Florida Medicaid program, behavioral health assessment services",
+                        "value": "require medically necessary behavioral health assessment services",
+                        "document": "UNITED_MHPAEA_2025.pdf"
+                      }
+                    ]
+                  },
+                  "critique": {
+                    "kept": [
+                      {
+                        "name": "criteria",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "For Florida Medicaid, a Comprehensive Behavioral Health Assessment is covered if it is medically necessary and used for the screening and identification of mental health or substance use disorders [3].",
+                        "value": "medically necessary",
+                        "reason": "The quote explicitly states that a Comprehensive Behavioral Health Assessment is covered 'if it is medically necessary', directly matching the provided value.",
+                        "document": "Medicaid_Health_Plan_Application_JULY_2011.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "fb82ce6c-ea60-4434-a732-4a7ebd0d5ad0"
+                      },
+                      {
+                        "name": "criteria",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "For Florida Medicaid, a Comprehensive Behavioral Health Assessment is covered if it is medically necessary and used for the screening and identification of mental health or substance use disorders [3].",
+                        "value": "used for the screening and identification of mental health or substance use disorders",
+                        "reason": "The value is an exact match and directly stated within the provided quote.",
+                        "document": "Medicaid_Health_Plan_Application_JULY_2011.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "fb82ce6c-ea60-4434-a732-4a7ebd0d5ad0"
+                      },
+                      {
+                        "name": "criteria",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "The recipient must be enrolled in the Florida Medicaid program on the date of service and require medically necessary behavioral health assessment services [4].",
+                        "value": "enrolled in the Florida Medicaid program on the date of service",
+                        "reason": "The quote explicitly states, 'The recipient must be enrolled in the Florida Medicaid program on the date of service,' which perfectly matches the provided value.",
+                        "document": "UNITED_MHPAEA_2025.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "e6a56bd8-5e4d-4385-8986-42018e6e96da"
+                      },
+                      {
+                        "name": "criteria",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "The recipient must be enrolled in the Florida Medicaid program on the date of service and require medically necessary behavioral health assessment services [4].",
+                        "value": "require medically necessary behavioral health assessment services",
+                        "reason": "The value 'require medically necessary behavioral health assessment services' is an exact phrase found within the provided quote.",
+                        "document": "UNITED_MHPAEA_2025.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "e6a56bd8-5e4d-4385-8986-42018e6e96da"
+                      }
+                    ],
+                    "leads": [],
+                    "record": {
+                      "criteria": [
+                        "medically necessary",
+                        "used for the screening and identification of mental health or substance use disorders",
+                        "enrolled in the Florida Medicaid program on the date of service",
+                        "require medically necessary behavioral health assessment services"
+                      ]
+                    },
+                    "dropped": [],
+                    "summary": "4 of 4 fields survived",
+                    "accepted": true,
+                    "verdicts": [
+                      {
+                        "name": "criteria",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "For Florida Medicaid, a Comprehensive Behavioral Health Assessment is covered if it is medically necessary and used for the screening and identification of mental health or substance use disorders [3].",
+                        "value": "medically necessary",
+                        "reason": "The quote explicitly states that a Comprehensive Behavioral Health Assessment is covered 'if it is medically necessary', directly matching the provided value.",
+                        "document": "Medicaid_Health_Plan_Application_JULY_2011.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "fb82ce6c-ea60-4434-a732-4a7ebd0d5ad0"
+                      },
+                      {
+                        "name": "criteria",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "For Florida Medicaid, a Comprehensive Behavioral Health Assessment is covered if it is medically necessary and used for the screening and identification of mental health or substance use disorders [3].",
+                        "value": "used for the screening and identification of mental health or substance use disorders",
+                        "reason": "The value is an exact match and directly stated within the provided quote.",
+                        "document": "Medicaid_Health_Plan_Application_JULY_2011.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "fb82ce6c-ea60-4434-a732-4a7ebd0d5ad0"
+                      },
+                      {
+                        "name": "criteria",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "The recipient must be enrolled in the Florida Medicaid program on the date of service and require medically necessary behavioral health assessment services [4].",
+                        "value": "enrolled in the Florida Medicaid program on the date of service",
+                        "reason": "The quote explicitly states, 'The recipient must be enrolled in the Florida Medicaid program on the date of service,' which perfectly matches the provided value.",
+                        "document": "UNITED_MHPAEA_2025.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "e6a56bd8-5e4d-4385-8986-42018e6e96da"
+                      },
+                      {
+                        "name": "criteria",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "The recipient must be enrolled in the Florida Medicaid program on the date of service and require medically necessary behavioral health assessment services [4].",
+                        "value": "require medically necessary behavioral health assessment services",
+                        "reason": "The value 'require medically necessary behavioral health assessment services' is an exact phrase found within the provided quote.",
+                        "document": "UNITED_MHPAEA_2025.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "e6a56bd8-5e4d-4385-8986-42018e6e96da"
+                      }
+                    ],
+                    "certifiable": true,
+                    "authority_mode": "any_cited",
+                    "missing_required": []
+                  }
+                },
+                "document": null,
+                "documents": [
+                  "document",
+                  "59G-4.028.pdf",
+                  "Medicaid_Health_Plan_Application_JULY_2011.pdf",
+                  "UNITED_MHPAEA_2025.pdf",
+                  "MOL_MHPAEA_Annual_Analysis.pdf",
+                  "FL.UM.27.pdf",
+                  "Sunshine Health Behavioral Health Clinical Policy",
+                  "CP.BH.124.pdf"
+                ],
+                "statement": "For Florida Medicaid, a Comprehensive Behavioral Health Assessment is covered if it is medically necessary, used for the screening and identification of mental health or substance use disorders, and the recipient is enrolled in the program on the date of service and requires medically necessary behavioral health assessment services.",
+                "confidence": null
+              }
+            }
+          ],
+          "items": [
+            {
+              "seq": 1,
+              "about": "coverage criteria",
+              "code": null,
+              "finding": "stated",
+              "gap": null,
+              "owner": null,
+              "quote": null,
+              "document": null,
+              "citation": "uncited"
+            }
+          ]
+        },
         {
           "id": "7405e66f-ce4f-4b46-8705-a35096cd426f",
           "by": "live-check",
@@ -15057,8 +15710,142 @@
           "last": "2026-09-07 00:30"
         }
       ],
-      "state_machine": [],
-      "runs": [],
+      "state_machine": [
+        {
+          "ref": 90,
+          "state": "open",
+          "about": "coverage criteria",
+          "rounds": 1,
+          "gap": null,
+          "finding": null,
+          "owner": null
+        }
+      ],
+      "runs": [
+        {
+          "id": "0be005f6-e9d2-40cc-bcee-d12e8477f1a6",
+          "by": "unblock-check",
+          "status": "cancelled",
+          "tasks": 1,
+          "started": "2026-09-07 20:35",
+          "finished": "2026-09-07 20:35",
+          "note": "review check",
+          "events": [
+            {
+              "at": "20:35:24",
+              "source": "registry",
+              "kind": "run_started",
+              "seq": null,
+              "text": "Queued 1 question for State Mental Health.",
+              "data": {
+                "queued": true,
+                "line_key": "state_mental_health",
+                "line_name": "State Mental Health",
+                "task_count": 1,
+                "requested_by": "unblock-check",
+                "model_profile": null
+              }
+            }
+          ],
+          "items": []
+        },
+        {
+          "id": "6d63505e-13d1-42ec-86b8-92762f24f383",
+          "by": "ananth",
+          "status": "failed",
+          "tasks": 1,
+          "started": "2026-09-07 20:18",
+          "finished": "2026-09-07 20:35",
+          "note": "abandoned: the worker that claimed this stopped without finishing it",
+          "events": [
+            {
+              "at": "20:18:23",
+              "source": "registry",
+              "kind": "run_started",
+              "seq": null,
+              "text": "Queued 1 question for State Mental Health.",
+              "data": {
+                "queued": true,
+                "line_key": "state_mental_health",
+                "line_name": "State Mental Health",
+                "task_count": 1,
+                "requested_by": "ananth",
+                "model_profile": "gemini"
+              }
+            },
+            {
+              "at": "20:18:26",
+              "source": "registry",
+              "kind": "model_profile",
+              "seq": null,
+              "text": "Asking under the gemini model profile.",
+              "data": {
+                "profile": "gemini"
+              }
+            },
+            {
+              "at": "20:18:26",
+              "source": "registry",
+              "kind": "governing_resolved",
+              "seq": null,
+              "text": "Governing rule 59G-4.300 is held \u2014 44 sections readable.",
+              "data": {
+                "chunks": 44,
+                "document": "59G-4.300_State_Health_Plan.pdf",
+                "rule_ref": "59G-4.300",
+                "resolvable": true,
+                "document_id": "24602c3f-f49d-4678-ae4e-ab065e740d28"
+              }
+            },
+            {
+              "at": "20:18:26",
+              "source": "registry",
+              "kind": "request_opened",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "code": null,
+                "expects": [
+                  "criteria",
+                  "diagnosis_required"
+                ],
+                "question": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for State Mental Health? The governing rule is 59G-4.300. Quote the governing policy text and name the source document.",
+                "request_id": 90,
+                "model_profile": "gemini",
+                "requirement_id": 127,
+                "requirement_type": "coverage_criteria"
+              }
+            },
+            {
+              "at": "20:18:26",
+              "source": "deep_research",
+              "kind": "turn_running",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "n": 1,
+                "note": null,
+                "query": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for State Mental Health? The governing rule is 59G-4.300. Quote the governing policy text and name the source document.",
+                "next_query": null,
+                "extract_state": "pending"
+              }
+            }
+          ],
+          "items": [
+            {
+              "seq": 1,
+              "about": "coverage criteria",
+              "code": null,
+              "finding": null,
+              "gap": null,
+              "owner": null,
+              "quote": null,
+              "document": null,
+              "citation": "uncited"
+            }
+          ]
+        }
+      ],
       "review": [
         {
           "kind": "standard_requirement",

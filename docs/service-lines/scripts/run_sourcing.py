@@ -168,14 +168,17 @@ def _source_all(cur, run_id, line, line_key, gov, reqs, profile, max_rounds):
 
         cur.execute("""insert into research.request
                          (consumer, subject_type, subject_id, question, evaluator_prompt,
-                          extraction_schema, jurisdiction, max_rounds, invoker, status)
+                          extraction_schema, jurisdiction, max_rounds, invoker, status,
+                          expects)
                        values ('service_line_registry','standard_requirement',%s,%s,%s,%s,%s,%s,
-                               'service_line_registry','open')
+                               'service_line_registry','open',%s)
                        on conflict (consumer, subject_type, subject_id) do update
                          set question=excluded.question, status='open',
-                             extraction_schema=excluded.extraction_schema
+                             extraction_schema=excluded.extraction_schema,
+                             expects=excluded.expects
                        returning id""",
-                    (subject_id, question, EVAL, Json(SLOTS[rtype]), JURISDICTION, max_rounds))
+                    (subject_id, question, EVAL, Json(SLOTS[rtype]), JURISDICTION,
+                     max_rounds, ", ".join(SLOTS[rtype])))
         pre_id = cur.fetchone()["id"]
 
         cur.execute("""insert into service_line.sourcing_link
@@ -384,18 +387,36 @@ def serve(poll_s=5, who=None):
     seen_idle = False
     claimed_n = 0
 
-    def beat(note=None):
-        """Say we are alive on every poll, not only when we take work.
+    # The heartbeat runs on its OWN connection in its OWN thread. Beating from the poll
+    # loop meant the worker went silent the moment it started working — a run takes
+    # minutes — so during the only period anyone cares whether it is alive, it looked
+    # dead. Worse, sourcing_abandoned reclaims a run whose worker has not beaten for two
+    # minutes, so the reclaim I added to rescue orphaned runs would have killed live ones.
+    # Liveness is orthogonal to the work; it does not belong on the working thread.
+    import threading
+    state = {"note": "starting", "claimed": 0, "stop": False}
 
-        The API used to infer a listening worker from sourcing_run.claimed_at, so an
-        idle worker — the healthiest state there is — reported as absent and the surface
-        told the user to start one that was already running.
-        """
-        cur.execute("""insert into service_line.worker_heartbeat (worker, beat_at, claimed, note)
+    def _heart():
+        hconn, hcur = db()
+        while not state["stop"]:
+            try:
+                hcur.execute(
+                    """insert into service_line.worker_heartbeat
+                         (worker, beat_at, claimed, note)
                        values (%s, now(), %s, %s)
                        on conflict (worker) do update
                          set beat_at=now(), claimed=excluded.claimed, note=excluded.note""",
-                    (who, claimed_n, note))
+                    (who, state["claimed"], state["note"]))
+            except Exception:
+                pass          # a missed beat is not worth killing the worker over
+            time.sleep(15)
+
+    def beat(note=None):
+        if note:
+            state["note"] = note
+        state["claimed"] = claimed_n
+
+    threading.Thread(target=_heart, daemon=True).start()
 
     beat("started")
     # A worker that died mid-run left its run at 'running' with nothing behind it, and

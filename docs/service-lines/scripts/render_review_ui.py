@@ -38,6 +38,12 @@ ROOT = Path("/Users/ananth/Mobius")
 CATALOG = ROOT / "docs/service-lines/fl-medicaid-bh.catalog.json"
 TOKENS = ROOT / "mobius-design/tokens.css"
 OUT = ROOT / "docs/product-docs/service-lines-review.html"
+# A second copy inside mobius-payor's app/, which the Dockerfile ships, so the page can
+# be served from the SAME ORIGIN as the API. The published artifact cannot call the API
+# at all — artifact pages run under a CSP that blocks outbound fetch/XHR, which no CORS
+# header can undo — so the artifact is a read-only snapshot and this copy is the one
+# with a working button.
+SERVED = ROOT / "mobius-payor/app/static/service-lines-review.html"
 
 # Where the Source button posts. A published page cannot reach a laptop, so when this
 # is unreachable the panel says what to run instead of failing silently — the surface
@@ -221,6 +227,9 @@ def build():
     data = json.dumps({"lines": lines}, separators=(",", ":"))
     OUT.write_text(PAGE.replace("__TOKENS__", tokens).replace("__LOGO__", LOGO)
                        .replace("__DATA__", data).replace("__API__", API))
+    SERVED.parent.mkdir(parents=True, exist_ok=True)
+    SERVED.write_text(OUT.read_text())
+    print(f"wrote {SERVED}  (served same-origin at /service-lines)")
     ready = sum(1 for x in lines if x["ready"])
     print(f"wrote {OUT}  ({OUT.stat().st_size // 1024} KB)")
     print(f"  {len(lines)} services · {ready} ready · {len(lines)-ready} awaiting sources")
@@ -446,6 +455,22 @@ td.cd small{display:block;font-weight:400;color:var(--mobius-text-muted)}
   .steps.live{max-height:280px;overflow-y:auto;margin-top:var(--mobius-space-sm);
     padding:var(--mobius-space-sm);background:var(--mobius-bg-secondary);
     border-radius:var(--mobius-radius-base)}
+  .linky{background:none;border:0;padding:4px 0;font:inherit;
+    font-size:var(--mobius-text-xs);color:var(--mobius-accent);cursor:pointer}
+  .linky:hover{text-decoration:underline}
+  .trace{margin-top:var(--mobius-space-sm);padding:var(--mobius-space-base);
+    background:var(--mobius-bg-secondary);border-radius:var(--mobius-radius-base)}
+  .tsec{margin-bottom:var(--mobius-space-md)}
+  .tsec>b{font-size:var(--mobius-text-xs);text-transform:uppercase;letter-spacing:.04em;
+    color:var(--mobius-text-muted);font-weight:600}
+  .docs{margin:6px 0 0;padding-left:18px;font-size:var(--mobius-text-xs);
+    color:var(--mobius-text-muted)}
+  .fld{margin-top:8px;padding:8px;background:var(--mobius-bg-card);
+    border:1px solid var(--mobius-border);border-radius:var(--mobius-radius-sm)}
+  .fld.drop{opacity:.72;border-style:dashed}
+  .steps.think{max-height:320px;overflow-y:auto;list-style:decimal;padding-left:22px}
+  .steps.think li{display:list-item;padding:2px 0}
+  .quote.long{max-height:340px;overflow-y:auto;white-space:pre-wrap}
   .quote{margin-top:4px;padding-left:9px;border-left:2px solid var(--mobius-border);
     color:var(--mobius-text-muted);font-size:12px}
 </style>
@@ -598,7 +623,12 @@ function itemRow(it){
    Contract §7: live is a tail of the stream, replay is the same rows read again, and
    they must render identically — otherwise the audit log is not evidence of what the
    viewer saw. */
-var API = "__API__";
+/* Same file is served two ways. From mobius-payor it is same-origin, and calling
+   location.origin keeps it working if the service ever moves host. Published as an
+   artifact it is read-only regardless — artifact pages run under a CSP that blocks
+   outbound fetch/XHR, so no base URL makes the button work there. */
+var API = /(^|\.)claudeusercontent\.com$|(^|\.)claude\.(ai|site)$/.test(location.hostname)
+  ? "__API__" : location.origin;
 var FIND = {stated:["Answered","c-ok"], none_applies:["No requirement","c-ok"],
             silent:["Document is silent","c-ok"], unresolved:["Could not answer","c-need"],
             unknown_class:["Unrecognised result","c-need"]};
@@ -623,9 +653,85 @@ var CITE = {verbatim:["In the document","c-ok"],
             unresolvable:["That document is not on file","c-need"],
             unverified:["","c-mute"], uncited:["No source given","c-need"]};
 
+
+/* The whole record for one question, fetched on demand — the reasoning log and answer
+   text are large and only wanted when someone opens one. */
+function loadTrace(runId, seq, host){
+  host.hidden = false;
+  host.innerHTML = '<p class="hint2">Loading…</p>';
+  fetch(API+"/api/service-line/runs/"+runId+"/tasks/"+seq)
+    .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+    .then(function(d){ host.innerHTML = traceHtml(d.data); })
+    .catch(function(e){ host.innerHTML = '<p class="hint2">Could not load the detail ('+
+      esc(e.message)+').</p>'; });
+}
+
+function traceHtml(d){
+  var h = '';
+  if (d.question) h += '<div class="tsec"><b>What we asked</b><div class="quote">'+
+    esc(d.question)+'</div>'+
+    (d.expects && d.expects.length ? '<div class="hint2">Answers wanted for: '+
+      d.expects.map(esc).join(', ')+'</div>' : '')+
+    (d.model_profile ? '<div class="hint2">Answered using '+
+      esc(PROFILE_SAID[d.model_profile]||d.model_profile)+'</div>' : '')+'</div>';
+
+  (d.rounds||[]).forEach(function(r, i){
+    h += '<div class="tsec"><b>Attempt '+(r.round||i+1)+'</b>'+
+      '<div class="hint2">'+esc(r.model||'')+
+        (r.extractor_model && r.extractor_model!==r.model?
+          ' · read by '+esc(r.extractor_model):'')+
+        ' · '+(r.documents||[]).length+' document'+((r.documents||[]).length===1?'':'s')+
+        ' considered</div>';
+
+    if ((r.documents||[]).length)
+      h += '<ul class="docs">'+r.documents.map(function(x){
+        return '<li>'+esc(x)+'</li>'; }).join('')+'</ul>';
+
+    /* Each field separately: what was pulled out, from which sentence, and whether the
+       judge kept it — plus OUR corpus verdict on whether the citation can be followed,
+       which is the check a reviewer would otherwise have to do by hand. */
+    if ((r.fields||[]).length) {
+      h += '<div class="th" style="margin-top:10px">What it pulled out</div>';
+      h += r.fields.map(function(f){
+        var c = CITE[f.citation];
+        return '<div class="fld'+(f.judge==="dropped"?" drop":"")+'">'+
+          '<div class="throw"><span><b>'+esc(f.name||'')+'</b>'+
+            (f.value!=null? ' &middot; '+esc(typeof f.value==='object'?
+              JSON.stringify(f.value):String(f.value)) : '')+'</span>'+
+            '<span class="chip '+(f.judge==="kept"?"c-ok":"c-need")+'">'+
+              (f.judge==="kept"?"Accepted":"Rejected")+'</span></div>'+
+          (f.reason? '<div class="hint2">'+esc(f.reason)+'</div>':'')+
+          (f.quote? '<div class="quote">'+esc(f.quote)+'</div>':'')+
+          (f.document? '<div class="hint2">'+esc(f.document)+
+            (c&&c[0]? ' &middot; <span class="chip '+c[1]+'">'+c[0]+'</span>':'')+'</div>':'')+
+          '</div>';
+      }).join('');
+    }
+    if (r.judge_summary) h += '<div class="hint2">'+esc(r.judge_summary)+'</div>';
+
+    if ((r.reasoning||[]).length)
+      h += '<details class="ev"><summary>Its reasoning ('+r.reasoning.length+' steps)</summary>'+
+        '<ol class="steps think">'+r.reasoning.map(function(x){
+          return '<li>'+esc(x)+'</li>'; }).join('')+'</ol></details>';
+    if (r.answer)
+      h += '<details class="ev"><summary>The full answer ('+
+        r.answer.length.toLocaleString()+' characters)</summary>'+
+        '<div class="quote long">'+esc(r.answer)+'</div></details>';
+    h += '</div>';
+  });
+
+  (d.diagnosis||[]).forEach(function(g){
+    h += '<div class="tsec"><b>Why it stopped</b><div class="hint2">'+
+      esc(g.gap_class||'')+(g.action? ' &middot; '+esc(g.action):'')+'</div>'+
+      (g.next_step? '<div class="quote">'+esc(g.next_step)+'</div>':'')+'</div>';
+  });
+  return h || '<p class="hint2">Nothing was recorded for this question.</p>';
+}
+
 function runBlock(r){
   var st = RSTAT[r.status] || [r.status,"c-mute"];
   var items = (r.items||[]).map(function(t){
+    var openable = !READ_ONLY_HOST();
     var f = FIND[t.finding] || (t.finding? [t.finding,"c-mute"] : ["Not settled","c-mute"]);
     return '<dt>'+esc(t.about)+(t.code? " "+esc(t.code):"")+'</dt><dd>'+
       '<span class="chip '+f[1]+'">'+f[0]+'</span>'+
@@ -634,7 +740,15 @@ function runBlock(r){
       (t.document? '<div class="hint2">'+esc(t.document)+
         (CITE[t.citation] && CITE[t.citation][0]?
           ' &middot; <span class="chip '+CITE[t.citation][1]+'">'+
-          CITE[t.citation][0]+'</span>' : '')+'</div>':'')+'</dd>';
+          CITE[t.citation][0]+'</span>' : '')+'</div>':'')+
+      /* "7 of 7 fields survived" stands in for 149 lines of reasoning, an 18,000
+         character answer, eight documents and seven separately judged fields. A
+         reviewer confirming a value needs what it was drawn from and why the judge
+         kept it, or confirming is a formality. */
+      (openable? '<div><button class="linky" data-trace="'+esc(r.id)+'" '+
+        'data-seq="'+t.seq+'">Show everything this question did</button>'+
+        '<div class="trace" id="tr-'+esc(r.id)+'-'+t.seq+'" hidden></div></div>' : '')+
+      '</dd>';
   }).join("");
   var steps = (r.events||[]).map(function(e){
     return '<li><span class="ts">'+esc(e.at||"")+'</span>'+
@@ -654,6 +768,9 @@ function runBlock(r){
    would offer a profile the day chat drops one and hide one the day chat adds one.
    "Recommended" marks the default rather than hiding the others — the point of the
    control is to let someone test the same question across models and compare. */
+function READ_ONLY_HOST(){
+  return /(^|\.)claudeusercontent\.com$|(^|\.)claude\.(ai|site)$/.test(location.hostname);
+}
 var PROFILE_SAID = {gemini:"Gemini", anthropic:"Claude", auto:"Automatic",
                     bandit:"Best performing", optimal:"Best available",
                     "default":"Standard"};
@@ -665,6 +782,7 @@ function loadProfiles(){
   var el = document.getElementById("srcprof");
   if (!el) return;
   el.innerHTML = '<option value="">Standard</option>';
+  if (READ_ONLY_HOST()) return;   // the list cannot be fetched from a published copy
   fetch(API+"/api/service-line/model-profiles")
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(d){
@@ -692,6 +810,15 @@ function startRun(lineId){
   live.innerHTML = "";
   live.hidden = false;
 
+  if (READ_ONLY()) {
+    // Say what this page IS rather than letting the fetch fail and reporting an
+    // outage. A shared snapshot that admits it is a snapshot is more use than one
+    // that looks broken.
+    note.innerHTML = "This is a shared, read-only copy — pages published here cannot "+
+      "call the registry service. Open <code>" + esc("__API__") + "/service-lines</code> "+
+      "to start a run and watch it.";
+    live.hidden = true; done(); return;
+  }
   fetch(API+"/api/service-line/lines/"+encodeURIComponent(lineId)+"/source", {
     method:"POST", headers:{"Content-Type":"application/json"},
     body: JSON.stringify({requested_by:"surface", model_profile: chosenProfile()})
@@ -719,6 +846,9 @@ function startRun(lineId){
     done();
   });
 
+  function READ_ONLY(){
+    return /(^|\.)claudeusercontent\.com$|(^|\.)claude\.(ai|site)$/.test(location.hostname);
+  }
   function done(){
     if (btn) { btn.disabled = false; btn.textContent = "Source this service"; }
   }
@@ -879,6 +1009,14 @@ function draw(){
 document.getElementById("main").addEventListener("click", function(e){
   var sb = e.target.closest && e.target.closest("[data-src]");
   if (sb) { startRun(sb.getAttribute("data-src")); return; }
+  var tb = e.target.closest && e.target.closest("[data-trace]");
+  if (tb) {
+    var id = tb.getAttribute("data-trace"), sq = tb.getAttribute("data-seq");
+    var host = document.getElementById("tr-"+id+"-"+sq);
+    if (host.hidden) { loadTrace(id, sq, host); tb.textContent = "Hide the detail"; }
+    else { host.hidden = true; tb.textContent = "Show everything this question did"; }
+    return;
+  }
   var hd = e.target.closest(".card > h2");
   if(!hd) return;
   var c = hd.parentElement, shut = c.classList.toggle("shut");
