@@ -9909,7 +9909,34 @@
         }
       ],
       "state_machine": [],
-      "runs": [],
+      "runs": [
+        {
+          "id": "7405e66f-ce4f-4b46-8705-a35096cd426f",
+          "by": "live-check",
+          "status": "cancelled",
+          "tasks": 1,
+          "started": "2026-09-07 18:05",
+          "finished": "2026-09-07 18:05",
+          "note": "live endpoint check",
+          "events": [
+            {
+              "at": "18:05:29",
+              "source": "registry",
+              "kind": "run_started",
+              "seq": null,
+              "text": "Queued 1 question for Comprehensive Behavioral Health Assessment.",
+              "data": {
+                "queued": true,
+                "line_key": "cbha",
+                "line_name": "Comprehensive Behavioral Health Assessment",
+                "task_count": 1,
+                "requested_by": "live-check"
+              }
+            }
+          ],
+          "items": []
+        }
+      ],
       "review": [
         {
           "kind": "standard_requirement",

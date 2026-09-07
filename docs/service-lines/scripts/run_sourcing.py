@@ -147,7 +147,8 @@ def targets(cur, line_key, only_unsourced=True, limit=None):
     return [dict(r) for r in cur.fetchall()]
 
 
-def run(line_key, requested_by, limit=None, dry=False, max_rounds=2, existing_run=None):
+def run(line_key, requested_by, limit=None, dry=False, max_rounds=2,
+        existing_run=None, profile=None):
     conn, cur = db()
     cur.execute("select key, name from service_line.line where key=%s", (line_key,))
     line = cur.fetchone()
@@ -162,11 +163,16 @@ def run(line_key, requested_by, limit=None, dry=False, max_rounds=2, existing_ru
         # The API already created the run and emitted run_started when it queued it.
         # Making a second row here would orphan the run_id the surface is streaming.
         run_id = existing_run
-        cur.execute("update service_line.sourcing_run set task_count=%s where id=%s",
-                    (len(reqs), run_id))
+        cur.execute("""update service_line.sourcing_run set task_count=%s,
+                          model_profile=coalesce(model_profile,%s) where id=%s""",
+                    (len(reqs), profile, run_id))
+        cur.execute("select model_profile from service_line.sourcing_run where id=%s", (run_id,))
+        profile = (cur.fetchone() or {}).get("model_profile") or profile
     else:
-        cur.execute("""insert into service_line.sourcing_run (line_key, requested_by, task_count)
-                       values (%s,%s,%s) returning id""", (line_key, requested_by, len(reqs)))
+        cur.execute("""insert into service_line.sourcing_run
+                         (line_key, requested_by, task_count, model_profile)
+                       values (%s,%s,%s,%s) returning id""",
+                    (line_key, requested_by, len(reqs), profile))
         run_id = cur.fetchone()["id"]
 
     gov = governing(cur, line_key)
@@ -175,6 +181,9 @@ def run(line_key, requested_by, limit=None, dry=False, max_rounds=2, existing_ru
              {"line_key": line_key, "line_name": line["name"], "task_count": len(reqs),
               "requested_by": requested_by},
              f"Sourcing {len(reqs)} requirements for {line['name']}.")
+    emit(cur, run_id, "model_profile", {"profile": profile},
+         f"Asking under the {profile} model profile." if profile
+         else "Asking under the worker's default model profile.")
     emit(cur, run_id, "governing_resolved", gov,
          (f"Governing rule {gov['rule_ref']} is held — {gov['chunks']} sections readable."
           if gov["resolvable"] else
@@ -182,6 +191,7 @@ def run(line_key, requested_by, limit=None, dry=False, max_rounds=2, existing_ru
 
     print(f"run {run_id}  {line['name']}  {len(reqs)} requirements")
     print(f"  governing: {gov}")
+    PROFILE_NOTE = profile or "worker default"
     if dry:
         cur.execute("""update service_line.sourcing_run
                           set status='cancelled', finished_at=now(),
@@ -189,7 +199,45 @@ def run(line_key, requested_by, limit=None, dry=False, max_rounds=2, existing_ru
         print("  (dry run — nothing asked)")
         return run_id
 
-    from deep_research.service import open_and_run   # noqa: E402
+    # perform_turn, not service.open_and_run. Both ask, extract, judge and record — but
+    # open_and_run calls ask_chat_streaming(q, chat_mode) with no profile, so a run takes
+    # whatever model the worker instance happens to be set to. That is not a choice
+    # anybody made, and it is how three runs died on Anthropic today while
+    # /chat/admin/model-profile reported "gemini": the GET reads one of four Cloud Run
+    # instances and the worker answering may be another. runner.perform_turn threads the
+    # profile through to the request, where it cannot fragment.
+    #
+    # This uses Deep Research's public entry points and mints the turn the way work()
+    # expects to find one. Nothing in their module is modified.
+    from deep_research.runner import perform_turn                       # noqa: E402
+
+    # TWO different LLM uses happen inside perform_turn, and only one of them is a
+    # chat request:
+    #
+    #   1. the ASK — ask_chat_streaming() hits the chat SERVICE, which searches the
+    #      corpus and answers. `profile` travels with that request and works.
+    #   2. the EXTRACTOR and JUDGE — extract()/critique() run IN THIS PROCESS via
+    #      llm_manager.generate_sync(stage="parser"). They turn the prose answer into
+    #      the typed slots `expects` asked for, and check each field. generate_sync
+    #      takes no profile argument, so #2 kept drawing Anthropic and dying on credits
+    #      while #1 was happily answering on Gemini.
+    #
+    # profile_override sets a ContextVar the router reads, so it covers the in-process
+    # half too. Without it, choosing a profile in the UI would silently steer only the
+    # ask and leave the extraction on whatever the pool drew.
+    from contextlib import ExitStack                                    # noqa: E402
+    stack = ExitStack()
+    if profile:
+        try:
+            from app.services.model_profile import profile_override     # noqa: E402
+            stack.enter_context(profile_override(profile))
+            print(f"  in-process extraction pinned to profile: {profile}")
+        except Exception as exc:
+            # Say so rather than running the extractor on an unintended model and
+            # reporting the result as if the profile had been honoured.
+            emit(cur, run_id, "error", {"profile": profile, "error": str(exc)[:300]},
+                 f"Could not pin the extractor to {profile}; it will use the default pool.")
+            print(f"  WARNING: extractor not pinned ({exc})")
 
     for seq, r in enumerate(reqs, 1):
         rtype = r["requirement_type"]
@@ -197,18 +245,8 @@ def run(line_key, requested_by, limit=None, dry=False, max_rounds=2, existing_ru
         question = (f"For {JURISDICTION}: " + ASK[rtype].format(subject=subject) +
                     (f" The governing rule is {gov['rule_ref']}." if gov["rule_ref"] else "") +
                     " Quote the governing policy text and name the source document.")
-        # §4.5 — subject_id must resolve. Until the producer accepts a structured
-        # subject we send the requirement id itself, which is the only string that
-        # joins. The composite convention ('bh_therapy/service_limit_H2019_HR') is
-        # exactly what 0 of 9 existing requests could not be filed under.
         subject_id = str(r["id"])
 
-        # Create the request row HERE, not inside open_and_run, so membership carries a
-        # request_id from the start. Without this the live stream shows nothing from the
-        # state machine until a task FINISHES — the joins to research.turn/attempt have
-        # no key to join on — which is a progress bar that only moves once the work is
-        # already done. open_and_run upserts on the same (consumer, subject_type,
-        # subject_id) conflict target, so it adopts this row rather than making a second.
         cur.execute("""insert into research.request
                          (consumer, subject_type, subject_id, question, evaluator_prompt,
                           extraction_schema, jurisdiction, max_rounds, invoker, status)
@@ -220,6 +258,7 @@ def run(line_key, requested_by, limit=None, dry=False, max_rounds=2, existing_ru
                        returning id""",
                     (subject_id, question, EVAL, Json(SLOTS[rtype]), JURISDICTION, max_rounds))
         pre_id = cur.fetchone()["id"]
+
         cur.execute("""insert into service_line.sourcing_link
                        (request_id, requirement_id, line_key, requirement_type, code,
                         qualifier, origin)
@@ -227,48 +266,69 @@ def run(line_key, requested_by, limit=None, dry=False, max_rounds=2, existing_ru
                        on conflict (request_id) do update
                          set requirement_id=excluded.requirement_id, origin='declared'""",
                     (pre_id, r["id"], line_key, rtype, r["code"], r["qualifier"]))
-
         cur.execute("""insert into service_line.sourcing_run_member
                        (run_id, request_id, requirement_id, requirement_type, code, qualifier, seq)
                        values (%s,%s,%s,%s,%s,%s,%s)""",
                     (run_id, pre_id, r["id"], rtype, r["code"], r["qualifier"], seq))
         emit(cur, run_id, "request_opened",
              {"requirement_id": r["id"], "request_id": pre_id, "requirement_type": rtype,
-              "code": r["code"], "expects": list(SLOTS[rtype]), "question": question},
+              "code": r["code"], "expects": list(SLOTS[rtype]), "question": question,
+              "model_profile": profile},
              None, seq)
-        print(f"  [{seq}/{len(reqs)}] {rtype}{' ' + r['code'] if r['code'] else ''} …", flush=True)
+        print(f"  [{seq}/{len(reqs)}] {rtype}{' ' + r['code'] if r['code'] else ''} "
+              f"(profile: {PROFILE_NOTE}) …", flush=True)
 
-        try:
-            res = open_and_run(
-                consumer="service_line_registry", subject_type="standard_requirement",
-                subject_id=subject_id, question=question, evaluator_prompt=EVAL,
-                extraction_schema=SLOTS[rtype], jurisdiction=JURISDICTION,
-                max_rounds=max_rounds)
-        except Exception as exc:
-            traceback.print_exc()
-            emit(cur, run_id, "error", {"requirement_id": r["id"], "error": str(exc)[:500]},
-                 f"{rtype} failed to run.", seq)
-            continue
+        state, note, q, rounds = None, None, question, 0
+        for n in range(1, max_rounds + 1):
+            cur.execute("""insert into research.turn (request_id, n, query, status)
+                           values (%s,%s,%s,'running')
+                           on conflict (request_id, n) do update
+                             set query=excluded.query, extract_state='pending',
+                                 attempt_id=null, status='running'
+                           returning *""", (pre_id, n, q))
+            turn = dict(cur.fetchone())
+            rounds = n
+            try:
+                out = perform_turn(cur, turn, "agentic", profile)
+            except Exception as exc:
+                traceback.print_exc()
+                emit(cur, run_id, "error",
+                     {"requirement_id": r["id"], "error": str(exc)[:500],
+                      "model_profile": profile},
+                     f"{rtype} failed to run.", seq)
+                state, note = "error", str(exc)[:300]
+                break
+            state, note = out.get("state"), out.get("note")
+            if state == "extracted":
+                break
+            # A turn left 'pending' means the ask itself failed — retrying the same
+            # question against the same broken path just burns the round budget.
+            if state == "pending":
+                break
+            cur.execute("select next_query from research.turn where id=%s", (turn["id"],))
+            nxt = (cur.fetchone() or {}).get("next_query")
+            if not nxt:
+                break
+            q = nxt
 
-        rid = res.get("request_id")
-        if rid != pre_id:
-            # open_and_run should have adopted our row via the conflict target. If it
-            # did not, the stream has been following the wrong request all along — say
-            # so loudly rather than quietly repointing and losing the earlier steps.
-            emit(cur, run_id, "error",
-                 {"expected_request_id": pre_id, "got": rid},
-                 "The state machine opened a different request than the one this run "
-                 "was following; live steps for this task were not captured.", seq)
-            cur.execute("""update service_line.sourcing_run_member set request_id=%s
-                            where run_id=%s and seq=%s""", (rid, run_id, seq))
+        if state == "extracted":
+            cur.execute("""update research.request set status='sourced', resolved_at=now()
+                            where id=%s""", (pre_id,))
+        elif state != "error":
+            cur.execute("update research.request set status='escalated' where id=%s", (pre_id,))
+
+        cur.execute("""select outcome, source_document from research.attempt
+                        where request_id=%s order by round desc, id desc limit 1""", (pre_id,))
+        last = cur.fetchone() or {}
         emit(cur, run_id, "request_settled",
-             {"requirement_id": r["id"], "request_id": rid, "status": res.get("status"),
-              "turns": res.get("turns_run"), "gap_class": res.get("gap_class"),
-              "document": res.get("source_document")},
-             res.get("statement"), seq)
-        print(f"        -> {res.get('status')} in {res.get('turns_run')} turn(s)"
-              f"{' [' + str(res.get('gap_class')) + ']' if res.get('gap_class') else ''}", flush=True)
+             {"requirement_id": r["id"], "request_id": pre_id, "state": state,
+              "turns": rounds, "outcome": last.get("outcome"),
+              "document": last.get("source_document"), "model_profile": profile},
+             note, seq)
+        print(f"        -> {state} in {rounds} turn(s)"
+              f"{' — ' + note[:80] if note else ''}", flush=True)
 
+    stack.close()
     cur.execute("""update service_line.sourcing_run set status='finished', finished_at=now()
                     where id=%s""", (run_id,))
     cur.execute("""select coalesce(f.finding,'undiagnosed') k, count(*) from (
@@ -301,7 +361,8 @@ def serve(poll_s=5, who=None):
                                      where status='requested'
                                      order by started_at limit 1
                                      for update skip locked)
-                    returning id, line_key, requested_by, requested_limit, max_rounds""",
+                    returning id, line_key, requested_by, requested_limit, max_rounds,
+                              model_profile""",
                     (who,))
         row = cur.fetchone()
         if not row:
@@ -314,7 +375,8 @@ def serve(poll_s=5, who=None):
         print(f"\nclaimed {row['id']} ({row['line_key']}) requested by {row['requested_by']}")
         try:
             run(row["line_key"], row["requested_by"], row["requested_limit"],
-                False, row["max_rounds"], existing_run=row["id"])
+                False, row["max_rounds"], existing_run=row["id"],
+                profile=row["model_profile"])
         except Exception as exc:
             traceback.print_exc()
             cur.execute("""update service_line.sourcing_run
@@ -330,11 +392,14 @@ if __name__ == "__main__":
     p.add_argument("--by", default="registry")
     p.add_argument("--limit", type=int)
     p.add_argument("--rounds", type=int, default=2)
+    p.add_argument("--profile", default=None,
+                   help="chat model profile: gemini | anthropic | auto | bandit | "
+                        "optimal | default. Omit to take the worker's own default.")
     p.add_argument("--dry", action="store_true")
     a = p.parse_args()
     if a.serve:
         serve()
     elif a.line_key:
-        print(run(a.line_key, a.by, a.limit, a.dry, a.rounds))
+        print(run(a.line_key, a.by, a.limit, a.dry, a.rounds, profile=a.profile))
     else:
         p.error("give a line_key, or --serve to take requests from the surface")

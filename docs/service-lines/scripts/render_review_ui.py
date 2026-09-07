@@ -424,6 +424,11 @@ td.cd small{display:block;font-weight:400;color:var(--mobius-text-muted)}
   /* A run and its steps. Deliberately quiet: this lives inside Technical details,
      which a reviewer opens only when they want to know how an answer was reached. */
   .throw{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .srcbar{display:flex;align-items:center;gap:6px}
+  .mini{font-size:var(--mobius-text-xs);color:var(--mobius-text-muted)}
+  .sel{font:inherit;font-size:12px;padding:4px 6px;border-radius:8px;
+    border:1px solid var(--mobius-border);background:var(--mobius-bg-card);
+    color:var(--mobius-text-primary)}
   .btn-src{font:inherit;font-size:12px;padding:5px 11px;border-radius:8px;
     border:1px solid var(--mobius-border);background:var(--mobius-surface);
     color:var(--mobius-text);cursor:pointer}
@@ -667,7 +672,11 @@ function draw(){
       }).join("")+'</dl></div>'+
     '<div class="pad" style="border-top:1px solid var(--mobius-border)">'+
       '<div class="throw"><h3 class="th">Sourcing</h3>'+
-        '<button class="btn-src" data-src="'+esc(l.id)+'">Source this service</button></div>'+
+        '<span class="srcbar">'+
+          '<label class="mini" for="srcprof">Answer using</label>'+
+          '<select class="sel" id="srcprof"></select>'+
+          '<button class="btn-src" data-src="'+esc(l.id)+'">Source this service</button>'+
+        '</span></div>'+
       '<div id="srcnote" class="hint2"></div>'+
       '<ol class="steps live" id="srclive" hidden></ol>'+
       (l.runs.length ? l.runs.map(runBlock).join("")
@@ -739,6 +748,33 @@ function runBlock(r){
     '<ol class="steps">'+steps+'</ol></div>';
 }
 
+/* The picker is populated from chat's own list, never a copy of it: a hard-coded set
+   would offer a profile the day chat drops one and hide one the day chat adds one.
+   "Recommended" marks the default rather than hiding the others — the point of the
+   control is to let someone test the same question across models and compare. */
+var PROFILE_SAID = {gemini:"Gemini", anthropic:"Claude", auto:"Automatic",
+                    bandit:"Best performing", optimal:"Best available",
+                    "default":"Standard"};
+function chosenProfile(){
+  var el = document.getElementById("srcprof");
+  return (el && el.value) || null;
+}
+function loadProfiles(){
+  var el = document.getElementById("srcprof");
+  if (!el) return;
+  el.innerHTML = '<option value="">Standard</option>';
+  fetch(API+"/api/service-line/model-profiles")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if (!d || !d.data || !d.data.profiles) return;
+      el.innerHTML = d.data.profiles.map(function(p){
+        return '<option value="'+esc(p)+'"'+(p==="gemini"?" selected":"")+'>'+
+          esc(PROFILE_SAID[p] || p)+'</option>';
+      }).join("");
+    })
+    .catch(function(){ /* leave the single Standard option */ });
+}
+
 function startRun(lineId){
   var note = document.getElementById("srcnote");
   var live = document.getElementById("srclive");
@@ -750,7 +786,7 @@ function startRun(lineId){
 
   fetch(API+"/api/service-line/lines/"+encodeURIComponent(lineId)+"/source", {
     method:"POST", headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({requested_by:"surface"})
+    body: JSON.stringify({requested_by:"surface", model_profile: chosenProfile()})
   })
   .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
   .then(function(d){
@@ -803,6 +839,7 @@ function startRun(lineId){
 }
 
   document.getElementById("main").innerHTML = h;
+  loadProfiles();
 }
 
 document.getElementById("main").addEventListener("click", function(e){
@@ -853,6 +890,7 @@ function drawQueue(){
   });
   if(!rows.length) h = '<div class="empty"><span>Nothing is waiting to be checked.</span></div>';
   document.getElementById("main").innerHTML = h;
+  loadProfiles();
 }
 document.getElementById("expand").addEventListener("click", function(){
   cur = null; drawNav(); drawQueue();
