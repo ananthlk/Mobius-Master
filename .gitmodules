@@ -68,3 +68,6 @@
 [submodule "mobius-interact"]
 	path = mobius-interact
 	url = https://github.com/ananthlk/mobius-interact.git
+[submodule "product-awareness"]
+	path = product-awareness
+	url = https://github.com/ananthlk/product-awareness.git
