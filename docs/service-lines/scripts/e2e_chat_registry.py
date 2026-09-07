@@ -41,7 +41,9 @@ CHAT = "https://mobius-chat-ortabkknqa-uc.a.run.app"
 
 
 def norm(s):
-    return re.sub(r"[^a-z0-9 ]+", " ", (s or "").lower())
+    """Markdown bold used to survive as a double space, so "**4** different"
+    never matched "4 different" and a correct answer graded as a failure."""
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9 ]+", " ", (s or "").lower())).strip()
 
 
 # Each case: what the registry holds, what the answer must contain, and what it
@@ -92,7 +94,8 @@ CASES = [
         "id": "5", "name": "unit undefined — must refuse to quantify",
         "q": "How many units of T2023 with modifier HA can be billed per month?",
         "truth": "the schedule says 'Maximum 1 unit per month' and never defines a unit",
-        "require": [["not define", "does not define", "never define", "not specified", "cannot be determined"]],
+        "require": [["not define", "does not define", "never define", "not specified",
+             "not provided", "cannot be determined"]],
         "forbid": ["do not infer", "give the raw wording", "you must", "synthesis requirement"],
         "why_forbid": "A model-facing directive rendered at a provider. The caveat's "
                       "`directive` field is for the model; `text` is for the user.",
@@ -102,9 +105,12 @@ CASES = [
         "q": "For the Florida Medicaid Behavioral Health Assessment Services line (bh_assessment), what does the standard require in order to bill?",
         "truth": "5 of 7 sourced; place_of_service and prior_authorization are placeholders. The question names the line because an ambiguous one made chat ask which of bh_assessment/cbha was meant — correct behaviour, wrongly graded as a failure.",
         "require": [["documentation", "document"], ["medical", "necessity", "qualification"]],
-        "forbid": ["not yet extracted", "stated in its coverage policy; not yet"],
-        "why_forbid": "Those are OUR placeholder wording. Quoting one as policy launders a "
-                      "gap into a requirement.",
+        "forbid": ["never quote", "unsourced row as policy",
+                   "stated in its coverage policy; not yet"],
+        "why_forbid": "Two failures. Quoting a placeholder as policy launders a gap "
+                      "into a requirement. And 'Never quote the statement of an unsourced "
+                      "row as policy' is the caveat's `directive` — a model instruction "
+                      "reproduced at a provider, the same leak as before in a new field.",
     },
 ]
 
