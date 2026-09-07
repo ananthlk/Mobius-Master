@@ -236,7 +236,12 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "behavior analysis services",
+          "behavior analysis",
+          "applied behavior analysis",
+          "aba"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -1049,7 +1054,10 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "behavioral health assessment services",
+          "behavioral health assessment"
+        ],
         "documents": [
           {
             "document": "2025 Community Behavoir Health Fee Schedule.pdf",
@@ -2864,7 +2872,10 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "behavioral health community support services",
+          "behavioral health community support"
+        ],
         "documents": [
           {
             "document": "2025 Community Behavoir Health Fee Schedule.pdf",
@@ -4494,7 +4505,10 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "behavioral health intervention services",
+          "behavioral health intervention"
+        ],
         "documents": [
           {
             "document": "2025 Community Behavoir Health Fee Schedule.pdf",
@@ -6281,7 +6295,10 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "behavioral health medication management services",
+          "behavioral health medication management"
+        ],
         "documents": [
           {
             "document": "2025 Community Behavoir Health Fee Schedule.pdf",
@@ -6760,15 +6777,621 @@
         },
         {
           "ref": 83,
-          "state": "open",
+          "state": "escalated",
           "about": "documentation",
-          "rounds": 1,
+          "rounds": 2,
           "gap": null,
           "finding": null,
           "owner": null
         }
       ],
       "runs": [
+        {
+          "id": "c450acf8-72e7-46ff-beeb-447a5ad6426f",
+          "by": "ananth",
+          "status": "finished",
+          "tasks": 1,
+          "started": "2026-09-07 18:17",
+          "finished": "2026-09-07 18:29",
+          "note": null,
+          "events": [
+            {
+              "at": "18:17:25",
+              "source": "registry",
+              "kind": "run_started",
+              "seq": null,
+              "text": "Sourcing 1 requirements for Behavioral Health Medication Management Services.",
+              "data": {
+                "line_key": "bh_medication_mgmt",
+                "line_name": "Behavioral Health Medication Management Services",
+                "task_count": 1,
+                "requested_by": "ananth"
+              }
+            },
+            {
+              "at": "18:17:25",
+              "source": "registry",
+              "kind": "model_profile",
+              "seq": null,
+              "text": "Asking under the gemini model profile.",
+              "data": {
+                "profile": "gemini"
+              }
+            },
+            {
+              "at": "18:17:25",
+              "source": "registry",
+              "kind": "governing_resolved",
+              "seq": null,
+              "text": "Governing rule 59G-4.029 is held \u2014 15 sections readable.",
+              "data": {
+                "chunks": 15,
+                "document": "59G-4.029.pdf",
+                "rule_ref": "59G-4.029",
+                "resolvable": true,
+                "document_id": "168b798d-0652-46ed-8134-60e29e5386c7"
+              }
+            },
+            {
+              "at": "18:17:26",
+              "source": "registry",
+              "kind": "request_opened",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "code": null,
+                "expects": [
+                  "elements",
+                  "retention_period"
+                ],
+                "question": "For Florida Medicaid: What documentation must be in the record to support billing Behavioral Health Medication Management Services? The governing rule is 59G-4.029. Quote the governing policy text and name the source document.",
+                "request_id": 83,
+                "model_profile": "gemini",
+                "requirement_id": 65,
+                "requirement_type": "documentation"
+              }
+            },
+            {
+              "at": "18:19:25",
+              "source": "deep_research",
+              "kind": "attempt",
+              "seq": 1,
+              "text": "0 of 0 fields survived",
+              "data": {
+                "model": "gemini-2.5-flash",
+                "quote": null,
+                "round": 1,
+                "outcome": "not_answered",
+                "verdict": {
+                  "extract": {
+                    "prose": "The documentation requirements for Florida Medicaid Behavioral Health Medication Management Services could not be retrieved from the provided documents.",
+                    "_model": "gemini-2.5-flash",
+                    "fields": []
+                  },
+                  "critique": {
+                    "kept": [],
+                    "leads": [],
+                    "record": {},
+                    "dropped": [],
+                    "summary": "0 of 0 fields survived",
+                    "accepted": false,
+                    "verdicts": [],
+                    "certifiable": true,
+                    "authority_mode": "any_cited",
+                    "missing_required": []
+                  }
+                },
+                "document": null,
+                "documents": [
+                  "Exhibit_II_A-MMA_2019-02-01.pdf",
+                  "59G-4.028.pdf",
+                  "State Mental Health Hospital Services",
+                  "SH-PRO-BH-PSR.pdf",
+                  "abhfl_medicaid_comprehensive_ltc_provider_manual.pdf",
+                  "FL-Care-Provider-Manual-Statewide-Medicaid-Managed-Care.pdf",
+                  "Appts.pdf",
+                  "Exhibit_II-A_Managed_Medical_Assistance__MMA__Program_Oct_2025.pdf"
+                ],
+                "statement": "The documentation requirements for Florida Medicaid Behavioral Health Medication Management Services could not be retrieved from the provided documents.",
+                "confidence": null
+              }
+            },
+            {
+              "at": "18:19:33",
+              "source": "deep_research",
+              "kind": "turn_running",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "n": 2,
+                "note": null,
+                "query": "For Florida Medicaid: What documentation must be in the record to support billing Behavioral Health Medication Management Services? The governing rule is 59G-4.029. Quote the governing policy text and name the source document.\n\nQuote the sentence that states each value.",
+                "next_query": null,
+                "extract_state": "pending"
+              }
+            },
+            {
+              "at": "18:29:17",
+              "source": "registry",
+              "kind": "request_settled",
+              "seq": 1,
+              "text": "chat: timed out waiting for chat",
+              "data": {
+                "state": "pending",
+                "turns": 2,
+                "outcome": "not_answered",
+                "document": null,
+                "request_id": 83,
+                "model_profile": "gemini",
+                "requirement_id": 65
+              }
+            },
+            {
+              "at": "18:29:18",
+              "source": "registry",
+              "kind": "run_finished",
+              "seq": null,
+              "text": null,
+              "data": {
+                "counts": {
+                  "undiagnosed": 1
+                }
+              }
+            }
+          ],
+          "items": [
+            {
+              "seq": 1,
+              "about": "documentation",
+              "code": null,
+              "finding": null,
+              "gap": null,
+              "owner": null,
+              "quote": null,
+              "document": null,
+              "citation": "uncited"
+            }
+          ]
+        },
+        {
+          "id": "36a31f8c-6ad8-4635-ada2-499d01712628",
+          "by": "ananth",
+          "status": "finished",
+          "tasks": 1,
+          "started": "2026-09-07 18:14",
+          "finished": "2026-09-07 18:16",
+          "note": null,
+          "events": [
+            {
+              "at": "18:14:06",
+              "source": "registry",
+              "kind": "run_started",
+              "seq": null,
+              "text": "Sourcing 1 requirements for Behavioral Health Medication Management Services.",
+              "data": {
+                "line_key": "bh_medication_mgmt",
+                "line_name": "Behavioral Health Medication Management Services",
+                "task_count": 1,
+                "requested_by": "ananth"
+              }
+            },
+            {
+              "at": "18:14:06",
+              "source": "registry",
+              "kind": "model_profile",
+              "seq": null,
+              "text": "Asking under the gemini model profile.",
+              "data": {
+                "profile": "gemini"
+              }
+            },
+            {
+              "at": "18:14:06",
+              "source": "registry",
+              "kind": "governing_resolved",
+              "seq": null,
+              "text": "Governing rule 59G-4.029 is held \u2014 15 sections readable.",
+              "data": {
+                "chunks": 15,
+                "document": "59G-4.029.pdf",
+                "rule_ref": "59G-4.029",
+                "resolvable": true,
+                "document_id": "168b798d-0652-46ed-8134-60e29e5386c7"
+              }
+            },
+            {
+              "at": "18:14:06",
+              "source": "registry",
+              "kind": "request_opened",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "code": null,
+                "expects": [
+                  "elements",
+                  "retention_period"
+                ],
+                "question": "For Florida Medicaid: What documentation must be in the record to support billing Behavioral Health Medication Management Services? The governing rule is 59G-4.029. Quote the governing policy text and name the source document.",
+                "request_id": 83,
+                "model_profile": "gemini",
+                "requirement_id": 65,
+                "requirement_type": "documentation"
+              }
+            },
+            {
+              "at": "18:16:04",
+              "source": "deep_research",
+              "kind": "attempt",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "model": null,
+                "quote": null,
+                "round": 1,
+                "outcome": "pending",
+                "verdict": null,
+                "document": null,
+                "documents": [
+                  "Exhibit_II_A-MMA_2019-02-01.pdf",
+                  "59G-4.028.pdf",
+                  "State Mental Health Hospital Services",
+                  "SH-PRO-BH-PSR.pdf",
+                  "abhfl_medicaid_comprehensive_ltc_provider_manual.pdf",
+                  "FL-Care-Provider-Manual-Statewide-Medicaid-Managed-Care.pdf",
+                  "Appts.pdf",
+                  "Exhibit_II-A_Managed_Medical_Assistance__MMA__Program_Oct_2025.pdf"
+                ],
+                "statement": null,
+                "confidence": null
+              }
+            },
+            {
+              "at": "18:16:08",
+              "source": "registry",
+              "kind": "error",
+              "seq": 1,
+              "text": "documentation failed to run.",
+              "data": {
+                "error": "Anthropic API error 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CepY49tKEiHnoXj2rEsjf\"}",
+                "model_profile": "gemini",
+                "requirement_id": 65
+              }
+            },
+            {
+              "at": "18:16:08",
+              "source": "registry",
+              "kind": "request_settled",
+              "seq": 1,
+              "text": "Anthropic API error 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CepY49tKEiHnoXj2rEsjf\"}",
+              "data": {
+                "state": "error",
+                "turns": 1,
+                "outcome": "pending",
+                "document": null,
+                "request_id": 83,
+                "model_profile": "gemini",
+                "requirement_id": 65
+              }
+            },
+            {
+              "at": "18:16:08",
+              "source": "registry",
+              "kind": "run_finished",
+              "seq": null,
+              "text": null,
+              "data": {
+                "counts": {
+                  "undiagnosed": 1
+                }
+              }
+            },
+            {
+              "at": "18:19:25",
+              "source": "deep_research",
+              "kind": "attempt",
+              "seq": 1,
+              "text": "0 of 0 fields survived",
+              "data": {
+                "model": "gemini-2.5-flash",
+                "quote": null,
+                "round": 1,
+                "outcome": "not_answered",
+                "verdict": {
+                  "extract": {
+                    "prose": "The documentation requirements for Florida Medicaid Behavioral Health Medication Management Services could not be retrieved from the provided documents.",
+                    "_model": "gemini-2.5-flash",
+                    "fields": []
+                  },
+                  "critique": {
+                    "kept": [],
+                    "leads": [],
+                    "record": {},
+                    "dropped": [],
+                    "summary": "0 of 0 fields survived",
+                    "accepted": false,
+                    "verdicts": [],
+                    "certifiable": true,
+                    "authority_mode": "any_cited",
+                    "missing_required": []
+                  }
+                },
+                "document": null,
+                "documents": [
+                  "Exhibit_II_A-MMA_2019-02-01.pdf",
+                  "59G-4.028.pdf",
+                  "State Mental Health Hospital Services",
+                  "SH-PRO-BH-PSR.pdf",
+                  "abhfl_medicaid_comprehensive_ltc_provider_manual.pdf",
+                  "FL-Care-Provider-Manual-Statewide-Medicaid-Managed-Care.pdf",
+                  "Appts.pdf",
+                  "Exhibit_II-A_Managed_Medical_Assistance__MMA__Program_Oct_2025.pdf"
+                ],
+                "statement": "The documentation requirements for Florida Medicaid Behavioral Health Medication Management Services could not be retrieved from the provided documents.",
+                "confidence": null
+              }
+            },
+            {
+              "at": "18:19:33",
+              "source": "deep_research",
+              "kind": "turn_running",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "n": 2,
+                "note": null,
+                "query": "For Florida Medicaid: What documentation must be in the record to support billing Behavioral Health Medication Management Services? The governing rule is 59G-4.029. Quote the governing policy text and name the source document.\n\nQuote the sentence that states each value.",
+                "next_query": null,
+                "extract_state": "pending"
+              }
+            }
+          ],
+          "items": [
+            {
+              "seq": 1,
+              "about": "documentation",
+              "code": null,
+              "finding": null,
+              "gap": null,
+              "owner": null,
+              "quote": null,
+              "document": null,
+              "citation": "uncited"
+            }
+          ]
+        },
+        {
+          "id": "12759654-efd6-456c-9f67-dec4d17a4869",
+          "by": "ananth",
+          "status": "finished",
+          "tasks": 1,
+          "started": "2026-09-07 18:12",
+          "finished": "2026-09-07 18:13",
+          "note": null,
+          "events": [
+            {
+              "at": "18:12:03",
+              "source": "registry",
+              "kind": "run_started",
+              "seq": null,
+              "text": "Sourcing 1 requirements for Behavioral Health Medication Management Services.",
+              "data": {
+                "line_key": "bh_medication_mgmt",
+                "line_name": "Behavioral Health Medication Management Services",
+                "task_count": 1,
+                "requested_by": "ananth"
+              }
+            },
+            {
+              "at": "18:12:03",
+              "source": "registry",
+              "kind": "model_profile",
+              "seq": null,
+              "text": "Asking under the gemini model profile.",
+              "data": {
+                "profile": "gemini"
+              }
+            },
+            {
+              "at": "18:12:03",
+              "source": "registry",
+              "kind": "governing_resolved",
+              "seq": null,
+              "text": "Governing rule 59G-4.029 is held \u2014 15 sections readable.",
+              "data": {
+                "chunks": 15,
+                "document": "59G-4.029.pdf",
+                "rule_ref": "59G-4.029",
+                "resolvable": true,
+                "document_id": "168b798d-0652-46ed-8134-60e29e5386c7"
+              }
+            },
+            {
+              "at": "18:12:03",
+              "source": "registry",
+              "kind": "request_opened",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "code": null,
+                "expects": [
+                  "elements",
+                  "retention_period"
+                ],
+                "question": "For Florida Medicaid: What documentation must be in the record to support billing Behavioral Health Medication Management Services? The governing rule is 59G-4.029. Quote the governing policy text and name the source document.",
+                "request_id": 83,
+                "model_profile": "gemini",
+                "requirement_id": 65,
+                "requirement_type": "documentation"
+              }
+            },
+            {
+              "at": "18:13:30",
+              "source": "deep_research",
+              "kind": "attempt",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "model": null,
+                "quote": null,
+                "round": 1,
+                "outcome": "pending",
+                "verdict": null,
+                "document": null,
+                "documents": [
+                  "Exhibit_II-A_-_Managed_Medical_Assistance__MMA__Program.pdf",
+                  "SH-PRO-BH-PSR.pdf",
+                  "State Mental Health Hospital Services",
+                  "abhfl_medicaid_comprehensive_ltc_provider_manual.pdf",
+                  "Statewide Inpatient Psychiatric Program Services",
+                  "59G-4.028.pdf",
+                  "Behavioral Health Overlay Services",
+                  "FL-Care-Provider-Manual-Statewide-Medicaid-Managed-Care.pdf"
+                ],
+                "statement": null,
+                "confidence": null
+              }
+            },
+            {
+              "at": "18:13:33",
+              "source": "registry",
+              "kind": "error",
+              "seq": 1,
+              "text": "documentation failed to run.",
+              "data": {
+                "error": "Anthropic API error 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CepXrmY69FD6s8bgVhvGG\"}",
+                "model_profile": "gemini",
+                "requirement_id": 65
+              }
+            },
+            {
+              "at": "18:13:33",
+              "source": "registry",
+              "kind": "request_settled",
+              "seq": 1,
+              "text": "Anthropic API error 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CepXrmY69FD6s8bgVhvGG\"}",
+              "data": {
+                "state": "error",
+                "turns": 1,
+                "outcome": "pending",
+                "document": null,
+                "request_id": 83,
+                "model_profile": "gemini",
+                "requirement_id": 65
+              }
+            },
+            {
+              "at": "18:13:33",
+              "source": "registry",
+              "kind": "run_finished",
+              "seq": null,
+              "text": null,
+              "data": {
+                "counts": {
+                  "undiagnosed": 1
+                }
+              }
+            },
+            {
+              "at": "18:16:04",
+              "source": "deep_research",
+              "kind": "attempt",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "model": null,
+                "quote": null,
+                "round": 1,
+                "outcome": "pending",
+                "verdict": null,
+                "document": null,
+                "documents": [
+                  "Exhibit_II_A-MMA_2019-02-01.pdf",
+                  "59G-4.028.pdf",
+                  "State Mental Health Hospital Services",
+                  "SH-PRO-BH-PSR.pdf",
+                  "abhfl_medicaid_comprehensive_ltc_provider_manual.pdf",
+                  "FL-Care-Provider-Manual-Statewide-Medicaid-Managed-Care.pdf",
+                  "Appts.pdf",
+                  "Exhibit_II-A_Managed_Medical_Assistance__MMA__Program_Oct_2025.pdf"
+                ],
+                "statement": null,
+                "confidence": null
+              }
+            },
+            {
+              "at": "18:19:25",
+              "source": "deep_research",
+              "kind": "attempt",
+              "seq": 1,
+              "text": "0 of 0 fields survived",
+              "data": {
+                "model": "gemini-2.5-flash",
+                "quote": null,
+                "round": 1,
+                "outcome": "not_answered",
+                "verdict": {
+                  "extract": {
+                    "prose": "The documentation requirements for Florida Medicaid Behavioral Health Medication Management Services could not be retrieved from the provided documents.",
+                    "_model": "gemini-2.5-flash",
+                    "fields": []
+                  },
+                  "critique": {
+                    "kept": [],
+                    "leads": [],
+                    "record": {},
+                    "dropped": [],
+                    "summary": "0 of 0 fields survived",
+                    "accepted": false,
+                    "verdicts": [],
+                    "certifiable": true,
+                    "authority_mode": "any_cited",
+                    "missing_required": []
+                  }
+                },
+                "document": null,
+                "documents": [
+                  "Exhibit_II_A-MMA_2019-02-01.pdf",
+                  "59G-4.028.pdf",
+                  "State Mental Health Hospital Services",
+                  "SH-PRO-BH-PSR.pdf",
+                  "abhfl_medicaid_comprehensive_ltc_provider_manual.pdf",
+                  "FL-Care-Provider-Manual-Statewide-Medicaid-Managed-Care.pdf",
+                  "Appts.pdf",
+                  "Exhibit_II-A_Managed_Medical_Assistance__MMA__Program_Oct_2025.pdf"
+                ],
+                "statement": "The documentation requirements for Florida Medicaid Behavioral Health Medication Management Services could not be retrieved from the provided documents.",
+                "confidence": null
+              }
+            },
+            {
+              "at": "18:19:33",
+              "source": "deep_research",
+              "kind": "turn_running",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "n": 2,
+                "note": null,
+                "query": "For Florida Medicaid: What documentation must be in the record to support billing Behavioral Health Medication Management Services? The governing rule is 59G-4.029. Quote the governing policy text and name the source document.\n\nQuote the sentence that states each value.",
+                "next_query": null,
+                "extract_state": "pending"
+              }
+            }
+          ],
+          "items": [
+            {
+              "seq": 1,
+              "about": "documentation",
+              "code": null,
+              "finding": null,
+              "gap": null,
+              "owner": null,
+              "quote": null,
+              "document": null,
+              "citation": "uncited"
+            }
+          ]
+        },
         {
           "id": "02a9b0be-4d08-4bb6-9d03-0c5ef1ffc700",
           "by": "ananth",
@@ -6832,10 +7455,10 @@
               "text": null,
               "data": {
                 "n": 1,
-                "note": null,
+                "note": "0 of 0 fields survived",
                 "query": "For Florida Medicaid: What documentation must be in the record to support billing Behavioral Health Medication Management Services? The governing rule is 59G-4.029. Quote the governing policy text and name the source document.",
-                "next_query": null,
-                "extract_state": "pending"
+                "next_query": "For Florida Medicaid: What documentation must be in the record to support billing Behavioral Health Medication Management Services? The governing rule is 59G-4.029. Quote the governing policy text and name the source document.\n\nQuote the sentence that states each value.",
+                "extract_state": "rejected"
               }
             },
             {
@@ -6859,6 +7482,119 @@
                 "counts": {
                   "undiagnosed": 1
                 }
+              }
+            },
+            {
+              "at": "18:13:30",
+              "source": "deep_research",
+              "kind": "attempt",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "model": null,
+                "quote": null,
+                "round": 1,
+                "outcome": "pending",
+                "verdict": null,
+                "document": null,
+                "documents": [
+                  "Exhibit_II-A_-_Managed_Medical_Assistance__MMA__Program.pdf",
+                  "SH-PRO-BH-PSR.pdf",
+                  "State Mental Health Hospital Services",
+                  "abhfl_medicaid_comprehensive_ltc_provider_manual.pdf",
+                  "Statewide Inpatient Psychiatric Program Services",
+                  "59G-4.028.pdf",
+                  "Behavioral Health Overlay Services",
+                  "FL-Care-Provider-Manual-Statewide-Medicaid-Managed-Care.pdf"
+                ],
+                "statement": null,
+                "confidence": null
+              }
+            },
+            {
+              "at": "18:16:04",
+              "source": "deep_research",
+              "kind": "attempt",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "model": null,
+                "quote": null,
+                "round": 1,
+                "outcome": "pending",
+                "verdict": null,
+                "document": null,
+                "documents": [
+                  "Exhibit_II_A-MMA_2019-02-01.pdf",
+                  "59G-4.028.pdf",
+                  "State Mental Health Hospital Services",
+                  "SH-PRO-BH-PSR.pdf",
+                  "abhfl_medicaid_comprehensive_ltc_provider_manual.pdf",
+                  "FL-Care-Provider-Manual-Statewide-Medicaid-Managed-Care.pdf",
+                  "Appts.pdf",
+                  "Exhibit_II-A_Managed_Medical_Assistance__MMA__Program_Oct_2025.pdf"
+                ],
+                "statement": null,
+                "confidence": null
+              }
+            },
+            {
+              "at": "18:19:25",
+              "source": "deep_research",
+              "kind": "attempt",
+              "seq": 1,
+              "text": "0 of 0 fields survived",
+              "data": {
+                "model": "gemini-2.5-flash",
+                "quote": null,
+                "round": 1,
+                "outcome": "not_answered",
+                "verdict": {
+                  "extract": {
+                    "prose": "The documentation requirements for Florida Medicaid Behavioral Health Medication Management Services could not be retrieved from the provided documents.",
+                    "_model": "gemini-2.5-flash",
+                    "fields": []
+                  },
+                  "critique": {
+                    "kept": [],
+                    "leads": [],
+                    "record": {},
+                    "dropped": [],
+                    "summary": "0 of 0 fields survived",
+                    "accepted": false,
+                    "verdicts": [],
+                    "certifiable": true,
+                    "authority_mode": "any_cited",
+                    "missing_required": []
+                  }
+                },
+                "document": null,
+                "documents": [
+                  "Exhibit_II_A-MMA_2019-02-01.pdf",
+                  "59G-4.028.pdf",
+                  "State Mental Health Hospital Services",
+                  "SH-PRO-BH-PSR.pdf",
+                  "abhfl_medicaid_comprehensive_ltc_provider_manual.pdf",
+                  "FL-Care-Provider-Manual-Statewide-Medicaid-Managed-Care.pdf",
+                  "Appts.pdf",
+                  "Exhibit_II-A_Managed_Medical_Assistance__MMA__Program_Oct_2025.pdf"
+                ],
+                "statement": "The documentation requirements for Florida Medicaid Behavioral Health Medication Management Services could not be retrieved from the provided documents.",
+                "confidence": null
+              }
+            },
+            {
+              "at": "18:19:33",
+              "source": "deep_research",
+              "kind": "turn_running",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "n": 2,
+                "note": null,
+                "query": "For Florida Medicaid: What documentation must be in the record to support billing Behavioral Health Medication Management Services? The governing rule is 59G-4.029. Quote the governing policy text and name the source document.\n\nQuote the sentence that states each value.",
+                "next_query": null,
+                "extract_state": "pending"
               }
             }
           ],
@@ -7791,7 +8527,12 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "behavioral health overlay services",
+          "behavioral health overlay",
+          "bhos",
+          "overlay services"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -7861,9 +8602,414 @@
           "gap": "open",
           "finding": null,
           "owner": "deep_research"
+        },
+        {
+          "ref": 88,
+          "state": "sourced",
+          "about": "coverage criteria",
+          "rounds": 1,
+          "gap": null,
+          "finding": null,
+          "owner": null
+        },
+        {
+          "ref": 89,
+          "state": "sourced",
+          "about": "documentation",
+          "rounds": 1,
+          "gap": null,
+          "finding": null,
+          "owner": null
         }
       ],
-      "runs": [],
+      "runs": [
+        {
+          "id": "fe236ea4-db64-4ce4-9488-e110307489a7",
+          "by": "ananth",
+          "status": "finished",
+          "tasks": 2,
+          "started": "2026-09-07 18:46",
+          "finished": "2026-09-07 18:52",
+          "note": null,
+          "events": [
+            {
+              "at": "18:46:18",
+              "source": "registry",
+              "kind": "run_started",
+              "seq": null,
+              "text": "Queued 2 questions for Behavioral Health Overlay Services.",
+              "data": {
+                "queued": true,
+                "line_key": "bh_overlay",
+                "line_name": "Behavioral Health Overlay Services",
+                "task_count": 2,
+                "requested_by": "ananth",
+                "model_profile": "gemini"
+              }
+            },
+            {
+              "at": "18:46:22",
+              "source": "registry",
+              "kind": "model_profile",
+              "seq": null,
+              "text": "Asking under the gemini model profile.",
+              "data": {
+                "profile": "gemini"
+              }
+            },
+            {
+              "at": "18:46:22",
+              "source": "registry",
+              "kind": "governing_resolved",
+              "seq": null,
+              "text": "Governing rule 59G-4.027 is held \u2014 153 sections readable.",
+              "data": {
+                "chunks": 153,
+                "document": "59G-4.027_Behavioral_Health_Overlay_Services_Coverage_and_Limitations_Handbook_Adoption.pdf",
+                "rule_ref": "59G-4.027",
+                "resolvable": true,
+                "document_id": "58bd52d2-6ee0-4ba5-8610-9e6eed797099"
+              }
+            },
+            {
+              "at": "18:46:23",
+              "source": "registry",
+              "kind": "request_opened",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "code": null,
+                "expects": [
+                  "criteria",
+                  "diagnosis_required"
+                ],
+                "question": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for Behavioral Health Overlay Services? The governing rule is 59G-4.027. Quote the governing policy text and name the source document.",
+                "request_id": 88,
+                "model_profile": "gemini",
+                "requirement_id": 125,
+                "requirement_type": "coverage_criteria"
+              }
+            },
+            {
+              "at": "18:46:23",
+              "source": "deep_research",
+              "kind": "turn_running",
+              "seq": 1,
+              "text": null,
+              "data": {
+                "n": 1,
+                "note": "1 of 1 fields survived",
+                "query": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for Behavioral Health Overlay Services? The governing rule is 59G-4.027. Quote the governing policy text and name the source document.",
+                "next_query": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for Behavioral Health Overlay Services? The governing rule is 59G-4.027. Quote the governing policy text and name the source document.\n\nQuote the sentence that states each value.",
+                "extract_state": "extracted"
+              }
+            },
+            {
+              "at": "18:49:10",
+              "source": "deep_research",
+              "kind": "attempt",
+              "seq": 1,
+              "text": "1 of 1 fields survived",
+              "data": {
+                "model": "gemini-2.5-flash",
+                "quote": null,
+                "round": 1,
+                "outcome": "extracted",
+                "verdict": {
+                  "extract": {
+                    "prose": "Molina Healthcare's provider manual indicates that Florida Medicaid Behavioral Health Overlay Services are for recipients in the care of Medicaid-enrolled, certified agencies under contract with the Department of Children and Families, Child Welfare and Community-Based Care organization.",
+                    "_model": "gemini-2.5-flash",
+                    "fields": [
+                      {
+                        "name": "criteria",
+                        "quote": "Molina Healthcare's provider manual describes these services as mental health, substance abuse, and supportive services for recipients in the care of Medicaid-enrolled, certified agencies under contract with the Department of Children and Families, Child Welfare and Community-Based Care organization",
+                        "scope": "Behavioral Health Overlay Services",
+                        "value": "[\"recipients in the care of Medicaid-enrolled, certified agencies under contract with the Department of Children and Families, Child Welfare and Community-Based Care organization\"]",
+                        "document": "molina_fl_provider_manual_2026.pdf"
+                      }
+                    ]
+                  },
+                  "critique": {
+                    "kept": [
+                      {
+                        "name": "criteria",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "Molina Healthcare's provider manual describes these services as mental health, substance abuse, and supportive services for recipients in the care of Medicaid-enrolled, certified agencies under contract with the Department of Children and Families, Child Welfare and Community-Based Care organization",
+                        "value": "[\"recipients in the care of Medicaid-enrolled, certified agencies under contract with the Department of Children and Families, Child Welfare and Community-Based Care organization\"]",
+                        "reason": "The exact text of the value, 'recipients in the care of Medicaid-enrolled, certified agencies under contract with the Department of Children and Families, Child Welfare and Community-Based Care organization', is present verbatim within the provided quote. The quote states that the services are 'for recipients in the care of Medicaid-enrolled, certified agencies under contract with the Department of Children and Families, Child Welfare and Community-Based Care organization', directly supporting this as a criterion.",
+                        "document": "molina_fl_provider_manual_2026.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "744f600e-f79e-4671-b872-71d90e407ebb"
+                      }
+                    ],
+                    "leads": [],
+                    "record": {
+                      "criteria": "[\"recipients in the care of Medicaid-enrolled, certified agencies under contract with the Department of Children and Families, Child Welfare and Community-Based Care organization\"]"
+                    },
+                    "dropped": [],
+                    "summary": "1 of 1 fields survived",
+                    "accepted": true,
+                    "verdicts": [
+                      {
+                        "name": "criteria",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "Molina Healthcare's provider manual describes these services as mental health, substance abuse, and supportive services for recipients in the care of Medicaid-enrolled, certified agencies under contract with the Department of Children and Families, Child Welfare and Community-Based Care organization",
+                        "value": "[\"recipients in the care of Medicaid-enrolled, certified agencies under contract with the Department of Children and Families, Child Welfare and Community-Based Care organization\"]",
+                        "reason": "The exact text of the value, 'recipients in the care of Medicaid-enrolled, certified agencies under contract with the Department of Children and Families, Child Welfare and Community-Based Care organization', is present verbatim within the provided quote. The quote states that the services are 'for recipients in the care of Medicaid-enrolled, certified agencies under contract with the Department of Children and Families, Child Welfare and Community-Based Care organization', directly supporting this as a criterion.",
+                        "document": "molina_fl_provider_manual_2026.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "744f600e-f79e-4671-b872-71d90e407ebb"
+                      }
+                    ],
+                    "certifiable": true,
+                    "authority_mode": "any_cited",
+                    "missing_required": []
+                  }
+                },
+                "document": null,
+                "documents": [
+                  "Exhibit_II-A-MMA_2020-02-01.pdf",
+                  "59G-4.031.pdf",
+                  "SH-PRO-BH-PSR.pdf",
+                  "59G-4.028.pdf",
+                  "MOL_MHPAEA_Annual_Analysis.pdf",
+                  "abhfl_fhk_provider_manual.pdf",
+                  "molina_fl_provider_manual_2026.pdf",
+                  "Medicaid_Health_Plan_Application_JULY_2011.pdf"
+                ],
+                "statement": "Molina Healthcare's provider manual indicates that Florida Medicaid Behavioral Health Overlay Services are for recipients in the care of Medicaid-enrolled, certified agencies under contract with the Department of Children and Families, Child Welfare and Community-Based Care organization.",
+                "confidence": null
+              }
+            },
+            {
+              "at": "18:49:30",
+              "source": "registry",
+              "kind": "request_settled",
+              "seq": 1,
+              "text": "1 of 1 fields survived",
+              "data": {
+                "state": "extracted",
+                "turns": 1,
+                "outcome": "extracted",
+                "document": null,
+                "request_id": 88,
+                "model_profile": "gemini",
+                "requirement_id": 125
+              }
+            },
+            {
+              "at": "18:49:30",
+              "source": "registry",
+              "kind": "request_opened",
+              "seq": 2,
+              "text": null,
+              "data": {
+                "code": null,
+                "expects": [
+                  "elements",
+                  "retention_period"
+                ],
+                "question": "For Florida Medicaid: What documentation must be in the record to support billing Behavioral Health Overlay Services? The governing rule is 59G-4.027. Quote the governing policy text and name the source document.",
+                "request_id": 89,
+                "model_profile": "gemini",
+                "requirement_id": 77,
+                "requirement_type": "documentation"
+              }
+            },
+            {
+              "at": "18:49:30",
+              "source": "deep_research",
+              "kind": "turn_running",
+              "seq": 2,
+              "text": null,
+              "data": {
+                "n": 1,
+                "note": "2 of 2 fields survived",
+                "query": "For Florida Medicaid: What documentation must be in the record to support billing Behavioral Health Overlay Services? The governing rule is 59G-4.027. Quote the governing policy text and name the source document.",
+                "next_query": "For Florida Medicaid: What documentation must be in the record to support billing Behavioral Health Overlay Services? The governing rule is 59G-4.027. Quote the governing policy text and name the source document.\n\nQuote the sentence that states each value.",
+                "extract_state": "extracted"
+              }
+            },
+            {
+              "at": "18:51:47",
+              "source": "deep_research",
+              "kind": "attempt",
+              "seq": 2,
+              "text": "2 of 2 fields survived",
+              "data": {
+                "model": "gemini-2.5-flash",
+                "quote": null,
+                "round": 1,
+                "outcome": "extracted",
+                "verdict": {
+                  "extract": {
+                    "prose": "While specific documentation requirements for Florida Medicaid Behavioral Health Overlay Services (Rule 59G-4.027) were not directly quoted, a similar policy for Behavioral Health Community Support Services (Rule 59G-4.031) requires a record of a mental health diagnosis from a licensed practitioner and daily progress notes that list each service and activity provided.",
+                    "_model": "gemini-2.5-flash",
+                    "fields": [
+                      {
+                        "name": "elements",
+                        "quote": "a similar policy for Behavioral Health Community Support Services (Rule 59G-4.031) requires providers to maintain a record of a mental health diagnosis from a licensed practitioner and daily progress notes that list each service and activity provided in the recipient's file [2].",
+                        "scope": "Behavioral Health Community Support Services (Rule 59G-4.031)",
+                        "value": "record of a mental health diagnosis from a licensed practitioner",
+                        "document": "59G-4.031.pdf"
+                      },
+                      {
+                        "name": "elements",
+                        "quote": "a similar policy for Behavioral Health Community Support Services (Rule 59G-4.031) requires providers to maintain a record of a mental health diagnosis from a licensed practitioner and daily progress notes that list each service and activity provided in the recipient's file [2].",
+                        "scope": "Behavioral Health Community Support Services (Rule 59G-4.031)",
+                        "value": "daily progress notes that list each service and activity provided",
+                        "document": "59G-4.031.pdf"
+                      }
+                    ]
+                  },
+                  "critique": {
+                    "kept": [
+                      {
+                        "name": "elements",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "a similar policy for Behavioral Health Community Support Services (Rule 59G-4.031) requires providers to maintain a record of a mental health diagnosis from a licensed practitioner and daily progress notes that list each service and activity provided in the recipient's file [2].",
+                        "value": "record of a mental health diagnosis from a licensed practitioner",
+                        "reason": "The quote explicitly states that the policy for Behavioral Health Community Support Services (Rule 59G-4.031) \"requires providers to maintain a record of a mental health diagnosis from a licensed practitioner.\"",
+                        "document": "59G-4.031.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "15a8eab2-09ab-424e-adc3-732828acbe5f"
+                      },
+                      {
+                        "name": "elements",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "a similar policy for Behavioral Health Community Support Services (Rule 59G-4.031) requires providers to maintain a record of a mental health diagnosis from a licensed practitioner and daily progress notes that list each service and activity provided in the recipient's file [2].",
+                        "value": "daily progress notes that list each service and activity provided",
+                        "reason": "The value \"daily progress notes that list each service and activity provided\" is explicitly stated verbatim within the provided quote.",
+                        "document": "59G-4.031.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "15a8eab2-09ab-424e-adc3-732828acbe5f"
+                      }
+                    ],
+                    "leads": [],
+                    "record": {
+                      "elements": [
+                        "record of a mental health diagnosis from a licensed practitioner",
+                        "daily progress notes that list each service and activity provided"
+                      ]
+                    },
+                    "dropped": [],
+                    "summary": "2 of 2 fields survived",
+                    "accepted": true,
+                    "verdicts": [
+                      {
+                        "name": "elements",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "a similar policy for Behavioral Health Community Support Services (Rule 59G-4.031) requires providers to maintain a record of a mental health diagnosis from a licensed practitioner and daily progress notes that list each service and activity provided in the recipient's file [2].",
+                        "value": "record of a mental health diagnosis from a licensed practitioner",
+                        "reason": "The quote explicitly states that the policy for Behavioral Health Community Support Services (Rule 59G-4.031) \"requires providers to maintain a record of a mental health diagnosis from a licensed practitioner.\"",
+                        "document": "59G-4.031.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "15a8eab2-09ab-424e-adc3-732828acbe5f"
+                      },
+                      {
+                        "name": "elements",
+                        "check": "judged",
+                        "issue": "none",
+                        "quote": "a similar policy for Behavioral Health Community Support Services (Rule 59G-4.031) requires providers to maintain a record of a mental health diagnosis from a licensed practitioner and daily progress notes that list each service and activity provided in the recipient's file [2].",
+                        "value": "daily progress notes that list each service and activity provided",
+                        "reason": "The value \"daily progress notes that list each service and activity provided\" is explicitly stated verbatim within the provided quote.",
+                        "document": "59G-4.031.pdf",
+                        "supported": true,
+                        "confidence": 1.0,
+                        "critic_model": "gemini-2.5-flash",
+                        "source_document_id": "15a8eab2-09ab-424e-adc3-732828acbe5f"
+                      }
+                    ],
+                    "certifiable": true,
+                    "authority_mode": "any_cited",
+                    "missing_required": []
+                  }
+                },
+                "document": null,
+                "documents": [
+                  "Exhibit_II-A-MMA_2020-02-01.pdf",
+                  "SH-PRO-BH-PSR.pdf",
+                  "Behavioral Health Overlay Services",
+                  "abhfl_medicaid_comprehensive_ltc_provider_manual.pdf",
+                  "59G-4.028.pdf",
+                  "FL-Care-Provider-Manual-Statewide-Medicaid-Managed-Care.pdf",
+                  "State Mental Health Hospital Services",
+                  "CMS-PRO-PE-Manual.pdf"
+                ],
+                "statement": "While specific documentation requirements for Florida Medicaid Behavioral Health Overlay Services (Rule 59G-4.027) were not directly quoted, a similar policy for Behavioral Health Community Support Services (Rule 59G-4.031) requires a record of a mental health diagnosis from a licensed practitioner and daily progress notes that list each service and activity provided.",
+                "confidence": null
+              }
+            },
+            {
+              "at": "18:52:35",
+              "source": "registry",
+              "kind": "request_settled",
+              "seq": 2,
+              "text": "2 of 2 fields survived",
+              "data": {
+                "state": "extracted",
+                "turns": 1,
+                "outcome": "extracted",
+                "document": null,
+                "request_id": 89,
+                "model_profile": "gemini",
+                "requirement_id": 77
+              }
+            },
+            {
+              "at": "18:52:35",
+              "source": "registry",
+              "kind": "run_finished",
+              "seq": null,
+              "text": null,
+              "data": {
+                "counts": {
+                  "undiagnosed": 2
+                }
+              }
+            }
+          ],
+          "items": [
+            {
+              "seq": 1,
+              "about": "coverage criteria",
+              "code": null,
+              "finding": "stated",
+              "gap": null,
+              "owner": null,
+              "quote": null,
+              "document": null,
+              "citation": "uncited"
+            },
+            {
+              "seq": 2,
+              "about": "documentation",
+              "code": null,
+              "finding": "stated",
+              "gap": null,
+              "owner": null,
+              "quote": null,
+              "document": null,
+              "citation": "uncited"
+            }
+          ]
+        }
+      ],
       "review": [
         {
           "kind": "standard_requirement",
@@ -8617,7 +9763,10 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "behavioral health therapy services",
+          "behavioral health therapy"
+        ],
         "documents": [
           {
             "document": "2025 Community Behavoir Health Fee Schedule.pdf",
@@ -9835,7 +10984,10 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "comprehensive behavioral health assessment",
+          "cbha"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -10177,7 +11329,11 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "evaluation and management",
+          "e&m",
+          "e/m"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -11095,7 +12251,12 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "florida assertive community treatment",
+          "fact",
+          "assertive community treatment",
+          "act team"
+        ],
         "documents": [
           {
             "document": "2025 Community Behavoir Health Fee Schedule.pdf",
@@ -12212,7 +13373,11 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "intensive outpatient program",
+          "intensive outpatient",
+          "iop"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -12463,7 +13628,12 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "mental health targeted case management",
+          "targeted case management",
+          "case management",
+          "tcm"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -13260,7 +14430,11 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "partial hospitalization program",
+          "partial hospitalization",
+          "php"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -13511,7 +14685,10 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "specialized therapeutic services",
+          "specialized therapeutic"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -13820,7 +14997,10 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "state mental health",
+          "state hospital"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -14119,7 +15299,12 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "child health services targeted case management",
+          "targeted case management",
+          "case management",
+          "child health tcm"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -14983,7 +16168,12 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "targeted case management for children at risk of abuse and neglect",
+          "targeted case management for children at risk",
+          "case management",
+          "tcm at risk"
+        ],
         "documents": [
           {
             "document": "TCM_for_Children_At-Risk_2022_Fee_Schedule.pdf",
@@ -16054,7 +17244,15 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "baker act involuntary examination",
+          "baker act",
+          "baker acted",
+          "baker-act",
+          "involuntary examination",
+          "involuntary exam",
+          "ex parte"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -16303,7 +17501,14 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "crisis stabilization unit / baker act receiving",
+          "crisis stabilization unit",
+          "csu",
+          "baker act receiving",
+          "crisis stabilization",
+          "receiving facility"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -17144,7 +18349,13 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "marchman act services",
+          "marchman act",
+          "marchman",
+          "marchman acted",
+          "involuntary substance"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -17771,7 +18982,13 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "mobile response team / crisis intervention",
+          "mobile response",
+          "mobile response team",
+          "mrt",
+          "crisis response"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -18014,7 +19231,11 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "qualified residential treatment program services",
+          "qualified residential treatment program",
+          "qrtp"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -19433,7 +20654,11 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "statewide inpatient psychiatric program",
+          "statewide inpatient psychiatric",
+          "sipp"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -21137,7 +22362,13 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "substance use residential treatment",
+          "residential treatment",
+          "substance use residential",
+          "sud residential",
+          "residential sud"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -21804,7 +23035,11 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "therapeutic group care services",
+          "therapeutic group care",
+          "group care"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -22625,7 +23860,13 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "withdrawal management / detoxification",
+          "withdrawal management",
+          "detox",
+          "detoxification",
+          "medically monitored withdrawal"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -23268,7 +24509,12 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "county health department clinic services",
+          "county health department clinic",
+          "county health department",
+          "chd clinic"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -23649,7 +24895,11 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "fqhc encounter",
+          "fqhc",
+          "federally qualified health center"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -24033,7 +25283,11 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "rural health clinic encounter",
+          "rhc",
+          "rural health clinic"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -26094,7 +27348,12 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "inpatient psychiatric",
+          "inpatient psych",
+          "psychiatric admission",
+          "adult psych unit"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,
@@ -29255,7 +30514,12 @@
         }
       ],
       "j_service_line": {
-        "query_phrases": [],
+        "query_phrases": [
+          "emergency department behavioral health",
+          "psych ed",
+          "behavioral health emergency",
+          "ed psych"
+        ],
         "documents": [],
         "seeded": 0,
         "tagged_documents": 0,

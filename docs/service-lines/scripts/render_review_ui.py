@@ -587,111 +587,11 @@ function itemRow(it){
     evidence(it)+'</div>';
 }
 
-function draw(){
-  var l = LINES.filter(function(x){return x.id===cur;})[0];
-  if(!l) return drawQueue();
-  var h = '<div><h1>'+esc(l.name)+'</h1><p class="sub">'+
-    (l.ready
-      ? 'Florida Medicaid behavioral health'+(l.rule?' · Rule '+esc(l.rule):'')
-      : 'We have not gathered the fee schedule or coverage documents for this service yet.')+
-    '</p></div>';
-
-  var behindN = l.modules.filter(function(m){
-    return m.state!=="done" && m.state!=="complete" && m.state!=="na" &&
-           m.state!=="not_applicable";}).length;
-  h += '<div class="kpis">'+
-    '<div class="kpi"><span>Billable codes</span><b>'+l.codes.length+'</b></div>'+
-    '<div class="kpi"><span>To check</span><b>'+l.toCheck+'</b></div>'+
-    '<div class="kpi"><span>Needs a source</span><b>'+l.toSource+'</b></div>'+
-    '<div class="kpi"><span>Modules behind</span><b>'+behindN+'</b></div></div>';
-
-  /* Where the service comes from. NOT technical — a reviewer needs the rule and
-     the documents in front of them, which is why they moved out of the folded
-     panel and up here, open. */
-  h += card("About this service", l.rule ? "Rule "+l.rule : "no rule recorded",
-    '<div class="pad"><dl class="tech">'+
-    '<dt>Governing rule</dt><dd>'+(l.rule?esc(l.rule):
-      '<span style="color:var(--mobius-warning)">none recorded yet</span>')+'</dd>'+
-    '<dt>Set by</dt><dd>'+esc(l.authority||"—")+'</dd>'+
-    '<dt>How it is paid</dt><dd>'+esc((l.grain||"—").replace(/_/g," "))+'</dd>'+
-    '<dt>Documents behind this</dt><dd>'+
-      (l.sources.length? l.sources.map(esc).join("<br>")
-        : '<span style="color:var(--mobius-error)">none held yet</span>')+'</dd>'+
-    '</dl></div>'+
-    (l.common.length?'<div class="pad items" style="border-top:1px solid var(--mobius-border)">'+
-      '<p class="lead" style="font-size:var(--mobius-text-sm);color:var(--mobius-text-muted)">'+
-      'Applies to every code below.</p>'+l.common.map(itemRow).join("")+'</div>':''));
-
-  /* One card per code. Everything about that code is inside it — what it is,
-     what it pays, its caps, and each thing waiting to be checked. */
-  l.codes.forEach(function(c){
-    var title = c.code + (c.mod ? " with " + c.mod : "");
-    var pending = c.items.filter(function(i){return i.state==="unreviewed";}).length;
-    var inner = '<div class="pad">'+
-      '<p class="lead">'+esc(c.what)+'</p>'+
-      '<dl class="tech">'+
-      '<dt>Rate</dt><dd>'+money(c.rate)+(c.unit?' per '+esc(c.unit):'')+'</dd>'+
-      (c.limits.length?'<dt>Limit</dt><dd>'+c.limits.map(esc).join('<br>')+'</dd>':'')+
-      (c.tele?'<dt>Telehealth</dt><dd>Allowed</dd>':'')+
-      '</dl>'+
-      (c.items.length?'<div class="items">'+c.items.map(itemRow).join("")+'</div>':'')+
-      '</div>';
-    h += card(title, pending? pending+" to check" : "checked", inner, true);
-  });
-
-  if(l.groupings.length){
-    h += card("Diagnosis and hospital grouping codes", l.groupings.length+" codes",
-      '<div class="pad"><p class="lead" style="font-size:var(--mobius-text-sm);'+
-      'color:var(--mobius-text-muted)">These place an encounter for hospital billing. '+
-      'They are not codes you bill directly.</p>'+
-      '<div class="items">'+l.groupings.map(itemRow).join("")+'</div></div>', true);
-  }
-
-  if(!l.ready){
-    h += '<section class="card"><div class="empty">'+
-      '<svg viewBox="0 0 100 100" width="24" height="24" fill="none" stroke="currentColor" '+
-      'stroke-width="4.5"><path d="M 50 50 C 50 22 22 22 22 50 C 22 78 50 78 50 50 '+
-      'C 50 78 78 78 78 50 C 78 22 50 22 50 50" stroke-linecap="round"/></svg>'+
-      '<span>Nothing to review until the documents for this service are gathered.</span>'+
-      '</div></section>';
-  }
-
-  /* System state, not domain fact. How this service was sourced, whether the
-     machinery is still working on it, and whether the other modules have caught
-     up — the questions an operator asks, never a reviewer. */
-  var MOD={done:["In sync","c-ok"],complete:["In sync","c-ok"],
-           doing:["Working","c-warn"],in_progress:["Working","c-warn"],
-           na:["Not needed","c-mute"],not_applicable:["Not needed","c-mute"]};
-  var behind = l.modules.filter(function(m){return (MOD[m.state]||["Not started"])[0]==="Not started";}).length;
-  var tech =
-    '<div class="pad"><h3 class="th">Other modules</h3><dl class="tech">'+
-      l.modules.map(function(m){
-        var v = MOD[m.state] || ["Not started","c-need"];
-        return '<dt>'+esc(m.name)+'</dt><dd><span class="chip '+v[1]+'">'+v[0]+'</span>'+
-          (m.why?'<div class="hint2">'+esc(m.why)+'</div>':'')+'</dd>';
-      }).join("")+'</dl></div>'+
-    '<div class="pad" style="border-top:1px solid var(--mobius-border)">'+
-      '<div class="throw"><h3 class="th">Sourcing</h3>'+
-        '<span class="srcbar">'+
-          '<label class="mini" for="srcprof">Answer using</label>'+
-          '<select class="sel" id="srcprof"></select>'+
-          '<button class="btn-src" data-src="'+esc(l.id)+'">Source this service</button>'+
-        '</span></div>'+
-      '<div id="srcnote" class="hint2"></div>'+
-      '<ol class="steps live" id="srclive" hidden></ol>'+
-      (l.runs.length ? l.runs.map(runBlock).join("")
-        : '<p class="hint2">This service has not been sourced yet. '+
-          'Starting a run asks the policy documents for each missing answer, '+
-          'and every step is recorded below.</p>')+
-    '</div>'+
-    '<div class="pad" style="border-top:1px solid var(--mobius-border)">'+
-      '<h3 class="th">Search terms</h3><dl class="tech">'+
-      '<dt>Agreed terms</dt><dd>'+(l.terms.confirmed||0)+' of '+(l.terms.mapped||0)+'</dd>'+
-      '<dt>Passages reachable</dt><dd>'+l.chunks+'</dd>'+
-      '</dl></div>';
-  h += card("Technical details", behind? behind+" modules behind" : "", tech, true);
-
-
+/* Module scope, NOT inside draw(). These were declared inside it, after the line that
+   builds the HTML — so `var RSTAT` hoisted as undefined and runBlock read it before
+   assignment, throwing on every service that has a run and leaving the whole page
+   frozen on whichever service happened to render first. A function declaration hoists;
+   the var it closes over does not. */
 /* One run, rendered the same way whether it is happening now or happened last week.
    Contract §7: live is a tail of the stream, replay is the same rows read again, and
    they must render identically — otherwise the audit log is not evidence of what the
@@ -837,6 +737,112 @@ function startRun(lineId){
         + "recorded either way."; };
   }
 }
+
+
+function draw(){
+  var l = LINES.filter(function(x){return x.id===cur;})[0];
+  if(!l) return drawQueue();
+  var h = '<div><h1>'+esc(l.name)+'</h1><p class="sub">'+
+    (l.ready
+      ? 'Florida Medicaid behavioral health'+(l.rule?' · Rule '+esc(l.rule):'')
+      : 'We have not gathered the fee schedule or coverage documents for this service yet.')+
+    '</p></div>';
+
+  var behindN = l.modules.filter(function(m){
+    return m.state!=="done" && m.state!=="complete" && m.state!=="na" &&
+           m.state!=="not_applicable";}).length;
+  h += '<div class="kpis">'+
+    '<div class="kpi"><span>Billable codes</span><b>'+l.codes.length+'</b></div>'+
+    '<div class="kpi"><span>To check</span><b>'+l.toCheck+'</b></div>'+
+    '<div class="kpi"><span>Needs a source</span><b>'+l.toSource+'</b></div>'+
+    '<div class="kpi"><span>Modules behind</span><b>'+behindN+'</b></div></div>';
+
+  /* Where the service comes from. NOT technical — a reviewer needs the rule and
+     the documents in front of them, which is why they moved out of the folded
+     panel and up here, open. */
+  h += card("About this service", l.rule ? "Rule "+l.rule : "no rule recorded",
+    '<div class="pad"><dl class="tech">'+
+    '<dt>Governing rule</dt><dd>'+(l.rule?esc(l.rule):
+      '<span style="color:var(--mobius-warning)">none recorded yet</span>')+'</dd>'+
+    '<dt>Set by</dt><dd>'+esc(l.authority||"—")+'</dd>'+
+    '<dt>How it is paid</dt><dd>'+esc((l.grain||"—").replace(/_/g," "))+'</dd>'+
+    '<dt>Documents behind this</dt><dd>'+
+      (l.sources.length? l.sources.map(esc).join("<br>")
+        : '<span style="color:var(--mobius-error)">none held yet</span>')+'</dd>'+
+    '</dl></div>'+
+    (l.common.length?'<div class="pad items" style="border-top:1px solid var(--mobius-border)">'+
+      '<p class="lead" style="font-size:var(--mobius-text-sm);color:var(--mobius-text-muted)">'+
+      'Applies to every code below.</p>'+l.common.map(itemRow).join("")+'</div>':''));
+
+  /* One card per code. Everything about that code is inside it — what it is,
+     what it pays, its caps, and each thing waiting to be checked. */
+  l.codes.forEach(function(c){
+    var title = c.code + (c.mod ? " with " + c.mod : "");
+    var pending = c.items.filter(function(i){return i.state==="unreviewed";}).length;
+    var inner = '<div class="pad">'+
+      '<p class="lead">'+esc(c.what)+'</p>'+
+      '<dl class="tech">'+
+      '<dt>Rate</dt><dd>'+money(c.rate)+(c.unit?' per '+esc(c.unit):'')+'</dd>'+
+      (c.limits.length?'<dt>Limit</dt><dd>'+c.limits.map(esc).join('<br>')+'</dd>':'')+
+      (c.tele?'<dt>Telehealth</dt><dd>Allowed</dd>':'')+
+      '</dl>'+
+      (c.items.length?'<div class="items">'+c.items.map(itemRow).join("")+'</div>':'')+
+      '</div>';
+    h += card(title, pending? pending+" to check" : "checked", inner, true);
+  });
+
+  if(l.groupings.length){
+    h += card("Diagnosis and hospital grouping codes", l.groupings.length+" codes",
+      '<div class="pad"><p class="lead" style="font-size:var(--mobius-text-sm);'+
+      'color:var(--mobius-text-muted)">These place an encounter for hospital billing. '+
+      'They are not codes you bill directly.</p>'+
+      '<div class="items">'+l.groupings.map(itemRow).join("")+'</div></div>', true);
+  }
+
+  if(!l.ready){
+    h += '<section class="card"><div class="empty">'+
+      '<svg viewBox="0 0 100 100" width="24" height="24" fill="none" stroke="currentColor" '+
+      'stroke-width="4.5"><path d="M 50 50 C 50 22 22 22 22 50 C 22 78 50 78 50 50 '+
+      'C 50 78 78 78 78 50 C 78 22 50 22 50 50" stroke-linecap="round"/></svg>'+
+      '<span>Nothing to review until the documents for this service are gathered.</span>'+
+      '</div></section>';
+  }
+
+  /* System state, not domain fact. How this service was sourced, whether the
+     machinery is still working on it, and whether the other modules have caught
+     up — the questions an operator asks, never a reviewer. */
+  var MOD={done:["In sync","c-ok"],complete:["In sync","c-ok"],
+           doing:["Working","c-warn"],in_progress:["Working","c-warn"],
+           na:["Not needed","c-mute"],not_applicable:["Not needed","c-mute"]};
+  var behind = l.modules.filter(function(m){return (MOD[m.state]||["Not started"])[0]==="Not started";}).length;
+  var tech =
+    '<div class="pad"><h3 class="th">Other modules</h3><dl class="tech">'+
+      l.modules.map(function(m){
+        var v = MOD[m.state] || ["Not started","c-need"];
+        return '<dt>'+esc(m.name)+'</dt><dd><span class="chip '+v[1]+'">'+v[0]+'</span>'+
+          (m.why?'<div class="hint2">'+esc(m.why)+'</div>':'')+'</dd>';
+      }).join("")+'</dl></div>'+
+    '<div class="pad" style="border-top:1px solid var(--mobius-border)">'+
+      '<div class="throw"><h3 class="th">Sourcing</h3>'+
+        '<span class="srcbar">'+
+          '<label class="mini" for="srcprof">Answer using</label>'+
+          '<select class="sel" id="srcprof"></select>'+
+          '<button class="btn-src" data-src="'+esc(l.id)+'">Source this service</button>'+
+        '</span></div>'+
+      '<div id="srcnote" class="hint2"></div>'+
+      '<ol class="steps live" id="srclive" hidden></ol>'+
+      (l.runs.length ? l.runs.map(runBlock).join("")
+        : '<p class="hint2">This service has not been sourced yet. '+
+          'Starting a run asks the policy documents for each missing answer, '+
+          'and every step is recorded below.</p>')+
+    '</div>'+
+    '<div class="pad" style="border-top:1px solid var(--mobius-border)">'+
+      '<h3 class="th">Search terms</h3><dl class="tech">'+
+      '<dt>Agreed terms</dt><dd>'+(l.terms.confirmed||0)+' of '+(l.terms.mapped||0)+'</dd>'+
+      '<dt>Passages reachable</dt><dd>'+l.chunks+'</dd>'+
+      '</dl></div>';
+  h += card("Technical details", behind? behind+" modules behind" : "", tech, true);
+
 
   document.getElementById("main").innerHTML = h;
   loadProfiles();

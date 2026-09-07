@@ -689,3 +689,84 @@ which remains the more valuable fix. Filed so it is written rather than lost in 
 **Separately still open:** under today's `authority=standard`, the Molina field suggests
 the existing check did not fire at all. That is a question about the current
 implementation, independent of whose policy it should express.
+
+---
+
+## §14 · Authority is the caller's policy, not the producer's taxonomy
+**FROM** Deep Research · **DATE** 2026-09-07 · **ACCEPTED, LANDED**
+
+Ananth's framing is right and it turns this from a defect into a boundary:
+
+> "Deep Research should be ignorant. It is for the CALLER to provide the allowed
+> sources, or what authenticity means. So when we deal with a payor-specific
+> workflow, it can."
+
+A payor manual is the wrong source for a question about a state rule and the
+RIGHT source for a question about that payor's own rule. Only the caller knows
+which workflow it is in. Deciding it here made the producer set a consumer's
+policy, and every consumer whose notion of authority differed had to accept ours
+or work around it — which is the shadow-answer failure the contract exists to
+prevent, appearing one layer down.
+
+### The Molina field was not a judge defect. The check never ran.
+
+Worth stating plainly because it is worse than the bug report:
+
+```python
+if rule_ref is not None and cur is not None:   # the authority gate
+```
+
+`run_batch` calls `critique(..., rule_ref=None, ...)`. So the gate was
+conditioned on a value the batch path never supplies, and **`authority='standard'`
+has been a no-op in the entire batch path** — accepted, stored, never consulted.
+Every kept field in every batch run passed an authority check that did not
+execute. The gate now fires whenever the caller has expressed a policy at all,
+which is what `authority` was always meant to mean.
+
+A second defect found while fixing it: the reason-text lookup was `_WHY[issue]`
+with square brackets, and `authority_tier` had just learned three new codes
+(`source_not_found`, `source_ambiguous`, `no_source_named`). It would have
+raised `KeyError` on the first one. A judge that crashes on an unfamiliar verdict
+is worse than one that reports it plainly; it is `.get()` with a fallback now.
+
+### The shape, taken as proposed
+
+```
+authority_policy: {
+  allow:        ["published_standard", "incorporated_by_reference"],
+  allow_docs:   [8814, 9021],
+  allow_payer:  "Molina Healthcare of Florida",
+  on_violation: "drop" | "flag" | "accept"
+}
+```
+
+`allow_docs` is checked first and ends the question — an explicit list is the
+caller being specific, and nothing should override it. `allow_payer` resolves
+against the document's own payer, so a payor's manual is authoritative for that
+payor's rule. `on_violation` is the caller's call, and `flag` keeps the field
+while recording why it is contested — some workflows want to see the delta
+rather than lose it.
+
+Same document, same claim, four policies:
+
+```
+registry asking about a STATE rule           dropped (tier_not_allowed)
+fact store asking about MOLINA's own rule    KEPT
+caller wants it flagged, not filtered        KEPT + flagged
+no policy — module default                   dropped (payor_source_for_standard)
+```
+
+**Nothing changes for existing consumers.** With no `authority_policy`, the
+module's own behaviour applies; `authority='standard'` maps to
+`allow: [published_standard, incorporated_by_reference]` so it now does what it
+always claimed to.
+
+### Your two workflows
+
+The registry passes `allow: [published_standard, incorporated_by_reference]` and
+refuses payor manuals. The payor fact store passes
+`allow_payer: "<the payer>"` and prefers them. Same machinery, opposite answers,
+no post-filtering and no re-judging what the judge already judged.
+
+**Status:** LANDED. §14 written by Deep Research rather than handed to you to
+draft — the ask was well-shaped enough to implement as proposed.

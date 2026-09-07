@@ -93,6 +93,13 @@ is meant. `H0032` is the exact case rule 2 names.
 
 ## 3.4 `j:service_line` — line-precise routing (agreed 2026-08-19)
 
+> **STATUS 2026-09-07 — READ §5.1 FIRST.** The v1 doc-side described below was
+> **erased** by nightly rebuilds and is being rebuilt on a durable design (dedicated
+> column, not `j_tags`). **Query-side is restored** (32 entries now in QA *and* RAG).
+> **Doc-side column is pending** DB-seat DDL + Retriever read-side. Treat the
+> "verified it live / 32 entries applied" statements in this section as **history of
+> v1**, not current state. §5.1 is authoritative.
+
 Concept tags alone cannot serve by line. Verified: the three lines sharing
 `substance_use_disorders` — `sud_residential`, `withdrawal_management`,
 `marchman_act` — carry **zero** `rendered_as` codes between them, so
