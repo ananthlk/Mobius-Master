@@ -1,0 +1,980 @@
+{
+  "platform": "Mobius RCM Network",
+  "version": "2026-09-07",
+  "description": "Five-lens view of 23 core platform modules: User experience, Technical architecture, Specifications, Eval/QA, Git operations",
+  "last_updated": "2026-09-07T00:00:00Z",
+  "updated_by": "Platform Architect",
+  "tiers": {
+    "A": { "name": "Point Solutions", "range": "$5M–$20M per org" },
+    "B": { "name": "Network Intelligence", "range": "$20M–$60M per network" },
+    "C": { "name": "Virtual Network", "range": "$60M–$150M+" }
+  },
+  "modules": [
+    {
+      "id": "chat",
+      "name": "Chat",
+      "tier": "B",
+      "gates": [4, 6, 7],
+      "user_view": {
+        "status": "live",
+        "description": "Conversational interface for policy, coding, appeals questions with citations",
+        "surface": "mobius-chat web interface",
+        "users": ["all operators", "all centers"]
+      },
+      "technical_view": {
+        "status": "live",
+        "owner": "Chat Frontend/UX Agent",
+        "module": "mobius-chat",
+        "repo": "github.com/ananthlk/mobius-chat",
+        "language": "TypeScript/React",
+        "deployment": "Cloud Run (ortabkknqa-uc)",
+        "description": "Chat BFF, render paths, bubble tabs, answer cards, think-mode escalation"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/mobius-chat.md",
+        "status": "current",
+        "coverage": "conversational interface, render paths, tab architecture"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["22q eval bank", "live QA on production"],
+        "gates": ["answer quality", "citation accuracy", "render correctness"],
+        "status": "calibrated"
+      },
+      "git_view": {
+        "repo": "mobius-chat",
+        "branch": "main",
+        "status": "deployed",
+        "deploy_target": "Cloud Run",
+        "deploy_script": "scripts/deploy.sh dev"
+      }
+    },
+    {
+      "id": "rag",
+      "name": "Payor Policy Agent (RAG)",
+      "tier": "B",
+      "gates": [4],
+      "user_view": {
+        "status": "live",
+        "description": "Retrieval-augmented generation: fee schedules, prior-auth rules, policy Q&A with sources",
+        "surface": "Chat answers with citations",
+        "users": ["all operators"]
+      },
+      "technical_view": {
+        "status": "live",
+        "owner": "Master RAG Agent (owned by Retriever Agent)",
+        "module": "mobius-rag",
+        "repo": "github.com/ananthlk/mobius-rag",
+        "language": "Python",
+        "deployment": "Cloud Run",
+        "description": "Corpus ingestion, RAG pipeline, escalation loop, web fallback, retrieval calibration"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/rag-backend.md",
+        "status": "current",
+        "coverage": "retrieval, augmentation, escalation, citation"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["22q overlap calibration (a/b/c/d/s)", "oracle ceiling 0.609"],
+        "gates": ["answer F1", "citation precision", "latency SLA"],
+        "status": "0.533 (integrated loop)"
+      },
+      "git_view": {
+        "repo": "mobius-rag",
+        "branch": "main",
+        "status": "deployed",
+        "deploy_target": "Cloud Run",
+        "data_store": "pgvector (instant RAG)"
+      }
+    },
+    {
+      "id": "react",
+      "name": "ReAct Agent",
+      "tier": "B",
+      "gates": [4, 6, 7],
+      "user_view": {
+        "status": "live",
+        "description": "Reasoning + action loop: tool calls, multi-turn chains, appeals workflows",
+        "surface": "Embedded in Chat, Appeals flows",
+        "users": ["appeals specialists", "chat users"]
+      },
+      "technical_view": {
+        "status": "live",
+        "owner": "ReAct Agent (owned by me, Retriever Agent)",
+        "module": "mobius-rag (react_loop.py)",
+        "repo": "github.com/ananthlk/mobius-rag",
+        "language": "Python",
+        "components": ["react_loop.py", "prompts.py", "tool_manifest.py", "round0.py"],
+        "description": "Multi-turn reasoning, tool binding, plan scaffolding, fact-store round 0"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/react-agent-spec.md",
+        "status": "current",
+        "coverage": "tool manifest, reasoning loop, escalation strategy"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["22q eval bank (multi-turn)", "tool hit rate"],
+        "gates": ["reasoning correctness", "tool selection", "latency"],
+        "status": "live"
+      },
+      "git_view": {
+        "repo": "mobius-rag",
+        "branch": "main",
+        "status": "deployed",
+        "deploy_target": "Cloud Run"
+      }
+    },
+    {
+      "id": "router",
+      "name": "Router Agent",
+      "tier": "B",
+      "gates": [4, 6],
+      "user_view": {
+        "status": "live",
+        "description": "Intelligent strategy selection: which tool (facts, retrieval, web, reasoning) for this query?",
+        "surface": "Transparent to chat (all answers routed)",
+        "users": ["all operators"]
+      },
+      "technical_view": {
+        "status": "live",
+        "owner": "Router Agent (owned by me, Retriever Agent)",
+        "module": "mobius-rag (router/)",
+        "repo": "github.com/ananthlk/mobius-rag",
+        "language": "Python",
+        "components": ["allocator.py", "greedy.py", "optimizer.py", "bayesian.py"],
+        "description": "Constrained optimizer over Eval priors, bandit reward calibration, step 4 allocator"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/router-reasoning-strategy.md",
+        "status": "current",
+        "coverage": "strategy selection, bandit framework, calibration"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["22q overlap calibration", "strategy precision", "latency trade-off"],
+        "gates": ["answer quality by strategy", "latency SLA", "tool selection precision"],
+        "status": "276 tests, live",
+        "reward": "PG matview refresh (not observe_quality)"
+      },
+      "git_view": {
+        "repo": "mobius-rag",
+        "branch": "main",
+        "status": "deployed",
+        "deploy_target": "Cloud Run",
+        "code_path": "mobius-rag/src/router/"
+      }
+    },
+    {
+      "id": "eval",
+      "name": "Eval / Test Command Center",
+      "tier": "B",
+      "gates": [1, 2, 3, 4, 5, 6, 7, 8],
+      "user_view": {
+        "status": "live",
+        "description": "QA cockpit: run tests, trace answers, grade responses, manage regression suite",
+        "surface": "Eval dashboard (mobius-chat platform view)",
+        "users": ["eval team", "product", "platform architects"]
+      },
+      "technical_view": {
+        "status": "live",
+        "owner": "Eval Agent (owned by me, Retriever Agent)",
+        "module": "Eval Command Center (UX + orchestration)",
+        "repo": "github.com/ananthlk/mobius-rag + mobius-chat",
+        "language": "Python (backend) + React (UX)",
+        "components": ["run_calibration", "grade_batch", "question_bank", "priors_pipeline"],
+        "description": "Design-first QA UX, co-build with UX, question-bank infrastructure, all test orchestration"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/eval-command-center.md",
+        "status": "current",
+        "coverage": "QA workflows, grading, regression tracking, calibration"
+      },
+      "eval_view": {
+        "owned_by": "Eval Agent (self-owned)",
+        "benchmarks": ["22q eval bank (1000+ questions)", "gate verdicts per module"],
+        "gates": ["answer F1", "judge agreement (Wilson-LB)", "§11 Bayes flip-gate"],
+        "status": "M6 judge + L3 promotion",
+        "measures": "fingerprint in run_calibration, lift=moved+changed"
+      },
+      "git_view": {
+        "repo": "mobius-rag + mobius-chat",
+        "branch": "main",
+        "status": "live",
+        "deploy_target": "Cloud Run",
+        "data_store": "BQ (rag_query_decisions, run_calibration, grading_sheet)"
+      }
+    },
+    {
+      "id": "appeals",
+      "name": "Appeals Decision Engine",
+      "tier": "B→C",
+      "gates": [6],
+      "user_view": {
+        "status": "building",
+        "description": "Appeal workflows: tracking, letter generation, regulatory compliance, shared playbooks",
+        "surface": "Appeals playbook card in Chat, dedicated appeals flow",
+        "users": ["appeals specialists", "compliance officers"]
+      },
+      "technical_view": {
+        "status": "building",
+        "owner": "Appeals Agent",
+        "module": "mobius-chat + mobius-contracts",
+        "repo": "github.com/ananthlk/mobius-chat",
+        "language": "Python (engine) + React (UI)",
+        "description": "Appeals state machine, decision model, letter generation, citation tracking"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/appeals-agent-spec.md",
+        "status": "signed",
+        "coverage": "appeals workflows, decision logic, regulatory mapping"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["appeals accuracy", "timeline compliance"],
+        "gates": ["M6 judge", "L3 promotion (Wilson-LB)", "§11 Bayes flip-gate"],
+        "status": "pilot passed dev, live eval pending"
+      },
+      "git_view": {
+        "repo": "mobius-chat",
+        "branch": "main",
+        "status": "building",
+        "deploy_target": "Cloud Run"
+      }
+    },
+    {
+      "id": "observer",
+      "name": "Observer Agent",
+      "tier": "B→C",
+      "gates": [4, 6],
+      "user_view": {
+        "status": "building",
+        "description": "Per-slot benefit-of-turn: does this answer help? Should we try a different strategy?",
+        "surface": "Transparent (feedback signal for Router calibration)",
+        "users": ["system internals"]
+      },
+      "technical_view": {
+        "status": "building",
+        "owner": "Observer Agent (owned by me, Retriever Agent)",
+        "module": "mobius-rag (observer)",
+        "repo": "github.com/ananthlk/mobius-rag",
+        "language": "Python",
+        "description": "Per-slot quality verdicts, benefit scoring, training signal for Router bandit"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/observer-agent-spec.md",
+        "status": "current",
+        "coverage": "benefit-of-turn metric, scoring model"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["observer accuracy on 22q"],
+        "gates": ["verdict precision", "signal quality"],
+        "status": "wiring gated on calibration"
+      },
+      "git_view": {
+        "repo": "mobius-rag",
+        "branch": "main",
+        "status": "code-ready, not deployed",
+        "deploy_target": "Cloud Run"
+      }
+    },
+    {
+      "id": "payor-platform",
+      "name": "Payor Platform Agent",
+      "tier": "B",
+      "gates": [4],
+      "user_view": {
+        "status": "live",
+        "description": "Payor-centric workspace: policies, facts, document sourcing, fact verification, start-a-run",
+        "surface": "Payor panel in mobius-chat",
+        "users": ["payor compliance officers", "policy specialists"]
+      },
+      "technical_view": {
+        "status": "live",
+        "owner": "Payor Platform Agent",
+        "module": "mobius-chat (payor panel)",
+        "repo": "github.com/ananthlk/mobius-chat",
+        "language": "React + Python",
+        "components": ["payor_lookup", "fact_store_panel", "start_a_run_button"],
+        "description": "Payor UI, fact store integration, sourcing triggers, registry coordination"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/payor-platform-agent.md",
+        "status": "current",
+        "coverage": "platform-wide chat, privileged operator vs read-only master"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["fact coverage per payor", "start-a-run success rate"],
+        "gates": ["answer accuracy", "citation correctness"],
+        "status": "live"
+      },
+      "git_view": {
+        "repo": "mobius-chat",
+        "branch": "main",
+        "status": "deployed",
+        "deploy_target": "Cloud Run"
+      }
+    },
+    {
+      "id": "payor-fact-store",
+      "name": "Payor Fact Store",
+      "tier": "B",
+      "gates": [4],
+      "user_view": {
+        "status": "building",
+        "description": "Certified facts (fees, timely-filing, covered services) with provenance—instant, deterministic answers",
+        "surface": "Chat answers (round 0 before retrieval), Appeals playbook",
+        "users": ["all operators for Appeals", "compliance for policy"]
+      },
+      "technical_view": {
+        "status": "building",
+        "owner": "Payor Platform Agent + Master RAG (Payor Fact Store Persistence owned by me, Retriever Agent)",
+        "module": "mobius-rag (facts_*), PostgreSQL (pgvector)",
+        "repo": "github.com/ananthlk/mobius-rag",
+        "language": "Python + SQL",
+        "components": ["facts API", "resolve endpoint", "appeals-pack endpoint", "coverage map"],
+        "description": "Answer-or-abstain contract, provenance tracking, two-tier architecture (round 0 facts + round 1 RAG)"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/payor-fact-store-architecture.md",
+        "status": "building",
+        "coverage": [
+          "payor-fact-store-api.md",
+          "deep-research-fact-store-lane.md",
+          "start-a-run-through-rag.md",
+          "payor-fact-store-deferred.md"
+        ]
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["fact coverage per payor", "hit rate on 22q", "false-positive rate"],
+        "gates": ["provenance correctness", "coverage expansion via Deep Research"],
+        "status": "zero code, spec phase"
+      },
+      "git_view": {
+        "repo": "mobius-rag",
+        "branch": "main",
+        "status": "building",
+        "deploy_target": "Cloud Run",
+        "data_store": "pgvector"
+      }
+    },
+    {
+      "id": "sourcing",
+      "name": "Sourcing Agent",
+      "tier": "B",
+      "gates": [4],
+      "user_view": {
+        "status": "live",
+        "description": "Document sourcing: web scraping, classification, chunking, metadata enrichment",
+        "surface": "Transparent (feeds corpus for Chat answers)",
+        "users": ["corpus maintainers", "sourcing operators"]
+      },
+      "technical_view": {
+        "status": "live",
+        "owner": "Sourcing Agent (owned by me, Retriever Agent)",
+        "module": "mobius-rag (sourcing)",
+        "repo": "github.com/ananthlk/mobius-rag",
+        "language": "Python",
+        "components": ["web scraper", "classifier", "chunker", "metadataEnricher"],
+        "description": "Docs INTO rag→Curation, seam=chunking_jobs+pages, corpus building"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/sourcing-agent-spec.md",
+        "status": "current",
+        "coverage": "sourcing workflows, web scraping, classification"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["corpus freshness", "document classification accuracy"],
+        "gates": ["doc type accuracy", "metadata completeness"],
+        "status": "live"
+      },
+      "git_view": {
+        "repo": "mobius-rag",
+        "branch": "main",
+        "status": "deployed",
+        "deploy_target": "Cloud Run"
+      }
+    },
+    {
+      "id": "curation",
+      "name": "Curation Agent",
+      "tier": "B",
+      "gates": [4],
+      "user_view": {
+        "status": "live",
+        "description": "Corpus quality: chunking, embedding, tagging, lexicon governance, publish pipeline",
+        "surface": "Transparent (improves Chat answer quality)",
+        "users": ["corpus curators", "product"]
+      },
+      "technical_view": {
+        "status": "live",
+        "owner": "Curation Agent (owned by me, Retriever Agent)",
+        "module": "mobius-rag (curation)",
+        "repo": "github.com/ananthlk/mobius-rag",
+        "language": "Python",
+        "components": ["chunk→embed→tag→publish", "lexicon module"],
+        "description": "Chunk quality, embedding calibration, tag selectivity loop, Lexicon underneath"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/curation-agent-spec.md",
+        "status": "current",
+        "coverage": "chunking strategy, tagging, lexicon curation"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["chunk quality", "tag precision/recall"],
+        "gates": ["embedding quality", "tag coverage"],
+        "status": "live"
+      },
+      "git_view": {
+        "repo": "mobius-rag",
+        "branch": "main",
+        "status": "deployed",
+        "deploy_target": "Cloud Run"
+      }
+    },
+    {
+      "id": "product-awareness",
+      "name": "Product Awareness Agent",
+      "tier": "B→C",
+      "gates": [1, 2, 3, 4, 5, 6, 7, 8],
+      "user_view": {
+        "status": "live",
+        "description": "Product truth: spec documentation, demo tours, onboarding materials, governance",
+        "surface": "Product Help & Docs (Chat), specs catalog, onboarding section",
+        "users": ["all users", "new team members"]
+      },
+      "technical_view": {
+        "status": "live",
+        "owner": "Product Awareness Agent (locked, governance role)",
+        "module": "platform governance",
+        "repo": "github.com/ananthlk/Mobius-Master",
+        "description": "Docs RAG-ready, demo tours, specs catalog, product truth governance"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/product-awareness-agent-spec.md",
+        "status": "current",
+        "coverage": "documentation governance, demo tours, onboarding"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["doc freshness", "onboarding completion rate"],
+        "gates": ["spec accuracy", "demo quality"],
+        "status": "live"
+      },
+      "git_view": {
+        "repo": "Mobius-Master",
+        "branch": "main",
+        "status": "live",
+        "path": "docs/product-docs/"
+      }
+    },
+    {
+      "id": "republishing",
+      "name": "Republishing Agent",
+      "tier": "B",
+      "gates": [4],
+      "user_view": {
+        "status": "building",
+        "description": "Corpus refresh: Lexicon N→N+1, re-chunking, re-embedding, eval lift measurement",
+        "surface": "Transparent (periodic corpus quality improvements)",
+        "users": ["system internals"]
+      },
+      "technical_view": {
+        "status": "building (~70% complete)",
+        "owner": "Republishing Agent (owned by me, Retriever Agent)",
+        "module": "mobius-rag (republish)",
+        "repo": "github.com/ananthlk/mobius-rag",
+        "language": "Python",
+        "description": "Corpus coherence (lexicon updates), eval lift tracking, version management"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/republishing-agent-spec.md",
+        "status": "current",
+        "coverage": "republishing workflows, lexicon updates"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["eval lift per republish", "corpus coherence"],
+        "gates": ["lift measurement", "regression detection"],
+        "status": "building"
+      },
+      "git_view": {
+        "repo": "mobius-rag",
+        "branch": "main",
+        "status": "building"
+      }
+    },
+    {
+      "id": "technical-review",
+      "name": "Technical Review Agent",
+      "tier": "A",
+      "gates": [1, 2, 3, 4, 5, 6, 7, 8],
+      "user_view": {
+        "status": "live",
+        "description": "Biweekly Tech Day: review architectures, health governance, independent verification",
+        "surface": "Tech Day agenda, architecture reviews, health reports",
+        "users": ["platform architects", "tech leads"]
+      },
+      "technical_view": {
+        "status": "live",
+        "owner": "Technical Review Agent (locked, architecture role)",
+        "module": "platform architecture governance",
+        "description": "Structure + health governance, independent verify, NEVER write module code"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/tech-review-agent-spec.md",
+        "status": "current",
+        "coverage": "tech day process, review cadence, health checks"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center (feedback loop)",
+        "benchmarks": ["architecture compliance", "health score"],
+        "gates": ["design review", "health verification"],
+        "status": "live"
+      },
+      "git_view": {
+        "repo": "Mobius-Master",
+        "branch": "main",
+        "status": "operational"
+      }
+    },
+    {
+      "id": "user-manager",
+      "name": "User Manager Agent",
+      "tier": "A",
+      "gates": [1],
+      "user_view": {
+        "status": "live",
+        "description": "User enrollment, profiles, preferences, account management",
+        "surface": "User settings, profile management, access control",
+        "users": ["all operators"]
+      },
+      "technical_view": {
+        "status": "live",
+        "owner": "User Manager Agent",
+        "module": "mobius-user",
+        "repo": "github.com/ananthlk/mobius-user",
+        "language": "Python + React",
+        "description": "Enrollment/profiles/prefs, owns mobius-user module"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/user-manager-agent-spec.md",
+        "status": "current",
+        "coverage": "user workflows, enrollment, access"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["user onboarding time", "profile accuracy"],
+        "gates": ["enrollment success rate"],
+        "status": "live"
+      },
+      "git_view": {
+        "repo": "mobius-user",
+        "branch": "main",
+        "status": "deployed",
+        "deploy_target": "Cloud Run"
+      }
+    },
+    {
+      "id": "org-agent",
+      "name": "Org Agent",
+      "tier": "A",
+      "gates": [1, 3, 5],
+      "user_view": {
+        "status": "live",
+        "description": "Organization setup and onboarding: datastore provisioning, configuration, initial training",
+        "surface": "Org setup flow, onboarding checklist",
+        "users": ["org admins", "implementation team"]
+      },
+      "technical_view": {
+        "status": "live",
+        "owner": "Org Agent",
+        "module": "org-setup orchestrator",
+        "repo": "github.com/ananthlk/mobius-os",
+        "language": "Python",
+        "description": "Org-setup orchestrator, onboarding+datastore, owners build deep"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/org-agent-spec.md",
+        "status": "current",
+        "coverage": "org setup workflows"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["setup completion time", "datastore health"],
+        "gates": ["configuration accuracy"],
+        "status": "live"
+      },
+      "git_view": {
+        "repo": "mobius-os",
+        "branch": "main",
+        "status": "deployed"
+      }
+    },
+    {
+      "id": "interact",
+      "name": "Interact Agent",
+      "tier": "B",
+      "gates": [6, 7],
+      "user_view": {
+        "status": "frozen",
+        "description": "Interactive surfaces: forms, workflows, embedded interactions",
+        "surface": "mobius-interact module",
+        "users": ["appeals flows", "intake workflows"]
+      },
+      "technical_view": {
+        "status": "frozen",
+        "owner": "Interact Agent",
+        "module": "mobius-interact",
+        "repo": "github.com/ananthlk/mobius-interact",
+        "language": "React",
+        "description": "mobius-interact + interact.v1 FROZEN; chat integration CLOSED"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/interact-agent-spec.md",
+        "status": "frozen",
+        "coverage": "interact workflows (no updates)"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "status": "frozen"
+      },
+      "git_view": {
+        "repo": "mobius-interact",
+        "branch": "main",
+        "status": "frozen",
+        "note": "Chat integration closed; no new features"
+      }
+    },
+    {
+      "id": "feedback",
+      "name": "Feedback Agent",
+      "tier": "B",
+      "gates": [8],
+      "user_view": {
+        "status": "live",
+        "description": "User feedback loop: CSAT/NPS collection, product feedback, issue routing",
+        "surface": "Feedback widget in Chat, My Vault liked tab",
+        "users": ["all operators"]
+      },
+      "technical_view": {
+        "status": "live",
+        "owner": "Feedback Agent",
+        "module": "feedback-capture",
+        "repo": "github.com/ananthlk/mobius-chat",
+        "language": "React + Python",
+        "description": "CSAT/NPS + product-feedback skill LIVE; feeds product-awareness"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/feedback-agent-spec.md",
+        "status": "live",
+        "coverage": "feedback capture, routing, product integration"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["feedback capture rate", "NPS trend"],
+        "gates": ["feedback quality"],
+        "status": "live"
+      },
+      "git_view": {
+        "repo": "mobius-chat",
+        "branch": "main",
+        "status": "deployed"
+      }
+    },
+    {
+      "id": "historical-extraction",
+      "name": "Historical Extraction Agent",
+      "tier": "B",
+      "gates": [4],
+      "user_view": {
+        "status": "blocked",
+        "description": "Extract historical documents into corpus (archive backlogs, legacy PDFs)",
+        "surface": "Transparent (feeds corpus)",
+        "users": ["corpus maintainers"]
+      },
+      "technical_view": {
+        "status": "blocked",
+        "owner": "Historical Extraction Agent (owned by me, Retriever Agent)",
+        "module": "mobius-rag (historical extraction)",
+        "blockers": ["Chat↔RAG linkage", "dead trace writer", "UI blocks"],
+        "description": "Archive ingestion, historical sourcing"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/historical-extraction-spec.md",
+        "status": "current",
+        "coverage": "extraction workflows"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "status": "blocked"
+      },
+      "git_view": {
+        "repo": "mobius-rag",
+        "status": "blocked"
+      }
+    },
+    {
+      "id": "vault",
+      "name": "Vault Page Agent",
+      "tier": "B",
+      "gates": [4],
+      "user_view": {
+        "status": "live",
+        "description": "My Vault: personal document library, liked answers, saved queries",
+        "surface": "My Vault tab in Chat",
+        "users": ["all operators"]
+      },
+      "technical_view": {
+        "status": "live",
+        "owner": "Vault Page Agent (owned by me, Retriever Agent)",
+        "module": "mobius-vault",
+        "repo": "github.com/ananthlk/mobius-chat",
+        "language": "React + Python",
+        "components": ["vault-panel.js", "mobius-vault", "7-section model"],
+        "description": "OWN vault-panel.js+mobius-vault; 7-section model LIVE"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/vault-page-agent-spec.md",
+        "status": "live",
+        "coverage": "vault workflows, document management"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["vault usage rate", "save accuracy"],
+        "gates": ["data integrity"],
+        "status": "live"
+      },
+      "git_view": {
+        "repo": "mobius-chat",
+        "branch": "main",
+        "status": "deployed"
+      }
+    },
+    {
+      "id": "phi-classifier",
+      "name": "PHI Classifier Agent",
+      "tier": "A",
+      "gates": [1, 2, 3, 4, 5, 6, 7, 8],
+      "user_view": {
+        "status": "live",
+        "description": "HIPAA compliance: detect PHI before it enters chat, mask evidence, override false-positives",
+        "surface": "Transparent (blocks PHI, offers override)",
+        "users": ["all operators", "compliance"]
+      },
+      "technical_view": {
+        "status": "live",
+        "owner": "PHI Classifier Agent (owned by me, Retriever Agent)",
+        "module": "mobius-rag (phi_classifier)",
+        "repo": "github.com/ananthlk/mobius-rag",
+        "language": "Python",
+        "description": "OWN phi-classifier: recall-over-precision, masked evidence, HIPAA default OFF"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/phi-classifier-agent-spec.md",
+        "status": "live",
+        "coverage": "PHI detection, masking, override"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["PHI recall", "false-positive rate", "compliance audit"],
+        "gates": ["recall ≥99%", "false-positive < 1%"],
+        "status": "live"
+      },
+      "git_view": {
+        "repo": "mobius-rag",
+        "branch": "main",
+        "status": "deployed"
+      }
+    },
+    {
+      "id": "service-line-registry",
+      "name": "Service Line Registry",
+      "tier": "B→C",
+      "gates": [4, 5, 7],
+      "user_view": {
+        "status": "live",
+        "description": "Master scope: service lines, codes, modifiers, definitions (not fees; Fact Store owns fees)",
+        "surface": "Registry lookup in Chat, payor panel",
+        "users": ["all operators", "billing teams"]
+      },
+      "technical_view": {
+        "status": "live",
+        "owner": "Service Line Registry (owned by me, Retriever Agent)",
+        "module": "mobius-payor (registry)",
+        "repo": "github.com/ananthlk/mobius-payor",
+        "language": "Python + React",
+        "components": ["registry lookup", "j:service_line axis", "j:doc_type query-side"],
+        "description": "Master scope: lines/codes/modifiers/definitions; NOT fees (Fact Store's)"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/service-line-registry-spec.md",
+        "status": "live",
+        "coverage": "registry structure, lookup, coverage"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["registry coverage", "lookup accuracy"],
+        "gates": ["line accuracy", "code correctness"],
+        "status": "live"
+      },
+      "git_view": {
+        "repo": "mobius-payor",
+        "branch": "main",
+        "status": "deployed",
+        "deploy_target": "Cloud Run"
+      }
+    },
+    {
+      "id": "download-skill",
+      "name": "Download Skill",
+      "tier": "B",
+      "gates": [4, 6],
+      "user_view": {
+        "status": "live",
+        "description": "Fetch and verify documents: policy PDFs, fee schedules, compliance documents",
+        "surface": "Chat skill (fetch_document command)",
+        "users": ["all operators"]
+      },
+      "technical_view": {
+        "status": "live",
+        "owner": "Download Skill (owned by me, Retriever Agent)",
+        "module": "mobius-rag (download_skill)",
+        "repo": "github.com/ananthlk/mobius-rag",
+        "language": "Python",
+        "components": ["4-tier fetch", "resolve-by-ID", "page-range", "guarded proxy", "verify_claim"],
+        "description": "LIVE: 4-tier fetch_document + resolve-by-ID + page-range + guarded proxy + verify_claim"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/download-skill-spec.md",
+        "status": "live",
+        "coverage": "download workflows, document fetching"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["fetch success rate", "document accuracy"],
+        "gates": ["fetch reliability"],
+        "status": "live"
+      },
+      "git_view": {
+        "repo": "mobius-rag",
+        "branch": "main",
+        "status": "deployed"
+      }
+    },
+    {
+      "id": "instant-rag",
+      "name": "Instant RAG / Vault Upload",
+      "tier": "B",
+      "gates": [4, 5],
+      "user_view": {
+        "status": "live",
+        "description": "Upload documents to Vault → automatically ingested → searchable in Chat",
+        "surface": "My Vault upload, Chat search over uploaded docs",
+        "users": ["all operators"]
+      },
+      "technical_view": {
+        "status": "live",
+        "owner": "Instant RAG Agent (owned by me, Retriever Agent)",
+        "module": "mobius-vault + mobius-rag",
+        "repo": "github.com/ananthlk/mobius-chat + mobius-rag",
+        "language": "React (FE) + Python (ingestion)",
+        "components": ["chat upload", "Vault→promotion", "pgvector instant"],
+        "description": "OWN chat upload→Vault→promotion; canonical=Path B (pgvector, mobius_cache)"
+      },
+      "specs_view": {
+        "link": "docs/product-docs/instant-rag-skill-spec.md",
+        "status": "live",
+        "coverage": "upload workflows, instant indexing"
+      },
+      "eval_view": {
+        "owned_by": "Eval Command Center",
+        "benchmarks": ["upload success rate", "search latency"],
+        "gates": ["P0: PHI GATES ingestion"],
+        "status": "live (HIPAA gate: PHI detection before promotion)"
+      },
+      "git_view": {
+        "repo": "mobius-chat + mobius-rag",
+        "branch": "main",
+        "status": "deployed",
+        "data_store": "pgvector"
+      }
+    },
+    {
+      "id": "platform-architects",
+      "name": "Platform Architects Group",
+      "tier": "C",
+      "gates": [1, 2, 3, 4, 5, 6, 7, 8],
+      "user_view": {
+        "status": "live",
+        "description": "Platform coherence governance: design system, experience governance, UX/DB coordination",
+        "surface": "Platform view (this dashboard), Platform coherence sprints",
+        "users": ["platform team", "tech leads"]
+      },
+      "technical_view": {
+        "status": "live",
+        "owner": "Platform Architects (locked governance role)",
+        "description": "UX scope: design-system+experience governance; co-owns data model governance"
+      },
+      "specs_view": {
+        "link": "docs/platform-definition.json",
+        "status": "live",
+        "coverage": "platform coherence model, all 23 modules, 5-lens view"
+      },
+      "eval_view": {
+        "owned_by": "Platform Architects (self-owned)",
+        "benchmarks": ["platform coherence score", "module maturity"],
+        "gates": ["RCM Gate progression", "architecture health"],
+        "status": "live"
+      },
+      "git_view": {
+        "repo": "Mobius-Master",
+        "branch": "main",
+        "status": "operational",
+        "path": "docs/platform-definition.json"
+      }
+    }
+  ],
+  "coordination": {
+    "file": "docs/RAG_FACTSTORE_COORDINATION.md",
+    "protocol": "append-only, never edit or delete",
+    "entries": "54+ entries tracking cross-agent dependencies, blockers, sign-offs",
+    "active_flows": [
+      "Payor Fact Store integration (PA-1 through PA-6)",
+      "Platform coherence (all modules)",
+      "AHCA rerun sprint (Eval owns baseline+delta)"
+    ]
+  },
+  "roadmap": {
+    "current_phase": "Tier B signal (Gates 1-5 live, Gate 6 building, Gate 7 partial)",
+    "next_milestone": "Gate 6 signed, Observer unwired, Chat v2 FE refactor, Appeals W1",
+    "target_completion": "Q4 2026",
+    "gates_progress": {
+      "1": { "status": "live", "name": "Claim Closure" },
+      "2": { "status": "live", "name": "Denial Management" },
+      "3": { "status": "live", "name": "Eligibility Verification" },
+      "4": { "status": "live", "name": "Payor Policies & Benefits (now with Fact Store)" },
+      "5": { "status": "live", "name": "Credentialing" },
+      "6": { "status": "building", "name": "Authorization / Appeals" },
+      "7": { "status": "partial", "name": "Coding & Claims" },
+      "8": { "status": "roadmap", "name": "Network Effects" }
+    }
+  },
+  "metadata": {
+    "sources": [
+      "docs/MEMORY.md (user memories and project context)",
+      "git log (deployment and ownership status)",
+      "docs/RAG_FACTSTORE_COORDINATION.md (cross-agent agreements)",
+      "docs/AHCA_RERUN_SPRINT.md (live sprint status)",
+      "BUG_LOG.md (known issues and blockers)"
+    ],
+    "next_update": "2026-09-14 (weekly refresh cycle)",
+    "automated_via": "platform-definition.json lives in git; chat platform page fetches on load from raw.githubusercontent.com"
+  }
+}
