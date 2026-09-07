@@ -628,3 +628,64 @@ Fixed forward regardless. `citation_resolves()` now searches `document_tables`, 
 claim resolving to a table row returns **`in_table`, ranked with `verbatim`** — a fee
 schedule row carrying the code, the modifier and the rate is the primary source, not a
 degraded one. `composed` no longer renders as a warning on the surface.
+
+---
+
+## §14 · Enhancement — authority is the caller's policy, not the producer's
+**RAISED BY** Ananth, 2026-09-07 · **FILED BY** Registry · **STATUS** open, not scheduled
+
+**The observation.** The first clean run through the typed path (bh_overlay, gemini, both
+questions settled) produced a kept field answering a question about the AHCA **standard**
+— rule 59G-4.027 — citing `molina_fl_provider_manual_2026.pdf`, a payor manual. Deep
+Research has a `payor_source_for_standard` drop reason for exactly this, and the judge
+kept it.
+
+**The reframe, which is the actual content of this section.** Ananth:
+
+> Deep Research should be ignorant. It is for the caller to provide the allowed sources,
+> or what authenticity means. So when we deal with a payor-specific workflow, it can.
+
+A payor manual is the *wrong* source for a question about a state rule and the *right*
+source for a question about that payor's own rule. **Only the caller knows which workflow
+it is in.** Today that judgement lives in the producer's judge, so the producer decides a
+consumer's policy, and every consumer whose notion of authority differs must either accept
+it or work around it.
+
+The seam already half-exists: `research.request.authority` takes `standard | any_cited`,
+and Deep Research's own `sunshine_fl` diagnosis reasoned correctly from it — *"if this
+subject is a payer rather than a service line, ask with authority=any_cited; a payor's own
+manual IS the authority for a payor's rule."* The limitation is that it is a two-value enum
+expressing one taxonomy, where it should be a predicate the caller supplies.
+
+**Proposed shape** (illustrative — the idea matters more than the fields):
+
+```jsonc
+authority_policy: {
+  allow:        ["ahca_rule", "fee_schedule"],      // tiers, or
+  allow_docs:   [8814, 9021],                       // explicit documents, or
+  allow_payer:  "Molina Healthcare of Florida",     // payor-specific work
+  on_violation: "drop" | "flag" | "accept"          // the caller's call
+}
+```
+
+The judge keeps doing the work — it is the right place, as agreed for `none_applies` in
+§5. It applies the **caller's** rule instead of an internal one. Absent a policy, current
+behaviour is the default and no existing consumer changes.
+
+**Why the Registry needs it.** Two workflows want opposite answers from one machine:
+
+| workflow | asks about | payor manual is |
+|---|---|---|
+| Service Line Registry | state rules | **inadmissible** |
+| Payor Fact Store | payor rules | **preferred** |
+
+Without a caller-supplied policy the Registry must either post-filter kept fields —
+re-judging what the producer judged, which §8 forbids as maintaining a shadow answer — or
+ask under a mode that is wrong for one of the two.
+
+**Priority.** Below the `statement` / `source_quote` / `quote_is_rendered` split from §11,
+which remains the more valuable fix. Filed so it is written rather than lost in a message.
+
+**Separately still open:** under today's `authority=standard`, the Molina field suggests
+the existing check did not fire at all. That is a question about the current
+implementation, independent of whose policy it should express.
