@@ -7,6 +7,30 @@ For how versions are assigned, read [RELEASE_PROCESS.md](RELEASE_PROCESS.md).
 
 ---
 
+## product-v1.1.0 — 2026-09-07
+
+**The first release that contains work.** v1.0.0 was a baseline and v1.0.1 a
+coverage fix; neither shipped anything new. This closes the 41-commit gap they
+left open, across five modules.
+
+- **Story:** [product-v1.1.0.md](product-v1.1.0.md)
+- **Manifest:** [product-v1.1.0.lock.json](product-v1.1.0.lock.json)
+
+| Module | Change | Notes |
+|---|---|---|
+| mobius-chat | v1.0.0 → **v1.1.0** | [notes](modules/mobius-chat/v1.1.0.md) — platform framework + Releases tab |
+| mobius-skills | v1.0.0 → **v1.1.0** | [notes](modules/mobius-skills/v1.1.0.md) — Deep Research: decisions as contracts |
+| mobius-payor | v1.0.0 → **v1.1.0** | [notes](modules/mobius-payor/v1.1.0.md) — Research Console served + gated |
+| product-awareness | v1.0.0 → **v1.1.0** | [notes](modules/product-awareness/v1.1.0.md) — registry in Postgres, τ_gap 0.35→0.63 |
+| mobius-answer-cache | v1.0.0 → **v1.0.1** | [notes](modules/mobius-answer-cache/v1.0.1.md) — docs correction |
+
+**First release with deployment-ordering constraints.** `mobius-payor` v1.1.0
+hard-depends on `mobius-user`'s `/api/v1/auth/verify` — rolling back
+`mobius-user` turns the Research Console into a 503 by design. Three more
+cross-module constraints are recorded in the story.
+
+---
+
 ## product-v1.0.1 — 2026-09-07
 
 **A coverage fix, not a newer release.** Four services were running in dev from
