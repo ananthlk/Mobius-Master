@@ -383,12 +383,28 @@ def run(rounds: int, rtype: str | None, limit: int | None) -> None:
                               retrieved, top_documents, outcome, statement, quote,
                               source_document, confidence, model, reason)
                            values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                        # THE REFUSED QUOTE IS THE EVIDENCE, AND IT WAS BEING THROWN AWAY.
+                        #
+                        # quote/document/confidence used to be stored only when
+                        # the attempt SUCCEEDED, so 23 of 225 rows carried a
+                        # quote and every one of them was an accepted fact.
+                        # The backlog rows — the ones a reviewer most needs to
+                        # read — had nothing to show for the refusal but a
+                        # sentence of prose. Service Line Registry hit this
+                        # trying to cross-check our `ungrounded` against their
+                        # citation_resolves() and found no rows to compare.
+                        #
+                        # An ungrounded verdict without the quote it refused is
+                        # an assertion, not a finding. `statement` stays
+                        # success-only: it is the fact we accepted, and a
+                        # proposed one sitting in that column would eventually
+                        # be read as a real one.
                         (req["id"], req["line_key"], req["requirement_type"], rnd, q,
                          len(docs), docs[:6], outcome,
                          (locals().get("ext_saved") or {}).get("statement") if outcome == "extracted" else None,
-                         (locals().get("ext_saved") or {}).get("quote") if outcome == "extracted" else None,
-                         (locals().get("ext_saved") or {}).get("document") if outcome == "extracted" else None,
-                         (locals().get("ext_saved") or {}).get("confidence") if outcome == "extracted" else None,
+                         (locals().get("ext_saved") or {}).get("quote"),
+                         (locals().get("ext_saved") or {}).get("document"),
+                         (locals().get("ext_saved") or {}).get("confidence"),
                          (locals().get("ext_saved") or {}).get("_model") or "llm_manager",
                          reason or None))
             print(f"        -> {outcome}" + (f" · {reason[:70]}" if reason else ""), flush=True)
