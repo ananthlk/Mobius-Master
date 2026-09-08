@@ -962,9 +962,13 @@ lookup_npi rather than becoming a blank refusal.
 
 It deliberately imports nothing from react_loop, which is what makes it testable in isolation.
 """, findings=[
- ("bad", "NO TEST FILE — and this is the module that parses hostile input through four fallback "
-         "tiers. It is pure and import-free precisely so it CAN be table-driven, and nobody "
-         "has."),
+ ("bad", "NO TEST FILE — and the determinism makes this worse, not better. VERIFIED "
+         "2026-09-08: parsing.py imports only json, logging, re and the context type. No LLM "
+         "call, no randomness, no clock, no IO, no database, no await. Same input, same output, "
+         "always. Ananth is right that it is 100% deterministic — which makes it the single "
+         "easiest module in this pipeline to test exhaustively, four fallback tiers and all, "
+         "and it is the one with nothing. A table of malformed LLM outputs would be a complete "
+         "suite."),
  ("good", "The tiers are ordered, documented and bounded, and the one heuristic escape hatch is "
           "scoped to a single named question shape rather than being a general guess."),
 ]),
@@ -1323,7 +1327,23 @@ which are not in this list.
                         "the pipeline.")]),
 "orchestrator": dict(rating="amber", depth="code", how="""
 See run_pipeline above — this module is that function plus its helpers.
-""", findings=[("bad", "1,902 lines and 31 log-and-continue handlers on the module that owns "
+""", findings=[("bad", "OWNER(chat): LATENCY MEASUREMENT ACROSS THE PIPELINE — Ananth's item, and "
+                       "the gap is measurable. NINETEEN OF TWENTY-FIVE pipeline modules carry ZERO "
+                       "timing: no perf_counter, no monotonic, no elapsed, no _ms. Every "
+                       "classic-path stage is untimed — state_load, classify, plan, clarify, "
+                       "resolve — as are tool_manifest (which renders ~4,800 tokens every turn), "
+                       "parsing, round0, message_resolver, personalization, curator_tools and "
+                       "react_retry_guard. Only six have any: react_loop 41 references, "
+                       "orchestrator 24, governor 10, integrate 9, prompts 6, critic 1 — so timing "
+                       "exists exactly where the file is already too big to reason about, and "
+                       "nowhere else. What is measurable today is the TURN, not its parts: "
+                       "react_trace carries total_elapsed_s, and _react_pf logs preflight steps "
+                       "only when one exceeds 50ms, so anything fast is invisible by construction. "
+                       "'Where did the 114 seconds go' cannot be answered from what the pipeline "
+                       "emits. THE STANDARD IS TECHNICAL REVIEW'S — their role lock names "
+                       "instrumentation explicitly, every segment timed, no untimed work. The "
+                       "implementation is chat's."),
+               ("bad", "1,902 lines and 31 log-and-continue handlers on the module that owns "
                        "the turn."),
                ("good", "The stage sequence is explicit enough that this diagram's flow was "
                         "parsed directly from it.")]),
