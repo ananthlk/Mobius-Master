@@ -1022,8 +1022,21 @@ state, so it is caller input, not conversation state.
          "block is read once, for reporting. Behaviour comes entirely from rendered_prompt, "
          "prose composed by mobius-user. So chat cannot itself honour tone='concise' — it can "
          "only inject whatever paragraph it was handed. If that rendering is wrong, stale or "
-         "empty, nothing here detects it, and the profile carries a `version` field that "
-         "nothing in chat checks."),
+         "empty, nothing here detects it."),
+ ("bad", "OWNER(user-manager): DISPUTED ASSIGNMENT. THE VERSION CHECK IS NEVER PERFORMED. The profile "
+         "carries a `version` field and nothing in mobius-chat reads it. "
+         "BUT THE CONTRACT ALREADY SPECIFIES THE OBLIGATION, and it does not fall on "
+         "mobius-user: CONSUMER_RECIPE_PROFILE.md line 116 says '`version` field changes -> "
+         "Drop cache, treat as the user updated something', and lines 145-147 say 'Watch for "
+         "the version field — if it changes between your cached copy and a fresh fetch, the "
+         "template was upgraded server-side and you should discard the cache.' The contract is "
+         "explicit and complete. The duty sits with WHOEVER CACHES, and the contract also says "
+         "'Don't poll /me per turn ... once per session boot is enough' — so the cache is in "
+         "the chat FRONTEND, which fetches at session boot and on preferences PUT and then "
+         "passes the profile through on every turn. The chat BACKEND receives it per-turn and "
+         "has no cache to invalidate. On the evidence this is a chat-frontend bug, not a "
+         "user-manager one. Assigned as directed and flagged rather than silently re-pointed — "
+         "one word changes the owner."),
  ("watch", "The module docstring says splicing happens at five stages; there are six call "
            "sites (react/prompts.py:545, react_loop.py:5146 and :5401, responder/final.py:600, "
            "final_parallel.py:269, adjudication/full.py:66). Close, but the count in the "
