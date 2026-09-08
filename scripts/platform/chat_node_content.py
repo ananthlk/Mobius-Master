@@ -140,10 +140,18 @@ phi_flag, identifier labels, evidence and classifier version.
            "others: chat_turn_messages, chat_state, chat_progress_events, chat_tool_results, "
            "chat_feedback, chat_source_feedback, chat_cache_shadow_log. Two of them are the "
            "CASCADE children above, so they are not optional context."),
- ("watch", "Mine, found while verifying the DB seat: a FIFTH FK points at chat_threads — "
-           "financial_strategy_versions.thread_id, ON DELETE SET NULL — and nothing in "
-           "mobius-chat references that table. A cross-module coupling into chat's thread "
-           "table that neither of us had named."),
+ ("bad", "THE FOURTH FK — mine to find, and I got two things wrong about it that the DB "
+         "seat corrected. It is the FOURTH into chat_threads, not the fifth (the unfiltered "
+         "count is 4: chat_turns SET NULL, chat_turn_messages CASCADE, chat_state CASCADE, "
+         "financial_strategy_versions SET NULL). And it is NOT an external module reaching "
+         "into chat's tables — mobius-chat creates it itself, "
+         "db/schema/028_financial_strategy_runs.sql. What is true, and worse than I said: "
+         "financial_strategy_versions has 57 live rows, every one FK-coupled to a chat "
+         "thread, 0 detached — and ZERO code anywhere in the fleet reads or writes it. Chat "
+         "owns the schema; nothing owns the data path. So deleting a thread detaches a "
+         "financial strategy record and, because nothing reads the table, NOBODY WOULD EVER "
+         "OBSERVE IT. chat_turns at least has readers who would notice 102 detached rows. "
+         "Verified against live mobius_chat."),
  ("bad", "CORRECTION from the DB seat to my own text: ensure_thread treats two failures "
          "differently and I merged them. On connection_error the caller's thread_id SURVIVES "
          "(returns id_to_use if thread_id else uuid4()); only on a NON-connection failure is "
