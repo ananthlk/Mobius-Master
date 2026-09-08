@@ -149,6 +149,34 @@ router.update_ema() after each call so the bandit learns from what actually happ
            "degraded answer nobody is told about — the exact pattern that hid the appeals "
            "outage for 29 days."),
 ]),
+"retrieval_budget": dict(rating="green", depth="code",
+ ux="No surface — the computed number rides in the RAG call payload; visible only in the "
+    "retrieval trace if you look for token_budget_for_retrieval", how="""
+The token adjuster. Task #98, and it exists because RAG was guessing.
+
+RAG's Structure stage used a static per-caller_mode table (chat.default 3000,
+chat.thinking 16000) for how many tokens of retrieved context it could afford, because
+chat never sent a real number. Ananth's correction was that RAG does not have to guess:
+chat knows its own context window, its system prompt, the conversation so far, and how
+much it must reserve to generate an answer.
+
+  token_budget_for_retrieval = context_window
+                             - system_prompt_tokens
+                             - conversation_history_tokens
+                             - answer_generation_reserve
+
+conversation_history_tokens is the term that moves — a thread's first turn and its
+twentieth differ by thousands of tokens — so the budget is genuinely per-turn rather than
+per-mode. react_loop computes it at five separate call sites and passes it with the RAG
+request.
+""", findings=[
+ ("good", "Replaces a guess with arithmetic, and the arithmetic is stated in the docstring "
+          "in the same form RAG's own docs use — the two sides agree on the formula."),
+ ("good", "Small, single-purpose, pure: takes ctx, returns an int."),
+ ("watch", "Computed at five call sites in react_loop rather than once per turn and reused. "
+           "Cheap, but five places can drift if one is missed when a new tool call is added."),
+ ("watch", "No test file, for arithmetic that decides how much corpus every retrieval gets."),
+]),
 }
 
 # ── The 25 pipeline sub-modules ─────────────────────────────────────────────

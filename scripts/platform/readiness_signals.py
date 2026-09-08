@@ -60,6 +60,7 @@ if __name__ == "__main__":
         "chat_api": "app/api/chat.py",
         "worker": "app/worker/run.py",
         "queue": "app/queue/redis_queue.py",
+        "retrieval_budget": "app/services/retrieval_budget.py",
     })
     fan = {m["module"].split(".")[-1]: m.get("fan_in", 0) for m in cat["submodules"]}
     emits = {m["module"].split(".")[-1]: len(m.get("telemetry") or []) for m in cat["submodules"]}

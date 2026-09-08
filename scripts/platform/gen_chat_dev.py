@@ -118,7 +118,8 @@ def main():
 
     # Cross-cutting: not steps, but under every step that generates.
     cross = [module_record("app/services/llm_manager.py", "cross-cutting"),
-             module_record("app/skills/phi_gate.py", "cross-cutting")]
+             module_record("app/skills/phi_gate.py", "cross-cutting"),
+             module_record("app/services/retrieval_budget.py", "cross-cutting")]
     for c in cross:
         out = subprocess.run(
             ["grep", "-rl", c["id"], "--include=*.py", "app/"],
