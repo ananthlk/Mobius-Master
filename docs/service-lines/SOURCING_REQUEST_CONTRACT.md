@@ -858,3 +858,61 @@ see. The value is still refused — only the *observation of absence* survives.
 
 This is §5's distinction (`silent` versus `none_applies`) meeting §14's authority policy,
 and the two must not be applied with one rule.
+
+---
+
+## §17 · A grading premise is a claim, and mine was false
+**Registry, 2026-09-08**
+
+Pilot question 120's evaluator prompt — written by the Registry — stated as a trap:
+
+> *"we hold NO DRG table anywhere in the database — 12 AHCA source documents … are
+> recorded in `service_line.source` with `held=false`. So the grouping LOGIC is not
+> answerable from our corpus"*
+
+Deep Research checked it against the published index before reusing it. **Six of those
+twelve are held and retrievable**, verified by exact filename:
+
+```
+DRG_Rate_Worksheet_FY2019-20_Effective_July-1-2019.xlsx      73 chunks
+DRG_Rate_Worksheet_2020-2021_Effective_July-1-2020…          74
+SFY_2021-2022_DRG_Rate_Worksheet_Eff_2021-07-01.xlsx        167
+Provider_DRG_Rate_Worksheet_FY_2019-2020…                    41
+Provider_DRG_Rate_Worksheet_FY_2020-2021…                    41
+DRG_Rembursement_Plan.pdf                                   276
+```
+
+A question opened on that prompt would have **graded a correct answer as a failure** and
+told a reader the grouping logic is unanswerable while the rate worksheets sat in the
+index. `service_line.source.held` is corrected for those six.
+
+**The premise came from our own `held` flag, never from the index.** That is the rule this
+project arrived at three times over — *before filing an acquisition, open the thing we
+already hold* — applied to acquisitions and not to the grading criteria written from the
+same flag. A grading premise asserts something about the world and must be checked like
+any other claim.
+
+### 17.1 A misspelling in our own filename is a permanent absence
+
+`DRG_Rembursement_Plan.pdf` — ours, not theirs. Any `held` check matching on title reads
+that document as absent no matter how many times it is acquired, and every re-acquisition
+lands next to the copy already there. Deep Research spotted it in the filename list.
+
+### 17.2 My own re-check over-claimed, and is not the source of the numbers above
+
+Auditing the flag, a loose token matcher reported **24 of 24** absent sources as actually
+held. It was wrong: four different fiscal-year worksheets all matched one
+`DRG_Rate_Worksheet.xlsx`, and *"DRG Reimbursement Plan"* matched
+`69G-6.030_Outpatient_Hospital_Reimbursement` — an outpatient rule. Two shared generic
+tokens (`drg`, `rate`, `worksheet`, `reimbursement`) is not identity, which is the same
+error §16's `document_governs` had to be tightened for on the same day.
+
+The six above are Deep Research's, verified by exact filename with chunk counts. **Six
+corrected, six left absent** — `FY 2022-23` worksheets, the Rough Draft, the APR DRG
+Training Session and the Title XIX plan are genuinely not there under any name checked.
+
+### 17.3 The source table double-counts
+
+24 rows for 12 distinct documents. Every DRG source is recorded twice, so any count of
+"how much do we still need" from that table is doubled. Registry defect, fixing
+separately.
