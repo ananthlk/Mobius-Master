@@ -71,7 +71,15 @@
         "deploy_target": "Cloud Run",
         "deploy_script": "scripts/deploy.sh dev"
       },
-      "layer": 1
+      "layer": 1,
+      "components": [
+        {
+          "service": "mobius-chat",
+          "stage": "",
+          "description": "Conversational surface and the ReAct loop's host."
+        }
+      ],
+      "kind": "surface"
     },
     {
       "id": "rag",
@@ -122,7 +130,15 @@
         "deploy_target": "Cloud Run",
         "data_store": "pgvector (instant RAG)"
       },
-      "layer": 6
+      "layer": 6,
+      "components": [
+        {
+          "service": "mobius-rag",
+          "stage": "publish",
+          "description": "Corpus API and retrieval over pgvector."
+        }
+      ],
+      "kind": "store"
     },
     {
       "id": "react",
@@ -180,7 +196,8 @@
         "status": "deployed",
         "deploy_target": "Cloud Run"
       },
-      "layer": 2
+      "layer": 2,
+      "kind": "agent"
     },
     {
       "id": "router",
@@ -239,7 +256,8 @@
         "deploy_target": "Cloud Run",
         "code_path": "mobius-rag/src/router/"
       },
-      "layer": 2
+      "layer": 2,
+      "kind": "agent"
     },
     {
       "id": "eval",
@@ -305,7 +323,15 @@
         "deploy_target": "Cloud Run",
         "data_store": "BQ (rag_query_decisions, run_calibration, grading_sheet)"
       },
-      "layer": 7
+      "layer": 7,
+      "components": [
+        {
+          "service": "mobius-qa",
+          "stage": "",
+          "description": "Eval runner, bake-off, and eval studio."
+        }
+      ],
+      "kind": "governance"
     },
     {
       "id": "appeals",
@@ -355,7 +381,15 @@
         "status": "building",
         "deploy_target": "Cloud Run"
       },
-      "layer": 4
+      "layer": 4,
+      "components": [
+        {
+          "service": "mobius-appeals-prototype",
+          "stage": "",
+          "description": "Appeals workflow prototype."
+        }
+      ],
+      "kind": "agent"
     },
     {
       "id": "observer",
@@ -403,7 +437,8 @@
         "status": "code-ready, not deployed",
         "deploy_target": "Cloud Run"
       },
-      "layer": 7
+      "layer": 7,
+      "kind": "agent"
     },
     {
       "id": "payor-platform",
@@ -457,7 +492,15 @@
         "status": "deployed",
         "deploy_target": "Cloud Run"
       },
-      "layer": 1
+      "layer": 1,
+      "components": [
+        {
+          "service": "mobius-payor",
+          "stage": "",
+          "description": "Payor workspace, service-line registry, sourcing runs."
+        }
+      ],
+      "kind": "agent"
     },
     {
       "id": "payor-fact-store",
@@ -519,7 +562,8 @@
         "deploy_target": "Cloud Run",
         "data_store": "pgvector"
       },
-      "layer": 6
+      "layer": 6,
+      "kind": "store"
     },
     {
       "id": "sourcing",
@@ -574,7 +618,25 @@
         "status": "deployed",
         "deploy_target": "Cloud Run"
       },
-      "layer": 0
+      "layer": 0,
+      "components": [
+        {
+          "service": "mobius-web-scraper",
+          "stage": "acquire",
+          "description": "Crawl + fetch. The fleet's compliant egress path \u2014 robots evaluation lives here."
+        },
+        {
+          "service": "mobius-web-scraper-worker",
+          "stage": "acquire",
+          "description": "Async crawl execution: the download lane behind the scraper API."
+        },
+        {
+          "service": "mobius-google-search",
+          "stage": "acquire",
+          "description": "Search-based discovery of candidate source documents."
+        }
+      ],
+      "kind": "agent"
     },
     {
       "id": "curation",
@@ -627,7 +689,30 @@
         "status": "deployed",
         "deploy_target": "Cloud Run"
       },
-      "layer": 0
+      "layer": 0,
+      "components": [
+        {
+          "service": "mobius-doc-reader",
+          "stage": "extract",
+          "description": "Table and section extraction from source documents."
+        },
+        {
+          "service": "mobius-rag-chunking-worker",
+          "stage": "chunk",
+          "description": "Splits documents into chunks; a separate worker, not in-request."
+        },
+        {
+          "service": "mobius-lexicon-maintenance",
+          "stage": "tag",
+          "description": "Lexicon governance: vocabulary, review queue, business allowlist."
+        },
+        {
+          "service": "mobius-rag-embedding-worker",
+          "stage": "embed",
+          "description": "Vertex embeddings into pgvector; a separate worker."
+        }
+      ],
+      "kind": "agent"
     },
     {
       "id": "product-awareness",
@@ -682,7 +767,15 @@
         "status": "live",
         "path": "docs/product-docs/"
       },
-      "layer": 3
+      "layer": 3,
+      "components": [
+        {
+          "service": "mobius-product-awareness",
+          "stage": "",
+          "description": "Product-doc corpus, retrieval, and the admin ingestion surface."
+        }
+      ],
+      "kind": "agent"
     },
     {
       "id": "republishing",
@@ -729,7 +822,15 @@
         "branch": "main",
         "status": "building"
       },
-      "layer": 0
+      "layer": 0,
+      "components": [
+        {
+          "service": "mobius-rag-embedding-worker",
+          "stage": "embed",
+          "description": "Re-embeds on lexicon N\u2192N+1 to measure eval lift."
+        }
+      ],
+      "kind": "agent"
     },
     {
       "id": "technical-review",
@@ -782,7 +883,8 @@
         "branch": "main",
         "status": "operational"
       },
-      "layer": 3
+      "layer": 3,
+      "kind": "governance"
     },
     {
       "id": "user-manager",
@@ -829,7 +931,15 @@
         "status": "deployed",
         "deploy_target": "Cloud Run"
       },
-      "layer": 3
+      "layer": 3,
+      "components": [
+        {
+          "service": "mobius-user",
+          "stage": "",
+          "description": "Enrollment, profiles, permissions."
+        }
+      ],
+      "kind": "agent"
     },
     {
       "id": "org-agent",
@@ -878,7 +988,15 @@
         "branch": "main",
         "status": "deployed"
       },
-      "layer": 3
+      "layer": 3,
+      "components": [
+        {
+          "service": "mobius-org-intelligence",
+          "stage": "",
+          "description": "Org setup and datastore provisioning."
+        }
+      ],
+      "kind": "agent"
     },
     {
       "id": "interact",
@@ -920,7 +1038,15 @@
         "status": "frozen",
         "note": "Chat integration closed; no new features"
       },
-      "layer": 1
+      "layer": 1,
+      "components": [
+        {
+          "service": "mobius-interact",
+          "stage": "",
+          "description": "Script registry and in-page runner."
+        }
+      ],
+      "kind": "surface"
     },
     {
       "id": "feedback",
@@ -966,7 +1092,15 @@
         "branch": "main",
         "status": "deployed"
       },
-      "layer": 3
+      "layer": 3,
+      "components": [
+        {
+          "service": "mobius-feedback",
+          "stage": "",
+          "description": "CSAT/NPS capture and routing."
+        }
+      ],
+      "kind": "agent"
     },
     {
       "id": "historical-extraction",
@@ -1007,7 +1141,15 @@
         "repo": "mobius-rag",
         "status": "blocked"
       },
-      "layer": 0
+      "layer": 0,
+      "components": [
+        {
+          "service": "mobius-doc-reader",
+          "stage": "extract",
+          "description": "Reads archive PDFs into text the pipeline can chunk."
+        }
+      ],
+      "kind": "agent"
     },
     {
       "id": "vault",
@@ -1058,7 +1200,15 @@
         "branch": "main",
         "status": "deployed"
       },
-      "layer": 1
+      "layer": 1,
+      "components": [
+        {
+          "service": "mobius-vault",
+          "stage": "",
+          "description": "Personal workspace panel."
+        }
+      ],
+      "kind": "surface"
     },
     {
       "id": "phi-classifier",
@@ -1114,7 +1264,15 @@
         "branch": "main",
         "status": "deployed"
       },
-      "layer": 3
+      "layer": 3,
+      "components": [
+        {
+          "service": "mobius-phi-classifier",
+          "stage": "",
+          "description": "PHI detection; fail-closed gate ahead of ingestion and cache writes."
+        }
+      ],
+      "kind": "governance"
     },
     {
       "id": "service-line-registry",
@@ -1170,7 +1328,15 @@
         "status": "deployed",
         "deploy_target": "Cloud Run"
       },
-      "layer": 4
+      "layer": 4,
+      "components": [
+        {
+          "service": "mobius-payor",
+          "stage": "",
+          "description": "Registry API and the review surface."
+        }
+      ],
+      "kind": "agent"
     },
     {
       "id": "download-skill",
@@ -1224,11 +1390,24 @@
         "branch": "main",
         "status": "deployed"
       },
-      "layer": 5
+      "layer": 5,
+      "components": [
+        {
+          "service": "mobius-web-scraper",
+          "stage": "acquire",
+          "description": "4-tier fetch_document runs through the scraper's egress path."
+        }
+      ],
+      "kind": "skill",
+      "consumers": [
+        "Chat (ReAct)",
+        "MCP (fleet-wide)",
+        "Sourcing Agent"
+      ]
     },
     {
       "id": "instant-rag",
-      "name": "Instant RAG / Vault Upload",
+      "name": "Document Upload (Path B)",
       "tier": "B",
       "gates": [
         4,
@@ -1236,24 +1415,13 @@
       ],
       "user_view": {
         "status": "live",
-        "description": "Upload documents to Vault \u2192 automatically ingested \u2192 searchable in Chat",
-        "surface": "My Vault upload, Chat search over uploaded docs",
-        "users": [
-          "all operators"
-        ]
+        "description": "Upload a document in Chat or Vault and have it ingested into the corpus.",
+        "surface": "Chat upload, My Vault"
       },
       "technical_view": {
         "status": "live",
-        "owner": "Instant RAG Agent (owned by me, Retriever Agent)",
-        "module": "mobius-vault + mobius-rag",
-        "repo": "github.com/ananthlk/mobius-chat + mobius-rag",
-        "language": "React (FE) + Python (ingestion)",
-        "components": [
-          "chat upload",
-          "Vault\u2192promotion",
-          "pgvector instant"
-        ],
-        "description": "OWN chat upload\u2192Vault\u2192promotion; canonical=Path B (pgvector, mobius_cache)"
+        "description": "Routes through the canonical mobius-rag /upload path (Path B: chunking, lexicon expansion, hybrid retrieval, rerank). The standalone instant-rag envelope service was bypassed on 2026-04-27 and formally deprecated 2026-07-09 with zero traffic \u2014 do not build on it.",
+        "repo": "mobius-rag"
       },
       "specs_view": {
         "link": "docs/product-docs/instant-rag-skill-spec.md",
@@ -1277,7 +1445,30 @@
         "status": "deployed",
         "data_store": "pgvector"
       },
-      "layer": 5
+      "layer": 5,
+      "components": [
+        {
+          "service": "mobius-rag",
+          "stage": "acquire",
+          "description": "/upload is the canonical entry point for user-supplied documents."
+        },
+        {
+          "service": "mobius-rag-chunking-worker",
+          "stage": "chunk",
+          "description": "Path B chunking, shared with the crawl pipeline."
+        },
+        {
+          "service": "mobius-rag-embedding-worker",
+          "stage": "embed",
+          "description": "Shared embedding worker."
+        }
+      ],
+      "kind": "skill",
+      "consumers": [
+        "Chat uploads",
+        "Vault"
+      ],
+      "note": "Standalone instant-rag service deprecated 2026-07-09 (mobius-skills/instant-rag/DEPRECATED.md)."
     },
     {
       "id": "platform-architects",
@@ -1330,7 +1521,8 @@
         "status": "operational",
         "path": "docs/platform-definition.json"
       },
-      "layer": 3
+      "layer": 3,
+      "kind": "governance"
     },
     {
       "id": "deep-research",
@@ -1364,7 +1556,454 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run (mobius-payor)"
-      }
+      },
+      "components": [
+        {
+          "service": "mobius-payor",
+          "stage": "",
+          "description": "Research Console and the research.* state machine."
+        }
+      ],
+      "kind": "agent"
+    },
+    {
+      "id": "email-skill",
+      "name": "Email Skill",
+      "tier": "B",
+      "gates": [
+        6,
+        7
+      ],
+      "layer": 5,
+      "user_view": {
+        "status": "live",
+        "description": "Send email to payors, patients and staff with idempotency and an audit trail.",
+        "surface": "Called by agents; results surface in Chat"
+      },
+      "technical_view": {
+        "status": "live",
+        "description": "Skill service: email_send / email_craft_send / email_prepare.",
+        "repo": "mobius-email"
+      },
+      "specs_view": {
+        "status": "live",
+        "description": "\u2014"
+      },
+      "eval_view": {
+        "status": "planned",
+        "description": "\u2014"
+      },
+      "git_view": {
+        "repo": "mobius-email",
+        "branch": "main",
+        "status": "live",
+        "deploy_target": "Cloud Run"
+      },
+      "components": [
+        {
+          "service": "mobius-email",
+          "stage": "",
+          "description": "Skill service: email_send / email_craft_send / email_prepare."
+        }
+      ],
+      "kind": "skill",
+      "consumers": [
+        "Chat (ReAct)",
+        "MCP (fleet-wide)",
+        "Appeals Agent"
+      ]
+    },
+    {
+      "id": "tasks-skill",
+      "name": "Tasks Skill",
+      "tier": "B",
+      "gates": [
+        6
+      ],
+      "layer": 5,
+      "user_view": {
+        "status": "live",
+        "description": "Create, assign and track tasks for staff.",
+        "surface": "Task list envelope in Chat"
+      },
+      "technical_view": {
+        "status": "live",
+        "description": "Skill service backing the task-list envelope and bulk_import_tasks.",
+        "repo": "mobius-task-manager"
+      },
+      "specs_view": {
+        "status": "live",
+        "description": "\u2014"
+      },
+      "eval_view": {
+        "status": "planned",
+        "description": "\u2014"
+      },
+      "git_view": {
+        "repo": "mobius-task-manager",
+        "branch": "main",
+        "status": "live",
+        "deploy_target": "Cloud Run"
+      },
+      "components": [
+        {
+          "service": "mobius-task-manager",
+          "stage": "",
+          "description": "Skill service backing the task-list envelope and bulk_import_tasks."
+        }
+      ],
+      "kind": "skill",
+      "consumers": [
+        "Chat (ReAct)",
+        "Vault",
+        "Payor Platform"
+      ]
+    },
+    {
+      "id": "healthcare-skill",
+      "name": "Healthcare Query Skill",
+      "tier": "B",
+      "gates": [
+        4
+      ],
+      "layer": 5,
+      "user_view": {
+        "status": "live",
+        "description": "Structured healthcare lookups: codes, NPIs, plan and provider data.",
+        "surface": "Transparent (called during answers)"
+      },
+      "technical_view": {
+        "status": "live",
+        "description": "Skill service for code/NPI/plan lookups.",
+        "repo": "mobius-healthcare"
+      },
+      "specs_view": {
+        "status": "live",
+        "description": "\u2014"
+      },
+      "eval_view": {
+        "status": "planned",
+        "description": "\u2014"
+      },
+      "git_view": {
+        "repo": "mobius-healthcare",
+        "branch": "main",
+        "status": "live",
+        "deploy_target": "Cloud Run"
+      },
+      "components": [
+        {
+          "service": "mobius-healthcare",
+          "stage": "",
+          "description": "Skill service for code/NPI/plan lookups."
+        }
+      ],
+      "kind": "skill",
+      "consumers": [
+        "Chat (ReAct)",
+        "MCP (fleet-wide)"
+      ]
+    },
+    {
+      "id": "vibe-skill",
+      "name": "Vibe Skill",
+      "tier": "B",
+      "gates": [
+        6
+      ],
+      "layer": 5,
+      "user_view": {
+        "status": "live",
+        "description": "Lightweight conversational/tone handling for non-policy turns.",
+        "surface": "Transparent (called during answers)"
+      },
+      "technical_view": {
+        "status": "live",
+        "description": "Stateless skill service.",
+        "repo": "mobius-vibe"
+      },
+      "specs_view": {
+        "status": "live",
+        "description": "\u2014"
+      },
+      "eval_view": {
+        "status": "planned",
+        "description": "\u2014"
+      },
+      "git_view": {
+        "repo": "mobius-vibe",
+        "branch": "main",
+        "status": "live",
+        "deploy_target": "Cloud Run"
+      },
+      "components": [
+        {
+          "service": "mobius-vibe",
+          "stage": "",
+          "description": "Stateless skill service."
+        }
+      ],
+      "kind": "skill",
+      "consumers": [
+        "Chat (ReAct)"
+      ]
+    },
+    {
+      "id": "answer-cache",
+      "name": "Answer Cache",
+      "tier": "B",
+      "gates": [
+        4
+      ],
+      "layer": 6,
+      "user_view": {
+        "status": "live",
+        "description": "Returns a previously-approved answer when the same question comes back.",
+        "surface": "Transparent (round 0 before retrieval)"
+      },
+      "technical_view": {
+        "status": "live",
+        "description": "pgvector answer cache with a fail-closed PHI write gate.",
+        "repo": "mobius-answer-cache"
+      },
+      "specs_view": {
+        "status": "live",
+        "description": "\u2014"
+      },
+      "eval_view": {
+        "status": "planned",
+        "description": "\u2014"
+      },
+      "git_view": {
+        "repo": "mobius-answer-cache",
+        "branch": "main",
+        "status": "live",
+        "deploy_target": "Cloud Run"
+      },
+      "components": [
+        {
+          "service": "mobius-answer-cache",
+          "stage": "",
+          "description": "pgvector answer cache with a fail-closed PHI write gate."
+        }
+      ],
+      "kind": "store"
+    },
+    {
+      "id": "credentialing",
+      "name": "Credentialing Agent",
+      "tier": "B",
+      "gates": [
+        1,
+        3,
+        5
+      ],
+      "layer": 4,
+      "user_view": {
+        "status": "live",
+        "description": "Provider enrollment, licence tracking, roster and taxonomy management.",
+        "surface": "Credentialing Copilot panel in Chat"
+      },
+      "technical_view": {
+        "status": "live",
+        "description": "Roster + credentialing pipeline and profile API.",
+        "repo": "mobius-provider-roster-credentialing"
+      },
+      "specs_view": {
+        "status": "live",
+        "description": "\u2014"
+      },
+      "eval_view": {
+        "status": "planned",
+        "description": "\u2014"
+      },
+      "git_view": {
+        "repo": "mobius-provider-roster-credentialing",
+        "branch": "main",
+        "status": "live",
+        "deploy_target": "Cloud Run"
+      },
+      "components": [
+        {
+          "service": "mobius-provider-roster-credentialing",
+          "stage": "",
+          "description": "Roster + credentialing pipeline and profile API."
+        }
+      ],
+      "kind": "agent"
+    },
+    {
+      "id": "story-ui",
+      "name": "Story UI",
+      "tier": "B",
+      "gates": [
+        8
+      ],
+      "layer": 1,
+      "user_view": {
+        "status": "live",
+        "description": "The narrative deck: strategy and methodology, presented and explorable.",
+        "surface": "story.html (mobius-story-ui)"
+      },
+      "technical_view": {
+        "status": "live",
+        "description": "FastAPI static server with SSE chat/skills proxies.",
+        "repo": "mobius-story-ui"
+      },
+      "specs_view": {
+        "status": "live",
+        "description": "\u2014"
+      },
+      "eval_view": {
+        "status": "planned",
+        "description": "\u2014"
+      },
+      "git_view": {
+        "repo": "mobius-story-ui",
+        "branch": "main",
+        "status": "live",
+        "deploy_target": "Cloud Run"
+      },
+      "components": [
+        {
+          "service": "mobius-story-ui",
+          "stage": "",
+          "description": "FastAPI static server with SSE chat/skills proxies."
+        }
+      ],
+      "kind": "surface"
+    },
+    {
+      "id": "os-extension",
+      "name": "Mobius OS Extension",
+      "tier": "B",
+      "gates": [
+        6,
+        7
+      ],
+      "layer": 1,
+      "user_view": {
+        "status": "live",
+        "description": "Chrome extension putting Mobius beside the EHR, with a local PHI screen.",
+        "surface": "Browser extension + sidecar panel"
+      },
+      "technical_view": {
+        "status": "live",
+        "description": "Extension backend: 10 blueprints under /api/v1/*.",
+        "repo": "mobius-os-backend"
+      },
+      "specs_view": {
+        "status": "live",
+        "description": "\u2014"
+      },
+      "eval_view": {
+        "status": "planned",
+        "description": "\u2014"
+      },
+      "git_view": {
+        "repo": "mobius-os-backend",
+        "branch": "main",
+        "status": "live",
+        "deploy_target": "Cloud Run"
+      },
+      "components": [
+        {
+          "service": "mobius-os-backend",
+          "stage": "",
+          "description": "Extension backend: 10 blueprints under /api/v1/*."
+        }
+      ],
+      "kind": "surface"
+    },
+    {
+      "id": "specs-catalog",
+      "name": "Specs Catalog",
+      "tier": "A",
+      "gates": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "layer": 3,
+      "user_view": {
+        "status": "live",
+        "description": "Git-backed catalog of specs, designs and sign-offs.",
+        "surface": "specs-platform"
+      },
+      "technical_view": {
+        "status": "live",
+        "description": "Auto-deploying specs catalog service.",
+        "repo": "mobius-specs"
+      },
+      "specs_view": {
+        "status": "live",
+        "description": "\u2014"
+      },
+      "eval_view": {
+        "status": "planned",
+        "description": "\u2014"
+      },
+      "git_view": {
+        "repo": "mobius-specs",
+        "branch": "main",
+        "status": "live",
+        "deploy_target": "Cloud Run"
+      },
+      "components": [
+        {
+          "service": "mobius-specs",
+          "stage": "",
+          "description": "Auto-deploying specs catalog service."
+        }
+      ],
+      "kind": "governance"
+    },
+    {
+      "id": "data-platform",
+      "name": "Data Platform (dbt)",
+      "tier": "B",
+      "gates": [
+        4,
+        8
+      ],
+      "layer": 6,
+      "user_view": {
+        "status": "live",
+        "description": "Marts and benchmarks: HCPCS rates, rosters, financial benchmarking.",
+        "surface": "dbt-ui / reports"
+      },
+      "technical_view": {
+        "status": "live",
+        "description": "dbt models plus a reporting UI; mobius-db-agent for schema operations.",
+        "repo": "mobius-dbt-ui"
+      },
+      "specs_view": {
+        "status": "live",
+        "description": "\u2014"
+      },
+      "eval_view": {
+        "status": "planned",
+        "description": "\u2014"
+      },
+      "git_view": {
+        "repo": "mobius-dbt-ui",
+        "branch": "main",
+        "status": "live",
+        "deploy_target": "Cloud Run"
+      },
+      "components": [
+        {
+          "service": "mobius-dbt-ui",
+          "stage": "",
+          "description": "dbt models plus a reporting UI; mobius-db-agent for schema operations."
+        }
+      ],
+      "kind": "store"
     }
   ],
   "coordination": {
@@ -1481,6 +2120,70 @@
       "label": "Parallel",
       "name": "Deep Research",
       "description": "The learning engine. Runs across all layers, asynchronously."
+    }
+  ],
+  "pipeline_stages": [
+    {
+      "stage": "acquire",
+      "label": "Acquire",
+      "description": "Get the document \u2014 crawl, search, fetch, or upload."
+    },
+    {
+      "stage": "extract",
+      "label": "Extract",
+      "description": "Pull structure out of it: tables, sections, text."
+    },
+    {
+      "stage": "chunk",
+      "label": "Chunk",
+      "description": "Split into retrievable units with their context kept."
+    },
+    {
+      "stage": "tag",
+      "label": "Tag",
+      "description": "Apply controlled vocabulary so retrieval can filter."
+    },
+    {
+      "stage": "embed",
+      "label": "Embed",
+      "description": "Vectorise and index for semantic search."
+    },
+    {
+      "stage": "publish",
+      "label": "Publish",
+      "description": "Make it live in the corpus, and keep it fresh."
+    }
+  ],
+  "kinds": [
+    {
+      "kind": "agent",
+      "label": "Agent",
+      "description": "Makes decisions. Chooses what to do next."
+    },
+    {
+      "kind": "skill",
+      "label": "Skill",
+      "description": "A task. No decisions \u2014 reused by many agents."
+    },
+    {
+      "kind": "surface",
+      "label": "Surface",
+      "description": "Where a person enters the system."
+    },
+    {
+      "kind": "store",
+      "label": "Store",
+      "description": "Where knowledge lives."
+    },
+    {
+      "kind": "worker",
+      "label": "Worker",
+      "description": "Machinery that runs a pipeline stage."
+    },
+    {
+      "kind": "governance",
+      "label": "Governance",
+      "description": "Sets and enforces the rules."
     }
   ]
 }
