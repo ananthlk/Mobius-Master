@@ -580,12 +580,23 @@ ReAct answer is published directly and none of this runs.
  ("good", "One swallow is explicitly reasoned — 'audit must never break the turn'."),
 ]),
 
-"continuity": dict(rating="green", depth="surface", how="""
-The 'do not flail' stage. Detects when to ask the user for help rather than keep trying
-(user-as-leverage), when the user has dropped the thread, and when the attempt ceiling is
-hit. Spec'd in docs/RELENTLESS_CONTINUITY_PLAN.md.
-""", findings=[("good", "One of only four modules with telemetry of its own, and it has tests."),
-               ("good", "105 lines for a real product behaviour.")]),
+"continuity": dict(rating="green", depth="code", how="""
+The 'do not flail' stage. Three questions: should we ask the user for help (user-as-leverage),
+has the user ended the pursuit, and have we hit the attempt ceiling.
+
+It types its vocabulary rather than passing strings around. StuckReason is a Literal —
+no_evidence, missing_code, conflicting_info, partial_answer, tool_failed — and there are five
+named objective end states (resolved, need_info, unable, user_ended, incomplete), so a stop is
+always a stated kind of stop rather than an absence of an answer. MAX_ATTEMPTS_BEFORE_STOP
+comes from MasterObjective. Spec'd in docs/RELENTLESS_CONTINUITY_PLAN.md.
+""", findings=[
+ ("good", "One of only four modules with telemetry of its own, and it has two test files."),
+ ("good", "Typed end states mean 'we stopped' always carries WHY — the difference between a "
+          "product that gives up legibly and one that just goes quiet."),
+ ("watch", "Delegates detection to app/state/continuity_checks.py and master_objective.py, "
+           "neither in this catalogue — the wrapper pattern again, though thin here."),
+]),
+
 "react_loop": dict(rating="red", depth="code", how="""
 The engine of the ReAct path: reason about what to do, call a tool, look at what came
 back, go again. It replaces run_plan and the classic sub-question answering, does the core
@@ -669,20 +680,42 @@ skill is one file and no edit here. The rest are still described inline.
            "planner was shown on a given turn. The second of the two the Chat seat and I "
            "agreed are worth a real signal."),
 ]),
-"capabilities": dict(rating="green", depth="surface", how="""
-The single source of truth for what each agent path can answer, fed to the parser and
-planner so questions get decomposed into sub-questions something can actually handle. Each
-tool declares its capabilities explicitly, so when one fails ReAct can pick another.
-""", findings=[("good", "Declared rather than inferred, and named as the single source of truth."),
-               ("watch", "No test file, and four callers depend on its shape.")]),
-"parsing": dict(rating="amber", depth="surface", how="""
-Pulls a structured decision out of the reasoning model's free-text reply. Each round is
-supposed to emit {thought, tool, inputs, is_complete}; in practice it arrives wrapped in
-code fences, with trailing commas, or with unescaped characters. These are the pure,
-context-free helpers that recover it.
-""", findings=[("bad", "No test file. This is parsing hostile input from a model — precisely "
-                       "the code that should be table-driven and heavily tested."),
-               ("good", "Pure and context-free, so it is trivially testable once someone does.")]),
+"capabilities": dict(rating="amber", depth="code", how="""
+The single source of truth for what each agent path can answer, fed to the parser and planner
+so questions are only decomposed into sub-questions something can actually handle. Each tool
+declares can_answer explicitly, so when one fails ReAct has a basis for picking another.
+""", findings=[
+ ("bad", "It carries a documented HOLE. A comment dated 2026-04-18 records that "
+         "ask_credentialing_npi was removed along with the other credentialing and roster "
+         "tools, and that the capability declaration 'rebuilds when credentialing ships as a "
+         "proper skill integration'. So the single source of truth is knowingly missing a "
+         "capability the product still has — the planner cannot route to something it is never "
+         "told exists."),
+ ("good", "Declared rather than inferred, and the file says so."),
+ ("watch", "No test file, and four callers depend on its shape."),
+]),
+
+"parsing": dict(rating="amber", depth="code", how="""
+Recovers a structured decision from the reasoning model's free text. Each round is supposed to
+emit {thought, tool, inputs, is_complete}; real output arrives in code fences, with trailing
+commas, with unescaped newlines, or buried in markdown prose. This is where the tolerance
+lives, and it is explicit about how much.
+
+FOUR TIERS, in order: strip a triple-backtick json fence; json.loads verbatim;
+json_repair.loads for common LLM hiccups; extract the first balanced {...} block and re-run the
+previous two on it. If all four miss the ReAct loop stops — except for one narrow class, 'NPIs
+for <org>', which keeps a heuristic fallback so a mangled planner response still routes to
+lookup_npi rather than becoming a blank refusal.
+
+It deliberately imports nothing from react_loop, which is what makes it testable in isolation.
+""", findings=[
+ ("bad", "NO TEST FILE — and this is the module that parses hostile input through four fallback "
+         "tiers. It is pure and import-free precisely so it CAN be table-driven, and nobody "
+         "has."),
+ ("good", "The tiers are ordered, documented and bounded, and the one heuristic escape hatch is "
+          "scoped to a single named question shape rather than being a general guess."),
+]),
+
 "completion_extension_gate": dict(rating="amber", depth="code",
  ux="No surface. ctx.completion_critic_ran / _satisfied / _gaps are set but nothing renders them",
  how="""
@@ -729,21 +762,49 @@ deadline, the 25 seconds reserving room to synthesise the final answer.
           "would defend — it fails toward answering rather than toward hanging."),
 ]),
 
-"react_retry_guard": dict(rating="green", depth="surface", how="""
-Stops the loop burning calls re-running a tool that already failed with the same inputs.
-Written against a specific pathology seen in production, where the bandit or the model
-picked the same dead path round after round.
-""", findings=[("good", "Has telemetry of its own AND two test files — the best-covered "
-                        "module in the pipeline."),
-               ("good", "Written against an observed failure rather than a hypothetical.")]),
-"curator_tools": dict(rating="amber", depth="surface", how="""
-Two tools that let the assistant work on the corpus mid-conversation:
-lookup_authoritative_sources queries RAG's /sources/search to enumerate URLs Mobius has
-seen for a payer and topic, and ingest_url pulls one in through the import pipeline.
-""", findings=[("watch", "Three swallows on calls that cross a service boundary into RAG. A "
-                         "failed ingest that logs and continues looks identical to a "
-                         "successful one from the conversation's point of view."),
-               ("good", "Has a test file.")]),
+"react_retry_guard": dict(rating="green", depth="code", how="""
+Stops the loop burning calls re-running a tool that already failed. Written against a pathology
+observed in production, where the bandit or the model picked the same dead path round after
+round.
+
+Three rules. Same tool plus same inputs plus no new evidence means skip — a failure is recorded
+when a tool raises, returns success=False, or comes back with an ErrorEnvelope, and before the
+next execution the guard checks whether any NEW tool result has landed since; if not it refuses
+and tells the model to choose differently. Fail-fast at loop end: if every round failed and
+nothing succeeded, it short-circuits the 'escalate honestly' path and emits a typed refusal.
+And tool exhaustion: N consecutive failures of one tool with no success between blocks that
+tool for the turn.
+""", findings=[
+ ("good", "Telemetry of its own AND two test files — the best-covered module in the pipeline."),
+ ("good", "Written against an observed production failure, and the rule is 'no new evidence' "
+          "rather than a blanket ban, so a legitimate retry after new information still runs."),
+ ("good", "A typed refusal beats a hedged answer: the fail-fast path produces something the "
+          "caller can branch on rather than prose that looks like an answer."),
+]),
+
+"curator_tools": dict(rating="amber", depth="code", how="""
+Two tools that let the assistant work on the corpus mid-conversation, called from
+react_loop._execute_tool. lookup_authoritative_sources queries RAG's /sources/search to
+enumerate URLs Mobius has seen for a payer, state and topic — both ingested and not. ingest_url
+POSTs to /documents/import-from-html (or import-from-gcs for uploaded PDFs) to pull one URL
+through chunking, embedding, lexicon and publish.
+
+Both are HTTP rather than direct DB, deliberately and with the reasoning written down:
+/sources/search runs on RAG so the same shape works whether chat shares a Postgres or talks to
+a future split-out curator service, and ingest_url has side effects that belong in RAG's
+process rather than being triggered across the wire by SQL.
+""", findings=[
+ ("bad", "MOBIUS_RAG_ADMIN_KEY is optional and the module says 'if unset we still try the call; "
+         "rag may 401 and the tool reports the failure cleanly'. An unauthenticated write "
+         "attempt is the designed behaviour, and the difference between 'not configured' and "
+         "'refused' is visible only in the tool's own failure text."),
+ ("good", "The HTTP-not-SQL choice is argued in the module rather than assumed, and it "
+          "anticipates a service split that has not happened yet."),
+ ("good", "Reuses RAG_API_URL rather than adding env vars — the file says so explicitly."),
+ ("watch", "Three swallows on calls crossing a service boundary; a failed ingest that logs and "
+           "continues looks the same to the conversation as a successful one."),
+]),
+
 "critic": dict(rating="amber", depth="code", how="""
 Audits a draft answer against the sources it claims to rest on, before the user sees it.
 The module's own docstring states the gap it fills: when the planner says is_complete and
@@ -791,63 +852,135 @@ which turns off the optional path only. The mandatory floor still runs.
           "right direction."),
 ]),
 
-"feedback_signal": dict(rating="green", depth="surface", how="""
-Decides whether this is the turn where the user gets asked for feedback, based on their own
-cadence rather than a fixed interval. The decision is made here; the planner only chooses
-whether to surface it.
-""", findings=[("good", "77 lines, extracted specifically to keep react_loop under its LOC "
-                        "ratchet — the extraction programme working as intended."),
-               ("watch", "No test file.")]),
-"context": dict(rating="amber", depth="surface", how="""
-The object every stage reads and writes: correlation_id, thread_id, state, plan and stage
-data. Stages mutate it in place; state moves only through explicit apply_delta transitions
-rather than patch merging.
-""", findings=[("bad", "Sixteen callers — by far the highest coupling in the pipeline. Every "
-                       "stage depends on its shape, so any change is a wide blast radius."),
-               ("good", "Zero exception handlers and explicit transitions: it is a data "
-                        "structure, not a service, which is the right choice."),
-               ("watch", "No test file of its own."),
-               ("good", "SCOPE LENS (DB seat): N/A, with reasoning rather than a null grep. "
-                        "context.py imports only dataclasses, typing and Plan — no storage "
-                        "import of any kind — and PipelineContext is never serialised "
-                        "wholesale anywhere in app/: no to_dict, no asdict(ctx), no "
-                        "json.dumps(ctx). A pure in-memory dataclass. Its fields reach storage "
-                        "only because other stages read them and write them, so the "
-                        "persistence decisions belong to those nodes, not this one."),
-               ("watch", "FORWARD NOTE from the DB seat: because ctx fields reach storage only "
-                         "via other stages, this object is the most likely route for "
-                         "state_load's unmodelled-key failure to recur — a field that exists "
-                         "in flight and gets persisted somewhere without being modelled. The "
-                         "node to watch is whichever one writes chat_turns.")]),
-"message_resolver": dict(rating="green", depth="surface", how="""
-Works out what the user means by 'it'. Two problems solved together: resolving pronouns
-against the previous turn ('search the web for it' after a failed query), and noticing when
-the answer already exists in something we produced earlier ('how many NPIs have issues'
-after a credentialing report) so it answers from that instead of searching again.
-""", findings=[("good", "Zero exception handlers, has a test file, and solves a real "
-                        "conversational failure rather than a hypothetical.")]),
-"personalization": dict(rating="green", depth="surface", how="""
-Splices the user's own preferences into the prompt and honours their autonomy setting.
-Implements the chat side of a contract owned by mobius-user
-(CONSUMER_RECIPE_PROFILE.md): splice_user_profile drops the rendered prompt between the
-base system prompt and what follows; autonomy_for gates tools. A no-op for anyone who has
-not onboarded.
-""", findings=[("good", "Implements a written cross-service contract rather than an "
-                        "assumption, and degrades to a no-op."),
-               ("watch", "Seven callers and no test file.")]),
-"active_context": dict(rating="green", depth="surface", how="""
-Remembers which tool the conversation is currently inside, so a follow-up lands in the
-right place instead of starting over. Replaced an older active_skill notion with something
-generic to any tool.
-""", findings=[("good", "60 lines, zero exception handlers."),
-               ("watch", "No test file.")]),
-"credentialing_envelope": dict(rating="green", depth="surface", how="""
-Routing helpers for credentialing conversations — works out when a message is really about
-roster reconciliation, and resolves the context that path needs. Shared with the ReAct
-path so both routes agree on what counts.
-""", findings=[("good", "Zero exception handlers, and sharing it prevents the two paths "
-                        "disagreeing about routing."),
-               ("watch", "No test file.")]),
+"feedback_signal": dict(rating="amber", depth="code", how="""
+Decides whether this is the turn where the user gets asked for feedback, computed from their own
+cadence state rather than a fixed interval. The decision is made here and stashed on
+ctx.feedback_signal; the planner only chooses whether to surface it via offer_feedback.
+
+Gated by FEEDBACK_PERIODIC_ENABLED, default ON. Extracted from react_loop specifically to keep
+that file under its LOC ratchet — the extraction programme working as designed.
+""", findings=[
+ ("bad", "The module states that inputs it cannot cheaply obtain at plan time — thread turn "
+         "count, last-turn QC, whether the user just rated — DEFAULT TO THE CONSERVATIVE VALUE "
+         "so the ask never over-fires, and that wiring them in is a follow-up. So the cadence "
+         "runs on partial inputs today. It is honest about it, but a reader of the output "
+         "cannot tell a real 'not yet' from a 'we did not know'."),
+ ("good", "Failing toward not-asking is the right direction for a feedback prompt, and the gap "
+          "is documented at the function rather than discovered later."),
+ ("watch", "No test file."),
+]),
+
+"context": dict(rating="amber", depth="code", how="""
+The object every stage reads and writes: correlation_id, thread_id, message, state, plan and
+per-stage data. Stages mutate it in place; state moves only through explicit apply_delta
+transitions rather than patch merging.
+
+Its field docstrings carry real cross-stage contracts. is_retry is the clearest: it is set when
+the raw message was detected as a bare retry phrase and `message` was OVERWRITTEN with the
+thread's prior question before the planner ran — and the docstring states that cache-assist
+MUST skip its lookup on a retry turn, because re-serving the cached answer the user is
+explicitly asking to redo defeats the point.
+""", findings=[
+ ("bad", "Sixteen callers — the highest coupling in the pipeline. Any change has a wide blast "
+         "radius."),
+ ("bad", "Cross-stage contracts live in FIELD DOCSTRINGS. 'cache-assist MUST skip its lookup "
+         "on a retry turn' is a real invariant enforced by nothing — a reader who does not open "
+         "this dataclass will not know it exists, and no test names it."),
+ ("good", "Zero exception handlers, explicit transitions: a data structure, not a service, "
+          "which is right for something sixteen modules touch."),
+ ("good", "SCOPE LENS (DB seat): N/A, with reasoning rather than a null grep. No storage import "
+          "of any kind, and PipelineContext is never serialised wholesale — no to_dict, no "
+          "asdict(ctx), no json.dumps(ctx). Its fields reach storage only because other stages "
+          "read and write them, so those decisions belong to those nodes."),
+ ("watch", "FORWARD NOTE from the DB seat, now confirmed: because ctx fields reach storage only "
+           "via other stages, this object is the route by which an unmodelled key gets "
+           "persisted. active_context is that node — it writes two ctx fields into the turn "
+           "record by name."),
+ ("watch", "No test file of its own."),
+]),
+
+"message_resolver": dict(rating="amber", depth="code", how="""
+Works out what the user means by 'it'. Two problems in one module.
+
+Pronoun resolution: 'can you search the web for it?' after a failed query resolves 'it' from the
+prior turn before planning. The trigger is REFERENCE_SIGNALS, a regex alternation of literal
+phrases — it, that, this one, the same, try again, google it, look it up, what about that, try
+a different approach, and a dozen more.
+
+Skill-output awareness: 'how many NPIs have issues with PML?' after a credentialing report is
+answered from the report already in context rather than sent to RAG or the web.
+
+It must run BEFORE classify, which preserves the effective_message it sets. Nothing enforces
+that order.
+""", findings=[
+ ("bad", "Reference detection is a hand-maintained regex of literal English phrases. It fires "
+         "for the phrasings someone thought of and silently does not for the rest — and a "
+         "missed reference does not error, it plans the wrong question."),
+ ("good", "Zero exception handlers, has a test file, and it solves an observed conversational "
+          "failure rather than a hypothetical one."),
+ ("watch", "The ordering dependency with classify is real and implicit."),
+]),
+
+"personalization": dict(rating="green", depth="code", how="""
+Splices the user's own preferences into the prompt and honours their autonomy setting. It
+implements the chat side of a contract owned by another module — mobius-user's
+CONSUMER_RECIPE_PROFILE.md — rather than an assumption about what a profile contains.
+
+Three functions: splice_user_profile drops the rendered prompt between a base system prompt and
+what follows; autonomy_for reads autonomy.routine_tasks / sensitive_tasks to gate whether a tool
+runs or asks first; personalization_emit_payload builds the envelope so the user can see their
+preferences were applied.
+
+Splicing happens at FIVE LLM-bearing stages — planner/ReAct reasoning, critic, integrator,
+adjudicator and one more — so preference shapes tool choice, the quality bar, the voice and the
+post-run grade, not just the wording.
+""", findings=[
+ ("good", "autonomy_for defaults to confirm_first when the profile is missing. The safe "
+          "fallback is the default, not the permissive one."),
+ ("good", "Implements a written cross-service contract and degrades to a no-op for anyone who "
+          "has not onboarded."),
+ ("watch", "Seven callers and no test file, for something that alters five prompts."),
+]),
+
+"active_context": dict(rating="amber", depth="code", how="""
+Remembers which tool the conversation is currently inside, so a follow-up lands in the right
+place instead of starting over. Replaced an older active_skill notion with something generic
+to any tool.
+
+Two functions, and the first is the one that matters: persist_active_context(ctx, turn_record)
+ADDS active_context and failed_query to the turn record before it is saved. load_active_context
+reads them back out of merged_state or the last turns.
+
+So this 60-line module is a WRITER INTO chat_turns — which makes it exactly the node the DB
+seat's forward note pointed at when they said the unmodelled-key failure would recur through
+whichever node writes turns.
+""", findings=[
+ ("bad", "It writes two keys into the turn record by name — active_context and failed_query — "
+         "and both are among the three keys state_load also carries outside ThreadState by a "
+         "hardcoded allowlist. The same un-modelled pair is hand-copied in two different "
+         "modules. The DB seat predicted this node would be where that failure recurs, before "
+         "either of us had read it."),
+ ("good", "60 lines, zero exception handlers, no config."),
+ ("watch", "No test file."),
+]),
+
+"credentialing_envelope": dict(rating="green", depth="code", how="""
+Routing helpers for credentialing conversations, shared between the classic and ReAct paths so
+both agree on what a message is asking for.
+
+The core is resolve_step3_roster_merge_context, which reads thread state and the credentialing
+options and returns three things: the roster upload id, whether the user chose outside-in
+(external_only), and whether to include roster members. The rest are predicates — does this
+thread have reconciliation data, is the message asking for reconciliation, does the envelope
+route there.
+""", findings=[
+ ("good", "Zero exception handlers, and sharing it between both paths is what stops the two "
+          "routes disagreeing about whether a message is a credentialing one."),
+ ("good", "Returns a typed tuple with each flag's meaning documented, rather than a dict the "
+          "caller has to interpret."),
+ ("watch", "No test file, for logic that decides which of two workflows a message enters."),
+]),
+
 "stages": dict(rating="green", depth="code", how="""
 Eleven lines listing the canonical names of the seven classical pipeline stages:
 state_load, classify, plan, clarify, resolve, integrate, publish. Every non-ReAct emit
