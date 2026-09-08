@@ -204,19 +204,38 @@ def extract(req: dict, question: str, answer: str, docs: list[str]) -> dict:
         line=req["line_name"], rtype=req["requirement_type"],
         question=question, answer=answer[:12000],
         docs="\n".join(f"- {d}" for d in docs) or "(none)")
+    # COULD NOT RUN IS NOT DID NOT FIND.
+    #
+    # These four paths all mean the extractor produced nothing usable — a 400
+    # for credit, a timeout, an empty completion, unparseable output. NONE of
+    # them says anything about the corpus. They were returning answered=False,
+    # which validate() maps to "not_answered", which lands in
+    # service_line.sourcing_gap as a knowledge gap.
+    #
+    # Service Line Registry, 2026-09-08: 40 of their 62 gap rows carried
+    # "extractor error: Anthropic API error 400 ... credit balance is too low".
+    # Two-thirds of their gap profile was our billing problem wearing a gap's
+    # clothes, and a repair loop reading it would go and acquire documents to
+    # fix an unpaid invoice.
+    #
+    # `error` was already a legal outcome and one row in sixty-two used it.
     try:
         raw, usage = generate_sync(prompt, stage="parser", max_tokens=4096, parser=True)
     except Exception as exc:
-        return {"answered": False, "reason": f"extractor error: {exc}"}
+        return {"answered": None, "outcome": "error",
+                "reason": f"the extractor could not run: {exc}"}
     if not (raw or "").strip():
-        return {"answered": False, "reason": "extractor returned nothing"}
+        return {"answered": None, "outcome": "error",
+                "reason": "the extractor returned nothing"}
     m = re.search(r"\{.*\}", raw, re.S)
     if not m:
-        return {"answered": False, "reason": "extractor returned no JSON"}
+        return {"answered": None, "outcome": "error",
+                "reason": "the extractor returned no JSON"}
     try:
         out = json.loads(m.group(0))
     except json.JSONDecodeError as exc:
-        return {"answered": False, "reason": f"bad JSON from extractor: {exc}"}
+        return {"answered": None, "outcome": "error",
+                "reason": f"the extractor returned bad JSON: {exc}"}
     out["_model"] = (usage or {}).get("model")
     return out
 
@@ -227,6 +246,11 @@ def _norm(s: str) -> str:
 
 def validate(ext: dict, answer: str, docs: list[str]) -> tuple[bool, str, str]:
     """Grounding is verified here, not taken on faith."""
+    # Checked FIRST, because `answered: None` is falsy and would otherwise fall
+    # straight into not_answered — which is the bug this distinction exists to
+    # end, reintroduced by operator precedence.
+    if ext.get("outcome") == "error" or ext.get("answered") is None:
+        return False, ext.get("reason") or "the extractor could not run", "error"
     if not ext.get("answered"):
         return False, ext.get("reason") or "not answered", "not_answered"
     if not docs:

@@ -139,10 +139,47 @@ Two corollaries that came out of the same case:
 
 ---
 
-## The shape underneath all six
+## An unpaid invoice, filed as a knowledge gap
+
+Service Line Registry read their acquisition backlog and found that 40 of its 62
+rows gave the same reason for the corpus being silent:
+
+    extractor error: Anthropic API error 400 ... credit balance is too low
+
+`extract()` had four paths that mean *the extractor never ran* — a 400, an empty
+completion, no JSON, unparseable JSON — and all four returned `answered: False`.
+`validate()` tested `if not ext.get("answered")` and wrote outcome
+`not_answered`, which 044's own comment defines as "chunks retrieved but they do
+not answer it": a claim about the CORPUS. Two thirds of another team's backlog
+was our billing problem wearing a knowledge gap's clothes, and a repair loop
+reading it would have gone and acquired documents to fix an unpaid invoice.
+`error` was already legal in the CHECK constraint. One row in 219 used it.
+
+The write-side fix is four lines, with one trap worth naming: the could-not-run
+paths now return `answered: None`, and **`None` is falsy** — so the error branch
+must be tested FIRST or every row falls straight back into the old bucket with
+nothing raising. The test file pins that ordering.
+
+**The half that actually changed what anyone reads.** Relabelling 43 attempt
+rows fixed nothing visible, because `sourcing_gap.last_reason` took the MOST
+RECENT attempt — and for those 40 rows the most recent attempt was the 400. The
+real finding ("the answer explicitly states the rule does not specify
+place-of-service settings") sat one round back, unread. `last_reason` now comes
+from the last attempt that REACHED the corpus, and our failures live in
+`last_error` where they cannot speak for it.
+
+And the surprise, which is the reason to measure rather than assume: the view
+gained `never_asked` expecting the backlog to shrink, and it came out **zero**.
+Every one of the 62 rows had between one and four attempts that genuinely
+reached the corpus. The backlog was real. Only the sentence on it was wrong. A
+mislabel is not evidence that the work behind it is phantom.
+
+---
+
+## The shape underneath all seven
 
 Each is a place where **two things that must agree were maintained separately**:
 a write and its reader, a status and its meaning, a label and its behaviour, a
-test and the branch it claims to cover, a schema and the document. The fix is
-always the same shape — derive one from the other, or assert they match — and it
+test and the branch it claims to cover, a schema and the document, an outcome
+label and the field that displays it. The fix is always the same shape — derive one from the other, or assert they match — and it
 is always cheaper than the incident.
