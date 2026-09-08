@@ -39,8 +39,13 @@ cfg.redis_request_key. The answer comes back under redis_response_key_prefix. Th
 authenticated user_id rides the payload through worker → pipeline → chat_turns.user_id
 for audit attribution.
 
-Auth is Depends(require_user), governed by CHAT_AUTH_MODE — required by default when
-CHAT_ENV is staging or prod, off in dev. The PHI gate runs here, before anything queues.
+Auth is Depends(require_user), governed by CHAT_AUTH_MODE. The code's intent is
+fail-closed: CHAT_ENV=dev is permissive, staging and prod are "fail-closed unless explicitly
+configured". THE DEPLOYED SERVICE CONFIGURES ITSELF OUT OF THAT. It sets CHAT_ENV=prod and
+CHAT_AUTH_MODE=optional together, so the fail-closed default is explicitly overridden and a
+request without a JWT is accepted on a service that declares itself prod.
+
+The PHI gate runs here, before anything queues.
 """, findings=[
  ("bad", "ensure_thread swallows every DB failure. On connection_error it warns and returns "
          "the id anyway; on any other failure it returns a FRESH uuid. A turn can proceed "
@@ -57,6 +62,16 @@ CHAT_ENV is staging or prod, off in dev. The PHI gate runs here, before anything
           "or evidence. Data minimisation at the boundary, and commented as such."),
  ("good", "Per-turn model profile is scoped to the turn explicitly so concurrent turns from "
           "different users do not fight over a process-wide global."),
+ ("bad", "RUNTIME LENS, 2026-09-08, mobius-chat in mobius-os-dev: CHAT_ENV=prod and "
+         "CHAT_AUTH_MODE=optional are set together. The env gate is designed to fail closed "
+         "on prod unless explicitly configured, and this is that explicit configuration. A "
+         "service naming itself prod is accepting unauthenticated turns. Whether dev-project "
+         "means this is harmless is Ananth's call, not mine — but the label and the behaviour "
+         "disagree, and that is worth someone deciding on purpose."),
+ ("good", "RUNTIME LENS: the Redis claim holds — CHAT_QUEUE_TYPE=redis is set and takes "
+          "precedence over QUEUE_TYPE in config.py. Worth recording that the code default is "
+          "'memory' and QUEUE_TYPE alone is unset, so reading only QUEUE_TYPE would have "
+          "produced a confident, wrong 'it uses the in-memory queue'."),
 ]),
 
 "PHI gate": dict(rating="green", depth="code", how="""
