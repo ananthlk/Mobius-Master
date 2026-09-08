@@ -71,3 +71,57 @@ Two rules that would have prevented this:
 1. An unbounded dependency on a library that ships majors is a latent outage. At
    minimum, bound the ones whose API you import directly by name.
 2. A service nobody has rebuilt recently is not known-good. It is unverified.
+
+## Round 2 — the three deferred major bumps (2026-09-08)
+
+Same method as `bcrypt` 4→5: a throwaway venv in `/tmp`, the used surface
+discovered by grep across the tree, then the same introspection script run
+against both majors and diffed. **No module code, config, or requirements file
+was touched, and nothing was deployed.** These are findings, not changes.
+
+### `redis` 5 → 8 — CLEARED
+
+Used surface (8 files): `from_url`, `get`, `set`, `ping`, `pipeline`, `expire`,
+`scan_iter`, `publish`, `lpush`, `brpop`, `pubsub`, `redis.TimeoutError`,
+`redis.ConnectionError`.
+
+5.3.1 vs 8.1.0: every used name present. One signature differs — `set()` gains
+four *optional* params (`ifeq`, `ifne`, `ifdeq`, `ifdne`) appended after the
+existing ones. Purely additive; no call site affected.
+
+### `google-cloud-storage` 2 → 3 — CLEARED
+
+Used surface (22 files): `storage.Client` (55), `.bucket()` (65), `.blob()` (55),
+`upload_from_*` (37), `download_as_*` (21).
+
+2.19.0 vs 3.13.1 — two signature diffs:
+
+- `Client.__init__` **gains** `api_key`. Additive.
+- `Blob.upload_from_string` **drops** `num_retries` and gains
+  `crc32c_checksum_value`. A removal, so it was checked directly:
+  `grep -rn num_retries --include='*.py'` across the whole tree returns **zero
+  hits**. Not a break here.
+
+### `google-cloud-aiplatform` 1 → 2 — CLEARED
+
+The highest-stakes of the three: 44 files, and it is the path every embedding and
+every Vertex generation call goes through — `GenerativeModel` (40),
+`vertexai.init` (27), `from vertexai.generative_models` (22),
+`TextEmbeddingModel` (21), `from vertexai.language_models` (11),
+`aiplatform.init` (11), `aiplatform.MatchingEngineIndexEndpoint` (7).
+
+1.165.1 vs 2.1.0: **twelve probes, twelve identical results** — `aiplatform.init`,
+`MatchingEngineIndexEndpoint.__init__` / `find_neighbors` / `deploy_index`,
+`vertexai.init`, `GenerativeModel.__init__` / `generate_content` / `start_chat`,
+`TextEmbeddingModel.from_pretrained` / `get_embeddings`, and the full symbol sets
+of both `vertexai.generative_models` and `vertexai.language_models`. Importing
+those modules on 2.1.0 under `-W always` emits **no** deprecation warning.
+
+The major bump removed things; none of them are things Mobius touches.
+
+### What this does and does not establish
+
+It establishes that the **names and signatures** Mobius calls survive each bump.
+It does not establish runtime behaviour against live GCS, Redis or Vertex — no
+network call was made. Any actual upgrade still gets deployed one module at a
+time and verified against the running service.
