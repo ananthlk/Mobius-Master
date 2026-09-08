@@ -1420,21 +1420,21 @@
       "layer": 6,
       "kind": "store",
       "owner": "Payor Fact Store",
-      "service": null,
+      "service": "mobius-rag",
       "repo": "mobius-rag",
       "verified": true,
       "tier": "B",
       "gates": [],
       "user_view": {
-        "status": "building",
-        "description": "In-repo: certified facts with provenance (facts.* schema in mobius_rag).",
-        "surface": "mobius-rag"
+        "status": "partial",
+        "description": "Certified payor facts with provenance \u2014 answer-or-abstain, no guessing. 65 facts across 3 domains from 55 templates.",
+        "surface": "facts.* in mobius_rag"
       },
       "technical_view": {
-        "status": "building",
-        "description": "In-repo: certified facts with provenance (facts.* schema in mobius_rag).",
+        "status": "partial",
+        "description": "facts schema in mobius_rag: payor_fact, fact_domain, fact_template, fact_run/fact_run_event, fact_sourcing_trace, fact_audit_log, fact_query_decision. Eval owns certification.",
         "repo": "mobius-rag",
-        "module": "(in-repo)"
+        "module": "facts schema"
       },
       "specs_view": {
         "status": "building",
@@ -1759,6 +1759,177 @@
         "status": "live",
         "deploy_target": "in-repo"
       }
+    },
+    {
+      "id": "service-line-registry",
+      "name": "Service Line Registry",
+      "layer": 6,
+      "kind": "store",
+      "owner": "Service Line Registry",
+      "service": "mobius-payor",
+      "repo": "mobius-payor",
+      "verified": true,
+      "tier": "B\u2192C",
+      "gates": [
+        4,
+        5,
+        7
+      ],
+      "user_view": {
+        "status": "live",
+        "description": "Which services a line covers, the codes and modifiers that bill it, and what each payor requires \u2014 answered per payor with provenance. 3,648 payor answers over 343 codes and 153 standard requirements. Fees are explicitly out of scope.",
+        "surface": "mobius-payor /service-lines"
+      },
+      "technical_view": {
+        "status": "live",
+        "description": "The service_line schema in mobius_rag: 48 tables spanning the catalog (line, line_code, code_system, qualifier), the answers (standard_answer, payor_answer, benefit_limit_answer), requirements and their provenance, and its own sourcing pipeline (sourcing_run/attempt/gap/repair) with a 616-row review queue.",
+        "repo": "mobius-payor",
+        "module": "service_line schema"
+      },
+      "specs_view": {
+        "status": "live",
+        "description": "Lexicon\u2194Registry contract is signed; changes go to the contract first."
+      },
+      "eval_view": {
+        "status": "partial",
+        "description": "Citation grading landed 2026-09; review queue is the human gate."
+      },
+      "git_view": {
+        "repo": "mobius-payor",
+        "branch": "main",
+        "status": "live",
+        "deploy_target": "Cloud Run"
+      },
+      "surfaces": [
+        {
+          "name": "Service Lines",
+          "path": "/service-lines"
+        },
+        {
+          "name": "Review queue",
+          "path": "/service-lines/review"
+        }
+      ]
+    },
+    {
+      "id": "fetch-document",
+      "name": "Fetch Document",
+      "layer": 0,
+      "kind": "skill",
+      "owner": "Download Skill",
+      "service": null,
+      "repo": "mobius-chat",
+      "verified": true,
+      "tier": "B",
+      "gates": [],
+      "user_view": {
+        "status": "live",
+        "description": "Fetches and verifies an external document \u2014 policy PDFs, fee schedules \u2014 on demand during a turn.",
+        "surface": "mobius-chat"
+      },
+      "technical_view": {
+        "status": "live",
+        "description": "In-repo skill (app/skills/builtin/fetch_document.py), 4-tier fetch through the scraper's egress path.",
+        "repo": "mobius-chat",
+        "module": "(in-repo)"
+      },
+      "specs_view": {
+        "status": "live",
+        "description": "\u2014"
+      },
+      "eval_view": {
+        "status": "planned",
+        "description": "\u2014"
+      },
+      "git_view": {
+        "repo": "mobius-chat",
+        "branch": "main",
+        "status": "live",
+        "deploy_target": "in-repo"
+      },
+      "consumers": [
+        "Chat (ReAct)",
+        "MCP (fleet-wide)",
+        "Sourcing"
+      ]
+    },
+    {
+      "id": "document-upload",
+      "name": "Document Upload (Path B)",
+      "layer": 0,
+      "kind": "skill",
+      "owner": "Instant RAG",
+      "service": null,
+      "repo": "mobius-chat",
+      "verified": true,
+      "tier": "B",
+      "gates": [],
+      "user_view": {
+        "status": "live",
+        "description": "Upload a document in Chat or Vault and have it ingested into the corpus.",
+        "surface": "mobius-chat"
+      },
+      "technical_view": {
+        "status": "live",
+        "description": "In-repo (app/api/uploads.py, app/skills/builtin/document_uploads.py) routing to mobius-rag /upload \u2014 Path B chunking, lexicon expansion, hybrid retrieval, rerank. The standalone instant-rag envelope service was bypassed 2026-04-27 and deprecated 2026-07-09.",
+        "repo": "mobius-chat",
+        "module": "(in-repo)"
+      },
+      "specs_view": {
+        "status": "live",
+        "description": "\u2014"
+      },
+      "eval_view": {
+        "status": "planned",
+        "description": "\u2014"
+      },
+      "git_view": {
+        "repo": "mobius-chat",
+        "branch": "main",
+        "status": "live",
+        "deploy_target": "in-repo"
+      },
+      "consumers": [
+        "Chat uploads",
+        "Vault"
+      ]
+    },
+    {
+      "id": "republishing",
+      "name": "Republishing / Nightly Refresh",
+      "layer": 0,
+      "kind": "worker",
+      "owner": "Republishing",
+      "service": null,
+      "repo": "mobius-rag",
+      "verified": true,
+      "tier": "B",
+      "gates": [],
+      "user_view": {
+        "status": "building",
+        "description": "Refreshes the corpus when the lexicon advances: re-chunk, re-embed, measure the eval lift.",
+        "surface": "mobius-rag"
+      },
+      "technical_view": {
+        "status": "building",
+        "description": "In-repo (app/nightly_orchestrator.py). Drives the chunking and embedding workers.",
+        "repo": "mobius-rag",
+        "module": "(in-repo)"
+      },
+      "specs_view": {
+        "status": "building",
+        "description": "\u2014"
+      },
+      "eval_view": {
+        "status": "planned",
+        "description": "\u2014"
+      },
+      "git_view": {
+        "repo": "mobius-rag",
+        "branch": "main",
+        "status": "building",
+        "deploy_target": "in-repo"
+      }
     }
   ],
   "coordination": {
@@ -1941,5 +2112,5 @@
       "description": "Sets and enforces the rules."
     }
   ],
-  "basis": "Modules are deployed services and in-repo code modules, traced to the deploy config that names them. Claude agent seats appear as `owner`, not as modules."
+  "basis": "Modules are deployed services and in-repo code modules, traced to the deploy config or source file that defines them. Claude agent seats appear as `owner`, never as modules \u2014 a seat with no code is not a component."
 }
