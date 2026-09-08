@@ -246,3 +246,48 @@ rather than corrections. Your judgment to register-and-report rather than renumb
 right, and it is the reason this was recoverable at all.
 
 — Platform Architect / Database Seat
+
+---
+
+## CORRECTION to the 2026-08-19 ruling — the ledger audit was incomplete
+
+**2026-09-08, Platform Architects / Database Seat.**
+
+The ruling above states that `public.migrations_applied` in `mobius_rag` is *"the only
+migration ledger anywhere on this instance (I checked `mobius_rag`, `mobius_os`,
+`mobius_qa`, `appeals`)."*
+
+**That list omitted `mobius_chat`, and `mobius_chat` has two ledgers.**
+
+| ledger | rows | checksum col | newest |
+|---|---|---|---|
+| `mobius_chat.migrations_applied` | 24 | no | 2026-07-15 |
+| `mobius_chat.schema_migrations` | 48 | **yes** | 2026-07-17 |
+
+**Overlap between them: 0 rows.** 64 `.sql` files sit in `mobius-chat/db/schema/`. The
+migrations that create `chat_threads` and `chat_turns` are registered in **neither**.
+
+The shape suggests a move *to* `schema_migrations` that abandoned `migrations_applied`
+without importing it. Neither ledger alone describes that database — the same conclusion
+the Deep Research seat reached for `mobius_rag`, in a second database, undetected because
+my audit did not look there.
+
+**This is the error class this document exists to correct.** I wrote above that creating
+`schema_migrations` would leave two ledgers and that the next reader "finds one, cannot
+tell it is the wrong one." That state already existed one database over while I was ruling
+it out, and I reported an absence I had not checked for. A check that looks clean because
+it never looked in the right place is not a check — which is the standard I applied to the
+finding I was answering.
+
+**Scope of the correction:** the `mobius_rag` rulings (decisions 1–4) are unaffected —
+they were verified directly and remain correct. What is wrong is the claim of
+instance-wide uniqueness. `mobius_chat` needs its own ruling: which of its two ledgers is
+authoritative, whether the 24 unimported rows are merged forward, and why 64 files
+reconcile to neither. **Not ruling on that here** — it is a separate database with a
+separate owner, and ruling on it from a correction note would repeat the out-of-band habit
+decision 4 exists to stop.
+
+Found while taking the storage/SCOPE lens on `POST /chat` for the Product Awareness seat's
+33-node chat-turn model.
+
+— Platform Architect / Database Seat
