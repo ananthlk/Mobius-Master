@@ -1,0 +1,145 @@
+<title>Mobius Fleet Power</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#f7f7f9; --surface:#ffffff; --ink:#1c1c28; --muted:#6b6b80;
+  --line:#e4e4ec; --accent:#7c3aed; --accent-soft:#f1eafd;
+  --ok:#17803d; --ok-soft:#e5f4ea; --warn:#b45309; --warn-soft:#fdf0dd;
+  --crit:#b91c1c; --crit-soft:#fdeaea; --bar:#7c3aed; --bar-track:#ededf3;
+}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#131318; --surface:#1c1c24; --ink:#ececf4; --muted:#9a9ab0;
+    --line:#2c2c38; --accent:#a78bfa; --accent-soft:#2a2140;
+    --ok:#4ade80; --ok-soft:#15291c; --warn:#fbbf24; --warn-soft:#2e2413;
+    --crit:#f87171; --crit-soft:#331717; --bar:#a78bfa; --bar-track:#26262f;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#131318; --surface:#1c1c24; --ink:#ececf4; --muted:#9a9ab0;
+  --line:#2c2c38; --accent:#a78bfa; --accent-soft:#2a2140;
+  --ok:#4ade80; --ok-soft:#15291c; --warn:#fbbf24; --warn-soft:#2e2413;
+  --crit:#f87171; --crit-soft:#331717; --bar:#a78bfa; --bar-track:#26262f;
+}
+body{background:var(--ground); color:var(--ink); font:14px/1.5 "IBM Plex Sans",system-ui,sans-serif;
+  margin:0; padding:32px 24px 56px;}
+.wrap{max-width:1060px; margin:0 auto;}
+header{display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 16px; margin-bottom:6px;}
+h1{font-size:22px; font-weight:700; margin:0; letter-spacing:-.01em;}
+h1 .accent{color:var(--accent);}
+.stamp{color:var(--muted); font:12px "IBM Plex Mono",monospace;}
+.sub{color:var(--muted); margin:0 0 24px; max-width:68ch;}
+.tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:28px;}
+.tile{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:14px 16px;}
+.tile .k{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:4px;}
+.tile .v{font:600 24px/1.1 "IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;}
+.tile .d{font-size:12px; color:var(--muted); margin-top:3px;}
+.tile.alert .v{color:var(--crit);}
+.tile.good .v{color:var(--ok);}
+section h2{font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);
+  font-weight:600; margin:28px 0 10px;}
+.tblwrap{overflow-x:auto; background:var(--surface); border:1px solid var(--line); border-radius:8px;}
+table{border-collapse:collapse; width:100%; min-width:780px;}
+th{font-size:11px; text-transform:uppercase; letter-spacing:.07em; color:var(--muted);
+  text-align:left; font-weight:600; padding:10px 10px; border-bottom:1px solid var(--line); white-space:nowrap;}
+td{padding:7px 10px; border-bottom:1px solid var(--line); vertical-align:middle; white-space:nowrap;}
+tr:last-child td{border-bottom:none;}
+td.num, th.num{text-align:right; font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;}
+.svc{font:500 13px "IBM Plex Mono",monospace;}
+.pill{display:inline-block; font-size:11px; font-weight:600; padding:2px 9px; border-radius:99px;}
+.pill.pinned{background:var(--accent-soft); color:var(--accent);}
+.pill.active{background:var(--ok-soft); color:var(--ok);}
+.pill.standby{background:var(--bar-track); color:var(--muted);}
+.pill.off{background:var(--bar-track); color:var(--muted); text-decoration:line-through;}
+.pill.unmanaged{background:var(--warn-soft); color:var(--warn);}
+.chip{display:inline-block; font-size:10px; font-weight:600; padding:1px 8px; border-radius:4px; margin-right:4px;}
+.chip.waste{background:var(--crit-soft); color:var(--crit);}
+.chip.pinnedidle{background:var(--warn-soft); color:var(--warn);}
+.chip.drift{background:var(--crit-soft); color:var(--crit);}
+.chip.note{background:var(--bar-track); color:var(--muted); font-weight:400;}
+.costcell{min-width:170px;}
+.costbar{display:flex; align-items:center; gap:8px;}
+.costbar .track{flex:1; height:6px; background:var(--bar-track); border-radius:3px; overflow:hidden;}
+.costbar .fill{height:100%; background:var(--bar); border-radius:3px;}
+.costbar .amt{font:500 12px "IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; min-width:64px; text-align:right;}
+.zero{color:var(--muted);}
+.notes{color:var(--muted); font-size:12px; margin-top:14px; max-width:78ch; white-space:normal;}
+.notes b{color:var(--ink);}
+footer{margin-top:32px; color:var(--muted); font-size:12px;}
+td.notecell{white-space:normal; min-width:180px; font-size:12px; color:var(--muted);}
+@media (prefers-reduced-motion: no-preference){ .costbar .fill{transition:width .4s ease;} }
+</style>
+<div class="wrap">
+  <header>
+    <h1>Mobius <span class="accent">Fleet Power</span></h1>
+    <span class="stamp" id="stamp"></span>
+  </header>
+  <p class="sub">Cloud Run scaling governance for <span id="proj" style="font-family:'IBM Plex Mono',monospace"></span> —
+  what's pinned, what's drifted from <b>fleet.yaml</b>, and where the money goes.
+  Cost is the trailing window extrapolated to 30 days (upper bound for CPU-throttled services).</p>
+
+  <div class="tiles" id="tiles"></div>
+
+  <section>
+    <h2>Services by estimated cost</h2>
+    <div class="tblwrap"><table id="tbl">
+      <thead><tr>
+        <th>Service</th><th>Mode</th><th class="num">Target</th><th class="num">Live</th>
+        <th class="num">Inst</th><th class="num">CPU / Mem</th><th class="num">Reqs</th>
+        <th class="num">Inst-hrs</th><th class="costcell">Est / month</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table></div>
+    <p class="notes"><b>WASTE?</b> instance-hours far beyond both the pin and the traffic ·
+    <b>PINNED-IDLE</b> warm floor with almost no requests ·
+    <b>DRIFT</b> live scaling differs from fleet.yaml (fix: <span style="font-family:'IBM Plex Mono',monospace">fleetpower apply</span>) ·
+    <b>UNMANAGED</b> not in the manifest, never touched by apply.</p>
+  </section>
+  <footer>Generated by <span style="font-family:'IBM Plex Mono',monospace">fleetpower.py report</span> · mobius-fleet-power</footer>
+</div>
+<script id="data" type="application/json">/*__DATA__*/</script>
+<script>
+const D = JSON.parse(document.getElementById('data').textContent);
+document.getElementById('stamp').textContent = D.generated_at + ' · trailing ' + D.window_days + 'd';
+document.getElementById('proj').textContent = D.project + ' / ' + D.region;
+const fmt$ = v => '$' + v.toFixed(v >= 100 ? 0 : 2);
+const drifted = D.services.filter(s => s.drift).length;
+const pinned = D.services.reduce((a, s) => a + s.eff_min, 0);
+const tiles = [
+  {k:'Est. monthly spend', v:fmt$(D.services.reduce((a,s)=>a+s.est_mo,0)), d:'all services, extrapolated', cls:''},
+  {k:'Pinned instances', v:String(pinned), d:'sum of effective min floors', cls:''},
+  {k:'Drift', v:String(drifted), d:drifted ? 'run fleetpower apply' : 'fleet matches manifest', cls:drifted?'alert':'good'},
+  {k:'Services', v:String(D.services.length), d:D.services.filter(s=>s.unmanaged).length + ' unmanaged', cls:''},
+];
+document.getElementById('tiles').innerHTML = tiles.map(t =>
+  `<div class="tile ${t.cls}"><div class="k">${t.k}</div><div class="v">${t.v}</div><div class="d">${t.d}</div></div>`).join('');
+const maxCost = Math.max(...D.services.map(s => s.est_mo), 1);
+const tbody = document.querySelector('#tbl tbody');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+tbody.innerHTML = D.services.map(s => {
+  const flags = [];
+  if (s.drift) flags.push('<span class="chip drift">DRIFT</span>');
+  for (const f of s.flags || []) {
+    const cls = f.startsWith('WASTE') ? 'waste' : f === 'PINNED-IDLE' ? 'pinnedidle' : 'note';
+    flags.push(`<span class="chip ${cls}">${esc(f)}</span>`);
+  }
+  const modeCls = s.unmanaged ? 'unmanaged' : esc(s.mode);
+  const modeTxt = s.unmanaged ? 'unmanaged' : esc(s.mode);
+  const pct = Math.max(s.est_mo / maxCost * 100, s.est_mo > 0 ? 1.5 : 0);
+  const zero = s.est_mo < 0.5 ? ' zero' : '';
+  return `<tr>
+    <td class="svc" title="${esc(s.note || '')}">${esc(s.name)}${flags.length ? ' ' + flags.join('') : ''}</td>
+    <td><span class="pill ${modeCls}">${modeTxt}</span></td>
+    <td class="num">${s.unmanaged ? '—' : s.target_min + '..' + s.target_max}</td>
+    <td class="num">${s.eff_min}..${s.eff_max}</td>
+    <td class="num">${s.instances != null ? s.instances : '·'}</td>
+    <td class="num">${s.cpu}c / ${s.mem}Gi</td>
+    <td class="num${s.reqs ? '' : ' zero'}">${s.reqs.toLocaleString()}</td>
+    <td class="num${s.hours > 0.05 ? '' : ' zero'}">${s.hours.toFixed(1)}</td>
+    <td class="costcell"><div class="costbar">
+      <div class="track"><div class="fill" style="width:${pct}%"></div></div>
+      <div class="amt${zero}">${fmt$(s.est_mo)}</div></div></td>
+  </tr>`;
+}).join('');
+</script>
