@@ -1,0 +1,70 @@
+# Mobius fleet power manifest — desired scaling state for every Cloud Run service.
+#
+# The money is in PINNED CAPACITY (min instances + always-allocated CPU), not in
+# "unused services": anything at min=0 with no traffic costs ~$0. So this file
+# manages min/max per service; `fleetpower apply` enforces it, `fleetpower audit`
+# flags services burning instance-hours they aren't earning.
+#
+# A service resolves to a target {min, max}:
+#   mode: one of the entries under `modes` below (min/max defaults)
+#   min/max on the service entry override the mode's values.
+# Services not listed here are reported as UNMANAGED (never touched by apply).
+
+project: mobius-os-dev
+region: us-central1
+
+modes:
+  "off":   {min: 0, max: 1}    # parked: scale to zero, accidental traffic can't fan out
+  standby: {min: 0, max: 3}    # occasional use
+  active:  {min: 0, max: 10}   # normal serving, scale to zero when idle
+  pinned:  {min: 1, max: 10}   # keep one warm instance (poll-loop workers, latency-critical)
+
+services:
+  # --- RAG core ---
+  mobius-rag:                  {mode: pinned, min: 1, max: 1, note: "min=max=1 guardrail (connection-leak ceiling); downsized 4c/8Gi -> 2c/4Gi Sep 7 (p95 cpu<10%, p99 mem<19%)"}
+  # Poll-loop workers: min=0 would stop queue polling entirely — min=1 is the floor
+  # until event-driven wake exists. For a bulk-ingest sprint: fleetpower boost <svc> --min 8
+  mobius-rag-chunking-worker:  {mode: pinned, min: 1, max: 8, note: "queue poll loop; 4vCPU/8Gi always-allocated = ~$230/mo per pinned instance"}
+  mobius-rag-embedding-worker: {mode: pinned, min: 1, max: 6, note: "queue poll loop; same cost profile as chunking"}
+  mobius-lexicon-maintenance:  {mode: active, max: 5}
+  mobius-answer-cache:         {mode: active, max: 2}
+
+  # --- Chat / user-facing ---
+  mobius-chat:                 {mode: pinned, min: 1, max: 20, note: "warm instance for first-token latency; downsized 2c/2Gi -> 1c/1Gi Sep 7 (p95 cpu<13%, p99 mem<19%)"}
+  mobius-os-backend:           {mode: active}
+  mobius-user:                 {mode: active}
+  mobius-interact:             {mode: standby}
+  mobius-story-ui:             {mode: standby, max: 5}
+
+  # --- Payor / facts ---
+  mobius-payor:                {mode: pinned, min: 1, max: 2, note: "existing min=1 kept; drop to active if latency doesn't matter"}
+  mobius-phi-classifier:       {mode: pinned, min: 1, max: 10, note: "HIPAA gate; throttled CPU so idle min is cheap"}
+  mobius-healthcare:           {mode: standby}
+
+  # --- Workers / agents ---
+  mobius-web-scraper:          {mode: standby}
+  # min=1 REQUIRED: brpop poll loop — min=0 stops queue polling and jobs sit
+  # "pending" forever (the 2026-08-17 outage). max=1 REQUIRED: politeness
+  # invariant (sprint §48) — the 1.5s/host rate limit is per-process, so a
+  # second instance doubles our request rate against state-government sites.
+  # Both are CORRECTNESS constraints, not tuning. cpu-throttling stays false
+  # (background thread needs CPU between requests).
+  mobius-web-scraper-worker:   {mode: pinned, min: 1, max: 1, note: "CRAWLER AGENT owns — min=1 poll-loop floor, max=1 politeness invariant §48; apply only when idle (SIGTERM kills a live crawl)"}
+  mobius-org-agent:            {mode: standby}
+  mobius-task-manager:         {mode: active, max: 5}
+  mobius-db-agent:             {mode: standby, max: 1}
+  mobius-google-search:        {mode: active}
+  mobius-email:                {mode: standby}
+  mobius-feedback:             {mode: standby}
+
+  # --- Product / docs / prototypes ---
+  mobius-specs:                {mode: standby, note: "image gcr.io/.../mobius-specs:latest GONE — any update fails validation; redeploy image before managing"}
+  specs-platform:              {mode: "off", note: "superseded by mobius-specs?"}
+  mobius-product-awareness:    {mode: standby}
+  product-awareness:           {mode: "off", note: "duplicate of mobius-product-awareness?"}
+  mobius-appeals-prototype:    {mode: standby}
+  mobius-provider-roster-credentialing: {mode: standby}
+  mobius-doc-reader:           {mode: standby}
+  mobius-dbt-ui:               {mode: standby}
+  mobius-org-intelligence:     {mode: "off"}
+  mobius-vibe:                 {mode: "off"}
