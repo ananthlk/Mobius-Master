@@ -51,8 +51,10 @@ SERVED = ROOT / "mobius-payor/app/static/service-lines-review.html"
 API = os.environ.get("MOBIUS_PAYOR_URL", "https://mobius-payor-ortabkknqa-uc.a.run.app")
 # Deep Research's research console — the one view of what the machine did. Overridable
 # because they own the URL contract, not us.
+# Their canonical path. /research-console still redirects here, but a link that costs a
+# 307 on every click is a link pointing at the old address.
 TRACE = os.environ.get("MOBIUS_RESEARCH_CONSOLE",
-                       "https://mobius-payor-ortabkknqa-uc.a.run.app/research-console")
+                       "https://mobius-payor-ortabkknqa-uc.a.run.app/research/console")
 
 LOGO = (
     '<svg viewBox="0 0 100 100" width="24" height="24" aria-hidden="true">'

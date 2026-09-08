@@ -495,7 +495,7 @@ var API = /(^|\.)claudeusercontent\.com$|(^|\.)claude\.(ai|site)$/.test(location
 /* Deep Research's console. Absolute, because the trace is served from their surface,
    not ours — and it must work from the published copy too, where a link is the only
    thing that CAN work (an artifact page cannot fetch, but it can link). */
-var TRACE_BASE = "https://mobius-payor-ortabkknqa-uc.a.run.app/research-console";
+var TRACE_BASE = "https://mobius-payor-ortabkknqa-uc.a.run.app/research/console";
 var FIND = {stated:["Answered","c-ok"], none_applies:["No requirement","c-ok"],
             silent:["Document is silent","c-ok"], unresolved:["Could not answer","c-need"],
             unknown_class:["Unrecognised result","c-need"]};
