@@ -978,8 +978,7 @@
         "status": "live",
         "deploy_target": "Cloud Run"
       },
-      "provenance": "mobius-skills @ feat/org-agent · org-agent/ · deploy config org-agent/deploy/{cloudbuild.yaml,deploy_dev.sh,dev.env}. Image tag b96505a resolves to that branch ONLY: it is 195 commits ahead of main, 27 behind, and unmerged. The deployed org-agent runs code that does not exist on main.",
-      "caveat": "Deployed from an unmerged branch (feat/org-agent, +195/-27 vs main). Owner decision required — merge it, or record the branch deploy as deliberate."
+      "provenance": "mobius-skills @ main · org-agent/ · deploy config org-agent/deploy/{cloudbuild.yaml,deploy_dev.sh,dev.env}. The running image tag b96505a was reachable from no remote ref until 2026-09-08: it sat on a LOCAL feat/org-agent two commits ahead of origin, so the source of a live service existed on one machine only. Merged to main (643c48e) and pushed; the deployed sha is now an ancestor of origin/main."
     },
     {
       "id": "specs",
