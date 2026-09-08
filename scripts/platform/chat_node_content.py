@@ -447,6 +447,25 @@ first is what people mean by "the state".
   D  PER-TURN CALLER INPUT — the profile, re-sent by the frontend on every turn, plus
      thread_id and any system_context. Never persisted here.
 
+AND THERE IS A TOOL THAT REACHES PRIOR TURNS — transform_previous_answer, a registry-owned
+builtin (app/skills/builtin/transform_previous.py). It exists because reshape requests
+("convert this to an appeal letter", "make it shorter", "rewrite for the credentialing team")
+used to fall through to search_corpus and come back with generic results unrelated to the
+actual prior answer, leaving the bot asking the user to re-paste their own content.
+
+The precision that matters: IT DOES NOT LOAD ANYTHING ITSELF. Its handler reads
+pipeline_ctx.last_turns — already populated by this stage — and takes the most recent
+assistant message from it. So it is a CONSUMER of channel B, not a fifth channel. It then
+asks the LLM to apply the transformation with no corpus call and no curator call, and the
+envelope carries signal=system_context precisely because the answer is synthesised from
+in-thread material rather than a retrieval source.
+
+Two consequences of it reading ctx rather than the database: the tool inherits channel B's
+depth, so it can only ever see the last TWO turns; and if state_load's read failed, the tool
+transforms whatever survived rather than reporting that it lost the thread.
+
+cached_answer.py is the other builtin that reaches into chat_turns.
+
 THEN THE MESSAGE ITSELF CAN BE REWRITTEN TWICE before planning:
   message_resolver resolves "it" / "that" / "try again" against the prior turn;
   classify, on a slot_fill, discards what the user typed and REBUILDS the whole prior question
