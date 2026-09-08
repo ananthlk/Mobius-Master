@@ -99,6 +99,23 @@ def main():
          "config": [], "kind": "pipeline"},
     ]
 
+    # The integrator is three LLM calls, not one step. The names are the
+    # module's own (integrator_a, Call B, Call C), so the split is read from
+    # the code rather than imposed on it.
+    integrate_passes = [
+        {"id": "Call A", "label": "integrator_a", "what": "First answer — core synthesis into the answer card.",
+         "skippable": "Skipped when dynamic enrichment fires and the answer is already sufficient."},
+        {"id": "Call B", "label": "critic pass", "what": "Critique and citations.", "skippable": None},
+        {"id": "Call C", "label": "enricher", "what": "Produces display_summary — the fuller prose behind the card.",
+         "skippable": None},
+    ]
+    integrate_modes = {
+        "mode": "MOBIUS_INTEGRATOR_MODE forces parallel|sequential; "
+                "MOBIUS_INTEGRATOR_PARALLEL_PCT samples when unset. Default sequential, 0%.",
+        "dynamic_enrichment": "MOBIUS_DYNAMIC_ENRICHMENT_PCT samples per turn; parallel path only. "
+                              "When react_loop's sufficiency check passes, Call A is skipped.",
+    }
+
     # Cross-cutting: not steps, but under every step that generates.
     cross = [module_record("app/services/llm_manager.py", "cross-cutting"),
              module_record("app/skills/phi_gate.py", "cross-cutting")]
@@ -151,6 +168,8 @@ def main():
     print(json.dumps({
         "generated_by": "scripts/platform/gen_chat_dev.py",
         "missing_content": missing,
+        "integrate_passes": integrate_passes,
+        "integrate_modes": integrate_modes,
         "flow": cat["flow"],
         "chain": chain,
         "cross_cutting": cross,

@@ -195,21 +195,38 @@ collects the answers, and walks a fallback cascade when the first choice cannot.
 """, findings=[("watch", "595 lines with a fallback cascade and only indirect test coverage."),
                ("watch", "One swallow on a dispatch path — worth checking whether a failed "
                          "agent call is distinguishable from one that returned nothing.")]),
-"integrate": dict(rating="amber", depth="code", how="""
-Turns reasoning and tool output into the answer card the user actually sees: formats the
-response, builds the payload, decides how it is presented.
+"integrate": dict(rating="amber", depth="code", ux="Answer card in the chat bubble; step labels 'Composing your answer' and 'Critique & citations'", how="""
+Not one step — THREE LLM calls plus a mode switch, which is why it is 1,887 lines.
 
-It runs on BOTH paths. On the ReAct path react_loop does the core synthesis and this
-module handles the enrichment that follows — unless react_loop set
-ctx.react_bypass_integrate, in which case the ReAct answer is published directly and this
-is skipped entirely.
+  Call A  integrator_a — the first answer. Core synthesis: turns reasoning and tool
+          output into the answer card the user sees.
+  Call B  the critic pass.
+  Call C  the enricher — produces display_summary, the fuller prose behind the card.
+
+Two execution modes, chosen per turn. MOBIUS_INTEGRATOR_MODE forces parallel or
+sequential; if unset, MOBIUS_INTEGRATOR_PARALLEL_PCT samples a percentage of turns.
+Default is sequential at 0% parallel — a deliberately conservative rollout.
+
+On top of that sits dynamic enrichment (Task #76, a Chat Master ruling):
+MOBIUS_DYNAMIC_ENRICHMENT_PCT samples per turn, and when react_loop's sufficiency check
+says the answer is already good enough, Call A is SKIPPED and B/C are launched in the
+background. Parallel path only; the sequential path is untouched by it.
+
+It runs on BOTH pipeline paths. On the ReAct path react_loop does the core synthesis and
+this handles what follows — unless ctx.react_bypass_integrate was set, in which case the
+ReAct answer is published directly and none of this runs.
 """, findings=[
- ("bad", "1,887 lines, 29 exception handlers, 20 of them log-and-continue, and the only test "
-         "named for it covers the fallback path. This is the module that decides what the "
-         "user sees, and it is the least well covered of the large ones."),
- ("good", "One swallow is explicitly reasoned — 'audit must never break the turn' — which is "
-          "the right call, written down."),
+ ("bad", "Three distinct responsibilities (synthesis, critique, enrichment), two execution "
+         "modes and a per-turn sampling gate in one 1,887-line module. The passes are "
+         "already conceptually separate — A, B and C are named as such throughout — so the "
+         "seam for splitting them exists and has not been taken."),
+ ("bad", "29 exception handlers, 20 log-and-continue, and the only test named for it covers "
+         "the fallback path. This decides what the user sees."),
+ ("good", "Both rollouts are percentage-sampled and default to off, so a bad change is "
+          "bounded to a slice of traffic rather than everyone."),
+ ("good", "One swallow is explicitly reasoned — 'audit must never break the turn'."),
 ]),
+
 "continuity": dict(rating="green", depth="surface", how="""
 The 'do not flail' stage. Detects when to ask the user for help rather than keep trying
 (user-as-leverage), when the user has dropped the thread, and when the attempt ceiling is
@@ -251,16 +268,39 @@ truncation recovery: a 'Continue' after the model was cut off.
            "not an EmitEnvelope. A fast short-circuit is not recorded, so the rate cannot be "
            "measured. Agreed with the Chat seat as one of two worth a real signal."),
 ]),
-"prompts": dict(rating="amber", depth="surface", how="""
-Everything the reasoning model actually reads. Mode labels and max-round constants the
-planner uses to decide how much leeway it has, the system prompt builder, and the
-per-round reasoning context that tells the model where the turn has got to. Extracted from
-react_loop to keep the text-generation surface separate from tool dispatch.
+"prompts": dict(rating="amber", depth="code",
+ ux="Prompt Composition Studio — frontend/prompts.html + app/api/admin_prompts.py "
+    "(blocks, compositions, versions, monitoring)", how="""
+Two jobs, and the second one is easy to miss.
+
+1. THE REACT PARAMETER PLANNER. This is where a turn's ReAct budget is decided, and the
+   answer to 'who sets up the ReAct parameters':
+     react_chat_mode_label   normalises the mode — copilot (default), agentic, quick, task
+     react_max_iterations_for_mode   rounds per mode: quick 2, copilot/task 3, agentic 10
+     _rag_call_ceiling_for_mode      corpus calls per turn: 6 for chat.thinking/agentic,
+                                     3 for everything else (Task #103 ruling)
+     react_agent_role(iteration, max_it)   what the model is told it is, per round
+     guidance_mode_threshold(max_it)       when the loop switches into guidance mode
+   The governor can override the round policy, but it is OFF by default, so in practice
+   these functions are the policy.
+
+2. THE PROMPT TEXT ITSELF — the system prompt builder and the per-round reasoning context.
+   And this does NOT all live in code: with MOBIUS_PROMPT_SOURCE=composition the prompts
+   are assembled from versioned blocks in Postgres instead, authored through a real UI.
 """, findings=[
- ("bad", "1,365 lines and NO test file. This is the text that determines model behaviour; a "
-         "silent change here moves every answer and nothing fails."),
- ("good", "The separation from tool dispatch is the right cut, and five callers use it."),
+ ("good", "There is a prompt-authoring surface: frontend/prompts.html backed by "
+          "app/api/admin_prompts.py — blocks, compositions, versions and monitoring, with "
+          "append-only versioning that never DELETEs or UPDATEs an existing block row. "
+          "Prompts are editable and reversible without a deploy. I rated this module "
+          "'invisible' before finding it; that was wrong."),
+ ("bad", "1,365 lines and NO test file — including the parameter functions above, which set "
+         "every turn's round and corpus-call budget. A wrong constant here silently changes "
+         "cost and answer quality for every user and nothing fails."),
+ ("watch", "Two prompt sources, code and composition, switched by MOBIUS_PROMPT_SOURCE. "
+           "Whichever one is not in use drifts silently, and the trace does not record which "
+           "source built the prompt for a given turn."),
 ]),
+
 "tool_manifest": dict(rating="green", depth="code", how="""
 The menu of tools the planner is shown. If a tool is not described here the planner cannot
 choose it, which makes this file a control surface rather than a list.

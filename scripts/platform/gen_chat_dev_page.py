@@ -142,7 +142,16 @@ h+='<div class="lane"><div class="lt">ReAct path</div>'+node('react_loop','repla
 h+='</div><div class="lane"><div class="lt">Classic path</div>';
 (f.classic_path||[]).forEach(function(x,i){ h+=node(strip(x))+(i<f.classic_path.length-1?A:''); });
 h+='</div></div>';
-(f.shared_post||[]).forEach(function(x){ h+=A+node(strip(x),'both paths'); });
+(f.shared_post||[]).forEach(function(x){ h+=A+node(strip(x),'both paths');
+  if(strip(x)==='integrate' && D.integrate_passes){
+    h+='<div class="ph" style="max-width:420px;margin-top:6px"><div class="pn">three LLM calls, not one step</div>'+
+       D.integrate_passes.map(function(p){
+         return '<div class="pd"><b style="color:var(--ink2)">'+esc(p.id)+'</b> · '+esc(p.label)+' — '+esc(p.what)+
+                (p.skippable?' <span style="color:var(--amber)">'+esc(p.skippable)+'</span>':'')+'</div>'; }).join('')+
+       '<div class="pd" style="color:var(--cyan)">'+esc(D.integrate_modes.mode)+'</div>'+
+       '<div class="pd" style="color:var(--cyan)">'+esc(D.integrate_modes.dynamic_enrichment)+'</div></div>';
+  }
+});
 if(f.shared_post_guard) h+='<div class="pd" style="max-width:340px;text-align:center;color:var(--amber)">'+esc(f.shared_post_guard)+'</div>';
 h+=A+'<div class="n" style="cursor:default"><div class="nn">publish</div></div></div>';
 document.getElementById('schema').innerHTML=h;
@@ -176,14 +185,15 @@ function detail(k){
   var ready = m.rating ? '<div class="f"><b>Production readiness '+rate+
       ' <span class="depth">read: '+esc(m.depth||'')+'</span></b>'+sigline+findings+'</div>' : '';
   var howf = m.how ? F('How it works', esc(m.how)) : '';
+  var uxf = m.ux ? F('UX — where you see or manage it', esc(m.ux)) : '';
 
   if(isChain){
-    fields = howf + ready + F('What happens here', esc(m.what)) +
+    fields = howf + uxf + ready + F('What happens here', esc(m.what)) +
       F('Where it lives','<span class="m">'+esc(m.path)+(m.line?':'+m.line:'')+'</span>') +
       F('Configuration', m.config.length? '<span class="m">'+esc(m.config.join(', '))+'</span>'
         : '<span class="none">nothing configurable</span>');
   } else {
-    fields = howf + ready + F('What the code says about itself', esc(m.role_full||m.role)) +
+    fields = howf + uxf + ready + F('What the code says about itself', esc(m.role_full||m.role)) +
       F('Where it lives','<span class="m">'+esc(m.path)+' · '+m.loc+' lines</span>') +
       F('Configuration — env vars it reads', (m.config&&m.config.length)
           ? '<span class="m">'+esc(m.config.join('\\n')).replace(/\\n/g,'<br>')+'</span>'
