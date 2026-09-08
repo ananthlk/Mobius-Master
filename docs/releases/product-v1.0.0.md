@@ -100,8 +100,9 @@ precisely the situation a single global version number cannot express.
 | product-awareness | v1.0.0 | `44d14cd` | main |
 
 Uncommitted work at cut time was **not** included — a tag points at a commit.
-The manifest records the excluded file count per module (30 files across 8
-modules).
+The manifest records the excluded file count per module (29 files across 8
+modules: payor 11, rag 7, chat 3, qa 3, dbt 2, and one each in skills-mcp,
+story-ui and interact).
 
 ### Not in the release set
 
