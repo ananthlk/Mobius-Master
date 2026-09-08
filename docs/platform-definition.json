@@ -239,7 +239,13 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
-      }
+      },
+      "surfaces": [
+        {
+          "name": "Lexicon review queue",
+          "path": "/ (frontend-v2)"
+        }
+      ]
     },
     {
       "id": "embedding-worker",
@@ -327,7 +333,25 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
-      }
+      },
+      "surfaces": [
+        {
+          "name": "Chat",
+          "path": "/"
+        },
+        {
+          "name": "Platform",
+          "path": "/platform"
+        },
+        {
+          "name": "Pipeline",
+          "path": "/pipeline"
+        },
+        {
+          "name": "Vault",
+          "path": "/vault"
+        }
+      ]
     },
     {
       "id": "payor",
@@ -364,7 +388,17 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
-      }
+      },
+      "surfaces": [
+        {
+          "name": "Research Console",
+          "path": "/research/console"
+        },
+        {
+          "name": "Service Line Registry review",
+          "path": "/service-lines/review"
+        }
+      ]
     },
     {
       "id": "story-ui",
@@ -481,7 +515,13 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
-      }
+      },
+      "surfaces": [
+        {
+          "name": "Runner demo",
+          "path": "/demo"
+        }
+      ]
     },
     {
       "id": "vault",
@@ -672,7 +712,17 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
-      }
+      },
+      "surfaces": [
+        {
+          "name": "Corpus admin",
+          "path": "/admin"
+        },
+        {
+          "name": "Schematic",
+          "path": "/schematic"
+        }
+      ]
     },
     {
       "id": "feedback",
@@ -817,7 +867,7 @@
     {
       "id": "org-intelligence",
       "name": "Org Intelligence",
-      "layer": 3,
+      "layer": 4,
       "kind": "service",
       "owner": "Org Agent",
       "service": "mobius-org-intelligence",
@@ -854,7 +904,7 @@
     {
       "id": "org-agent",
       "name": "Org Agent",
-      "layer": 3,
+      "layer": 4,
       "kind": "service",
       "owner": "Org Agent",
       "service": "mobius-org-agent",
@@ -935,7 +985,13 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
-      }
+      },
+      "surfaces": [
+        {
+          "name": "Specs catalog",
+          "path": "/"
+        }
+      ]
     },
     {
       "id": "db-agent",
@@ -1259,7 +1315,21 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
-      }
+      },
+      "surfaces": [
+        {
+          "name": "Corpus Health console",
+          "path": "/corpus/health"
+        },
+        {
+          "name": "Eval console",
+          "path": "/eval"
+        },
+        {
+          "name": "RAG frontend",
+          "path": "/"
+        }
+      ]
     },
     {
       "id": "answer-cache",
@@ -1336,7 +1406,13 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
-      }
+      },
+      "surfaces": [
+        {
+          "name": "dbt reports UI",
+          "path": "/"
+        }
+      ]
     },
     {
       "id": "fact-store",
@@ -1430,7 +1506,17 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "in-repo"
-      }
+      },
+      "surfaces": [
+        {
+          "name": "Eval studio",
+          "path": "mobius-qa/eval-studio"
+        },
+        {
+          "name": "Retrieval bake-off",
+          "path": "mobius-qa/bakeoff"
+        }
+      ]
     },
     {
       "id": "observer",
@@ -1515,6 +1601,160 @@
       },
       "git_view": {
         "repo": "mobius-skills",
+        "branch": "main",
+        "status": "live",
+        "deploy_target": "in-repo"
+      }
+    },
+    {
+      "id": "skills-mcp",
+      "name": "Skills MCP Server",
+      "layer": 5,
+      "kind": "skill",
+      "owner": "Skills MCP",
+      "service": null,
+      "repo": "mobius-skills-mcp",
+      "verified": true,
+      "tier": "B",
+      "gates": [],
+      "user_view": {
+        "status": "live",
+        "description": "MCP server exposing ~15 tools fleet-wide \u2014 corpus_search, payor_fact, email_*, org_npi_lookup, check_provider_credentialing. How agents other than Chat call skills.",
+        "surface": "mobius-skills-mcp"
+      },
+      "technical_view": {
+        "status": "live",
+        "description": "MCP server exposing ~15 tools fleet-wide \u2014 corpus_search, payor_fact, email_*, org_npi_lookup, check_provider_credentialing. How agents other than Chat call skills.",
+        "repo": "mobius-skills-mcp",
+        "module": "(in-repo)"
+      },
+      "specs_view": {
+        "status": "live",
+        "description": "\u2014"
+      },
+      "eval_view": {
+        "status": "planned",
+        "description": "\u2014"
+      },
+      "git_view": {
+        "repo": "mobius-skills-mcp",
+        "branch": "main",
+        "status": "live",
+        "deploy_target": "in-repo"
+      },
+      "consumers": [
+        "Chat (ReAct)",
+        "Story UI",
+        "OS extension",
+        "any MCP client"
+      ]
+    },
+    {
+      "id": "llm-manager",
+      "name": "LLM Manager & Prompt Blocks",
+      "layer": 2,
+      "kind": "code",
+      "owner": "LLMManager",
+      "service": null,
+      "repo": "mobius-chat",
+      "verified": true,
+      "tier": "B",
+      "gates": [],
+      "user_view": {
+        "status": "live",
+        "description": "In-repo: composes prompts from reusable blocks and governs model selection per turn (app/pipeline/react/prompts.py, governor.py).",
+        "surface": "mobius-chat"
+      },
+      "technical_view": {
+        "status": "live",
+        "description": "In-repo: composes prompts from reusable blocks and governs model selection per turn (app/pipeline/react/prompts.py, governor.py).",
+        "repo": "mobius-chat",
+        "module": "(in-repo)"
+      },
+      "specs_view": {
+        "status": "live",
+        "description": "\u2014"
+      },
+      "eval_view": {
+        "status": "planned",
+        "description": "\u2014"
+      },
+      "git_view": {
+        "repo": "mobius-chat",
+        "branch": "main",
+        "status": "live",
+        "deploy_target": "in-repo"
+      }
+    },
+    {
+      "id": "auth-client",
+      "name": "Auth Client Package",
+      "layer": 1,
+      "kind": "code",
+      "owner": "Auth",
+      "service": null,
+      "repo": "mobius-auth",
+      "verified": true,
+      "tier": "B",
+      "gates": [],
+      "user_view": {
+        "status": "live",
+        "description": "Shared front-end auth package (AuthModal, PreferencesModal, UserMenu). Consumed by file path, not deployed.",
+        "surface": "mobius-auth"
+      },
+      "technical_view": {
+        "status": "live",
+        "description": "Shared front-end auth package (AuthModal, PreferencesModal, UserMenu). Consumed by file path, not deployed.",
+        "repo": "mobius-auth",
+        "module": "(in-repo)"
+      },
+      "specs_view": {
+        "status": "live",
+        "description": "\u2014"
+      },
+      "eval_view": {
+        "status": "planned",
+        "description": "\u2014"
+      },
+      "git_view": {
+        "repo": "mobius-auth",
+        "branch": "main",
+        "status": "live",
+        "deploy_target": "in-repo"
+      }
+    },
+    {
+      "id": "fleet-power",
+      "name": "Fleet Power Manager",
+      "layer": 3,
+      "kind": "governance",
+      "owner": "Fleet Power",
+      "service": null,
+      "repo": "mobius-fleet-power",
+      "verified": true,
+      "tier": "B",
+      "gates": [],
+      "user_view": {
+        "status": "live",
+        "description": "fleet.yaml governs min/max instances for every service. Edit and apply \u2014 never raw gcloud, or a service-level minScale annotation survives deploys.",
+        "surface": "mobius-fleet-power"
+      },
+      "technical_view": {
+        "status": "live",
+        "description": "fleet.yaml governs min/max instances for every service. Edit and apply \u2014 never raw gcloud, or a service-level minScale annotation survives deploys.",
+        "repo": "mobius-fleet-power",
+        "module": "(in-repo)"
+      },
+      "specs_view": {
+        "status": "live",
+        "description": "\u2014"
+      },
+      "eval_view": {
+        "status": "planned",
+        "description": "\u2014"
+      },
+      "git_view": {
+        "repo": "mobius-fleet-power",
         "branch": "main",
         "status": "live",
         "deploy_target": "in-repo"
