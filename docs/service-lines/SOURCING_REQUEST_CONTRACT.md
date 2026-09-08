@@ -911,8 +911,25 @@ The six above are Deep Research's, verified by exact filename with chunk counts.
 corrected, six left absent** — `FY 2022-23` worksheets, the Rough Draft, the APR DRG
 Training Session and the Title XIX plan are genuinely not there under any name checked.
 
-### 17.3 The source table double-counts
+### 17.3 The source table does NOT double-count — I filed a defect that is not one
 
-24 rows for 12 distinct documents. Every DRG source is recorded twice, so any count of
-"how much do we still need" from that table is doubled. Registry defect, fixing
-separately.
+Reported as a duplication bug, then measured: **zero `(document, line_key)` pairs appear
+more than once.** The DRG worksheets are recorded twice because each one legitimately
+serves two service lines:
+
+```
+DRG Rate Worksheet FY 2019-20   ->  ed_behavioral, inpatient_psych_adult
+DRG Reimbursement Plan          ->  ed_behavioral, inpatient_psych_adult
+```
+
+That is correct modelling — the same document governs payment for both — and "fixing" it
+would have destroyed a real association. Withdrawn.
+
+What is true is narrower: **a row count is not a document count**, and the two must be
+named as what they are. `service_line.source` holds 78 rows over 53 documents; the DRG
+subset was 24 rows over 12 documents. The prompt's "12 documents" was accurate. Six of
+those twelve are now corrected to held, leaving 12 rows over 6 documents still absent.
+
+Third wrong claim in this section's own subject matter, and the same root as §17.2:
+reaching for the cheapest available signal — token overlap there, row count here —
+instead of the thing actually being asked about.
