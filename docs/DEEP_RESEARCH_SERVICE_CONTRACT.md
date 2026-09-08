@@ -156,3 +156,48 @@ everyone except the caller.
 - Lower a requirement you set without you deciding it.
 - Report a task late without checking whether it is done.
 - Close a question without a reason a person can read.
+
+---
+
+## 7. The actors, and what each one writes
+
+Ananth, 2026-09-08: *"every one of these actors should be writing … i want every
+thought process displayed with the actor's name as label so that it is easy to
+follow, else this is not auditable."*
+
+Thirteen actors. Every one now writes its own steps to `research.ledger`, and
+every stream in the console carries the name of the actor that produced it.
+
+| Actor | Decides | Records |
+|---|---|---|
+| **Requester** | asks the question | `asked` |
+| **Drafter** | searches and answers — this is the reasoning log | `retrieval`, `answered`, `reconnoitred` |
+| **Assembler** | turns prose into typed fields | `typed`, `candidate` |
+| **Judge** | checks every field against the answer it came from | `judge_verdict` |
+| **Arbiter** | accept, go again, or escalate | `accepted`, `dispatched` |
+| **Executor** | performs what the arbiter dispatched | writes the ledger directly |
+| **Recorder** | writes the account, and never decides | `turn_settled` |
+| **Diagnoser** | why it failed and what happens next | `diagnosed` |
+| **Refiner** | rewrites the question for the next round | `refined`, `reasked` |
+| **Resolver** | checks predicates, closes what is done, acts on your rulings | `checked`, `settled`, `met_unreported`, `still_open`, `offered`, `acted_on_ruling` |
+| **Acquirer** | goes and gets a document we do not hold | `acquiring` |
+| **Halter** | stops, and starts again | `halted`, `released` |
+| **The caller** | rules, overrules, closes | `research.ruling`, `research.judge_override` |
+
+The last five wrote **nothing at all** until this date. They were not idle —
+the diagnoser classified every failure, the refiner rewrote questions between
+rounds, the resolver closed tasks on a schedule — and none of it appeared in the
+account anyone reads. A machine whose decisions are invisible is not auditable,
+whatever its outputs look like.
+
+### Two gaps this exposed, still open
+
+**`runner.work()` never calls the diagnoser.** The live path escalates on
+`rounds_exhausted` with no gap class and no repair, so the caller is told
+"escalated" with no reason. The arbiter now records that decision — including
+`diagnosed: false` — so the gap is visible rather than silent. Making that path
+diagnose is a behaviour change and is not done.
+
+**Recording is uneven across paths.** `run_batch` records 10 kinds of step,
+`run_v2` 7, `runner` 6. Only 23 of 47 requests carry any ledger rows at all.
+The actors are wired; the paths are not yet level.
