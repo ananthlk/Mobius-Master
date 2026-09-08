@@ -171,25 +171,56 @@ phi_flag, identifier labels, evidence and classifier version.
           "produced a confident, wrong 'it uses the in-memory queue'."),
 ]),
 
-"PHI gate": dict(rating="green", depth="code", how="""
-Not a module of its own so much as a call made at the API boundary before anything is
-queued: _phi_check_message POSTs the message text to the PHI classifier's /message-check.
+"PHI gate": dict(rating="amber", depth="code",
+ ux="No surface of its own. The 422 body carries phi_blocked, identifier_labels and evidence "
+    "so the UI can explain a block; the audit rows have no reader anywhere.", how="""
+Not a module so much as a call made at the API boundary before anything is queued:
+_phi_check_message POSTs the message to the PHI classifier's /message-check.
 
-It is FAIL-CLOSED, and this is the whole point. Any timeout, network error or non-200
-returns block=True with gate='indeterminate'. Taking the classifier offline therefore
-cannot be used to bypass the gate. The docstring is explicit that the frontend pre-check
-fails OPEN and is a UX affordance only — this backend re-run is the authoritative layer.
+FAIL-CLOSED, and that is the point. Any timeout, network error or non-200 returns block=True
+with gate='indeterminate', so taking the classifier offline cannot bypass the gate. The
+frontend pre-check fails OPEN and is a UX affordance only; this backend re-run is the
+authoritative layer.
 
-A blocked message returns HTTP 422 carrying phi_blocked, the identifier labels and the
-evidence, so the UI can explain itself. An attested override (body.phi_override) is
-allowed but logged as its own outcome. Downstream only ever sees the categories.
+IT WRITES ITS ASSESSMENT TO THE DATABASE. Every verdict goes to
+compliance.hipaa_message_check_log — id, ts, correlation_id, thread_id, user_id, org_slug,
+action, gate, phi_flag, identifier_labels, phi_evidence, classifier_version. 3,259 rows live,
+from 2026-07-20 to today. So the gate is genuinely instrumented, and my earlier description
+of this node as having no telemetry was wrong — I had filed the write under POST /chat because
+that is the file it lives in, and lost it from the node whose assessment it records.
 """, findings=[
- ("good", "Fail-closed by construction, with the reasoning written down at the call site."),
- ("good", "Small (95 lines), single-purpose, has its own test file, and is configurable "
-          "without a redeploy: PHI_GATE_URL, PHI_CLASSIFIER_URL, PHI_GATE_TIMEOUT_SEC."),
+ ("good", "Fail-closed by construction, with the reasoning written at the call site."),
+ ("good", "It DOES persist its assessment: 3,259 rows in compliance.hipaa_message_check_log "
+          "carrying the gate, the flag, the identifier labels and the classifier version. "
+          "Corrects my earlier claim that this node emits nothing."),
+ ("good", "Configurable without a redeploy: PHI_GATE_URL, PHI_CLASSIFIER_URL, "
+          "PHI_GATE_TIMEOUT_SEC. Has its own test file. 95 lines."),
+ ("bad", "TWO IMPLEMENTATIONS OF THE SAME GATE, and only one is audited. "
+         "app/api/chat.py:247 checks chat MESSAGES and writes the audit row. "
+         "app/skills/phi_gate.py:66 checks FEEDBACK text with its own httpx call and writes "
+         "NOTHING to the database — _log_gate emits a logger.info with labels and counts only. "
+         "Same classifier, same endpoint, same fail-closed posture, two code paths, one "
+         "audit trail. Feedback text passing through a PHI gate leaves no compliance record."),
+ ("bad", "THE AUDIT WRITE IS FAIL-OPEN. _log_phi_msg_gate's docstring calls it a "
+         "'Best-effort INSERT' and its failure path logs a warning and continues. The gate is "
+         "fail-closed; the record that it fired is not. Technical Review ruled this as its own "
+         "item — evidentiary, not availability. OPEN DECISION, mine: block the turn when the "
+         "audit cannot be written, or give it a durable dead-letter."),
+ ("watch", "600 rows have gate='phi' AND phi_flag=true AND identifier labels present, and "
+           "action='passed' — against 18 blocked. The labels on them are License/Cert #, URL "
+           "and Name, which is the expected recall-over-precision behaviour: a provider's name "
+           "and licence number in a credentialing question is not patient PHI, and the "
+           "classifier returns block=false for them. The gap is that the audit row records "
+           "gate, flag, labels and action but NOT WHY the two disagree. From the log alone you "
+           "cannot answer 'why was this PHI-flagged message allowed?' — and that is 600 of the "
+           "668 PHI-flagged rows, so it is the majority case, not an edge."),
+ ("watch", "Nothing reads this table. No dashboard, no query, no alert — 3,259 compliance rows "
+           "with no reader. A write path whose output nobody consumes is the shape that hid "
+           "the appeals outage; here it means a gate could start behaving differently and the "
+           "evidence would sit in Postgres unlooked-at."),
  ("watch", "A 4-second default timeout against a remote classifier sits on the synchronous "
-           "request path. A slow classifier does not fail open, but it does add latency to "
-           "every message before the user sees any acknowledgement."),
+           "request path. It does not fail open, but it adds latency to every message before "
+           "the user sees any acknowledgement."),
 ]),
 
 "queue": dict(rating="red", depth="code", how="""
