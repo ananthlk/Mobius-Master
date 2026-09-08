@@ -1554,15 +1554,15 @@
         6
       ],
       "user_view": {
-        "status": "building",
-        "description": "In-repo: per-slot benefit-of-turn verdicts feeding Router calibration. Status contested \u2014 see note.",
-        "surface": "mobius-rag"
+        "status": "live",
+        "description": "Judges each retrieval slot on its own bar \u2014 would another turn help? Wired into the live orchestrator 2026-07-26 after Eval's calibration (22-query forced bank + live router calibration).",
+        "surface": "Transparent (feeds Router's decide_continuation)"
       },
       "technical_view": {
-        "status": "building",
-        "description": "In-repo: per-slot benefit-of-turn verdicts feeding Router calibration. Status contested \u2014 see note.",
+        "status": "live",
+        "description": "app/services/retriever/observer.py, called from orchestrator.py:445 via _observer_verdict. Per-strategy adequacy: capacity-aware fill for a/b/s, decay-floor score check for d, quote_verified for c. Portfolio-allocated slots bypass it and take a terminal stopgap verdict \u2014 but portfolio is weight 0 / shadow-only by default, so the default path is Observer.",
         "repo": "mobius-rag",
-        "module": "(in-repo)"
+        "module": "app/services/retriever/observer.py"
       },
       "specs_view": {
         "link": "docs/product-docs/observer-agent-spec.md",
@@ -1585,7 +1585,8 @@
         "branch": "main",
         "status": "building",
         "deploy_target": "in-repo"
-      }
+      },
+      "note": "Design signed off 4/4 (Retriever, Chat, DB, Tech) 2026-07-24; production wiring landed 2026-07-26. Multi-turn expansion for portfolio slots is still deferred to Synthesis's CoverageDiagnostic."
     },
     {
       "id": "deep-research",
