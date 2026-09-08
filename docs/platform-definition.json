@@ -23,7 +23,7 @@
       "id": "web-scraper",
       "name": "Web Scraper",
       "layer": 0,
-      "kind": "worker",
+      "kind": "skill",
       "owner": "Crawler Agent",
       "service": "mobius-web-scraper",
       "repo": "mobius-skills",
@@ -54,7 +54,14 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
-      }
+      },
+      "consumers": [
+        "Chat (ReAct)",
+        "MCP (fleet-wide)",
+        "Sourcing",
+        "fetch_document"
+      ],
+      "invocation": "web_scrape \u2014 appears twice in the chat tool manifest and is exposed over MCP."
     },
     {
       "id": "web-scraper-worker",
@@ -91,7 +98,8 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
-      }
+      },
+      "invocation": "Queue-driven. Not callable as a skill \u2014 it runs when work is enqueued."
     },
     {
       "id": "google-search",
@@ -128,13 +136,18 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
-      }
+      },
+      "consumers": [
+        "Chat (ReAct)",
+        "MCP (fleet-wide)",
+        "Sourcing"
+      ]
     },
     {
       "id": "doc-reader",
       "name": "Doc Reader",
       "layer": 0,
-      "kind": "worker",
+      "kind": "skill",
       "owner": "Curation",
       "service": "mobius-doc-reader",
       "repo": "mobius-skills",
@@ -165,7 +178,13 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
-      }
+      },
+      "consumers": [
+        "Chat (sub-skill)",
+        "Curation",
+        "Historical extraction"
+      ],
+      "invocation": "Called via app/sub_skills/doc_reader.py \u2014 invoked by chat directly rather than chosen by the planner, but a task other components call."
     },
     {
       "id": "chunking-worker",
@@ -202,13 +221,14 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
-      }
+      },
+      "invocation": "Queue-driven. Not callable as a skill \u2014 it runs when work is enqueued."
     },
     {
       "id": "lexicon",
       "name": "Lexicon Maintenance",
       "layer": 0,
-      "kind": "worker",
+      "kind": "service",
       "owner": "Eval / Lexicon",
       "service": "mobius-lexicon-maintenance",
       "repo": "mobius-qa",
@@ -282,7 +302,8 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
-      }
+      },
+      "invocation": "Queue-driven. Not callable as a skill \u2014 it runs when work is enqueued."
     },
     {
       "id": "chat",
@@ -574,7 +595,7 @@
       "id": "router",
       "name": "Router / Allocator",
       "layer": 2,
-      "kind": "code",
+      "kind": "agent",
       "owner": "Router",
       "service": null,
       "repo": "mobius-chat",
@@ -626,7 +647,7 @@
       "id": "react-loop",
       "name": "ReAct Loop",
       "layer": 2,
-      "kind": "code",
+      "kind": "agent",
       "owner": "ReAct",
       "service": null,
       "repo": "mobius-chat",
@@ -1522,7 +1543,7 @@
       "id": "observer",
       "name": "Observer",
       "layer": 7,
-      "kind": "code",
+      "kind": "agent",
       "owner": "Observer",
       "service": null,
       "repo": "mobius-rag",
@@ -1570,7 +1591,7 @@
       "id": "deep-research",
       "name": "Deep Research",
       "layer": 99,
-      "kind": "service",
+      "kind": "agent",
       "owner": "Deep Research",
       "service": null,
       "repo": "mobius-skills",
@@ -2084,12 +2105,22 @@
     {
       "kind": "agent",
       "label": "Agent",
-      "description": "Makes decisions. Chooses what to do next."
+      "description": "Decides what happens next."
     },
     {
       "kind": "skill",
       "label": "Skill",
-      "description": "A task. No decisions \u2014 reused by many agents."
+      "description": "A task other components call. No decisions."
+    },
+    {
+      "kind": "worker",
+      "label": "Worker",
+      "description": "Queue-driven. Runs when work is enqueued."
+    },
+    {
+      "kind": "service",
+      "label": "Service",
+      "description": "A deployed capability with its own API."
     },
     {
       "kind": "surface",
@@ -2102,9 +2133,9 @@
       "description": "Where knowledge lives."
     },
     {
-      "kind": "worker",
-      "label": "Worker",
-      "description": "Machinery that runs a pipeline stage."
+      "kind": "code",
+      "label": "Code",
+      "description": "In-repo module, not separately deployed."
     },
     {
       "kind": "governance",
