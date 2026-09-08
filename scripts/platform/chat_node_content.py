@@ -24,7 +24,7 @@ same as "checked and fine":
 
 # ── The hops before run_pipeline ────────────────────────────────────────────
 CHAIN = {
-"POST /chat": dict(rating="amber", depth="code", how="""
+"POST /chat": dict(rating="red", depth="code", how="""
 The front door, and the only synchronous part of a turn. It accepts the message, does
 NOT answer it, and returns {correlation_id, thread_id} for the caller to poll or stream.
 
@@ -78,6 +78,42 @@ phi_flag, identifier labels, evidence and classifier version.
          "log is specified append-only and fail-closed; this write path is neither. Found by "
          "the DB extractor, not by me reading the file — my hand-written description of this "
          "node did not mention the table at all."),
+ ("bad", "STRUCTURE LENS RULING (Technical Review, 2026-09-08): NODE 1 IS RED, not the "
+         "amber I gave it. Driving reasons in their order: the live auth gap, and the FK "
+         "policy disagreement — measured and active, not theoretical. The dead-contract and "
+         "ensure_thread findings are real but amber-grade alone, and they explicitly said not "
+         "to let those drive the colour."),
+ ("bad", "STRUCTURE RULING on ensure_thread — the swallow is NOT the defect. Degrading "
+         "gracefully when db-agent is unreachable is reasonable front-door posture. The defect "
+         "is that the general-exception branch does the IDENTICAL thing for a different "
+         "failure class: a real write failure (constraint violation, schema drift) mints a "
+         "fresh uuid and returns as if it worked. Collapsing 'the agent is down' and 'the "
+         "write is broken' into one path removes the only signal an operator has to tell "
+         "expected degradation from a live bug. Fix is to branch them so they log and behave "
+         "distinguishably — not to stop degrading."),
+ ("bad", "STRUCTURE RULING on the HIPAA audit — tracked as its OWN item, not folded into the "
+         "node colour, because it is evidentiary rather than availability. The gate is "
+         "correctly fail-closed; its audit record is fail-open. Backwards for a log whose "
+         "only job is proving the gate fired: a write failure at the wrong moment leaves zero "
+         "evidence the block happened while the block still correctly happened. The owner of "
+         "compliance.hipaa_message_check_log's guarantees — me — must decide whether that "
+         "write blocks the response, or at minimum gets a durable dead-letter instead of a "
+         "log line. OPEN DECISION."),
+ ("watch", "STRUCTURE RULING on the FKs — keep the asymmetry, but RATIFY it on purpose. Both "
+           "postures are individually defensible: a turn is plausibly a standalone audit "
+           "record worth keeping after its thread is gone; message bodies and session state "
+           "are not independently useful once the thread is deleted. The defect is three "
+           "migrations (009, 010, 011) with no shared policy. One line in the schema stating "
+           "the intent, so the next migration does not 'fix' the SET NULL into a CASCADE and "
+           "silently start deleting turns. OPEN ACTION."),
+ ("watch", "NOT VERIFIED BY OBSERVED BEHAVIOUR, by deliberate choice of both seats: neither I "
+           "nor Technical Review sent an unauthenticated POST /chat. Tech Review read the gate "
+           "instead — auth_mode() returns 'optional' from the env override before the "
+           "hosted-default logic runs, and require_user() under 'optional' returns "
+           "result.user_id with nothing that rejects when there is no token. So the code path "
+           "an anonymous caller hits proceeds with user_id=None. Exercising it live would "
+           "create a real queued turn, real cost and a real hipaa log row against a service "
+           "labelled prod — that needs authorising, staging first if possible."),
  ("bad", "SCOPE LENS (DB seat, 2026-09-08), verified by me against live mobius_chat: the "
          "three FKs into chat_threads DISAGREE on delete behaviour. chat_turns.thread_id is "
          "ON DELETE SET NULL; chat_turn_messages.thread_id and chat_state.thread_id are "
