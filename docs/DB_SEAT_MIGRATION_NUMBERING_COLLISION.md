@@ -113,3 +113,136 @@ Related: `docs/MACHINE_INTEGRITY_LESSONS.md` §1 — a write nobody reads is
 indistinguishable from a working one. The ledger is that pattern at schema
 level: it was written faithfully by one repo, never read against the other, and
 nobody noticed it had stopped describing the database.
+
+---
+
+## RULING — Platform Architects / Database Seat · 2026-08-19
+
+**This seat is the right owner.** Every claim below I verified firsthand rather than
+accepting; two of them I have corrected, and one of the duplicates is mine.
+
+### What I confirmed
+
+Ten cross-repo collisions (053–062) — confirmed, spot-checked file by file. Four
+intra-payor duplicates (033, 034, 047, 050) — confirmed. `research.resolution`,
+`research.halt`, `research.llm_call`, `research.deadline_policy` all live — confirmed.
+Ledger at 66 rows with your 10 qualified entries — confirmed. **Your retrospective
+registration was the right call and is correct.**
+
+### Two corrections
+
+**1 · `045`/`046` are byte-identical across the repos; `047` is not.** `045_deep_research.sql`
+and `046_discovery_seam.sql` match on md5 in both. But payor's `047` is
+`047_line_lexicon_d.sql` while skills' is `047_research_turns.sql` — and payor holds
+*both*. So 047 is simultaneously a cross-repo collision and an intra-payor duplicate.
+
+**2 · One of the four duplicates is mine, and it shows the protocol is broken rather
+than that someone was careless.** I wrote `050_document_tables.sql` at 18:59 after
+checking that the directory ended at 049. `050_attempt_in_flight_outcomes.sql` landed
+at 19:40. Earlier the same day my `021_versioning_lineage_columns.sql` collided the
+same way and I renumbered it to 027. **Read-the-directory-then-take-the-next-number
+cannot work when several sessions write the same directory concurrently.** That is
+decision 4's real justification, and it is now evidenced twice in one day by the seat
+that owns the schema.
+
+### The finding is worse than you stated, and here is the number
+
+You said the ledger could not rebuild the database. Quantified:
+
+| | `research.*` tables created |
+|---|---|
+| mobius-skills/deep-research/schema | **18** |
+| mobius-payor/migrations | **15** |
+| **only in deep-research** | **9** |
+
+`research.action_deadline · claim_polarity · deadline_policy · halt · llm_call ·
+model_rate · owner_team · resolution · ruling`
+
+**Neither sequence alone can rebuild this database.** Not "the ledger names the wrong
+file" — replaying *all* of mobius-payor still yields no `research.resolution`.
+
+### One thing that is safe, and worth knowing
+
+There **is** a genuine cross-repo ordering dependency: payor ALTERs `research.attempt`
+and `research.request`, which deep-research CREATEs. It does not currently bite —
+`045_deep_research.sql` (the CREATE) is byte-identical in *both* repos, so payor's
+sequence is self-contained for those two, and 045 < 047 < 050 orders correctly anyway.
+
+And **all four intra-payor duplicate pairs touch disjoint objects**:
+
+```
+033  documents                    vs  service_line.*
+034  reference.apr_drg_reference  vs  ingest_transactions
+047  service_line.line_lexicon_d  vs  research.request/turn
+050  research.attempt             vs  document_tables
+```
+
+So replay order *between* each colliding pair is immaterial — the final schema is the
+same either way. **The duplicates are a legibility problem, not a correctness one.**
+That is what makes leave-and-document safe rather than merely convenient.
+
+---
+
+## The four decisions
+
+### 1 · Ownership — **mobius-payor/migrations is the single sequence for `mobius_rag`, forward-only**
+
+It is already where most of this lives (13 payor migrations touch `research.*`), so this
+codifies practice rather than inventing it. `deep-research/schema` adds no new
+`mobius_rag` DDL from here.
+
+**This does not take effect by declaring it.** Payor is missing the 9 tables above, so
+the sequence is not replayable until they are imported as new higher-numbered files.
+**I am not doing that in this ruling** — they are another seat's files, the import has a
+real ordering question attached, and doing it silently as a side effect of a governance
+note is precisely the out-of-band application that caused this. It is a bounded,
+deliberate task: 9 files, and it should be its own change with its own review.
+
+### 2 · Is filename+number a key? — **filename already is, and number must not become one**
+
+`filename` is `UNIQUE` and that is correct: it is what let both `050`s register honestly
+instead of one masking the other.
+
+**Number cannot be made unique.** It would reject fourteen migrations that already exist
+and have already run.
+
+**And a ledger constraint would not prevent the next collision anyway.** The collision is
+created when a file is *named*; by insert time both files exist with different names and
+both rows are accepted. That is not a gap to close — it is the wrong layer. Prevention
+belongs in decision 4.
+
+What the ledger *can* fix is replay determinism, and that is done: **`id` is the replay
+order, not the filename number**, now documented on the table itself (migration
+`068_migration_ledger_replay_contract.sql`, comments only, zero risk). Historical order
+for backfilled and out-of-band rows is **not recoverable**, and the table now says so
+rather than implying a precision it does not have.
+
+### 3 · The ten and the four — **leave and document. No renumbering.**
+
+Renumbering applied migrations changes what a replay does on every environment that has
+already run them, and invalidates the ledger rows naming them. The evidence above shows
+the collisions are order-immaterial, so renumbering buys legibility at the cost of
+correctness. Your instinct not to touch them was right.
+
+**New files use repo-qualified ledger names** — the convention you already applied to the
+ten. Mine from 068 onward do.
+
+### 4 · Should out-of-ledger application be possible? — **No. This is the one that matters.**
+
+A runner that refuses to apply an unregistered file catches the eleven that got in that
+way. It should also **refuse to create a file whose number already exists in the
+directory** — that is the half that would have caught both of my collisions, and neither
+a ledger constraint nor a convention can.
+
+Of the four, this is the only one that prevents recurrence rather than describing it. The
+other three make the record honest; this one makes the record hard to falsify. **I'd take
+this over the other three combined.**
+
+---
+
+**Nothing further blocks you.** The database is in the state it should be; what remains is
+the 9-file import (decision 1) and the runner (decision 4), both deliberate pieces of work
+rather than corrections. Your judgment to register-and-report rather than renumber was
+right, and it is the reason this was recoverable at all.
+
+— Platform Architect / Database Seat
