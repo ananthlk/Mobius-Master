@@ -78,6 +78,44 @@ phi_flag, identifier labels, evidence and classifier version.
          "log is specified append-only and fail-closed; this write path is neither. Found by "
          "the DB extractor, not by me reading the file — my hand-written description of this "
          "node did not mention the table at all."),
+ ("bad", "SCOPE LENS (DB seat, 2026-09-08), verified by me against live mobius_chat: the "
+         "three FKs into chat_threads DISAGREE on delete behaviour. chat_turns.thread_id is "
+         "ON DELETE SET NULL; chat_turn_messages.thread_id and chat_state.thread_id are "
+         "CASCADE. So deleting a thread KEEPS the turn rows and DESTROYS their messages — "
+         "'delete this conversation' leaves a detached turn carrying user_id and timestamps "
+         "whose content is gone. 102 of 5,705 turns are already in that state. For anything "
+         "PHI- or retention-shaped this is the finding on this node, and it is completely "
+         "invisible from chat.py."),
+ ("bad", "SCOPE LENS: there is NO retention or cleanup path for chat_threads or chat_turns "
+         "anywhere in mobius-chat. No DELETE FROM either table. rag_query_traces got a "
+         "bounded prune this week; chat did not."),
+ ("bad", "SCOPE LENS: storage here is NOT a local write. db_execute is an MCP call to "
+         "mobius-db-agent (DB_AGENT_MCP_URL) with a direct-DB fallback when the agent is "
+         "unreachable (CHAT_DB_MODE=direct / _fallback_execute). That is why ensure_thread "
+         "has a connection_error branch at all. My description read as if this were a local "
+         "INSERT; it is a service dependency with two code paths."),
+ ("watch", "SCOPE LENS: mobius_chat has TWO disjoint migration ledgers — migrations_applied "
+           "(24 rows, no checksum) and schema_migrations (48, with checksum), zero overlap, "
+           "against 64 .sql files on disk. NEITHER registers the migrations creating "
+           "chat_threads or chat_turns. The DB seat filed a correction to their own "
+           "2026-08-19 ruling that mobius_rag held the instance's only ledger — they had not "
+           "checked mobius_chat."),
+ ("watch", "SCOPE LENS: this node writes into a NINE-table family; my model named two. The "
+           "others: chat_turn_messages, chat_state, chat_progress_events, chat_tool_results, "
+           "chat_feedback, chat_source_feedback, chat_cache_shadow_log. Two of them are the "
+           "CASCADE children above, so they are not optional context."),
+ ("watch", "Mine, found while verifying the DB seat: a FIFTH FK points at chat_threads — "
+           "financial_strategy_versions.thread_id, ON DELETE SET NULL — and nothing in "
+           "mobius-chat references that table. A cross-module coupling into chat's thread "
+           "table that neither of us had named."),
+ ("bad", "CORRECTION from the DB seat to my own text: ensure_thread treats two failures "
+         "differently and I merged them. On connection_error the caller's thread_id SURVIVES "
+         "(returns id_to_use if thread_id else uuid4()); only on a NON-connection failure is "
+         "a fresh uuid returned, discarding it. And the orphan cannot accumulate — "
+         "chat_turns.thread_id has an FK to chat_threads, so a turn against a missing thread "
+         "is REJECTED at write time. The risk is a lost turn, not silent continuity drift."),
+ ("bad", "CORRECTION: chat_turns.user_id is nullable TEXT with NO foreign key — unvalidated "
+         "free text, and 498 of 5,705 rows are NULL. I implied it was a validated reference."),
  ("good", "RUNTIME LENS: the Redis claim holds — CHAT_QUEUE_TYPE=redis is set and takes "
           "precedence over QUEUE_TYPE in config.py. Worth recording that the code default is "
           "'memory' and QUEUE_TYPE alone is unset, so reading only QUEUE_TYPE would have "
