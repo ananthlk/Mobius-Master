@@ -372,6 +372,20 @@ Technical Review named on the queue node: I graded the construction, not the gua
          "overwrites the whole conversation's accumulated state with defaults plus that turn. "
          "Not skipped — destroyed. Correct behaviour given a true empty read; catastrophic "
          "given a failed one."),
+ ("bad", "THE FIX IS LOCAL, NOT A REDESIGN — and this reframing is the DB seat's. The "
+         "same file already uses the right pattern thirty lines further down: _write_state_row "
+         "warns and returns on connection_error but RAISES RuntimeError on anything else. So "
+         "the write path is loud and the read path is silent, in one module, and the silent "
+         "one is the one that loses data. get_state is not missing a convention — it is the "
+         "one function not following its own file's. Verified both sites."),
+ ("bad", "CROSS-NODE, and invisible to any code read: mobius_chat has NO query guards. "
+         "statement_timeout = 0 and no idle-in-transaction guard. mobius_rag carries "
+         "idle_in_transaction_session_timeout = 120s and is the ONLY per-database override on "
+         "the entire instance — verified against pg_db_role_setting, not a session read. It "
+         "reads like a guard added after an incident that chat never inherited. Two "
+         "consequences: a pathological chat query runs unbounded holding a connection, and "
+         "SQLSTATE 57014 effectively cannot fire, so db_client's `timeout` branch is dead-"
+         "looking code that would come alive the moment anyone sets a timeout."),
  ("bad", "AND NOTHING CAN DETECT IT AFTERWARDS. state_version increments on the same write, "
          "so the row goes 11 -> 12 exactly as a normal turn would. There is no artifact "
          "distinguishing 'turn 12 of a conversation' from 'state reset, now calling itself "
