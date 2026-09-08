@@ -125,3 +125,60 @@ It establishes that the **names and signatures** Mobius calls survive each bump.
 It does not establish runtime behaviour against live GCS, Redis or Vertex — no
 network call was made. Any actual upgrade still gets deployed one module at a
 time and verified against the running service.
+
+## Round 3 — the fourth mcp instance, and why the first sweep missed it
+
+`mobius-appeals-prototype` was the fourth service importing
+`mcp.server.fastmcp.FastMCP`. The first sweep missed it for two reasons, both
+worth recording because they generalise:
+
+1. **It has no `requirements.txt`.** Every dependency is installed inline in the
+   Dockerfile: `RUN pip install --no-cache-dir fastapi uvicorn pyyaml httpx
+   asyncpg "mcp[cli]>=1.0"`. A sweep that reads requirements files sees nothing.
+2. **Its failure was swallowed, not fatal.** `api/app.py` wraps the MCP route
+   injection in `except Exception as _mcp_err: log.warning("...non-fatal...")`.
+   Where db-agent died loudly on import, this container started clean and simply
+   served no MCP tools.
+
+So this was not a latent risk. It was a **live capability outage**:
+
+- `Appeals MCP route injection failed (non-fatal): No module named
+  'mcp.server.fastmcp'` — first logged **2026-08-10**, revision `00147`.
+- **29 days** with zero appeals tools exposed, while callers took **189 `/mcp`
+  404s on 2026-09-08 alone** and 11 the day before.
+- `GET /mcp` returned 404 on the live revision and 406 on the pinned rebuild —
+  406 being what a streamable-HTTP MCP endpoint correctly returns for a bare GET.
+
+**Fix and verification.** Pinned to `"mcp[cli]>=1.0,<2"`. Built on Cloud Build
+(green), deployed as a **no-traffic** revision so Cloud Run health-checked it
+under real config while 100% of traffic stayed on `00177`. That revision came up
+Ready and logged `Appeals MCP routes injected at /mcp (5 tools)`. Only then was
+traffic promoted. All five tools now list over `/mcp/tools`:
+`appeals_lookup_rules`, `appeals_get_playbook`, `appeals_find_carc`,
+`appeals_validate_claim`, `appeals_assemble_letter`.
+
+### The mcp class is now closed
+
+Four services import `mcp.server.fastmcp`; all four are pinned `<2`:
+`mobius-db-agent`, `mobius-skills-mcp`, `provider-roster-credentialing`,
+`appeals-agent`.
+
+`mobius-chat` is the only other consumer and is a **client**, not a server. Its
+runtime imports were tested against mcp 2.2.0 and all pass:
+`mcp.client.session.ClientSession`, `mcp.client.streamable_http`, `mcp.types`.
+One import does break — `mcp.shared.exceptions.McpError`, renamed to `MCPError`
+in 2.x — but it appears **only in `mobius-chat/tests/`**, never at runtime. Chat
+is deliberately left unpinned: a rebuild would break its test suite, not the
+service. Recorded rather than changed.
+
+The root `requirements.txt:72` carries an unbounded `mcp[cli]>=1.0.0`, but no
+image builds from it — `Dockerfile.module-hub` is stdlib-only with no pip step.
+
+### The lesson worth keeping
+
+A swallowed import turns a crash into an invisible capability loss. db-agent's
+failure was found in a day because the container died. This one ran for 29 days
+looking healthy — `/health` 200, `/docs` 200, startup clean — while the thing it
+exists to provide was simply absent. **Any `except Exception: log.warning(...)`
+around a capability import needs a readback that proves the capability is
+actually there**, or the health check is lying.
