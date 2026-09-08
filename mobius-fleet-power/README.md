@@ -63,8 +63,9 @@ python3 fleetpower.py apply
   Both are prompts to reconsider the manifest entry, not automatic actions.
 - **A service whose image tag was pruned** (e.g. mobius-specs, `:latest` gone
   from GCR) fails *any* update with "image not found". Redeploy the image first.
-- **Cost model** is us-central1 tier-1 list price; throttled services' idle
-  min instances bill below the request rate, so estimates are an upper bound.
+- **Cost model** is us-central1 tier-1 list price, with throttled services'
+  pinned-idle hours priced at the idle min-instance SKU ($0.0000025/vCPU-s
+  and /GiB-s, verified against the Cloud Billing Catalog).
 
 ## Wishlist / next steps
 
