@@ -29,6 +29,24 @@ the top) and optional explicit `min`/`max` overrides. Services not listed are
 reported UNMANAGED and never touched. To change fleet scaling, edit fleet.yaml
 and run `apply` — don't run raw gcloud, or status will (correctly) nag about drift.
 
+## Demo / ingest prep (workers are parked at min=0)
+
+The RAG workers are OFF between runs (Sep 8 decision: dev cost over instant
+SLA). Nothing polls the ingestion queue while parked — uploads (including
+instant-RAG through chat) sit "pending" until a boost. The nightly pipeline
+boosts at 10pm and re-parks after. Before a demo or manual ingest:
+
+```bash
+python3 fleetpower.py boost mobius-rag-chunking-worker --min 8
+python3 fleetpower.py boost mobius-rag-embedding-worker --min 6
+```
+
+Park everything again when done (also clears any other drift):
+
+```bash
+python3 fleetpower.py apply
+```
+
 ## Sharp edges learned the hard way
 
 - **Two scaling layers.** Revision-level `autoscaling.knative.dev/minScale`
@@ -36,9 +54,10 @@ and run `apply` — don't run raw gcloud, or status will (correctly) nag about d
   `run.googleapis.com/minScale` (set by `--min`) pin instances independently;
   the effective floor is the max of both. fleetpower reads both. Lowering a
   revision-level min requires a new revision → gated behind `--allow-redeploy`.
-- **Poll-loop workers must not hit min=0.** mobius-rag-{chunking,embedding}-worker
-  process their queue from a background thread; min=0 stops all queue polling.
-  min=1 is the floor until event-driven wake exists.
+- **min=0 on the poll-loop workers stops ALL queue polling** — that is now a
+  deliberate parked state (see Demo prep above), not an accident, but the
+  failure mode is unchanged: enqueued jobs wait silently. Wake-on-enqueue
+  removes this trade-off when built.
 - **audit flags, not verdicts.** `WASTE?` = instance-hours far beyond both the
   pin and the traffic; `PINNED-IDLE` = warm floor with almost no requests.
   Both are prompts to reconsider the manifest entry, not automatic actions.
