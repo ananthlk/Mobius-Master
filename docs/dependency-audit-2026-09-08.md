@@ -182,3 +182,64 @@ looking healthy — `/health` 200, `/docs` 200, startup clean — while the thin
 exists to provide was simply absent. **Any `except Exception: log.warning(...)`
 around a capability import needs a readback that proves the capability is
 actually there**, or the health check is lying.
+
+## Round 4 — provenance sweep: does anything deploy from code that is on no remote?
+
+Every deployed Cloud Run service, traced from its image back to a git ref.
+
+**Method note, because the naive form of this check over-reports.**
+`git rev-list <sha> --not --remotes` excludes remote *branches* but **not tags**.
+A first pass flagged `mobius-story-ui`, whose deployed commit is in fact carried
+by the pushed tag `v1.0.0`. The correct test is `--not --remotes --tags`.
+
+### Found and fixed
+
+- **`mobius-phi-classifier`** — deployed sha `94cf81b` (2026-07-22) lived on a
+  local `feat/phi-classifier` and on no remote for **48 days**: 47 lines across
+  `classifier.py`, `config.py`, `models.py` and a test, on a PHI service. The
+  branch existed on origin at `bb083cd`; local was exactly one commit ahead.
+  Pushed (fast-forward).
+- **`mobius-rag`** — not a deployed-image problem but found by the same sweep:
+  three commits sat on a local `main`, unpushed since 2026-08-12/17, including
+  `feat(curator): the source-registry curator UI`. A direct push was impossible
+  (3 ahead, 201 behind). Preserved first to `rescue/unpushed-main-20260908` (a
+  pure ref push), then merged onto `origin/main` **in a temporary worktree** so
+  the shared checkout's seven in-flight dirty files were never touched. One real
+  conflict in `tests/test_curator_service.py`, resolved by inspection: the branch
+  side of the hunk was empty, so keeping origin/main's two provenance tests lost
+  nothing. Pushed as `d8aef46`.
+
+### The two hand-named tags, traced
+
+Both had no git sha in the tag and no build label, and were left as **unknown**
+rather than assumed clean. Both are now resolved:
+
+**`mobius-rag/rag:inletparity`** — Cloud Build `836436b4`, 2026-09-06, source a
+GCS tarball. Fingerprinted by blob: `app/main.py` matches exactly one commit,
+**`53f6178`**, whose date matches the build. Confirmed across the whole tree —
+**224 of 224 `app/**.py` byte-identical, 0 differ, 0 absent**. `53f6178` is an
+ancestor of `origin/main`. Safe.
+
+*One real gap it exposed:* of 927 source files in that tarball, 8 are not in git
+— five `.claude/worktrees/` scratch files swept in by the upload, and three
+**`frontend/dist/` build artifacts** (`index.html`, `index-*.js`, `index-*.css`).
+The shipped frontend bundle is therefore not reproducible from git alone, and
+`frontend/dist/index.html` is currently uncommitted in the working tree.
+
+**`mobius-task-manager/task-manager:20260719-214044-phi-gate-labelrule`** — no
+Cloud Build record; built locally with the classic builder at
+2026-07-20T01:41:36Z, which is the local time in the tag. No labels, so no sha to
+read. Traced by content instead: the image config's four `COPY` layers were
+pulled from Artifact Registry and extracted, and **all 36 shipped files are
+byte-identical to `origin/main` today** — 0 differ, 0 absent.
+
+Precisely stated: for task-manager I could not name the *commit that built it*,
+but I proved the deployed content is fully recoverable from a pushed ref, which
+is the property that actually matters here.
+
+### Standing after this sweep
+
+31 services. Every one is now either traced to a commit on a remote, or proven
+byte-recoverable from one. Two commits remain unpushed on `mobius-rag`'s
+`retriever-answer-engine` — both dated today, another session's live work, and
+deliberately left alone.
