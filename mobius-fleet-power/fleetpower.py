@@ -41,6 +41,9 @@ RATE = {
     "idle": {"cpu": 0.0090, "mem": 0.0090},
 }
 
+# Cloud SQL Enterprise us-central1 approx list price.
+SQL_RATE = {"vcpu_h": 0.0413, "ram_gib_h": 0.0070, "ssd_gb_mo": 0.17}
+
 ANN_SVC_MIN = "run.googleapis.com/minScale"
 ANN_SVC_MAX = "run.googleapis.com/maxScale"
 ANN_REV_MIN = "autoscaling.knative.dev/minScale"
@@ -175,6 +178,59 @@ def est_month(cfg: dict, hours: float, pinned_h: float, days: float) -> float:
     return (idle_h * idle_rate + active_h * hourly_rate(cfg)) * (30 / days)
 
 
+def sql_metric(project: str, metric: str, days: float, aligner: str) -> dict[str, list]:
+    """Daily-aligned Cloud SQL metric values per database_id."""
+    end = datetime.now(timezone.utc)
+    start = end - timedelta(days=days)
+    params = {
+        "filter": f'metric.type="cloudsql.googleapis.com/{metric}"',
+        "interval.startTime": start.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "interval.endTime": end.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "aggregation.alignmentPeriod": "86400s",
+        "aggregation.perSeriesAligner": aligner,
+    }
+    url = (f"https://monitoring.googleapis.com/v3/projects/{project}/timeSeries?"
+           + urllib.parse.urlencode(params))
+    req = urllib.request.Request(url, headers={"Authorization": f"Bearer {_token()}"})
+    with urllib.request.urlopen(req, timeout=60) as resp:
+        data = json.load(resp)
+    out: dict[str, list] = {}
+    for ts in data.get("timeSeries", []):
+        db = ts["resource"]["labels"].get("database_id", "?")
+        out[db] = [float(p["value"].get("doubleValue", 0)) for p in ts.get("points", [])]
+    return out
+
+
+def sql_report(project: str, days: float) -> list[dict]:
+    """Cloud SQL instances with size, est. cost, and utilization."""
+    raw = json.loads(run(["gcloud", "sql", "instances", "list",
+                          "--project", project, "--format", "json"]))
+    cpu_avg = sql_metric(project, "database/cpu/utilization", days, "ALIGN_MEAN")
+    cpu_max = sql_metric(project, "database/cpu/utilization", days, "ALIGN_MAX")
+    mem_max = sql_metric(project, "database/memory/utilization", days, "ALIGN_MAX")
+    out = []
+    for inst in raw:
+        name = inst["name"]
+        tier = inst["settings"]["tier"]  # db-custom-<vcpu>-<ram MiB>
+        parts = tier.split("-")
+        vcpu = int(parts[2]) if len(parts) == 4 and parts[1] == "custom" else 0
+        ram = int(parts[3]) / 1024 if len(parts) == 4 and parts[1] == "custom" else 0
+        disk = int(inst["settings"].get("dataDiskSizeGb", 0))
+        est = (vcpu * SQL_RATE["vcpu_h"] + ram * SQL_RATE["ram_gib_h"]) * 720 \
+            + disk * SQL_RATE["ssd_gb_mo"]
+        db_id = f"{project}:{name}"
+        avg = lambda v: sum(v) / len(v) if v else 0.0
+        out.append({
+            "name": name, "tier": tier, "vcpu": vcpu, "ram_gib": ram,
+            "disk_gb": disk, "running": inst.get("state") == "RUNNABLE",
+            "est_mo": round(est if inst.get("state") == "RUNNABLE" else disk * SQL_RATE["ssd_gb_mo"], 2),
+            "cpu_avg": round(avg(cpu_avg.get(db_id, [])) * 100, 1),
+            "cpu_max": round(max(cpu_max.get(db_id, [0])) * 100, 1),
+            "mem_max": round(max(mem_max.get(db_id, [0])) * 100, 1),
+        })
+    return out
+
+
 # ---------- commands ----------
 
 def cmd_status(m: dict, args) -> int:
@@ -302,7 +358,20 @@ def cmd_audit(m: dict, args) -> int:
         if h < 0.01 and not flags:
             continue
         print(f"{name:<38}{h:>9.1f}{r:>10,}{cfg['eff_min']:>4}{est_mo:>9.2f}  {' '.join(flags)}")
-    print(f"\n{'TOTAL':<38}{'':>9}{'':>10}{'':>4}{total:>9.2f}")
+    print(f"\n{'TOTAL (Cloud Run)':<38}{'':>9}{'':>10}{'':>4}{total:>9.2f}")
+    try:
+        sqls = sql_report(m["project"], days)
+    except Exception as e:
+        print(f"\n(Cloud SQL section unavailable: {e})", file=sys.stderr)
+        sqls = []
+    if sqls:
+        print(f"\nCloud SQL (utilization over same window):")
+        print(f"{'INSTANCE':<26}{'TIER':<20}{'DISK':>6}{'CPU avg':>9}{'CPU max':>9}{'MEM max':>9}{'$EST/MO':>9}")
+        for s in sqls:
+            state = "" if s["running"] else "  (stopped)"
+            print(f"{s['name']:<26}{s['tier']:<20}{s['disk_gb']:>5}G{s['cpu_avg']:>8.1f}%"
+                  f"{s['cpu_max']:>8.1f}%{s['mem_max']:>8.1f}%{s['est_mo']:>9.2f}{state}")
+        print(f"\n{'TOTAL (Run + SQL)':<38}{'':>9}{'':>10}{'':>4}{total + sum(s['est_mo'] for s in sqls):>9.2f}")
     return 0
 
 
@@ -345,11 +414,16 @@ def cmd_report(m: dict, args) -> int:
             "always_cpu": cfg["always_cpu"], "flags": flags,
         })
     services.sort(key=lambda s: (-s["est_mo"], s["name"]))
+    try:
+        sqls = sql_report(m["project"], days)
+    except Exception:
+        sqls = []
     data = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
         "window_days": days,
         "project": m["project"], "region": m["region"],
         "services": services,
+        "sql": sqls,
     }
     template = (Path(__file__).parent / "report_template.html").read_text()
     html = template.replace("/*__DATA__*/", json.dumps(data).replace("</", "<\\/"))
