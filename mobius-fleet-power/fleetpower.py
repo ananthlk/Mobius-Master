@@ -36,6 +36,9 @@ MANIFEST_DEFAULT = Path(__file__).parent / "fleet.yaml"
 RATE = {
     "always": {"cpu": 0.0648, "mem": 0.0072},
     "request": {"cpu": 0.0864, "mem": 0.0090},
+    # Idle min instances under request-based billing (SKUs "Services Min
+    # Instance CPU/Memory (Request-based billing)": $0.0000025/s each).
+    "idle": {"cpu": 0.0090, "mem": 0.0090},
 }
 
 ANN_SVC_MIN = "run.googleapis.com/minScale"
@@ -160,6 +163,18 @@ def hourly_rate(cfg: dict) -> float:
     return cfg["cpu"] * r["cpu"] + cfg["mem"] * r["mem"]
 
 
+def est_month(cfg: dict, hours: float, pinned_h: float, days: float) -> float:
+    """Estimated 30-day cost. Always-allocated services bill flat; throttled
+    services bill their pinned-idle hours at the idle SKU and only the
+    remainder at the active request rate."""
+    if cfg["always_cpu"]:
+        return hours * hourly_rate(cfg) * (30 / days)
+    idle_h = min(pinned_h, hours)
+    active_h = max(hours - idle_h, 0.0)
+    idle_rate = cfg["cpu"] * RATE["idle"]["cpu"] + cfg["mem"] * RATE["idle"]["mem"]
+    return (idle_h * idle_rate + active_h * hourly_rate(cfg)) * (30 / days)
+
+
 # ---------- commands ----------
 
 def cmd_status(m: dict, args) -> int:
@@ -268,8 +283,8 @@ def cmd_audit(m: dict, args) -> int:
     for name, cfg in live.items():
         h = hours.get(name, 0.0) / 3600
         r = int(reqs.get(name, 0))
-        est_mo = h * hourly_rate(cfg) * (30 / days)
         pinned_h = cfg["eff_min"] * 24 * days
+        est_mo = est_month(cfg, h, pinned_h, days)
         flags = []
         if name not in m["services"]:
             flags.append("UNMANAGED")
@@ -281,7 +296,7 @@ def cmd_audit(m: dict, args) -> int:
         rows.append((est_mo, name, h, r, cfg, flags))
     rows.sort(reverse=True)
     total = sum(r[0] for r in rows)
-    print(f"Trailing {days}d, extrapolated to 30d (upper bound for throttled services):\n")
+    print(f"Trailing {days}d, extrapolated to 30d (throttled pinned hours at idle SKU rates):\n")
     print(f"{'SERVICE':<38}{'INST-HRS':>9}{'REQS':>10}{'MIN':>4}{'$EST/MO':>9}  FLAGS")
     for est_mo, name, h, r, cfg, flags in rows:
         if h < 0.01 and not flags:
@@ -307,8 +322,8 @@ def cmd_report(m: dict, args) -> int:
         entry = m["services"].get(name)
         h = hours.get(name, 0.0) / 3600
         r = int(reqs.get(name, 0))
-        est_mo = h * hourly_rate(cfg) * (30 / days)
         pinned_h = cfg["eff_min"] * 24 * days
+        est_mo = est_month(cfg, h, pinned_h, days)
         flags = []
         if h > pinned_h * 1.5 + 1 and r < h * 10:
             flags.append("WASTE?")
