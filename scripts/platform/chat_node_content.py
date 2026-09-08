@@ -402,8 +402,9 @@ WHAT IT LOADS, block by block:
   3  Three un-modelled keys  active_skill, last_failed_query, active_context. In the stored
                            JSON but NOT in ThreadState, restored by a hardcoded name list.
   4  report_run_id         from merged.active, so "ask about this report" can resolve.
-  5  Last turns            get_last_turn_messages — roughly the last 3 turns.
-  6  Last turn sources     get_last_turn_sources — documents cited last turn.
+  5  Last turns            get_last_turn_messages(limit_turns=2) — the last TWO turns.
+  6  Last turn sources     get_last_turn_sources(limit_turns=2) — deduped by document_id,
+                           and it feeds the retriever include_document_ids, not just the prompt.
   7  Prior resolved entities  get_prior_resolved_entities, reaching 8 turns back, and GATED
                            on is_continuation: a fresh turn skips the query entirely because
                            there is nothing prior to resolve (Task #90).
@@ -420,6 +421,42 @@ above into the string prepended to the user message — jurisdiction, payer, pro
 perspective, domain, open questions, and up to 10 source names, with resolved slots capped
 at 6. On STANDALONE it returns the EMPTY STRING and the stage also evicts slots and clears
 tool results, so a standalone turn starts genuinely clean.
+
+TURN 2 OF THE SAME THREAD — how it actually gets its context. Four channels, and only the
+first is what people mean by "the state".
+
+  A  PERSISTED STRUCTURED STATE — chat_state.state_json, one row per thread.
+     Jurisdiction (payer, program, state, perspective), open_slots, resolved_slots,
+     recent_entities, last_user_intent, refined_query, master_objective, safety. Plus the
+     three keys carried outside the model: active_skill, last_failed_query, active_context.
+
+  B  TURN HISTORY — three separate reads, three different depths:
+       get_last_turn_messages(limit_turns=2)  the last TWO turns, from chat_turn_messages
+       get_last_turn_sources(limit_turns=2)   sources from the last two turns of chat_turns,
+                                              deduped by document_id — and this one does more
+                                              than inform the prompt: its own docstring says it
+                                              feeds the retriever's include_document_ids, so
+                                              turn 2 is STEERED toward the documents turn 1
+                                              cited.
+       get_prior_resolved_entities(limit_turns=8)  eight turns back, gaps_closed only, and
+                                              skipped entirely unless is_continuation is set.
+
+  C  THE ROLLING BRIEF — chat_threads.summary_long, a different table from the state, threaded
+     to the integrator so it refines the previous brief rather than rebuilding one.
+
+  D  PER-TURN CALLER INPUT — the profile, re-sent by the frontend on every turn, plus
+     thread_id and any system_context. Never persisted here.
+
+THEN THE MESSAGE ITSELF CAN BE REWRITTEN TWICE before planning:
+  message_resolver resolves "it" / "that" / "try again" against the prior turn;
+  classify, on a slot_fill, discards what the user typed and REBUILDS the whole prior question
+  from the stored refined_query plus jurisdiction — which is why a one-word answer does not
+  lose the question.
+
+AND WHAT REACHES THE MODEL is not the raw blocks: build_context_pack renders a header
+(jurisdiction, payer, program, perspective, domain, open questions), up to 10 source names and
+at most 6 resolved slots, prepended to the message — or the EMPTY STRING when the route is
+STANDALONE, which also evicts slots and clears tool results.
 
 WHAT IT DOES NOT LOAD, which is the part people assume:
   * The USER PROFILE. It never touches state_load. It arrives per-turn in the POST payload,
