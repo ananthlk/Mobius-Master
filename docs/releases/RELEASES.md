@@ -5,6 +5,27 @@ see the lockfile for commit SHAs.
 
 For how versions are assigned, read [RELEASE_PROCESS.md](RELEASE_PROCESS.md).
 
+## Post-v1.1.0 — the feature-branch item is closed (2026-09-07)
+
+Named as a requirement in all three release stories and now done.
+`mobius-rag` (`retriever-answer-engine`, +201) and `mobius-payor`
+(`claude/sources-module-canonical-payor-enumerate`, +238) were fast-forwarded to
+`main` — `main` was a strict ancestor of both, so no merge commit and no
+conflict was possible.
+
+Done as a remote-side push (`git push origin <branch>:main`) rather than a local
+checkout, so neither working tree was touched and no other session sharing these
+checkouts was disrupted. Both branches still exist and both sessions are still on
+them, with their uncommitted files intact.
+
+**This does not stop the pattern.** `main` equals each branch as of the v1.1.0
+tag, but work continues on the branches, so they will diverge again. The
+durable fix is for those sessions to work on `main`, or for the merge to become
+routine rather than a thing a release story has to keep asking for.
+
+The v1.1.0 story still lists this as unresolved. That is left as written — it was
+true when the release was cut.
+
 ---
 
 ## product-v1.1.0 — 2026-09-07
