@@ -23,10 +23,10 @@ PLAIN = {
  "plan": "Turns the message into a plan — what is really being asked, and the sub-questions that would answer it.",
  "clarify": "Catches what we cannot answer yet: a missing state or jurisdiction, or two routes that conflict. Asks instead of guessing.",
  "resolve": "Sends each sub-question to whichever agent can answer it, and walks down a fallback cascade when the first one cannot.",
- "integrate": "Assembles the answer the user actually sees — formats it and builds the response payload. The ReAct path replaces this entirely.",
+ "integrate": "Assembles the answer the user actually sees — formats it and builds the response payload. It runs on BOTH paths: on the ReAct path the core synthesis is done by react_loop, and this module handles the enrichment passes that follow, unless react_loop set ctx.react_bypass_integrate to publish directly.",
  "continuity": "Knows when to stop trying alone: when to ask the user for help, when they have dropped the thread, and when we have hit the attempt ceiling.",
  "react_loop": "The engine of the ReAct path. Reason about what to do, call a tool, look at what came back, go again. Replaces plan, resolve and integrate in one loop.",
- "round0": "A shortcut. When the caller already did the work and handed us verified data, answer straight from it rather than entering the tool loop at all. Also handles a Continue after a mid-turn truncation.",
+ "round0": "A shortcut. When the caller supplied verified ground truth, answer straight from it rather than entering the tool loop. Also handles mid-turn truncation recovery — a \u201cContinue\u201d after the model was cut off.",
  "prompts": "Writes what the reasoning model actually reads each round — the system prompt, and the per-round context telling it where the turn has got to.",
  "tool_manifest": "The menu of tools the planner is shown. If a tool is not described here, the planner cannot choose it. Half the entries now come from the skill registry rather than this file.",
  "capabilities": "What each path can actually answer. Fed to the planner so it only splits a question into pieces something is able to handle.",
@@ -41,7 +41,7 @@ PLAIN = {
  "personalization": "Splices the user's own preferences into the prompt and honours their autonomy setting. A no-op for anyone who has not onboarded.",
  "active_context": "Remembers which tool the conversation is currently inside, so a follow-up lands in the right place instead of starting over.",
  "credentialing_envelope": "Routing helpers for credentialing conversations — works out when a message is really about roster reconciliation.",
- "stages": "The list of stage names. Twelve lines, but it is what every emit event and the whole trace are keyed on.",
+ "stages": "The canonical names for the 7 classical pipeline stages. Every non-ReAct emit event and trace entry uses these strings; the ReAct path uses its own stage keys, which are not in this list.",
 }
 
 def main():
@@ -58,9 +58,12 @@ def main():
                       p["note"] + f"  (react_loop.py:{p['cite']})",
                       (["react_loop"] if p["phase"] == "Round 0" else []) + p["modules"]))
     order.append(("Classic path",
-                  "Taken when use_react is off. run_integrate lives inside this branch only — the "
-                  "ReAct path replaces it.",
+                  "Taken when use_react is off.",
                   [strip(f) for f in flow["classic_path"]]))
+    if flow.get("shared_post"):
+        order.append(("After the branch — both paths",
+                      "Runs whichever path was taken. " + (flow.get("shared_post_guard") or ""),
+                      [strip(f) for f in flow["shared_post"]]))
     placed = {n for _, _, ns in order for n in ns}
     order.append(("Carried everywhere",
                   "Not a step in the loop. Read or written by many stages rather than called at one point.",

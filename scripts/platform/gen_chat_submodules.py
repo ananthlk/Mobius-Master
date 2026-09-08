@@ -67,36 +67,78 @@ def ux_for(sig, meta):
 
 
 def flow():
-    """The loop's shape, parsed from orchestrator.py rather than drawn.
+    """The loop's shape, walked with ast rather than guessed from indentation.
 
-    run_pipeline branches: `if use_react:` takes the ReAct path, `else:` runs
-    the classic stages. Stage order comes from the source order of the
-    run_*() call sites, and the branch from their indentation relative to the
-    if/else. integrate sits INSIDE the else, which is why the ReAct path has
-    no integrate node — react_loop's own docstring says it replaces it.
+    An earlier version read the source line by line and decided which block a
+    call sat in by comparing indent widths. It got run_integrate wrong twice:
+    the call is indented 12, but inside a `try:` that sits AFTER the
+    if/else — not inside the else. The Chat seat caught it. Indentation does
+    not tell you the enclosing block; the parse tree does.
 
-    The inner Reason/Act/Observe grouping is the one part not mechanically
-    derived: it is read off react_loop's own section comments, and each node
-    carries the line that justifies it so a reader can check the claim.
+    So: find run_pipeline, find the `if use_react:` node, and collect the
+    run_*() calls that appear before it, in its body, in its orelse, and in
+    the statements that follow it at the same level. That last bucket is the
+    one the heuristic could not see, and it is where run_integrate lives —
+    it runs on BOTH paths, unless react_loop set ctx.react_bypass_integrate.
     """
-    src = open(os.path.join(REPO, "app/pipeline/orchestrator.py"),
-               encoding="utf-8").read().split("\n")
-    calls, branch = [], {}
-    for i, line in enumerate(src, 1):
-        ind = len(line) - len(line.lstrip())
-        m = re.search(r"\b(run_state_load|run_classify|run_plan|run_clarify|"
-                      r"run_resolve|run_integrate|run_react)\s*\(", line)
-        if m: calls.append({"fn": m.group(1), "line": i, "indent": ind})
-        if re.match(r"\s*if use_react:", line):  branch["if"] = {"line": i, "indent": ind}
-        elif re.match(r"\s*else:", line) and "if" in branch and "else" not in branch \
-             and ind == branch["if"]["indent"]:
-            branch["else"] = {"line": i, "indent": ind}
+    path = os.path.join(REPO, "app/pipeline/orchestrator.py")
+    src = open(path, encoding="utf-8").read()
+    tree = ast.parse(src)
+    STAGE_CALLS = {"run_state_load", "run_classify", "run_plan", "run_clarify",
+                   "run_resolve", "run_integrate", "run_react"}
 
-    def seg(lo, hi):
-        return [c for c in calls if lo < c["line"] < hi]
-    pre  = [c for c in calls if c["line"] < branch["if"]["line"]]
-    react = seg(branch["if"]["line"], branch["else"]["line"])
-    classic = [c for c in calls if c["line"] > branch["else"]["line"]]
+    def calls_in(nodes):
+        out = []
+        for n in nodes:
+            for c in ast.walk(n):
+                if isinstance(c, ast.Call) and isinstance(c.func, ast.Name) \
+                   and c.func.id in STAGE_CALLS:
+                    out.append({"fn": c.func.id, "line": c.lineno})
+        seen, uniq = set(), []
+        for c in sorted(out, key=lambda x: x["line"]):
+            if c["fn"] not in seen:
+                seen.add(c["fn"]); uniq.append(c)
+        return uniq
+
+    fn = next((n for n in ast.walk(tree)
+               if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+               and n.name == "run_pipeline"), None)
+    if fn is None:
+        raise SystemExit("run_pipeline not found — the parse assumption is stale")
+
+    # The branch is NOT at the top level of run_pipeline: it is nested inside a
+    # try. And a different `if use_react_override is not None:` sits above it,
+    # which a substring match on the dumped test happily picks first. So: match
+    # the test exactly (a bare Name `use_react`), search the whole function, and
+    # find the enclosing block by parent map — the siblings after the branch are
+    # what matters, and that list is only knowable from the parent.
+    parent, container = {}, {}
+    for node in ast.walk(fn):
+        for field, val in ast.iter_fields(node):
+            if isinstance(val, list):
+                for child in val:
+                    if isinstance(child, ast.AST):
+                        parent[child] = node
+                        container[child] = val
+
+    branch = next((n for n in ast.walk(fn)
+                   if isinstance(n, ast.If) and isinstance(n.test, ast.Name)
+                   and n.test.id == "use_react"), None)
+    if branch is None:
+        raise SystemExit("`if use_react:` not found — the parse assumption is stale")
+
+    body = container[branch]
+    idx = body.index(branch)
+
+    pre   = calls_in(body[:idx])
+    react = calls_in(branch.body)
+    classic = calls_in(branch.orelse)
+    post  = calls_in(body[idx + 1:])
+
+    # Accessed as getattr(ctx, "react_bypass_integrate", False) — a string
+    # constant, not an Attribute node, so an ast attribute walk finds nothing.
+    guard = [i for i, l in enumerate(src.split("\n"), 1)
+             if "react_bypass_integrate" in l and fn.lineno <= i]
 
     rl = os.path.join(REPO, "app/pipeline/react_loop.py")
     rsrc = open(rl, encoding="utf-8").read().split("\n")
@@ -109,9 +151,14 @@ def flow():
         "entry": "POST /chat",
         "shared_pre": [c["fn"] for c in pre],
         "branch_on": "use_react",
-        "branch_line": branch["if"]["line"],
+        "branch_line": branch.lineno,
         "react_path": [c["fn"] for c in react],
         "classic_path": [c["fn"] for c in classic],
+        "shared_post": [c["fn"] for c in post],
+        "shared_post_guard": ("ctx.react_bypass_integrate — set in react_loop, skips the "
+                              "integrator and publishes the ReAct answer directly"
+                              if guard else None),
+        "shared_post_guard_lines": guard,
         "exit": "publish",
         "react_phases": [
             {"phase": "Round 0", "modules": ["round0"],
@@ -127,9 +174,12 @@ def flow():
              "cite": cite(r"Critic gate"),
              "note": "Audits the draft against sources and decides whether to go round again."},
         ],
-        "note": ("Parsed from orchestrator.py. integrate is inside the else branch, so the "
-                 "ReAct path does not run it — react_loop replaces it, as its docstring says."),
+        "note": ("Walked with ast. run_integrate is NOT classic-only: it sits after the "
+                 "if/else and runs on both paths unless react_loop set "
+                 "ctx.react_bypass_integrate. Corrected 2026-09-08 after the Chat seat "
+                 "caught the earlier indentation-based reading."),
     }
+
 
 def main():
     global MAKERS
@@ -174,7 +224,7 @@ def main():
                 "module": name,
                 "group": d.replace("app/", ""),
                 "path": os.path.relpath(fp, REPO),
-                "loc": src.count("\n") + 1,
+                "loc": len(src.splitlines()),
                 "role": doc.split("\n")[0].strip() or "(no docstring)",
                 "role_full": doc[:600],
                 "stage": next((s for s in stages if f[:-3] == s), None),

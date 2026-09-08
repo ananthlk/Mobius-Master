@@ -194,11 +194,16 @@
     p2.className="badge "+(signed===rows.length?"b-ok":"b-wait");
     p2.textContent = signed===rows.length ? "signed · all "+rows.length : "awaiting review · "+signed+"/"+rows.length;
     document.getElementById("gapnote").innerHTML =
-      '<b>The question both seats need to answer.</b> '+med+' of '+rows.length+
-      ' emit no telemetry of their own — <code>react_loop</code> and <code>orchestrator</code> emit on their '+
-      'behalf. Every critic signal is emitted by <code>react_loop.py</code>, not <code>critic.py</code>. '+
-      'So &ldquo;how often did round0 short-circuit?&rdquo; cannot be answered from the trace. Gap worth '+
-      'closing, or correct by design? Telemetry sink: <code>'+esc(META.telemetry_sink)+'</code>.';
+      '<b>The telemetry question, as corrected by the Chat seat.</b> '+med+' of '+rows.length+
+      ' emit no EmitEnvelope of their own — <code>react_loop</code> and <code>orchestrator</code> emit '+
+      'on their behalf, and for the critic that is <i>correct by design</i>: react_loop owns the loop '+
+      'state and decides when to invoke critic, so critic.py should not know it is being observed. '+
+      'My original claim that round0\u2019s short-circuit cannot be seen at all was wrong \u2014 '+
+      '<code>react_loop.py:4223</code> marks it. But it is a latency-gated <b>application log line</b> '+
+      '(<code>_react_pf</code> logs only when the step took \u2265 50&nbsp;ms), not an envelope in '+
+      '<code>'+esc(META.telemetry_sink)+'</code>, so it still cannot give a true rate. The two worth '+
+      'making independently observable are <code>round0</code> and <code>tool_manifest</code>; the '+
+      'other 19 are fine as they are.';
 
     document.getElementById("sections").innerHTML = DATA.map(function(g){
       var rs = g.rows.filter(function(r){ return !onlyOpen || !STATE.chat[r.id]; });
