@@ -1,0 +1,271 @@
+<title>Chat Pipeline Sign-Off</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --violet:#7c3aed; --violet-soft:rgba(124,58,237,.085);
+    --bg:#f7f6fb; --card:#fff; --card-2:#f2f0f8;
+    --ink:#181626; --ink-2:#3f3b51; --muted:#6d6a80;
+    --line:#e5e1ef; --line-2:#d1cbe3;
+    --ok:#15803d; --ok-bg:rgba(21,128,61,.10);
+    --wait:#b45309; --wait-bg:rgba(180,83,9,.11);
+    --gap:#9a3412; --gap-bg:rgba(154,64,18,.09);
+    --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+    --body:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    --display:"Newsreader",Georgia,serif;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --violet:#a78bfa; --violet-soft:rgba(167,139,250,.12);
+    --bg:#131120; --card:#1b1830; --card-2:#231e3a;
+    --ink:#edebf7; --ink-2:#c6c1db; --muted:#9b97b3;
+    --line:#312c4b; --line-2:#443d61;
+    --ok:#4ade80; --ok-bg:rgba(74,222,128,.13);
+    --wait:#fbbf24; --wait-bg:rgba(251,191,36,.13);
+    --gap:#fdba74; --gap-bg:rgba(253,186,116,.12);
+  }}
+  :root[data-theme="dark"]{
+    --violet:#a78bfa; --violet-soft:rgba(167,139,250,.12);
+    --bg:#131120; --card:#1b1830; --card-2:#231e3a;
+    --ink:#edebf7; --ink-2:#c6c1db; --muted:#9b97b3;
+    --line:#312c4b; --line-2:#443d61;
+    --ok:#4ade80; --ok-bg:rgba(74,222,128,.13);
+    --wait:#fbbf24; --wait-bg:rgba(251,191,36,.13);
+    --gap:#fdba74; --gap-bg:rgba(253,186,116,.12);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);
+       font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:38px 22px 90px}
+  h1{font-family:var(--display);font-weight:600;font-size:32px;letter-spacing:-.015em;margin:0 0 5px;text-wrap:balance}
+  .sub{color:var(--muted);font-size:14px;margin:0;max-width:68ch}
+  code{font-family:var(--mono);font-size:.88em;background:var(--card-2);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+
+  .parties{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:10px;margin:20px 0 14px}
+  .party{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .party b{display:block;font-size:13px;margin-bottom:2px}
+  .party .who{font-size:11.5px;color:var(--muted);line-height:1.45;display:block}
+  .badge{display:inline-block;font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:99px;margin-top:8px}
+  .b-ok{background:var(--ok-bg);color:var(--ok)} .b-wait{background:var(--wait-bg);color:var(--wait)}
+
+  .note{font-size:13.5px;color:var(--ink-2);background:var(--violet-soft);
+        border-left:2px solid var(--violet);padding:11px 14px;border-radius:0 7px 7px 0;margin:16px 0}
+  .bar{display:flex;flex-wrap:wrap;gap:8px 22px;margin:16px 0 6px;font-size:13px;color:var(--muted);
+       align-items:baseline}
+  .bar b{font-family:var(--mono);font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums}
+  .ctrls{margin:10px 0 22px;display:flex;gap:8px;flex-wrap:wrap}
+  .btn{font-family:var(--body);font-size:12px;padding:5px 11px;border-radius:6px;cursor:pointer;
+       border:1px solid var(--line-2);background:var(--card);color:var(--ink-2)}
+  .btn:hover{border-color:var(--violet);color:var(--violet)}
+  .btn:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+
+  h2{font-family:var(--display);font-weight:600;font-size:19px;margin:30px 0 2px}
+  .sec-sub{color:var(--muted);font-size:12.5px;margin:0 0 12px;max-width:76ch}
+
+  .row{background:var(--card);border:1px solid var(--line);border-radius:10px;
+       margin-bottom:8px;border-left:3px solid var(--line-2);overflow:hidden}
+  .row.signed{border-left-color:var(--ok)}
+  .row.med{border-left-color:var(--gap)}
+  .rhead{padding:12px 15px;cursor:pointer;display:flex;flex-wrap:wrap;align-items:baseline;gap:8px}
+  .rhead:hover{background:var(--card-2)}
+  .caret{color:var(--muted);font-size:10px;width:10px;flex:none}
+  .nm{font-family:var(--mono);font-size:13.5px;font-weight:500}
+  .tag{font-family:var(--mono);font-size:9.5px;padding:2px 7px;border-radius:99px;white-space:nowrap}
+  .t-emit{background:var(--ok-bg);color:var(--ok)} .t-med{background:var(--gap-bg);color:var(--gap)}
+  .t-note{background:var(--card-2);color:var(--muted)}
+  .plain{flex:1 1 100%;margin:5px 0 0 18px;font-size:13.5px;color:var(--ink-2);max-width:82ch}
+  .rbody{padding:0 15px 13px 33px;border-top:1px solid var(--line)}
+  .fld{margin-top:11px}
+  .fld b{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.07em;
+         color:var(--violet);margin-bottom:3px}
+  .fld div,.fld pre{font-size:12px;color:var(--ink-2);line-height:1.55;margin:0;overflow-wrap:anywhere}
+  .fld pre{font-family:var(--body);white-space:pre-wrap;max-height:230px;overflow-y:auto}
+  .fld .mono{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .empty{color:var(--gap)}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:11px 20px}
+
+  .sign{margin-top:13px;padding-top:11px;border-top:1px solid var(--line);
+        display:flex;flex-wrap:wrap;align-items:center;gap:9px 16px}
+  .sg{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+  .tick{appearance:none;width:16px;height:16px;border-radius:4px;flex:none;
+        border:1.5px solid var(--line-2);background:var(--card);cursor:pointer;display:grid;place-content:center}
+  .tick:checked{background:var(--ok);border-color:var(--ok)}
+  .tick:checked::after{content:"";width:8px;height:4px;border:2px solid var(--card);
+        border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+  .tick:disabled{opacity:.5;cursor:default}
+  .tick:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+  .cmt{flex:1 1 240px;min-width:190px;font-family:var(--body);font-size:12px;padding:5px 9px;
+       border:1px solid var(--line);border-radius:6px;background:var(--card-2);color:var(--ink)}
+  .cmt:focus{outline:1.5px solid var(--violet)}
+  footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);
+         font-size:12.5px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  #saving{font-family:var(--mono);font-size:11px;color:var(--violet)}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <h1>Chat Pipeline — Joint Sign-Off</h1>
+  <p class="sub">Every sub-module of <code>mobius-chat</code>'s pipeline, in the order a turn runs
+     through them. Each carries a plain-English description, what the code says about itself, who
+     uses it, what it emits, and where that shows. Two seats sign off; the template then repeats
+     across the other layers.</p>
+
+  <div class="parties">
+    <div class="party"><b>Payor Policy seat</b>
+      <span class="who">Drafted the plain-English descriptions and measured the usage, telemetry and
+        UX state from the source.</span>
+      <span class="badge b-ok">signed · 2026-09-08</span></div>
+    <div class="party"><b>Chat seat</b>
+      <span class="who">Owns mobius-chat. Corrects anything the docstring got wrong or left out, then
+        countersigns per row.</span>
+      <span class="badge b-wait" id="p2">awaiting review</span></div>
+    <div class="party"><b>Ananth</b>
+      <span class="who">Chime in on any row — the comment box is shared.</span>
+      <span class="badge b-wait">open</span></div>
+  </div>
+
+  <p class="note" id="gapnote"></p>
+  <div class="bar" id="bar"></div>
+  <div class="ctrls">
+    <button class="btn" id="expand">Expand all</button>
+    <button class="btn" id="collapse">Collapse all</button>
+    <button class="btn" id="onlyopen">Show only unsigned</button>
+  </div>
+  <div id="sections"></div>
+
+  <footer><span>Ticks and comments are saved to this page for everyone who opens it.</span>
+    <span id="saving"></span></footer>
+</div>
+
+<script id="state" type="application/json">
+{"chat":{},"notes":{}}
+</script>
+<script>
+(function(){
+  var DATA = /*__DATA__*/null;
+  var META = /*__META__*/null;
+  var STATE = JSON.parse(document.getElementById("state").textContent);
+  STATE.chat = STATE.chat||{}; STATE.notes = STATE.notes||{};
+  var open = {}, onlyOpen = false, canWrite = true, timer=null, ns=null;
+
+  function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+  function all(){ return DATA.reduce(function(a,g){return a.concat(g.rows);},[]); }
+
+  function fld(label, inner){ return '<div class="fld"><b>'+esc(label)+'</b>'+inner+'</div>'; }
+
+  function rowHtml(r){
+    var ok = !!STATE.chat[r.id], isOpen = !!open[r.id], emit = r.obs === "self-emitting";
+    var body = isOpen ? '<div class="rbody">'+
+      fld("What the code says about itself", '<pre>'+esc(r.doc||"(no docstring)")+'</pre>')+
+      '<div class="grid2">'+
+        fld("Where it lives", '<div class="mono">'+esc(r.path)+'<br>'+r.loc+' lines</div>')+
+        fld("Used by ("+r.fan_in+")", '<div class="mono">'+(r.callers.length?esc(r.callers.join("\n")).replace(/\n/g,"<br>"):'<span class="empty">nothing imports it</span>')+'</div>')+
+        fld("Public API", '<div class="mono">'+(r.api.length?esc(r.api.join(", ")):'<span class="empty">none exported</span>')+'</div>')+
+        fld("Signals it emits", '<div class="mono">'+(r.signals.length?esc(r.signals.join(", ")):'<span class="empty">emits nothing</span>')+'</div>')+
+        fld("Where that shows (UX)", '<div>'+(r.surfaces.length?esc(r.surfaces.join(" · ")):'<span class="empty">no surface of its own</span>')+'</div>')+
+        fld("Observability", '<div'+(emit?'':' class="empty"')+'>'+esc(r.obs_note||"")+'</div>')+
+      '</div>'+
+      '<div class="sign">'+
+        '<label class="sg"><input class="tick" type="checkbox" checked disabled aria-label="Payor Policy signed"> Payor Policy</label>'+
+        '<label class="sg"><input class="tick tk" type="checkbox" data-id="'+esc(r.id)+'"'+(ok?" checked":"")+
+          ' aria-label="Chat seat sign-off for '+esc(r.id)+'"> Chat seat</label>'+
+        '<input class="cmt nt" data-id="'+esc(r.id)+'" placeholder="Correction or comment…" value="'+esc(STATE.notes[r.id]||"")+'">'+
+      '</div></div>' : '';
+    return '<div class="row '+(ok?"signed":(emit?"":"med"))+'">'+
+      '<div class="rhead" data-tog="'+esc(r.id)+'" tabindex="0" role="button" aria-expanded="'+isOpen+'">'+
+        '<span class="caret">'+(isOpen?"▾":"▸")+'</span>'+
+        '<span class="nm">'+esc(r.id)+'</span>'+
+        '<span class="tag '+(emit?"t-emit":"t-med")+'">'+(emit?"self-emitting":"mediated")+'</span>'+
+        '<span class="tag t-note">'+r.loc+' loc · used by '+r.fan_in+'</span>'+
+        (ok?'<span class="tag t-emit">chat signed</span>':'')+
+        '<span class="plain">'+esc(r.plain||"(no plain-English description yet)")+'</span>'+
+      '</div>'+body+'</div>';
+  }
+
+  function render(){
+    var rows = all(), signed = rows.filter(function(r){return STATE.chat[r.id];}).length;
+    var med = rows.filter(function(r){return r.obs!=="self-emitting";}).length;
+    document.getElementById("bar").innerHTML =
+      '<span><b>'+rows.length+'</b> sub-modules</span>'+
+      '<span><b>'+(rows.length-med)+'</b> self-emitting</span>'+
+      '<span><b>'+med+'</b> mediated</span>'+
+      '<span><b>'+signed+'</b> countersigned by chat</span>'+
+      '<span><b>'+Object.keys(STATE.notes).length+'</b> comments</span>';
+    var p2=document.getElementById("p2");
+    p2.className="badge "+(signed===rows.length?"b-ok":"b-wait");
+    p2.textContent = signed===rows.length ? "signed · all "+rows.length : "awaiting review · "+signed+"/"+rows.length;
+    document.getElementById("gapnote").innerHTML =
+      '<b>The question both seats need to answer.</b> '+med+' of '+rows.length+
+      ' emit no telemetry of their own — <code>react_loop</code> and <code>orchestrator</code> emit on their '+
+      'behalf. Every critic signal is emitted by <code>react_loop.py</code>, not <code>critic.py</code>. '+
+      'So &ldquo;how often did round0 short-circuit?&rdquo; cannot be answered from the trace. Gap worth '+
+      'closing, or correct by design? Telemetry sink: <code>'+esc(META.telemetry_sink)+'</code>.';
+
+    document.getElementById("sections").innerHTML = DATA.map(function(g){
+      var rs = g.rows.filter(function(r){ return !onlyOpen || !STATE.chat[r.id]; });
+      if(!rs.length) return "";
+      return '<h2>'+esc(g.title)+'</h2><p class="sec-sub">'+esc(g.note)+'</p>'+rs.map(rowHtml).join("");
+    }).join("");
+    wire();
+  }
+
+  function wire(){
+    document.querySelectorAll("[data-tog]").forEach(function(h){
+      var t=function(){ var id=h.dataset.tog; open[id]=!open[id]; render(); };
+      h.addEventListener("click",t);
+      h.addEventListener("keydown",function(e){ if(e.key==="Enter"||e.key===" "){e.preventDefault();t();} });
+    });
+    document.querySelectorAll(".tk").forEach(function(t){
+      t.addEventListener("change",function(){
+        if(t.checked) STATE.chat[t.dataset.id]=true; else delete STATE.chat[t.dataset.id];
+        render(); queue();
+      });
+    });
+    document.querySelectorAll(".nt").forEach(function(n){
+      n.addEventListener("input",function(){
+        if(n.value.trim()) STATE.notes[n.dataset.id]=n.value; else delete STATE.notes[n.dataset.id];
+        queue();
+      });
+      n.addEventListener("click",function(e){e.stopPropagation();});
+    });
+  }
+
+  document.getElementById("expand").onclick=function(){ all().forEach(function(r){open[r.id]=true;}); render(); };
+  document.getElementById("collapse").onclick=function(){ open={}; render(); };
+  document.getElementById("onlyopen").onclick=function(e){
+    onlyOpen=!onlyOpen; e.target.textContent = onlyOpen?"Show all":"Show only unsigned"; render(); };
+
+  var SOURCE=null;
+  fetch(location.href).then(function(r){return r.text();})
+    .then(function(t){ if(t.slice(0,200).toLowerCase().indexOf("<!doctype")>-1) SOURCE=t; })
+    .catch(function(){});
+  function docSource(){
+    if(!SOURCE) return null;
+    return SOURCE.replace(/<script id="state" type="application\/json">[\s\S]*?<\/script>/,
+      '<script id="state" type="application/json">\n'+JSON.stringify(STATE)+'\n<\/script>');
+  }
+  function queue(){ clearTimeout(timer); timer=setTimeout(save,900); }
+  function save(){
+    if(!canWrite||!ns) return;
+    var src=docSource(), el=document.getElementById("saving");
+    if(!src){ el.textContent="saving unavailable"; return; }
+    el.textContent="saving…";
+    ns.publish(src).then(function(){el.textContent="";}).catch(function(e){
+      var c=e&&e.code;
+      if(c==="conflict"){ el.textContent=""; return; }
+      if(c==="not_writer"||c==="not_granted"||c==="not_declared"||c==="capability_disabled"){
+        canWrite=false; el.textContent="read-only view";
+        document.querySelectorAll(".tk,.nt").forEach(function(x){x.disabled=true;}); return; }
+      el.textContent="not saved";
+    });
+  }
+
+  render();
+  if(window.claude&&claude.use){
+    claude.use("artifact").then(function(n){
+      ns=n; if(!n){ canWrite=false;
+        document.querySelectorAll(".tk,.nt").forEach(function(x){x.disabled=true;});
+        document.getElementById("saving").textContent="read-only view"; }
+    }).catch(function(){canWrite=false;});
+  }
+})();
+</script>
