@@ -145,6 +145,15 @@ def main():
     sig_alias = {"POST /chat": "chat_api", "PHI gate": "phi_gate", "queue": "queue",
                  "worker": "worker", "run_pipeline": "orchestrator"}
 
+    # What the DEPLOYED service actually sets. Without this the page describes
+    # code defaults and calls them behaviour — which is how both the Chat seat
+    # and I said "the governor is off by default, so it never fires", when
+    # deploy/dev.env sets MOBIUS_PRODUCT_PROMISE_ENABLED=true and the running
+    # service has it on. A readiness review that reads defaults is fiction.
+    live_path = ("/private/tmp/claude-502/-Users-ananth-Mobius/"
+                 "7bd378b9-3a8f-4998-a9b3-06f2d630c20f/scratchpad/live_env.json")
+    live = json.load(open(live_path))["env"] if os.path.exists(live_path) else {}
+
     def attach(key, obj):
         c = content.get(key)
         if c:
@@ -153,6 +162,8 @@ def main():
             obj["depth"] = c["depth"]
             obj["findings"] = c["findings"]
         obj["signals"] = sigs.get(sig_alias.get(key, key), {})
+        obj["live_config"] = [{"name": v, "live": live.get(v, "(not set — code default)")}
+                              for v in (obj.get("config") or [])]
 
     # No module of its own — it is an if-block inline in react_loop. Synthesise
     # a record so it can be a node, and be explicit that its "file" is its host.
@@ -191,6 +202,7 @@ def main():
     print(json.dumps({
         "generated_by": "scripts/platform/gen_chat_dev.py",
         "missing_content": missing,
+        "live_env_service": "mobius-chat (us-central1)",
         "integrate_passes": integrate_passes,
         "integrate_modes": integrate_modes,
         "flow": cat["flow"],

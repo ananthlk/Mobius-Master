@@ -195,8 +195,12 @@ function detail(k){
   } else {
     fields = howf + uxf + ready + F('What the code says about itself', esc(m.role_full||m.role)) +
       F('Where it lives','<span class="m">'+esc(m.path)+' · '+m.loc+' lines</span>') +
-      F('Configuration — env vars it reads', (m.config&&m.config.length)
-          ? '<span class="m">'+esc(m.config.join('\\n')).replace(/\\n/g,'<br>')+'</span>'
+      F('Configuration — code default vs LIVE', (m.live_config&&m.live_config.length)
+          ? '<span class="m">'+m.live_config.map(function(c){
+              var set = c.live.indexOf('(not set')!==0;
+              return esc(c.name)+' = '+(set?'<b style="color:var(--cyan)">'+esc(c.live)+'</b>'
+                                            :'<span style="color:var(--dim)">'+esc(c.live)+'</span>');
+            }).join('<br>')+'</span>'
           : '<span class="none">nothing configurable</span>') +
       F('Where to see the output', (m.telemetry&&m.telemetry.length)
           ? esc(m.telemetry.map(function(t){return t.signal;}).join(', '))+

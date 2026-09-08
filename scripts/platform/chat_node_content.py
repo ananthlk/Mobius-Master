@@ -313,14 +313,16 @@ Not one step — THREE LLM calls plus a mode switch, which is why it is 1,887 li
   Call B  the critic pass.
   Call C  the enricher — produces display_summary, the fuller prose behind the card.
 
-Two execution modes, chosen per turn. MOBIUS_INTEGRATOR_MODE forces parallel or
-sequential; if unset, MOBIUS_INTEGRATOR_PARALLEL_PCT samples a percentage of turns.
-Default is sequential at 0% parallel — a deliberately conservative rollout.
+Two execution modes. MOBIUS_INTEGRATOR_MODE forces parallel or sequential; if unset,
+MOBIUS_INTEGRATOR_PARALLEL_PCT samples. The CODE default is sequential at 0% parallel — but
+the deployed service sets MOBIUS_INTEGRATOR_MODE=parallel, so the conservative default is
+not what runs.
 
 On top of that sits dynamic enrichment (Task #76, a Chat Master ruling):
 MOBIUS_DYNAMIC_ENRICHMENT_PCT samples per turn, and when react_loop's sufficiency check
 says the answer is already good enough, Call A is SKIPPED and B/C are launched in the
-background. Parallel path only; the sequential path is untouched by it.
+background. Parallel path only. The deployed service sets it to 100 — so on every turn
+judged sufficient, the first answer call does not happen at all.
 
 It runs on BOTH pipeline paths. On the ReAct path react_loop does the core synthesis and
 this handles what follows — unless ctx.react_bypass_integrate was set, in which case the
@@ -332,8 +334,9 @@ ReAct answer is published directly and none of this runs.
          "seam for splitting them exists and has not been taken."),
  ("bad", "29 exception handlers, 20 log-and-continue, and the only test named for it covers "
          "the fallback path. This decides what the user sees."),
- ("good", "Both rollouts are percentage-sampled and default to off, so a bad change is "
-          "bounded to a slice of traffic rather than everyone."),
+ ("bad", "Both rollouts are percentage-sampled and default to off, which reads as safe — "
+         "but the deployment sets mode=parallel and DYNAMIC_ENRICHMENT_PCT=100. The sampling "
+         "safety exists in the code and is not in use; every turn takes the newest path."),
  ("good", "One swallow is explicitly reasoned — 'audit must never break the turn'."),
 ]),
 
@@ -406,9 +409,10 @@ Two jobs, and the second one is easy to miss.
  ("bad", "1,365 lines and NO test file — including the parameter functions above, which set "
          "every turn's round and corpus-call budget. A wrong constant here silently changes "
          "cost and answer quality for every user and nothing fails."),
- ("watch", "Two prompt sources, code and composition, switched by MOBIUS_PROMPT_SOURCE. "
-           "Whichever one is not in use drifts silently, and the trace does not record which "
-           "source built the prompt for a given turn."),
+ ("bad", "MOBIUS_PROMPT_SOURCE=composition on the deployed service, so the LIVE prompts are "
+         "the versioned DB blocks and the 1,365 lines of code prompts are the dormant half. "
+         "The untested module is real, but the text it holds is not what production reads — "
+         "and the trace does not record which source built a given turn's prompt."),
 ]),
 
 "tool_manifest": dict(rating="green", depth="code", how="""
@@ -469,9 +473,10 @@ deadline, the 25 seconds reserving room to synthesise the final answer.
          "inside an if-block in a 6,113-line file. It is invisible to search, cannot be "
          "unit-tested in isolation, and is the reason this node was missing from the schema "
          "until the Chat seat pointed at a line number."),
- ("bad", "The governor is OFF by default, so this never fires in production today. The "
-         "static per-mode constants in prompts.py are the live policy. Real, working, "
-         "quality-driven adaptation that nothing currently runs."),
+ ("watch", "I first wrote that this never fires because the governor is off by default. "
+           "Wrong: the deployed service sets MOBIUS_PRODUCT_PROMISE_ENABLED=true, so this "
+           "gate IS live for agentic turns. It is the depth half of the per-turn adaptation "
+           "pair whose breadth half is retrieval_budget."),
  ("watch", "The contract table defines max_extension_rounds=1 for copilot, but the gate "
            "requires mode_label == 'agentic'. Copilot's extension budget is therefore "
            "defined and unreachable — either the gate or the table is wrong."),
@@ -509,15 +514,34 @@ only look at structure, and the post-run adjudicator runs after delivery.
                          "seat's position, which I accept, is that this is correct by design — "
                          "react_loop owns the loop state and critic.py should not know it is "
                          "being observed.")]),
-"governor": dict(rating="amber", depth="surface", how="""
-The round policy: how many rounds this turn gets and what it is told to do next, driven by
-a Product Promise contract instead of the round rules that used to be scattered through
-react_loop. Built to a spec owned by another seat.
-""", findings=[("watch", "Gated entirely behind MOBIUS_PRODUCT_PROMISE_ENABLED, default OFF. "
-                         "It is 380 lines of unexercised policy — the risk is not that it "
-                         "breaks, it is that it silently rots until someone turns it on."),
-               ("good", "Has a test file, and replacing scattered rules with one contract is "
-                        "the right direction.")]),
+"governor": dict(rating="amber", depth="code", how="""
+The round policy, contract-driven: how many rounds this turn gets, what directive the model
+is given next, and — since Chat Architecture's 2026-07-30 ruling — which prompt composition
+is selected, replacing react_agent_role() as the live selector.
+
+IT IS ON. The code default is OFF, but deploy/dev.env sets
+MOBIUS_PRODUCT_PROMISE_ENABLED=true and the deployed service has it true. I previously wrote
+that it never fires; that was reading the default and calling it behaviour.
+
+That makes it the live complement to retrieval_budget. retrieval_budget adapts how much
+CONTEXT a turn gets; the governor and its completion-extension gate adapt how many ROUNDS a
+turn gets. Breadth and depth, both per-turn, both adaptive — and both running.
+
+One consequence worth knowing: with the flag on, the Product Promise groundedness floor runs
+the critic INDEPENDENTLY of critic_enabled(). The deployed service sets MOBIUS_REACT_CRITIC=0,
+which turns off the optional path only. The mandatory floor still runs.
+""", findings=[
+ ("good", "It is the depth half of a per-turn adaptation pair whose breadth half "
+          "(retrieval_budget) is already live and unconditional. The pairing is coherent."),
+ ("bad", "It was shipped behind a default-off flag that the deployment turns on, which means "
+         "the code reads as dormant and the system is not. Two of us — the Chat seat and I — "
+         "independently said 'off by default, never fires' from reading the default."),
+ ("watch", "Enabling it changes control flow AND prompt-composition selection at once. Those "
+           "are two rollouts wearing one flag; a regression cannot be attributed to one."),
+ ("good", "Has a test file, and replacing scattered round rules with one contract is the "
+          "right direction."),
+]),
+
 "feedback_signal": dict(rating="green", depth="surface", how="""
 Decides whether this is the turn where the user gets asked for feedback, based on their own
 cadence rather than a fixed interval. The decision is made here; the planner only chooses
