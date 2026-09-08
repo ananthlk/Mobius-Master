@@ -806,7 +806,19 @@ rather than patch merging.
                        "stage depends on its shape, so any change is a wide blast radius."),
                ("good", "Zero exception handlers and explicit transitions: it is a data "
                         "structure, not a service, which is the right choice."),
-               ("watch", "No test file of its own.")]),
+               ("watch", "No test file of its own."),
+               ("good", "SCOPE LENS (DB seat): N/A, with reasoning rather than a null grep. "
+                        "context.py imports only dataclasses, typing and Plan — no storage "
+                        "import of any kind — and PipelineContext is never serialised "
+                        "wholesale anywhere in app/: no to_dict, no asdict(ctx), no "
+                        "json.dumps(ctx). A pure in-memory dataclass. Its fields reach storage "
+                        "only because other stages read them and write them, so the "
+                        "persistence decisions belong to those nodes, not this one."),
+               ("watch", "FORWARD NOTE from the DB seat: because ctx fields reach storage only "
+                         "via other stages, this object is the most likely route for "
+                         "state_load's unmodelled-key failure to recur — a field that exists "
+                         "in flight and gets persisted somewhere without being modelled. The "
+                         "node to watch is whichever one writes chat_turns.")]),
 "message_resolver": dict(rating="green", depth="surface", how="""
 Works out what the user means by 'it'. Two problems solved together: resolving pronouns
 against the previous turn ('search the web for it' after a failed query), and noticing when
