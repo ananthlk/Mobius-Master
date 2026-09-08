@@ -71,3 +71,9 @@
 [submodule "product-awareness"]
 	path = product-awareness
 	url = https://github.com/ananthlk/product-awareness.git
+[submodule "mobius-feedback"]
+	path = mobius-feedback
+	url = https://github.com/ananthlk/mobius-feedback.git
+[submodule "specs-platform"]
+	path = specs-platform
+	url = https://github.com/ananthlk/specs-platform.git

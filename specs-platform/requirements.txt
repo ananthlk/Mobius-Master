@@ -1,3 +1,0 @@
-# Specs Catalog Server
-# Python 3.11+ required
-# No external dependencies - uses only stdlib
