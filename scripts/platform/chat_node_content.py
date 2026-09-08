@@ -387,74 +387,99 @@ request.
 # ── The 25 pipeline sub-modules ─────────────────────────────────────────────
 SUB = {
 "state_load": dict(rating="red", depth="code", how="""
-Runs on every turn, before the path is even chosen. Reads the thread's stored state, works
-out what this message changes, applies the delta, writes it back, and builds the context pack
-the rest of the pipeline reads. get_state -> ThreadState -> extract_state_delta -> apply_delta
--> save_state_full.
+Runs on every turn, before the path is chosen. It is not one load — it assembles NINE BLOCKS
+from four different sources, and a route decides how many of them reach the model.
 
-It does NOT check PHI — that happened at the API boundary, before the queue.
+WHAT IT LOADS, block by block:
 
-I rated this GREEN on the strength of it being small, pure and explicit. The scope lens found
-a data-loss path in it. The rating was wrong and the reason I got it wrong is the same one
-Technical Review named on the queue node: I graded the construction, not the guarantee.
+  1  Thread state          chat_state.state_json -> ThreadState. The persisted conversation.
+  2  Run defaults          DEFAULT_STATE, a code constant, used when there is no row. Its
+                           shape: active{payer, program, domain, jurisdiction, user_role,
+                           jurisdiction_obj} all None; open_slots []; resolved_slots {};
+                           recent_entities []; last_user_intent, last_updated_turn_id,
+                           refined_query, master_objective all None; and
+                           safety{patient_allowed: FALSE} — the safety default is deny.
+  3  Three un-modelled keys  active_skill, last_failed_query, active_context. In the stored
+                           JSON but NOT in ThreadState, restored by a hardcoded name list.
+  4  report_run_id         from merged.active, so "ask about this report" can resolve.
+  5  Last turns            get_last_turn_messages — roughly the last 3 turns.
+  6  Last turn sources     get_last_turn_sources — documents cited last turn.
+  7  Prior resolved entities  get_prior_resolved_entities, reaching 8 turns back, and GATED
+                           on is_continuation: a fresh turn skips the query entirely because
+                           there is nothing prior to resolve (Task #90).
+  8  Rolling summary       chat_threads.summary_long, the canonical per-thread brief updated
+                           in place each turn, with a fallback to the latest per-turn
+                           context_summary for threads predating migration 036. Threaded to
+                           the integrator so it REFINES rather than rebuilds.
+  9  Ephemeral jurisdiction  _reset_reason, _jurisdiction_new, _prior_payer computed onto
+                           active for emit_jurisdiction_context. Explicitly marked as NOT to
+                           be persisted.
+
+Then route_context returns STANDALONE, LIGHT or STATEFUL, and build_context_pack turns the
+above into the string prepended to the user message — jurisdiction, payer, program,
+perspective, domain, open questions, and up to 10 source names, with resolved slots capped
+at 6. On STANDALONE it returns the EMPTY STRING and the stage also evicts slots and clears
+tool results, so a standalone turn starts genuinely clean.
+
+WHAT IT DOES NOT LOAD, which is the part people assume:
+  * The USER PROFILE. It never touches state_load. It arrives per-turn in the POST payload,
+    rides worker/run.py:111 to run_pipeline(user_profile=...) at orchestrator:487, and is
+    spliced into five prompts by the personalization module. It is caller input, not
+    conversation state, and is never persisted here.
+  * The SYSTEM PROMPT. Not state either — assembled at the LLM call from prompts.py or, live,
+    from versioned blocks in Postgres via MOBIUS_PROMPT_SOURCE=composition.
+  * PHI. Checked at the API boundary, before the queue.
 """, findings=[
- ("bad", "A TRANSIENT READ FAILURE DESTROYS ACCUMULATED THREAD STATE. Verified: get_state "
-         "returns None for a DB error and None for no-row — identical, and its docstring says "
-         "only 'or None if no row', never mentioning the error case. state_load then does "
-         "`raw = get_state(...) or {}`, builds ThreadState from defaults, and if the message "
-         "carries a delta calls save_state_full, whose UPSERT does a FULL REPLACE ('Replace "
-         "state entirely (no merge)'). So one failed read plus any delta-bearing message "
-         "overwrites the whole conversation's accumulated state with defaults plus that turn. "
-         "Not skipped — destroyed. Correct behaviour given a true empty read; catastrophic "
-         "given a failed one."),
- ("bad", "THE FIX IS LOCAL, NOT A REDESIGN — and this reframing is the DB seat's. The "
-         "same file already uses the right pattern thirty lines further down: _write_state_row "
-         "warns and returns on connection_error but RAISES RuntimeError on anything else. So "
-         "the write path is loud and the read path is silent, in one module, and the silent "
-         "one is the one that loses data. get_state is not missing a convention — it is the "
-         "one function not following its own file's. Verified both sites."),
- ("bad", "CROSS-NODE, and invisible to any code read: mobius_chat has NO query guards. "
+ ("bad", "A TRANSIENT READ FAILURE DESTROYS ACCUMULATED THREAD STATE. get_state returns None "
+         "for a DB error and None for no-row — identical, and its docstring says only 'or None "
+         "if no row', never mentioning the error case. state_load does `raw = get_state(...) "
+         "or {}`, builds ThreadState from DEFAULT_STATE, and if the message carries a delta "
+         "calls save_state_full, whose UPSERT is a FULL REPLACE by design. One failed read plus "
+         "any delta-bearing message overwrites the whole conversation with defaults plus that "
+         "turn. Not skipped — destroyed."),
+ ("bad", "AND NOTHING CAN DETECT IT AFTERWARDS. state_version increments on the same write, so "
+         "the row goes 11 -> 12 exactly as a normal turn would. There is no artifact "
+         "distinguishing 'turn 12 of a conversation' from 'state reset, now calling itself 12'."),
+ ("bad", "THE FIX IS LOCAL, NOT A REDESIGN. The same file already uses the right pattern thirty "
+         "lines down: _write_state_row warns and returns on connection_error but RAISES on "
+         "anything else. Write path loud, read path silent, one module — and the silent one "
+         "loses data. get_state is the one function not following its own file's convention."),
+ ("bad", "state_version is WRITE-ONLY — inserted, incremented, never read or compared anywhere "
+         "in app/. So it cannot detect the above, AND read-modify-write through "
+         "get_state/save_state_full is unguarded: two concurrent turns on one thread are a "
+         "lost update."),
+ ("bad", "CROSS-NODE, invisible to any code read: mobius_chat has NO query guards. "
          "statement_timeout = 0 and no idle-in-transaction guard. mobius_rag carries "
          "idle_in_transaction_session_timeout = 120s and is the ONLY per-database override on "
-         "the entire instance — verified against pg_db_role_setting, not a session read. It "
-         "reads like a guard added after an incident that chat never inherited. Two "
-         "consequences: a pathological chat query runs unbounded holding a connection, and "
-         "SQLSTATE 57014 effectively cannot fire, so db_client's `timeout` branch is dead-"
-         "looking code that would come alive the moment anyone sets a timeout."),
- ("bad", "AND NOTHING CAN DETECT IT AFTERWARDS. state_version increments on the same write, "
-         "so the row goes 11 -> 12 exactly as a normal turn would. There is no artifact "
-         "distinguishing 'turn 12 of a conversation' from 'state reset, now calling itself "
-         "12'. Compare node 1: ensure_thread also fails open, but the FK catches the "
-         "consequence. Here nothing catches it — same fail-open philosophy, no backstop."),
- ("bad", "state_version is WRITE-ONLY. Verified by grep: it is inserted, incremented, and "
-         "mentioned in two docstrings — never read, never compared, anywhere in app/. So it "
-         "cannot detect the above, AND read-modify-write through get_state/save_state_full is "
-         "unguarded: two concurrent turns on one thread are a lost update. The column that "
-         "would make optimistic concurrency possible exists and is never used for it."),
- ("watch", "State size is bimodal and it is NOT conversation length. Verified live: 4,895 "
-           "rows, p50 441 B, p95 918 B, p99 72 kB, 59 rows over 32 kB. The DB seat measured "
-           "corr(state_version, size) = 0.009 — a distinct population, not accumulation. "
-           "master_objective is the inflator (up to 145 kB), active_context second (82 kB), "
-           "everything else under 240 bytes. Both are uncapped, while uploaded files ARE "
-           "capped at 15 records."),
- ("watch", "Three keys are persisted OUTSIDE the model and kept alive by a hardcoded name "
-           "list: active_skill, last_failed_query, active_context are in the stored JSON but "
-           "not in ThreadState, surviving only because state_load copies them from raw by "
-           "name, twice. A fourth such key added anywhere else is silently dropped on the next "
-           "save. And active_context is the #2 size inflator, so the un-modelled path is also "
-           "a heavyweight one."),
- ("watch", "An empty thread_id returns empty state and never touches storage — which is the "
-           "landing zone for node 1's failure modes. The 102 NULL-thread_id turns and every "
-           "ensure_thread fresh-uuid path arrive here and are silently treated as brand-new "
+         "the instance. A pathological chat query runs unbounded holding a connection, and "
+         "SQLSTATE 57014 cannot fire, so db_client's `timeout` branch is dead-looking code that "
+         "would come alive the moment anyone sets a timeout."),
+ ("watch", "NINE blocks from four sources, assembled in one 127-line function with no "
+           "structure separating them. Block 7 is conditionally skipped, block 8 has a legacy "
+           "fallback, block 9 must never be persisted — three different rules a reader has to "
+           "hold at once, none of them named as a step."),
+ ("watch", "Three keys persisted OUTSIDE the model, kept alive by a hardcoded allowlist copied "
+           "in THREE places within this one file — before the delta save, in the merge, and "
+           "again in the STANDALONE eviction path. A fourth such key is silently dropped."),
+ ("watch", "State size is bimodal and NOT conversation length. Verified live: 4,895 rows, p50 "
+           "441 B, p95 918 B, p99 72 kB, 59 over 32 kB, corr(state_version, size) = 0.009. "
+           "master_objective is the inflator (up to 145 kB), active_context second (82 kB). "
+           "Both uncapped, while uploaded files ARE capped at 15 records."),
+ ("watch", "An empty thread_id returns empty state and never touches storage — the landing "
+           "zone for node 1's failure modes. The 102 NULL-thread_id turns and every "
+           "ensure_thread fresh-uuid path arrive here and are treated as brand-new "
            "conversations."),
- ("good", "RUNTIME LENS, answering the DB seat's question: CHAT_RAG_DATABASE_URL IS set on "
-          "the live service, so state is genuinely being persisted rather than silently "
-          "dropped. The failure mode above is a real risk, not an active outage."),
- ("watch", "WHAT THIS CANNOT SEE: whether finding 1 has ever fired. It leaves no artifact by "
-           "construction, so its rate is not recoverable from the data — absence of evidence "
+ ("good", "The safety default is DENY: DEFAULT_STATE sets safety.patient_allowed = False, so a "
+          "thread with no state cannot start permissive."),
+ ("good", "STANDALONE genuinely resets: context_pack returns empty, slots are evicted and tool "
+          "results cleared, so stale context cannot bleed into a fresh question."),
+ ("good", "RUNTIME LENS: CHAT_RAG_DATABASE_URL IS set on the live service, so state is being "
+          "persisted. The failure mode above is a real risk, not an active outage."),
+ ("watch", "WHAT THIS CANNOT SEE: whether the data-loss path has ever fired. It leaves no "
+           "artifact by construction, so its rate is not recoverable — absence of evidence "
            "here is guaranteed, not reassuring. Also unmeasured: whether concurrent turns on "
-           "one thread occur in production, and whether any writer outside mobius-chat/app "
-           "mutates chat_state."),
+           "one thread occur, and whether any writer outside mobius-chat/app mutates "
+           "chat_state."),
 ]),
 
 "classify": dict(rating="amber", depth="code", how="""
