@@ -1374,12 +1374,12 @@
         4
       ],
       "user_view": {
-        "status": "partial",
-        "description": "Semantic cache of previously-approved answers, with a fail-closed PHI write gate. Deployed and healthy on pgvector, but nothing calls it yet \u2014 chat's CACHE_ASSIST_ENABLED is 0 and the carved-out modules are still live in chat.",
+        "status": "frozen",
+        "description": "Semantic cache of previously-approved answers. SHELVED 2026-09-08 \u2014 deployed and healthy but never finished, and nothing calls it. Scales to zero, so it is left running rather than torn down.",
         "surface": "mobius-answer-cache"
       },
       "technical_view": {
-        "status": "partial",
+        "status": "frozen",
         "description": "BACKEND=pgvector against the mobius_cache database. Deployed via 'gcloud run deploy --source', so no deploy config in the repo names it.",
         "repo": "mobius-answer-cache",
         "module": "mobius-answer-cache"
@@ -1398,7 +1398,7 @@
         "status": "live",
         "deploy_target": "Cloud Run"
       },
-      "note": "Deployed 2026-07-17, rev 00005-9w9. Not integrated with chat."
+      "note": "Shelved by Ananth 2026-09-08: not fully built, not being worked on. If revived, move the DB password out of CACHE_DATABASE_URL into Secret Manager."
     },
     {
       "id": "dbt",
