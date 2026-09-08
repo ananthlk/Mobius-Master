@@ -187,20 +187,53 @@ allowed but logged as its own outcome. Downstream only ever sees the categories.
            "every message before the user sees any acknowledgement."),
 ]),
 
-"queue": dict(rating="green", depth="code", how="""
-A Redis list used as a work queue. get_queue() returns a memory or redis adapter chosen by
-QUEUE_TYPE, both behind a QueueAdapter ABC, so the same code runs in tests and production.
-publish_request lpush'es the JSON payload; the worker pops from the other end.
+"queue": dict(rating="amber", depth="code", how="""
+A Redis list used as a work queue, and the handoff between the API and the worker.
 
-Connection handling retries 12 times with a 5-second backoff — about a minute — before
-giving up, which covers a Redis restart without dropping the process.
+The ops, verified: publish does LPUSH onto cfg.redis_request_key; the worker does BRPOP with
+a 5-second timeout. LPUSH + BRPOP is correct FIFO — push left, pop right. ORDERING IS SOUND.
+Durability is not.
+
+BRPOP removes the item atomically with no destination. There is no in-flight list, no ack,
+no visibility timeout, no redelivery. The instant BRPOP returns, Redis has no record the
+item ever existed. So if the worker dies between popping and publishing, THE TURN IS LOST —
+silently and unrecoverably. The user sees a request that never returns, and there is no
+server-side artifact of the loss: no row, no key, no log of an orphan.
+
+The response side is a per-correlation-id key with a 24-hour TTL, written at two sites. That
+is 288x the live turn deadline of 300s, so a slow turn cannot outlive its response key — a
+risk I had suspected and which does not exist. But the asymmetry inverts into a real one:
+THE RESPONSE HAS A TTL, THE REQUEST LIST HAS NONE. A request never consumed sits in
+mobius:chat:requests indefinitely, with nothing ageing it out and nothing alerting on depth.
+
+get_queue() picks memory or redis behind a QueueAdapter ABC, so the same code runs in tests
+and production. Connection handling retries 12 times with 5s backoff, about a minute, which
+covers a Redis restart without losing the process.
 """, findings=[
- ("good", "A real abstraction rather than a Redis import scattered through the codebase: "
-          "one ABC, two implementations, chosen by config."),
- ("watch", "No test file for the redis adapter specifically. The retry/backoff path is the "
-           "part most likely to matter in an outage and the least likely to be exercised."),
- ("watch", "A plain Redis list gives no delivery guarantee. A worker that dies after popping "
-           "and before publishing loses that turn; nothing re-queues it."),
+ ("bad", "No delivery guarantee at all. BRPOP with no processing list means worker death "
+         "between pop and publish loses the turn with no artifact anywhere. Provable by "
+         "reading, and deliberately NOT tested: proving a durability gap by causing one turns "
+         "a documented risk into a real lost turn on a live service, to establish something "
+         "the code already states. If it must be observed, it needs authorising against "
+         "staging."),
+ ("bad", "The request list has no TTL and no depth alerting, while the response key has 24h. "
+         "An unconsumed request accumulates silently and forever."),
+ ("good", "Ordering is genuinely correct — LPUSH + BRPOP is FIFO, and the code says so at "
+          "both sites rather than leaving it to be inferred."),
+ ("good", "A real abstraction: one ABC, two implementations, chosen by config, so tests and "
+          "production run the same path."),
+ ("good", "NEGATIVE RESULT, recorded so it is not rediscovered as a finding: "
+          "flush_request_queue() deletes the entire backlog and its docstring says 'Staging "
+          "debug only'. It reads alarming in a grep. It has ZERO callers anywhere in app/ — "
+          "dead code, not a live risk. Found by the DB seat, verified by me."),
+ ("watch", "RUNTIME LENS: every key and TTL setting is at its CODE DEFAULT — REDIS_REQUEST_KEY, "
+           "REDIS_RESPONSE_KEY_PREFIX and REDIS_RESPONSE_TTL_SECONDS are all unset live. Only "
+           "CHAT_QUEUE_TYPE=redis and REDIS_URL are configured. Unusual for this service, "
+           "where most other defaults are overridden."),
+ ("watch", "WHAT THIS EXTRACTION CANNOT SEE: whether anything outside mobius-chat writes to "
+           "or drains mobius:chat:requests, and what the actual queue depth is on the live "
+           "instance. Both are observable and neither has been checked, so treat this node's "
+           "durability claims as code-true and runtime-unmeasured."),
 ]),
 
 "worker": dict(rating="amber", depth="code", how="""
