@@ -454,6 +454,23 @@ WHAT IT DOES NOT LOAD, which is the part people assume:
          "the instance. A pathological chat query runs unbounded holding a connection, and "
          "SQLSTATE 57014 cannot fire, so db_client's `timeout` branch is dead-looking code that "
          "would come alive the moment anyone sets a timeout."),
+ ("watch", "WHERE THE THREAD SUMMARY LIVES — not in the state, and there are THREE stores "
+           "with three lifecycles. (1) chat_threads.summary_long, the canonical rolling brief, "
+           "written by responder/thread_summarizer.py, updated in place each turn, server-side "
+           "only, read here as previous_thread_summary and threaded to the integrator so it "
+           "REFINES rather than rebuilds. Live: 1,349 of 5,330 threads have one, avg 185 chars, "
+           "max 600 — the docstring says under about 60 words, so the cap is a target not an "
+           "enforcement. (2) chat_turns.context_summary, per-turn, the fallback this stage "
+           "walks when summary_long is absent — 3,134 of 5,712 turns. (3) And summaries DO sit "
+           "inside chat_state.state_json after all, nested: 216 rows under master_objective, 54 "
+           "under active_context, 2 under active. Those two keys are exactly the size inflators "
+           "the DB seat measured at 145 kB and 82 kB, so the summaries in the state are the "
+           "ones bloating it."),
+ ("watch", "The canonical store is written for roughly HALF of threads — 31% to 74% by week "
+           "over the last eight weeks, 51% this week — so this is current behaviour, not a "
+           "migration-036 backfill artifact. I have NOT established why: single-turn threads "
+           "plausibly need no brief, but I did not verify the summariser's firing condition, so "
+           "treat the split as measured and unexplained."),
  ("watch", "NINE blocks from four sources, assembled in one 127-line function with no "
            "structure separating them. Block 7 is conditionally skipped, block 8 has a legacy "
            "fallback, block 9 must never be persisted — three different rules a reader has to "
