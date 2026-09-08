@@ -7,15 +7,15 @@
   "tiers": {
     "A": {
       "name": "Point Solutions",
-      "range": "$5M\u2013$20M per org"
+      "range": "$5M–$20M per org"
     },
     "B": {
       "name": "Network Intelligence",
-      "range": "$20M\u2013$60M per network"
+      "range": "$20M–$60M per network"
     },
     "C": {
       "name": "Virtual Network",
-      "range": "$60M\u2013$150M+"
+      "range": "$60M–$150M+"
     }
   },
   "modules": [
@@ -43,11 +43,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-skills",
@@ -61,7 +61,7 @@
         "Sourcing",
         "fetch_document"
       ],
-      "invocation": "web_scrape \u2014 appears twice in the chat tool manifest and is exposed over MCP.",
+      "invocation": "web_scrape — appears twice in the chat tool manifest and is exposed over MCP.",
       "stage": "acquire"
     },
     {
@@ -72,7 +72,7 @@
       "owner": "Crawler Agent",
       "service": "mobius-web-scraper-worker",
       "repo": "mobius-skills",
-      "verified": false,
+      "verified": true,
       "tier": "B",
       "gates": [],
       "user_view": {
@@ -88,11 +88,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-skills",
@@ -100,8 +100,9 @@
         "status": "live",
         "deploy_target": "Cloud Run"
       },
-      "invocation": "Queue-driven. Not callable as a skill \u2014 it runs when work is enqueued.",
-      "stage": "acquire"
+      "invocation": "Queue-driven. Not callable as a skill — it runs when work is enqueued.",
+      "stage": "acquire",
+      "provenance": "mobius-skills @ main · web-scraper/ · deploy script web-scraper/scripts/deploy_worker.sh. Shares the mobius-web-scraper image (tag 20260908-132159-49ffb2f583); the worker differs by entrypoint, not by codebase. Previously flagged unverified on the claim that no deploy config named it — that was wrong."
     },
     {
       "id": "google-search",
@@ -127,11 +128,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-skills",
@@ -170,11 +171,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-skills",
@@ -187,7 +188,7 @@
         "Curation",
         "Historical extraction"
       ],
-      "invocation": "Called via app/sub_skills/doc_reader.py \u2014 invoked by chat directly rather than chosen by the planner, but a task other components call.",
+      "invocation": "Called via app/sub_skills/doc_reader.py — invoked by chat directly rather than chosen by the planner, but a task other components call.",
       "stage": "extract"
     },
     {
@@ -214,11 +215,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-rag",
@@ -226,7 +227,7 @@
         "status": "live",
         "deploy_target": "Cloud Run"
       },
-      "invocation": "Queue-driven. Not callable as a skill \u2014 it runs when work is enqueued.",
+      "invocation": "Queue-driven. Not callable as a skill — it runs when work is enqueued.",
       "stage": "chunk"
     },
     {
@@ -253,11 +254,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-qa",
@@ -297,11 +298,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-rag",
@@ -309,7 +310,7 @@
         "status": "live",
         "deploy_target": "Cloud Run"
       },
-      "invocation": "Queue-driven. Not callable as a skill \u2014 it runs when work is enqueued.",
+      "invocation": "Queue-driven. Not callable as a skill — it runs when work is enqueued.",
       "stage": "embed"
     },
     {
@@ -329,12 +330,12 @@
       ],
       "user_view": {
         "status": "live",
-        "description": "Chat API and UI: question \u2192 queue \u2192 worker \u2192 response, with a pluggable queue.",
+        "description": "Chat API and UI: question → queue → worker → response, with a pluggable queue.",
         "surface": "mobius-chat"
       },
       "technical_view": {
         "status": "live",
-        "description": "Chat API and UI: question \u2192 queue \u2192 worker \u2192 response, with a pluggable queue.",
+        "description": "Chat API and UI: question → queue → worker → response, with a pluggable queue.",
         "repo": "mobius-chat",
         "module": "mobius-chat"
       },
@@ -405,11 +406,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-payor",
@@ -454,11 +455,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-story-ui",
@@ -491,11 +492,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-os",
@@ -520,12 +521,12 @@
       ],
       "user_view": {
         "status": "live",
-        "description": "Declarative web-interaction engine: find \u2192 click \u2192 type \u2192 read over a page.",
+        "description": "Declarative web-interaction engine: find → click → type → read over a page.",
         "surface": "mobius-interact"
       },
       "technical_view": {
         "status": "live",
-        "description": "Declarative web-interaction engine: find \u2192 click \u2192 type \u2192 read over a page.",
+        "description": "Declarative web-interaction engine: find → click → type → read over a page.",
         "repo": "mobius-interact",
         "module": "mobius-interact"
       },
@@ -566,12 +567,12 @@
       ],
       "user_view": {
         "status": "live",
-        "description": "Personal workspace panel, mounted into Chat. Static assets \u2014 no separate Cloud Run service.",
+        "description": "Personal workspace panel, mounted into Chat. Static assets — no separate Cloud Run service.",
         "surface": "mobius-vault"
       },
       "technical_view": {
         "status": "live",
-        "description": "Personal workspace panel, mounted into Chat. Static assets \u2014 no separate Cloud Run service.",
+        "description": "Personal workspace panel, mounted into Chat. Static assets — no separate Cloud Run service.",
         "repo": "mobius-vault",
         "module": "(in-repo)"
       },
@@ -674,11 +675,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-chat",
@@ -696,7 +697,7 @@
       "service": "mobius-product-awareness",
       "repo": "product-awareness",
       "verified": true,
-      "tier": "B\u2192C",
+      "tier": "B→C",
       "gates": [
         1,
         2,
@@ -823,11 +824,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "Mobius-user",
@@ -880,7 +881,7 @@
           "compliance audit"
         ],
         "gates": [
-          "recall \u226599%",
+          "recall ≥99%",
           "false-positive < 1%"
         ],
         "status": "live"
@@ -916,11 +917,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-skills",
@@ -937,7 +938,7 @@
       "owner": "Org Agent",
       "service": "mobius-org-agent",
       "repo": "mobius-skills",
-      "verified": false,
+      "verified": true,
       "tier": "A",
       "gates": [
         1,
@@ -976,7 +977,9 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
-      }
+      },
+      "provenance": "mobius-skills @ feat/org-agent · org-agent/ · deploy config org-agent/deploy/{cloudbuild.yaml,deploy_dev.sh,dev.env}. Image tag b96505a resolves to that branch ONLY: it is 195 commits ahead of main, 27 behind, and unmerged. The deployed org-agent runs code that does not exist on main.",
+      "caveat": "Deployed from an unmerged branch (feat/org-agent, +195/-27 vs main). Owner decision required — merge it, or record the branch deploy as deliberate."
     },
     {
       "id": "specs",
@@ -1002,11 +1005,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "specs-platform",
@@ -1045,11 +1048,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-db-agent",
@@ -1086,11 +1089,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-skills",
@@ -1107,8 +1110,8 @@
       "owner": "Appeals",
       "service": "mobius-appeals-prototype",
       "repo": "mobius-skills",
-      "verified": false,
-      "tier": "B\u2192C",
+      "verified": true,
+      "tier": "B→C",
       "gates": [
         6
       ],
@@ -1137,7 +1140,7 @@
         "gates": [
           "M6 judge",
           "L3 promotion (Wilson-LB)",
-          "\u00a711 Bayes flip-gate"
+          "§11 Bayes flip-gate"
         ],
         "status": "pilot passed dev, live eval pending"
       },
@@ -1146,7 +1149,8 @@
         "branch": "main",
         "status": "building",
         "deploy_target": "Cloud Run"
-      }
+      },
+      "provenance": "mobius-skills @ main · appeals-agent/ · Dockerfile at appeals-agent/Dockerfile, byte-identical to the source that built the running revision (recovered from the Cloud Build source zip). No requirements.txt: dependencies are installed inline in the Dockerfile, and all but mcp remain unbounded."
     },
     {
       "id": "email",
@@ -1172,11 +1176,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-skills",
@@ -1209,11 +1213,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-skills",
@@ -1246,11 +1250,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-skills",
@@ -1283,11 +1287,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-skills",
@@ -1375,7 +1379,7 @@
       ],
       "user_view": {
         "status": "frozen",
-        "description": "Semantic cache of previously-approved answers. SHELVED 2026-09-08 \u2014 deployed and healthy but never finished, and nothing calls it. Scales to zero, so it is left running rather than torn down.",
+        "description": "Semantic cache of previously-approved answers. SHELVED 2026-09-08 — deployed and healthy but never finished, and nothing calls it. Scales to zero, so it is left running rather than torn down.",
         "surface": "mobius-answer-cache"
       },
       "technical_view": {
@@ -1386,11 +1390,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-answer-cache",
@@ -1424,11 +1428,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-dbt",
@@ -1456,7 +1460,7 @@
       "gates": [],
       "user_view": {
         "status": "partial",
-        "description": "Certified payor facts with provenance \u2014 answer-or-abstain, no guessing. 65 facts across 3 domains from 55 templates.",
+        "description": "Certified payor facts with provenance — answer-or-abstain, no guessing. 65 facts across 3 domains from 55 templates.",
         "surface": "facts.* in mobius_rag"
       },
       "technical_view": {
@@ -1467,11 +1471,11 @@
       },
       "specs_view": {
         "status": "building",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-rag",
@@ -1525,7 +1529,7 @@
         "gates": [
           "answer F1",
           "judge agreement (Wilson-LB)",
-          "\u00a711 Bayes flip-gate"
+          "§11 Bayes flip-gate"
         ],
         "status": "M6 judge + L3 promotion",
         "measures": "fingerprint in run_calibration, lift=moved+changed"
@@ -1556,19 +1560,19 @@
       "service": null,
       "repo": "mobius-rag",
       "verified": true,
-      "tier": "B\u2192C",
+      "tier": "B→C",
       "gates": [
         4,
         6
       ],
       "user_view": {
         "status": "live",
-        "description": "Judges each retrieval slot on its own bar \u2014 would another turn help? Wired into the live orchestrator 2026-07-26 after Eval's calibration (22-query forced bank + live router calibration).",
+        "description": "Judges each retrieval slot on its own bar — would another turn help? Wired into the live orchestrator 2026-07-26 after Eval's calibration (22-query forced bank + live router calibration).",
         "surface": "Transparent (feeds Router's decide_continuation)"
       },
       "technical_view": {
         "status": "live",
-        "description": "app/services/retriever/observer.py, called from orchestrator.py:445 via _observer_verdict. Per-strategy adequacy: capacity-aware fill for a/b/s, decay-floor score check for d, quote_verified for c. Portfolio-allocated slots bypass it and take a terminal stopgap verdict \u2014 but portfolio is weight 0 / shadow-only by default, so the default path is Observer.",
+        "description": "app/services/retriever/observer.py, called from orchestrator.py:445 via _observer_verdict. Per-strategy adequacy: capacity-aware fill for a/b/s, decay-floor score check for d, quote_verified for c. Portfolio-allocated slots bypass it and take a terminal stopgap verdict — but portfolio is weight 0 / shadow-only by default, so the default path is Observer.",
         "repo": "mobius-rag",
         "module": "app/services/retriever/observer.py"
       },
@@ -1605,7 +1609,7 @@
       "service": null,
       "repo": "mobius-skills",
       "verified": true,
-      "tier": "B\u2192C",
+      "tier": "B→C",
       "gates": [
         4,
         7
@@ -1627,7 +1631,7 @@
       },
       "eval_view": {
         "status": "partial",
-        "description": "Cost telemetry instrumented recently \u2014 1 of 47 questions has a cost record, and the console says so on the face of the panel."
+        "description": "Cost telemetry instrumented recently — 1 of 47 questions has a cost record, and the console says so on the face of the panel."
       },
       "git_view": {
         "repo": "mobius-skills",
@@ -1649,22 +1653,22 @@
       "gates": [],
       "user_view": {
         "status": "live",
-        "description": "MCP server exposing ~15 tools fleet-wide \u2014 corpus_search, payor_fact, email_*, org_npi_lookup, check_provider_credentialing. How agents other than Chat call skills.",
+        "description": "MCP server exposing ~15 tools fleet-wide — corpus_search, payor_fact, email_*, org_npi_lookup, check_provider_credentialing. How agents other than Chat call skills.",
         "surface": "mobius-skills-mcp"
       },
       "technical_view": {
         "status": "live",
-        "description": "MCP server exposing ~15 tools fleet-wide \u2014 corpus_search, payor_fact, email_*, org_npi_lookup, check_provider_credentialing. How agents other than Chat call skills.",
+        "description": "MCP server exposing ~15 tools fleet-wide — corpus_search, payor_fact, email_*, org_npi_lookup, check_provider_credentialing. How agents other than Chat call skills.",
         "repo": "mobius-skills-mcp",
         "module": "(in-repo)"
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-skills-mcp",
@@ -1703,11 +1707,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-chat",
@@ -1740,11 +1744,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-auth",
@@ -1766,22 +1770,22 @@
       "gates": [],
       "user_view": {
         "status": "live",
-        "description": "fleet.yaml governs min/max instances for every service. Edit and apply \u2014 never raw gcloud, or a service-level minScale annotation survives deploys.",
+        "description": "fleet.yaml governs min/max instances for every service. Edit and apply — never raw gcloud, or a service-level minScale annotation survives deploys.",
         "surface": "mobius-fleet-power"
       },
       "technical_view": {
         "status": "live",
-        "description": "fleet.yaml governs min/max instances for every service. Edit and apply \u2014 never raw gcloud, or a service-level minScale annotation survives deploys.",
+        "description": "fleet.yaml governs min/max instances for every service. Edit and apply — never raw gcloud, or a service-level minScale annotation survives deploys.",
         "repo": "mobius-fleet-power",
         "module": "(in-repo)"
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-fleet-power",
@@ -1799,7 +1803,7 @@
       "service": "mobius-payor",
       "repo": "mobius-payor",
       "verified": true,
-      "tier": "B\u2192C",
+      "tier": "B→C",
       "gates": [
         4,
         5,
@@ -1807,7 +1811,7 @@
       ],
       "user_view": {
         "status": "live",
-        "description": "Which services a line covers, the codes and modifiers that bill it, and what each payor requires \u2014 answered per payor with provenance. 3,648 payor answers over 343 codes and 153 standard requirements. Fees are explicitly out of scope.",
+        "description": "Which services a line covers, the codes and modifiers that bill it, and what each payor requires — answered per payor with provenance. 3,648 payor answers over 343 codes and 153 standard requirements. Fees are explicitly out of scope.",
         "surface": "mobius-payor /service-lines"
       },
       "technical_view": {
@@ -1818,7 +1822,7 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "Lexicon\u2194Registry contract is signed; changes go to the contract first."
+        "description": "Lexicon↔Registry contract is signed; changes go to the contract first."
       },
       "eval_view": {
         "status": "partial",
@@ -1854,7 +1858,7 @@
       "gates": [],
       "user_view": {
         "status": "live",
-        "description": "Fetches and verifies an external document \u2014 policy PDFs, fee schedules \u2014 on demand during a turn.",
+        "description": "Fetches and verifies an external document — policy PDFs, fee schedules — on demand during a turn.",
         "surface": "mobius-chat"
       },
       "technical_view": {
@@ -1865,11 +1869,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-chat",
@@ -1902,17 +1906,17 @@
       },
       "technical_view": {
         "status": "live",
-        "description": "In-repo (app/api/uploads.py, app/skills/builtin/document_uploads.py) routing to mobius-rag /upload \u2014 Path B chunking, lexicon expansion, hybrid retrieval, rerank. The standalone instant-rag envelope service was bypassed 2026-04-27 and deprecated 2026-07-09.",
+        "description": "In-repo (app/api/uploads.py, app/skills/builtin/document_uploads.py) routing to mobius-rag /upload — Path B chunking, lexicon expansion, hybrid retrieval, rerank. The standalone instant-rag envelope service was bypassed 2026-04-27 and deprecated 2026-07-09.",
         "repo": "mobius-chat",
         "module": "(in-repo)"
       },
       "specs_view": {
         "status": "live",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-chat",
@@ -1950,11 +1954,11 @@
       },
       "specs_view": {
         "status": "building",
-        "description": "\u2014"
+        "description": "—"
       },
       "eval_view": {
         "status": "planned",
-        "description": "\u2014"
+        "description": "—"
       },
       "git_view": {
         "repo": "mobius-rag",
@@ -2030,7 +2034,7 @@
       "layer": 0,
       "label": "Pre-Layer 0",
       "name": "Sourcing & Ingestion Pipeline",
-      "description": "How knowledge gets in, stage by stage. Components are shown where they serve \u2014 several are Skills (Layer 5) doing ingestion work."
+      "description": "How knowledge gets in, stage by stage. Components are shown where they serve — several are Skills (Layer 5) doing ingestion work."
     },
     {
       "layer": 1,
@@ -2085,7 +2089,7 @@
     {
       "stage": "acquire",
       "label": "Acquire",
-      "description": "Get the document \u2014 crawl, search, fetch, or upload."
+      "description": "Get the document — crawl, search, fetch, or upload."
     },
     {
       "stage": "extract",
@@ -2155,5 +2159,5 @@
       "description": "Sets and enforces the rules."
     }
   ],
-  "basis": "Modules are deployed services and in-repo code modules, traced to the deploy config or source file that defines them. Claude agent seats appear as `owner`, never as modules \u2014 a seat with no code is not a component."
+  "basis": "Modules are deployed services and in-repo code modules, traced to the deploy config or source file that defines them. Claude agent seats appear as `owner`, never as modules — a seat with no code is not a component."
 }
