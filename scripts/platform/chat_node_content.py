@@ -895,6 +895,34 @@ It is mid-migration and says so: five tools are now registry-owned, their descri
 living on SkillSpec.description and rendered through registry.manifest_text(), so adding a
 skill is one file and no edit here. The rest are still described inline.
 """, findings=[
+ ("bad", "OWNER(chat): MOVE THE MANIFEST OUT OF CODE — Ananth's point, and the cost is "
+         "measurable. 16 blocks are hardcoded here totalling 19,191 characters, roughly 4,800 "
+         "TOKENS injected into the planner prompt. The biggest are _SERVICE_LINE_ROUTING "
+         "(~798 tok), _APPEALS (~736), _RAG (~705) and _SEARCH_UPLOADED_DOCUMENT (~636). "
+         "Every wording change to any of them is a code edit and a redeploy.\n\n"
+         "THE TARGET ALREADY EXISTS IN TWO FORMS and this is half-built rather than unbuilt: "
+         "five tools are registry-owned, their text living on SkillSpec.description and "
+         "rendered through registry.manifest_text() — the module says adding one of those is "
+         "one file and no edit here. And the Prompt Composition Studio already holds a "
+         "react.tool_manifest BLOCK, so the manifest has a home in the versioned, "
+         "UI-editable store. The remaining 16 blocks have simply not moved."),
+ ("bad", "OWNER(chat): CONTEXT-SPECIFIC TOOL SELECTION IS BUILT AND UNUSED. The full plumbing "
+         "for Ananth's second ask is already there — get_tool_manifest(allowed=[...]) filters "
+         "the rendered text, storage/tool_policy.py computes the list, and the orchestrator "
+         "folds it into ctx.allowed_tools. It is not being used to cut prompt length:\n\n"
+         "  USER-ACCESSIBLE: a user_tool_subscriptions table exists and works — but it holds "
+         "25 rows for exactly ONE user. The capability is real and nobody has it.\n"
+         "  CONTEXT-SPECIFIC: mode_defaults narrows for exactly one mode. `task` gets [] (no "
+         "tools); copilot, agentic and quick all get None, which means UNRESTRICTED — the "
+         "entire ~4,800-token manifest, every turn.\n"
+         "  PER-REQUEST: request_policy exists and its own comment calls it a 'future hook'.\n\n"
+         "So the answer to 'can we make tool choice user-accessible and context-specific to cut "
+         "prompt length' is that both switches are already wired and both are set to "
+         "everything-on for every mode a real user runs."),
+ ("watch", "The dominant blocks are domain routing rather than tool descriptions — "
+           "_SERVICE_LINE_ROUTING at ~798 tokens is the single largest, and appeals is second. "
+           "So a context filter keyed on the QUESTION rather than the mode would cut the most: "
+           "a credentialing question does not need the appeals routing table, and vice versa."),
  ("good", "694 lines, zero exception handlers, has a test file. Clean."),
  ("good", "The registry migration is documented in the module itself, including what it buys."),
  ("watch", "No config and no telemetry: you cannot tell from the trace what manifest the "
