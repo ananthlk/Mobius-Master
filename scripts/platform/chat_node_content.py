@@ -318,11 +318,22 @@ MOBIUS_INTEGRATOR_PARALLEL_PCT samples. The CODE default is sequential at 0% par
 the deployed service sets MOBIUS_INTEGRATOR_MODE=parallel, so the conservative default is
 not what runs.
 
-On top of that sits dynamic enrichment (Task #76, a Chat Master ruling):
-MOBIUS_DYNAMIC_ENRICHMENT_PCT samples per turn, and when react_loop's sufficiency check
-says the answer is already good enough, Call A is SKIPPED and B/C are launched in the
-background. Parallel path only. The deployed service sets it to 100 — so on every turn
-judged sufficient, the first answer call does not happen at all.
+There are also two paths that skip calls entirely, and the second is subtler than "skip A".
+
+The disambiguation fast-path skips A, B and C outright — when the turn is a disambiguation
+there is nothing to synthesise.
+
+Dynamic enrichment (Task #76) needs FOUR conditions together: not disambiguation, the
+parallel path, the percentage gate open, and react_loop's own
+_is_sufficient_for_deterministic_pass(ctx). When all four hold, Call A's LLM call is skipped
+and react_draft is structured DETERMINISTICALLY — regex only, no synthesis. B and C still
+run, but as fire-and-forget background jobs that patch the persisted card when they land and
+never block the response. So the user gets a regex-formatted answer immediately and a
+critiqued, enriched one moments later, in place.
+
+The deployed service sets MOBIUS_DYNAMIC_ENRICHMENT_PCT=100, so the percentage gate is
+always open — but the sufficiency check still decides per turn, so this is not
+unconditional.
 
 It runs on BOTH pipeline paths. On the ReAct path react_loop does the core synthesis and
 this handles what follows — unless ctx.react_bypass_integrate was set, in which case the
@@ -334,9 +345,15 @@ ReAct answer is published directly and none of this runs.
          "seam for splitting them exists and has not been taken."),
  ("bad", "29 exception handlers, 20 log-and-continue, and the only test named for it covers "
          "the fallback path. This decides what the user sees."),
- ("bad", "Both rollouts are percentage-sampled and default to off, which reads as safe — "
-         "but the deployment sets mode=parallel and DYNAMIC_ENRICHMENT_PCT=100. The sampling "
-         "safety exists in the code and is not in use; every turn takes the newest path."),
+ ("watch", "Both rollouts are percentage-sampled and default to off, which reads as safe — "
+           "but the deployment sets mode=parallel and DYNAMIC_ENRICHMENT_PCT=100, so the "
+           "sampling machinery is not sampling. The Chat seat confirms 100 is a lit canary "
+           "rather than a broken one, and the per-turn sufficiency check still gates it. "
+           "Whether someone meant to leave it fully lit is a question for Ananth."),
+ ("watch", "When the deterministic path fires the user's first answer is regex-formatted, "
+           "not LLM-composed, and is patched in place when B/C land. That is a visible "
+           "product behaviour with no signal of its own — nothing in the trace says which "
+           "of the three integrator paths produced the card the user first saw."),
  ("good", "One swallow is explicitly reasoned — 'audit must never break the turn'."),
 ]),
 
@@ -477,9 +494,11 @@ deadline, the 25 seconds reserving room to synthesise the final answer.
            "Wrong: the deployed service sets MOBIUS_PRODUCT_PROMISE_ENABLED=true, so this "
            "gate IS live for agentic turns. It is the depth half of the per-turn adaptation "
            "pair whose breadth half is retrieval_budget."),
- ("watch", "The contract table defines max_extension_rounds=1 for copilot, but the gate "
-           "requires mode_label == 'agentic'. Copilot's extension budget is therefore "
-           "defined and unreachable — either the gate or the table is wrong."),
+ ("bad", "CONFIRMED BUG (Chat seat, 2026-09-08). governor.py:82 gives copilot "
+         "max_extension_rounds=1; the gate at react_loop.py:5080 requires mode_label == "
+         "'agentic'. Copilot's budget is defined and can never be spent. Fix is one of two: "
+         "widen the gate to ('agentic','copilot'), or set copilot's budget to 0. The table "
+         "looks authoritative and is not."),
  ("good", "The wall-clock guard (#107) is the right shape: it reserves 25s for final "
           "synthesis rather than letting an extension eat the answer."),
  ("good", "A completion-critic failure degrades to satisfied and falls through to the "
@@ -510,7 +529,14 @@ only look at structure, and the post-run adjudicator runs after delivery.
 """, findings=[("good", "Two test files, including one for call resilience."),
                ("good", "Gated by MOBIUS_REACT_CRITIC and MOBIUS_REACT_GROUNDEDNESS_HEURISTIC, "
                         "so it can be turned on or off without a redeploy."),
-               ("watch", "Emits nothing itself; react_loop emits every critic signal. The Chat "
+               ("bad", "MOBIUS_REACT_CRITIC=0 does NOT disable the critic, and reads exactly as though "
+                       "it does. With the governor on, the Product Promise mandatory groundedness floor "
+                       "invokes critic.py independently of critic_enabled() — react_loop:5140-5145 says "
+                       "so explicitly, and the only flag authorised to bypass those gates is "
+                       "MOBIUS_PRODUCT_PROMISE_ENABLED, not this one. The deployed service has "
+                       "CRITIC=0 and the governor on, so the critic is running while its apparent "
+                       "off-switch reads off. Confirmed by the Chat seat."),
+                       ("watch", "Emits nothing itself; react_loop emits every critic signal. The Chat "
                          "seat's position, which I accept, is that this is correct by design — "
                          "react_loop owns the loop state and critic.py should not know it is "
                          "being observed.")]),
