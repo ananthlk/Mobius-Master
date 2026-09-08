@@ -45,7 +45,9 @@ configured". THE DEPLOYED SERVICE CONFIGURES ITSELF OUT OF THAT. It sets CHAT_EN
 CHAT_AUTH_MODE=optional together, so the fail-closed default is explicitly overridden and a
 request without a JWT is accepted on a service that declares itself prod.
 
-The PHI gate runs here, before anything queues.
+The PHI gate runs here, before anything queues — and every verdict is written to
+compliance.hipaa_message_check_log with the correlation id, thread, user, action, gate,
+phi_flag, identifier labels, evidence and classifier version.
 """, findings=[
  ("bad", "ensure_thread swallows every DB failure. On connection_error it warns and returns "
          "the id anyway; on any other failure it returns a FRESH uuid. A turn can proceed "
@@ -68,6 +70,14 @@ The PHI gate runs here, before anything queues.
          "service naming itself prod is accepting unauthenticated turns. Whether dev-project "
          "means this is harmless is Ananth's call, not mine — but the label and the behaviour "
          "disagree, and that is worth someone deciding on purpose."),
+ ("bad", "THE HIPAA AUDIT WRITE IS FAIL-OPEN. _log_phi_msg_gate's own docstring calls it "
+         "a \"Best-effort INSERT into compliance.hipaa_message_check_log\", and the failure "
+         "path is except Exception -> logger.warning. So the PHI GATE is fail-closed and "
+         "correct, but the RECORD THAT IT RAN is not: a database blip means turns proceed "
+         "properly gated with no compliance evidence that gating happened. The HIPAA analysis "
+         "log is specified append-only and fail-closed; this write path is neither. Found by "
+         "the DB extractor, not by me reading the file — my hand-written description of this "
+         "node did not mention the table at all."),
  ("good", "RUNTIME LENS: the Redis claim holds — CHAT_QUEUE_TYPE=redis is set and takes "
           "precedence over QUEUE_TYPE in config.py. Worth recording that the code default is "
           "'memory' and QUEUE_TYPE alone is unset, so reading only QUEUE_TYPE would have "

@@ -164,6 +164,37 @@ if(rest.length) document.getElementById('schema').insertAdjacentHTML('beforeend'
   '<div class="pd">Read or written by many stages rather than called at one point.</div>'+
   '<div class="chips">'+rest.map(chip).join('')+'</div></div>');
 
+// Every DB touch, every UX surface, every parameter — extracted, not listed.
+// A field that is empty says so; a field that cannot be extracted says THAT,
+// because blank reads as "nothing here" when it may mean "not visible to a
+// static read".
+function detailBlocks(m){
+  var d = m.detail; if(!d) return '';
+  if(d._unavailable) return '<div class="f"><b>Detail</b><div class="none">'+esc(d._unavailable)+'</div></div>';
+  function list(arr, empty){
+    return (arr&&arr.length) ? '<span class="m">'+arr.map(esc).join('<br>')+'</span>'
+                             : '<span class="none">'+empty+'</span>'; }
+  var db = d.db||{}, ux = d.ux||{}, pa = d.parameters||{};
+  var out = '';
+  out += '<div class="f"><b>DB — what it touches</b><div>'+
+    'SQL: '+list(db.sql,'no literal SQL in this file')+'<br>'+
+    'storage fns: '+list(db.storage_fns,'imports nothing from app.storage')+
+    (db.redis_keys&&db.redis_keys.length?'<br>redis keys: '+list(db.redis_keys,''):'')+
+    '<br><span style="opacity:.55;font-size:10px">'+esc(db.note||'')+'</span></div></div>';
+  out += '<div class="f"><b>UX — surfaces</b><div>'+
+    'routes: '+list(ux.routes_defined,'defines no routes')+'<br>'+
+    'frontend files naming it: '+list(ux.frontend_files,'none — no frontend references it by name')+
+    '</div></div>';
+  var consts = (pa.module_constants||[]).map(function(c){return c.name+' = '+c.value;});
+  var dflts  = (pa.keyword_defaults||[]).map(function(c){return c.fn+'('+c.param+'='+c.default+')';});
+  out += '<div class="f"><b>Parameters — constants and defaults</b><div>'+
+    'module constants: '+list(consts,'none')+'<br>'+
+    'keyword defaults: '+list(dflts,'none')+
+    '<br><span style="opacity:.55;font-size:10px">env vars are in Configuration above; these need a code change</span>'+
+    '</div></div>';
+  return out;
+}
+
 function detail(k){
   var m=SUB[k]; if(!m) return;
   SEL=k;
@@ -191,7 +222,8 @@ function detail(k){
     fields = howf + uxf + ready + F('What happens here', esc(m.what)) +
       F('Where it lives','<span class="m">'+esc(m.path)+(m.line?':'+m.line:'')+'</span>') +
       F('Configuration', m.config.length? '<span class="m">'+esc(m.config.join(', '))+'</span>'
-        : '<span class="none">nothing configurable</span>');
+        : '<span class="none">nothing configurable</span>') +
+      detailBlocks(m);
   } else {
     fields = howf + uxf + ready + F('What the code says about itself', esc(m.role_full||m.role)) +
       F('Where it lives','<span class="m">'+esc(m.path)+' · '+m.loc+' lines</span>') +
@@ -211,7 +243,8 @@ function detail(k){
       F('Used by ('+(m.fan_in||0)+')', (m.callers&&m.callers.length)
           ? '<span class="m">'+esc(m.callers.join(', '))+'</span>'
           : '<span class="none">nothing imports it</span>') +
-      (m.api&&m.api.length? F('Public API','<span class="m">'+esc(m.api.join(', '))+'</span>'):'');
+      (m.api&&m.api.length? F('Public API','<span class="m">'+esc(m.api.join(', '))+'</span>'):'') +
+      detailBlocks(m);
   }
   document.getElementById('detail').innerHTML='<div class="card"><h3>'+esc(m.id||m.step)+rate+'</h3>'+
     '<span class="mod">'+esc(m.module||m.path||'')+'</span>'+fields+'</div>';

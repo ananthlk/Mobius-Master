@@ -154,6 +154,10 @@ def main():
                  "7bd378b9-3a8f-4998-a9b3-06f2d630c20f/scratchpad/live_env.json")
     live = json.load(open(live_path))["env"] if os.path.exists(live_path) else {}
 
+    det_path = ("/private/tmp/claude-502/-Users-ananth-Mobius/"
+                "7bd378b9-3a8f-4998-a9b3-06f2d630c20f/scratchpad/node_detail.json")
+    detail = json.load(open(det_path)) if os.path.exists(det_path) else {}
+
     def attach(key, obj):
         c = content.get(key)
         if c:
@@ -164,6 +168,7 @@ def main():
         obj["signals"] = sigs.get(sig_alias.get(key, key), {})
         obj["live_config"] = [{"name": v, "live": live.get(v, "(not set — code default)")}
                               for v in (obj.get("config") or [])]
+        obj["detail"] = detail.get(key, {})
 
     # No module of its own — it is an if-block inline in react_loop. Synthesise
     # a record so it can be a node, and be explicit that its "file" is its host.
