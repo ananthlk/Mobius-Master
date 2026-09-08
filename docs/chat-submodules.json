@@ -1,0 +1,764 @@
+{
+ "generated_by": "scripts/platform/gen_chat_submodules.py",
+ "service": "mobius-chat",
+ "bar": "named role in a declared pipeline",
+ "declared_stages": [
+  "state_load",
+  "classify",
+  "plan",
+  "clarify",
+  "resolve",
+  "integrate",
+  "publish"
+ ],
+ "telemetry_sink": "chat_turns.thinking_log (EmitEnvelope, discriminated by `signal`)",
+ "signal_taxonomy_size": 37,
+ "submodules": [
+  {
+   "id": "app-pipeline-active_context",
+   "module": "app.pipeline.active_context",
+   "group": "pipeline",
+   "path": "app/pipeline/active_context.py",
+   "loc": 61,
+   "role": "Active context persistence.",
+   "role_full": "Active context persistence.\nReplaces active_skill \u2014 generic for any tool.",
+   "stage": null,
+   "api": [
+    "persist_active_context()",
+    "load_active_context()",
+    "load_failed_query()"
+   ],
+   "telemetry": [],
+   "callers": [
+    "app.pipeline.react_loop"
+   ],
+   "fan_in": 1,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.react_loop \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-pipeline-context",
+   "module": "app.pipeline.context",
+   "group": "pipeline",
+   "path": "app/pipeline/context.py",
+   "loc": 306,
+   "role": "Pipeline context: correlation_id, thread_id, state, plan, and stage data.",
+   "role_full": "Pipeline context: correlation_id, thread_id, state, plan, and stage data.\n\nHolds everything the pipeline stages need to read/write. Stages modify context\nin place; no patch merge\u2014explicit transitions via apply_delta on state.",
+   "stage": null,
+   "api": [
+    "PipelineContext"
+   ],
+   "telemetry": [],
+   "callers": [
+    "app.pipeline.__init__",
+    "app.pipeline.orchestrator",
+    "app.pipeline.react.feedback_signal",
+    "app.pipeline.react.parsing",
+    "app.pipeline.react.prompts",
+    "app.pipeline.react.round0",
+    "app.pipeline.react_loop",
+    "app.services.post_run_adjudication",
+    "app.stages.clarify",
+    "app.stages.classify",
+    "app.stages.continuity",
+    "app.stages.integrate",
+    "app.stages.plan",
+    "app.stages.resolve",
+    "app.stages.state_load",
+    "app.state.user_context_resolution"
+   ],
+   "fan_in": 16,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator, app.pipeline.react_loop, app.stages.continuity \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-pipeline-credentialing_envelope",
+   "module": "app.pipeline.credentialing_envelope",
+   "group": "pipeline",
+   "path": "app/pipeline/credentialing_envelope.py",
+   "loc": 178,
+   "role": "Credentialing envelope: canonical message + routing helpers (shared with ReAct).",
+   "role_full": "Credentialing envelope: canonical message + routing helpers (shared with ReAct).",
+   "stage": null,
+   "api": [
+    "resolve_step3_roster_merge_context()",
+    "roster_uploads_from_active()",
+    "thread_has_roster_reconciliation_data()",
+    "message_requests_roster_reconciliation()",
+    "message_prefers_outside_in_credentialing()",
+    "envelope_routes_to_reconciliation()",
+    "classify_org_vs_uploads()",
+    "build_canonical_credentialing_message()"
+   ],
+   "telemetry": [],
+   "callers": [
+    "app.services.credentialing_run_service"
+   ],
+   "fan_in": 1,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through its callers \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-pipeline-curator_tools",
+   "module": "app.pipeline.curator_tools",
+   "group": "pipeline",
+   "path": "app/pipeline/curator_tools.py",
+   "loc": 329,
+   "role": "ReAct tool handlers for the curator (Phase 13.5).",
+   "role_full": "ReAct tool handlers for the curator (Phase 13.5).\n\nTwo tools live here, called from ``react_loop._execute_tool``:\n\n* ``lookup_authoritative_sources`` \u2014 query rag's /sources/search to\n  enumerate URLs Mobius has seen for a payer/state/topic. Returns\n  both ingested and not-yet-ingested URLs.\n\n* ``ingest_url`` \u2014 POST to rag's /documents/import-from-html (or\n  /import-from-gcs for already-uploaded PDFs) to pull a single URL\n  through the chunking + embedding + lexicon + publish pipeline.\n\nBoth are HTTP, not direct DB. Reasons:\n* /sources/search runs on rag; the same shape works whether chat reads",
+   "stage": null,
+   "api": [
+    "call_lookup_authoritative_sources()",
+    "call_ingest_url()"
+   ],
+   "telemetry": [],
+   "callers": [
+    "app.pipeline.react_loop"
+   ],
+   "fan_in": 1,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.react_loop \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-pipeline-message_resolver",
+   "module": "app.pipeline.message_resolver",
+   "group": "pipeline",
+   "path": "app/pipeline/message_resolver.py",
+   "loc": 423,
+   "role": "Conversational continuity and active skill context resolution.",
+   "role_full": "Conversational continuity and active skill context resolution.\n\nTwo problems solved together:\n\nProblem 1 \u2014 Pronoun resolution:\n  \"Can you search the web for it?\" after a failed query\n  \u2192 resolve \"it\" from prior turn before planning\n\nProblem 2 \u2014 Skill output awareness:\n  \"How many NPIs have issues with PML?\" after a credentialing report\n  \u2192 answer from report data in context, not from RAG or web",
+   "stage": null,
+   "api": [
+    "resolve_pronouns()",
+    "resolve_message_references()",
+    "detect_skill_reference()",
+    "build_skill_context_summary()",
+    "extract_roster_skill_data()"
+   ],
+   "telemetry": [],
+   "callers": [
+    "app.pipeline.orchestrator",
+    "app.pipeline.react_loop",
+    "app.planner.blueprint",
+    "app.stages.resolve"
+   ],
+   "fan_in": 4,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator, app.pipeline.react_loop \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-pipeline-orchestrator",
+   "module": "app.pipeline.orchestrator",
+   "group": "pipeline",
+   "path": "app/pipeline/orchestrator.py",
+   "loc": 1903,
+   "role": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).",
+   "role_full": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).\n\nRuns stages in order; handles clarification/refinement early exit; publishes response.",
+   "stage": null,
+   "api": [
+    "run_pipeline()"
+   ],
+   "telemetry": [
+    {
+     "signal": "cache_candidates_returned",
+     "tier": "chat-side",
+     "surface": "trace only"
+    },
+    {
+     "signal": "cache_lookup_fired",
+     "tier": "chat-side",
+     "surface": "trace only"
+    },
+    {
+     "signal": "note",
+     "tier": "chat-side",
+     "surface": "trace only"
+    },
+    {
+     "signal": "personalization_applied",
+     "tier": "thinking-chain",
+     "surface": "thinking chain (user-visible)"
+    },
+    {
+     "signal": "turn_completed",
+     "tier": "promoted",
+     "surface": "task-manager dashboard"
+    },
+    {
+     "signal": "turn_failed",
+     "tier": "promoted",
+     "surface": "task-manager dashboard"
+    },
+    {
+     "signal": "turn_truncated",
+     "tier": "promoted",
+     "surface": "task-manager dashboard"
+    }
+   ],
+   "callers": [
+    "app.main",
+    "app.pipeline.__init__",
+    "app.worker.run"
+   ],
+   "fan_in": 3,
+   "surfaces": [
+    "task-manager dashboard",
+    "thinking chain (user-visible)",
+    "trace only"
+   ],
+   "observability": "self-emitting",
+   "observability_note": "Emits its own signals; visible in chat_turns.thinking_log under its own name."
+  },
+  {
+   "id": "app-pipeline-personalization",
+   "module": "app.pipeline.personalization",
+   "group": "pipeline",
+   "path": "app/pipeline/personalization.py",
+   "loc": 130,
+   "role": "User-profile splicing helpers.",
+   "role_full": "User-profile splicing helpers.\n\nMobius-user/CONSUMER_RECIPE_PROFILE.md is the contract. This module\nimplements the chat-side consumer:\n\n  * ``splice_user_profile(base, profile)`` \u2014 Pattern A from the recipe.\n    Drop ``profile.rendered_prompt`` between a base system prompt and\n    whatever follows. No-op when the user hasn't onboarded.\n  * ``autonomy_for(profile, sensitive)`` \u2014 Pattern B. Read-only access\n    to ``profile.autonomy.{routine,sensitive}_tasks`` for tool-execution\n    gating (confirm-first vs auto). Defaults to ``confirm_first`` when\n    profile is missing \u2014 safest fallback.\n  * `",
+   "stage": null,
+   "api": [
+    "splice_user_profile()",
+    "autonomy_for()",
+    "personalization_emit_payload()"
+   ],
+   "telemetry": [],
+   "callers": [
+    "app.pipeline.orchestrator",
+    "app.pipeline.react.critic",
+    "app.pipeline.react.prompts",
+    "app.pipeline.react_loop",
+    "app.responder.final",
+    "app.responder.final_parallel",
+    "app.services.adjudication.full"
+   ],
+   "fan_in": 7,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator, app.pipeline.react_loop \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-pipeline-react_loop",
+   "module": "app.pipeline.react_loop",
+   "group": "pipeline",
+   "path": "app/pipeline/react_loop.py",
+   "loc": 6114,
+   "role": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.",
+   "role_full": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.\n\nReplaces (when enabled): run_plan() + _answer_for_subquestion() + run_integrate().\n\nKeeps: answer_non_patient(), answer_tool(), answer_reasoning(),\n       emitter system, badge system, jurisdiction system.\n\nEmission map (thinking chunks sent to UI via emitter=on_thinking):\n  Pre-loop:\n    [if pronoun enriched] \"\u21ba Understood: <resolved message>\"\n    [if follow-up to active context] \"\u25cc Answering from the report we just generated\u2026\"\n    [jurisdiction] emit_jurisdiction_context: \"\u2713 Confirmed: \u2026\" | \"? Payer not identified\u2026\" | etc.\n    \"I'm breaking down",
+   "stage": null,
+   "api": [
+    "chunk_text_identity()",
+    "run_react()"
+   ],
+   "telemetry": [
+    {
+     "signal": "critic_approved",
+     "tier": "chat-side",
+     "surface": "trace only"
+    },
+    {
+     "signal": "critic_approved_after_retry",
+     "tier": "promoted",
+     "surface": "task-manager dashboard"
+    },
+    {
+     "signal": "critic_audit_started",
+     "tier": "chat-side",
+     "surface": "trace only"
+    },
+    {
+     "signal": "critic_flagged",
+     "tier": "promoted",
+     "surface": "task-manager dashboard"
+    },
+    {
+     "signal": "fallback_triggered",
+     "tier": "thinking-chain",
+     "surface": "thinking chain (user-visible)"
+    },
+    {
+     "signal": "guidance_mode_activated",
+     "tier": "promoted",
+     "surface": "task-manager dashboard"
+    },
+    {
+     "signal": "note",
+     "tier": "chat-side",
+     "surface": "trace only"
+    },
+    {
+     "signal": "query_understood",
+     "tier": "thinking-chain",
+     "surface": "thinking chain (user-visible)"
+    },
+    {
+     "signal": "react_trace",
+     "tier": "chat-side",
+     "surface": "diagnostic panel"
+    },
+    {
+     "signal": "retrieval_complete",
+     "tier": "thinking-chain",
+     "surface": "thinking chain (user-visible)"
+    },
+    {
+     "signal": "rounds_exhausted_with_warning",
+     "tier": "promoted",
+     "surface": "task-manager dashboard"
+    },
+    {
+     "signal": "strategy_selected",
+     "tier": "thinking-chain",
+     "surface": "thinking chain (user-visible)"
+    },
+    {
+     "signal": "tool_exhausted",
+     "tier": "promoted",
+     "surface": "task-manager dashboard"
+    }
+   ],
+   "callers": [
+    "app.main",
+    "app.pipeline.orchestrator",
+    "app.pipeline.react.round0",
+    "app.stages.integrate"
+   ],
+   "fan_in": 4,
+   "surfaces": [
+    "diagnostic panel",
+    "task-manager dashboard",
+    "thinking chain (user-visible)",
+    "trace only"
+   ],
+   "observability": "self-emitting",
+   "observability_note": "Emits its own signals; visible in chat_turns.thinking_log under its own name."
+  },
+  {
+   "id": "app-pipeline-react_retry_guard",
+   "module": "app.pipeline.react_retry_guard",
+   "group": "pipeline",
+   "path": "app/pipeline/react_retry_guard.py",
+   "loc": 343,
+   "role": "Smart-retry guard for the ReAct loop (Phase 0.7).",
+   "role_full": "Smart-retry guard for the ReAct loop (Phase 0.7).\n\nPrevents the pathology observed in production where the bandit or the LLM\ndecision picks the *same* tool with the *same* inputs across rounds after it\nalready failed, burning LLM calls on a known-dead path.\n\nRules\n-----\n1. **Same tool + same inputs + no new evidence \u2192 skip.** A \"failed attempt\"\n   is recorded when a tool execution either raises, returns ``success=False``,\n   or returns a result attached to an :class:`ErrorEnvelope`. Before the next\n   tool execution, if the (tool, inputs_signature) pair matches a prior\n   failure, we check whe",
+   "stage": null,
+   "api": [
+    "inputs_signature()",
+    "FailedAttempt",
+    "ReactRetryGuard"
+   ],
+   "telemetry": [
+    {
+     "signal": "tool_exhausted",
+     "tier": "promoted",
+     "surface": "task-manager dashboard"
+    }
+   ],
+   "callers": [
+    "app.pipeline.react_loop"
+   ],
+   "fan_in": 1,
+   "surfaces": [
+    "task-manager dashboard"
+   ],
+   "observability": "self-emitting",
+   "observability_note": "Emits its own signals; visible in chat_turns.thinking_log under its own name."
+  },
+  {
+   "id": "app-pipeline-stages",
+   "module": "app.pipeline.stages",
+   "group": "pipeline",
+   "path": "app/pipeline/stages.py",
+   "loc": 12,
+   "role": "Stage names for the pipeline. Used for emit events and trace.",
+   "role_full": "Stage names for the pipeline. Used for emit events and trace.",
+   "stage": null,
+   "api": [],
+   "telemetry": [],
+   "callers": [
+    "app.pipeline.orchestrator"
+   ],
+   "fan_in": 1,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-pipeline-tool_manifest",
+   "module": "app.pipeline.tool_manifest",
+   "group": "pipeline",
+   "path": "app/pipeline/tool_manifest.py",
+   "loc": 695,
+   "role": "TOOL_MANIFEST \u2014 the planner prompt's catalog of dispatchable tools.",
+   "role_full": "TOOL_MANIFEST \u2014 the planner prompt's catalog of dispatchable tools.\n\nHybrid shape after skill-registry commit 3:\n\n  - Five tools are now **registry-owned** (document_upload_skill,\n    list_thread_document_uploads, healthcare_query, web_scrape,\n    google_search). Their descriptions live on ``SkillSpec.description``\n    and we render them here via ``registry.manifest_text(...)``. Adding\n    a new answer_tool-dispatched skill is one file \u2014 no edit here.\n\n  - Four tools are **router-owned**: ``search_corpus``,\n    ``healthcare_npi_lookup``, ``search_uploaded_document``, and\n    ``refuse`` dispatc",
+   "stage": null,
+   "api": [
+    "get_tool_manifest()"
+   ],
+   "telemetry": [],
+   "callers": [
+    "app.api.chat",
+    "app.main",
+    "app.pipeline.react.prompts"
+   ],
+   "fan_in": 3,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through its callers \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-pipeline-react-critic",
+   "module": "app.pipeline.react.critic",
+   "group": "pipeline/react",
+   "path": "app/pipeline/react/critic.py",
+   "loc": 789,
+   "role": "ReAct critic \u2014 audits a draft answer against retrieved sources.",
+   "role_full": "ReAct critic \u2014 audits a draft answer against retrieved sources.\n\n**The problem this module solves.** When the planner says\n``is_complete=true`` and produces a draft answer, nothing in the\npipeline checks whether the draft's factual claims are grounded in\nthe retrieved sources. Shape validators (sections / direct_answer /\nmode) care about structure. The post-run adjudicator gives a quality\nscore but runs too late \u2014 after delivery. So hallucinated phone\nnumbers, fabricated rule citations, and unsubstantiated \"X is\nrequired\" assertions sail through to the user with citation markers\nthat look rigo",
+   "stage": null,
+   "api": [
+    "critic_enabled()",
+    "should_run_critic()",
+    "groundedness_heuristic_enabled()",
+    "compute_groundedness_heuristic()",
+    "build_critic_user_message()",
+    "resolve_critic_system_prompt_v2()",
+    "parse_critic_response()",
+    "format_critique_as_observation()",
+    "build_completion_critic_user_message()",
+    "parse_completion_critic_response()"
+   ],
+   "telemetry": [],
+   "callers": [
+    "app.pipeline.react_loop",
+    "app.services.react_block_seed"
+   ],
+   "fan_in": 2,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.react_loop \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-pipeline-react-feedback_signal",
+   "module": "app.pipeline.react.feedback_signal",
+   "group": "pipeline/react",
+   "path": "app/pipeline/react/feedback_signal.py",
+   "loc": 78,
+   "role": "Periodic product-feedback cadence signal for a ReAct turn.",
+   "role_full": "Periodic product-feedback cadence signal for a ReAct turn.\n\nExtracted from react_loop.py so that file stays under its LOC ratchet\n(tests/test_react_split_phase_1i). See docs/feedback-agent-spec.md \u00a74B/\u00a76:\nthe *decision* (which ask, if any) is computed here from per-user cadence state;\nthe planner only chooses whether to surface it via ``offer_feedback``.",
+   "stage": null,
+   "api": [
+    "maybe_set_feedback_signal()",
+    "enrich_offer_feedback()"
+   ],
+   "telemetry": [],
+   "callers": [
+    "app.pipeline.orchestrator",
+    "app.pipeline.react_loop"
+   ],
+   "fan_in": 2,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator, app.pipeline.react_loop \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-pipeline-react-governor",
+   "module": "app.pipeline.react.governor",
+   "group": "pipeline/react",
+   "path": "app/pipeline/react/governor.py",
+   "loc": 381,
+   "role": "Product Promise round governor \u2014 the contract-driven replacement for",
+   "role_full": "Product Promise round governor \u2014 the contract-driven replacement for\nreact's scattered, hardcoded round policies (Ananth's proposal, spec'd in\ndocs/REACT_PRODUCT_PROMISE_SPEC.md, owned by the \"Product promise contract\"\nagent; this module is ReAct's side of the implementation, built to their\nspec against react_loop.py's actual mechanics).\n\nGated entirely behind ``MOBIUS_PRODUCT_PROMISE_ENABLED`` (default OFF) per\nChat Architecture's ruling, 2026-07-30: when OFF, none of this runs and\ntoday's `react_max_iterations_for_mode()`/`is_guidance_round()`/\n`critic_enabled()`/`should_run_critic()` behavi",
+   "stage": null,
+   "api": [
+    "product_promise_enabled()",
+    "default_contract_for_mode()",
+    "evaluate()",
+    "round_directive_text()",
+    "directive_to_agent_role()",
+    "agent_role_to_reasoning_depth()",
+    "directive_to_reasoning_depth()",
+    "latency_budget_ms()",
+    "resolve_reasoning_depth()",
+    "extract_query_intent_floor()"
+   ],
+   "telemetry": [],
+   "callers": [
+    "app.pipeline.react_loop"
+   ],
+   "fan_in": 1,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.react_loop \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-pipeline-react-parsing",
+   "module": "app.pipeline.react.parsing",
+   "group": "pipeline/react",
+   "path": "app/pipeline/react/parsing.py",
+   "loc": 166,
+   "role": "ReAct decision parsing (Phase 1i pass 1 \u2014 extracted from react_loop.py).",
+   "role_full": "ReAct decision parsing (Phase 1i pass 1 \u2014 extracted from react_loop.py).\n\nPure, context-free helpers for pulling a structured decision dict out of\nthe reasoning model's free-text response. Each reasoning round emits a\nJSON object describing the next tool call (``{thought, tool, inputs,\nis_complete}``); real-world LLM output is rarely clean JSON \u2014 it may\narrive wrapped in ```json fences, include trailing commas, have\nunescaped newlines, or embed the JSON inside markdown prose. This\nmodule is where the tolerance lives.\n\nFour tiers tried in order (see ``_parse_react_decision_json``):\n  1. Strip t",
+   "stage": null,
+   "api": [],
+   "telemetry": [],
+   "callers": [
+    "app.pipeline.react_loop"
+   ],
+   "fan_in": 1,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.react_loop \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-pipeline-react-prompts",
+   "module": "app.pipeline.react.prompts",
+   "group": "pipeline/react",
+   "path": "app/pipeline/react/prompts.py",
+   "loc": 1366,
+   "role": "ReAct prompt + reasoning-context helpers (Phase 1i pass 1).",
+   "role_full": "ReAct prompt + reasoning-context helpers (Phase 1i pass 1).\n\nExtracted from react_loop.py to isolate the text-generation surface\nfrom the tool-dispatch surface. Everything in this module is either:\n\n  - A mode-label / max-rounds constant the planner reads to decide how\n    much leeway to give the reasoner.\n  - A prompt template builder (``_react_reasoning_system``).\n  - The per-round reasoning context builder\n    (``build_reasoning_context``) that feeds the planner.\n  - One LLM call wrapper ``_call_llm_json`` used by run_react to emit\n    and collect the decision JSON.\n\nThe Phase 1i split (202",
+   "stage": null,
+   "api": [
+    "react_chat_mode_label()",
+    "react_max_iterations_for_mode()",
+    "react_agent_role()",
+    "guidance_mode_threshold()",
+    "is_guidance_round()",
+    "resolve_react_system_prompt_v2()",
+    "build_reasoning_context()",
+    "ResolvedCompositionPrompt"
+   ],
+   "telemetry": [],
+   "callers": [
+    "app.main",
+    "app.pipeline.react.critic",
+    "app.pipeline.react.round0",
+    "app.pipeline.react_loop",
+    "app.services.react_block_seed"
+   ],
+   "fan_in": 5,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.react_loop \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-pipeline-react-round0",
+   "module": "app.pipeline.react.round0",
+   "group": "pipeline/react",
+   "path": "app/pipeline/react/round0.py",
+   "loc": 197,
+   "role": "ReAct Round 0 \u2014 system_context short-circuit.",
+   "role_full": "ReAct Round 0 \u2014 system_context short-circuit.\n\nWhen ``POST /chat`` supplies ``system_context`` \u2014 pre-loaded, verified data\nfrom a caller that already did the work (story presentation nodes, skill\ncards with computed metrics) \u2014 we try to answer directly from that context\nbefore entering the normal Round 1..N tool loop.\n\nSecond caller (2026-08-04, Task #29,\ndocs/MIDTURN_TRUNCATION_RECOVERY_SPEC.md \u00a73): a \"Continue\" retry after a\ntruncated turn is just a new ``POST /chat`` with ``system_context`` set to\nthe checkpointed evidence (see ``react_loop.py``'s\n``_checkpoint_best_evidence``). No react-si",
+   "stage": null,
+   "api": [
+    "build_round0_user_message()",
+    "build_round_context_prefix()",
+    "try_system_context_round0()"
+   ],
+   "telemetry": [],
+   "callers": [
+    "app.pipeline.react_loop"
+   ],
+   "fan_in": 1,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.react_loop \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-stages-clarify",
+   "module": "app.stages.clarify",
+   "group": "stages",
+   "path": "app/stages/clarify.py",
+   "loc": 87,
+   "role": "Stage: jurisdiction clarification, route clash, and query refinement. Sets resolvable? and messages.",
+   "role_full": "Stage: jurisdiction clarification, route clash, and query refinement. Sets resolvable? and messages.",
+   "stage": "clarify",
+   "api": [
+    "run_clarify()"
+   ],
+   "telemetry": [],
+   "callers": [
+    "app.pipeline.orchestrator"
+   ],
+   "fan_in": 1,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-stages-classify",
+   "module": "app.stages.classify",
+   "group": "stages",
+   "path": "app/stages/classify.py",
+   "loc": 25,
+   "role": "Stage: classify slot_fill vs new_question, compute effective_message.",
+   "role_full": "Stage: classify slot_fill vs new_question, compute effective_message.",
+   "stage": "classify",
+   "api": [
+    "run_classify()"
+   ],
+   "telemetry": [],
+   "callers": [
+    "app.pipeline.orchestrator"
+   ],
+   "fan_in": 1,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-stages-continuity",
+   "module": "app.stages.continuity",
+   "group": "stages",
+   "path": "app/stages/continuity.py",
+   "loc": 106,
+   "role": "Continuity stage: detect when to ask user for help (user-as-leverage), when user ends pursuit, and when max attempts reached.",
+   "role_full": "Continuity stage: detect when to ask user for help (user-as-leverage), when user ends pursuit, and when max attempts reached.\n\nSee docs/RELENTLESS_CONTINUITY_PLAN.md.",
+   "stage": null,
+   "api": [
+    "should_ask_user_for_help()",
+    "get_objective_end_state()"
+   ],
+   "telemetry": [
+    {
+     "signal": "tool_failed",
+     "tier": "promoted",
+     "surface": "task-manager dashboard"
+    }
+   ],
+   "callers": [
+    "app.pipeline.orchestrator"
+   ],
+   "fan_in": 1,
+   "surfaces": [
+    "task-manager dashboard"
+   ],
+   "observability": "self-emitting",
+   "observability_note": "Emits its own signals; visible in chat_turns.thinking_log under its own name."
+  },
+  {
+   "id": "app-stages-integrate",
+   "module": "app.stages.integrate",
+   "group": "stages",
+   "path": "app/stages/integrate.py",
+   "loc": 1888,
+   "role": "Stage: format response, build response payload.",
+   "role_full": "Stage: format response, build response payload.",
+   "stage": "integrate",
+   "api": [
+    "breakdown_row_from_usage()",
+    "run_integrate()"
+   ],
+   "telemetry": [],
+   "callers": [
+    "app.pipeline.orchestrator",
+    "app.services.post_run_adjudication"
+   ],
+   "fan_in": 2,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-stages-plan",
+   "module": "app.stages.plan",
+   "group": "stages",
+   "path": "app/stages/plan.py",
+   "loc": 141,
+   "role": "Stage: parse message into plan, compute refined_query, build blueprint.",
+   "role_full": "Stage: parse message into plan, compute refined_query, build blueprint.",
+   "stage": "plan",
+   "api": [
+    "run_plan()"
+   ],
+   "telemetry": [],
+   "callers": [
+    "app.pipeline.orchestrator"
+   ],
+   "fan_in": 1,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-stages-resolve",
+   "module": "app.stages.resolve",
+   "group": "stages",
+   "path": "app/stages/resolve.py",
+   "loc": 596,
+   "role": "Stage: route subquestions to agents, collect answers \u2014 with fallback cascade.",
+   "role_full": "Stage: route subquestions to agents, collect answers \u2014 with fallback cascade.",
+   "stage": "resolve",
+   "api": [
+    "extract_urls()",
+    "validate_tool_result()",
+    "run_resolve()"
+   ],
+   "telemetry": [],
+   "callers": [
+    "app.pipeline.orchestrator"
+   ],
+   "fan_in": 1,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-stages-state_load",
+   "module": "app.stages.state_load",
+   "group": "stages",
+   "path": "app/stages/state_load.py",
+   "loc": 128,
+   "role": "Stage: load state, apply delta from message, build context pack.",
+   "role_full": "Stage: load state, apply delta from message, build context pack.",
+   "stage": "state_load",
+   "api": [
+    "run_state_load()"
+   ],
+   "telemetry": [],
+   "callers": [
+    "app.pipeline.orchestrator"
+   ],
+   "fan_in": 1,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own."
+  },
+  {
+   "id": "app-stages-agents-capabilities",
+   "module": "app.stages.agents.capabilities",
+   "group": "stages/agents",
+   "path": "app/stages/agents/capabilities.py",
+   "loc": 334,
+   "role": "Path capabilities registry: what each agent path can answer.",
+   "role_full": "Path capabilities registry: what each agent path can answer.\n\nFed to the parser/planner so it decomposes questions into subquestions\nthat match supported capabilities. Single source of truth.\n\nEach tool has explicit capability declarations so the parser/LLM can\nmatch questions to the right tool. If the first tool fails, ReAct can try another.",
+   "stage": null,
+   "api": [
+    "capabilities_for_parser()",
+    "tool_capabilities_for_parser()",
+    "available_capabilities_json()",
+    "defaults_policy_json()",
+    "slim_master_plan()",
+    "planner_input_json()",
+    "get_capability_answer()"
+   ],
+   "telemetry": [],
+   "callers": [
+    "app.pipeline.tool_manifest",
+    "app.planner.parser",
+    "app.services.tool_agent",
+    "app.stages.plan"
+   ],
+   "fan_in": 4,
+   "surfaces": [],
+   "observability": "mediated",
+   "observability_note": "Emits nothing. Observable only through its callers \u2014 its behaviour has no telemetry identity of its own."
+  }
+ ]
+}
