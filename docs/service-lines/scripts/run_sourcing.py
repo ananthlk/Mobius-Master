@@ -232,7 +232,25 @@ def _source_all(cur, run_id, line, line_key, gov, reqs, profile, max_rounds):
         question = (f"For {JURISDICTION}: " + ASK[rtype].format(subject=subject) +
                     (f" The governing rule is {gov['rule_ref']}." if gov["rule_ref"] else "") +
                     " Quote the governing policy text and name the source document.")
-        subject_id = str(r["id"])
+        # subject_id must be READABLE and unique. A bare primary key is not a
+        # subject — it renders in Deep Research's console as "125", which tells a
+        # reader nothing and looks like a bug (raised by the Deep Research seat,
+        # 2026-09-07, 14 requests affected).
+        #
+        # It cannot be the readable form alone: 153 requirements collapse to 108
+        # distinct line_key/requirement_type/code/qualifier keys, and subject_id
+        # is the ON CONFLICT key — so a purely readable id would silently merge
+        # 45 requirements into each other. That collision is why this line was
+        # changed to the raw id in the first place.
+        #
+        # Until the ratified structured subject lands (SOURCING_REQUEST_CONTRACT
+        # §11.1: subject = {line_key, requirement_type, code, qualifier}, with
+        # subject_id kept as a rendered display string and never a key), the id
+        # is carried as a "#N" suffix: readable at the front, unique at the back.
+        subject_id = (f"{line_key}/{rtype}"
+                      + (f"/{r['code']}" if r["code"] else "")
+                      + (f"/{r['qualifier']}" if r["qualifier"] else "")
+                      + f"#{r['id']}")
 
         cur.execute("""insert into research.request
                          (consumer, subject_type, subject_id, question, evaluator_prompt,
