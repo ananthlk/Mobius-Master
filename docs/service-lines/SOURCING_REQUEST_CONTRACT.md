@@ -907,6 +907,29 @@ held. It was wrong: four different fiscal-year worksheets all matched one
 tokens (`drg`, `rate`, `worksheet`, `reimbursement`) is not identity, which is the same
 error §16's `document_governs` had to be tightened for on the same day.
 
+A wider run of the same matcher finished later and was worse still — **18 of 18 matched
+to unrelated documents**:
+
+```
+DRG Rate Worksheet FY 2019-20           -> MMA_DY13_Annual_Report_CMS20191002.pdf   2532 chunks
+DRG Rate Worksheet FY 2022-23           -> Practitioner_Fee_Schedule_2022_July.pdf  8945
+DRG Reimbursement Plan                  -> Coding for Screening and Brief Interv…    889
+Provider DRG Rate Worksheet FY 2019-20  -> Provider_EAPG_Rate_Worksheet…              76
+```
+
+Two things made it maximally wrong rather than merely loose. It matched on tokens like
+`2019`, `provider`, `worksheet`, `report` — and it **sorted candidates by chunk count
+descending**, so among everything sharing two generic tokens it reliably chose the
+*largest, most generic* document in the corpus. A tie-break intended to prefer the
+best-populated match instead preferred the least specific one.
+
+The EAPG row is the substantive one: EAPG and DRG are **different grouping systems** —
+ambulatory versus inpatient — so that match is not a near miss but a category error, on
+the exact subject the question was about.
+
+None of this reached the correction. The six applied are Deep Research's, verified by
+exact filename.
+
 The six above are Deep Research's, verified by exact filename with chunk counts. **Six
 corrected, six left absent** — `FY 2022-23` worksheets, the Rough Draft, the APR DRG
 Training Session and the Title XIX plan are genuinely not there under any name checked.
