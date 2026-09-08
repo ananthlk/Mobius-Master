@@ -666,6 +666,28 @@ It also emits nearly all of the pipeline's telemetry — thirteen distinct signa
 of itself and of the sub-modules it drives. Every critic signal comes from here, not from
 critic.py.
 """, findings=[
+ ("bad", "OWNER(chat): REFACTOR react_loop — raised by Ananth as an item, and measuring it "
+         "makes it far more tractable than 6,113 lines suggests. TWO FUNCTIONS ARE 69% OF THE "
+         "FILE: _execute_tool is 2,253 lines (L1153) and run_react is 1,966 (L4149); with "
+         "_finalize_response at 337 the top three are 4,556 lines, 74% of the file. The "
+         "remaining 24 top-level defs are 684 lines between them. So this is not 36 things to "
+         "untangle — it is essentially two.\n\n"
+         "AND THE BIGGER ONE IS MECHANICAL. _execute_tool is a 25-BRANCH DISPATCH CHAIN over "
+         "tool names — appeals_*, service_line_*, healthcare_query, google_search, web_scrape, "
+         "recall_search, precision_search, document_upload_skill and the rest — averaging ~90 "
+         "lines of handler inlined per tool. The target shape is one handler per tool behind a "
+         "registry, and THE PRECEDENT ALREADY EXISTS IN THIS CODEBASE: curator_tools.py holds "
+         "exactly two of those handlers (lookup_authoritative_sources, ingest_url) in their own "
+         "module, called from _execute_tool. The pattern is established and applied to 2 of 25.\n\n"
+         "The mechanism also exists: the Phase 1i extraction programme, with a LOC ratchet test "
+         "(tests/test_react_split_phase_1i) that has already pulled out prompts, parsing, "
+         "round0, critic, governor and feedback_signal.\n\n"
+         "WHY IT MATTERS BEYOND TIDINESS, and this reconciles it with Technical Review's ruling "
+         "that line count is a SYMPTOM rather than the defect: the actual defect is 21 "
+         "log-and-continue handlers sitting on capability paths. You cannot reliably audit 21 "
+         "swallows spread across a 2,253-line function. Splitting per tool is what makes each "
+         "swallow reviewable in a file small enough to hold in your head — the refactor is the "
+         "ENABLER for the fix, not a substitute for it."),
  ("bad", "6,113 lines. Well past the size at which review is reliable, and it is the single "
          "most important file in the product. Phase 1i has been extracting pieces (prompts, "
          "parsing, round0, critic, governor, feedback_signal) and there is an explicit LOC "
