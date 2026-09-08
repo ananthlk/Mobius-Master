@@ -199,30 +199,112 @@ It does NOT check PHI — that happened at the API boundary, before the queue.
  ("watch", "Its docstring is one line, which is why this node was the first thing that read "
            "as empty when Ananth pressure-tested the diagram."),
 ]),
-"classify": dict(rating="green", depth="surface", how="""
-Twenty-four lines. Decides whether the message is a new question or the user filling in a
-blank the system asked about (slot_fill), and computes the effective message to work from.
-That distinction changes routing downstream, which is why it runs this early.
-""", findings=[("good", "Small enough to be obviously correct."),
-               ("watch", "No test file, though the branch it sets is read by later stages.")]),
-"plan": dict(rating="amber", depth="surface", how="""
-Parses the message into a plan: the refined query, and a blueprint of the sub-questions
-that would answer it. Only runs on the classic path — the ReAct loop plans as it goes.
-""", findings=[("watch", "No test file for a stage that decides what the rest of the classic "
-                         "path will try to answer.")]),
-"clarify": dict(rating="green", depth="surface", how="""
-Catches the turns that cannot be answered yet: a missing jurisdiction, a route clash, or a
-query that needs refining. Sets resolvable and the messages to send back. This is what
-turns a bad answer into a question.
-""", findings=[("good", "Has tests, including one specifically for ReAct clarify questions."),
-               ("good", "Asking rather than guessing is a deliberate product stance and it "
-                        "lives in one small module.")]),
-"resolve": dict(rating="amber", depth="surface", how="""
-The classic path's dispatcher. Routes each sub-question to the agent that can answer it,
-collects the answers, and walks a fallback cascade when the first choice cannot.
-""", findings=[("watch", "595 lines with a fallback cascade and only indirect test coverage."),
-               ("watch", "One swallow on a dispatch path — worth checking whether a failed "
-                         "agent call is distinguishable from one that returned nothing.")]),
+"classify": dict(rating="amber", depth="code", how="""
+Twenty-four lines, and the hinge on which conversational continuity turns.
+
+It asks one question — is this a new question, or the user filling a blank we left? —
+by calling classify_message(message, last_turn, open_slots, last_refined). Three outcomes
+matter: slot_fill, jurisdiction_change, or neither.
+
+The interesting branch is what happens on the first two. If there is a stored refined
+query, it does NOT plan from what the user just typed. It rebuilds the whole thing:
+build_refined_query(last_refined, jurisdiction_from_active). So a one-word reply — "Florida"
+— becomes the entire previous question re-asked with Florida attached. That is why a slot
+fill does not lose the question.
+
+Otherwise it preserves an effective_message that message_resolver already set (pronoun
+resolution), falling back to the raw message. That fallback chain is an ordering
+dependency: message_resolver must have run first or "it" never gets resolved.
+""", findings=[
+ ("bad", "The stage is a 24-line wrapper; the actual logic is 226 lines in "
+         "app/state/refined_query.py, which is NOT in this catalogue. Reading the node tells "
+         "you almost nothing about the behaviour — the same boundary error as the PHI gate, "
+         "a third time."),
+ ("watch", "No test file, for the code that decides whether a follow-up keeps its question."),
+ ("good", "Pure and side-effect free: reads merged_state, writes two ctx fields."),
+]),
+
+"plan": dict(rating="amber", depth="code", how="""
+Turns the effective message into a Plan — a list of SubQuestions — plus a refined query and
+a blueprint. Only the classic path runs it; ReAct plans as it goes.
+
+Two shortcuts matter more than the main path.
+
+_plan_from_master_objective: on a slot fill, if a master objective is stored, it reuses the
+sub-objectives already agreed rather than re-parsing. A follow-up does not get re-decomposed
+into a different set of questions than the one the user was answering.
+
+_minimal_plan: when parsing fails, rather than erroring it emits one subquestion carrying the
+raw message with kind=non_patient and intent_score 0.5. The turn continues on a degraded
+plan. That is a deliberate choice — a bad plan beats no answer — but it is silent.
+
+It feeds capabilities_for_parser in, so the decomposition only produces sub-questions
+something can actually answer, and runs parse_credentialing_flow_intent over the text.
+""", findings=[
+ ("bad", "The parse-failure fallback is invisible. A turn planned from _minimal_plan looks "
+         "identical downstream to one that parsed cleanly — same shape, no signal, nothing in "
+         "the trace says the planner gave up. This is the appeals pattern in miniature."),
+ ("watch", "No test file, for the stage that decides what the classic path will try to answer."),
+ ("good", "Reusing the master objective on slot fill is the right call and is the reason a "
+          "follow-up does not silently become a different question."),
+]),
+
+"clarify": dict(rating="green", depth="code", how="""
+The stage that turns a bad answer into a question. It returns resolvable — False means stop
+and ask rather than proceed.
+
+Three checks, in order. Route clash first: detect_route on the message, and when confidence
+is below 1.0 with competing choices, it asks outright — "I can either search the web or
+search our policy materials" — rather than guessing which the user meant. Then jurisdiction:
+need_jurisdiction_clarification against the plan's subquestions and active state, consulting
+the RAG lexicon URL so the tagger can judge scope. Then query refinement.
+
+There is a deliberate exemption worth knowing: when the turn is a follow-up about a stored
+credentialing report — an active roster_report skill, or a stored report_run_id — the
+jurisdiction ask is skipped, because answering from a report we already produced needs no
+RAG scope. Asking "which state?" about a report already on screen is the failure that
+exemption exists to prevent.
+""", findings=[
+ ("good", "Has tests, including one specifically for ReAct clarify questions."),
+ ("good", "Asking rather than guessing is a product stance and it lives in one small module "
+          "with the three triggers visible in order."),
+ ("watch", "The report-context exemption is matched with lowercase substring checks on the "
+           "message ('pml', 'npi', 'section', 'how many'). It works, but it is phrase "
+           "matching standing in for intent, and it will not survive rewording."),
+ ("watch", "Delegates to app/state/clarification.py (88 loc) and query_refinement.py (128 "
+           "loc), neither of which is in this catalogue."),
+]),
+
+"resolve": dict(rating="amber", depth="code", how="""
+The classic path's dispatcher, and the only stage with an explicit, numbered escalation
+ladder. Each subquestion is answered by walking layers until one succeeds:
+
+  0  hard stop
+  1  RAG — the corpus
+  2  system tool
+  3  web / scrape
+  4  reasoning — the model answering without retrieval
+  5  ask_user
+
+Every hop is announced: emit_layer_attempt as each is tried, emit_fallback when one gives
+way to the next, so the thinking chain shows the escalation rather than only its outcome.
+
+The guard worth knowing is on layer 4. Reasoning is allowed to answer only when sources are
+present; if none are, layer 4 is skipped and the cascade falls through to ask_user. That is
+the difference between an ungrounded answer and an honest question, and it is one comparison
+in the middle of a 595-line file.
+""", findings=[
+ ("good", "The ladder is explicit and numbered, and layer_used is returned, so which layer "
+          "answered is knowable per subquestion rather than inferred."),
+ ("good", "The layer-4 groundedness guard — no sources means no reasoning answer, ask instead "
+          "— is exactly the right default."),
+ ("watch", "595 lines and only indirect test coverage; the tests named for it are about "
+           "fetch_document and message resolution, not the cascade itself."),
+ ("watch", "validate_tool_result returns (is_valid, failure_reason) and an invalid result "
+           "triggers the next layer — so a tool that returns something useless is "
+           "indistinguishable downstream from one that failed outright."),
+]),
+
 "integrate": dict(rating="amber", depth="code", ux="Answer card in the chat bubble; step labels 'Composing your answer' and 'Critique & citations'", how="""
 Not one step — THREE LLM calls plus a mode switch, which is why it is 1,887 lines.
 
