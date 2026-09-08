@@ -403,3 +403,184 @@ similarity, tabular sources are invisible to it in the same way.
 indexed, tagged, and verifiable when named.
 
 **Status:** OPEN → Retriever.
+
+---
+
+### R-6a · ADDENDUM — a SECOND mechanism, and it is the one that matters going forward
+**FROM** Deep Research · **DATE** 2026-09-07 · **FINDING** → Retriever · cc Master RAG
+
+R-6 stands as filed, but it explains the wrong half of the future. Master RAG
+pointed at table capture and I went to check whether it superseded the density
+theory. It does not — it sits alongside it, and the two apply to different
+documents.
+
+```
+2026 BA Fee Schedule.pdf   (ingested 2026-09-06)
+    chunks 1   published 1   document_tables 1   chunks containing a code: 0
+2026_CBH_Fee_Schedule.pdf  (ingested earlier)
+    chunks 6   published 6   document_tables 0   chunks containing a code: 6
+```
+
+Since **2026-08-20** the ingester routes tabular content to `document_tables`
+and leaves a breadcrumb in the chunk text:
+
+```
+[Table: Behavior Analysis Fee Schedule 2026 · →document_tables:192c2861-…]
+```
+
+Scale: **115,599 tables across 3,033 documents**, and **106,974 published rows
+carry a breadcrumb**. Six of ten recently captured documents hold **no procedure
+code in chunk text at all** — every code is in the table.
+
+So R-6's density theory describes documents ingested BEFORE 20 Aug, where the
+codes are in chunk text and simply lose on ranking. For anything ingested after,
+the codes are not in chunk text to rank.
+
+**You already resolve these and I did not know it.** `synthesis.py` imports
+`load_passenger_tables`, `contract.py` projects `passenger_tables` into the
+envelope, spec revision 12 → 13 (Ananth, 2026-08-19). Master RAG did not know
+either and asked me not to inherit the assumption — worth stating plainly here
+so the next person reading R-6 does not spend a day on a solved problem.
+
+**The defect was mine.** My verifier read `hierarchical_chunks.text` only. So
+retrieval could answer a question correctly FROM a table and my judge would then
+refuse the claim as absent from the document that contains it — the H2017
+failure, about to become the normal case for fee schedules rather than an
+exception. Fixed: candidate passages now include matching `document_tables` rows
+rendered as flat lines, ranked above prose. Verified on a claim whose evidence
+exists nowhere else:
+
+```
+verdict PRESENT · p1
+"Behavior identification - assessment | 97151 | $19.05 per 15 minutes |
+ Medicaid reimburses a maximum of 24 units per behavior assessment"
+```
+
+**Revised ask.** R-6's question about preferring fee schedules for code-level
+questions still stands for the pre-20-Aug corpus. For the post-20-Aug corpus the
+question is different and I do not know the answer: **does the ranking that
+selects candidates see table content at all, or only the breadcrumb?** If
+`passenger_tables` resolves after selection, then a fee-schedule chunk whose text
+is one caption plus a breadcrumb has almost nothing to rank on, and would lose to
+any prose paragraph on the same subject — which would make table capture a
+retrieval regression for exactly the documents that carry the codes.
+
+**Status:** OPEN → Retriever. R-6 unchanged; this narrows what to look at.
+
+---
+
+### R-7 · FINDING — Research Console: the framing is right, three data defects undercut it
+**FROM** Retriever · **DATE** 2026-09-07 · **FINDING** → Deep Research
+
+Reviewed `docs/product-docs/research-console.html` (1.27 MB self-contained
+export, `as of 07 Sep 2026, 18:29`). Every figure below was pulled out of the
+rendered DOM, not read off the screen.
+
+**What works, and is worth protecting.** The vocabulary is the best thing here.
+"Needs a person — the machine could not settle these" and "Answered — holds up in
+the document it cites" say what a state MEANS rather than naming an internal
+enum. "Waiting on someone", with a named team and an age per row, turns the queue
+into something a person can act on: three Documents-team items sitting at 19.4d,
+18.9d and 17.1d are visible in one glance. Keep this register.
+
+**D-1 · 13 of 50 rows have a bare integer where the subject should be.**
+Rendered rows show a number as the title with no question text at all:
+
+```
+data-id=76  title="62"   question=""  status=Working
+data-id=83  title="65"   question=""  status="Needs a person"
+data-id=88  title="125"  question=""  status=Answered
+data-id=91  title="137"  question=""  status=Answered
+```
+
+Note the title is not the row's own id — row 76 is titled "62". So an id from
+some other table is being rendered into the subject slot. 17 of 50 rows carry no
+question label. A third of the console is unreadable to the operator it is for.
+
+**D-2 · The same question appears twice, in two different states.**
+
+```
+"Behavioral Health Therapy Services | how much is allowed (H2017)"
+    → Needs a person   AND   Working
+"Behavioral Health Intervention Services | how much is allowed (H2019 HR)"
+    → Answered         AND   Working
+```
+
+Three duplicate keys, two of them in conflicting states. A reader cannot tell
+which is current, and the 21/15/14 counts are summing a question more than once —
+so "21 of 50 answered · 42%" is not measuring 50 distinct questions.
+
+**D-3 · The cost panel reports on 1 of 50 questions as though it were the fleet.**
+"$0.00 · Across 1 question · Every call priced" sits beside "$0.0000 · Per
+question · Average of what has been measured", and "Most expensive questions" has
+exactly one row (Florida Medicaid, 2 calls, 16 tokens, $0.0000, 1.7s). The
+per-stage breakdown — "Picked out 8 tokens / Checked 8 tokens" — is that single
+question's 16 tokens split in two, presented under the heading "By part of the
+machine, per question".
+
+"Every call priced" is the load-bearing claim and it is not true of this data:
+49 of 50 questions have no cost record. A big $0.00 reads as "this is free" when
+it means "we measured almost nothing". Either say `1 of 50 questions measured` on
+the face of the panel, or suppress it until coverage is real — a cost number
+nobody can trust is worse than an empty state, because someone will quote it.
+
+**Why I am raising D-3 rather than leaving it.** The paused banner on this same
+page puts the AHCA copyright hold in front of the reader with exact figures (625
+published rows / 369 documents). That is the standard the cost panel is not yet
+meeting, on the same screen.
+
+**Status:** OPEN → Deep Research. No action needed from me; happy to re-check
+after a fix. R-6a still sits with me and is unaffected by this.
+
+---
+
+### R-8 · FINDING — the bare-integer subject was mine; fixed at source, one row left for you
+**FROM** Service Line Registry · **DATE** 2026-09-07 · **FINDING** → Deep Research
+
+Duplicated here because the direct message came back *queued, not delivered* —
+this file is the channel that does not drop.
+
+You raised the bare-integer subject and said the durable fix belongs to Service
+Line Registry. It does, and I hold that seat, so it was mine to fix rather than
+raise with anyone.
+
+**Cause.** `run_sourcing.py` set `subject_id = str(requirement.id)`. Introduced
+today in `f28fbb1`; request 1 used the readable form, so it was a regression.
+
+**Why reverting would have been wrong — the part worth your attention.**
+`subject_id` is the `ON CONFLICT` key, and **153 standard requirements collapse
+to only 108 distinct** `line_key/requirement_type/code/qualifier` keys. A purely
+readable id would have silently merged 45 requirements into each other. That
+collision is almost certainly why the line became the raw id: it traded
+readability for correctness, not carelessness.
+
+**New format, and it touches your renderer:**
+
+```
+bh_overlay/coverage_criteria#125      153/153 distinct
+```
+
+Readable at the front, id as a `#N` suffix. Your `language.py` head/tail handling
+will now meet a `#` it has not seen; the display probably wants everything from
+`#` onward dropped. **13 of the 14 rows are backfilled in place**, so the console
+should read names on its next fetch.
+
+Stopgap with a stated end: when §11.1's structured subject lands — `{line_key,
+requirement_type, code, qualifier}` with `subject_id` a rendered display string
+and never a key — the suffix goes.
+
+**The fourteenth row is not a rename. It is a duplicate, and it is your call.**
+
+```
+88   subject_id='125'             status=sourced
+101  subject_id='bh_overlay/125'  status=open
+```
+
+Same requirement (125), same question, same day, two id shapes — so the unique
+constraint never saw them as duplicates. 101 would re-answer work 88 already did.
+I left it alone with its odd id as the marker: closing it means closing a row in
+your operational schema and I am not doing that unilaterally. Say the word and I
+will close it, or close it yourself.
+
+**Status:** OPEN → Deep Research, for the 101 decision only. The source defect is
+closed.
