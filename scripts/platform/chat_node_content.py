@@ -1038,6 +1038,25 @@ which turns off the optional path only. The mandatory floor still runs.
           "the code."),
  ("good", "It is the depth half of a per-turn adaptation pair whose breadth half "
           "(retrieval_budget) is already live and unconditional. The pairing is coherent."),
+ ("bad", "OWNER(chat): THE GOVERNOR IS STRUCTURALLY UNOBSERVABLE. governor.py contains "
+         "ZERO logger calls — verified by grep, not inferred. It makes the round policy, "
+         "issues the per-round directive, selects the prompt composition and grants extension "
+         "rounds, and it says nothing about any of it.\n\n"
+         "Its ONLY window is the react_trace envelope, and react_loop emits that, not the "
+         "governor — so the observability belongs to a different module than the decisions. "
+         "That envelope carries governor_enabled, max_rounds and the per-round directives, "
+         "which is how I verified the thing works at all.\n\n"
+         "AND THAT SINGLE WINDOW CAN FAIL SILENTLY. react_loop.py:3922 wraps the react_trace "
+         "emit in `except Exception as _rt_exc: logger.debug(...)` — debug level, no re-raise, "
+         "no counter. So if the trace emit fails, the governor becomes completely invisible AND "
+         "nothing anywhere says so. One swallow at debug level is the difference between "
+         "'observable' and 'not'.\n\n"
+         "The extension gate has the same shape one level down: it sets "
+         "ctx.completion_critic_ran, _satisfied and _gaps, and nothing renders any of them.\n\n"
+         "The practical consequence, measured today: with zero chat traffic in 24h and no "
+         "logger calls in the module, there was NO way to answer 'is the governor working' "
+         "except to send a live turn and read the trace. Exercising production should not be "
+         "the only instrument."),
  ("bad", "It was shipped behind a default-off flag that the deployment turns on, which means "
          "the code reads as dormant and the system is not. Two of us — the Chat seat and I — "
          "independently said 'off by default, never fires' from reading the default."),
