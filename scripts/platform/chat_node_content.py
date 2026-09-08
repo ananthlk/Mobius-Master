@@ -125,11 +125,16 @@ phi_flag, identifier labels, evidence and classifier version.
  ("bad", "SCOPE LENS: there is NO retention or cleanup path for chat_threads or chat_turns "
          "anywhere in mobius-chat. No DELETE FROM either table. rag_query_traces got a "
          "bounded prune this week; chat did not."),
- ("bad", "SCOPE LENS: storage here is NOT a local write. db_execute is an MCP call to "
-         "mobius-db-agent (DB_AGENT_MCP_URL) with a direct-DB fallback when the agent is "
-         "unreachable (CHAT_DB_MODE=direct / _fallback_execute). That is why ensure_thread "
-         "has a connection_error branch at all. My description read as if this were a local "
-         "INSERT; it is a service dependency with two code paths."),
+ ("bad", "SCOPE LENS: db_execute is written as an MCP call to mobius-db-agent with a "
+         "direct-DB fallback, which is why ensure_thread has a connection_error branch at "
+         "all. My original description read as if this were a plain local INSERT."),
+ ("bad", "RUNTIME LENS CORRECTS THE SCOPE LENS: live, the MCP hop DOES NOT HAPPEN. "
+         "CHAT_DB_MODE=direct is set on the deployed service and DB_AGENT_MCP_URL and "
+         "DB_AGENT_CALLER_ID are both UNSET — so the fallback IS the path, and the db-agent "
+         "dependency the code is built around is not in use here. Two consequences: the "
+         "connection_error branch that shapes ensure_thread's degradation is guarding a hop "
+         "that never occurs, and any reasoning about db-agent's availability, access control "
+         "or caller manifests is describing a deployment other than this one."),
  ("watch", "SCOPE LENS: mobius_chat has TWO disjoint migration ledgers — migrations_applied "
            "(24 rows, no checksum) and schema_migrations (48, with checksum), zero overlap, "
            "against 64 .sql files on disk. NEITHER registers the migrations creating "
@@ -346,24 +351,63 @@ request.
 
 # ── The 25 pipeline sub-modules ─────────────────────────────────────────────
 SUB = {
-"state_load": dict(rating="green", depth="code", how="""
-The first thing that runs, on every turn, before the path is even chosen. It reads the
-thread's stored state, works out what this message changes, applies that delta, saves it
-back, and builds the context pack the rest of the pipeline reads.
-
-Concretely: get_state(thread_id) → ThreadState → extract_state_delta(message, state) →
-apply_delta → save_state_full. Continuity fields that are not part of the ThreadState
-model (active_skill, last_failed_query, active_context) are carried across by hand so they
-survive the round trip. With no thread_id it degrades to empty state rather than failing.
+"state_load": dict(rating="red", depth="code", how="""
+Runs on every turn, before the path is even chosen. Reads the thread's stored state, works
+out what this message changes, applies the delta, writes it back, and builds the context pack
+the rest of the pipeline reads. get_state -> ThreadState -> extract_state_delta -> apply_delta
+-> save_state_full.
 
 It does NOT check PHI — that happened at the API boundary, before the queue.
+
+I rated this GREEN on the strength of it being small, pure and explicit. The scope lens found
+a data-loss path in it. The rating was wrong and the reason I got it wrong is the same one
+Technical Review named on the queue node: I graded the construction, not the guarantee.
 """, findings=[
- ("good", "Small, single-purpose, and the state transition is explicit: no patch merging, "
-          "deltas applied through one function."),
- ("watch", "No test file, and it is the module every turn depends on for continuity."),
- ("watch", "Its docstring is one line, which is why this node was the first thing that read "
-           "as empty when Ananth pressure-tested the diagram."),
+ ("bad", "A TRANSIENT READ FAILURE DESTROYS ACCUMULATED THREAD STATE. Verified: get_state "
+         "returns None for a DB error and None for no-row — identical, and its docstring says "
+         "only 'or None if no row', never mentioning the error case. state_load then does "
+         "`raw = get_state(...) or {}`, builds ThreadState from defaults, and if the message "
+         "carries a delta calls save_state_full, whose UPSERT does a FULL REPLACE ('Replace "
+         "state entirely (no merge)'). So one failed read plus any delta-bearing message "
+         "overwrites the whole conversation's accumulated state with defaults plus that turn. "
+         "Not skipped — destroyed. Correct behaviour given a true empty read; catastrophic "
+         "given a failed one."),
+ ("bad", "AND NOTHING CAN DETECT IT AFTERWARDS. state_version increments on the same write, "
+         "so the row goes 11 -> 12 exactly as a normal turn would. There is no artifact "
+         "distinguishing 'turn 12 of a conversation' from 'state reset, now calling itself "
+         "12'. Compare node 1: ensure_thread also fails open, but the FK catches the "
+         "consequence. Here nothing catches it — same fail-open philosophy, no backstop."),
+ ("bad", "state_version is WRITE-ONLY. Verified by grep: it is inserted, incremented, and "
+         "mentioned in two docstrings — never read, never compared, anywhere in app/. So it "
+         "cannot detect the above, AND read-modify-write through get_state/save_state_full is "
+         "unguarded: two concurrent turns on one thread are a lost update. The column that "
+         "would make optimistic concurrency possible exists and is never used for it."),
+ ("watch", "State size is bimodal and it is NOT conversation length. Verified live: 4,895 "
+           "rows, p50 441 B, p95 918 B, p99 72 kB, 59 rows over 32 kB. The DB seat measured "
+           "corr(state_version, size) = 0.009 — a distinct population, not accumulation. "
+           "master_objective is the inflator (up to 145 kB), active_context second (82 kB), "
+           "everything else under 240 bytes. Both are uncapped, while uploaded files ARE "
+           "capped at 15 records."),
+ ("watch", "Three keys are persisted OUTSIDE the model and kept alive by a hardcoded name "
+           "list: active_skill, last_failed_query, active_context are in the stored JSON but "
+           "not in ThreadState, surviving only because state_load copies them from raw by "
+           "name, twice. A fourth such key added anywhere else is silently dropped on the next "
+           "save. And active_context is the #2 size inflator, so the un-modelled path is also "
+           "a heavyweight one."),
+ ("watch", "An empty thread_id returns empty state and never touches storage — which is the "
+           "landing zone for node 1's failure modes. The 102 NULL-thread_id turns and every "
+           "ensure_thread fresh-uuid path arrive here and are silently treated as brand-new "
+           "conversations."),
+ ("good", "RUNTIME LENS, answering the DB seat's question: CHAT_RAG_DATABASE_URL IS set on "
+          "the live service, so state is genuinely being persisted rather than silently "
+          "dropped. The failure mode above is a real risk, not an active outage."),
+ ("watch", "WHAT THIS CANNOT SEE: whether finding 1 has ever fired. It leaves no artifact by "
+           "construction, so its rate is not recoverable from the data — absence of evidence "
+           "here is guaranteed, not reassuring. Also unmeasured: whether concurrent turns on "
+           "one thread occur in production, and whether any writer outside mobius-chat/app "
+           "mutates chat_state."),
 ]),
+
 "classify": dict(rating="amber", depth="code", how="""
 Twenty-four lines, and the hinge on which conversational continuity turns.
 
