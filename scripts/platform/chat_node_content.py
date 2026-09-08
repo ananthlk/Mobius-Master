@@ -187,7 +187,7 @@ allowed but logged as its own outcome. Downstream only ever sees the categories.
            "every message before the user sees any acknowledgement."),
 ]),
 
-"queue": dict(rating="amber", depth="code", how="""
+"queue": dict(rating="red", depth="code", how="""
 A Redis list used as a work queue, and the handoff between the API and the worker.
 
 The ops, verified: publish does LPUSH onto cfg.redis_request_key; the worker does BRPOP with
@@ -210,6 +210,31 @@ get_queue() picks memory or redis behind a QueueAdapter ABC, so the same code ru
 and production. Connection handling retries 12 times with 5s backoff, about a minute, which
 covers a Redis restart without losing the process.
 """, findings=[
+ ("bad", "STRUCTURE RULING (Technical Review, 2026-09-08): RED — and the clean structure "
+         "is a reason to rate it LOWER, not higher. A polished ABC around this gap is worse "
+         "for review trust than an ugly implementation, because the cleanliness is exactly "
+         "what makes a reader assume the underlying guarantee is sound too. 'LPUSH+BRPOP = "
+         "correct FIFO' is true, stated confidently in comments, and irrelevant to the actual "
+         "gap — while the thing the node exists to guarantee goes unmentioned. Rate the "
+         "guarantee the node exists to provide, not the class hierarchy built around it. This "
+         "corrects my error directly: I rated the abstraction and let it carry the node."),
+ ("bad", "STRUCTURE RULING — what pushes it past 'known limitation' is the absence of DEPTH "
+         "ALERTING. A worker that starts dying mid-turn produces no operator-visible signal "
+         "that anything is wrong. That is not a lossy guarantee with a bounded blast radius; "
+         "it is an unmeasured, unbounded one."),
+ ("watch", "ACCEPTANCE CRITERION, set by Technical Review so 'add redelivery' cannot be "
+           "hand-waved: durability must run CLAIM-TO-ACK, not enqueue-to-dequeue. Either an "
+           "in-flight record written before the callback and cleared after publish_response "
+           "succeeds, with a sweep for stale claims — or a primitive that gives it natively "
+           "(Redis Streams consumer groups: XREADGROUP + XACK is exactly this pattern already "
+           "built). Mechanism is Chat's call. The bar is: a worker death mid-turn is provably "
+           "not silent."),
+ ("watch", "STRUCTURE RULING on the two side items: flush_request_queue should be DELETED "
+           "rather than left — dead, destructive and alarming-by-grep is a bad combination to "
+           "carry even at zero risk today. And 'running on defaults' paired with the "
+           "durability gap reads as nobody having made a deliberate call about this node's "
+           "blast radius, where this service overrides defaults on purpose elsewhere. That is "
+           "a gap in OWNERSHIP, not just a config fact."),
  ("bad", "No delivery guarantee at all. BRPOP with no processing list means worker death "
          "between pop and publish loses the turn with no artifact anywhere. Provable by "
          "reading, and deliberately NOT tested: proving a durability gap by causing one turns "
