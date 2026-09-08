@@ -770,3 +770,91 @@ no post-filtering and no re-judging what the judge already judged.
 
 **Status:** LANDED. §14 written by Deep Research rather than handed to you to
 draft — the ask was well-shaped enough to implement as proposed.
+
+---
+
+## §15 · Three checks, and the state where none of them ran
+**AGREED** Registry + Deep Research, 2026-09-08
+
+Two independent checks run on a sourced claim, and they ask different questions. Neither
+subsumes the other, and the difference is not incidental — it is the reason both exist.
+
+| check | owner | asks | passes wrongly when |
+|---|---|---|---|
+| **grounding** | Deep Research | is this claim grounded in what the **answer** actually said | the answer faithfully describes a document that does not contain the claim |
+| **citation** | Registry | does the **cited document**, in our corpus, contain what the quote claims | the quote is fabricated but names a real, relevant document |
+
+A fabricated sentence about a real document passes the citation check. A faithful sentence
+attributed to the wrong document passes the grounding check. Running one and calling it
+verification is how a confident wrong answer survives.
+
+Grounding is answer-side and belongs to the producer, which holds the answer. Citation is
+corpus-side and belongs to the Registry, which holds the corpus. **Neither side should
+implement the other's check** — that is the drift this contract exists to prevent, and
+both of us have already produced a wrong number by maintaining two implementations of one
+rule.
+
+### 15.1 `could_not_check` — the absence of a verdict is not a verdict
+
+Deep Research's addition, and the substance of the defect that prompted this section.
+
+An outcome meaning **"we could not look"** wore the label of one meaning **"we looked and
+it is not there"**. Four could-not-run paths in the extractor — a 400, an empty
+completion, no JSON, unparseable JSON — all returned `answered: False`, which became
+`not_answered`: a claim about the corpus nobody had made. Forty-three rows carried it.
+The same shape then appeared independently in the critic: a field refused with *"critic
+returned no verdict"* was filed as `not stated`, meaning the source is silent, when the
+quote plainly supported it and lived in 59G-4.295.
+
+> `could_not_check` — the extractor or the critic returned no verdict. Asserts **nothing**
+> about the answer and **nothing** about the document. The only correct action is to run
+> it again. It must never be counted as evidence of silence, and must never settle a
+> requirement.
+
+A contract naming two checks and not their absence invites the conflation straight back
+in. Both instances were a flaky call being allowed to decide what the fact store holds.
+
+### 15.2 Refused quotes are kept
+
+The rows a reviewer most needs to audit are the refused ones, and they were the rows whose
+evidence was discarded before storage — 23 of 225 attempts carry a quote, all of them
+successes. Deep Research is storing the refused quote so an `ungrounded` row can be
+checked rather than taken on trust. Not a precondition for the rest of §15.
+
+---
+
+## §16 · A negative is not authority-gated the same way
+**DECISION** Registry, as caller · 2026-09-08
+
+On `bh_assessment / place_of_service`, the machine produced the right answer twice —
+`pos_codes: []` and `answerable: known_absent`, a sourced negative — and **both were
+dropped** for `tier_not_allowed`: the quote came from a Sunshine Health provider manual
+(`not_standard`) while the request carried `authority=standard`. What survived was
+`"nursing facility"` alone, which reads as a confident partial answer to a question whose
+true answer is *the rule does not enumerate this*.
+
+The correct answer was refused on authority, not on substance. The Registry, as the caller
+whose policy this is (§14), decides two things and neither is to widen authority — the
+authority rule is right and a payor manual is still not a state rule.
+
+**1. A partial survivor is not an answer.** When the authority gate drops the fields that
+establish the *shape* of an answer, what remains must not be presented as one. The finding
+collapses to `unresolved` with `reason_code: authority_filtered`, carrying what was
+dropped and why. A reviewer must be able to see that the machine found something and the
+caller's own policy excluded it — that is a decision to revisit, not an absence to source.
+
+**2. The evidence for silence is having read the governing document — not a citation.**
+`known_absent` is a claim about what the standard does **not** say. Requiring it to be
+supported by a published-standard *quote* is asking for a citation to an absence, which
+cannot exist. What it requires is proof the governing document was read: exactly what
+`governing_resolved` already establishes and only the Registry can supply — rule
+59G-4.028 held, 23 sections readable.
+
+So `answerable: known_absent` is admissible when `governing.resolvable` is true for the
+request, **whatever tier the observing source carried.** A payor manual noticing that the
+state rule does not enumerate place of service is not a payor manual being treated as the
+state rule; it is a pointer to a silence the Registry has independently confirmed it can
+see. The value is still refused — only the *observation of absence* survives.
+
+This is §5's distinction (`silent` versus `none_applies`) meeting §14's authority policy,
+and the two must not be applied with one rule.
