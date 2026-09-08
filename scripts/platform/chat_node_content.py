@@ -195,12 +195,16 @@ that is the file it lives in, and lost it from the node whose assessment it reco
           "Corrects my earlier claim that this node emits nothing."),
  ("good", "Configurable without a redeploy: PHI_GATE_URL, PHI_CLASSIFIER_URL, "
           "PHI_GATE_TIMEOUT_SEC. Has its own test file. 95 lines."),
- ("bad", "TWO IMPLEMENTATIONS OF THE SAME GATE, and only one is audited. "
+ ("bad", "OWNER(chat): TWO IMPLEMENTATIONS OF THE SAME GATE, and only one is audited. "
          "app/api/chat.py:247 checks chat MESSAGES and writes the audit row. "
          "app/skills/phi_gate.py:66 checks FEEDBACK text with its own httpx call and writes "
          "NOTHING to the database — _log_gate emits a logger.info with labels and counts only. "
          "Same classifier, same endpoint, same fail-closed posture, two code paths, one "
          "audit trail. Feedback text passing through a PHI gate leaves no compliance record."),
+ ("watch", "OBSERVATION (Ananth, 2026-09-08): the feedback path's PHI assessment should "
+           "move from a log line into Postgres, so both gates land in the same audit table "
+           "rather than one being queryable and the other being grep-able. Recorded as an "
+           "observation, not scheduled — no action taken."),
  ("bad", "THE AUDIT WRITE IS FAIL-OPEN. _log_phi_msg_gate's docstring calls it a "
          "'Best-effort INSERT' and its failure path logs a warning and continues. The gate is "
          "fail-closed; the record that it fired is not. Technical Review ruled this as its own "

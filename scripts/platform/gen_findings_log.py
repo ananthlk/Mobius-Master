@@ -24,6 +24,17 @@ def load(path, name):
     m = importlib.util.module_from_spec(sp); sp.loader.exec_module(m)
     return m
 
+OWNER_RE = re.compile(r"^OWNER\(([a-z-]+)\):\s*")
+
+def owner_of(text):
+    """A finding may name the seat that owns the fix, as OWNER(chat): ...
+
+    Without this a bug log is a list of things that are wrong with nobody
+    holding any of them, which is how a log becomes a graveyard.
+    """
+    m = OWNER_RE.match(text)
+    return (m.group(1), OWNER_RE.sub("", text)) if m else (None, text)
+
 def lens_of(text):
     t = text.upper()
     for key, lens in (("RUNTIME LENS", "runtime"), ("SCOPE LENS", "scope"),
@@ -45,9 +56,10 @@ def main():
     rows = []
     for node, d in sorted(nodes.items()):
         for kind, text in d.get("findings", []):
+            owner, body = owner_of(" ".join(text.split()))
             rows.append({
                 "node": node, "rating": d["rating"], "sev": SEV.get(kind, "?"),
-                "lens": lens_of(text), "text": " ".join(text.split()),
+                "lens": lens_of(text), "owner": owner, "text": body,
             })
 
     bugs   = [r for r in rows if r["sev"] == "BUG"]
@@ -66,6 +78,16 @@ def main():
     by_lens = {}
     for r in rows:
         by_lens.setdefault(r["lens"], {"BUG": 0, "CHECK": 0, "OK": 0})[r["sev"]] += 1
+    assigned = [r for r in bugs if r["owner"]]
+    if assigned:
+        out.append("\n## Assigned bugs — someone holds these\n")
+        out.append("| Owner | Node | Bug |")
+        out.append("|---|---|---|")
+        for r in sorted(assigned, key=lambda r: (r["owner"], r["node"])):
+            out.append(f"| **{r['owner']}** | `{r['node']}` | {r['text']} |")
+        out.append(f"\n{len(assigned)} of {len(bugs)} bugs have a named owner. The rest are "
+                   "unassigned, which means nobody is holding them.\n")
+
     out.append("\n## Who found what\n")
     out.append("| Lens | Bugs | Checks | OK |")
     out.append("|---|---|---|---|")
@@ -91,7 +113,8 @@ def main():
             if r["node"] != cur:
                 cur = r["node"]
                 out.append(f"\n### `{cur}` — {r['rating']}\n")
-            out.append(f"- **[{r['lens']}]** {r['text']}")
+            own = f" _owner: {r['owner']}_" if r.get("owner") else ""
+            out.append(f"- **[{r['lens']}]**{own} {r['text']}")
 
     path = os.path.join(ROOT, "docs/chat-schema-findings.md")
     open(path, "w").write("\n".join(out) + "\n")
