@@ -981,25 +981,54 @@ that order.
  ("watch", "The ordering dependency with classify is real and implicit."),
 ]),
 
-"personalization": dict(rating="green", depth="code", how="""
-Splices the user's own preferences into the prompt and honours their autonomy setting. It
-implements the chat side of a contract owned by another module — mobius-user's
-CONSUMER_RECIPE_PROFILE.md — rather than an assumption about what a profile contains.
+"personalization": dict(rating="amber", depth="code",
+ ux="The personalization_applied envelope — the user sees their preferences were honoured. "
+    "Preferences are AUTHORED in mobius-user, not here.", how="""
+Chat's side of a contract owned by another module: Mobius-user/CONSUMER_RECIPE_PROFILE.md.
 
-Three functions: splice_user_profile drops the rendered prompt between a base system prompt and
-what follows; autonomy_for reads autonomy.routine_tasks / sensitive_tasks to gate whether a tool
-runs or asks first; personalization_emit_payload builds the envelope so the user can see their
-preferences were applied.
+WHERE COMMUNICATION PREFERENCES LIVE. In profile.communication, three fields with closed
+vocabularies:
 
-Splicing happens at FIVE LLM-bearing stages — planner/ReAct reasoning, critic, integrator,
-adjudicator and one more — so preference shapes tool choice, the quality bar, the voice and the
-post-run grade, not just the wording.
+  tone                  professional | friendly | concise
+  ai_experience_level   beginner | regular | expert
+  greeting_enabled      boolean
+
+Siblings in the same profile: autonomy{routine_tasks, sensitive_tasks} each automatic |
+confirm_first | manual; preferred_name; tasks; timezone; version; generated_at; and
+rendered_prompt.
+
+HOW THEY REACH THE MODEL — and this is the part that is not obvious. They do NOT reach it as
+fields. mobius-user pre-renders them into rendered_prompt, a 4-6 line paragraph of about 150
+tokens, and THAT is what chat splices. The structured communication block is read in exactly
+one place in the entire service — personalization.py:114-123 — and only to build the
+personalization_applied envelope. It never steers behaviour.
+
+What steers is the rendered prose, spliced at six call sites covering the planner/ReAct
+reasoning prompt, the critic, the integrator (both sequential and parallel responders) and
+the post-run adjudicator. So a preference shapes tool choice, the quality bar, the voice and
+the grade — but only in whatever words mobius-user chose.
+
+The profile arrives per-turn in the POST payload. It is never persisted in chat's thread
+state, so it is caller input, not conversation state.
 """, findings=[
  ("good", "autonomy_for defaults to confirm_first when the profile is missing. The safe "
           "fallback is the default, not the permissive one."),
- ("good", "Implements a written cross-service contract and degrades to a no-op for anyone who "
-          "has not onboarded."),
- ("watch", "Seven callers and no test file, for something that alters five prompts."),
+ ("good", "Implements a written cross-service contract rather than an assumption about what a "
+          "profile contains, and degrades to a no-op for anyone who has not onboarded."),
+ ("good", "The emit payload reports the NEGATIVE case too — {applied: false, reason: "
+          "no_profile | feature_disabled_via_env} — so 'personalization did nothing' is "
+          "visible rather than silent."),
+ ("bad", "CHAT IS A PASS-THROUGH FOR PREFERENCES AND CANNOT ACT ON THEM. The communication "
+         "block is read once, for reporting. Behaviour comes entirely from rendered_prompt, "
+         "prose composed by mobius-user. So chat cannot itself honour tone='concise' — it can "
+         "only inject whatever paragraph it was handed. If that rendering is wrong, stale or "
+         "empty, nothing here detects it, and the profile carries a `version` field that "
+         "nothing in chat checks."),
+ ("watch", "The module docstring says splicing happens at five stages; there are six call "
+           "sites (react/prompts.py:545, react_loop.py:5146 and :5401, responder/final.py:600, "
+           "final_parallel.py:269, adjudication/full.py:66). Close, but the count in the "
+           "documentation and the count in the code are not the same number."),
+ ("watch", "Seven callers and no test file, for something that alters six prompts."),
 ]),
 
 "active_context": dict(rating="amber", depth="code", how="""
