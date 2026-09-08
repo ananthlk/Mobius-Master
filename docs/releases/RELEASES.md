@@ -7,6 +7,29 @@ For how versions are assigned, read [RELEASE_PROCESS.md](RELEASE_PROCESS.md).
 
 ---
 
+## product-v1.0.1 — 2026-09-07
+
+**A coverage fix, not a newer release.** Four services were running in dev from
+repositories `product-v1.0.0` never named. This adds them, so the manifest
+finally describes the whole running system rather than most of it.
+
+- **Story:** [product-v1.0.1.md](product-v1.0.1.md)
+- **Manifest:** [product-v1.0.1.lock.json](product-v1.0.1.lock.json)
+
+| Added | Service | Notes |
+|---|---|---|
+| Mobius-user | `mobius-user` | [notes](modules/Mobius-user/v1.0.0.md) |
+| mobius-feedback | `mobius-feedback` | [notes](modules/mobius-feedback/v1.0.0.md) — carved into its own repo |
+| mobius-db-agent | `mobius-db-agent` | [notes](modules/mobius-db-agent/v1.0.0.md) — was miscarried as pre-release while serving traffic |
+| specs-platform | `mobius-specs` | [notes](modules/specs-platform/v1.0.0.md) — carved into its own repo |
+
+The other fourteen modules are pinned at their v1.0.0 versions, unchanged.
+**Forty-one commits across five modules sit outside this release** — including
+the whole platform-framework rebuild — because those modules were never
+re-tagged. v1.0.1 is a *wider* manifest, not a newer one.
+
+---
+
 ## product-v1.0.0 — 2026-09-07
 
 **The first formally versioned Mobius.** Not a feature release: a

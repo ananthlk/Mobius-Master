@@ -26,9 +26,15 @@ SHIPPING = [
     "mobius-skills-mcp", "mobius-os", "mobius-story-ui", "mobius-qa",
     "mobius-interact", "mobius-dbt", "mobius-auth", "mobius-answer-cache",
     "mobius-vault", "product-awareness",
+    # Added in product-v1.0.1. Each deploys a live Cloud Run service, so
+    # product-v1.0.0 pinned a manifest that was not the whole running system.
+    # mobius-feedback and specs-platform were carved out of the superproject
+    # for this release; mobius-db-agent was miscarried as pre-release while
+    # already serving traffic.
+    "Mobius-user", "mobius-feedback", "mobius-db-agent", "specs-platform",
 ]
 PRE_RELEASE = [
-    "mobius-config", "mobius-contracts", "mobius-db-agent", "mobius-design",
+    "mobius-config", "mobius-contracts", "mobius-design",
     "mobius-document-viewer", "mobius-migrations", "mobius-qa-modules",
     "mobius-rag-api",
 ]
