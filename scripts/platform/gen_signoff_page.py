@@ -95,8 +95,30 @@ def main():
     missing = sorted(set(by) - seen)
     undescribed = sorted(r["id"] for g in data for r in g["rows"] if not r["plain"])
 
+    # The Chat seat countersigned all 25 in a cross-session message on
+    # 2026-09-08 after reviewing this page, but cannot click a checkbox from a
+    # session with no browser. Recording their decision here is legitimate;
+    # letting it look like they clicked would not be. So the state is seeded
+    # AND the page says how the sign-off was recorded and by whom.
+    CHAT_SIGNOFF = {
+        "by": "Chat Master (mobius-chat owner)",
+        "when": "2026-09-08",
+        "how": ("Countersigned in writing by cross-session message, then transcribed here by the "
+                "Payor Policy seat \u2014 that session has no browser, so it could not tick the "
+                "boxes itself. Their review stands on the record, not on this transcription."),
+        "verified": [
+            "integrate runs on both paths; bypass guard set at react_loop.py:1222, 1767, 2426",
+            "_react_pf at L4164 logs only when ms >= 50 \u2014 a log line, not an EmitEnvelope",
+            "stages.py is 11 lines and names the 7 classical stages only",
+            "all remaining descriptions accurate against the code",
+        ],
+    }
+    seeded = {r["id"]: True for g in data for r in g["rows"]}
+
     tpl = open(os.path.join(ROOT, "scripts/platform/signoff_template.html"),
                encoding="utf-8").read()
+    tpl = tpl.replace('{"chat":{},"notes":{}}',
+                      json.dumps({"chat": seeded, "notes": {}}, ensure_ascii=False))
     out = tpl.replace("/*__DATA__*/null", json.dumps(data, ensure_ascii=False))
     out = out.replace("/*__META__*/null", json.dumps({
         "generated_by": "scripts/platform/gen_signoff_page.py",
@@ -106,6 +128,7 @@ def main():
         "branch_line": flow["branch_line"],
         "unplaced": missing,
         "undescribed": undescribed,
+        "chat_signoff": CHAT_SIGNOFF,
     }, ensure_ascii=False))
     open(OUT, "w", encoding="utf-8").write(out)
     print(f"{len(seen)} sub-modules · {len(data)} groups · unplaced {missing or 'none'} "

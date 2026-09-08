@@ -114,14 +114,15 @@
         UX state from the source.</span>
       <span class="badge b-ok">signed · 2026-09-08</span></div>
     <div class="party"><b>Chat seat</b>
-      <span class="who">Owns mobius-chat. Corrects anything the docstring got wrong or left out, then
-        countersigns per row.</span>
+      <span class="who">Owns mobius-chat. Corrected three descriptions and the telemetry finding,
+        then countersigned.</span>
       <span class="badge b-wait" id="p2">awaiting review</span></div>
     <div class="party"><b>Ananth</b>
       <span class="who">Chime in on any row — the comment box is shared.</span>
       <span class="badge b-wait">open</span></div>
   </div>
 
+  <p class="note" id="prov"></p>
   <p class="note" id="gapnote"></p>
   <div class="bar" id="bar"></div>
   <div class="ctrls">
@@ -193,6 +194,17 @@
     var p2=document.getElementById("p2");
     p2.className="badge "+(signed===rows.length?"b-ok":"b-wait");
     p2.textContent = signed===rows.length ? "signed · all "+rows.length : "awaiting review · "+signed+"/"+rows.length;
+    var cs = META.chat_signoff;
+    if (cs) {
+      document.getElementById("prov").innerHTML =
+        '<b>How the Chat seat\u2019s sign-off was recorded.</b> '+esc(cs.how)+
+        ' Signed by <b>'+esc(cs.by)+'</b> on '+esc(cs.when)+'. What they checked against the code: '+
+        '<ul style="margin:6px 0 0 18px;padding:0">'+
+        cs.verified.map(function(v){return '<li>'+esc(v)+'</li>';}).join('')+'</ul>';
+    } else {
+      document.getElementById("prov").style.display = "none";
+    }
+
     document.getElementById("gapnote").innerHTML =
       '<b>The telemetry question, as corrected by the Chat seat.</b> '+med+' of '+rows.length+
       ' emit no EmitEnvelope of their own — <code>react_loop</code> and <code>orchestrator</code> emit '+
