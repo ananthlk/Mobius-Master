@@ -95,7 +95,7 @@ h1{font-size:19px;margin:0 0 3px;font-weight:650}
 <script>
 var D = __DATA__;
 var SUB={}, SEL=null;
-D.submodules.forEach(function(m){ SUB[m.module.split('.').pop()]=m; });
+D.submodules.forEach(function(m){ SUB[m.key || m.module.split('.').pop()]=m; });
 D.cross_cutting.forEach(function(c){ SUB[c.id]=c; });
 D.chain.forEach(function(c){ SUB['chain:'+c.step]=c; });
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){

@@ -357,6 +357,49 @@ context-free helpers that recover it.
 """, findings=[("bad", "No test file. This is parsing hostile input from a model — precisely "
                        "the code that should be table-driven and heavily tested."),
                ("good", "Pure and context-free, so it is trivially testable once someone does.")]),
+"completion_extension_gate": dict(rating="amber", depth="code",
+ ux="No surface. ctx.completion_critic_ran / _satisfied / _gaps are set but nothing renders them",
+ how="""
+THE dynamic ReAct parameter adjuster — and the reason it took a message to the Chat seat
+to find it is that it has no module, no class and no name. It is roughly sixty lines
+inline in react_loop's main loop body (react_loop.py:5077-5133), from Task #104 with the
+wall-clock guard added by #107.
+
+What it does: when the model says is_complete=true and a draft exists, it runs a cheap
+second opinion — the completion critic, a 400-token fast call with a 1500ms latency
+budget — asking whether the answer actually covers the question. If the critic says no,
+the loop does not finish. It appends a synthetic tool result naming what is still missing
+and a suggested next query, then:
+
+    _pp_extension_rounds_used += 1
+    max_it += 1            # react_loop.py:5120 — mutates the local ceiling
+    continue
+
+So the round ceiling is raised for THIS TURN ONLY, in response to observed answer quality.
+That is the whole adjuster.
+
+Six conditions must all hold: the governor is on, a contract was built, the mode is
+agentic, the turn is not already at ceiling, extension budget remains
+(max_extension_rounds - used > 0), and there is wall-clock left — elapsed + 25s < the turn
+deadline, the 25 seconds reserving room to synthesise the final answer.
+""", findings=[
+ ("bad", "The most interesting control loop in the product is an un-named `max_it += 1` "
+         "inside an if-block in a 6,113-line file. It is invisible to search, cannot be "
+         "unit-tested in isolation, and is the reason this node was missing from the schema "
+         "until the Chat seat pointed at a line number."),
+ ("bad", "The governor is OFF by default, so this never fires in production today. The "
+         "static per-mode constants in prompts.py are the live policy. Real, working, "
+         "quality-driven adaptation that nothing currently runs."),
+ ("watch", "The contract table defines max_extension_rounds=1 for copilot, but the gate "
+           "requires mode_label == 'agentic'. Copilot's extension budget is therefore "
+           "defined and unreachable — either the gate or the table is wrong."),
+ ("good", "The wall-clock guard (#107) is the right shape: it reserves 25s for final "
+          "synthesis rather than letting an extension eat the answer."),
+ ("good", "A completion-critic failure degrades to satisfied and falls through to the "
+          "normal finalize path, with the reasoning written at the call site. A swallow I "
+          "would defend — it fails toward answering rather than toward hanging."),
+]),
+
 "react_retry_guard": dict(rating="green", depth="surface", how="""
 Stops the loop burning calls re-running a tool that already failed with the same inputs.
 Written against a specific pathology seen in production, where the bandit or the model

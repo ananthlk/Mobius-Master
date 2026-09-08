@@ -170,7 +170,7 @@ def flow():
             {"phase": "Act", "modules": ["react_retry_guard", "curator_tools"],
              "cite": cite(r"block repeat call if"),
              "note": "Dispatches tools, and refuses a repeat of a call that already failed."},
-            {"phase": "Observe", "modules": ["critic", "governor", "feedback_signal"],
+            {"phase": "Observe", "modules": ["critic", "governor", "feedback_signal", "completion_extension_gate"],
              "cite": cite(r"Critic gate"),
              "note": "Audits the draft against sources and decides whether to go round again."},
         ],

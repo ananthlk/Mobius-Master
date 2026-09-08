@@ -154,7 +154,29 @@ def main():
             obj["findings"] = c["findings"]
         obj["signals"] = sigs.get(sig_alias.get(key, key), {})
 
+    # No module of its own — it is an if-block inline in react_loop. Synthesise
+    # a record so it can be a node, and be explicit that its "file" is its host.
+    by["completion_extension_gate"] = {
+        "id": "completion_extension_gate",
+        "module": "app.pipeline.react_loop (inline, L5077-5133)",
+        "path": "app/pipeline/react_loop.py:5077-5133",
+        "loc": 57, "group": "pipeline/react",
+        "role": "Inline completion-critic extension gate — raises max_it for this turn.",
+        "role_full": "No docstring: it is an if-block, not a module.",
+        "api": [], "callers": ["app.pipeline.react_loop"], "fan_in": 1,
+        "telemetry": [], "surfaces": [],
+        "config": ["MOBIUS_PRODUCT_PROMISE_ENABLED", "MOBIUS_TURN_DEADLINE_S"],
+        "writes": [], "observability": "mediated",
+        "observability_note": ("Sets ctx.completion_critic_ran / _satisfied / _gaps, but "
+                               "emits no signal and nothing renders them."),
+    }
+
+    # Key explicitly. The page used to derive it as module.split(".").pop(),
+    # which produced garbage for the inline gate whose "module" is
+    # "app.pipeline.react_loop (inline, L5077-5133)" — its chip then pointed at
+    # nothing and clicking it silently did nothing.
     for name, m in by.items():
+        m["key"] = name
         attach(name, m)
     for c in cross:
         attach(c["id"], c)
