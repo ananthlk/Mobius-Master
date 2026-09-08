@@ -287,7 +287,11 @@ function detail(k){
   var ready = m.rating ? '<div class="f"><b>Production readiness '+rate+
       ' <span class="depth">read: '+esc(m.depth||'')+'</span></b>'+sigline+findings+'</div>' : '';
   var howf = m.how ? F('How it works', esc(m.how)) : '';
-  var uxf = m.ux ? F('UX — where you see or manage it', esc(m.ux)) : '';
+  // A node whose whole point is "where do I manage this" should hand you the
+  // link, not a string to retype.
+  var uxf = m.ux ? F('UX — where you see or manage it',
+      esc(m.ux).replace(/(https?:\\/\\/[^\\s<]+)/g,
+        '<a href="$1" target="_blank" rel="noopener" style="color:var(--mobius-accent)">$1</a>')) : '';
 
   if(isChain){
     fields = howf + uxf + ready + F('What happens here', esc(m.what)) +

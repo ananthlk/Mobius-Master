@@ -788,8 +788,10 @@ truncation recovery: a 'Continue' after the model was cut off.
            "measured. Agreed with the Chat seat as one of two worth a real signal."),
 ]),
 "prompts": dict(rating="amber", depth="code",
- ux="Prompt Composition Studio — frontend/prompts.html + app/api/admin_prompts.py "
-    "(blocks, compositions, versions, monitoring)", how="""
+ ux="Prompt Composition Studio — LIVE at https://mobius-chat-ortabkknqa-uc.a.run.app/admin/prompts "
+    "(served from frontend/prompts.html via main.py:3160, backed by app/api/admin_prompts.py). "
+    "Blocks, compositions, versions and monitoring. Note the route is /admin/prompts — "
+    "/prompts and /prompts.html both 404.", how="""
 Two jobs, and the second one is easy to miss.
 
 1. THE REACT PARAMETER PLANNER. This is where a turn's ReAct budget is decided, and the
@@ -934,12 +936,14 @@ The single source of truth for what each agent path can answer, fed to the parse
 so questions are only decomposed into sub-questions something can actually handle. Each tool
 declares can_answer explicitly, so when one fails ReAct has a basis for picking another.
 """, findings=[
- ("bad", "It carries a documented HOLE. A comment dated 2026-04-18 records that "
-         "ask_credentialing_npi was removed along with the other credentialing and roster "
-         "tools, and that the capability declaration 'rebuilds when credentialing ships as a "
-         "proper skill integration'. So the single source of truth is knowingly missing a "
-         "capability the product still has — the planner cannot route to something it is never "
-         "told exists."),
+ ("watch", "VISIBILITY, not a functional defect — Ananth's call, and it is the right "
+           "read. A comment dated 2026-04-18 records that ask_credentialing_npi was removed "
+           "along with the other credentialing and roster tools, and that the declaration "
+           "'rebuilds when credentialing ships as a proper skill integration'. Several "
+           "cannot_answer lines still redirect to check_provider_credentialing, which is not "
+           "among the 17 declared tools. Nothing misroutes as a result — the tools genuinely "
+           "are not there — so this is a register that has not caught up with a deliberate "
+           "removal, not a routing bug. Downgraded from bug to observation."),
  ("good", "Declared rather than inferred, and the file says so."),
  ("watch", "No test file, and four callers depend on its shape."),
 ]),

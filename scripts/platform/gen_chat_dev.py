@@ -165,6 +165,11 @@ def main():
             obj["rating"] = c["rating"]
             obj["depth"] = c["depth"]
             obj["findings"] = c["findings"]
+            # `ux` is optional per node — carry it when present. It was being
+            # written in the content file and silently dropped here, so every
+            # "where do I manage this" answer was invisible on the page.
+            if c.get("ux"):
+                obj["ux"] = c["ux"]
         obj["signals"] = sigs.get(sig_alias.get(key, key), {})
         obj["live_config"] = [{"name": v, "live": live.get(v, "(not set — code default)")}
                               for v in (obj.get("config") or [])]
