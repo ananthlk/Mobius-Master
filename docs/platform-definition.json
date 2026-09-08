@@ -22,7 +22,7 @@
     {
       "id": "web-scraper",
       "name": "Web Scraper",
-      "layer": 0,
+      "layer": 5,
       "kind": "skill",
       "owner": "Crawler Agent",
       "service": "mobius-web-scraper",
@@ -61,7 +61,8 @@
         "Sourcing",
         "fetch_document"
       ],
-      "invocation": "web_scrape \u2014 appears twice in the chat tool manifest and is exposed over MCP."
+      "invocation": "web_scrape \u2014 appears twice in the chat tool manifest and is exposed over MCP.",
+      "stage": "acquire"
     },
     {
       "id": "web-scraper-worker",
@@ -99,12 +100,13 @@
         "status": "live",
         "deploy_target": "Cloud Run"
       },
-      "invocation": "Queue-driven. Not callable as a skill \u2014 it runs when work is enqueued."
+      "invocation": "Queue-driven. Not callable as a skill \u2014 it runs when work is enqueued.",
+      "stage": "acquire"
     },
     {
       "id": "google-search",
       "name": "Google Search",
-      "layer": 0,
+      "layer": 5,
       "kind": "skill",
       "owner": "Sourcing",
       "service": "mobius-google-search",
@@ -141,12 +143,13 @@
         "Chat (ReAct)",
         "MCP (fleet-wide)",
         "Sourcing"
-      ]
+      ],
+      "stage": "acquire"
     },
     {
       "id": "doc-reader",
       "name": "Doc Reader",
-      "layer": 0,
+      "layer": 5,
       "kind": "skill",
       "owner": "Curation",
       "service": "mobius-doc-reader",
@@ -184,7 +187,8 @@
         "Curation",
         "Historical extraction"
       ],
-      "invocation": "Called via app/sub_skills/doc_reader.py \u2014 invoked by chat directly rather than chosen by the planner, but a task other components call."
+      "invocation": "Called via app/sub_skills/doc_reader.py \u2014 invoked by chat directly rather than chosen by the planner, but a task other components call.",
+      "stage": "extract"
     },
     {
       "id": "chunking-worker",
@@ -222,7 +226,8 @@
         "status": "live",
         "deploy_target": "Cloud Run"
       },
-      "invocation": "Queue-driven. Not callable as a skill \u2014 it runs when work is enqueued."
+      "invocation": "Queue-driven. Not callable as a skill \u2014 it runs when work is enqueued.",
+      "stage": "chunk"
     },
     {
       "id": "lexicon",
@@ -265,7 +270,8 @@
           "name": "Lexicon review queue",
           "path": "/ (frontend-v2)"
         }
-      ]
+      ],
+      "stage": "tag"
     },
     {
       "id": "embedding-worker",
@@ -303,7 +309,8 @@
         "status": "live",
         "deploy_target": "Cloud Run"
       },
-      "invocation": "Queue-driven. Not callable as a skill \u2014 it runs when work is enqueued."
+      "invocation": "Queue-driven. Not callable as a skill \u2014 it runs when work is enqueued.",
+      "stage": "embed"
     },
     {
       "id": "chat",
@@ -1350,7 +1357,8 @@
           "name": "RAG frontend",
           "path": "/"
         }
-      ]
+      ],
+      "stage": "publish"
     },
     {
       "id": "answer-cache",
@@ -1836,7 +1844,7 @@
     {
       "id": "fetch-document",
       "name": "Fetch Document",
-      "layer": 0,
+      "layer": 5,
       "kind": "skill",
       "owner": "Download Skill",
       "service": null,
@@ -1873,12 +1881,13 @@
         "Chat (ReAct)",
         "MCP (fleet-wide)",
         "Sourcing"
-      ]
+      ],
+      "stage": "acquire"
     },
     {
       "id": "document-upload",
       "name": "Document Upload (Path B)",
-      "layer": 0,
+      "layer": 5,
       "kind": "skill",
       "owner": "Instant RAG",
       "service": null,
@@ -1914,7 +1923,8 @@
       "consumers": [
         "Chat uploads",
         "Vault"
-      ]
+      ],
+      "stage": "acquire"
     },
     {
       "id": "republishing",
@@ -1951,7 +1961,8 @@
         "branch": "main",
         "status": "building",
         "deploy_target": "in-repo"
-      }
+      },
+      "stage": "publish"
     }
   ],
   "coordination": {
@@ -2018,8 +2029,8 @@
     {
       "layer": 0,
       "label": "Pre-Layer 0",
-      "name": "Sourcing & Ingestion",
-      "description": "How knowledge gets in. Nothing downstream exists without this."
+      "name": "Sourcing & Ingestion Pipeline",
+      "description": "How knowledge gets in, stage by stage. Components are shown where they serve \u2014 several are Skills (Layer 5) doing ingestion work."
     },
     {
       "layer": 1,
@@ -2049,7 +2060,7 @@
       "layer": 5,
       "label": "Layer 5",
       "name": "Skills",
-      "description": "Discrete tools agents call."
+      "description": "A task other components call. Reused across agents; makes no decisions."
     },
     {
       "layer": 6,
