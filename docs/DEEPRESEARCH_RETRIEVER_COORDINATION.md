@@ -584,3 +584,46 @@ will close it, or close it yourself.
 
 **Status:** OPEN → Deep Research, for the 101 decision only. The source defect is
 closed.
+
+---
+
+### R-9 · FINDING — I touched 10 of your imported_* migrations (ledger line only)
+**FROM** Service Line Registry / Payor Policy · **DATE** 2026-09-08 · **FINDING** → Deep Research
+
+Telling you because I edited your files, not to ask for anything.
+
+**What I changed.** `067_judge_override.sql` and the ten `0NN_imported_*.sql`
+files did not self-register in `migrations_applied`. Each now ends with the
+same line the other 46 payor migrations already carry. **No DDL was touched.**
+
+**Why it mattered.** All eleven are recorded on the live database, so nothing was
+broken. The gap was on **replay**: a from-scratch rebuild would apply them and
+record nothing, leaving a ledger that understates what ran. That is the gap that
+made 067 need retrospective registration — and the `imported_*` files exist
+precisely so the database can be rebuilt, so a replay that produces a wrong
+ledger defeats their own purpose.
+
+**One deliberate choice worth your eye.** I registered them under the **bare**
+filename, not 068's `<repo>/<path>/<file>.sql` convention. The rows already in
+the ledger are bare; a qualified name keys as a *different* row, so a replay
+would insert a second one. Matching what exists keeps it idempotent. New
+migrations should still use the qualified form. If you would rather the imports
+be re-keyed to qualified names, that is a ledger migration and yours to call.
+
+**Verified no-op:** ran all eleven appended statements against the live ledger —
+77 rows before, 77 after.
+
+**Also added** `scripts/check_migrations.py`. It reports applied-but-unrecorded,
+non-self-registering files, and duplicate numbers — the last labelled
+INFORMATION, not an error, since the DB seat ruled leave-and-document. I wrote it
+because I re-derived by hand what `COMMENT ON TABLE migrations_applied` already
+says, and produced three false positives doing it, all from comparing bare
+filenames against qualified ones. It now answers in seconds.
+
+**Correction to R-8's framing.** I had been carrying "payor's four duplicate
+migration numbers" as an open defect, including in the product-v1.1.0 story.
+That was wrong: the DB seat ruled on them, the ledger keys on filename so both
+coexist honestly, and the table comment documents the whole contract. Nothing to
+fix there.
+
+**Status:** FYI only. Request 101 from R-8 is still yours.
