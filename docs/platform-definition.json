@@ -1269,19 +1269,19 @@
       "owner": "Answer Cache",
       "service": "mobius-answer-cache",
       "repo": "mobius-answer-cache",
-      "verified": false,
+      "verified": true,
       "tier": "B",
       "gates": [
         4
       ],
       "user_view": {
-        "status": "live",
-        "description": "Returns a previously-approved answer when the same question returns. NOTE: the repo README still says 'not yet a deployed service' while a service of this name is running.",
+        "status": "partial",
+        "description": "Semantic cache of previously-approved answers, with a fail-closed PHI write gate. Deployed and healthy on pgvector, but nothing calls it yet \u2014 chat's CACHE_ASSIST_ENABLED is 0 and the carved-out modules are still live in chat.",
         "surface": "mobius-answer-cache"
       },
       "technical_view": {
-        "status": "live",
-        "description": "Returns a previously-approved answer when the same question returns. NOTE: the repo README still says 'not yet a deployed service' while a service of this name is running.",
+        "status": "partial",
+        "description": "BACKEND=pgvector against the mobius_cache database. Deployed via 'gcloud run deploy --source', so no deploy config in the repo names it.",
         "repo": "mobius-answer-cache",
         "module": "mobius-answer-cache"
       },
@@ -1298,7 +1298,8 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
-      }
+      },
+      "note": "Deployed 2026-07-17, rev 00005-9w9. Not integrated with chat."
     },
     {
       "id": "dbt",
