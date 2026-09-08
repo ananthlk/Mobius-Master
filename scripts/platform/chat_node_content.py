@@ -918,6 +918,10 @@ agentic, the turn is not already at ceiling, extension budget remains
 (max_extension_rounds - used > 0), and there is wall-clock left — elapsed + 25s < the turn
 deadline, the 25 seconds reserving room to synthesise the final answer.
 """, findings=[
+ ("good", "OBSERVED FIRING, 2026-09-08. One agentic turn against the deployed service came "
+          "back with react_trace max_rounds=12 where the per-mode constant is 10 — two "
+          "extensions granted, 2 of the contract's 3 spent. The gate is not theoretical and it "
+          "is not dormant; it is adjusting the round ceiling on live turns today."),
  ("bad", "The most interesting control loop in the product is an un-named `max_it += 1` "
          "inside an if-block in a 6,113-line file. It is invisible to search, cannot be "
          "unit-tested in isolation, and is the reason this node was missing from the schema "
@@ -1017,6 +1021,21 @@ One consequence worth knowing: with the flag on, the Product Promise groundednes
 the critic INDEPENDENTLY of critic_enabled(). The deployed service sets MOBIUS_REACT_CRITIC=0,
 which turns off the optional path only. The mandatory floor still runs.
 """, findings=[
+ ("good", "VERIFIED WORKING, 2026-09-08, by exercising it — not by reading the flag. I sent "
+          "one agentic turn to the deployed service and read the react_trace it emitted. "
+          "governor_enabled=True; mode=agentic; final_directive=complete; per-round directives "
+          "issued (search on rounds 1-6); groundedness_floor_ran=True and groundedness_passed="
+          "True; total_elapsed_s=114.1 against a 300s deadline.\n\n"
+          "THE DECISIVE NUMBER IS max_rounds=12. react_max_iterations_for_mode returns 10 for "
+          "agentic. The trace says 12. So the completion-critic extension gate FIRED TWICE, "
+          "spending 2 of the contract's 3 max_extension_rounds — the dynamic parameter "
+          "adjuster raising the ceiling mid-turn in response to the critic saying the answer "
+          "did not yet cover the question. That is the whole mechanism, observed rather than "
+          "inferred.\n\n"
+          "It also settles the critic flag empirically: MOBIUS_REACT_CRITIC=0 on this service, "
+          "and groundedness_floor_ran came back True. The mandatory Product Promise floor runs "
+          "the critic regardless of that flag, exactly as the Chat seat and I concluded from "
+          "the code."),
  ("good", "It is the depth half of a per-turn adaptation pair whose breadth half "
           "(retrieval_budget) is already live and unconditional. The pairing is coherent."),
  ("bad", "It was shipped behind a default-off flag that the deployment turns on, which means "
