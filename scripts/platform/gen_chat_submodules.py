@@ -65,6 +65,72 @@ def ux_for(sig, meta):
     if "ui decoration" in n:            return "thinking chain (user-visible)"
     return "trace only"
 
+
+def flow():
+    """The loop's shape, parsed from orchestrator.py rather than drawn.
+
+    run_pipeline branches: `if use_react:` takes the ReAct path, `else:` runs
+    the classic stages. Stage order comes from the source order of the
+    run_*() call sites, and the branch from their indentation relative to the
+    if/else. integrate sits INSIDE the else, which is why the ReAct path has
+    no integrate node — react_loop's own docstring says it replaces it.
+
+    The inner Reason/Act/Observe grouping is the one part not mechanically
+    derived: it is read off react_loop's own section comments, and each node
+    carries the line that justifies it so a reader can check the claim.
+    """
+    src = open(os.path.join(REPO, "app/pipeline/orchestrator.py"),
+               encoding="utf-8").read().split("\n")
+    calls, branch = [], {}
+    for i, line in enumerate(src, 1):
+        ind = len(line) - len(line.lstrip())
+        m = re.search(r"\b(run_state_load|run_classify|run_plan|run_clarify|"
+                      r"run_resolve|run_integrate|run_react)\s*\(", line)
+        if m: calls.append({"fn": m.group(1), "line": i, "indent": ind})
+        if re.match(r"\s*if use_react:", line):  branch["if"] = {"line": i, "indent": ind}
+        elif re.match(r"\s*else:", line) and "if" in branch and "else" not in branch \
+             and ind == branch["if"]["indent"]:
+            branch["else"] = {"line": i, "indent": ind}
+
+    def seg(lo, hi):
+        return [c for c in calls if lo < c["line"] < hi]
+    pre  = [c for c in calls if c["line"] < branch["if"]["line"]]
+    react = seg(branch["if"]["line"], branch["else"]["line"])
+    classic = [c for c in calls if c["line"] > branch["else"]["line"]]
+
+    rl = os.path.join(REPO, "app/pipeline/react_loop.py")
+    rsrc = open(rl, encoding="utf-8").read().split("\n")
+    def cite(pat):
+        for i, l in enumerate(rsrc, 1):
+            if re.search(pat, l, re.I): return i
+        return None
+
+    return {
+        "entry": "POST /chat",
+        "shared_pre": [c["fn"] for c in pre],
+        "branch_on": "use_react",
+        "branch_line": branch["if"]["line"],
+        "react_path": [c["fn"] for c in react],
+        "classic_path": [c["fn"] for c in classic],
+        "exit": "publish",
+        "react_phases": [
+            {"phase": "Round 0", "modules": ["round0"],
+             "cite": cite(r"Round 0: system_context short-circuit"),
+             "note": "Short-circuits the loop when the caller already did the work."},
+            {"phase": "Reason", "modules": ["prompts", "tool_manifest", "capabilities", "parsing"],
+             "cite": cite(r"ReAct loop: Reason .* Act .* Observe"),
+             "note": "Builds the planner prompt and parses the decision back out."},
+            {"phase": "Act", "modules": ["react_retry_guard", "curator_tools"],
+             "cite": cite(r"block repeat call if"),
+             "note": "Dispatches tools, and refuses a repeat of a call that already failed."},
+            {"phase": "Observe", "modules": ["critic", "governor", "feedback_signal"],
+             "cite": cite(r"Critic gate"),
+             "note": "Audits the draft against sources and decides whether to go round again."},
+        ],
+        "note": ("Parsed from orchestrator.py. integrate is inside the else branch, so the "
+                 "ReAct path does not run it — react_loop replaces it, as its docstring says."),
+    }
+
 def main():
     global MAKERS
     MAKERS = makers()
@@ -162,6 +228,7 @@ def main():
         "service": "mobius-chat",
         "bar": "named role in a declared pipeline",
         "declared_stages": list(stages),
+        "flow": flow(),
         "telemetry_sink": "chat_turns.thinking_log (EmitEnvelope, discriminated by `signal`)",
         "signal_taxonomy_size": len(tax),
         "submodules": sorted(mods.values(), key=lambda x: (x["group"], x["module"])),

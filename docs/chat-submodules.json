@@ -11,6 +11,66 @@
   "integrate",
   "publish"
  ],
+ "flow": {
+  "entry": "POST /chat",
+  "shared_pre": [
+   "run_state_load"
+  ],
+  "branch_on": "use_react",
+  "branch_line": 761,
+  "react_path": [
+   "run_react"
+  ],
+  "classic_path": [
+   "run_classify",
+   "run_plan",
+   "run_clarify",
+   "run_resolve",
+   "run_integrate"
+  ],
+  "exit": "publish",
+  "react_phases": [
+   {
+    "phase": "Round 0",
+    "modules": [
+     "round0"
+    ],
+    "cite": 4075,
+    "note": "Short-circuits the loop when the caller already did the work."
+   },
+   {
+    "phase": "Reason",
+    "modules": [
+     "prompts",
+     "tool_manifest",
+     "capabilities",
+     "parsing"
+    ],
+    "cite": 4151,
+    "note": "Builds the planner prompt and parses the decision back out."
+   },
+   {
+    "phase": "Act",
+    "modules": [
+     "react_retry_guard",
+     "curator_tools"
+    ],
+    "cite": 5648,
+    "note": "Dispatches tools, and refuses a repeat of a call that already failed."
+   },
+   {
+    "phase": "Observe",
+    "modules": [
+     "critic",
+     "governor",
+     "feedback_signal"
+    ],
+    "cite": 5280,
+    "note": "Audits the draft against sources and decides whether to go round again."
+   }
+  ],
+  "note": "Parsed from orchestrator.py. integrate is inside the else branch, so the ReAct path does not run it \u2014 react_loop replaces it, as its docstring says."
+ },
  "telemetry_sink": "chat_turns.thinking_log (EmitEnvelope, discriminated by `signal`)",
  "signal_taxonomy_size": 37,
  "submodules": [
