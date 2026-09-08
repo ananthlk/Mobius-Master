@@ -42,37 +42,66 @@ This is the first release where modules constrain each other's deployment. A
 lockfile that pinned versions without recording this would be actively
 misleading.
 
-1. **`mobius-payor` v1.1.0 hard-depends on `mobius-user`'s
-   `POST /api/v1/auth/verify`.** The `/auth/me` fallback was deliberately
-   removed, so **rolling back `mobius-user` turns the Research Console into a 503
-   by design.** These two cannot be rolled back independently.
+1. **`mobius-payor` v1.1.0 fails closed on `mobius-user`.** The `/auth/me`
+   fallback was removed deliberately: `POST /api/v1/auth/verify` is the only check
+   that enforces **deactivation**, and keeping the fallback meant a `mobius-user`
+   rollback would silently downgrade to a weaker check. **Reads are gated too**
+   (Ananth: "no sign in no access to even view"), so `/api/research/overview` and
+   `/request/{id}` are gated as well — the console becomes *unusable*, not
+   degraded. And it is not only rollback: **any `mobius-user` outage does this.**
+   That is intended behaviour, and the failure message says which of the two it is.
 
 2. **`mobius-skills` changed the meaning of `accepted`** — now `bool(kept)`, with
-   the required-field check split into `meets_required`. The shape is unchanged
-   and nothing breaks, but a consumer branching on `accepted` will see requests
-   flip from `not_answered` to accepted-with-caveat. Behaviour change inside an
-   unchanged contract: worth reading before consuming.
+   the required-field check split into `meets_required`. Shape unchanged,
+   behaviour changed. The reasoning: acceptance is about whether the answer met
+   the requester's intent, not about validating the request. **A consumer that
+   cannot store a record without a given field should branch on `meets_required`
+   and refuse on its own contract**, not on `accepted`.
 
-3. **The console has a generator/server split across two repos.**
-   `deep_research/console.py` in `mobius-skills` generates the page;
-   `mobius-payor` serves a checked-in copy at
-   `app/routers/_research_console_page.py`. **Bumping skills without
-   regenerating and redeploying payor leaves the served console behind.** A
-   hand-edit to the copy has already caused one production drift.
+3. **The console has two independent staleness paths, not one.**
+   - `deep_research/console.py` in `mobius-skills` generates the page, served
+     from a checked-in copy at `mobius-payor app/routers/_research_console_page.py`.
+     A `console.py` change needs **regenerate + redeploy payor**.
+   - `deep_research/console_data.py` builds the reader-facing vocabulary into the
+     `research.language` **table**, fetched at runtime. A `language.py` change
+     needs **console_data re-run, and no payor redeploy at all**.
 
-4. **`research.*` schema ownership is unsettled.** `mobius-payor` reads the
-   schema `mobius-skills` owns, and adds `research.judge_override` to it from its
-   own migration ledger. Two ledgers writing one schema is how migration
-   collisions start — and `payor` already has duplicate migration numbers.
+   Two paths out of one repo, with different remedies. The drift was real: the
+   generator previously emitted a page with no `boot()` while the deployed copy
+   had one hand-added, so regenerating would have shipped an empty console. Fixed
+   in this release.
+
+4. **`research.*` DDL is owned by `mobius-payor`, and always has been** — since
+   `045_deep_research.sql`. Thirteen payor migrations touch the schema, including
+   064/065/066. `mobius-skills` owns the **code** that reads and writes it;
+   `067_judge_override.sql` is consistent with that split, not a violation.
+
+   *An earlier draft of this story claimed shared ownership was a new violation.
+   That was wrong, corrected after review by the Deep Research seat and verified
+   against both repositories.*
+
+   Two real problems remain in that area:
+   - **Four duplicate migration numbers**, not two: `033`, `034`, `047`, `050`.
+   - **`067` was applied out of band** — run directly with psycopg2, bypassing the
+     `migrations_applied` ledger, and registered retrospectively with a note
+     saying so. The single-ledger rule exists so nobody has to reconstruct what
+     ran. Surfaced by this release review rather than by the apply.
+   - The DDL files are **duplicated across both repos** — `deep-research/schema/`
+     holds byte-identical copies of payor's `045`/`046`/`047`. Payor's ledger is
+     authoritative; the copies are a drift risk with no mechanism keeping them in
+     step.
 
 ## Carried forward, unresolved
 
-- **`mobius-rag` and `mobius-payor` are still tagged from feature branches** —
+- **`mobius-rag` and `mobius-payor` were tagged from feature branches** —
   `retriever-answer-engine` and `claude/sources-module-canonical-payor-enumerate`,
-  both strictly ahead of `main`. Named as a v1.1.0 requirement in the v1.0.0
-  story and still not done. This is now the oldest open item in the release
-  history.
-- **`payor`'s duplicate migration numbers** (two `047_*`, two `050_*`) remain.
+  both strictly ahead of `main` at the moment this release was cut. Named as a
+  requirement in the v1.0.0 story and unresolved through three releases.
+  **Both were fast-forwarded to `main` immediately after this tag** — see
+  RELEASES.md. The tags still point at the branch commits, which is accurate:
+  that is where they were cut from.
+- **`payor`'s duplicate migration numbers** — `033`, `034`, `047` and `050`, all
+  four duplicated.
 - **`mobius-interact`'s namespace write-auth** remains unenforced.
 - Six uncommitted files in `payor` were excluded from its tag — a tag points at a
   commit.
@@ -86,5 +115,6 @@ from the commits and verified against the code.
 ## What v1.2.0 should require
 
 1. `mobius-rag` and `mobius-payor` merged to `main` — third release running.
-2. One owner for the `research.*` migration ledger.
+2. The four duplicate payor migration numbers resolved, and the duplicated
+   DDL copies in `deep-research/schema/` either removed or kept in step.
 3. The console generator and its served copy reconciled, or the copy removed.
