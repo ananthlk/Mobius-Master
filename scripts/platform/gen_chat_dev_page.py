@@ -5,92 +5,163 @@ import json, sys, html
 DATA = sys.argv[1]; OUT = sys.argv[2]
 d = json.load(open(DATA))
 
-TPL = """<!doctype html><html><head><meta charset="utf-8">
+TPL = """<!doctype html><html data-theme="dark"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Chat turn — dev schema</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="tokens-dark.css">
 <style>
-:root{--bg:#0f0d18;--panel:#171325;--panel2:#1e1930;--line:rgba(255,255,255,.12);
- --ink:rgba(255,255,255,.92);--ink2:rgba(255,255,255,.62);--dim:rgba(255,255,255,.40);
- --violet:#a78bfa;--green:#4ade80;--amber:#fbbf24;--red:#f87171;--cyan:#7dd3fc;
- --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;--body:"Inter",system-ui,sans-serif;}
+/* Mobius design system: never fork or redefine --mobius-*; no font-family
+   literals; no raw px sizes. Everything below resolves to a token. The only
+   local variables are layout widths, which the token set does not cover. */
+:root{ --pane-detail: 25rem; --gap: var(--mobius-space-lg); }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 var(--body);-webkit-font-smoothing:antialiased}
-.wrap{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:24px;max-width:1500px;margin:0 auto;padding:22px}
-@media(max-width:1080px){.wrap{grid-template-columns:1fr}.side{order:-1;position:sticky;top:0;max-height:50vh;overflow:auto;background:var(--bg);z-index:5}}
-h1{font-size:19px;margin:0 0 3px;font-weight:650}
-.lead{color:var(--dim);font-size:12px;margin:0 0 4px}
-.devtag{display:inline-block;font:500 10px var(--mono);color:var(--amber);
- border:1px solid rgba(251,191,36,.4);border-radius:99px;padding:2px 8px;margin-bottom:10px}
-.band{border:1px dashed var(--line);border-radius:12px;padding:13px;margin-bottom:16px}
-.band-t{font:700 9.5px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--violet);margin-bottom:9px}
-.chain{display:flex;flex-wrap:wrap;align-items:stretch;gap:7px}
-.cnode{flex:1 1 150px;background:var(--panel);border:1px solid var(--line);border-radius:9px;
- padding:9px 11px;cursor:pointer;min-width:140px}
-.cnode:hover,.cnode:focus-visible{border-color:var(--violet);outline:none}
-.cnode.sel{border-color:var(--violet);background:rgba(167,139,250,.14)}
-.cnode.gate{border-color:rgba(248,113,113,.5)}
-.cn{font:600 12px var(--body)}
-.cs{font-size:9.5px;color:var(--dim);margin-top:2px}
-.arr{align-self:center;color:var(--dim)}
+body{margin:0;background:var(--mobius-bg-primary);color:var(--mobius-text-primary);
+ font-family:var(--mobius-font-sans);font-size:var(--mobius-text-sm);line-height:1.55;
+ -webkit-font-smoothing:antialiased}
+
+header.top{display:flex;align-items:center;gap:var(--mobius-space-md);
+ padding:var(--mobius-space-md) var(--mobius-space-lg);
+ border-bottom:1px solid var(--mobius-border);background:var(--mobius-bg-secondary);
+ position:sticky;top:0;z-index:20}
+header.top img{height:1.5rem;width:auto}
+header.top h1{font-size:var(--mobius-text-md);font-weight:600;margin:0}
+header.top .lead{font-size:var(--mobius-text-xs);color:var(--mobius-text-muted);margin:0}
+.devtag{font-family:var(--mobius-font-mono);font-size:var(--mobius-text-xs);
+ color:var(--mobius-warning);border:1px solid var(--mobius-warning);
+ border-radius:var(--mobius-radius-full);padding:0.1rem var(--mobius-space-sm)}
+.spacer{flex:1}
+.pbtn{font-family:var(--mobius-font-sans);font-size:var(--mobius-text-xs);
+ padding:0.25rem var(--mobius-space-sm);border-radius:var(--mobius-radius-sm);
+ border:1px solid var(--mobius-border-medium);background:var(--mobius-bg-card);
+ color:var(--mobius-text-secondary);cursor:pointer;white-space:nowrap}
+.pbtn:hover{border-color:var(--mobius-violet);color:var(--mobius-violet)}
+.pbtn:focus-visible{outline:2px solid var(--mobius-violet);outline-offset:2px}
+.pbtn[aria-pressed="true"]{border-color:var(--mobius-violet);color:var(--mobius-violet);
+ background:var(--mobius-bg-tertiary)}
+
+/* Two panels, each independently collapsible, so you can go back and forth:
+   schema full-width to see the shape, detail full-width to read a node. */
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) var(--pane-detail);
+ gap:var(--gap);max-width:96rem;margin:0 auto;padding:var(--gap)}
+/* A collapsed panel is display:none, which REMOVES it from the grid — so the
+   survivor would fall into column 1. Sizing the collapsed state as a single
+   column is what makes the remaining panel actually fill the page. */
+.wrap.detail-collapsed,.wrap.schema-collapsed{grid-template-columns:minmax(0,1fr)}
+.wrap.detail-collapsed .side{display:none}
+.wrap.schema-collapsed .main{display:none}
+/* Reading a node full-width: let it flow instead of sticking in a short box. */
+.wrap.schema-collapsed .side{position:static;max-height:none;overflow:visible}
+.wrap.schema-collapsed .card{max-width:60rem;margin:0 auto}
+.wrap.schema-collapsed .card .desc{max-height:none}
+@media(max-width:64rem){
+ .wrap{grid-template-columns:1fr}
+ .side{order:-1;position:sticky;top:3.25rem;max-height:50vh;overflow:auto;
+  background:var(--mobius-bg-primary);z-index:5}
+ .wrap.detail-collapsed .side,.wrap.schema-collapsed .main{display:none}
+}
+
+.band{border:1px dashed var(--mobius-border-medium);border-radius:var(--mobius-radius-lg);
+ padding:var(--mobius-space-md);margin-bottom:var(--mobius-space-md)}
+.band-t{font-size:var(--mobius-text-xs);letter-spacing:.08em;text-transform:uppercase;
+ color:var(--mobius-violet);font-weight:700;margin-bottom:var(--mobius-space-sm)}
+.chain{display:flex;flex-wrap:wrap;align-items:stretch;gap:var(--mobius-space-xs)}
+.cnode{flex:1 1 9rem;background:var(--mobius-bg-card);border:1px solid var(--mobius-border);
+ border-radius:var(--mobius-radius-md);padding:var(--mobius-space-sm);cursor:pointer;min-width:8.5rem}
+.cnode:hover,.cnode:focus-visible{border-color:var(--mobius-violet);outline:none}
+.cnode.sel{border-color:var(--mobius-violet);background:var(--mobius-bg-tertiary)}
+.cnode.gate{border-color:var(--mobius-error)}
+.cn{font-size:var(--mobius-text-sm);font-weight:600}
+.cs{font-size:var(--mobius-text-xs);color:var(--mobius-text-muted);margin-top:0.1rem}
+.arr{align-self:center;color:var(--mobius-text-muted)}
 .schema{display:flex;flex-direction:column;align-items:center}
-.n{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 15px;
- text-align:center;min-width:160px;cursor:pointer}
-.n:hover,.n:focus-visible{border-color:var(--violet);outline:none}
-.n.sel{border-color:var(--violet);background:rgba(167,139,250,.16)}
-.nn{font:600 12px var(--body)} .ns{font-size:9.5px;color:var(--dim);margin-top:1px}
-.a{color:var(--dim);font-size:14px;line-height:1.5}
-.lanes{display:flex;gap:22px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
-.lane{border:1px dashed var(--line);border-radius:11px;padding:12px;min-width:250px;
- display:flex;flex-direction:column;align-items:center}
-.lt{font:700 9.5px var(--body);letter-spacing:.07em;text-transform:uppercase;color:var(--violet);margin-bottom:8px}
-.ph{width:100%;border-left:2px solid rgba(167,139,250,.4);padding:4px 0 4px 9px;margin:3px 0}
-.pn{font:700 10px var(--body);color:var(--ink2)}
-.pd{font-size:9.5px;color:var(--dim);margin:1px 0 5px;line-height:1.45}
-.chips{display:flex;flex-wrap:wrap;gap:5px}
-.chip{font:400 10px var(--body);padding:3px 8px;border-radius:5px;cursor:pointer;
- border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink2)}
-.chip:hover,.chip:focus-visible{border-color:var(--violet);outline:none}
-.chip.sel{border-color:var(--violet);background:rgba(167,139,250,.2)}
-.chip .cfg{color:var(--cyan)} .chip .em{color:var(--green)} .chip .no{color:var(--amber)}
-.r-green{box-shadow:inset 3px 0 0 var(--green)} .r-amber{box-shadow:inset 3px 0 0 var(--amber)}
-.r-red{box-shadow:inset 3px 0 0 var(--red)}
-.pill{display:inline-block;font:700 9px var(--body);letter-spacing:.06em;text-transform:uppercase;
- padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:2px}
-.p-green{background:rgba(74,222,128,.16);color:var(--green)}
-.p-amber{background:rgba(251,191,36,.16);color:var(--amber)}
-.p-red{background:rgba(248,113,113,.18);color:var(--red)}
-.find{margin:5px 0 0;padding-left:15px;font-size:11px;line-height:1.55}
-.find li{margin-bottom:5px}
-.f-bad::marker{content:"▲ ";color:var(--red)}
-.f-watch::marker{content:"▸ ";color:var(--amber)}
-.f-good::marker{content:"✓ ";color:var(--green)}
-.sigs{display:flex;flex-wrap:wrap;gap:3px 10px;font:400 10px var(--mono);color:var(--dim)}
-.sigs b{color:var(--ink2);font-weight:500}
-.depth{font:400 9.5px var(--mono);color:var(--dim)}
-.side{position:sticky;top:14px;align-self:start;max-height:calc(100vh - 28px);overflow-y:auto}
-.card{border:1px solid rgba(167,139,250,.35);border-radius:12px;padding:15px 17px;background:rgba(167,139,250,.07)}
-.card h3{margin:0 0 2px;font-size:15px}
-.card .mod{font:400 10px var(--mono);color:var(--dim)}
-.card .desc{font-size:12px;color:var(--ink2);margin:8px 0 12px;white-space:pre-wrap;max-height:230px;overflow:auto}
-.f{margin-top:11px}
-.f b{display:block;font:700 9.5px var(--body);letter-spacing:.07em;text-transform:uppercase;color:var(--violet);margin-bottom:3px}
-.f div{font-size:11px;color:var(--ink2);line-height:1.55;overflow-wrap:anywhere}
-.f .m{font-family:var(--mono);font-size:10.5px;color:var(--dim)}
-.none{color:var(--amber)}
-.legend{font-size:10px;color:var(--dim);text-align:center;margin-top:10px}
-</style></head><body><div class="wrap"><div>
-<h1>How a chat turn actually runs</h1>
-<span class="devtag">DEV BUILD — local only, nothing deployed</span>
-<p class="lead" id="lead"></p>
+.n{background:var(--mobius-bg-card);border:1px solid var(--mobius-border);
+ border-radius:var(--mobius-radius-md);padding:var(--mobius-space-sm) var(--mobius-space-md);
+ text-align:center;min-width:10rem;cursor:pointer}
+.n:hover,.n:focus-visible{border-color:var(--mobius-violet);outline:none}
+.n.sel{border-color:var(--mobius-violet);background:var(--mobius-bg-tertiary)}
+.nn{font-size:var(--mobius-text-sm);font-weight:600}
+.ns{font-size:var(--mobius-text-xs);color:var(--mobius-text-muted)}
+.a{color:var(--mobius-text-muted);line-height:1.4}
+.lanes{display:flex;gap:var(--mobius-space-lg);flex-wrap:wrap;justify-content:center;align-items:flex-start}
+.lane{border:1px dashed var(--mobius-border-medium);border-radius:var(--mobius-radius-lg);
+ padding:var(--mobius-space-md);min-width:15rem;display:flex;flex-direction:column;align-items:center}
+.lt{font-size:var(--mobius-text-xs);letter-spacing:.07em;text-transform:uppercase;
+ color:var(--mobius-violet);font-weight:700;margin-bottom:var(--mobius-space-sm)}
+.ph{width:100%;border-left:2px solid var(--mobius-violet);
+ padding:var(--mobius-space-xs) 0 var(--mobius-space-xs) var(--mobius-space-sm);margin:0.15rem 0}
+.pn{font-size:var(--mobius-text-xs);font-weight:700;color:var(--mobius-text-secondary)}
+.pd{font-size:var(--mobius-text-xs);color:var(--mobius-text-muted);margin:0.1rem 0 0.3rem;line-height:1.45}
+.chips{display:flex;flex-wrap:wrap;gap:var(--mobius-space-xs)}
+.chip{font-size:var(--mobius-text-xs);padding:0.15rem var(--mobius-space-sm);
+ border-radius:var(--mobius-radius-sm);cursor:pointer;border:1px solid var(--mobius-border);
+ background:var(--mobius-bg-card);color:var(--mobius-text-secondary)}
+.chip:hover,.chip:focus-visible{border-color:var(--mobius-violet);outline:none}
+.chip.sel{border-color:var(--mobius-violet);background:var(--mobius-bg-tertiary)}
+.chip .cfg{color:var(--mobius-accent)} .chip .em{color:var(--mobius-success)}
+.chip .no{color:var(--mobius-warning)}
+.r-green{box-shadow:inset 3px 0 0 var(--mobius-success)}
+.r-amber{box-shadow:inset 3px 0 0 var(--mobius-warning)}
+.r-red{box-shadow:inset 3px 0 0 var(--mobius-error)}
+.pill{display:inline-block;font-size:var(--mobius-text-xs);letter-spacing:.06em;
+ text-transform:uppercase;font-weight:700;padding:0.1rem var(--mobius-space-sm);
+ border-radius:var(--mobius-radius-full);margin-left:var(--mobius-space-xs)}
+.p-green{background:var(--mobius-bg-tertiary);color:var(--mobius-success)}
+.p-amber{background:var(--mobius-bg-tertiary);color:var(--mobius-warning)}
+.p-red{background:var(--mobius-bg-tertiary);color:var(--mobius-error)}
+.find{margin:var(--mobius-space-xs) 0 0;padding-left:var(--mobius-space-md);
+ font-size:var(--mobius-text-xs);line-height:1.55}
+.find li{margin-bottom:0.3rem}
+.f-bad::marker{content:"▲ ";color:var(--mobius-error)}
+.f-watch::marker{content:"▸ ";color:var(--mobius-warning)}
+.f-good::marker{content:"✓ ";color:var(--mobius-success)}
+.sigs{display:flex;flex-wrap:wrap;gap:0.15rem var(--mobius-space-md);
+ font-family:var(--mobius-font-mono);font-size:var(--mobius-text-xs);color:var(--mobius-text-muted)}
+.sigs b{color:var(--mobius-text-secondary);font-weight:500}
+.depth{font-family:var(--mobius-font-mono);font-size:var(--mobius-text-xs);color:var(--mobius-text-muted)}
+.side{position:sticky;top:calc(3.25rem + var(--gap));align-self:start;
+ max-height:calc(100vh - 5rem);overflow-y:auto}
+.card{border:1px solid var(--mobius-violet);border-radius:var(--mobius-radius-lg);
+ padding:var(--mobius-space-md);background:var(--mobius-bg-card)}
+.card h3{margin:0 0 0.1rem;font-size:var(--mobius-text-md)}
+.card .mod{font-family:var(--mobius-font-mono);font-size:var(--mobius-text-xs);color:var(--mobius-text-muted)}
+.card .desc{font-size:var(--mobius-text-xs);color:var(--mobius-text-secondary);
+ margin:var(--mobius-space-sm) 0 var(--mobius-space-md);white-space:pre-wrap;
+ max-height:16rem;overflow:auto}
+.f{margin-top:var(--mobius-space-sm)}
+.f b{display:block;font-size:var(--mobius-text-xs);letter-spacing:.07em;text-transform:uppercase;
+ color:var(--mobius-violet);margin-bottom:0.15rem}
+.f div{font-size:var(--mobius-text-xs);color:var(--mobius-text-secondary);line-height:1.55;overflow-wrap:anywhere}
+.f .m{font-family:var(--mobius-font-mono);font-size:var(--mobius-text-xs);color:var(--mobius-text-muted)}
+.none{color:var(--mobius-warning)}
+.legend{font-size:var(--mobius-text-xs);color:var(--mobius-text-muted);text-align:center;
+ margin-top:var(--mobius-space-sm)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<header class="top">
+  <img src="logo.svg" alt="Mobius">
+  <div>
+    <h1>How a chat turn actually runs</h1>
+    <p class="lead" id="lead"></p>
+  </div>
+  <span class="devtag">DEV \u2014 local only</span>
+  <span class="spacer"></span>
+  <button class="pbtn" id="tgl-schema" aria-pressed="false">Hide diagram</button>
+  <button class="pbtn" id="tgl-detail" aria-pressed="false">Hide detail</button>
+</header>
+<div class="wrap" id="wrap"><div class="main">
 <div class="band"><div class="band-t">Before the pipeline — the part the shipped diagram omits</div>
 <div class="chain" id="chain"></div></div>
 <div class="band"><div class="band-t">Inside run_pipeline</div><div class="schema" id="schema"></div>
-<p class="legend">● emits its own signals&nbsp; ◦ observable only through its caller&nbsp; ⚙ has env-var config<br>left edge: <span style="color:var(--green)">green</span> ready · <span style="color:var(--amber)">amber</span> named weakness · <span style="color:var(--red)">red</span> failure here is invisible or unbounded</p></div>
+<p class="legend">● emits its own signals&nbsp; ◦ observable only through its caller&nbsp; ⚙ has env-var config<br>
+left edge: <span style="color:var(--mobius-success)">green</span> ready ·
+<span style="color:var(--mobius-warning)">amber</span> named weakness ·
+<span style="color:var(--mobius-error)">red</span> failure here is invisible or unbounded</p></div>
 <div class="band"><div class="band-t">Cross-cutting — under every step, not a step</div>
 <div class="chain" id="cross"></div></div>
 </div><div class="side"><div id="detail"></div>
-<p class="legend" style="text-align:left;margin-top:9px">Click anything. This panel follows you down the page.</p>
+<p class="legend" style="text-align:left">Click anything. This panel follows you down the page.</p>
 </div></div>
 <script>
 var D = __DATA__;
@@ -253,6 +324,37 @@ document.addEventListener('click',function(e){ var t=e.target.closest('[data-k]'
 document.addEventListener('keydown',function(e){ if(e.key!=='Enter'&&e.key!==' ')return;
   var t=e.target.closest&&e.target.closest('[data-k]'); if(t){e.preventDefault();detail(t.dataset.k);} });
 detail('chain:PHI gate');
+
+// Two panels, each collapsible, so you can go back and forth: diagram alone to
+// read the shape, detail alone to read a node. State is remembered per browser
+// so the view you were using survives a regenerate-and-reload, which is the
+// whole point when the page is rebuilt every few minutes.
+(function(){
+  var wrap=document.getElementById('wrap');
+  function bind(btn, cls, hideLabel, showLabel, other, otherCls){
+    var b=document.getElementById(btn);
+    function apply(on, save){
+      wrap.classList.toggle(cls, on);
+      b.setAttribute('aria-pressed', on?'true':'false');
+      b.textContent = on ? showLabel : hideLabel;
+      if(on){ // never collapse both — the other one comes back
+        wrap.classList.remove(otherCls);
+        var ob=document.getElementById(other);
+        ob.setAttribute('aria-pressed','false');
+        ob.textContent = ob.dataset.hide;
+        try{ localStorage.removeItem('devschema:'+otherCls); }catch(e){}
+      }
+      if(save){ try{ on ? localStorage.setItem('devschema:'+cls,'1')
+                        : localStorage.removeItem('devschema:'+cls); }catch(e){} }
+    }
+    b.dataset.hide=hideLabel;
+    b.addEventListener('click', function(){ apply(!wrap.classList.contains(cls), true); });
+    var stored=false; try{ stored = localStorage.getItem('devschema:'+cls)==='1'; }catch(e){}
+    if(stored) apply(true,false);
+  }
+  bind('tgl-detail','detail-collapsed','Hide detail','Show detail','tgl-schema','schema-collapsed');
+  bind('tgl-schema','schema-collapsed','Hide diagram','Show diagram','tgl-detail','detail-collapsed');
+})();
 </script></body></html>
 """
 open(OUT, "w", encoding="utf-8").write(TPL.replace("__DATA__", json.dumps(d)))
