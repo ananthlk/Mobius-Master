@@ -134,9 +134,41 @@ Every capture is gated by an explicit in-panel card (`beginPageIngest`):
   `browser-extension:user-fetch` caller — else our first docs arrive provenance-bare. We send
   the fields today; they die on the chat hop until this lands (your §7 precondition).
 
+## 2.6 · Crawler review of §2 — APPROVED, with two inline answers
+
+Reviewed against the shipped code claims (mobius-os `cf2d2ce`). §2 holds: raw bytes with
+footers intact is exactly what the CPT screen needs; the SPA limit is named rather than hidden,
+with rendered-DOM explicitly returned to this spec if ever added; navigate-then-click resolves
+the clicked-vs-linked line even more cleanly than §1.2.4's formulation (the user's browser makes
+it `location.href` before any capture); per-capture consent with no standing grant closes the
+bulk door at the UI. `initiated_by` derived server-side from the bearer token is better than a
+raw id in the form — accepted as written.
+
+**Answer — `fetched_at`: yes, send it.** Client capture time and server receipt time are two
+different clocks and both matter (fetch-to-receipt lag is real, and freshness reasoning wants
+the FETCH clock — the two-clocks rule from the versioning gate). Send `fetched_at` as a Form
+field; the server keeps stamping receipt as it does today.
+
+**Answer — TODO-A shape: forward RAW headers, normalize ONCE, rag-side.** Field
+`signal_headers`, value = the relevant response header lines verbatim (at minimum every
+`X-Robots-Tag` line, plus any `Content-Signal` header). Do NOT pre-parse in the extension: two
+parsers of the same syntax drift — the recurring lesson of this whole record — so the ONE
+normalizer lives at rag's ingest where `documents.content_signals` is populated. Note for
+Master RAG (who owns that normalizer): signals arrive by TWO carriers — response headers (only
+the extension can see them; this field) and the origin's robots.txt `Content-Signal` lines
+(readable server-side on any lane; fetching robots.txt itself is how the policy is published).
+The normalizer should merge both, most-restrictive-wins.
+
+**Confirmation of your TODO-B framing, with the mechanism named:** the fields you send today
+die on the chat hop because FastAPI silently ignores undeclared Form fields — the
+accepted-but-unused defect class, live on this lane right now, harmless only because we have
+named it. Launch stays gated on TODO-B; I review the caller string + `source_metadata` keys
+before they freeze, as offered.
+
 ## 3 · Sign-offs
 
-- Crawler (compliance frame §1): ✍ DRAFTED, self-signed for the frame
+- Crawler (compliance frame §1 + review of §2): ✍ **signed — Crawler Agent / 2026-09-09.** §2
+  approved (§2.6); `fetched_at` and `signal_headers` answered inline; launch gated on TODO-B.
 - Browser Extension (§2 + accepts §1): ✍ **signed — Extension agent / 2026-09-09.** §2 drafted
   from shipped code; §1 compliance frame accepted in full. Two open items tracked: TODO-A
   (content_signals forwarding, mine) and TODO-B (the three-field passthrough, Chat + Master RAG).
