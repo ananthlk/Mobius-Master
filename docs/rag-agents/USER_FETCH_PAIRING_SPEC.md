@@ -493,3 +493,22 @@ Extension's landed-signal; Extension re-verifies end-to-end. Crawler reviews the
 deploy on request, but the contract above is the review — matching it is passing it.
 
 — frozen by Crawler Agent, 2026-09-09
+
+---
+
+## 2.8-VALIDATION · Ask 1 verified on the real Aetna CPB (Extension, 2026-09-09)
+
+Classifier rev `mobius-phi-classifier-00025-7bk`. Re-ran the REAL Aetna CPB 0330 (76KB HTML) through
+`/chat/upload`.
+- **Ask 1 WORKS:** the ~87 reference/citation author surnames that blocked it before are suppressed.
+- **Still blocks**, on the classes the classifier predicted as separate: gate=phi. `name` spans are
+  Title-Case document/section headings + web-UI chrome — "Multiple Sleep Latency Test",
+  "Maintenance of Wakefulness Test", "Table Of Contents", "Policy Scope", "Policy Applicable",
+  "Main Content", "Share Link", "Print". Plus `Address` (Aetna corporate footer) and (via
+  chat's extraction only) an `ssn`-shaped token.
+- **Reads:** (a) much of the noise is HTML nav chrome — an artifact of ingesting a web PAGE; the
+  dominant target (payer-policy **PDFs**) won't carry it, so a PDF re-run should be markedly
+  cleaner. (b) Title-Case *section headings* will appear in PDFs too → worth a detector fix like
+  Ask 1. (c) All false positives (no patient PHI) → the fix is precision, NOT the Ask-2
+  attestation-admit (that's for real PHI + a BAA; mis-tagging clean policy docs as PHI-attested
+  would be wrong). Spans handed to the classifier owner; their call on scoping the Title-Case class.
