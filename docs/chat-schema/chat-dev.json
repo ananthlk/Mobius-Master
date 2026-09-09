@@ -17,7 +17,7 @@
     "owner": "chat + Eval",
     "gate": "every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
-    "n": 14
+    "n": 16
    },
    {
     "id": "P3",
@@ -1177,6 +1177,14 @@
    "rating": "red",
    "depth": "code",
    "findings": [
+    [
+     "bad",
+     "A STALE TEST WAS ASSERTING A VULNERABILITY. Found by Chat Master during P1b, verified by me at app/api/uploads.py:153-159 and tests/test_b1d_restoration_banner.py.\n\nTwo tests asserted `auth_scope == \"global\"` for an UNAUTHENTICATED caller \u2014 that the restoration banner returns cross-session uploads to someone with no identity. One user's filenames in another user's banner. The path was deliberately removed; the handler now returns `{auth_scope: \"none\", count: 0, uploads: []}` with the comment 'returning cross-session uploads to an unauthenticated caller is a data-isolation violation'.\n\nSo the tests documented the HOLE, not the requirement. Anyone triaging them the obvious way \u2014 make the failing test pass \u2014 restores the global path and reintroduces the leak, and THE SUITE GOES GREEN WHILE DOING IT. A failing test that looks like a chore is the most dangerous shape a security regression can take, because the fix and the exploit are the same edit. Rewritten to assert the secure behaviour with a DO NOT RESTORE note in the source and in the baseline's shrink_log.\n\nThis is a NEW VARIANT of this node's class and worth naming separately: not a producer without a consumer, but a TEST WHOSE ASSERTION OUTLIVED THE CONTRACT IT ENCODED. The producer changed correctly and the check kept demanding the old behaviour \u2014 pressure, pointed backwards.\n\nIt also vindicates the P1b framing. Had we treated the 25 as noise to be cleared, or 'fixed' them to get a green suite, this is the one that would have cost something real."
+    ],
+    [
+     "bad",
+     "FIVE OF THE ELEVEN P1b FAILURES DEGRADED SILENTLY RATHER THAN FAILING LOUDLY \u2014 the same property as this node, observed in the test suite itself. _execute_tool_with_retry caught a TypeError and returned an exception envelope, so the retry never fired and the test failed on a retry COUNT rather than on the type error. _write_async reads record[<col>] under try/except, so a missing key became a silent no-op. build_pre_built_sections skipped a malformed hint and wrote no key at all. In each case the real fault was one layer up from where the test complained, which is why 'the test is stale' and 'the code is broken' were hard to tell apart without checking live behaviour first \u2014 which Chat Master did before touching any assertion."
+    ],
     [
      "bad",
      "OWNER(chat): THE DEPLOY SCRIPT PRINTS A FALSE REASSURANCE. Found by Chat Master, verified by me at scripts/deploy.sh:113. On a dirty tree it emits:\n\n  warn: working tree has uncommitted changes \u2014 image will reflect committed HEAD only\n\nThat claim is not true and nothing implements it. It is a bare echo. The build at :147 runs `gcloud builds submit \"${PARENT_DIR}\"`, which tars the WORKING DIRECTORY (596 files on the P1c run), and deploy/cloudbuild.yaml does a plain `docker build .` on that context \u2014 no git checkout, no archive of HEAD, and deploy/.gcloudignore has no rule covering the dirty paths. Uncommitted work ships while the operator is told it does not.\n\nThis is the same class as the rest of this node, one layer up: the WARNING is the producer and the behaviour it promises is the consumer that was never built. Worse than silence, because it converts a hazard an operator would otherwise check into one they have been told to ignore.\n\nCONSEQUENCE FOR THIS PROGRAM, and it is not small: every deploy so far has run against a dirty tree, so NO REVISION IS A CLEAN BEFORE/AFTER REFERENCE POINT. P1a's image carried another session's platform.html and 051_*.sql; P1c's carries the same two. Neither affects chat behaviour, but any claim of the form 'this revision differs from the last one only by phase X' is unsupported while the tree is dirty."

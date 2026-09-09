@@ -12,14 +12,14 @@ program. That is what makes this a tracker and not a snapshot.
 Plan and gate definition: `docs/chat-refactor-program.md`. Nothing starts until
 its sign-off table is complete.
 
-**82 bugs · 52 sequenced into 5 phases · 30 explicitly outside · 0 unassigned**
+**84 bugs · 54 sequenced into 5 phases · 30 explicitly outside · 0 unassigned**
 
 ## Progress
 
 | Phase | Name | Bugs | Owner | Gate metric | Blocks | Status |
 |---|---|---:|---|---|---|---|
 | **P1** | Delete | 6 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☐ not started |
-| **P2** | Make absent producers detectable | 14 | chat + Eval | every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☐ not started |
+| **P2** | Make absent producers detectable | 16 | chat + Eval | every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☐ not started |
 | **P3** | One decision point | 12 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ☐ not started |
 | **P4** | Split | 15 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
 | **P5** | Config UX | 5 | chat + Prompt Studio | max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped | — | ☐ not started |
@@ -32,7 +32,7 @@ complete, and P0 blocks all of the others.
 | Owner | Sequenced bugs |
 |---|---:|
 | chat | 28 |
-| unassigned-owner | 24 |
+| unassigned-owner | 26 |
 
 ## P1 — Delete  ·  6 items
 
@@ -53,7 +53,7 @@ The cost of leading with it, stated plainly: this phase CANNOT CLAIM A LATENCY W
 | ☐ | `run_pipeline` | chat | THE CLASSIC PATH IS DEAD AND IT IS 1,159 LINES |
 | ☐ | `run_pipeline` | chat | THE CREDENTIALING SURFACE IS 8,994 LINES IN CHAT AND ITS TABLES ARE EMPTY |
 
-## P2 — Make absent producers detectable  ·  14 items
+## P2 — Make absent producers detectable  ·  16 items
 
 **Owner** chat + Eval
 **Gate** every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join  
@@ -71,6 +71,8 @@ BASELINE RULE: the latency numbers captured at the END of this phase are the ref
 |---|---|---|---|
 | ☐ | `active_context` | — | It writes two keys into the turn record by name — active_context and failed_query — and both are among the thr |
 | ☐ | `curator_tools` | — | DOES IT DO ANYTHING? Yes — and answering that properly corrected two of my own claims |
+| ☐ | `emit_envelope` | — | A STALE TEST WAS ASSERTING A VULNERABILITY |
+| ☐ | `emit_envelope` | — | FIVE OF THE ELEVEN P1b FAILURES DEGRADED SILENTLY RATHER THAN FAILING LOUDLY — the same property as this node, |
 | ☐ | `emit_envelope` | chat | THE DEPLOY SCRIPT PRINTS A FALSE REASSURANCE |
 | ☐ | `emit_envelope` | chat | THE FAILURE-PATH EMITTERS WERE BUILT, TESTED, AND NEVER WIRED |
 | ☐ | `emit_envelope` | chat | 184 UNWIRED CANDIDATES ACROSS app/, 86 OF THEM WITH TESTS |

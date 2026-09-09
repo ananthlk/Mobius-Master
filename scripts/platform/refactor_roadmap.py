@@ -73,6 +73,8 @@ RULES = [
     ("P2", "orchestrator",  "LATENCY MEASUREMENT"),
     ("P2", "governor",      "116 OF 187 CONFIG KNOBS"),
     ("P2", "governor",      "blueprint_snapshot is 0 of 2,744"),
+    ("P2", "emit_envelope", "A STALE TEST WAS ASSERTING A VULNERABILITY"),
+    ("P2", "emit_envelope", "FIVE OF THE ELEVEN P1b FAILURES DEGRADED SILENTLY"),
     ("P2", "emit_envelope", "THE DEPLOY SCRIPT PRINTS A FALSE REASSURANCE"),
     ("P2", "emit_envelope", "FAILURE-PATH EMITTERS WERE BUILT, TESTED, AND NEVER WIRED"),
     ("P2", "emit_envelope", "184 UNWIRED CANDIDATES"),
