@@ -40,7 +40,7 @@
     "owner": "chat",
     "gate": "every extracted unit has a test file; total lines roughly flat",
     "blocks": null,
-    "n": 15
+    "n": 16
    },
    {
     "id": "P5",
@@ -936,6 +936,10 @@
     [
      "bad",
      "OWNER(chat): THE CIRCUIT BREAKER DID NOT PULL A PROVIDER THAT FAILS 100% OF THE TIME, FOR TWO DAYS. The module documents 'immediate pull if error_rate_24h > 15% or hard_error_rate > 20%'. Measured against llm_calls:\n\n  2026-09-06   471 anthropic selections, 469 succeeded\n  2026-09-07   132 selections,  70 succeeded  <- outage begins 00:58Z\n  2026-09-08   130 selections,   0 succeeded\n  2026-09-09    73 selections,   0 succeeded\n\n203 selections across two full days at a 100% failure rate, and the breaker never fired. Every one of those turns paid a round-trip to a dead provider before falling back.\n\nTHE LIKELY MECHANISM IS THE SAME NULL COLUMN THAT BROKE THE ema. The 24h error-rate breaker reads model_performance_by_stage, which model_registry.py:2293 filters `WHERE variant_id = 'default'` \u2014 the column the writer never populated until the LLM Agent's fix landed on 2026-09-09. A matview whose row set never advances cannot report the last 24 hours of anything. So the bandit's safety mechanism was reading a frozen snapshot while live traffic failed.\n\nNOT CONFIRMED end to end \u2014 I have not traced the breaker's read path to that matview myself, and the LLM Agent's fix may have already changed the picture. Recorded as the leading mechanism with the failure measured, not as a proven chain."
+    ],
+    [
+     "bad",
+     "OWNER(chat): THE TEST SUITE MUTATES THE BANDIT'S LIVE STATE \u2014 TO BE TESTED IN THE BANDIT'S OWN PASS (Ananth, 2026-09-09). Found by Chat Master while a P2b test file shifted collection order; root cause verified by me independently.\n\nMODEL_ROSTER is a process-wide MUTABLE SINGLETON and the specs are written in place at runtime: spec.ema_quality (model_registry.py:1987, 2030), spec.call_count += 1 (:1983), spec.quality_samples += 1 (:1988, 2031), plus a PG refresh overwriting both at :2317-2323.\n\nMeasured during ONE full-suite run: gemini-2.5-flash accumulated call_count=38 and quality_samples=37, dragging its ema_quality from a seeded 0.78 down to 0.609 \u2014 below gemini-2.0-flash-lite's untouched 0.65, inverting the model ordering a test asserts on.\n\nTHE BROKEN TEST IS THE SMALL HALF. The counters the suite moves are the SAME ONES THAT DRIVE THE BANDIT'S PHASE TRANSITIONS: Phase 1->2 at 10 quality samples, Phase 2->3 (locked exploitation) at 100. A test run that adds 37 samples to one model is pushing it toward exploitation on evidence that is not traffic. Whether that leaks beyond the process is the open question \u2014 the in-process roster does not persist, but :2317-2323 reads FROM Postgres, so the direction of contamination needs establishing rather than assuming.\n\nWHAT THE BANDIT'S PASS MUST TEST, recorded now so it is not re-derived:\n  1. a full-suite run leaves MODEL_ROSTER's seeded values unchanged\n  2. phase transitions are driven by persisted traffic, not by in-process accumulation from any source\n  3. the beta_prior test asserts its stated intent (per-model ema_quality, not a constant) without depending on unmutated seeds \u2014 the incidental ordering assertion is a property of test order, not of the code under test\n  4. a sibling file already documents this hazard and works around it with source inspection (test_claude_current_gen_models.py:29-35). One test file knew and the bandit's did not \u2014 the workaround should be the rule, not local knowledge.\n\nAnanth ruled the immediate test fix proceeds so P2b is not blocked. A GREEN TEST DOES NOT CLOSE THIS."
     ],
     [
      "bad",

@@ -11,15 +11,13 @@ the POST half of the gate, not only as a report.
 
 | collected | passed | failed | errors | skipped | wall |
 |---:|---:|---:|---:|---:|---:|
-| 2532 | 2512 | 15 | 0 | 5 | 141.1s |
+| 2532 | 2513 | 14 | 0 | 5 | 147.9s |
 
 Known-failing baseline: **14** tests, frozen 2026-09-08 before any P1a
 deletion. Ananth's ruling — these predate the program, so the gate SUBTRACTS them.
 A failure not in that set is a regression. The list may shrink, never grow.
 
-### REGRESSIONS — 1 failing test(s) NOT in the baseline
-
-- `tests.test_model_router_bandit::test_beta_prior_uses_per_model_benchmark`
+**No regressions** — every failure is in the known-failing baseline.
 
 ## A2 · What the tests actually cover, per schema node
 
@@ -27,13 +25,14 @@ A total test count is not coverage of the thing you are about to change. This ma
 test files to nodes by name, which is a WEAK signal — it proves a file exists whose
 name matches, not that the node's behaviour is asserted. Eval owns replacing it.
 
-**18 of 36 nodes have a matching test file · 18 have none · 4 of those are RED**
+**18 of 37 nodes have a matching test file · 19 have none · 5 of those are RED**
 
 | Node | Rating | Bugs | Test files | Cases |
 |---|---|---:|---|---:|
 | `POST /chat` | red | 14 | **none** | — |
 | `clarification` | red | 2 | **none** | — |
 | `jurisdiction` | red | 2 | **none** | — |
+| `model_registry` | red | 2 | **none** | — |
 | `state_load` | red | 5 | **none** | — |
 | `PHI gate` | amber | 2 | **none** | — |
 | `active_context` | amber | 1 | **none** | — |

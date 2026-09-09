@@ -81,6 +81,7 @@ RULES = [
     ("P2", "emit_envelope", "THE CONFIRMED ROSTER"),
     ("P1", "run_pipeline",  "26 TESTS ARE ALREADY FAILING"),
     ("P1", "emit_envelope", "THE CREDENTIALING ROUTER WOULD SURVIVE LOSING ITS IMPLEMENTATION"),
+    ("P4", "model_registry", "THE TEST SUITE MUTATES THE BANDIT'S LIVE STATE"),
     ("P2", "model_registry", "THE CIRCUIT BREAKER DID NOT PULL A PROVIDER"),
     ("P2", "model_registry", "THE BANDIT HAS NO SURFACE"),
     ("P2", "emit_envelope", "TOOL SELECTION IS SPORADIC"),

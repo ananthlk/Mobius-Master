@@ -12,7 +12,7 @@ program. That is what makes this a tracker and not a snapshot.
 Plan and gate definition: `docs/chat-refactor-program.md`. Nothing starts until
 its sign-off table is complete.
 
-**96 bugs · 65 sequenced into 5 phases · 31 explicitly outside · 0 unassigned**
+**97 bugs · 66 sequenced into 5 phases · 31 explicitly outside · 0 unassigned**
 
 ## Progress
 
@@ -21,7 +21,7 @@ its sign-off table is complete.
 | **P1** | Delete | 9 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☐ not started |
 | **P2** | Make absent producers detectable | 23 | chat + Eval | every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☐ not started |
 | **P3** | One decision point | 13 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ☐ not started |
-| **P4** | Split | 15 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
+| **P4** | Split | 16 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
 | **P5** | Config UX | 5 | chat + Prompt Studio | max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped | — | ☐ not started |
 
 No phase may start before `docs/chat-refactor-program.md`'s sign-off table is
@@ -31,7 +31,7 @@ complete, and P0 blocks all of the others.
 
 | Owner | Sequenced bugs |
 |---|---:|
-| chat | 37 |
+| chat | 38 |
 | unassigned-owner | 28 |
 
 ## P1 — Delete  ·  9 items
@@ -120,7 +120,7 @@ BASELINE RULE: the latency numbers captured at the END of this phase are the ref
 | ☐ | `tool_manifest` | chat | A TOOL RETURNED A REAL PLAYBOOK AND CHAT REPORTED THERE WAS NONE |
 | ☐ | `tool_manifest` | chat | SPORADIC TOOL SELECTION — FOLDED INTO THE TOOLS REFACTOR, with the three candidate layers named |
 
-## P4 — Split  ·  15 items
+## P4 — Split  ·  16 items
 
 **Owner** chat · **ratifier** Tech Review + Eval
 **Gate** every extracted unit has a test file; total lines roughly flat  
@@ -136,6 +136,7 @@ BASELINE RULE: the latency numbers captured at the END of this phase are the ref
 | ☐ | `integrate` | — | Three distinct responsibilities (synthesis, critique, enrichment), two execution modes and a per-turn sampling |
 | ☐ | `integrate` | — | 29 exception handlers, 20 log-and-continue, and the only test named for it covers the fallback path |
 | ☐ | `message_resolver` | — | Reference detection is a hand-maintained regex of literal English phrases |
+| ☐ | `model_registry` | chat | THE TEST SUITE MUTATES THE BANDIT'S LIVE STATE — TO BE TESTED IN THE BANDIT'S OWN PASS (Ananth, 2026-09-09) |
 | ☐ | `orchestrator` | — | 1,902 lines and 31 log-and-continue handlers on the module that owns the turn. |
 | ☐ | `parsing` | — | NO TEST FILE — and the determinism makes this worse, not better |
 | ☐ | `prompts` | chat | SEPARATE THE PARAMETER PLANNER FROM THE PROMPT GENERATOR — Ananth's point, and measuring it makes the case rat |
