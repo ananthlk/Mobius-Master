@@ -85,6 +85,7 @@ RULES = [
     ("P2", "model_registry", "THE CIRCUIT BREAKER DID NOT PULL A PROVIDER"),
     ("P2", "model_registry", "THE BANDIT HAS NO SURFACE"),
     ("P3", "tool_manifest", "TOOL SELECTION IS SPORADIC, AND THE MODEL NARRATES"),
+    ("P2", "emit_envelope", "A NAME-BASED SEARCH ANSWERS"),
     ("P2", "emit_envelope", "AN UN-INSTRUMENTED EXTERNAL WAIT"),
     ("P2", "emit_envelope", "A READ-BACK OF THE WRONG ARTIFACT"),
     ("P2", "react_loop", "_rich_evidence IS AN UNRECORDED BRANCH"),

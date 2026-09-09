@@ -139,6 +139,8 @@ header.top .lead{font-size:var(--mobius-text-xs);color:var(--mobius-text-muted);
  margin-top:var(--mobius-space-sm)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 .band-dead{opacity:.72}
+.n.removed,.cnode.removed{border-left-color:var(--mobius-border-medium)}
+.rr{font-size:var(--mobius-text-xs);letter-spacing:.06em;text-transform:uppercase;opacity:.6}
 .cnode.dead{border-style:dashed;text-decoration:line-through;text-decoration-thickness:1px}
 .cnode.dead .cs{text-decoration:none;opacity:.75}
 table.rm{width:100%;border-collapse:collapse;font-size:var(--mobius-font-size-sm)}

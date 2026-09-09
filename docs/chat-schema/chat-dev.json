@@ -24,7 +24,7 @@
     "owner": "chat + Eval",
     "gate": "every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
-    "n": 23
+    "n": 24
    },
    {
     "id": "P3",
@@ -758,8 +758,8 @@
    ],
    "fan_in": 14,
    "how": "WHEN CHAT STOPS AND ASKS INSTEAD OF ANSWERING. There are FOUR mechanisms and they belong to\nthree different owners.\n\n  A. Jurisdiction ask      state/clarification.py \u2014 \"Which health plan or payer?\"  DEAD (legacy branch)\n  B. Route-clash ask       stages/clarify.py:30 \u2014 \"web or policy materials?\"        DEAD (legacy branch)\n  C. Query refinement      state/query_refinement.py                                DEAD (legacy branch)\n  D. RAG clarify bypass    react_loop.py:1760 \u2014 terminal stop mid-loop              THE ONLY LIVE ONE\n\nD is the one the user actually experiences, and it does not originate in chat at all. RAG\nreturns routing_keys.clarify_questions in its corpus telemetry; when RAG's status is\n\"no_retrieval\" AND those questions survive two chat-side filters, react_loop sets\nreact_bypass_integrate, puts the clarify text in final_message and exits the loop. So the\nquestion the user is asked was WRITTEN BY THE RETRIEVER, and chat's only role is to decide\nwhether to relay it.\n\nThe two filters (react_loop.py:961, added 2026-08-08 on a Chat Master directive because RAG\nwas firing CLARIFY on well-formed queries) are:\n\n  1. SPECIFICITY \u2014 reject if the text matches any of 15 generic templates\n     (\"could you clarify\", \"please specify\", \"more details\"...); accept if it contains one of\n     20 domain terms (payer, plan, code, cpt, hcpcs, icd, state...), OR any digit, OR any\n     capitalised word after the first.\n  2. CONTEXT \u2014 reject if chat's own carried-forward state/payor already appears in the query\n     text, i.e. don't ask what we already know.",
-   "rating": "red",
-   "depth": "code",
+   "rating": "removed",
+   "depth": "removed",
    "findings": [
     [
      "bad",
@@ -789,6 +789,7 @@
     "todos": 0,
     "deleted": true
    },
+   "rating_was": "red",
    "live_config": [],
    "detail": {}
   },
@@ -825,6 +826,10 @@
    "rating": "red",
    "depth": "code",
    "findings": [
+    [
+     "bad",
+     "A NAME-BASED SEARCH ANSWERS 'IS THERE A SYMBOL CALLED X', NEVER 'DOES X HAPPEN'. Chat Master's self-correction, 2026-09-09, and it is the third distinct way this codebase hides a live thing from a competent search.\n\nThey were about to report completion_extension_gate as a stale schema entry with no code, and shipped that claim in code as NODES_WITHOUT_CODE before catching it. The node IS live: ~60 lines INLINE in react_loop's main loop \u2014 the completion critic plus the `max_it += 1` bump \u2014 with no module, class or function of its own. A nameless inline block has NO SYMBOL, so a symbol search returns empty and the empty result proves nothing.\n\nIT WAS INVISIBLE TWO INDEPENDENT WAYS AT ONCE, which is why it mattered most of the set: nothing to decorate meant its LLM call was charged to the enclosing round's processing (the un-instrumented-wait defect above), AND nothing to grep meant a reader concluded it did not exist. Now opens an explicit span.\n\nRelated to but distinct from 'an import edge is not a consumption edge': that one is a false POSITIVE from a name (an import that proves nothing is consumed); this is a false NEGATIVE from the absence of a name."
+    ],
     [
      "bad",
      "AN UN-INSTRUMENTED EXTERNAL WAIT IS INDISTINGUISHABLE FROM OUR OWN WORK \u2014 the most expensive variant of this node's class, because it does not merely hide a failure, it MISDIRECTS THE FIX. Chat Master, 2026-09-09, retracting three of their own numbers, and I verified the corrected ones from turn_spans before recording them.\n\nThe three retractions were one defect: an external wait with no span of its own has its wall time fall through to the enclosing module's PROCESSING column. So:\n  'integrate is ~1,079ms/turn of pure processing, the largest block of code we control' -> actually 240ms; the integrator's own LLM calls had no spans and their wall landed in the processing column, reading as 12,087ms on one turn\n  'state_load has a read loop' -> the smoke test reuses fixed cids, so four runs counted as one turn, ~14x inflation\n  a 5,770ms RAG call reported as 5,770ms of our processing -> same cause\n\nNOTHING FAILED. The number was present, plausible, and named the wrong module. That is worse than a missing metric: a missing number prompts someone to go measure, while a wrong one sends an engineer to optimise code that was idle the whole time.\n\nVERIFIED FROM turn_spans on the cited turn (7897f928, 56.5s wall): react_loop root 44,274ms wall of which 12,978 llm and a single tool:healthcare_query span at 30,099ms; integrate 11,726ms wall of which 11,486 llm. Our own processing across the turn is ~1.4-1.5s. CHAT'S OWN CODE IS 2.7% OF THE TURN.\n\nTWO STRUCTURAL GUARDS SHIPPED WITH THE RETRACTION, and the reasoning behind the first is the transferable part: turn_spans.concurrent (migration 064) so parallel siblings contribute max() rather than sum() \u2014 a COLUMN rather than a naming convention, because a convention is a rule with no enforcement. And turn_matrix() takes injectable spans so shape rules test without a DB, after the previous version shipped a broken write precisely because every test patched db_execute."
@@ -2486,8 +2491,8 @@
     "deleted": true
    },
    "how": "The stage that turns a bad answer into a question. It returns resolvable \u2014 False means stop\nand ask rather than proceed.\n\nThree checks, in order. Route clash first: detect_route on the message, and when confidence\nis below 1.0 with competing choices, it asks outright \u2014 \"I can either search the web or\nsearch our policy materials\" \u2014 rather than guessing which the user meant. Then jurisdiction:\nneed_jurisdiction_clarification against the plan's subquestions and active state, consulting\nthe RAG lexicon URL so the tagger can judge scope. Then query refinement.\n\nThere is a deliberate exemption worth knowing: when the turn is a follow-up about a stored\ncredentialing report \u2014 an active roster_report skill, or a stored report_run_id \u2014 the\njurisdiction ask is skipped, because answering from a report we already produced needs no\nRAG scope. Asking \"which state?\" about a report already on screen is the failure that\nexemption exists to prevent.",
-   "rating": "green",
-   "depth": "code",
+   "rating": "removed",
+   "depth": "removed",
    "findings": [
     [
      "good",
@@ -2506,6 +2511,7 @@
      "Delegates to app/state/clarification.py (88 loc) and query_refinement.py (128 loc), neither of which is in this catalogue."
     ]
    ],
+   "rating_was": "green",
    "live_config": [],
    "detail": {}
   },
@@ -2539,8 +2545,8 @@
     "deleted": true
    },
    "how": "Twenty-four lines, and the hinge on which conversational continuity turns.\n\nIt asks one question \u2014 is this a new question, or the user filling a blank we left? \u2014\nby calling classify_message(message, last_turn, open_slots, last_refined). Three outcomes\nmatter: slot_fill, jurisdiction_change, or neither.\n\nThe interesting branch is what happens on the first two. If there is a stored refined\nquery, it does NOT plan from what the user just typed. It rebuilds the whole thing:\nbuild_refined_query(last_refined, jurisdiction_from_active). So a one-word reply \u2014 \"Florida\"\n\u2014 becomes the entire previous question re-asked with Florida attached. That is why a slot\nfill does not lose the question.\n\nOtherwise it preserves an effective_message that message_resolver already set (pronoun\nresolution), falling back to the raw message. That fallback chain is an ordering\ndependency: message_resolver must have run first or \"it\" never gets resolved.",
-   "rating": "amber",
-   "depth": "code",
+   "rating": "removed",
+   "depth": "removed",
    "findings": [
     [
      "bad",
@@ -2555,6 +2561,7 @@
      "Pure and side-effect free: reads merged_state, writes two ctx fields."
     ]
    ],
+   "rating_was": "amber",
    "live_config": [],
    "detail": {}
   },
@@ -2588,8 +2595,8 @@
     "deleted": true
    },
    "how": "The 'do not flail' stage. Three questions: should we ask the user for help (user-as-leverage),\nhas the user ended the pursuit, and have we hit the attempt ceiling.\n\nIt types its vocabulary rather than passing strings around. StuckReason is a Literal \u2014\nno_evidence, missing_code, conflicting_info, partial_answer, tool_failed \u2014 and there are five\nnamed objective end states (resolved, need_info, unable, user_ended, incomplete), so a stop is\nalways a stated kind of stop rather than an absence of an answer. MAX_ATTEMPTS_BEFORE_STOP\ncomes from MasterObjective. Spec'd in docs/RELENTLESS_CONTINUITY_PLAN.md.",
-   "rating": "red",
-   "depth": "code",
+   "rating": "removed",
+   "depth": "removed",
    "findings": [
     [
      "good",
@@ -2608,6 +2615,7 @@
      "OWNER(chat): CONTINUITY RUNS EVERY TURN AND CANNOT DO ANYTHING, BECAUSE ITS INPUT IS NEVER CREATED ON THE LIVE PATH. Ananth 2026-09-08 read it as duplicative; it is worse than duplicative \u2014 it is inert, and it reports a fixed answer.\n\nBoth of its functions key off ctx.merged_state['master_objective']. That objective is created by create_or_update_objective(), which has EXACTLY ONE caller: orchestrator.py:819, inside the `if not use_react` legacy branch. On the ReAct path the objective is only ever READ (orchestrator.py:725 loads it out of merged_state) and nothing on that path ever writes one. So obj is None every turn, and:\n\n  should_ask_user_for_help()  -> (False, None) always. ctx.response_payload['user_ask'] is NEVER set. The frontend has a fallback at app.js:13338 that renders user_ask as the next question when the integrator returned none \u2014 that branch is unreachable.\n  get_objective_end_state()   -> ('resolved', None) always, by the `if not obj` early return at continuity.py:83-84.\n\nTHE SECOND ONE IS NOT MERELY DEAD, IT IS WRONG. Every turn sets response_payload['objective_status'] = 'resolved' \u2014 including refusals, clarify bypasses, groundedness failures shipped with a warning, and the 203 budget-exhausted turns that ran out of rounds without the planner ever being satisfied. The four other end states (need_info, unable, user_ended, incomplete) are unreachable. The module whose stated purpose is that 'a stop is always a stated kind of stop' currently states the same kind of stop for every outcome. I previously rated this node GREEN on the strength of its typed end states; that was rating the construction and not the guarantee, and the rating is corrected to RED here.\n\nTHE DUPLICATION IS REAL AND THE OTHER COPY IS THE LIVE ONE. react_loop already computes the same three judgements and its versions ARE wired: ctx.react_unfinished_reason (no_path_forward, incomplete_coverage, need_more_info, need_more_time \u2014 measured firing on live turns), ctx.react_unfinished_summary and ctx.react_unblock_ask. integrate.py reads react_unfinished_reason at four sites, orchestrator.py at one, progress.py at one. So the product does have typed stop reasons that work; they are react_loop's, not continuity's."
     ]
    ],
+   "rating_was": "red",
    "live_config": [],
    "detail": {}
   },
@@ -2641,8 +2649,8 @@
     "deleted": true
    },
    "how": "Routing helpers for credentialing conversations, shared between the classic and ReAct paths so\nboth agree on what a message is asking for.\n\nThe core is resolve_step3_roster_merge_context, which reads thread state and the credentialing\noptions and returns three things: the roster upload id, whether the user chose outside-in\n(external_only), and whether to include roster members. The rest are predicates \u2014 does this\nthread have reconciliation data, is the message asking for reconciliation, does the envelope\nroute there.",
-   "rating": "green",
-   "depth": "code",
+   "rating": "removed",
+   "depth": "removed",
    "findings": [
     [
      "good",
@@ -2657,6 +2665,7 @@
      "No test file, for logic that decides which of two workflows a message enters."
     ]
    ],
+   "rating_was": "green",
    "live_config": [],
    "detail": {}
   },
@@ -2690,8 +2699,8 @@
     "deleted": true
    },
    "how": "Turns the effective message into a Plan \u2014 a list of SubQuestions \u2014 plus a refined query and\na blueprint. Only the classic path runs it; ReAct plans as it goes.\n\nTwo shortcuts matter more than the main path.\n\n_plan_from_master_objective: on a slot fill, if a master objective is stored, it reuses the\nsub-objectives already agreed rather than re-parsing. A follow-up does not get re-decomposed\ninto a different set of questions than the one the user was answering.\n\n_minimal_plan: when parsing fails, rather than erroring it emits one subquestion carrying the\nraw message with kind=non_patient and intent_score 0.5. The turn continues on a degraded\nplan. That is a deliberate choice \u2014 a bad plan beats no answer \u2014 but it is silent.\n\nIt feeds capabilities_for_parser in, so the decomposition only produces sub-questions\nsomething can actually answer, and runs parse_credentialing_flow_intent over the text.",
-   "rating": "amber",
-   "depth": "code",
+   "rating": "removed",
+   "depth": "removed",
    "findings": [
     [
      "bad",
@@ -2706,6 +2715,7 @@
      "Reusing the master objective on slot fill is the right call and is the reason a follow-up does not silently become a different question."
     ]
    ],
+   "rating_was": "amber",
    "live_config": [],
    "detail": {}
   },
@@ -2739,8 +2749,8 @@
     "deleted": true
    },
    "how": "The classic path's dispatcher, and the only stage with an explicit, numbered escalation\nladder. Each subquestion is answered by walking layers until one succeeds:\n\n  0  hard stop\n  1  RAG \u2014 the corpus\n  2  system tool\n  3  web / scrape\n  4  reasoning \u2014 the model answering without retrieval\n  5  ask_user\n\nEvery hop is announced: emit_layer_attempt as each is tried, emit_fallback when one gives\nway to the next, so the thinking chain shows the escalation rather than only its outcome.\n\nThe guard worth knowing is on layer 4. Reasoning is allowed to answer only when sources are\npresent; if none are, layer 4 is skipped and the cascade falls through to ask_user. That is\nthe difference between an ungrounded answer and an honest question, and it is one comparison\nin the middle of a 595-line file.",
-   "rating": "amber",
-   "depth": "code",
+   "rating": "removed",
+   "depth": "removed",
    "findings": [
     [
      "good",
@@ -2759,6 +2769,7 @@
      "validate_tool_result returns (is_valid, failure_reason) and an invalid result triggers the next layer \u2014 so a tool that returns something useless is indistinguishable downstream from one that failed outright."
     ]
    ],
+   "rating_was": "amber",
    "live_config": [],
    "detail": {}
   }

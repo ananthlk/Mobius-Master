@@ -226,6 +226,15 @@ def main():
                 obj["ux"] = c["ux"]
         obj["signals"] = sigs.get(sig_alias.get(key, key), {})
         if obj.get("deleted"):
+            # A RATING IS A JUDGEMENT ABOUT LIVE CODE. Leaving green/amber/red on a
+            # module that no longer exists is worse than leaving the description:
+            # the description is prose a reader weighs, the rating is a badge they
+            # scan. Chat Master read `credentialing_envelope` as "rated green,
+            # depth=code" and correctly called it stale — the stamp I added covers
+            # the how-text and never touched the badge.
+            obj["rating_was"] = obj.get("rating")
+            obj["rating"] = "removed"
+            obj["depth"] = "removed"
             # Same rule as the catalogue fields above: a deleted module's
             # signals are history. readiness_signals already returns zeros for
             # a missing file, but the pre-computed `sigs` map may predate the

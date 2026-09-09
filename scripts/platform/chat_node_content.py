@@ -559,6 +559,22 @@ and nothing in the live path ever calls it, reads it back, or persists what it p
 Each instance looks healthy in isolation. The code is present, the tests pass, the docstring
 describes real intent. The capability is simply absent at runtime, and health stays green.
 """, findings=[
+ ("bad", "A NAME-BASED SEARCH ANSWERS 'IS THERE A SYMBOL CALLED X', NEVER 'DOES X "
+         "HAPPEN'. Chat Master's self-correction, 2026-09-09, and it is the third distinct "
+         "way this codebase hides a live thing from a competent search.\n\n"
+         "They were about to report completion_extension_gate as a stale schema entry with no "
+         "code, and shipped that claim in code as NODES_WITHOUT_CODE before catching it. The "
+         "node IS live: ~60 lines INLINE in react_loop's main loop — the completion critic "
+         "plus the `max_it += 1` bump — with no module, class or function of its own. A "
+         "nameless inline block has NO SYMBOL, so a symbol search returns empty and the empty "
+         "result proves nothing.\n\n"
+         "IT WAS INVISIBLE TWO INDEPENDENT WAYS AT ONCE, which is why it mattered most of the "
+         "set: nothing to decorate meant its LLM call was charged to the enclosing round's "
+         "processing (the un-instrumented-wait defect above), AND nothing to grep meant a "
+         "reader concluded it did not exist. Now opens an explicit span.\n\n"
+         "Related to but distinct from 'an import edge is not a consumption edge': that one is "
+         "a false POSITIVE from a name (an import that proves nothing is consumed); this is a "
+         "false NEGATIVE from the absence of a name."),
  ("bad", "AN UN-INSTRUMENTED EXTERNAL WAIT IS INDISTINGUISHABLE FROM OUR OWN WORK — the "
          "most expensive variant of this node's class, because it does not merely hide a "
          "failure, it MISDIRECTS THE FIX. Chat Master, 2026-09-09, retracting three of their "
