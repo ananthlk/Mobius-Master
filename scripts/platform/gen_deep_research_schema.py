@@ -1226,6 +1226,49 @@ def render(doc, path):
           "fires it is a decision the request type should have covered — so the "
           "types get derived from what happens rather than invented.")], "bad")
 
+    # ---- details: the worklist ---------------------------------------------
+    tk = C.get("task_kinds") or {}
+    add("work:kinds", "The work itself", f"{len(tk)} kinds of activity",
+        [("", "<ul class=finds>" + "".join(
+            f"<li class='f {'bad' if v.get('outside') else 'good'}'>"
+            f"<b>{esc(v.get('says'))}</b> <span class=cur>{esc(k)} · "
+            f"{'outside this system' if v.get('outside') else 'here'} · "
+            f"{esc(v.get('owner_role'))}</span>"
+            f"<br><span class=cur>groups on: {esc(v.get('groups_on'))}</span>"
+            + (f"<br><span class=cur>{esc(v['note'])}</span>" if v.get("note") else "")
+            + "</li>" for k, v in tk.items()) + "</ul>"),
+         ("why it is not questions", "Every action in this module was an action "
+          "ON a question, one row per question — the wrong grain for whoever "
+          "does the work. 39 questions carrying advice collapse into 8 "
+          "activities and the top one is worth 23; as 23 rows it looked like 23 "
+          "separate problems."),
+         ("a task need not have a question", "task_question is many-to-many and "
+          "may be empty. 'Call this person and find an answer' is work — it may "
+          "unblock six questions, one, or none yet — and it could not be "
+          "expressed while every task was an action on one request."),
+         ("priority", "Derived, never assigned: questions unblocked plus the "
+          "overdue ones. The moment somebody can type a number into it, the "
+          "number stops describing the work.")], "warn")
+
+    tb = C.get("target_basis") or {}
+    add("work:basis", "How we knew which document",
+        "extract · name · class · explore",
+        [("", "<ol class=finds style='padding-left:20px'>" + "".join(
+            f"<li class='f {'good' if k != 'explore' else 'unproven'}' "
+            f"style='padding-left:4px'><b>{esc(k)}</b> — {esc(v)}</li>"
+            for k, v in tb.items()) + "</ol>"),
+         ("the rung that changed the work", "Before the last one, a question we "
+          "could say nothing about produced 'Get a source that governs this for "
+          "csu_baker_act' — the system pretending to know what to fetch, which "
+          "somebody discovers only after opening it. `explore` is research "
+          "rather than retrieval, and it is the only fetch-adjacent work that "
+          "happens HERE rather than outside."),
+         ("what the corpus settled", "A provider manual is 1 row per payer "
+          "(Molina 1, Simply 1, United 1); AHCA has 49 fee schedules, one per "
+          "code category; there are 113 distinct 59G rules, one per service. "
+          "Keying every errand on the service line asked four people for the "
+          "same handbook.")], "info")
+
     W = doc.get("request_writers") or []
     gated = [w for w in W if w["gated"]]
     add("contract:doors", "Ways to create a request",
@@ -1308,6 +1351,10 @@ def render(doc, path):
                             "ok" if u["state"] == "live" else "info")
                        for u in C.get("surfaces", []))
     TONE_ART = {"present": "ok", "partial": "warn", "absent": "bad"}
+    work = chip("work:kinds", "The work itself",
+                f"{len(C.get('task_kinds') or {})} kinds", "warn")
+    work += chip("work:basis", "How we knew which document",
+                 "4 rungs", "info")
     arts = "".join(chip(f"art:{a['id']}", a["title"], a["state"],
                         TONE_ART.get(a["state"], ""))
                    for a in C.get("artifacts", []))
@@ -1425,7 +1472,9 @@ border-radius:99px;background:var(--bg2)}}
 all — and the three missing ones are where the arbiter has been improvising.
 State is read against what actually carries each: an artifact claiming to exist
 without naming a column fails this build.</p>
-<div class=row>{arts}</div></div>
+<div class=row>{arts}</div>
+<div class=gl>and the work they turn into — a worklist is activities, not questions</div>
+<div class=row>{work}</div></div>
 
 <div class=band><div class=band-t>3 · The contract — one declaration, several consumers</div>
 <p class=band-s>Four verbs, declared once in <code>deep_research/contract.py</code>,

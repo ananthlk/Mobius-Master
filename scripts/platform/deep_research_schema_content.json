@@ -246,6 +246,37 @@
    [
     "unproven",
     "Written 2026-09-09. Six ungated insert paths still exist; the invariant names them rather than removing them."
+   ],
+   [
+    "good",
+    "A package since the framework landed — fields, verbs, surfaces, actions, specifics, notes, words, artifacts, authority, tools, decisions, tasks. The split failed the generator's own invariant on the first build, which is the check doing its job."
+   ]
+  ]
+ },
+ "worklist": {
+  "group": "the answer",
+  "rating": "amber",
+  "how": "Turns what we advise on each question into the work somebody actually does — grouping many questions into one errand where they need the same document, and saying which rung of the ladder told us what that document is.",
+  "findings": [
+   [
+    "good",
+    "39 questions carrying advice collapse into 8 activities, and the top one is worth 23 — an item invisible while it was 23 rows, because it looked like 23 problems."
+   ],
+   [
+    "good",
+    "A document class carries its own SCOPE. The corpus settles it: a provider manual is one row per payer, a 59G rule is one per service, a fee schedule is one per category. Four handbook errands were four requests for one document."
+   ],
+   [
+    "good",
+    "When nothing identifies a document, the activity is `explore` — research, not retrieval, and the only fetch-adjacent work that happens HERE rather than outside. 'Name the document' would have put the burden on somebody who already knows, and mostly nobody does."
+   ],
+   [
+    "bad",
+    "Derived from recommendations only, so it can hold only work the machine already knows how to advise. 'Call this person' cannot be derived — nothing in the record knows a person exists to call — and there is no route to declare one."
+   ],
+   [
+    "unproven",
+    "Priority is questions-unblocked plus overdue. Crude on purpose, and nobody has worked a single item, so the ordering has never been tested against what a person would actually pick up."
    ]
   ]
  }
