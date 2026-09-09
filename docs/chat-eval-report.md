@@ -11,17 +11,13 @@ the POST half of the gate, not only as a report.
 
 | collected | passed | failed | errors | skipped | wall |
 |---:|---:|---:|---:|---:|---:|
-| 2560 | 2530 | 25 | 0 | 5 | 150.2s |
+| 2555 | 2525 | 25 | 0 | 5 | 135.8s |
 
-Known-failing baseline: **26** tests, frozen 2026-09-08 before any P1a
+Known-failing baseline: **25** tests, frozen 2026-09-08 before any P1a
 deletion. Ananth's ruling — these predate the program, so the gate SUBTRACTS them.
 A failure not in that set is a regression. The list may shrink, never grow.
 
 **No regressions** — every failure is in the known-failing baseline.
-
-**1 baseline failure(s) now PASS** — shrink the baseline:
-
-- `tests.test_latency_no_regrets::test_run_pipeline_emits_thinking_before_state_load`
 
 ## A2 · What the tests actually cover, per schema node
 
@@ -60,7 +56,7 @@ name matches, not that the node's behaviour is asserted. Eval owns replacing it.
 | `curator_tools` | amber | 3 | `test_curator_tools.py` | 16 |
 | `governor` | amber | 6 | `test_governor_bandit_criteria.py` | 39 |
 | `integrate` | amber | 3 | `test_integrate_fallback.py` | 2 |
-| `llm_manager` | amber | 0 | `test_llm_manager.py`, `test_llm_manager_attachments.py`, `test_llm_manager_v2.py` | 51 |
+| `llm_manager` | amber | 1 | `test_llm_manager.py`, `test_llm_manager_attachments.py`, `test_llm_manager_v2.py` | 51 |
 | `message_resolver` | amber | 1 | `test_message_resolver_and_skill_context.py` | 13 |
 | `orchestrator` | amber | 2 | `test_orchestrator.py` | 13 |
 | `react_retry_guard` | green | 0 | `test_react_retry_guard.py`, `test_react_retry_guard_exhaustion.py`, `test_react_retry_guard_zero_result.py` | 56 |
@@ -85,6 +81,6 @@ deterministic replay harness yet (P1.1). A flip would be unattributable.
 
 | modules | loc | except handlers | log-and-continue | bare except |
 |---:|---:|---:|---:|---:|
-| 227 | 75,478 | 822 | 502 | 0 |
+| 222 | 74,747 | 818 | 500 | 0 |
 
 I7 is monotonic: the log-and-continue count may fall, never rise.
