@@ -22,9 +22,10 @@ shows the hole rather than omitting the section.
 import json
 import os
 import re
-import subprocess
 import sys
-import tempfile
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from platform_common import check_script, esc  # noqa: E402
 
 sys.path.insert(0, "/Users/ananth/Mobius/mobius-skills/deep-research")
 from deep_research import contract as ct      # noqa: E402
@@ -32,42 +33,6 @@ from deep_research import language as L       # noqa: E402
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else "/tmp/research-ux.html"
 DATA = sys.argv[2] if len(sys.argv) > 2 else None
-
-
-def esc(x) -> str:
-    return (str("" if x is None else x).replace("&", "&amp;").replace("<", "&lt;")
-            .replace(">", "&gt;").replace('"', "&quot;"))
-
-
-def load_rows() -> dict:
-    if DATA and os.path.exists(DATA):
-        return json.load(open(DATA))
-    return {"requests": []}
-
-
-def check_script(html: str) -> bool:
-    """Parse what we emitted. This generator once shipped a page whose every
-    script was dead from one stray newline inside a JS string, and nothing about
-    the rendered HTML said so. Rendering is not running."""
-    blocks = re.findall(r"<script>(.*?)</script>", html, re.S)
-    if not blocks:
-        return True
-    with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as fh:
-        fh.write("\n".join(blocks))
-        path = fh.name
-    try:
-        r = subprocess.run(["node", "--check", path], capture_output=True, text=True)
-    except FileNotFoundError:
-        print("  ! node not found — emitted script NOT parsed; unverified.")
-        return True
-    finally:
-        os.unlink(path)
-    if r.returncode:
-        print("\nBUILD FAILED — emitted JavaScript will not parse:")
-        print("  " + (r.stderr or "").strip().replace("\n", "\n  ")[:800])
-        return False
-    print(f"  script: {len(blocks)} block(s) parsed")
-    return True
 
 
 # Which stances a reader can act on, in the resolver's own severity order.
@@ -80,6 +45,12 @@ STANCE_TONE = {"ready": "ok", "thin": "ok", "conditional": "ok",
 WAIT_TONE = {"you": "bad", "nobody": "warn", "nothing": "bad",
              "the machine": "ok"}
 ART_TONE = {"present": "ok", "partial": "warn", "absent": "bad"}
+
+
+def load_rows() -> dict:
+    if DATA and os.path.exists(DATA):
+        return json.load(open(DATA))
+    return {"requests": []}
 
 
 def ask_form(doc) -> str:

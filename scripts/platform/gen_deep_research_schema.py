@@ -30,6 +30,9 @@ import os
 import re
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from platform_common import check_script, esc  # noqa: E402
+
 PKG = "/Users/ananth/Mobius/mobius-skills/deep-research/deep_research"
 OUT = sys.argv[1] if len(sys.argv) > 1 else "/tmp/deep-research.json"
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -829,7 +832,7 @@ def main() -> None:
 #
 # PA will co-own this page, so it is also the spec contract between us: what is
 # HERE is agreed, what is marked `future` is proposed and not yet built.
-def esc(x):
+def _unused_esc(x):
     return (str(x if x is not None else "")
             .replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
 
@@ -879,39 +882,6 @@ FUTURE = [
             "refresh.sh runs both generators and fails if either does.",
      "needs": "agreement on the script's home"},
 ]
-
-
-def check_script(html: str) -> bool:
-    """Parse the emitted JavaScript. Fails the build if it will not run.
-
-    Added after the sister generator shipped a page whose every script was dead
-    from one stray newline inside a JS string literal. Nothing about a rendered
-    page says its script did not parse — this page is entirely click-driven, so
-    the same fault would leave a schematic that shows one panel and never
-    changes it. Rendering is not running.
-    """
-    import subprocess
-    import tempfile
-    blocks = re.findall(r"<script>(.*?)</script>", html, re.S)
-    if not blocks:
-        return True
-    with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as fh:
-        fh.write("\n".join(blocks))
-        path = fh.name
-    try:
-        r = subprocess.run(["node", "--check", path], capture_output=True,
-                           text=True)
-    except FileNotFoundError:
-        print("  ! node not found — emitted script NOT parsed; treat as "
-              "unverified.")
-        return True
-    finally:
-        os.unlink(path)
-    if r.returncode:
-        print("\nBUILD FAILED — emitted JavaScript will not parse:")
-        print("  " + (r.stderr or "").strip().replace("\n", "\n  ")[:900])
-        return False
-    return True
 
 
 def render(doc, path):

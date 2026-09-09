@@ -279,5 +279,24 @@
     "Priority is questions-unblocked plus overdue. Crude on purpose, and nobody has worked a single item, so the ordering has never been tested against what a person would actually pick up."
    ]
   ]
+ },
+ "ux_data": {
+  "group": "the surface",
+  "rating": "green",
+  "how": "Composes every request the UX shows — its artifacts, its actions, its notes — and the worklist derived from them, so the page has one source rather than a query per section.",
+  "findings": [
+   [
+    "bad",
+    "Existed only as a script in a scratch directory. The page it feeds could be rebuilt by nobody but the session that wrote it — a generated artefact that cannot be regenerated, which is the failure this whole schematic exists to prevent, one layer out."
+   ],
+   [
+    "good",
+    "Lives in the skill rather than beside the generator: it reads research.* and composes contract + worklist. The skill owns what the data MEANS; the generator owns how it LOOKS."
+   ],
+   [
+    "good",
+    "Moving it changed the emitted page by zero bytes, which is the only evidence a refactor is a refactor."
+   ]
+  ]
  }
 }
