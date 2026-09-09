@@ -654,6 +654,7 @@ def main() -> None:
         "no undeclared, ungated way to create a request has appeared",
         "no action is offered on a condition nothing ever sets",
         "no stance recommends an action nobody can take",
+        "the page's own JavaScript parses — a rendered page is not a running one",
     ]
     doc["curated_on"] = content.get("_curated_on", "2026-09-09")
 
@@ -746,6 +747,39 @@ FUTURE = [
             "refresh.sh runs both generators and fails if either does.",
      "needs": "agreement on the script's home"},
 ]
+
+
+def check_script(html: str) -> bool:
+    """Parse the emitted JavaScript. Fails the build if it will not run.
+
+    Added after the sister generator shipped a page whose every script was dead
+    from one stray newline inside a JS string literal. Nothing about a rendered
+    page says its script did not parse — this page is entirely click-driven, so
+    the same fault would leave a schematic that shows one panel and never
+    changes it. Rendering is not running.
+    """
+    import subprocess
+    import tempfile
+    blocks = re.findall(r"<script>(.*?)</script>", html, re.S)
+    if not blocks:
+        return True
+    with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as fh:
+        fh.write("\n".join(blocks))
+        path = fh.name
+    try:
+        r = subprocess.run(["node", "--check", path], capture_output=True,
+                           text=True)
+    except FileNotFoundError:
+        print("  ! node not found — emitted script NOT parsed; treat as "
+              "unverified.")
+        return True
+    finally:
+        os.unlink(path)
+    if r.returncode:
+        print("\nBUILD FAILED — emitted JavaScript will not parse:")
+        print("  " + (r.stderr or "").strip().replace("\n", "\n  ")[:900])
+        return False
+    return True
 
 
 def render(doc, path):
@@ -1274,6 +1308,8 @@ var start = decodeURIComponent((location.hash||'').replace(/^#/,''));
 show(D[start] ? start : 'step:judge');
 </script>"""
     open(path, "w").write(html)
+    if not check_script(html):
+        sys.exit(1)
 
 
 if __name__ == "__main__":

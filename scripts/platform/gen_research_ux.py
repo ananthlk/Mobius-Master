@@ -27,6 +27,7 @@ import sys
 
 sys.path.insert(0, "/Users/ananth/Mobius/mobius-skills/deep-research")
 from deep_research import contract as ct   # noqa: E402
+from deep_research import language as L    # noqa: E402
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else "/tmp/research-ux.html"
 DATA = sys.argv[2] if len(sys.argv) > 2 else None
@@ -75,6 +76,35 @@ STANCE_TONE = {
 }
 
 
+def check_script(html: str) -> bool:
+    """Parse the emitted JavaScript. Fails the build if it will not run."""
+    import re
+    import subprocess
+    import tempfile
+    blocks = re.findall(r"<script>(.*?)</script>", html, re.S)
+    if not blocks:
+        return True
+    with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as fh:
+        fh.write("\n".join(blocks))
+        path = fh.name
+    try:
+        r = subprocess.run(["node", "--check", path],
+                           capture_output=True, text=True)
+    except FileNotFoundError:
+        print("  ! node not found — the emitted script was NOT parsed. "
+              "This page has shipped broken before; treat it as unverified.")
+        return True
+    finally:
+        os.unlink(path)
+    if r.returncode:
+        print("\nBUILD FAILED — the emitted page contains JavaScript that will "
+              "not parse:")
+        print("  " + (r.stderr or "").strip().replace("\n", "\n  ")[:900])
+        return False
+    print(f"  script: {len(blocks)} block(s) parsed")
+    return True
+
+
 def main() -> None:
     doc = ct.as_doc()
     rows = load_rows()
@@ -107,11 +137,12 @@ def main() -> None:
                f"<input id=f_{name} placeholder=\"{esc(ex)}\">")
         inputs.append(
             f"<div class=field data-name={name}>"
-            f"<label for=f_{name}>{esc(name)}"
-            + (" <span class=req>required</span>" if req else
-               " <span class=opt>optional</span>")
+            f"<label for=f_{name}>{esc(f.get('label') or name)}"
+            + (" <span class=req>needed</span>" if req else
+               " <span class=opt>if you have it</span>")
             + f"</label><p class=says>{esc(f.get('says',''))}</p>{why}{box}"
-            f"<p class=err id=e_{name}></p></div>")
+            f"<p class=err id=e_{name}></p>"
+            f"<p class=key>stored as <code>{esc(name)}</code></p></div>")
 
     refusals = {r["when"][3:]: r["say"] for r in sub["refusals"]
                 if r["when"].startswith("no ")}
@@ -138,13 +169,17 @@ def main() -> None:
     def row(r) -> str:
         st = r.get("stance")
         tone = STANCE_TONE.get(st or "", "")
+        # EVERY INTERNAL NAME GOES THROUGH THE VOCABULARY. `unverified` reads to
+        # a person as "somebody doubted the source"; it means we never opened
+        # it. That misreading turns our gap into a finding about a document,
+        # which is the one mistake this whole loop is built to prevent.
+        stance_word, stance_help = L.stance(st)
+        state_word, _ = L.state(r["status"])
         rec = r.get("recommended")
         eta = r.get("eta") or {}
-        wait = eta.get("waiting_on")
+        wait_word, _ = L.waiting(eta.get("waiting_on"))
         recbits = (f"<span class=rec>{esc(by_action.get(rec, {}).get('label', rec))}</span>"
-                   if rec else "<span class=cur>no action advised</span>")
-        # THE ACTIONS THEMSELVES, on the row. A page that names what a person
-        # should do and gives them nowhere to do it has answered half.
+                   if rec else "<span class=cur>Nothing we would advise</span>")
         btns = "".join(
             f"<button class='act{' adv' if a == rec else ''}' data-a='{esc(a)}' "
             f"data-r='{r['id']}' title='{esc(by_action.get(a, {}).get('does', ''))}'>"
@@ -157,12 +192,13 @@ def main() -> None:
                 f"<td class=n>{r['id']}</td>"
                 f"<td><b>{esc(r['subject_id'])}</b>"
                 f"<span class=q>{esc((r.get('question') or '')[:104])}</span></td>"
-                f"<td><span class='pill {esc(r['status'])}'>{esc(r['status'])}</span>"
-                f"<span class='st {tone}' style=margin-top:4px>{esc(st or '—')}</span></td>"
+                f"<td><span class='pill {esc(r['status'])}'>{esc(state_word)}</span>"
+                f"<span class='st {tone}' style=margin-top:4px "
+                f"title='{esc(stance_help)}'>{esc(stance_word)}</span></td>"
                 f"<td class=advise>{recbits}"
                 f"<span class=q>{esc(r.get('why') or '')}</span>"
-                f"<span class='wait {WAIT_TONE.get(wait,'')}'>waiting on "
-                f"{esc(wait or '—')}</span>"
+                f"<span class='wait {WAIT_TONE.get(eta.get('waiting_on'),'')}'>"
+                f"{esc(wait_word)}</span>"
                 f"<span class=q>{esc(eta.get('say') or '')}</span>"
                 f"<div class=acts>{btns}</div></td>"
                 f"<td class=n>{r.get('rounds')}</td>"
@@ -176,11 +212,15 @@ def main() -> None:
     from collections import Counter
     recs = Counter(r.get("recommended") for r in reqs)
     waits = Counter((r.get("eta") or {}).get("waiting_on") for r in reqs)
+    acts_by_id = {a["id"]: a for a in doc["actions"]}
     tally = "".join(
-        f"<span class=t><b>{n}</b> {esc(str(k or 'nothing advised'))}</span>"
-        for k, n in recs.most_common())
-    tally += "<span class=t style='opacity:.5'>·</span>" + "".join(
-        f"<span class=t><b>{n}</b> waiting on {esc(str(k or 'nobody'))}</span>"
+        f"<span class=t><b>{n}</b> "
+        + esc(acts_by_id.get(k, {}).get("label", "nothing we would advise"))
+        + "</span>" for k, n in recs.most_common())
+    tally += "<span class=t style='opacity:.45'>|</span>" + "".join(
+        f"<span class=t><b>{n}</b> "
+        + ("finished, nothing pending" if k is None else esc(L.waiting(k)[0]))
+        + "</span>"
         for k, n in waits.most_common())
 
     html = f"""<title>Deep Research — the four doors</title>
@@ -271,6 +311,9 @@ background:var(--sunk);color:var(--muted)}}
 .st.warn{{background:var(--warn-soft);color:var(--warn)}}
 .st.bad{{background:var(--bad-soft);color:var(--bad)}}
 .advise{{max-width:430px}}
+.key{{margin:4px 0 0;font-family:var(--mono);font-size:10.5px;color:var(--muted);
+opacity:.75}}
+.key code{{background:none;padding:0}}
 .rec{{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:500;
 letter-spacing:.04em;text-transform:uppercase;background:var(--violet-soft);
 color:var(--violet);padding:2px 8px;border-radius:3px}}
@@ -303,34 +346,33 @@ font-family:var(--mono);font-size:11.5px;color:var(--muted);line-height:1.8}}
 [hidden]{{display:none!important}}
 </style>
 <div class=wrap>
-<p class=eyebrow>Deep research · five doors, one contract</p>
-<h1>Submit · check status · decide · close out</h1>
-<p class=lede>Everything on this page — which fields are required, the words a
-refusal uses, which doors exist and what each one may call — is read out of
-<code>deep_research/contract.py</code>, the same declaration the API validates
-against. The form cannot ask for something the endpoint refuses, because neither
-of them holds its own copy of the rules.</p>
-<p class=src>generated by scripts/platform/gen_research_ux.py · contract v1 ·
-{len(doc['verbs'])} verbs · {len(doc['surfaces'])} surfaces · {len(reqs)} live requests</p>
+<p class=eyebrow>Deep research</p>
+<h1>Ask a question.<br>See what happened. Do something about it.</h1>
+<p class=lede>Five ways in, one set of rules. Ask something and the system goes
+and reads the source documents. Come back whenever you like: it tells you whether
+the answer can be trusted yet, what is holding it up, and what you can do about
+it right now.</p>
+<p class=src>{len(reqs)} real questions, read live · built from one shared set of
+rules (contract v1) · scripts/platform/gen_research_ux.py</p>
 
-<div class=hero><b>{recs.get('reopen', 0)} of {len(reqs)}</b> questions should be
-run again. They settled — <code>sourced</code> or <code>abandoned</code> — with a
-stance saying the answer was never actually established, most because they closed
-before the gate that opens the cited document existed. Closing is a state; it is
-not a finding.
+<div class=hero><b>{recs.get('reopen', 0)} of {len(reqs)}</b> of these should be
+asked again. They are marked finished, but nobody ever opened the document to
+check the answer — most were closed before that check existed. Being finished is
+not the same as being right.
 <div class=tally>{tally}</div></div>
 
-<h2>The doors</h2>
-<p class=lede style="margin-bottom:14px">What separates the audiences is a filter
-and which verbs they may call. Not a different API underneath.</p>
+<h2>Where do you come in?</h2>
+<p class=lede style="margin-bottom:14px">The same questions, shown to whoever is
+looking. Nobody sees a different system — just a different slice of it.</p>
 <div class=doors>{doors}</div>
 
 <div id=panel_ask class=card>
   <h2>Ask a question</h2>
-  <p class=says style="margin-bottom:18px">Four required fields. Two of them are
-  what the machine cannot invent for you.</p>
+  <p class=says style="margin-bottom:18px">Four things we need. Two of them are
+  things only you can tell us — what a good answer would have to show you, and
+  who to give it back to.</p>
   {''.join(inputs)}
-  <button class=go id=go>Submit</button>
+  <button class=go id=go>Ask it</button>
   <pre id=out hidden></pre>
 </div>
 
@@ -338,22 +380,22 @@ and which verbs they may call. Not a different API underneath.</p>
   <div id=drawer class=card hidden></div>
   <p class=filter id=filt></p>
   <div class=card style="padding:14px 16px">
-  <table><thead><tr><th>#</th><th>subject</th><th>state</th>
-  <th>what we advise, and why</th><th>rounds</th><th>open</th></tr></thead>
+  <table><thead><tr><th>#</th><th>question</th><th>where it stands</th>
+  <th>what we suggest, and why</th><th>tries</th><th>waiting</th></tr></thead>
   <tbody id=tb>{body}</tbody></table></div>
-  <p class=note><b>Status and stance are different questions.</b>
-  <code>status</code> says whether the loop is still moving. <code>stance</code>
-  says whether the result is usable. A request can be <code>sourced</code> and
-  <code>unverified</code> at the same time, and for 24 of them it is.</p>
+  <p class=note><b>“Finished” and “trustworthy” are two different things.</b>
+  The first badge says whether the system is still working on it. The second says
+  whether you can act on what came back. A question can be <b>Answered</b> and
+  <b>Not checked yet</b> at the same time — 24 of these are.</p>
 </div>
 
 <hr>
-<h2>The contract, as served</h2>
-<table><thead><tr><th>route</th><th>says</th><th>required</th><th>who calls it</th>
+<h2>For anyone building against this</h2>
+<table><thead><tr><th>route</th><th>what it does</th><th>needs</th><th>who uses it</th>
 </tr></thead><tbody>{vtable}</tbody></table>
-<p class=note>Every one of these is live. The schema build fails if a verb here
-has no route, if a door calls a verb that is not declared, or if a new ungated
-way to create a request appears.</p>
+<p class=note>Everything above is one published set of rules, read by this page
+and by the service behind it. Neither keeps its own copy, so a form can never ask
+for something the service would refuse.</p>
 
 <footer>
 one declaration → three consumers: this page, mobius-payor's router (via
@@ -406,6 +448,7 @@ document.getElementById('go').addEventListener('click', function(){{
 // The doors are FILTERS over one queue. Switching them re-narrows the same rows
 // rather than fetching a different shape, which is the claim this page makes.
 var FILTERS = {json.dumps({s['id']: {'filter': s['filter'], 'calls': s['calls'],
+                                     'filter_says': s.get('filter_says'),
                                      'title': s['title'], 'shows': s['shows']}
                            for s in doc['surfaces']})};
 var ME = 'service_line_registry';
@@ -417,10 +460,14 @@ function door(id){{
   document.getElementById('panel_queue').hidden = ask;
   if(ask) return;
   var f = FILTERS[id];
-  document.getElementById('filt').textContent =
-    (f.filter ? f.filter.replace('me', ME).replace('this service', ME)
-                        .replace('this domain', ME) : 'no filter — everything')
-    + '   ·   can call: ' + f.calls.join(', ');
+  // The filter in the reader's words. The WHERE clause is still available —
+  // engineers need it and it is one hover away — but nobody should have to read
+  // SQL to learn that a queue is theirs.
+  var el = document.getElementById('filt');
+  el.textContent = f.filter_says || 'Everything';
+  el.title = f.filter ? f.filter.replace('me', ME).replace('this service', ME)
+                                .replace('this domain', ME)
+                      : 'no filter';
   document.querySelectorAll('#tb tr').forEach(function(tr){{
     var show = true;
     if(f.filter && f.filter.indexOf('invoker') >= 0) show = tr.dataset.invoker === ME;
@@ -440,20 +487,22 @@ document.addEventListener('click', function(e){{
   var A = ACTIONS[a.dataset.a] || {{}};
   var d = document.getElementById('drawer');
   var extra = (A.needs || []).filter(function(n){{ return n !== 'because'; }});
-  var bodyObj = {{action: a.dataset.a, because: '<one sentence a reader will '
-    + 'see in a month>'}};
-  extra.forEach(function(n){{ bodyObj[n] = '<' + n + '>'; }});
+  var bodyObj = {{action: a.dataset.a,
+    because: 'one sentence a reader will see in a month'}};
+  extra.forEach(function(n){{ bodyObj[n] = 'the ' + n; }});
   d.hidden = false;
   d.innerHTML = '<h2>' + A.label + '</h2>'
     + '<p class=says>' + (A.does || '') + '</p>'
     + '<p class=note><b>Moves it to:</b> ' + (A.moves || '') + '<br>'
     + '<b>Offered when:</b> ' + (A.when || '') + '</p>'
-    + '<pre>POST ' + (A.post_to || '/api/research/request/{{id}}/act')
+    + '<pre id=drawerpre></pre>';
+  document.getElementById('drawerpre').textContent =
+    'POST ' + (A.post_to || '/api/research/request/{{id}}/act')
         .replace('{{id}}', a.dataset.r)
-    + '\n' + JSON.stringify(bodyObj, null, 2)
-    + '\n\n// the route refuses an action it did not offer on this question,'
-    + '\n// and records what we ADVISED beside what you chose — took_advice is'
-    + '\n// the only thing that makes the recommendation measurable.</pre>';
+    + '\\n' + JSON.stringify(bodyObj, null, 2)
+    + '\\n\\n// the route refuses an action it did not offer on this question,'
+    + '\\n// and records what we ADVISED beside what you chose — took_advice is'
+    + '\\n// the only thing that makes the recommendation measurable.';
   d.scrollIntoView({{behavior: 'smooth', block: 'nearest'}});
 }});
 document.addEventListener('click', function(e){{
@@ -463,6 +512,21 @@ document.addEventListener('click', function(e){{
 door('ask');
 </script>"""
     open(OUT, "w").write(html)
+
+    # THE PAGE MUST RUN, NOT MERELY RENDER.
+    #
+    # This generator emitted a page that looked completely correct and whose
+    # every script was dead: a `\n` written in the source sat inside the html
+    # f-string, so Python put a real line break inside a JS string literal. One
+    # SyntaxError kills the whole block — no doors, no form, no drawer — and
+    # nothing about the rendered HTML says so. I published it.
+    #
+    # So the build parses what it emitted. Same discipline as the schema
+    # generator's invariants: a check that has caught something real once is
+    # worth more than one argued for.
+    if not check_script(html):
+        sys.exit(1)
+
     print(f"{len(doc['verbs'])} verbs · {len(doc['surfaces'])} doors · "
           f"{len(reqs)} requests → {OUT}")
     print(f"  usable stances among 'sourced': {len(usable)} of {len(sourced)}")

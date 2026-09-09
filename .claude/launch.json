@@ -2,34 +2,24 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "mobius-chat",
-      "runtimeExecutable": "bash",
+      "name": "ext-demo",
+      "runtimeExecutable": "python3",
       "runtimeArgs": [
-        "-c",
-        "cd mobius-chat && python3 -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-5000}"
+        "/private/tmp/claude-502/-Users-ananth-Mobius/85ecdcba-dd6d-496c-9d42-2dbd71c0c9d9/scratchpad/ext-demo/proxy.py"
       ],
-      "port": 5000,
-      "autoPort": true
+      "port": 4173
     },
     {
-      "name": "research-console-live",
-      "runtimeExecutable": "bash",
+      "name": "research-ux",
+      "runtimeExecutable": "python3",
       "runtimeArgs": [
-        "-c",
-        "cd /Users/ananth/Mobius/mobius-payor && PYTHONPATH=/private/tmp/claude-502/-Users-ananth-Mobius/6999871c-ecbf-40d0-b26c-92174f91c392/scratchpad:. python3 -m uvicorn localdev:app --host 127.0.0.1 --port ${PORT:-8131}"
+        "-m",
+        "http.server",
+        "8791",
+        "--directory",
+        "/private/tmp/claude-502/-Users-ananth-Mobius/6999871c-ecbf-40d0-b26c-92174f91c392/scratchpad"
       ],
-      "port": 8131,
-      "autoPort": true
-    },
-    {
-      "name": "chat-dev-schema",
-      "runtimeExecutable": "bash",
-      "runtimeArgs": [
-        "-c",
-        "cd /private/tmp/claude-502/-Users-ananth-Mobius/7bd378b9-3a8f-4998-a9b3-06f2d630c20f/scratchpad/devschema && python3 -m http.server ${PORT:-8144}"
-      ],
-      "port": 8144,
-      "autoPort": true
+      "port": 8791
     }
   ]
 }
