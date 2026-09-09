@@ -1124,9 +1124,13 @@ def render(doc, path):
                                else "everything — no filter"),
              ("calls", " ".join(f"<code>{esc(x)}</code>" for x in sfc["calls"])),
              ("state", f"<b>{esc(sfc['state'])}</b>"),
-             ("the point", "Five doors, one contract. What separates the audiences "
-                           "is the FILTER and which verbs they may call — not a "
-                           "different API underneath.")],
+             ("open it", (f"<a href='{esc(sfc['url'])}' target=_blank>"
+                          f"{esc(sfc['url'])}</a>") if sfc.get("url")
+                         else "<span class=cur>no surface of its own — it folds "
+                              "into a tab</span>"),
+             ("the point", "Three doors, one contract. What separates the "
+                           "audiences is the FILTER and which verbs they may "
+                           "call — not a different API underneath.")],
             "ok" if sfc["state"] == "live" else "info")
 
     # ---- details: the actions ----------------------------------------------
@@ -1387,6 +1391,9 @@ def render(doc, path):
     doors = chip("contract:doors", "Ways to create a request",
                  f"{sum(1 for w in W if w['gated'])} of {len(W)} gated", "bad")
 
+    live_url = (C.get("live") or {}).get("ask", "")
+    live_on = doc.get("curated_on", "")
+
     L = doc["loop"]
     dj = json.dumps(detail)
     html = f"""<title>Deep Research State Model</title>
@@ -1465,6 +1472,8 @@ border-radius:99px;background:var(--bg2)}}
 .f.good:before{{content:"✓";color:var(--ok)}}
 .f.bad:before{{content:"✗";color:var(--bad)}}
 .f.unproven:before{{content:"?";color:var(--accent)}}
+a{{color:var(--accent)}}
+.band-s b a{{color:var(--violet)}}
 </style>
 <header><h1>Deep Research — the state model</h1>
 <span class=tag>spec contract</span>
@@ -1479,7 +1488,9 @@ border-radius:99px;background:var(--bg2)}}
 {chip('meta:limits', 'Read this first — what the page cannot tell you', '?', 'info')}</div>
 
 <div class=band><div class=band-t>2 · What every request carries</div>
-<p class=band-s>Seven artifacts. Two exist in full, two partly, and three not at
+<p class=band-s><b>Live at <a href="{live_url}" target=_blank>{live_url}</a></b>
+— deployed {live_on}. Sign in to Mobius to use it.<br>
+Seven artifacts. Two exist in full, two partly, and three not at
 all — and the three missing ones are where the arbiter has been improvising.
 State is read against what actually carries each: an artifact claiming to exist
 without naming a column fails this build.</p>
