@@ -11,7 +11,7 @@ the POST half of the gate, not only as a report.
 
 | collected | passed | failed | errors | skipped | wall |
 |---:|---:|---:|---:|---:|---:|
-| 2546 | 2527 | 14 | 0 | 5 | 160.0s |
+| 2562 | 2543 | 14 | 0 | 5 | 152.5s |
 
 Known-failing baseline: **14** tests, frozen 2026-09-08 before any P1a
 deletion. Ananth's ruling — these predate the program, so the gate SUBTRACTS them.
@@ -25,15 +25,14 @@ A total test count is not coverage of the thing you are about to change. This ma
 test files to nodes by name, which is a WEAK signal — it proves a file exists whose
 name matches, not that the node's behaviour is asserted. Eval owns replacing it.
 
-**18 of 37 nodes have a matching test file · 19 have none · 5 of those are RED**
+**19 of 37 nodes have a matching test file · 18 have none · 4 of those are RED**
 
 | Node | Rating | Bugs | Test files | Cases |
 |---|---|---:|---|---:|
-| `POST /chat` | red | 14 | **none** | — |
+| `POST /chat` | red | 15 | **none** | — |
 | `clarification` | red | 2 | **none** | — |
 | `jurisdiction` | red | 2 | **none** | — |
 | `model_registry` | red | 3 | **none** | — |
-| `state_load` | red | 5 | **none** | — |
 | `PHI gate` | amber | 2 | **none** | — |
 | `active_context` | amber | 1 | **none** | — |
 | `capabilities` | amber | 0 | **none** | — |
@@ -46,20 +45,21 @@ name matches, not that the node's behaviour is asserted. Eval owns replacing it.
 | `plan` | amber | 1 | **none** | — |
 | `prompts` | amber | 4 | **none** | — |
 | `round0` | amber | 0 | **none** | — |
-| `run_pipeline` | amber | 5 | **none** | — |
+| `run_pipeline` | amber | 8 | **none** | — |
 | `stages` | green | 0 | **none** | — |
 | `continuity` | red | 1 | `test_continuity_checks.py` | 2 |
-| `emit_envelope` | red | 16 | `test_emit_envelope.py`, `test_emit_envelope_fanout.py` | 37 |
+| `emit_envelope` | red | 10 | `test_emit_envelope.py`, `test_emit_envelope_fanout.py` | 37 |
 | `queue` | red | 4 | `test_queue_usage_breakdown_enrich.py` | 1 |
-| `react_loop` | red | 5 | `test_react_loop.py` | 52 |
-| `tool_manifest` | red | 4 | `test_tool_manifest.py` | 5 |
+| `react_loop` | red | 6 | `test_react_loop.py` | 52 |
+| `state_load` | red | 6 | `test_state_load_state_integrity.py` | 10 |
+| `tool_manifest` | red | 5 | `test_tool_manifest.py` | 5 |
 | `clarify` | green | 0 | `test_react_clarify_questions.py` | 23 |
 | `context` | amber | 2 | `test_message_resolver_and_skill_context.py`, `test_react_continuation_context.py`, `test_system_context.py` | 49 |
 | `critic` | amber | 3 | `test_critic_call_resilience.py`, `test_critic_skip_on_cache.py`, `test_react_completion_critic_stage_registration.py`, `test_react_critic.py`, `test_react_critic_integration.py` | 99 |
 | `curator_tools` | amber | 3 | `test_curator_tools.py` | 16 |
 | `governor` | amber | 6 | `test_governor_bandit_criteria.py` | 39 |
 | `integrate` | amber | 3 | `test_integrate_fallback.py` | 2 |
-| `llm_manager` | amber | 2 | `test_llm_manager.py`, `test_llm_manager_attachments.py`, `test_llm_manager_permanent_failure_logging.py`, `test_llm_manager_v2.py` | 54 |
+| `llm_manager` | amber | 3 | `test_llm_manager.py`, `test_llm_manager_attachments.py`, `test_llm_manager_permanent_failure_logging.py`, `test_llm_manager_v2.py` | 54 |
 | `message_resolver` | amber | 1 | `test_message_resolver_and_skill_context.py` | 13 |
 | `orchestrator` | amber | 2 | `test_orchestrator.py` | 13 |
 | `react_retry_guard` | green | 0 | `test_react_retry_guard.py`, `test_react_retry_guard_exhaustion.py`, `test_react_retry_guard_zero_result.py` | 56 |
@@ -83,6 +83,6 @@ deterministic replay harness yet (P1.1). A flip would be unattributable.
 
 | modules | loc | except handlers | log-and-continue | bare except |
 |---:|---:|---:|---:|---:|
-| 205 | 66,292 | 694 | 407 | 0 |
+| 205 | 66,674 | 704 | 414 | 0 |
 
 I7 is monotonic: the log-and-continue count may fall, never rise.

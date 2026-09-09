@@ -85,6 +85,7 @@ RULES = [
     ("P2", "model_registry", "THE CIRCUIT BREAKER DID NOT PULL A PROVIDER"),
     ("P2", "model_registry", "THE BANDIT HAS NO SURFACE"),
     ("P3", "tool_manifest", "TOOL SELECTION IS SPORADIC, AND THE MODEL NARRATES"),
+    ("P3", "state_load", "ROOT CAUSE OF THE PER-READ OVERHEAD"),
     ("P3", "state_load", "state_load IS 1.2s AT p50"),
     ("P2", "emit_envelope", "A NAME-BASED SEARCH ANSWERS"),
     ("P2", "emit_envelope", "AN UN-INSTRUMENTED EXTERNAL WAIT"),
