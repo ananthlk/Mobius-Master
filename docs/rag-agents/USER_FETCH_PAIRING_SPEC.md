@@ -630,3 +630,21 @@ chat must still FORWARD all five — `9d41aff` forwards only `source_url`; `9a84
 So the finish line remains "chat deploys a revision carrying `9a84923` (reaching HEAD)"; the dual-accept
 just means the shape inside that forward doesn't matter. Extension change: none. Rag: done. Open on
 this thread: only the /upload auth migration (with Ananth; Chat Master looped as the calling hop).
+
+### 2.9-VERIFY addendum-3 · finish-line verify BLOCKED by a gate regression (Extension, 2026-09-09)
+
+Chat revision `00975-bpc` (image tag carries `9a84923`, 100% traffic — Product Awareness confirmed).
+Ran the true end-to-end (extension-shape multipart FORM upload). **Cannot complete the verify: the PHI
+gate blocks every upload before the provenance forward.**
+- `/chat/upload` on 00975-bpc → `gate: indeterminate` → `blocked` on clean, digit-free content (multiple
+  tries). Blocks pre-forward, so `source_provenance` isn't in the block-path response.
+- **Classifier is healthy** — `/health` 200; direct `POST /classify` on the same text → `gate: clean`.
+  So chat's *call* to the classifier errors and fail-closes to `indeterminate`; the classifier itself is
+  fine. (A 19-digit numeric in one test returned `gate: phi` — call intermittently reaches vs errors →
+  smells of timeout/URL/config, not the classifier.)
+- **Likely cause:** `9a84923`'s diff is only the provenance query-forward — it doesn't touch the gate call.
+  Per Product Awareness, `deploy.sh` builds the working dir, so 00975-bpc = `9a84923` + uncommitted delta
+  at 22:54Z. A gate regression points at that delta, not the commit.
+- **Owner:** chat's classifier-call path (Chat Master; Product Awareness looped). Extension not involved
+  (server-side, pre-forward). Provenance work itself is unverified-not-broken; re-runs the instant a benign
+  upload returns `gate: clean`. Repro handed over (blocked_phi transaction_id fa43b766-...).
