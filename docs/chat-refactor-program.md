@@ -289,9 +289,66 @@ a mean hiding a tail: **p50 is 20.0 seconds and p95 is 38.5.** The whole distrib
 is slow. Any per-module breakdown has to explain where a 20-second median call sits
 inside a turn, because that is the number a user feels.
 
-**Open, for Eval:** whether the 22-question bank is the right instrument for a latency
-baseline as opposed to a quality one, what "fast mode" fixes and what it leaves
-variable, and how many runs before a difference is signal. Not my call.
+**EVAL HAS RULED, 2026-09-09** — full answers in `docs/p2b-latency-telemetry-eval.md`.
+The reframing is theirs and it is better than the question I asked.
+
+**Latency here is THREE layers and one instrument cannot serve all three:**
+
+| Layer | Dominated by | Instrument | Owner |
+|---|---|---|---|
+| 1 · routing — Σ(llm calls × per-model latency) | which stage pins Pro (4× flash) | the 2,750-turn corpus, stratified mode × bypass × per-stage model | chat builds the replay runner, to Eval's spec |
+| 2 · code — `wall − llm` | loops, bad DB calls | the 22q, provider-independent | Eval owns the runner (`/eval/bank` exists) |
+| 3 · counts — writes/module, calls/model/stage | the 40-write loop, a stray Pro call | either set, **n=1** | chat's span emitters |
+
+So the 22q is the **wrong** instrument for the wall-clock baseline and the **right** one
+for the loop hunt. The stratified corpus *is* the routing instrument — don't rebuild
+the bank for routing coverage and don't build a third one.
+
+**Signal semantics, which change what the phase optimises for:**
+- **Counts are signal at n=1.** A loop is 40 writes every run; a stray Pro call is +1
+  every run. Both target bug classes show in a single run, no statistics. This is the
+  PRIMARY detector.
+- **Per-call LLM latency is stamped once, not re-measured per turn.** Routing latency =
+  per-turn counts × stamped per-model latency. That is how a 20s median becomes
+  attributable rather than noise.
+- **Wall/DB deltas need a noise floor: ≥5 runs first.** Report p50 and p95 per module,
+  **never the mean** — the mean is eaten by the tail and the tail is where the loop is.
+
+**Control set to pin:** model mix, input set, caller_mode (never mix quick and
+agentic), warm state (discard a warm-up; RAG is min=max=1), serialized runs.
+
+**Four additions to the taken design decisions, all Eval's:**
+1. **Label each count by its TARGET** — "40 writes to `chat_state`" is a loop, "40
+   writes across 40 tables" is a busy turn, and a bare integer cannot tell them apart.
+2. `n` ships in v1, not v2.
+3. **Acceptance is a same-turn read-back**: one real turn on the live path → a row
+   exists → diagnostics renders it → one test asserts all three. A row in isolation is
+   instance 13.
+4. **Stamp per MODEL, not per provider** (flash and Pro are 4× apart inside Vertex),
+   and the stamp needs a READER — a baseline-compare that refuses or red-flags a run
+   whose model mix differs. Without that consumer the stamp is a labelled producer
+   nobody enforces.
+
+**Still open, put back to us:** Eval is *inferring* "fast mode" means `chat.copilot`.
+The concrete config needs confirming — if it is copilot it is a good lens for layers
+2–3, but its numbers do not represent agentic latency.
+
+**Eval also answered the two long-open items:**
+- **Coverage signal** — replace filename matching with two layers: **reachability**
+  (AST-walk each collected test's call graph, does it actually call the node's
+  entrypoint) shipped now, and **contract tags** (`@pytest.mark.guards("queue:no_silent_loss")`)
+  audited by Eval. Rendered as an enum where only the top state shows a tick: **ABSENT
+  · PERIPHERAL · GUARDED · ASSERTS-NOTHING**. Eval starts the Layer-2 audit on the four
+  REDs once Layer 1 is wired.
+- **Assertability rule:** *a decision is assertable iff the inputs it consumed are
+  persisted alongside the outcome.* Outcomes-only tell you what happened, never why.
+  Highest-leverage single change is persisting **`terminated_by`** — it unlocks both the
+  deterministic critic-required function and the 203-turn budget-exhausted audit.
+
+**And a flag Eval added that I had not:** the NULL `correlation_id` does not block P2b,
+but leaving it unmarked is itself a producer-13 — a future consumer will join
+`llm_calls` to turns, get 55% of rows and believe it has all of them. Mark the column
+**non-joinable** or populate it.
 
 **Two constraints from this program's own findings:**
 1. **Instrument before optimising.** No latency claim is admissible until the baseline

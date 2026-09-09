@@ -11,13 +11,15 @@ the POST half of the gate, not only as a report.
 
 | collected | passed | failed | errors | skipped | wall |
 |---:|---:|---:|---:|---:|---:|
-| 2517 | 2498 | 14 | 0 | 5 | 160.6s |
+| 2517 | 2497 | 15 | 0 | 5 | 0.0s |
 
 Known-failing baseline: **14** tests, frozen 2026-09-08 before any P1a
 deletion. Ananth's ruling — these predate the program, so the gate SUBTRACTS them.
 A failure not in that set is a regression. The list may shrink, never grow.
 
-**No regressions** — every failure is in the known-failing baseline.
+### REGRESSIONS — 1 failing test(s) NOT in the baseline
+
+- `tests.test_orchestrator::test_fire_rag_grade_callbacks_patches_correlation_id_url`
 
 ## A2 · What the tests actually cover, per schema node
 
@@ -48,7 +50,7 @@ name matches, not that the node's behaviour is asserted. Eval owns replacing it.
 | `run_pipeline` | amber | 5 | **none** | — |
 | `stages` | green | 0 | **none** | — |
 | `continuity` | red | 1 | `test_continuity_checks.py` | 2 |
-| `emit_envelope` | red | 10 | `test_emit_envelope.py`, `test_emit_envelope_fanout.py` | 37 |
+| `emit_envelope` | red | 12 | `test_emit_envelope.py`, `test_emit_envelope_fanout.py` | 37 |
 | `queue` | red | 4 | `test_queue_usage_breakdown_enrich.py` | 1 |
 | `react_loop` | red | 5 | `test_react_loop.py` | 52 |
 | `tool_manifest` | red | 3 | `test_tool_manifest.py` | 5 |
