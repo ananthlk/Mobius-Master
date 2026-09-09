@@ -23,7 +23,7 @@
     "owner": "chat + Eval",
     "gate": "every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
-    "n": 13
+    "n": 14
    },
    {
     "id": "P3",
@@ -1187,6 +1187,10 @@
    "rating": "red",
    "depth": "code",
    "findings": [
+    [
+     "bad",
+     "OWNER(chat): THE DEPLOY SCRIPT PRINTS A FALSE REASSURANCE. Found by Chat Master, verified by me at scripts/deploy.sh:113. On a dirty tree it emits:\n\n  warn: working tree has uncommitted changes \u2014 image will reflect committed HEAD only\n\nThat claim is not true and nothing implements it. It is a bare echo. The build at :147 runs `gcloud builds submit \"${PARENT_DIR}\"`, which tars the WORKING DIRECTORY (596 files on the P1c run), and deploy/cloudbuild.yaml does a plain `docker build .` on that context \u2014 no git checkout, no archive of HEAD, and deploy/.gcloudignore has no rule covering the dirty paths. Uncommitted work ships while the operator is told it does not.\n\nThis is the same class as the rest of this node, one layer up: the WARNING is the producer and the behaviour it promises is the consumer that was never built. Worse than silence, because it converts a hazard an operator would otherwise check into one they have been told to ignore.\n\nCONSEQUENCE FOR THIS PROGRAM, and it is not small: every deploy so far has run against a dirty tree, so NO REVISION IS A CLEAN BEFORE/AFTER REFERENCE POINT. P1a's image carried another session's platform.html and 051_*.sql; P1c's carries the same two. Neither affects chat behaviour, but any claim of the form 'this revision differs from the last one only by phase X' is unsupported while the tree is dirty."
+    ],
     [
      "bad",
      "OWNER(chat): THE FAILURE-PATH EMITTERS WERE BUILT, TESTED, AND NEVER WIRED. Four envelope builders in this module have ZERO callers in app/ and one test file each:\n\n  make_tool_failed                     0 callers, 1 test file\n  make_rate_limit_hit                  0 callers, 1 test file\n  make_turn_started                    0 callers, 1 test file\n  make_confidence_filter_dropped_all   0 callers, 1 test file\n\nNOW LOOK AT WHAT ACTUALLY EMITS. Across 400 live turns in 7 days: tool_invoked 13, tool_completed 11, and tool_failed ZERO \u2014 not rare, STRUCTURALLY IMPOSSIBLE, because nothing calls the builder. turn_completed 380, turn_started ZERO.\n\nSo the telemetry can record that a tool was invoked and that it completed, and has no way to record that one failed. It can count completions and not starts, which means A COMPLETION RATE CANNOT BE COMPUTED \u2014 only a completion count, which always looks like success. The observability is biased toward health BY CONSTRUCTION.\n\nThat is the mechanism behind 'health stayed green' during the 29-day appeals outage, and it is not a one-off: it is this module's shape."

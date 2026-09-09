@@ -489,6 +489,24 @@ and nothing in the live path ever calls it, reads it back, or persists what it p
 Each instance looks healthy in isolation. The code is present, the tests pass, the docstring
 describes real intent. The capability is simply absent at runtime, and health stays green.
 """, findings=[
+ ("bad", "OWNER(chat): THE DEPLOY SCRIPT PRINTS A FALSE REASSURANCE. Found by Chat Master, "
+         "verified by me at scripts/deploy.sh:113. On a dirty tree it emits:\n\n"
+         "  warn: working tree has uncommitted changes — image will reflect committed HEAD only\n\n"
+         "That claim is not true and nothing implements it. It is a bare echo. The build at "
+         ":147 runs `gcloud builds submit \"${PARENT_DIR}\"`, which tars the WORKING DIRECTORY "
+         "(596 files on the P1c run), and deploy/cloudbuild.yaml does a plain `docker build .` "
+         "on that context — no git checkout, no archive of HEAD, and deploy/.gcloudignore has "
+         "no rule covering the dirty paths. Uncommitted work ships while the operator is told "
+         "it does not.\n\n"
+         "This is the same class as the rest of this node, one layer up: the WARNING is the "
+         "producer and the behaviour it promises is the consumer that was never built. Worse "
+         "than silence, because it converts a hazard an operator would otherwise check into "
+         "one they have been told to ignore.\n\n"
+         "CONSEQUENCE FOR THIS PROGRAM, and it is not small: every deploy so far has run "
+         "against a dirty tree, so NO REVISION IS A CLEAN BEFORE/AFTER REFERENCE POINT. P1a's "
+         "image carried another session's platform.html and 051_*.sql; P1c's carries the same "
+         "two. Neither affects chat behaviour, but any claim of the form 'this revision "
+         "differs from the last one only by phase X' is unsupported while the tree is dirty."),
  ("bad", "OWNER(chat): THE FAILURE-PATH EMITTERS WERE BUILT, TESTED, AND NEVER WIRED. Four "
          "envelope builders in this module have ZERO callers in app/ and one test file each:\n\n"
          "  make_tool_failed                     0 callers, 1 test file\n"
