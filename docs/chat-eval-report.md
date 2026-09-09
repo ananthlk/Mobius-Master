@@ -11,13 +11,17 @@ the POST half of the gate, not only as a report.
 
 | collected | passed | failed | errors | skipped | wall |
 |---:|---:|---:|---:|---:|---:|
-| 2593 | 2561 | 26 | 0 | 6 | 0.0s |
+| 2560 | 2530 | 25 | 0 | 5 | 150.2s |
 
 Known-failing baseline: **26** tests, frozen 2026-09-08 before any P1a
 deletion. Ananth's ruling — these predate the program, so the gate SUBTRACTS them.
 A failure not in that set is a regression. The list may shrink, never grow.
 
 **No regressions** — every failure is in the known-failing baseline.
+
+**1 baseline failure(s) now PASS** — shrink the baseline:
+
+- `tests.test_latency_no_regrets::test_run_pipeline_emits_thinking_before_state_load`
 
 ## A2 · What the tests actually cover, per schema node
 
@@ -58,7 +62,7 @@ name matches, not that the node's behaviour is asserted. Eval owns replacing it.
 | `integrate` | amber | 3 | `test_integrate_fallback.py` | 2 |
 | `llm_manager` | amber | 0 | `test_llm_manager.py`, `test_llm_manager_attachments.py`, `test_llm_manager_v2.py` | 51 |
 | `message_resolver` | amber | 1 | `test_message_resolver_and_skill_context.py` | 13 |
-| `orchestrator` | amber | 2 | `test_orchestrator.py` | 14 |
+| `orchestrator` | amber | 2 | `test_orchestrator.py` | 13 |
 | `react_retry_guard` | green | 0 | `test_react_retry_guard.py`, `test_react_retry_guard_exhaustion.py`, `test_react_retry_guard_zero_result.py` | 56 |
 | `resolve` | amber | 0 | `test_fetch_document_resolve_by_id.py`, `test_message_resolver_and_skill_context.py`, `test_prior_resolved_entities.py` | 57 |
 | `retrieval_budget` | green | 0 | `test_retrieval_budget.py` | 5 |

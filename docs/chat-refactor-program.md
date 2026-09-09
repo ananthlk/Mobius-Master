@@ -158,7 +158,7 @@ behaviour if the measurements hold.
 
 | Target | Size | Evidence | Caveat that must be cleared first |
 |---|---|---|---|
-| classic path (`resolve`, `plan`, `classify`, `clarify`, `refined_query`, `clarification`) | 1,159 lines + 54-line branch | imported by nothing but the branch; 3 user-facing strings, 0 live occurrences in 2,741 turns | `use_react` is a per-request API field — removing the branch is a **contract change**; and `query_refinement.py` looks legacy but `blueprint.py` needs it |
+| classic path (`resolve`, `plan`, `classify`, `clarify`, `refined_query`, `clarification`) | **DONE — 2,181 lines** (1,298 app + 883 test), vs my 1,159 estimate | imported by nothing but the branch; 3 user-facing strings, 0 live occurrences in 2,741 turns | `use_react` is a per-request API field — removing the branch is a **contract change**; and `query_refinement.py` looks legacy but `blueprint.py` needs it |
 | `credentialing_envelope` — 7 of 8 functions | 177 lines | 7 have zero callers | none; this one is genuinely free |
 | credentialing workflow — **code only** | 8,994 lines + 125 refs in shared modules | `provider-roster-credentialing` skill owns the domain and references `provider_roster` directly, so this is **duplication, not disuse** — a stronger argument than emptiness | needs prod counts + the skill owner confirming who writes `provider_roster`; the 125 scattered refs are the real work |
 | credentialing tables — **DO NOT DROP** | 11 empty tables | DB seat's ruling: empty tables cost nothing, dropping is the irreversible half, and row counts do not license it | revisit after the code is gone and they have sat empty a quarter |
@@ -316,14 +316,48 @@ still need the harness.
 **Sequencing consequence:** P1 splits.
 
   P1.1 deterministic replay harness              DONE 2026-09-08, verified
-  P1a  remove `use_react` -> classic path unreachable -> delete 1,159 lines
-       gate: import-graph proof + suite green + zero invariant movement
+  P1a  remove use_react -> classic path unreachable        DONE 2026-09-08, VERIFIED
+       2,181 lines removed. Gate exit 0: 0 regressions, I2 383->383, I4 0->0,
+       I7 506->502 (fell, as required). Unreachability re-proved independently:
+       zero importers for all six modules, no use_react anywhere in app/,
+       orchestrator imports clean.
   P1b  NOT BLOCKING — Ananth 2026-09-08: "we have had these failures for a
        while." The 26 are frozen as an accepted baseline the gate SUBTRACTS
        (docs/chat-test-baseline.json), rather than a queue to clear first.
   P1c  retire master_objective + continuity      needs the harness
   P1d  credentialing code removal                needs the harness + the two
        roster-skill items below
+
+**P1a verified 2026-09-08, independently.** I re-ran the full suite myself
+(2,530/2,560, 25 failed, 147s), re-ran the gate (exit 0), re-proved unreachability by
+import grep, and measured the diff at 2,181 `.py` deletions rather than accepting the
+number. My 1,159 was app-code only and covered the first layer; the gap is almost
+entirely test files that exclusively exercised deleted modules.
+
+**Chat Master's three corrections, adjudicated:**
+
+- **Correction 1 (my STAYS/DELETE call was inverted) — NOT UPHELD, and it matters
+  because acting on it would introduce the error it warns about.** The written order
+  and this document both say `state/refined_query.py` (226) is in the delete list and
+  `state/query_refinement.py` (128) stays because `blueprint.py:6` imports
+  `reframe_for_retrieval` from it. That is what the docs say and what the code now
+  does: `refined_query.py` is gone, `query_refinement.py` is untouched and
+  `blueprint.py` still imports it. The two-file hazard is real and worth the flag —
+  it is why I called it out in the first place — but the order was not inverted and
+  the findings doc needs no correction here.
+- **Correction 2 (transitive layer is TRIM, not DELETE) — UPHELD.**
+  `plan_display.py` is live in ReAct (`react_loop.py:107`, `react/prompts.py:34`) and
+  `message_resolver.py` is called from the shared orchestrator preamble before the
+  branch. Both correctly left in place. I flagged them as *suspected* sweeps and said
+  the sweep had not been done; they did it and the answer is narrower than feared.
+- **Correction 3 (2,181, not 1,159) — UPHELD and verified.** 1,298 app + 883 test.
+
+**The out-of-scope fix is KEPT, not reverted.** `test_latency_no_regrets` patched
+`orchestrator.clear_progress`, which is not an attribute of that module and never has
+been — it was failing on that regardless of `use_react`. That is the "newly passing 1"
+and it is a genuine pre-existing failure fixed, not a regression masked; I re-ran the
+suite independently to confirm. The known-failing baseline shrinks 26 -> 25, which is
+the direction its own rule permits, and the reason is recorded in its `shrink_log`.
 
 **P1.1 verified 2026-09-08.** `tests/harness/`, 31/31 passing, covering I1/I2/I4/I7.
 It invokes the real `run_react` with `_call_llm_json` patched by responses keyed on
