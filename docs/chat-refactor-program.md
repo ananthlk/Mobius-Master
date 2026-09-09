@@ -306,8 +306,40 @@ still need the harness.
   P1c  retire master_objective + continuity      needs the harness
   P1d  credentialing code removal                needs the harness AND prod counts
 
-3. **Prod row counts for the credentialing tables — Ananth is getting these.** The
-   code deletion stays blocked until they land; dev being empty is not a mandate.
-   Per the DB seat, the tables are not dropped either way.
+3. **Prod row counts — WITHDRAWN as a blocker. Ananth was right and I was wrong.**
+   Two reasons, and I should have caught the second before writing it down.
+
+   The tables are not being dropped, so the irreversible half is already off the
+   table and row counts were only ever evidence for it. And **there is no
+   production.** Verified rather than assumed: three GCP projects exist, and the
+   only live chat is `mobius-chat` in `mobius-os-dev`. `mobius-chat-api` /
+   `-worker` in both `mobius-staging-mobius` and `mobiusos-new` were last deployed
+   **2026-02-05** — seven months ago. `mobius-os-dev` IS the environment, so its
+   row counts are the evidence, not a weak proxy for evidence somewhere else.
+
+   I imported the DB seat's dev-vs-prod caveat without checking whether the second
+   half of that distinction exists. The caveat was sound reasoning about a world
+   with a production deployment; it was not a fact about ours.
+
+   **But checking it surfaced a real blocker that row counts were hiding, and it
+   points the other way.** Chat's 13 credentialing routes DO have callers:
+
+   - `mobius-chat/frontend/static/app.js` — **114 credentialing references**, plus
+     refs in `index.html`, `roster-unified.html`, `signin.html`, `pipeline.html`.
+   - `mobius-skills/provider-roster-credentialing/static/pipeline-chat.js` calls
+     `credentialing-runs/` — **the skill service that supposedly owns the domain
+     calls back into chat's routes.** So the relationship is not clean duplication
+     with chat as the redundant copy; the two are entangled, and that service is
+     live and actively iterated (revision 00094).
+
+   So P1d is NOT a code-only deletion behind an empty schema. It is a removal that
+   takes a frontend surface and a sibling service's dependency with it. That is a
+   larger and different change, and it needs the Chat FE seat, which I do not hold.
+
+   One thing I checked and will not over-claim: two of the FE element ids the JS
+   binds to (`credentialingPreferOutsideIn`, `credentialingUploadRoster`) do not
+   exist in any HTML, so those listeners silently never attach — that part is dead.
+   I checked two ids out of 114 references. That is a hint, not an audit, and it is
+   the FE seat's call, not mine.
 4. What the 83 integrator-bypass turns matching no known bypass actually are.
 5. Whether `should_run_critic`'s rule is per-mode or global.

@@ -454,11 +454,24 @@ turn needs clarification or refinement it publishes and returns without finishin
          "credentialing a CMHC) and the roster_report skill appears in ZERO of their thinking "
          "logs. The credentialing QUESTIONS are plain RAG and touch none of this. Removing the "
          "workflow does not remove the ability to answer those 59.\n\n"
-         "NOT ESTABLISHED, and it gates the decision: whether provider-roster-credentialing is "
-         "deployed and serving, who wrote provider_roster 156 rows, and whether any client calls "
-         "the 13 chat routes. This is a DEV database — empty tables here are evidence about dev, "
-         "not proof about production. Do not treat the row counts as a removal mandate until "
-         "someone checks prod."),
+         "RESOLVED 2026-09-08, and it inverts the conclusion. THERE IS NO PRODUCTION: three GCP "
+         "projects exist and the only live chat is mobius-chat in mobius-os-dev; mobius-chat-api "
+         "and -worker in both mobius-staging-mobius and mobiusos-new were last deployed "
+         "2026-02-05, seven months ago. So the dev row counts ARE the evidence, not a proxy for "
+         "evidence elsewhere — I had imported a dev-vs-prod caveat without checking that the "
+         "second half of the distinction exists.\n\n"
+         "AND THE 13 ROUTES DO HAVE CALLERS, which the row counts were hiding. "
+         "mobius-chat/frontend/static/app.js carries 114 credentialing references, with more in "
+         "index.html, roster-unified.html, signin.html and pipeline.html. And "
+         "mobius-skills/provider-roster-credentialing/static/pipeline-chat.js calls "
+         "credentialing-runs/ — THE SKILL SERVICE THAT OWNS THE DOMAIN CALLS BACK INTO CHAT'S "
+         "ROUTES, and it is live at revision 00094. So this is not clean duplication with chat "
+         "as the redundant copy; the two are entangled.\n\n"
+         "The removal therefore takes a frontend surface and a sibling service's dependency with "
+         "it. It needs the Chat FE seat. Partial signal, offered as a hint and not an audit: two "
+         "of the element ids app.js binds to (credentialingPreferOutsideIn, "
+         "credentialingUploadRoster) exist in NO html, so those listeners never attach — but "
+         "that is 2 ids checked out of 114 references."),
 ]),
 }
 
