@@ -311,3 +311,26 @@ than the module. Your call, since you set the counts/wall split.
 **Q6 (bandit in the Eval macro schema) is still mine and still open** — separate design task, I'll take it next; not folded into this ruling.
 
 — Payor Policy / Eval seat
+
+---
+
+## Q7 follow-up — root cause of the per-read wall-time (for the Chat seat)
+
+Ananth asked what's causing the lag, then answered his own question in the form of the fix: *one connection per turn, and clean up after yourselves.* Both are right. Here is the confirmed code-side cause and the fix, for whoever owns `db_client`.
+
+**Root cause (confirmed from source, `app/db_client.py`).** In `CHAT_DB_MODE=direct` (live), every `db_query`/`db_execute` routes through `_fallback_query`/`_fallback_execute`, and **each call does its own `_acquire_conn` → execute → `_release_conn`**. `_acquire_conn` runs a **`SELECT 1` liveness probe + `commit` on every pooled acquire** (`app/db_client.py:~335–345`) before handing the connection back. So each read pays **two** Cloud SQL round-trips — the liveness probe, then the real query. `state_load` alone does ~4 reads → ~8 round-trips; a full turn does 5–10 DB ops → **10–20 round-trips.** The 2026-04-22 pool amortizes the *connect* cost but **not** the per-acquire `SELECT 1`. The *variability* (260–630ms) is `getconn` contention on top — the code already logs a loud **5s acquire-timeout** when the `max=10` pool saturates (`app/db_client.py:~350–360`).
+
+Why the proxy is 45ms: a `psql` session is one warm connection, **no** liveness probe, **one** round-trip. The service reproduces none of that per read.
+
+**The fix — Ananth's, endorsed, two inseparable parts:**
+
+1. **One connection per turn.** Acquire once at turn start, thread it through every stage's DB op, drop the per-query `getconn` and the per-query `SELECT 1`. That collapses 10–20 round-trips into ~one-per-query with zero liveness overhead, and per-read wall-time falls toward the query's own cost. It's the natural next step on the road already started (pool amortizes *connect* → turn-scope amortizes *acquire + liveness*).
+2. **Guaranteed release — non-negotiable.** A turn-scoped connection MUST be released on **every** exit path, including exceptions and the now-20s LLM-call timeouts, in a `finally` at turn end. Otherwise it leaks and starves the `max=10` pool — which *is* the `getconn` contention and 5s timeouts we see. Note the shape: cleanup-on-the-failure-path is the exact class of bug `state_load` itself just fixed.
+
+**Honesty caveat.** The per-query `SELECT 1` + acquire/release is confirmed from source. The *base* Cloud Run→Cloud SQL round-trip being high (vs 45ms local) is the network/egress path and is **unmeasured** — I'm not claiming its share. But turn-scoping removes the extra round-trips and the contention regardless of that split, so the fix holds either way.
+
+**How the P2b telemetry proves it (and why the span design matters here).** Split **connection-acquire time (incl. the `SELECT 1`) from query-execute time** in each DB span. Before the fix, acquire-time is non-zero on every read; after, acquire-time → ~0 for reads 2..N of a turn and per-read wall-time → execute-only. That is the acquire/execute split doing exactly the job it was specified for — the `SELECT 1` is acquire-time masquerading as query-time, and the span makes it visible per turn instead of read out of the source by hand.
+
+**Ownership:** `db_client` is the Chat seat's to change; Eval / Technical Review does not write chat module code. This is the diagnosis + the target, not a patch.
+
+— Payor Policy / Eval seat
