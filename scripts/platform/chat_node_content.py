@@ -739,6 +739,27 @@ It also emits nearly all of the pipeline's telemetry — thirteen distinct signa
 of itself and of the sub-modules it drives. Every critic signal comes from here, not from
 critic.py.
 """, findings=[
+ ("bad", "OWNER(chat): THE CURATION DECISION IS NEVER PERSISTED, which makes "
+         "evidence_review untestable after the fact. Measured against 5,713 live turns: 568 "
+         "carry gaps_closed and 701 carry gaps_open, so the gap half genuinely records. But "
+         "the persisted round is {round, tool, learned, running_answer, gaps_closed, "
+         "gaps_open} — and `keep` appears ZERO times in any turn. In memory the round also "
+         "carries kept_chunk_count and kept_chunk_chars; neither survives to the database "
+         "either.\n\n"
+         "So you can see THAT chunks were curated and you cannot see WHICH. The question a "
+         "rigorous test most wants to ask — did the model keep the chunks its answer actually "
+         "rests on — cannot be asked of any turn that has already run. It can only be observed "
+         "live, in memory, on a turn you are watching.\n\n"
+         "CHECKED AND NOT A BUG, recorded so nobody re-raises it: there are TWO round shapes "
+         "and both readers are right for their own. In memory ctx.react_trace_rounds carries "
+         "gaps flat AND nested under `enrichment` (react_loop.py:4987-4995), which is what "
+         "react_loop:3819 reads. The persisted final_message.reasoning_trace is flattened, "
+         "enrichment stripped, which is what storage/turns.py:428 reads. I went looking for a "
+         "shape mismatch and there isn't one."),
+ ("watch", "final_message is a TEXT column holding sometimes-JSON: 5,276 rows parse as a JSON "
+           "object, 437 are plain prose, 7 are null. Any analysis over the trace has to guard "
+           "for that — my first query over it failed on a row beginning with the word "
+           "'Which'."),
  ("watch", "WHERE GAPS AND CURATED EVIDENCE ARE KEPT — Ananth asked whether this is "
            "post-RAG or after ReAct. Neither: it is INSIDE the loop, once per round, "
            "immediately after each tool result, and it has no module of its own.\n\n"
