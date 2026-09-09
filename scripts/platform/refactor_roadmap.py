@@ -49,11 +49,20 @@ PHASES = [
      "blocks": None,
      "why": "Highest blast radius. Only after the gate has worked three times."},
     {"id": "P5", "name": "Config UX", "owner": "chat + Prompt Studio", "ratifier": "Tech Review",
-     "gate": "governor tables editable without a deploy, with confidence_bar bounded",
+     "gate": "max_rounds / max_extension_rounds / soft_target_s editable without a "
+             "deploy; confidence_bar NOT shipped",
      "blocks": None,
-     "why": "Lands 'change model speed and latency without a deploy'. Hard "
-            "prerequisite: confidence_bar is unbounded and setting agentic to 'low' "
-            "silently disables the groundedness floor."},
+     "why": "Lands 'change model speed and latency without a deploy'.\n\nSCOPE "
+            "NARROWED by the LLM Agent's ruling: only _MODE_DEFAULTS' three numeric "
+            "fields move, into a NEW table keyed by chat_mode cloning ConfigManager's "
+            "pattern — NOT into llm_configs, which is keyed by module_key and shaped "
+            "for LLM-call knobs. Global scope, matching migration 050's ratified "
+            "precedent. Both selector maps stay in code: they are composition "
+            "semantics, not tuning knobs.\n\nconfidence_bar is EXCLUDED ENTIRELY, "
+            "which is stronger than the bound I asked for. A value that can disable "
+            "the safety floor needs a second sign-off from whoever owns the Product "
+            "Promise contract before it is exposed at all — not a clamp a config UI "
+            "enforces on its own."},
 ]
 
 # (phase, node or None for any, distinctive substring). First match wins.

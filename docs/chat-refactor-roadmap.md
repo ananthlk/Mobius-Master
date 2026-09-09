@@ -12,7 +12,7 @@ program. That is what makes this a tracker and not a snapshot.
 Plan and gate definition: `docs/chat-refactor-program.md`. Nothing starts until
 its sign-off table is complete.
 
-**73 bugs · 45 sequenced into 5 phases · 28 explicitly outside · 0 unassigned**
+**74 bugs · 45 sequenced into 5 phases · 28 explicitly outside · 1 unassigned**
 
 ## Progress
 
@@ -22,7 +22,7 @@ its sign-off table is complete.
 | **P2** | Instrument — latency and decisions | 9 | chat + Eval | every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☐ not started |
 | **P3** | One decision point | 11 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ☐ not started |
 | **P4** | Split | 15 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
-| **P5** | Config UX | 5 | chat + Prompt Studio | governor tables editable without a deploy, with confidence_bar bounded | — | ☐ not started |
+| **P5** | Config UX | 5 | chat + Prompt Studio | max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped | — | ☐ not started |
 
 No phase may start before `docs/chat-refactor-program.md`'s sign-off table is
 complete, and P0 blocks all of the others.
@@ -125,10 +125,14 @@ BASELINE RULE: the latency numbers captured at the END of this phase are the ref
 ## P5 — Config UX  ·  5 items
 
 **Owner** chat + Prompt Studio · **ratifier** Tech Review
-**Gate** governor tables editable without a deploy, with confidence_bar bounded  
+**Gate** max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped  
 **Blocks** —
 
-> Lands 'change model speed and latency without a deploy'. Hard prerequisite: confidence_bar is unbounded and setting agentic to 'low' silently disables the groundedness floor.
+> Lands 'change model speed and latency without a deploy'.
+
+SCOPE NARROWED by the LLM Agent's ruling: only _MODE_DEFAULTS' three numeric fields move, into a NEW table keyed by chat_mode cloning ConfigManager's pattern — NOT into llm_configs, which is keyed by module_key and shaped for LLM-call knobs. Global scope, matching migration 050's ratified precedent. Both selector maps stay in code: they are composition semantics, not tuning knobs.
+
+confidence_bar is EXCLUDED ENTIRELY, which is stronger than the bound I asked for. A value that can disable the safety floor needs a second sign-off from whoever owns the Product Promise contract before it is exposed at all — not a clamp a config UI enforces on its own.
 
 | ☐ | Node | Owner | Finding |
 |---|---|---|---|
@@ -172,3 +176,7 @@ Each carries a reason. Excluding by silence is the failure mode this guards agai
 | `POST /chat` | security posture | needs Ananth's authorisation + staging; no clean unauthenticated POST sent | RUNTIME LENS, 2026-09-08, mobius-chat in mobius-os-dev: CHAT_ENV=prod  |
 | `personalization` | user-manager | chat cannot act on preferences it forwards | CHAT IS A PASS-THROUGH FOR PREFERENCES AND CANNOT ACT ON THEM |
 | `personalization` | user-manager | assignment itself is disputed | DISPUTED ASSIGNMENT |
+
+## UNASSIGNED — the roadmap is incomplete
+
+- `governor` — SCOPE LENS (DB seat, 2026-09-08): chat_turns.blueprint_snapshot is 0 of 2,744 — a DECLARED COLUMN NOTHING HAS 

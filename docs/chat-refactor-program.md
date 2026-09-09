@@ -64,11 +64,32 @@ advance does not start.**
   SIGN  the owning seat + Eval both sign, or the phase reverts
 ```
 
-**The replay corpus.** 2,741 live turns over 60 days are already in
-`chat_turns` with their `thinking_log`. That is the baseline set — real traffic, not
-synthetic. Every measurement in the findings log was taken from it, so the same
-queries are the harness. Eval to rule on stratification (by mode, by
-`unfinished_reason`, by bypass class) and on how many turns are enough.
+**The corpus — and what it is NOT.** Frozen in `docs/chat-refactor-baseline.json`:
+2,750 turns, fingerprint `7278bebc`. It is a **committed file, not a query** —
+Technical Review asked whether the set was frozen or the live table read twice, and
+it was the latter: every measurement in the findings log used a moving
+`now() - interval '60 days'` window, which is why the DB seat measured 2,744 against
+my 2,741. From here PRE is the file.
+
+**It is a DIFFERENTIAL gate, not a replay of production** (DB seat's ruling, adopted
+verbatim). `chat_state` holds one row per thread, mutated in place, no history — so
+the state a turn actually ran with is not recoverable, only today's value. Both PRE
+and POST get the same reconstructed input, so any delta is attributable to the code
+change. That is what a refactor gate needs and it is all this claims. Nobody may
+describe it as reproducing historical behaviour.
+
+**Stratified on `context_summary`** (DB seat): present on 1,853 turns, absent on 897.
+A pooled comparison silently over-weights the 67% carrying context. Both strata are
+reported. **Caveat I owe back to the DB seat:** 378 of the 383 integrator bypasses
+fall in `no_context`, because a bypassed turn exits before the summary is written —
+so this stratum is partly an *effect* of the outcome we are measuring, not an
+independent covariate. It still separates the populations usefully; it must not be
+read as a control.
+
+**Dependency, flagged by the DB seat:** the gate now depends on 60 days of
+`chat_turns` existing. There is no retention path today, so it is safe — but a future
+retention change would silently shrink the corpus and break comparability. Any
+retention work must trip over this line.
 
 **Invariants — must be identical before and after, every phase.** These are
 assertions about the envelope, not about answer text:
@@ -78,10 +99,29 @@ assertions about the envelope, not about answer text:
 | I1 | every turn produces exactly one terminal envelope | catches a refactor that drops a finalize path — there are 12+ `_finalize_response` call sites |
 | I2 | the set of turns that bypass the integrator is unchanged | 383 today; a change here is a change in what the user sees |
 | I3 | PHI gate verdict per turn is unchanged | fail-closed must stay fail-closed |
-| I4 | `rounds_used` and `max_rounds` per turn are unchanged | the governor's arithmetic is the thing most at risk |
-| I5 | groundedness floor ran / skipped per turn is unchanged | 966 / 634 today |
+| I4 | `rounds_used` / `max_rounds` unchanged — **except** where the extension-writer unification changes the outcome, which gets a named reviewed diff, never a silent pass | the governor's arithmetic is most at risk |
+| I5 | floor ran / skipped unchanged, **same carve-out** if floor timing interacts with which round it runs in | 966 ran / 1,784 skipped at baseline |
 | I6 | the source set per turn is unchanged | retrieval must not shift under a refactor of control flow |
 | I7 | no new swallowed exception | count `log-and-continue` handlers; the number may fall, never rise |
+
+**The I4/I5 carve-out** (Technical Review's amendment, adopted). Unifying the two
+extension writers **is in scope** — it is P3. So a blanket "rounds unchanged"
+invariant would fail on exactly the 102 turns already identified as past soft target,
+and the gate would reject the change it exists to enable. An invariant that cannot
+distinguish an unintended change from the specific defect the program exists to fix
+is not testing the right thing. The carve-out is scoped, not a weakening: the
+expected delta is predicted before the cut and reviewed against after.
+
+**The replay mechanism — the honest answer.** There is no record/replay harness in
+`mobius-chat` today: no VCR, no cassettes, no `MOBIUS_LLM_MOCK`, no seed or
+determinism switch in `llm_manager`. So a live re-run makes I3 and I5 judgement calls
+with real model variance, and a flip could be non-determinism rather than regression.
+**Building the deterministic harness is therefore a P1 prerequisite, not an
+assumption** — pinned LLM responses so PRE and POST compare identical inputs through
+code-only diffs. Until it exists, the only assertable invariants are the ones
+computable from persisted telemetry without re-running anything (I1, I2, I4, I6, I7),
+which is exactly what the frozen baseline holds. I3 and I5 are **deferred until the
+harness lands**; no phase may claim them before then.
 
 **What the metric is, per phase, is named in Section 3.** A phase claiming "cleaner
 code" and no metric does not start either.
@@ -120,7 +160,8 @@ behaviour if the measurements hold.
 |---|---|---|---|
 | classic path (`resolve`, `plan`, `classify`, `clarify`, `refined_query`, `clarification`) | 1,159 lines + 54-line branch | imported by nothing but the branch; 3 user-facing strings, 0 live occurrences in 2,741 turns | `use_react` is a per-request API field — removing the branch is a **contract change**; and `query_refinement.py` looks legacy but `blueprint.py` needs it |
 | `credentialing_envelope` — 7 of 8 functions | 177 lines | 7 have zero callers | none; this one is genuinely free |
-| credentialing workflow | 8,994 lines + 125 refs in shared modules | 11 of 13 tables empty; `provider-roster-credentialing` skill owns the domain | **dev DB only** — prod row counts and route callers not checked; the 125 scattered refs are the real work, not the file deletions |
+| credentialing workflow — **code only** | 8,994 lines + 125 refs in shared modules | `provider-roster-credentialing` skill owns the domain and references `provider_roster` directly, so this is **duplication, not disuse** — a stronger argument than emptiness | needs prod counts + the skill owner confirming who writes `provider_roster`; the 125 scattered refs are the real work |
+| credentialing tables — **DO NOT DROP** | 11 empty tables | DB seat's ruling: empty tables cost nothing, dropping is the irreversible half, and row counts do not license it | revisit after the code is gone and they have sat empty a quarter |
 
 **Metric:** lines removed; `log-and-continue` handler count down; **zero** invariant
 movement. If any invariant moves, the deletion was not dead code. Explicitly NOT a
