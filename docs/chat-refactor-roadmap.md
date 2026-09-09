@@ -12,7 +12,7 @@ program. That is what makes this a tracker and not a snapshot.
 Plan and gate definition: `docs/chat-refactor-program.md`. Nothing starts until
 its sign-off table is complete.
 
-**77 bugs · 47 sequenced into 5 phases · 29 explicitly outside · 1 unassigned**
+**77 bugs · 47 sequenced into 5 phases · 30 explicitly outside · 0 unassigned**
 
 ## Progress
 
@@ -157,6 +157,7 @@ Each carries a reason. Excluding by silence is the failure mode this guards agai
 | `POST /chat` | DB seat | same | THE FOURTH FK — mine to find, and I got two things wrong about it that |
 | `state_load` | DB seat | cross-node, storage governance | CROSS-NODE, invisible to any code read: mobius_chat has NO query guard |
 | `llm_manager` | LLM Agent | upstream Vertex latency; a latency breaker doing its job, not a chat defect | OUT OF PROGRAM — LIVE MODEL LATENCY DEGRADATION, 2026-09-08/09 |
+| `llm_manager` | LLM Agent | fixed in de43bd2, pushed not deployed; model routing is theirs | OUT OF PROGRAM — WHY THE 'ema' NEVER GETS RE-GROUNDED |
 | `PHI gate` | compliance decision | same item, second node | THE AUDIT WRITE IS FAIL-OPEN |
 | `POST /chat` | compliance decision | fail-open write under a fail-closed gate; posture decision pending | THE HIPAA AUDIT WRITE IS FAIL-OPEN |
 | `POST /chat` | compliance decision | tracked as its own item by Tech Review | STRUCTURE RULING on the HIPAA audit — tracked as its OWN item, not fol |
@@ -179,7 +180,3 @@ Each carries a reason. Excluding by silence is the failure mode this guards agai
 | `POST /chat` | security posture | needs Ananth's authorisation + staging; no clean unauthenticated POST sent | RUNTIME LENS, 2026-09-08, mobius-chat in mobius-os-dev: CHAT_ENV=prod  |
 | `personalization` | user-manager | chat cannot act on preferences it forwards | CHAT IS A PASS-THROUGH FOR PREFERENCES AND CANNOT ACT ON THEM |
 | `personalization` | user-manager | assignment itself is disputed | DISPUTED ASSIGNMENT |
-
-## UNASSIGNED — the roadmap is incomplete
-
-- `llm_manager` — OUT OF PROGRAM — WHY THE 'ema' NEVER GETS RE-GROUNDED
