@@ -619,6 +619,23 @@ def main() -> None:
                 breaks.append(f"surface '{sfc['id']}' calls '{called}', which the "
                               f"contract does not declare — a UX rendering an API "
                               f"that does not exist")
+    # AN ACTION NOBODY CAN EVER SEE is the same defect one layer out: a rule
+    # written against a token the evaluator never sets is a button that is
+    # declared, rendered nowhere, and impossible to notice missing.
+    KNOWN_FACTS = {"any", "open", "settled", "running", "partial", "refused",
+                   "authority_can_widen", "decision_open", "unusable"}
+    action_ids = {a["id"] for a in doc["contract"].get("actions", [])}
+    for a in doc["contract"].get("actions", []):
+        for tok in a.get("offer_when") or []:
+            if tok not in KNOWN_FACTS:
+                breaks.append(f"action '{a['id']}' is offered when '{tok}', which "
+                              f"nothing ever sets — a button that can never "
+                              f"appear")
+    for stance, pair in (doc["contract"].get("recommended") or {}).items():
+        if pair and pair[0] and pair[0] not in action_ids:
+            breaks.append(f"stance '{stance}' recommends '{pair[0]}', which is not "
+                          f"an action anybody can take")
+
     for w in doc["request_writers"]:
         if w["gated"]:
             continue
@@ -635,6 +652,8 @@ def main() -> None:
         "every verb the contract declares is served by a live route",
         "no surface calls a verb the contract does not declare",
         "no undeclared, ungated way to create a request has appeared",
+        "no action is offered on a condition nothing ever sets",
+        "no stance recommends an action nobody can take",
     ]
     doc["curated_on"] = content.get("_curated_on", "2026-09-09")
 
@@ -933,6 +952,49 @@ def render(doc, path):
                            "different API underneath.")],
             "ok" if sfc["state"] == "live" else "info")
 
+    # ---- details: the actions ----------------------------------------------
+    rec_by_action = {}
+    for stance, pair in (C.get("recommended") or {}).items():
+        if pair and pair[0]:
+            rec_by_action.setdefault(pair[0], []).append(
+                (stance if stance != "None" else "not settled yet", pair[1]))
+    for a in C.get("actions", []):
+        recs = "".join(
+            f"<li class='f good'>recommended when the stance is "
+            f"<b>{esc(st)}</b><br><span class=cur>{esc(why)}</span></li>"
+            for st, why in rec_by_action.get(a["id"], []))
+        add(f"act:{a['id']}", a["label"], a["id"],
+            [("what it does", esc(a["does"])),
+             ("who it moves it to", esc(a["moves"])),
+             ("offered when", esc(a["when"])),
+             ("needs", " ".join(f"<code>{esc(n)}</code>" for n in a.get("needs"))
+                       or "nothing"),
+             ("rule", " · ".join(f"<code>{esc(t)}</code>"
+                                 for t in a.get("offer_when", []))),
+             ("we advise it", f"<ul class=finds>{recs}</ul>" if recs else
+              "<span class=cur>never the recommendation — always available, "
+              "never advised</span>"),
+             ("posted to", f"<code>{esc(a['post_to'])}</code>" if a.get("post_to")
+                           else "<code>POST /api/research/request/{id}/act</code>")],
+            "ok" if rec_by_action.get(a["id"]) else "")
+
+    T = C.get("timing") or {}
+    add("act:eta", "How long — measured, not promised",
+        f"{T.get('sampled_turns')} completed turns, {T.get('measured_on')}",
+        [("median round", f"<b>{T.get('median_round_min')} minutes</b>"),
+         ("slowest tenth", f"<b>{round((T.get('p90_round_min') or 0)/60)} hours</b>"),
+         ("why the spread", "That p90 is not slow compute. It is a turn parked on "
+                            "Discovery, on Lexicon or on a person. Averaging the "
+                            "two gives an estimate wrong in both directions, so "
+                            "the answer says WHO it is waiting on before it says "
+                            "how long."),
+         ("the four answers", "<ul class=finds>"
+          "<li class=f><b>you</b> — a decision is open; nothing moves until it is answered</li>"
+          "<li class=f><b>a service</b> — parked on Discovery or Lexicon, on their clock</li>"
+          "<li class=f><b>the machine</b> — a round is running</li>"
+          "<li class='f bad'><b>nothing</b> — it will not progress on its own</li></ul>")],
+        "info")
+
     W = doc.get("request_writers") or []
     gated = [w for w in W if w["gated"]]
     add("contract:doors", "Ways to create a request",
@@ -1014,6 +1076,13 @@ def render(doc, path):
     surfaces = "".join(chip(f"ux:{u['id']}", u["title"], u["state"],
                             "ok" if u["state"] == "live" else "info")
                        for u in C.get("surfaces", []))
+    acts = "".join(chip(f"act:{a['id']}", a["label"], a["id"],
+                        "ok" if any((p or [None])[0] == a["id"]
+                                    for p in (C.get("recommended") or {}).values())
+                        else "")
+                   for a in C.get("actions", []))
+    acts += chip("act:eta", "How long — measured", "21 min median", "info")
+
     W = doc.get("request_writers") or []
     doors = chip("contract:doors", "Ways to create a request",
                  f"{sum(1 for w in W if w['gated'])} of {len(W)} gated", "bad")
@@ -1117,6 +1186,8 @@ that is not declared.</p>
 <div class=row>{verbs}</div>
 <div class=gl>the ux · five doors, one contract</div>
 <div class=row>{surfaces}</div>
+<div class=gl>what a person can DO about it — one is recommended, with the reason</div>
+<div class=row>{acts}</div>
 <div class=gl>and every way in</div>
 {doors}
 <p class=legend>What separates the audiences is a FILTER and which verbs they may

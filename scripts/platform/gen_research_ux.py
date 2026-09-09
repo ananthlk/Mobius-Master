@@ -131,18 +131,40 @@ def main() -> None:
         f"<b>{esc(s['title'])}</b><span>{esc(s['audience'])}</span>"
         f"<em>{' '.join(s['calls'])}</em></button>" for s in doc["surfaces"])
 
+    by_action = {a["id"]: a for a in doc["actions"]}
+    WAIT_TONE = {"you": "bad", "nobody": "warn", "nothing": "bad",
+                 "the machine": "ok"}
+
     def row(r) -> str:
         st = r.get("stance")
         tone = STANCE_TONE.get(st or "", "")
-        return (f"<tr data-invoker=\"{esc(r.get('invoker'))}\" "
-                f"data-consumer=\"{esc(r.get('consumer'))}\" "
-                f"data-dec=\"{r.get('dec') or 0}\" data-status=\"{esc(r['status'])}\">"
+        rec = r.get("recommended")
+        eta = r.get("eta") or {}
+        wait = eta.get("waiting_on")
+        recbits = (f"<span class=rec>{esc(by_action.get(rec, {}).get('label', rec))}</span>"
+                   if rec else "<span class=cur>no action advised</span>")
+        # THE ACTIONS THEMSELVES, on the row. A page that names what a person
+        # should do and gives them nowhere to do it has answered half.
+        btns = "".join(
+            f"<button class='act{' adv' if a == rec else ''}' data-a='{esc(a)}' "
+            f"data-r='{r['id']}' title='{esc(by_action.get(a, {}).get('does', ''))}'>"
+            f"{esc(by_action.get(a, {}).get('label', a))}</button>"
+            for a in (r.get("can") or []))
+        return ("<tr data-invoker='" + esc(r.get("invoker")) + "' "
+                "data-consumer='" + esc(r.get("consumer")) + "' "
+                "data-dec='" + str(r.get("dec") or 0) + "' "
+                "data-status='" + esc(r["status"]) + "'>"
                 f"<td class=n>{r['id']}</td>"
                 f"<td><b>{esc(r['subject_id'])}</b>"
-                f"<span class=q>{esc((r.get('question') or '')[:110])}</span></td>"
-                f"<td><span class='pill {esc(r['status'])}'>{esc(r['status'])}</span></td>"
-                f"<td><span class='st {tone}'>{esc(st or '—')}</span>"
-                f"<span class=q>{esc(r.get('stance_headline') or '')}</span></td>"
+                f"<span class=q>{esc((r.get('question') or '')[:104])}</span></td>"
+                f"<td><span class='pill {esc(r['status'])}'>{esc(r['status'])}</span>"
+                f"<span class='st {tone}' style=margin-top:4px>{esc(st or '—')}</span></td>"
+                f"<td class=advise>{recbits}"
+                f"<span class=q>{esc(r.get('why') or '')}</span>"
+                f"<span class='wait {WAIT_TONE.get(wait,'')}'>waiting on "
+                f"{esc(wait or '—')}</span>"
+                f"<span class=q>{esc(eta.get('say') or '')}</span>"
+                f"<div class=acts>{btns}</div></td>"
                 f"<td class=n>{r.get('rounds')}</td>"
                 f"<td class=n>{r.get('dec') or ''}</td></tr>")
 
@@ -150,6 +172,16 @@ def main() -> None:
 
     sourced = [r for r in reqs if r["status"] == "sourced"]
     usable = [r for r in sourced if STANCE_TONE.get(r.get("stance") or "") == "ok"]
+
+    from collections import Counter
+    recs = Counter(r.get("recommended") for r in reqs)
+    waits = Counter((r.get("eta") or {}).get("waiting_on") for r in reqs)
+    tally = "".join(
+        f"<span class=t><b>{n}</b> {esc(str(k or 'nothing advised'))}</span>"
+        for k, n in recs.most_common())
+    tally += "<span class=t style='opacity:.5'>·</span>" + "".join(
+        f"<span class=t><b>{n}</b> waiting on {esc(str(k or 'nobody'))}</span>"
+        for k, n in waits.most_common())
 
     html = f"""<title>Deep Research — the four doors</title>
 <link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -238,6 +270,24 @@ background:var(--sunk);color:var(--muted)}}
 .st.ok{{background:var(--ok-soft);color:var(--ok)}}
 .st.warn{{background:var(--warn-soft);color:var(--warn)}}
 .st.bad{{background:var(--bad-soft);color:var(--bad)}}
+.advise{{max-width:430px}}
+.rec{{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:500;
+letter-spacing:.04em;text-transform:uppercase;background:var(--violet-soft);
+color:var(--violet);padding:2px 8px;border-radius:3px}}
+.wait{{display:inline-block;margin-top:7px;font-family:var(--mono);font-size:10.5px;
+letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:3px;
+background:var(--sunk);color:var(--muted)}}
+.wait.bad{{background:var(--bad-soft);color:var(--bad)}}
+.wait.warn{{background:var(--warn-soft);color:var(--warn)}}
+.wait.ok{{background:var(--ok-soft);color:var(--ok)}}
+.acts{{display:flex;flex-wrap:wrap;gap:4px;margin-top:9px}}
+.act{{font-family:var(--sans);font-size:11.5px;background:var(--sunk);color:var(--ink2);
+border:1px solid var(--line2);border-radius:3px;padding:3px 8px;cursor:pointer}}
+.act:hover{{border-color:var(--violet);color:var(--violet)}}
+.act.adv{{background:var(--violet);color:#fff;border-color:var(--violet);font-weight:600}}
+.tally{{display:flex;flex-wrap:wrap;gap:13px;margin-top:13px;font-size:12px;
+color:var(--ink2)}}
+.tally .t b{{font-family:var(--mono);font-weight:500;color:var(--ink)}}
 .filter{{font-family:var(--mono);font-size:12px;color:var(--muted);
 margin:0 0 12px;padding:8px 12px;background:var(--sunk);border-radius:4px;
 border-left:2px solid var(--violet)}}
@@ -263,12 +313,12 @@ of them holds its own copy of the rules.</p>
 <p class=src>generated by scripts/platform/gen_research_ux.py · contract v1 ·
 {len(doc['verbs'])} verbs · {len(doc['surfaces'])} surfaces · {len(reqs)} live requests</p>
 
-<div class=hero><b>{len(usable)} of {len(sourced)}</b> requests marked
-<code>sourced</code> carry a stance a reader could act on. The rest are
-<code>unverified</code> — nothing ever opened the cited document — or
-<code>inconclusive</code>. They all predate the document gate, so the reading is
-honest; “sourced” has been read as “answered” for three weeks, and until today
-nothing computed the difference.</div>
+<div class=hero><b>{recs.get('reopen', 0)} of {len(reqs)}</b> questions should be
+run again. They settled — <code>sourced</code> or <code>abandoned</code> — with a
+stance saying the answer was never actually established, most because they closed
+before the gate that opens the cited document existed. Closing is a state; it is
+not a finding.
+<div class=tally>{tally}</div></div>
 
 <h2>The doors</h2>
 <p class=lede style="margin-bottom:14px">What separates the audiences is a filter
@@ -285,10 +335,11 @@ and which verbs they may call. Not a different API underneath.</p>
 </div>
 
 <div id=panel_queue hidden>
+  <div id=drawer class=card hidden></div>
   <p class=filter id=filt></p>
   <div class=card style="padding:14px 16px">
-  <table><thead><tr><th>#</th><th>subject</th><th>status</th>
-  <th>stance — what to do with it</th><th>rounds</th><th>waiting</th></tr></thead>
+  <table><thead><tr><th>#</th><th>subject</th><th>state</th>
+  <th>what we advise, and why</th><th>rounds</th><th>open</th></tr></thead>
   <tbody id=tb>{body}</tbody></table></div>
   <p class=note><b>Status and stance are different questions.</b>
   <code>status</code> says whether the loop is still moving. <code>stance</code>
@@ -378,6 +429,33 @@ function door(id){{
     tr.hidden = !show;
   }});
 }}
+var ACTIONS = {json.dumps({a['id']: a for a in doc['actions']})};
+// EVERY ACTION IS A POST WITH A REASON. The drawer shows the exact body the
+// route takes and the action's own declared words for what it does — not a
+// second description written in the page that could disagree with the one the
+// caller read before choosing.
+document.addEventListener('click', function(e){{
+  var a = e.target.closest('.act');
+  if(!a) return;
+  var A = ACTIONS[a.dataset.a] || {{}};
+  var d = document.getElementById('drawer');
+  var extra = (A.needs || []).filter(function(n){{ return n !== 'because'; }});
+  var bodyObj = {{action: a.dataset.a, because: '<one sentence a reader will '
+    + 'see in a month>'}};
+  extra.forEach(function(n){{ bodyObj[n] = '<' + n + '>'; }});
+  d.hidden = false;
+  d.innerHTML = '<h2>' + A.label + '</h2>'
+    + '<p class=says>' + (A.does || '') + '</p>'
+    + '<p class=note><b>Moves it to:</b> ' + (A.moves || '') + '<br>'
+    + '<b>Offered when:</b> ' + (A.when || '') + '</p>'
+    + '<pre>POST ' + (A.post_to || '/api/research/request/{{id}}/act')
+        .replace('{{id}}', a.dataset.r)
+    + '\n' + JSON.stringify(bodyObj, null, 2)
+    + '\n\n// the route refuses an action it did not offer on this question,'
+    + '\n// and records what we ADVISED beside what you chose — took_advice is'
+    + '\n// the only thing that makes the recommendation measurable.</pre>';
+  d.scrollIntoView({{behavior: 'smooth', block: 'nearest'}});
+}});
 document.addEventListener('click', function(e){{
   var b = e.target.closest('.door');
   if(b) door(b.dataset.door);
