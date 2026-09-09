@@ -24,7 +24,7 @@
     "owner": "chat + Eval",
     "gate": "every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
-    "n": 24
+    "n": 23
    },
    {
     "id": "P3",
@@ -32,7 +32,7 @@
     "owner": "chat",
     "gate": "modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target",
     "blocks": "P5",
-    "n": 13
+    "n": 14
    },
    {
     "id": "P4",
@@ -96,11 +96,11 @@
   ],
   "shared_post_guard": "ctx.react_bypass_integrate \u2014 set in react_loop, skips the integrator and publishes the ReAct answer directly",
   "shared_post_guard_lines": [
-   580,
-   869,
-   873,
-   1000,
-   1045
+   589,
+   878,
+   882,
+   1009,
+   1054
   ],
   "exit": "publish",
   "react_phases": [
@@ -129,7 +129,7 @@
      "react_retry_guard",
      "curator_tools"
     ],
-    "cite": 5680,
+    "cite": 5690,
     "note": "Dispatches tools, and refuses a repeat of a call that already failed."
    },
    {
@@ -140,7 +140,7 @@
      "feedback_signal",
      "completion_extension_gate"
     ],
-    "cite": 5312,
+    "cite": 5322,
     "note": "Audits the draft against sources and decides whether to go round again."
    }
   ],
@@ -158,6 +158,10 @@
    "rating": "red",
    "depth": "code",
    "findings": [
+    [
+     "bad",
+     "OWNER(chat): JWTs ARE IN THE REQUEST LOGS. Found 2026-09-09 while measuring credentialing route traffic, not by looking for it. Cloud Run request logs for mobius-chat contain entries like `%2F%23t%3DeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` \u2014 that is `/#t=<access token>` URL-encoded into the request PATH. Decoded, the payload carries sub, tenant_id, exp and type=access.\n\nA fragment is not normally sent to a server, so something is encoding the token into the path rather than leaving it after the #. However it happens, the consequence is that live access tokens are written to Cloud Run request logs, where they are readable by anyone with log access and by anyone a log excerpt is pasted to. Two distinct tokens appear across 30 days.\n\nNOT INVESTIGATED \u2014 I have not established which client does this, whether the tokens are still within their exp, or whether the same pattern reaches other services' logs. Logged rather than chased, per Ananth's standing instruction, and flagged to Chat Master so nobody pastes a log excerpt before it is understood. Related to the CHAT_AUTH_MODE=optional item on the POST /chat node but a separate defect."
+    ],
     [
      "bad",
      "ensure_thread swallows every DB failure. On connection_error it warns and returns the id anyway; on any other failure it returns a FRESH uuid. A turn can proceed against a thread_id that is not in chat_threads, and the conversation silently loses continuity instead of failing. The code names this 'historical behavior \u2026 so callers never see exceptions here'."
@@ -429,6 +433,18 @@
    "findings": [
     [
      "bad",
+     "OWNER(chat): THE CREDENTIALING ROUTER WOULD SURVIVE LOSING ITS IMPLEMENTATION, AND THAT IS THE PROBLEM. Chat Master found this and reversed a split I had already endorsed; I verified the mechanism and it holds, with one correction that makes it WORSE rather than better.\n\napi/credentialing.py has ZERO top-level credentialing imports \u2014 verified by AST, not grep. Every route imports its storage module INSIDE the function. Measured across the 15 decorated routes:\n\n  14 import a credentialing/roster module function-locally\n   8 of those sit inside a broad `except Exception:` that returns [] or a plausible value\n   6 have NO try at all \u2014 an ImportError would surface as a 500\n   1 imports nothing credentialing\n\nChat Master reported 'all 16 routes follow this shape'. They do not, and the mixed picture is the more dangerous one: delete the twelve service modules and EIGHT routes start lying (200 with an empty body, forever, indistinguishable from the empty-table state they already return) while SIX start 500ing. Two different failure modes from one deletion, one silent and one loud, and NOTHING TELLS THEM APART. A uniform failure would at least be diagnosable.\n\nAND THE GATE IS BLIND TO BOTH. I1/I2/I4/I7 are computed from chat_turns.thinking_log; these routes never touch the react loop. A green gate would prove nothing about fifteen hollowed-out routes. That retires my own earlier line that 'the gate's invariants are all we'd have' for the untested twelve \u2014 they are not thin here, they are absent.\n\nTHE DEEPER POINT, which is Chat Master's and is correct: the try/except MECHANISES the defect. We would ship eight routes that report success while their implementation is gone \u2014 instances thirteen through twenty of the class, created inside the phase meant to remove it. So api/credentialing.py and the twelve are ONE ATOMIC UNIT. The only orderings that leave no lie are 'delete router and services together' (routes 404 \u2014 honest) or 'delete nothing yet'. Holding."
+    ],
+    [
+     "bad",
+     "OWNER(chat): ~25 FRONTEND FETCHES ARE 404ing TODAY AND NOBODY NOTICED \u2014 this node's class, live, not hypothetical. Found by Chat Master during the P1d sweep. app/api/roster.py was DELETED in 65c4751 and roughly 25 call sites in chat's own pipeline-*.js were never removed, so every fetch to /chat/roster-truth/* and /chat/roster-reconcile/* returns 404. The try/catch swallows it and the selector renders empty. The capability has been gone for as long as that commit is old and the page looks the same as it always did.\n\nWorth keeping beside the twelve confirmed instances because it is the only one where the producer was removed by a DELIBERATE deletion and the consumers were simply forgotten \u2014 which is precisely the risk this program runs every phase. It is also the argument for P1d taking the frontend with it rather than after it."
+    ],
+    [
+     "bad",
+     "OWNER(chat): DELETING THE CREDENTIALING PLANNER PATH WOULD SILENTLY BREAK AN UNRELATED LIVE TOOL. Chat Master caught this before touching anything. list_thread_document_uploads is a working non-credentialing tool, and blueprint.py:173 is its ONLY planner routing path \u2014 reached exclusively through cf_intent, the object from the credentialing_flow_intent module P1d marks for deletion. Remove cf_intent and the planner loses the ability to route there. Nothing raises; the tool just stops being selected.\n\nWE WOULD HAVE CREATED A NEW INSTANCE OF THE CLASS WE ARE CATALOGUING. That is the finding: a deletion program aimed at producers-without-consumers is itself a machine for manufacturing them, unless every removal asks what ELSE reads this.\n\nblueprint.py is the one genuinely interleaved file \u2014 force_roster_tool_hint, use_credentialing_qa and cf_intent are set in credentialing branches and read by the GENERIC per-subquestion loop at :122-176, and the keyword gate at :71-84 fires on 'section', 'readiness' and 'revenue opportunity', generic phrases that happen to serve credentialing today. Restructuring with harness coverage, not excision."
+    ],
+    [
+     "bad",
      "1,902 lines with 42 exception handlers, 31 of which log and continue. Individually most are defensive and correct \u2014 a broken tracing init genuinely should not kill a turn. Collectively they make it very hard to know which failures are survivable by design and which are the appeals-outage shape, where a capability disappears and the turn still looks healthy."
     ],
     [
@@ -496,6 +512,10 @@
    "rating": "amber",
    "depth": "code",
    "findings": [
+    [
+     "bad",
+     "OWNER(chat): 45% OF llm_calls ROWS CANNOT BE JOINED TO A TURN. Measured 2026-09-09 while designing the latency telemetry: correlation_id is NULL on 790 of 1,979 rows in 24h. It is not random \u2014 FOUR STAGES ARE AT ZERO PERCENT:\n\n  parser           360 rows, 0 with correlation_id\n  rag_fact_check   164 rows, 0\n  phi_classify      98 rows, 0\n  integrator        23 rows, 0\n  react_1          233 rows, 94 (40%)\n  ...every other stage is at 97-100%\n\nSo the per-stage LLM cost of PHI classification, fact-checking and parsing is attributable to no turn at all. The column exists, the writer populates it for most stages, and these four never pass it. Note `parser` still logs 360 calls a day after P2a deleted the planner subtree. RESOLVED 2026-09-09 by the query Chat Master could not run: parser's last call was 01:12:21Z and P1a deployed at 01:44Z \u2014 ZERO parser calls after it. Those 360 rows are pre-P1a runtime inside a 24h window, exactly as they predicted. Closed.\n\nTHE OTHER THREE ARE LIVE, which makes their 0% a real defect rather than a deletion artifact: phi_classify last ran 05:48:41Z, rag_fact_check 05:44:03Z, integrator 05:46:53Z \u2014 all current. So the LLM cost of PHI CLASSIFICATION AND FACT-CHECKING ATTRIBUTES TO NO TURN AT ALL, and anyone costing a turn today undercounts silently while the total still looks plausible. Same shape as cited_source_indices being non-empty 11% of the time and nobody noticing.\n\nNOT A BLOCKER FOR THE LATENCY WORK, per Ananth 2026-09-09: module-level telemetry measures LLM time INSIDE the module span, so duration does not depend on this join. The join is for attribution \u2014 which model, which variant \u2014 not for timing. Logged as its own defect rather than folded into the telemetry design, and the telemetry is explicitly designed not to need it."
+    ],
     [
      "good",
      "One chokepoint for every LLM call is exactly what you want for cost control, model routing, PHI-aware routing and A/B analytics. This is the right shape."
@@ -612,7 +632,7 @@
    "id": "retrieval_budget",
    "path": "app/services/retrieval_budget.py",
    "kind": "cross-cutting",
-   "loc": 116,
+   "loc": 118,
    "role": "Chat's real, request-level context-window math for",
    "role_full": "Chat's real, request-level context-window math for\n``token_budget_for_retrieval`` -- Task #98 (2026-08-15, Chat Master/Ananth).\n\nRAG's Structure stage (mobius-rag/app/services/retriever/shape/structure.py)\nhas always guessed the retrieval token budget from a static per-caller_mode\ntable (chat.default=3000, chat.thinking=16000, ...) because chat never sent\na real value. Ananth's direct correction: \"RAG does not have to guess\" --\nchat knows its own context window, system prompt, conversation history, and\nanswer-generation reserve; it should compute the real number and pass it.\nRAG's own docstring frames the formula as::\n\n    token_budget_for_retrieval = context_window\n                         ",
    "api": [
@@ -655,7 +675,7 @@
    "id": "jurisdiction",
    "path": "app/state/jurisdiction.py",
    "kind": "cross-cutting",
-   "loc": 137,
+   "loc": 140,
    "role": "Jurisdiction model: state, payor, program, perspective, regulatory_agency.",
    "role_full": "Jurisdiction model: state, payor, program, perspective, regulatory_agency.\nResolves from state.active (legacy flat fields + jurisdiction_obj).",
    "api": [
@@ -807,19 +827,11 @@
    "findings": [
     [
      "bad",
-     "OWNER(chat): TOOL SELECTION IS SPORADIC, AND THE MODEL NARRATES A MISS AS A BROKEN TOOL. Ananth, live, 2026-09-09 \u2014 and his word for it, 'sporadic', is the accurate one and worse than 'broken'.\n\n  13:27:21  'can i offer some feedback'          -> model: 'my feedback tool isn't working right now'\n  13:28:34  'the feedback is the tool section...'-> tool fired FULLY: capture card rendered, category correctly classified Bug, verbatim stored, Done button\n\nSeventy seconds apart, same session, same user. The feedback service is healthy \u2014 I called /classify directly: HTTP 200 in 1.3s, mobius-feedback rev 00002-2xm ready. So the tool is not broken; it is INTERMITTENTLY NOT SELECTED, and when it is not, the model tells the user it is broken.\n\nTHAT IS HARDER TO DIAGNOSE THAN A DEAD TOOL, not easier. A tool that always fails gets reported and fixed. One that works most of the time and blames itself the rest produces user reports nobody can reproduce, and the last three such reports (appeals playbook, PHI verification, this) all had a healthy backend.\n\nAND THE TELEMETRY CANNOT TELL THE THREE APART. I pulled the failing turn's thinking_log: it carries NO TOOL ENVELOPES AT ALL \u2014 no tool_invoked, no tool_completed, and tool_failed is structurally impossible because make_tool_failed has zero callers. So 'never selected', 'selected and returned empty' and 'selected and errored' are indistinguishable after the fact. The model has the same problem in real time, which is why it guesses \u2014 and its own trace shows the guess hardening across rounds: 'failed... likely because it wasn't triggered correctly' becomes 'failed repeatedly, indicating it's not currently functional'.\n\nCORRECTION TO MY OWN EARLIER FRAMING: I told Ananth the model 'fabricated' a broken tool, comparing it to the appeals 'Unknown tool' case. That was half right. The tool genuinely did not fire; what was fabricated was the CAUSE, not the failure. His 'sporadic' is the better description and it points at selection, not at the service."
-    ],
-    [
-     "bad",
      "AN UN-INSTRUMENTED EXTERNAL WAIT IS INDISTINGUISHABLE FROM OUR OWN WORK \u2014 the most expensive variant of this node's class, because it does not merely hide a failure, it MISDIRECTS THE FIX. Chat Master, 2026-09-09, retracting three of their own numbers, and I verified the corrected ones from turn_spans before recording them.\n\nThe three retractions were one defect: an external wait with no span of its own has its wall time fall through to the enclosing module's PROCESSING column. So:\n  'integrate is ~1,079ms/turn of pure processing, the largest block of code we control' -> actually 240ms; the integrator's own LLM calls had no spans and their wall landed in the processing column, reading as 12,087ms on one turn\n  'state_load has a read loop' -> the smoke test reuses fixed cids, so four runs counted as one turn, ~14x inflation\n  a 5,770ms RAG call reported as 5,770ms of our processing -> same cause\n\nNOTHING FAILED. The number was present, plausible, and named the wrong module. That is worse than a missing metric: a missing number prompts someone to go measure, while a wrong one sends an engineer to optimise code that was idle the whole time.\n\nVERIFIED FROM turn_spans on the cited turn (7897f928, 56.5s wall): react_loop root 44,274ms wall of which 12,978 llm and a single tool:healthcare_query span at 30,099ms; integrate 11,726ms wall of which 11,486 llm. Our own processing across the turn is ~1.4-1.5s. CHAT'S OWN CODE IS 2.7% OF THE TURN.\n\nTWO STRUCTURAL GUARDS SHIPPED WITH THE RETRACTION, and the reasoning behind the first is the transferable part: turn_spans.concurrent (migration 064) so parallel siblings contribute max() rather than sum() \u2014 a COLUMN rather than a naming convention, because a convention is a rule with no enforcement. And turn_matrix() takes injectable spans so shape rules test without a DB, after the previous version shipped a broken write precisely because every test patched db_execute."
     ],
     [
      "bad",
      "A READ-BACK OF THE WRONG ARTIFACT IS INDISTINGUISHABLE FROM A SUCCESSFUL ONE. Chat Master's sharpening of this node's class, earned from a failure we produced together on 2026-09-09 and worth more than the bug that caused it.\n\nThe PHI correlation_id fix failed in two independent halves. MINE: I traced classifier.py:301 passing `correlation_id=correlation_id` and read it as forwarding to the LLM call \u2014 it populates MessageCheckEnvelope, the diagnostics record. Two destinations; I did not check which. THEIRS: they verified end-to-end by reading a log line that contained the field \u2014\n  INFO phi_message_check {\"correlation_id\": \"f0927dcc-...\", \"gate\": \"clean\"}\n\u2014 which IS that same envelope. They performed a read-back and it PASSED, on the wrong row.\n\nEither half alone would have been caught by the other. Together they produced a green gate, a correct-looking diff, and a confident false claim that the fix worked. What caught it was querying the destination of record \u2014 llm_calls \u2014 after a real turn.\n\nTHE RULE THIS CHANGES: 'ship a reader with the writer' is not sufficient, because a reader can read the wrong thing and pass. The acceptance criterion must NAME THE ARTIFACT \u2014 for P2b, the test asserts against the stored span row that diagnostics actually renders from, not an emitter log, not an in-memory object, not the nearest thing that happens to carry the field. An unnamed read-back is a producer-consumer check that can be satisfied by a coincidence."
-    ],
-    [
-     "bad",
-     "OWNER(chat): _rich_evidence IS AN UNRECORDED BRANCH THAT CHANGES ROUND COUNT \u2014 invisible drift inside the latency instrument. Found by Chat Master while answering Eval's control-set question, verified by me at react_loop.py:357-358 and :5864.\n\n  _FAST_MODE_MIN_CHUNKS = 3 \u00b7 _FAST_MODE_MIN_CHARS = 500\n  _rich_evidence = (_chunk_count >= 3 and _total_chars >= 500) -> early-exit synthesis\n\nIt is NOT SELECTABLE: no request field, no env var \u2014 grepped and confirmed. It fires on what RETRIEVAL HAPPENS TO RETURN, so the same question takes the early exit or does not depending on the corpus that day. Early exit means fewer rounds, fewer rounds means fewer LLM calls, and LLM call count is the routing multiplier the latency baseline is trying to hold still.\n\nSo a run where 8 of 22 questions exit early is NOT COMPARABLE to one where 3 did, and NOTHING IN TODAY'S DATA WOULD REVEAL THAT HAPPENED. A branch that changes round count and is never recorded is drift you cannot see \u2014 the same shape as every other finding on this node, sitting inside the instrument built to detect drift.\n\nRECORD IT PER TURN, do not try to force it. You cannot pin a content-triggered branch; you can log whether it fired, which makes two runs comparable or honestly incomparable."
     ],
     [
      "watch",
@@ -828,26 +840,6 @@
     [
      "bad",
      "AN IMPORT EDGE IS NOT A CONSUMPTION EDGE \u2014 Chat Master's generalisation of the P1a orphan, and it belongs beside the producer/consumer class because it is how that class hides from a sweep.\n\nP1a asked 'does anything IMPORT this?' The question that establishes liveness is 'does anything CONSUME this?' A re-export makes those two give opposite answers: planner/__init__.py re-exported `parse`, so parser.py had an importer for its entire dead life. The same trick works three other ways \u2014 a module imported by something itself unreached, a package nobody imports, a name referenced only from a fixture. All four look live to a grep.\n\nTHE FIX IS REACHABILITY, NOT HOPS: resolve __init__ re-exports to the defining module, then ask whether any module TRANSITIVELY IMPORTED FROM AN ENTRY POINT (app/main.py, app/worker/run.py) consumes the name. Present-in-the-tree is not reachable. Chat Master's own note is the strongest argument for it: this check would have flagged the entire planner subtree the INSTANT stages/plan.py was deleted, so it pays for itself on the very phase that created the orphan rather than a phase later.\n\nSame family as the swallowed ImportError in the credentialing router \u2014 a signal that reports CONNECTED while nothing flows."
-    ],
-    [
-     "bad",
-     "OWNER(chat): 45% OF llm_calls ROWS CANNOT BE JOINED TO A TURN. Measured 2026-09-09 while designing the latency telemetry: correlation_id is NULL on 790 of 1,979 rows in 24h. It is not random \u2014 FOUR STAGES ARE AT ZERO PERCENT:\n\n  parser           360 rows, 0 with correlation_id\n  rag_fact_check   164 rows, 0\n  phi_classify      98 rows, 0\n  integrator        23 rows, 0\n  react_1          233 rows, 94 (40%)\n  ...every other stage is at 97-100%\n\nSo the per-stage LLM cost of PHI classification, fact-checking and parsing is attributable to no turn at all. The column exists, the writer populates it for most stages, and these four never pass it. Note `parser` still logs 360 calls a day after P2a deleted the planner subtree. RESOLVED 2026-09-09 by the query Chat Master could not run: parser's last call was 01:12:21Z and P1a deployed at 01:44Z \u2014 ZERO parser calls after it. Those 360 rows are pre-P1a runtime inside a 24h window, exactly as they predicted. Closed.\n\nTHE OTHER THREE ARE LIVE, which makes their 0% a real defect rather than a deletion artifact: phi_classify last ran 05:48:41Z, rag_fact_check 05:44:03Z, integrator 05:46:53Z \u2014 all current. So the LLM cost of PHI CLASSIFICATION AND FACT-CHECKING ATTRIBUTES TO NO TURN AT ALL, and anyone costing a turn today undercounts silently while the total still looks plausible. Same shape as cited_source_indices being non-empty 11% of the time and nobody noticing.\n\nNOT A BLOCKER FOR THE LATENCY WORK, per Ananth 2026-09-09: module-level telemetry measures LLM time INSIDE the module span, so duration does not depend on this join. The join is for attribution \u2014 which model, which variant \u2014 not for timing. Logged as its own defect rather than folded into the telemetry design, and the telemetry is explicitly designed not to need it."
-    ],
-    [
-     "bad",
-     "OWNER(chat): THE CREDENTIALING ROUTER WOULD SURVIVE LOSING ITS IMPLEMENTATION, AND THAT IS THE PROBLEM. Chat Master found this and reversed a split I had already endorsed; I verified the mechanism and it holds, with one correction that makes it WORSE rather than better.\n\napi/credentialing.py has ZERO top-level credentialing imports \u2014 verified by AST, not grep. Every route imports its storage module INSIDE the function. Measured across the 15 decorated routes:\n\n  14 import a credentialing/roster module function-locally\n   8 of those sit inside a broad `except Exception:` that returns [] or a plausible value\n   6 have NO try at all \u2014 an ImportError would surface as a 500\n   1 imports nothing credentialing\n\nChat Master reported 'all 16 routes follow this shape'. They do not, and the mixed picture is the more dangerous one: delete the twelve service modules and EIGHT routes start lying (200 with an empty body, forever, indistinguishable from the empty-table state they already return) while SIX start 500ing. Two different failure modes from one deletion, one silent and one loud, and NOTHING TELLS THEM APART. A uniform failure would at least be diagnosable.\n\nAND THE GATE IS BLIND TO BOTH. I1/I2/I4/I7 are computed from chat_turns.thinking_log; these routes never touch the react loop. A green gate would prove nothing about fifteen hollowed-out routes. That retires my own earlier line that 'the gate's invariants are all we'd have' for the untested twelve \u2014 they are not thin here, they are absent.\n\nTHE DEEPER POINT, which is Chat Master's and is correct: the try/except MECHANISES the defect. We would ship eight routes that report success while their implementation is gone \u2014 instances thirteen through twenty of the class, created inside the phase meant to remove it. So api/credentialing.py and the twelve are ONE ATOMIC UNIT. The only orderings that leave no lie are 'delete router and services together' (routes 404 \u2014 honest) or 'delete nothing yet'. Holding."
-    ],
-    [
-     "bad",
-     "OWNER(chat): ~25 FRONTEND FETCHES ARE 404ing TODAY AND NOBODY NOTICED \u2014 this node's class, live, not hypothetical. Found by Chat Master during the P1d sweep. app/api/roster.py was DELETED in 65c4751 and roughly 25 call sites in chat's own pipeline-*.js were never removed, so every fetch to /chat/roster-truth/* and /chat/roster-reconcile/* returns 404. The try/catch swallows it and the selector renders empty. The capability has been gone for as long as that commit is old and the page looks the same as it always did.\n\nWorth keeping beside the twelve confirmed instances because it is the only one where the producer was removed by a DELIBERATE deletion and the consumers were simply forgotten \u2014 which is precisely the risk this program runs every phase. It is also the argument for P1d taking the frontend with it rather than after it."
-    ],
-    [
-     "bad",
-     "OWNER(chat): DELETING THE CREDENTIALING PLANNER PATH WOULD SILENTLY BREAK AN UNRELATED LIVE TOOL. Chat Master caught this before touching anything. list_thread_document_uploads is a working non-credentialing tool, and blueprint.py:173 is its ONLY planner routing path \u2014 reached exclusively through cf_intent, the object from the credentialing_flow_intent module P1d marks for deletion. Remove cf_intent and the planner loses the ability to route there. Nothing raises; the tool just stops being selected.\n\nWE WOULD HAVE CREATED A NEW INSTANCE OF THE CLASS WE ARE CATALOGUING. That is the finding: a deletion program aimed at producers-without-consumers is itself a machine for manufacturing them, unless every removal asks what ELSE reads this.\n\nblueprint.py is the one genuinely interleaved file \u2014 force_roster_tool_hint, use_credentialing_qa and cf_intent are set in credentialing branches and read by the GENERIC per-subquestion loop at :122-176, and the keyword gate at :71-84 fires on 'section', 'readiness' and 'revenue opportunity', generic phrases that happen to serve credentialing today. Restructuring with harness coverage, not excision."
-    ],
-    [
-     "bad",
-     "OWNER(chat): JWTs ARE IN THE REQUEST LOGS. Found 2026-09-09 while measuring credentialing route traffic, not by looking for it. Cloud Run request logs for mobius-chat contain entries like `%2F%23t%3DeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` \u2014 that is `/#t=<access token>` URL-encoded into the request PATH. Decoded, the payload carries sub, tenant_id, exp and type=access.\n\nA fragment is not normally sent to a server, so something is encoding the token into the path rather than leaving it after the #. However it happens, the consequence is that live access tokens are written to Cloud Run request logs, where they are readable by anyone with log access and by anyone a log excerpt is pasted to. Two distinct tokens appear across 30 days.\n\nNOT INVESTIGATED \u2014 I have not established which client does this, whether the tokens are still within their exp, or whether the same pattern reaches other services' logs. Logged rather than chased, per Ananth's standing instruction, and flagged to Chat Master so nobody pastes a log excerpt before it is understood. Related to the CHAT_AUTH_MODE=optional item on the POST /chat node but a separate defect."
     ],
     [
      "bad",
@@ -1004,7 +996,7 @@
    "module": "app.pipeline.active_context",
    "group": "pipeline",
    "path": "app/pipeline/active_context.py",
-   "loc": 60,
+   "loc": 63,
    "role": "Active context persistence.",
    "role_full": "Active context persistence.\nReplaces active_skill \u2014 generic for any tool.",
    "stage": null,
@@ -1115,7 +1107,7 @@
    "module": "app.pipeline.curator_tools",
    "group": "pipeline",
    "path": "app/pipeline/curator_tools.py",
-   "loc": 328,
+   "loc": 331,
    "role": "ReAct tool handlers for the curator (Phase 13.5).",
    "role_full": "ReAct tool handlers for the curator (Phase 13.5).\n\nTwo tools live here, called from ``react_loop._execute_tool``:\n\n* ``lookup_authoritative_sources`` \u2014 query rag's /sources/search to\n  enumerate URLs Mobius has seen for a payer/state/topic. Returns\n  both ingested and not-yet-ingested URLs.\n\n* ``ingest_url`` \u2014 POST to rag's /documents/import-from-html (or\n  /import-from-gcs for already-uploaded PDFs) to pull a single URL\n  through the chunking + embedding + lexicon + publish pipeline.\n\nBoth are HTTP, not direct DB. Reasons:\n* /sources/search runs on rag; the same shape works whether chat reads",
    "stage": null,
@@ -1243,7 +1235,7 @@
    "module": "app.pipeline.orchestrator",
    "group": "pipeline",
    "path": "app/pipeline/orchestrator.py",
-   "loc": 1861,
+   "loc": 1873,
    "role": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).",
    "role_full": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).\n\nRuns stages in order; handles clarification/refinement early exit; publishes response.",
    "stage": null,
@@ -1347,7 +1339,7 @@
    "module": "app.pipeline.personalization",
    "group": "pipeline",
    "path": "app/pipeline/personalization.py",
-   "loc": 129,
+   "loc": 131,
    "role": "User-profile splicing helpers.",
    "role_full": "User-profile splicing helpers.\n\nMobius-user/CONSUMER_RECIPE_PROFILE.md is the contract. This module\nimplements the chat-side consumer:\n\n  * ``splice_user_profile(base, profile)`` \u2014 Pattern A from the recipe.\n    Drop ``profile.rendered_prompt`` between a base system prompt and\n    whatever follows. No-op when the user hasn't onboarded.\n  * ``autonomy_for(profile, sensitive)`` \u2014 Pattern B. Read-only access\n    to ``profile.autonomy.{routine,sensitive}_tasks`` for tool-execution\n    gating (confirm-first vs auto). Defaults to ``confirm_first`` when\n    profile is missing \u2014 safest fallback.\n  * `",
    "stage": null,
@@ -1505,7 +1497,7 @@
    "module": "app.pipeline.react.feedback_signal",
    "group": "pipeline/react",
    "path": "app/pipeline/react/feedback_signal.py",
-   "loc": 77,
+   "loc": 79,
    "role": "Periodic product-feedback cadence signal for a ReAct turn.",
    "role_full": "Periodic product-feedback cadence signal for a ReAct turn.\n\nExtracted from react_loop.py so that file stays under its LOC ratchet\n(tests/test_react_split_phase_1i). See docs/feedback-agent-spec.md \u00a74B/\u00a76:\nthe *decision* (which ask, if any) is computed here from per-user cadence state;\nthe planner only chooses whether to surface it via ``offer_feedback``.",
    "stage": null,
@@ -1815,7 +1807,7 @@
    "module": "app.pipeline.react_loop",
    "group": "pipeline",
    "path": "app/pipeline/react_loop.py",
-   "loc": 6175,
+   "loc": 6185,
    "role": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.",
    "role_full": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.\n\nReplaces (when enabled): run_plan() + _answer_for_subquestion() + run_integrate().\n\nKeeps: answer_non_patient(), answer_tool(), answer_reasoning(),\n       emitter system, badge system, jurisdiction system.\n\nEmission map (thinking chunks sent to UI via emitter=on_thinking):\n  Pre-loop:\n    [if pronoun enriched] \"\u21ba Understood: <resolved message>\"\n    [if follow-up to active context] \"\u25cc Answering from the report we just generated\u2026\"\n    [jurisdiction] emit_jurisdiction_context: \"\u2713 Confirmed: \u2026\" | \"? Payer not identified\u2026\" | etc.\n    \"I'm breaking down",
    "stage": null,
@@ -1924,6 +1916,10 @@
    "rating": "red",
    "depth": "code",
    "findings": [
+    [
+     "bad",
+     "OWNER(chat): _rich_evidence IS AN UNRECORDED BRANCH THAT CHANGES ROUND COUNT \u2014 invisible drift inside the latency instrument. Found by Chat Master while answering Eval's control-set question, verified by me at react_loop.py:357-358 and :5864.\n\n  _FAST_MODE_MIN_CHUNKS = 3 \u00b7 _FAST_MODE_MIN_CHARS = 500\n  _rich_evidence = (_chunk_count >= 3 and _total_chars >= 500) -> early-exit synthesis\n\nIt is NOT SELECTABLE: no request field, no env var \u2014 grepped and confirmed. It fires on what RETRIEVAL HAPPENS TO RETURN, so the same question takes the early exit or does not depending on the corpus that day. Early exit means fewer rounds, fewer rounds means fewer LLM calls, and LLM call count is the routing multiplier the latency baseline is trying to hold still.\n\nSo a run where 8 of 22 questions exit early is NOT COMPARABLE to one where 3 did, and NOTHING IN TODAY'S DATA WOULD REVEAL THAT HAPPENED. A branch that changes round count and is never recorded is drift you cannot see \u2014 the same shape as every other finding on this node, sitting inside the instrument built to detect drift.\n\nRECORD IT PER TURN, do not try to force it. You cannot pin a content-triggered branch; you can log whether it fired, which makes two runs comparable or honestly incomparable."
+    ],
     [
      "bad",
      "OWNER(chat): THE CURATION DECISION IS NEVER PERSISTED, which makes evidence_review untestable after the fact. Measured against 5,713 live turns: 568 carry gaps_closed and 701 carry gaps_open, so the gap half genuinely records. But the persisted round is {round, tool, learned, running_answer, gaps_closed, gaps_open} \u2014 and `keep` appears ZERO times in any turn. In memory the round also carries kept_chunk_count and kept_chunk_chars; neither survives to the database either.\n\nSo you can see THAT chunks were curated and you cannot see WHICH. The question a rigorous test most wants to ask \u2014 did the model keep the chunks its answer actually rests on \u2014 cannot be asked of any turn that has already run. It can only be observed live, in memory, on a turn you are watching.\n\nCHECKED AND NOT A BUG, recorded so nobody re-raises it: there are TWO round shapes and both readers are right for their own. In memory ctx.react_trace_rounds carries gaps flat AND nested under `enrichment` (react_loop.py:4987-4995), which is what react_loop:3819 reads. The persisted final_message.reasoning_trace is flattened, enrichment stripped, which is what storage/turns.py:428 reads. I went looking for a shape mismatch and there isn't one."
@@ -2057,7 +2053,7 @@
    "module": "app.pipeline.react_retry_guard",
    "group": "pipeline",
    "path": "app/pipeline/react_retry_guard.py",
-   "loc": 342,
+   "loc": 345,
    "role": "Smart-retry guard for the ReAct loop (Phase 0.7).",
    "role_full": "Smart-retry guard for the ReAct loop (Phase 0.7).\n\nPrevents the pathology observed in production where the bandit or the LLM\ndecision picks the *same* tool with the *same* inputs across rounds after it\nalready failed, burning LLM calls on a known-dead path.\n\nRules\n-----\n1. **Same tool + same inputs + no new evidence \u2192 skip.** A \"failed attempt\"\n   is recorded when a tool execution either raises, returns ``success=False``,\n   or returns a result attached to an :class:`ErrorEnvelope`. Before the next\n   tool execution, if the (tool, inputs_signature) pair matches a prior\n   failure, we check whe",
    "stage": null,
@@ -2171,6 +2167,10 @@
    "rating": "red",
    "depth": "code",
    "findings": [
+    [
+     "bad",
+     "OWNER(chat): TOOL SELECTION IS SPORADIC, AND THE MODEL NARRATES A MISS AS A BROKEN TOOL. Ananth, live, 2026-09-09 \u2014 and his word for it, 'sporadic', is the accurate one and worse than 'broken'.\n\n  13:27:21  'can i offer some feedback'          -> model: 'my feedback tool isn't working right now'\n  13:28:34  'the feedback is the tool section...'-> tool fired FULLY: capture card rendered, category correctly classified Bug, verbatim stored, Done button\n\nSeventy seconds apart, same session, same user. The feedback service is healthy \u2014 I called /classify directly: HTTP 200 in 1.3s, mobius-feedback rev 00002-2xm ready. So the tool is not broken; it is INTERMITTENTLY NOT SELECTED, and when it is not, the model tells the user it is broken.\n\nTHAT IS HARDER TO DIAGNOSE THAN A DEAD TOOL, not easier. A tool that always fails gets reported and fixed. One that works most of the time and blames itself the rest produces user reports nobody can reproduce, and the last three such reports (appeals playbook, PHI verification, this) all had a healthy backend.\n\nAND THE TELEMETRY CANNOT TELL THE THREE APART. I pulled the failing turn's thinking_log: it carries NO TOOL ENVELOPES AT ALL \u2014 no tool_invoked, no tool_completed, and tool_failed is structurally impossible because make_tool_failed has zero callers. So 'never selected', 'selected and returned empty' and 'selected and errored' are indistinguishable after the fact. The model has the same problem in real time, which is why it guesses \u2014 and its own trace shows the guess hardening across rounds: 'failed... likely because it wasn't triggered correctly' becomes 'failed repeatedly, indicating it's not currently functional'.\n\nCORRECTION TO MY OWN EARLIER FRAMING: I told Ananth the model 'fabricated' a broken tool, comparing it to the appeals 'Unknown tool' case. That was half right. The tool genuinely did not fire; what was fabricated was the CAUSE, not the failure. His 'sporadic' is the better description and it points at selection, not at the service."
+    ],
     [
      "bad",
      "OWNER(chat): A TOOL RETURNED A REAL PLAYBOOK AND CHAT REPORTED THERE WAS NONE. Found by Ananth testing live, 2026-09-09, cid 0985d25a and bb898cf5. Logged for the tool node, NOT fixed \u2014 his ruling.\n\nQuery: 'how do I appeal a CARC 197 denial for Sunshine Health in Florida?' Chat emitted 'No playbook \u2014 using FL Medicaid defaults' and, in copilot mode, gave up after 3 rounds with unfinished_reason=no_path_forward.\n\nTHE PLAYBOOK EXISTS. I called the same endpoint chat calls:\n  GET /playbook-guarded/Sunshine%20Health/197?audience=provider -> 200\n  deadline_appeal_days 90 \u00b7 submission_method portal \u00b7 fax 1-833-504-0580\n  mail Post Office Box 3070, Farmington MO 63640-3823\n  appeal_levels: Internal Appeal (L1), Peer-to-Peer Review (L2), ...\n\nSo the answer the user wanted was one HTTP call away and the handler took its found=False branch anyway. The suspect is react_loop.py:3127 \u2014 `lookup = carc_group or str(carc) if carc else carc_group`. Python parses that as `carc_group or (str(carc) if carc else carc_group)`, so whatever the planner passes decides the path: a carc_group of 'PRECERT' builds /playbook-guarded/{payor}/PRECERT while the row is keyed 197. NOT CONFIRMED \u2014 I did not capture the planner's actual inputs, so this is the leading suspect and not the established cause.\n\nTHEN THE MODEL FABRICATED A TOOL ERROR AND TOLD THE USER. It reported 'Unknown tool: appeals_get_playbook' and 'the appeals tools are currently unavailable'. I searched the stored turn: EVERY occurrence of that string is inside the model's own thought field and NONE is in any tool result. The dispatcher is a single function, the appeals branch at react_loop.py:3005 is reachable, its own emit strings appear in the trace, and the service returns 200. The tool handed back success=True with a useless payload; the model could not tell why it was not helping, invented a mechanical explanation, and shipped that explanation to the user as fact.\n\nTHIS IS THE SYSTEMIC FINDING TWICE IN ONE TURN. The tool reports success while its payload is a failure, and tool_failed CANNOT be emitted because make_tool_failed has no caller (see the emit_envelope node). So nothing in the system could report that this tool was failing \u2014 the model was the only thing that noticed, and the only thing it could do was guess. That is what reached the screen.\n\nMODE MATTERS: agentic recovered by falling back to rag in round 3 and produced a correct answer with the real deadlines and address; copilot's 3-round budget ran out first. Same defect, different visibility.\n\nNOT CAUSED BY P1a OR P1c \u2014 the appeals dispatch is untouched by both and the found=False branch predates them. Not verified against the pre-refactor revision.\n\nNode moved GREEN -> RED. A control surface that silently reports 'no data' when the data exists is not green, however clean the migration around it is \u2014 rating the guarantee, not the construction."

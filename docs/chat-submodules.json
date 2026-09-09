@@ -28,11 +28,11 @@
   ],
   "shared_post_guard": "ctx.react_bypass_integrate \u2014 set in react_loop, skips the integrator and publishes the ReAct answer directly",
   "shared_post_guard_lines": [
-   580,
-   869,
-   873,
-   1000,
-   1045
+   589,
+   878,
+   882,
+   1009,
+   1054
   ],
   "exit": "publish",
   "react_phases": [
@@ -61,7 +61,7 @@
      "react_retry_guard",
      "curator_tools"
     ],
-    "cite": 5680,
+    "cite": 5690,
     "note": "Dispatches tools, and refuses a repeat of a call that already failed."
    },
    {
@@ -72,7 +72,7 @@
      "feedback_signal",
      "completion_extension_gate"
     ],
-    "cite": 5312,
+    "cite": 5322,
     "note": "Audits the draft against sources and decides whether to go round again."
    }
   ],
@@ -86,7 +86,7 @@
    "module": "app.pipeline.active_context",
    "group": "pipeline",
    "path": "app/pipeline/active_context.py",
-   "loc": 60,
+   "loc": 63,
    "role": "Active context persistence.",
    "role_full": "Active context persistence.\nReplaces active_skill \u2014 generic for any tool.",
    "stage": null,
@@ -139,7 +139,7 @@
    "module": "app.pipeline.curator_tools",
    "group": "pipeline",
    "path": "app/pipeline/curator_tools.py",
-   "loc": 328,
+   "loc": 331,
    "role": "ReAct tool handlers for the curator (Phase 13.5).",
    "role_full": "ReAct tool handlers for the curator (Phase 13.5).\n\nTwo tools live here, called from ``react_loop._execute_tool``:\n\n* ``lookup_authoritative_sources`` \u2014 query rag's /sources/search to\n  enumerate URLs Mobius has seen for a payer/state/topic. Returns\n  both ingested and not-yet-ingested URLs.\n\n* ``ingest_url`` \u2014 POST to rag's /documents/import-from-html (or\n  /import-from-gcs for already-uploaded PDFs) to pull a single URL\n  through the chunking + embedding + lexicon + publish pipeline.\n\nBoth are HTTP, not direct DB. Reasons:\n* /sources/search runs on rag; the same shape works whether chat reads",
    "stage": null,
@@ -187,7 +187,7 @@
    "module": "app.pipeline.orchestrator",
    "group": "pipeline",
    "path": "app/pipeline/orchestrator.py",
-   "loc": 1861,
+   "loc": 1873,
    "role": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).",
    "role_full": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).\n\nRuns stages in order; handles clarification/refinement early exit; publishes response.",
    "stage": null,
@@ -250,7 +250,7 @@
    "module": "app.pipeline.personalization",
    "group": "pipeline",
    "path": "app/pipeline/personalization.py",
-   "loc": 129,
+   "loc": 131,
    "role": "User-profile splicing helpers.",
    "role_full": "User-profile splicing helpers.\n\nMobius-user/CONSUMER_RECIPE_PROFILE.md is the contract. This module\nimplements the chat-side consumer:\n\n  * ``splice_user_profile(base, profile)`` \u2014 Pattern A from the recipe.\n    Drop ``profile.rendered_prompt`` between a base system prompt and\n    whatever follows. No-op when the user hasn't onboarded.\n  * ``autonomy_for(profile, sensitive)`` \u2014 Pattern B. Read-only access\n    to ``profile.autonomy.{routine,sensitive}_tasks`` for tool-execution\n    gating (confirm-first vs auto). Defaults to ``confirm_first`` when\n    profile is missing \u2014 safest fallback.\n  * `",
    "stage": null,
@@ -279,7 +279,7 @@
    "module": "app.pipeline.react_loop",
    "group": "pipeline",
    "path": "app/pipeline/react_loop.py",
-   "loc": 6175,
+   "loc": 6185,
    "role": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.",
    "role_full": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.\n\nReplaces (when enabled): run_plan() + _answer_for_subquestion() + run_integrate().\n\nKeeps: answer_non_patient(), answer_tool(), answer_reasoning(),\n       emitter system, badge system, jurisdiction system.\n\nEmission map (thinking chunks sent to UI via emitter=on_thinking):\n  Pre-loop:\n    [if pronoun enriched] \"\u21ba Understood: <resolved message>\"\n    [if follow-up to active context] \"\u25cc Answering from the report we just generated\u2026\"\n    [jurisdiction] emit_jurisdiction_context: \"\u2713 Confirmed: \u2026\" | \"? Payer not identified\u2026\" | etc.\n    \"I'm breaking down",
    "stage": null,
@@ -375,7 +375,7 @@
    "module": "app.pipeline.react_retry_guard",
    "group": "pipeline",
    "path": "app/pipeline/react_retry_guard.py",
-   "loc": 342,
+   "loc": 345,
    "role": "Smart-retry guard for the ReAct loop (Phase 0.7).",
    "role_full": "Smart-retry guard for the ReAct loop (Phase 0.7).\n\nPrevents the pathology observed in production where the bandit or the LLM\ndecision picks the *same* tool with the *same* inputs across rounds after it\nalready failed, burning LLM calls on a known-dead path.\n\nRules\n-----\n1. **Same tool + same inputs + no new evidence \u2192 skip.** A \"failed attempt\"\n   is recorded when a tool execution either raises, returns ``success=False``,\n   or returns a result attached to an :class:`ErrorEnvelope`. Before the next\n   tool execution, if the (tool, inputs_signature) pair matches a prior\n   failure, we check whe",
    "stage": null,
@@ -479,7 +479,7 @@
    "module": "app.pipeline.react.feedback_signal",
    "group": "pipeline/react",
    "path": "app/pipeline/react/feedback_signal.py",
-   "loc": 77,
+   "loc": 79,
    "role": "Periodic product-feedback cadence signal for a ReAct turn.",
    "role_full": "Periodic product-feedback cadence signal for a ReAct turn.\n\nExtracted from react_loop.py so that file stays under its LOC ratchet\n(tests/test_react_split_phase_1i). See docs/feedback-agent-spec.md \u00a74B/\u00a76:\nthe *decision* (which ask, if any) is computed here from per-user cadence state;\nthe planner only chooses whether to surface it via ``offer_feedback``.",
    "stage": null,

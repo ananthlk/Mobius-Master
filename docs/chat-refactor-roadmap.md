@@ -19,8 +19,8 @@ its sign-off table is complete.
 | Phase | Name | Bugs | Owner | Gate metric | Blocks | Status |
 |---|---|---:|---|---|---|---|
 | **P1** | Delete | 9 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☐ not started |
-| **P2** | Make absent producers detectable | 24 | chat + Eval | every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☐ not started |
-| **P3** | One decision point | 13 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ☐ not started |
+| **P2** | Make absent producers detectable | 23 | chat + Eval | every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☐ not started |
+| **P3** | One decision point | 14 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ☐ not started |
 | **P4** | Split | 16 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
 | **P5** | Config UX | 5 | chat + Prompt Studio | max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped | — | ☐ not started |
 
@@ -47,16 +47,16 @@ The cost of leading with it, stated plainly: this phase CANNOT CLAIM A LATENCY W
 | ☐ | Node | Owner | Finding |
 |---|---|---|---|
 | ☐ | `clarification` | chat | FOUR CLARIFY MECHANISMS, THREE OF THEM DEAD, ALL FOUR STILL IN THE TREE |
-| ☐ | `emit_envelope` | chat | THE CREDENTIALING ROUTER WOULD SURVIVE LOSING ITS IMPLEMENTATION, AND THAT IS THE PROBLEM |
-| ☐ | `emit_envelope` | chat | ~25 FRONTEND FETCHES ARE 404ing TODAY AND NOBODY NOTICED — this node's class, live, not hypothetical |
-| ☐ | `emit_envelope` | chat | DELETING THE CREDENTIALING PLANNER PATH WOULD SILENTLY BREAK AN UNRELATED LIVE TOOL |
 | ☐ | `jurisdiction` | chat | THE JURISDICTION CLARIFICATION IS DEAD CODE ON THE LIVE PATH |
 | ☐ | `jurisdiction` | chat | jurisdiction_change is decided by regex on the raw message and only matters on a path that does not run |
+| ☐ | `run_pipeline` | chat | THE CREDENTIALING ROUTER WOULD SURVIVE LOSING ITS IMPLEMENTATION, AND THAT IS THE PROBLEM |
+| ☐ | `run_pipeline` | chat | ~25 FRONTEND FETCHES ARE 404ing TODAY AND NOBODY NOTICED — this node's class, live, not hypothetical |
+| ☐ | `run_pipeline` | chat | DELETING THE CREDENTIALING PLANNER PATH WOULD SILENTLY BREAK AN UNRELATED LIVE TOOL |
 | ☐ | `run_pipeline` | chat | 26 TESTS ARE ALREADY FAILING BEFORE THE REFACTOR STARTS |
 | ☐ | `run_pipeline` | chat | THE CLASSIC PATH IS DEAD AND IT IS 1,159 LINES |
 | ☐ | `run_pipeline` | chat | THE CREDENTIALING SURFACE IS 8,994 LINES IN CHAT AND ITS TABLES ARE EMPTY |
 
-## P2 — Make absent producers detectable  ·  24 items
+## P2 — Make absent producers detectable  ·  23 items
 
 **Owner** chat + Eval
 **Gate** every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join  
@@ -74,12 +74,9 @@ BASELINE RULE: the latency numbers captured at the END of this phase are the ref
 |---|---|---|---|
 | ☐ | `active_context` | — | It writes two keys into the turn record by name — active_context and failed_query — and both are among the thr |
 | ☐ | `curator_tools` | — | DOES IT DO ANYTHING? Yes — and answering that properly corrected two of my own claims |
-| ☐ | `emit_envelope` | chat | TOOL SELECTION IS SPORADIC, AND THE MODEL NARRATES A MISS AS A BROKEN TOOL |
 | ☐ | `emit_envelope` | — | AN UN-INSTRUMENTED EXTERNAL WAIT IS INDISTINGUISHABLE FROM OUR OWN WORK — the most expensive variant of this n |
 | ☐ | `emit_envelope` | — | A READ-BACK OF THE WRONG ARTIFACT IS INDISTINGUISHABLE FROM A SUCCESSFUL ONE |
-| ☐ | `emit_envelope` | chat | _rich_evidence IS AN UNRECORDED BRANCH THAT CHANGES ROUND COUNT — invisible drift inside the latency instrumen |
 | ☐ | `emit_envelope` | — | AN IMPORT EDGE IS NOT A CONSUMPTION EDGE — Chat Master's generalisation of the P1a orphan, and it belongs besi |
-| ☐ | `emit_envelope` | chat | 45% OF llm_calls ROWS CANNOT BE JOINED TO A TURN |
 | ☐ | `emit_envelope` | — | A STALE TEST WAS ASSERTING A VULNERABILITY |
 | ☐ | `emit_envelope` | — | FIVE OF THE ELEVEN P1b FAILURES DEGRADED SILENTLY RATHER THAN FAILING LOUDLY — the same property as this node, |
 | ☐ | `emit_envelope` | chat | THE DEPLOY SCRIPT PRINTS A FALSE REASSURANCE |
@@ -90,14 +87,16 @@ BASELINE RULE: the latency numbers captured at the END of this phase are the ref
 | ☐ | `governor` | — | SCOPE LENS (DB seat, 2026-09-08): chat_turns.blueprint_snapshot is 0 of 2,744 — a DECLARED COLUMN NOTHING HAS  |
 | ☐ | `governor` | chat | 116 OF 187 CONFIG KNOBS RUN ON INVISIBLE CODE DEFAULTS |
 | ☐ | `governor` | chat | THE GOVERNOR IS STRUCTURALLY UNOBSERVABLE |
+| ☐ | `llm_manager` | chat | 45% OF llm_calls ROWS CANNOT BE JOINED TO A TURN |
 | ☐ | `model_registry` | chat | THE CIRCUIT BREAKER DID NOT PULL A PROVIDER THAT FAILS 100% OF THE TIME, FOR TWO DAYS |
 | ☐ | `model_registry` | chat | THE BANDIT HAS NO SURFACE |
 | ☐ | `orchestrator` | chat | LATENCY MEASUREMENT ACROSS THE PIPELINE — Ananth's item, and the gap is measurable |
 | ☐ | `plan` | — | The parse-failure fallback is invisible |
+| ☐ | `react_loop` | chat | _rich_evidence IS AN UNRECORDED BRANCH THAT CHANGES ROUND COUNT — invisible drift inside the latency instrumen |
 | ☐ | `react_loop` | chat | THE CURATION DECISION IS NEVER PERSISTED, which makes evidence_review untestable after the fact |
 | ☐ | `state_load` | — | state_version is WRITE-ONLY — inserted, incremented, never read or compared anywhere in app/ |
 
-## P3 — One decision point  ·  13 items
+## P3 — One decision point  ·  14 items
 
 **Owner** chat · **ratifier** Tech Review
 **Gate** modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target  
@@ -118,6 +117,7 @@ BASELINE RULE: the latency numbers captured at the END of this phase are the ref
 | ☐ | `governor` | — | It was shipped behind a default-off flag that the deployment turns on, which means the code reads as dormant a |
 | ☐ | `integrate` | chat | 13% OF TURNS NEVER REACH THE INTEGRATOR, AND THE USER CAN TELL |
 | ☐ | `run_pipeline` | chat | THE MASTER_OBJECTIVE GAP — filed at Ananth's direction, 2026-09-08, and IT IS A DATED REGRESSION, not a design |
+| ☐ | `tool_manifest` | chat | TOOL SELECTION IS SPORADIC, AND THE MODEL NARRATES A MISS AS A BROKEN TOOL |
 | ☐ | `tool_manifest` | chat | A TOOL RETURNED A REAL PLAYBOOK AND CHAT REPORTED THERE WAS NONE |
 | ☐ | `tool_manifest` | chat | SPORADIC TOOL SELECTION — FOLDED INTO THE TOOLS REFACTOR, with the three candidate layers named |
 
@@ -201,7 +201,7 @@ Each carries a reason. Excluding by silence is the failure mode this guards agai
 | `curator_tools` | payor-policy | unauthenticated corpus write in mobius-rag; 1 of 79 routes audited | LOOK INTO RAG'S WRITE SURFACE — an unauthenticated corpus write, surfa |
 | `curator_tools` | payor-policy | same | AND THE ADMIN KEY IS NOT CHECKED AT ALL |
 | `POST /chat` | rating | a rating ruling, not a unit of work | STRUCTURE LENS RULING (Technical Review, 2026-09-08): NODE 1 IS RED, n |
+| `POST /chat` | security posture | access tokens written to Cloud Run request logs; needs its own investigation, not a refactor phase | JWTs ARE IN THE REQUEST LOGS |
 | `POST /chat` | security posture | needs Ananth's authorisation + staging; no clean unauthenticated POST sent | RUNTIME LENS, 2026-09-08, mobius-chat in mobius-os-dev: CHAT_ENV=prod  |
-| `emit_envelope` | security posture | access tokens written to Cloud Run request logs; needs its own investigation, not a refactor phase | JWTs ARE IN THE REQUEST LOGS |
 | `personalization` | user-manager | chat cannot act on preferences it forwards | CHAT IS A PASS-THROUGH FOR PREFERENCES AND CANNOT ACT ON THEM |
 | `personalization` | user-manager | assignment itself is disputed | DISPUTED ASSIGNMENT |
