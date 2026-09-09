@@ -258,6 +258,62 @@ nowhere. Not PHI work; Chat Master will do it, but is holding it behind Ananth's
 it's the same endpoint. Crawler to send the caller string + `source_metadata` key review when
 ready; Chat Master will hold it against the change.
 
+### 2.8 · PHI classifier / compliance ruling — GATE CONTRACT (2026-09-09)
+
+**Ask 1 — reference/bibliography name suppression: ACCEPTED, feasible, building now (their skill).**
+Bounded structural suppression of one FP class; prose recall unchanged. Exact predicate:
+- SUPPRESS a PERSON/"name" span ONLY when BOTH: (a) its offset is inside a detected
+  reference/bibliography REGION, AND (b) it matches AUTHOR-CITATION SHAPE — Surname + 1–3
+  uppercase initials ("Annane D", "Smith JA", "van der Berg RM").
+- REGION detection is conservative (uncertainty → not a region → keep the flag): a
+  references|bibliography|sources|citations|works-cited heading, OR a contiguous run of
+  citation-shaped lines (numbered/bracketed prefix + journal markers `Year;Vol:pages`, "et al",
+  `doi:`).
+- NEVER suppressed: names in prose; ANY non-name category even inside a region (ssn/dob/mrn/
+  address still fire — a references block can't launder a DOB); a full "Firstname Lastname"
+  without initials. LLM contextual pass still backstops. Scope = `/classify` (doc ingestion).
+- **Extension action:** none (their skill). They deploy + ping; Extension re-runs Aetna CPB 0330
+  (expect References authors suppressed → gate=clean; a planted DOB/SSN anywhere still blocks).
+
+**Ask 2 — attestation admit-mode: APPROVED as a mechanism, structured as TWO KEYS.**
+The extension toggle attests the USER may ACCESS PHI at site X. It does NOT establish that MOBIUS
+(business associate) may RECEIVE + STORE it — that is the **BAA** between Mobius and the covered
+entity. Two authorizations; attestation covers only the first.
+- **KEY 1 (org-level, theirs, gated):** org HIPAA-allowed mode = a signed BAA is in place.
+  Audit-logged; **an attestation NEVER flips it; the extension NEVER calls `/hipaa-mode`
+  (read-only to us).** Whether the current deployment's BAA posture makes Key 1 satisfiable is a
+  **legal fact only Ananth/legal can set** — flagged to Ananth by the compliance owner.
+- **KEY 2 (per-transaction):** the user's per-site attestation (authenticated, in the
+  authorization log with task_id).
+- **ADMIT RULE (their rule; Chat Master's `/chat/upload` enforces):** admit a `gate==phi` doc ⟺
+  Key 1 AND Key 2 (verified server-side). Both → admit tagged `phi_attested`, attribute to
+  user_id, **PRIVATE-only visibility**, disclosure-audit row (`hipaa_analysis_log`,
+  `gate_source='browser-extension:user-fetch'`, `action='admitted_on_attestation'`,
+  categories-only) linked to the authz-log task_id. `gate==clean` → admit normally.
+  **Attestation present but org NOT HIPAA-allowed (today's default) → still BLOCK** (record intent
+  + provenance; PHI does not enter). Admitting PHI on attestation-without-a-BAA is the gated
+  compliance action that is not agent/endpoint-grantable.
+- **HANDSHAKE (Extension → `/chat/upload`):** send
+  `phi_attestation: { attested:true, task_id, site_origin, attested_at }` — **NOT** a bare
+  `phi_attested:true`. task_id mandatory; the admit path verifies it server-side against the
+  authorization log (real, recent, this user, this site). Do NOT send `hipaa_mode` / do NOT call
+  `/hipaa-mode`. `/classify` unchanged (returns gate + evidence + `hipaa_mode_allowed`); the
+  admit COMPOSITION (verdict × Key1 × Key2) lives in `/chat/upload`. Owners: rule = PHI classifier;
+  enforcement = Chat Master; task_id verification lookup = os-backend (authz-log owner).
+- **Valid-attestation constraints:** authenticated user tied to user_id+org; genuine affirmative
+  action (never pre-checked); per-site + time-bounded (no standing global grant); immutable log
+  row; revocable; minimum-necessary (admits for the attested site/purpose only).
+- **Extension action:** wire the `phi_attestation{...}` object on ingest **only after** the
+  three-way settles enforcement (Chat Master) + verification lookup (os-backend) AND Ananth clears
+  the Key-1 BAA posture + gives Chat Master the direct go. HOLD until then — the shape is now fixed
+  by the ruling, but the admit is inert until Key 1 is legally satisfiable.
+
+**Other surfaces — compliance owner confirmations (no change needed):** page-read attach →
+`/classify` (a full page attaches as a document; client `phiScreen` is UX-only/advisory, correct);
+logs = metadata + masked labels only → compliant, `/redact` not required (we never log raw text);
+egress/export = none (deeplink carries thread_id, not content) → no gate; CPT = Crawler's
+`cpt_screen`, acknowledged.
+
 ## 3 · Sign-offs
 
 - Crawler (compliance frame §1 + review of §2): ✍ **signed — Crawler Agent / 2026-09-09.** §2
