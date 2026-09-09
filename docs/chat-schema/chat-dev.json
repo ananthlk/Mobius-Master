@@ -32,7 +32,7 @@
     "owner": "chat",
     "gate": "modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target",
     "blocks": "P5",
-    "n": 14
+    "n": 15
    },
    {
     "id": "P4",
@@ -109,7 +109,7 @@
     "modules": [
      "round0"
     ],
-    "cite": 4075,
+    "cite": 4090,
     "note": "Short-circuits the loop when the caller already did the work."
    },
    {
@@ -120,7 +120,7 @@
      "capabilities",
      "parsing"
     ],
-    "cite": 4151,
+    "cite": 4166,
     "note": "Builds the planner prompt and parses the decision back out."
    },
    {
@@ -129,7 +129,7 @@
      "react_retry_guard",
      "curator_tools"
     ],
-    "cite": 5690,
+    "cite": 5705,
     "note": "Dispatches tools, and refuses a repeat of a call that already failed."
    },
    {
@@ -140,7 +140,7 @@
      "feedback_signal",
      "completion_extension_gate"
     ],
-    "cite": 5322,
+    "cite": 5337,
     "note": "Audits the draft against sources and decides whether to go round again."
    }
   ],
@@ -1047,7 +1047,7 @@
    "module": "app.pipeline.context",
    "group": "pipeline",
    "path": "app/pipeline/context.py",
-   "loc": 303,
+   "loc": 317,
    "role": "Pipeline context: correlation_id, thread_id, state, plan, and stage data.",
    "role_full": "Pipeline context: correlation_id, thread_id, state, plan, and stage data.\n\nHolds everything the pipeline stages need to read/write. Stages modify context\nin place; no patch merge\u2014explicit transitions via apply_delta on state.",
    "stage": null,
@@ -1240,7 +1240,7 @@
    "module": "app.pipeline.orchestrator",
    "group": "pipeline",
    "path": "app/pipeline/orchestrator.py",
-   "loc": 1873,
+   "loc": 1877,
    "role": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).",
    "role_full": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).\n\nRuns stages in order; handles clarification/refinement early exit; publishes response.",
    "stage": null,
@@ -1812,7 +1812,7 @@
    "module": "app.pipeline.react_loop",
    "group": "pipeline",
    "path": "app/pipeline/react_loop.py",
-   "loc": 6185,
+   "loc": 6200,
    "role": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.",
    "role_full": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.\n\nReplaces (when enabled): run_plan() + _answer_for_subquestion() + run_integrate().\n\nKeeps: answer_non_patient(), answer_tool(), answer_reasoning(),\n       emitter system, badge system, jurisdiction system.\n\nEmission map (thinking chunks sent to UI via emitter=on_thinking):\n  Pre-loop:\n    [if pronoun enriched] \"\u21ba Understood: <resolved message>\"\n    [if follow-up to active context] \"\u25cc Answering from the report we just generated\u2026\"\n    [jurisdiction] emit_jurisdiction_context: \"\u2713 Confirmed: \u2026\" | \"? Payer not identified\u2026\" | etc.\n    \"I'm breaking down",
    "stage": null,
@@ -1912,7 +1912,6 @@
    ],
    "writes": [
     "append_message_chunk",
-    "get_state",
     "record_result",
     "save_state_full"
    ],
@@ -2371,7 +2370,7 @@
    "module": "app.stages.state_load",
    "group": "stages",
    "path": "app/stages/state_load.py",
-   "loc": 127,
+   "loc": 155,
    "role": "Stage: load state, apply delta from message, build context pack.",
    "role_full": "Stage: load state, apply delta from message, build context pack.",
    "stage": "state_load",
@@ -2388,7 +2387,6 @@
    "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own.",
    "config": [],
    "writes": [
-    "get_state",
     "save_state_full"
    ],
    "key": "state_load",
@@ -2396,6 +2394,10 @@
    "rating": "red",
    "depth": "code",
    "findings": [
+    [
+     "bad",
+     "OWNER(chat): state_load IS 1.2s AT p50 AND IT IS ALL SEQUENTIAL DB READS \u2014 measured 2026-09-09 from turn_spans, the first finding this node's own instrumentation produced.\n\n  p50 1,229ms \u00b7 p95 2,192ms \u00b7 max 3,337ms across 107 spans\n  57 OF 107 SPANS EXCEED ONE SECOND, and it is not the smoke test alone \u2014 a source=real span sits at 2,333ms.\n\nThe counts break it down completely, and this is exactly the discrimination Eval specified when they insisted a count carry its TARGET. Worst span:\n    chat_state           n=1    369ms\n    chat_turn_messages   n=1    909ms\n    chat_turns           n=1  1,452ms\n    chat_threads         n=1    605ms\n\nEVERY n IS 1. So this is NOT a loop \u2014 the bug class the instrument was built to hunt \u2014 it is FOUR SEQUENTIAL ROUND-TRIPS, each slow on its own. A bare duration would have said 'state_load is slow'; count+target says 'four reads, none repeated, all slow', which is a different fix entirely: parallelise or collapse the reads, do not go looking for a loop.\n\nIt also corrects the attribution doc, which reported state_load at 345ms processing + 140ms db on one turn. That turn was not representative: across 107 spans the median is 1.2s and the work is essentially all DB. Chat Master had already retracted a state_load claim for smoke-test cid reuse; this is the opposite direction \u2014 the module is slower than the single sampled turn suggested, not faster.\n\nIN SCOPE FOR THIS NODE'S PASS as the latency half of production readiness."
+    ],
     [
      "bad",
      "OWNER(chat): A TRANSIENT READ FAILURE DESTROYS ACCUMULATED THREAD STATE. get_state returns None for a DB error and None for no-row \u2014 identical, and its docstring says only 'or None if no row', never mentioning the error case. state_load does `raw = get_state(...) or {}`, builds ThreadState from DEFAULT_STATE, and if the message carries a delta calls save_state_full, whose UPSERT is a FULL REPLACE by design. One failed read plus any delta-bearing message overwrites the whole conversation with defaults plus that turn. Not skipped \u2014 destroyed."

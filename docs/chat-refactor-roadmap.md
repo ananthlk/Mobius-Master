@@ -12,7 +12,7 @@ program. That is what makes this a tracker and not a snapshot.
 Plan and gate definition: `docs/chat-refactor-program.md`. Nothing starts until
 its sign-off table is complete.
 
-**99 bugs · 68 sequenced into 5 phases · 31 explicitly outside · 0 unassigned**
+**100 bugs · 69 sequenced into 5 phases · 31 explicitly outside · 0 unassigned**
 
 ## Progress
 
@@ -20,7 +20,7 @@ its sign-off table is complete.
 |---|---|---:|---|---|---|---|
 | **P1** | Delete | 9 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☐ not started |
 | **P2** | Make absent producers detectable | 24 | chat + Eval | every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☐ not started |
-| **P3** | One decision point | 14 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ☐ not started |
+| **P3** | One decision point | 15 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ☐ not started |
 | **P4** | Split | 16 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
 | **P5** | Config UX | 5 | chat + Prompt Studio | max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped | — | ☐ not started |
 
@@ -31,7 +31,7 @@ complete, and P0 blocks all of the others.
 
 | Owner | Sequenced bugs |
 |---|---:|
-| chat | 39 |
+| chat | 40 |
 | unassigned-owner | 29 |
 
 ## P1 — Delete  ·  9 items
@@ -97,7 +97,7 @@ BASELINE RULE: the latency numbers captured at the END of this phase are the ref
 | ☐ | `react_loop` | chat | THE CURATION DECISION IS NEVER PERSISTED, which makes evidence_review untestable after the fact |
 | ☐ | `state_load` | chat | state_version is WRITE-ONLY — inserted, incremented, never read or compared anywhere in app/ |
 
-## P3 — One decision point  ·  14 items
+## P3 — One decision point  ·  15 items
 
 **Owner** chat · **ratifier** Tech Review
 **Gate** modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target  
@@ -118,6 +118,7 @@ BASELINE RULE: the latency numbers captured at the END of this phase are the ref
 | ☐ | `governor` | — | It was shipped behind a default-off flag that the deployment turns on, which means the code reads as dormant a |
 | ☐ | `integrate` | chat | 13% OF TURNS NEVER REACH THE INTEGRATOR, AND THE USER CAN TELL |
 | ☐ | `run_pipeline` | chat | THE MASTER_OBJECTIVE GAP — filed at Ananth's direction, 2026-09-08, and IT IS A DATED REGRESSION, not a design |
+| ☐ | `state_load` | chat | state_load IS 1.2s AT p50 AND IT IS ALL SEQUENTIAL DB READS — measured 2026-09-09 from turn_spans, the first f |
 | ☐ | `tool_manifest` | chat | TOOL SELECTION IS SPORADIC, AND THE MODEL NARRATES A MISS AS A BROKEN TOOL |
 | ☐ | `tool_manifest` | chat | A TOOL RETURNED A REAL PLAYBOOK AND CHAT REPORTED THERE WAS NONE |
 | ☐ | `tool_manifest` | chat | SPORADIC TOOL SELECTION — FOLDED INTO THE TOOLS REFACTOR, with the three candidate layers named |

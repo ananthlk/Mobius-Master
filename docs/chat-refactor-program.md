@@ -549,6 +549,77 @@ clothes.
 gap, the JWTs in request logs, the queue durability work, the RAG write surface. Those
 have their own owners and are already listed under "Not in this program".
 
+## 3d. Definition of done for a node — production readiness
+
+**Ananth, 2026-09-09:** *"when chat is done I want us to test but also make the module
+production ready — test = unit test + latency test."*
+
+A node's pass is finished when **all five** hold. Four are computable; the fifth is a
+judgement that has to be argued.
+
+### 1 · Findings closed, each with its own evidence
+Every `OWNER(chat)` finding on the node is fixed, and each has a before/after in the
+commit. Bundling a fix inside a restructure does not bundle their evidence — otherwise
+"the module was refactored and the tests pass" becomes the proof for a behaviour change
+nobody reviewed. Findings belonging to other seats stay open and are named as such.
+
+### 2 · Unit test — coverage reaches GUARDED
+Not "a test file exists". Eval's enum, and only the top state counts:
+
+```
+ABSENT           nothing calls the node's entrypoint
+IMPORTED-NOT-CALLED  imported, never called
+PERIPHERAL       called, no contract tag
+GUARDED          called + a contract tag Eval has audited
+ASSERTS-NOTHING  tagged, but the assertion cannot catch the defect
+```
+
+The node's tag names the failure mode from its own findings —
+`@pytest.mark.guards("state_load:no_silent_reset")`. **Reachability is mechanical and
+mine; the audit that the assertion would actually fail is Eval's.** A node cannot mark
+itself GUARDED.
+
+### 3 · Latency test — assert the COUNTS, report the distribution
+Eval's ruling, and the distinction is what makes this testable at all:
+
+- **Counts are deterministic — assert them at n=1.** "This module issues exactly N DB
+  reads to these targets" is a unit-testable claim that fails the moment someone adds a
+  read inside a loop. This is the assertion.
+- **Wall time is not** — p50 4.7s against p95 15.6s on flash alone. A wall-time
+  assertion is a flake generator. Report **p50 and p95 per module, never the mean**, and
+  treat a move as signal only against a noise floor from ≥5 runs.
+- **A 0 is "not measured", never "free."** A node without a span cannot pass this.
+
+### 4 · Observability — the node can report its own failure
+It emits a span under its own node key, and **there exists a code path by which its
+failure is recorded**. This is the phase's own rule turned on the node: if the only
+evidence of a failure is that something downstream looks wrong, the node is not ready
+however green its tests are.
+
+### 5 · Rating — of the guarantee, not the construction
+Technical Review's ruling. Clean structure around a lossy guarantee rates **lower**,
+not higher. A node leaves its pass rated on what it now guarantees, argued in its
+findings, not on how tidy the code became.
+
+---
+
+**`state_load` as the worked example**, since it is first:
+
+| | now | done when |
+|---|---|---|
+| findings | 5 (4 chat, 1 DB seat) | 4 closed with evidence; the DB-seat one named and left |
+| coverage | **ABSENT** | GUARDED — `state_load:no_silent_reset`, audited by Eval |
+| latency | **p50 1,229ms · p95 2,192ms**, 57 of 107 spans over 1s | asserts `n=1` per read to each of its four targets; p50/p95 reported against a ≥5-run floor |
+| observability | emits a span | a failed read is *recordable* — today it returns `None` and vanishes |
+| rating | RED | argued, not assumed |
+
+**And the latency finding is what the counts were built for.** `state_load`'s four reads
+are `chat_state` 369ms, `chat_turn_messages` 909ms, `chat_turns` 1,452ms,
+`chat_threads` 605ms — **every `n` is 1**. So it is not a loop; it is four sequential
+round-trips. A bare duration would have said "state_load is slow" and sent someone
+hunting a loop. Count + target says "four reads, none repeated, all slow", which is a
+different fix: parallelise or collapse them.
+
 ## 4. Not in this program
 
 Named so they are not silently absorbed:

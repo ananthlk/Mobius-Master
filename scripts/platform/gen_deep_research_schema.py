@@ -658,6 +658,28 @@ def main() -> None:
             breaks.append(f"the contract declares {v['method']} {v['route']} and "
                           f"nothing serves it — a promise in a schema that no "
                           f"route keeps")
+    # A surface is a tab or it folds into one. A door that is neither is a
+    # place a person can reach and never leave, and six peers implying six
+    # places is exactly what the tabs exist to stop.
+    _surfaces = doc["contract"]["surfaces"]
+    prim = {u["id"] for u in _surfaces if u.get("primary")}
+    for u in _surfaces:
+        if u.get("primary"):
+            if u.get("folds_into"):
+                breaks.append(f"surface '{u['id']}' is a tab AND folds into "
+                              f"{u['folds_into']!r} — it cannot be both")
+            if not u.get("tab"):
+                breaks.append(f"surface '{u['id']}' is primary and has no tab "
+                              f"name — a door with nothing on it")
+        else:
+            if u.get("folds_into") not in prim:
+                breaks.append(f"surface '{u['id']}' folds into "
+                              f"{u.get('folds_into')!r}, which is not a tab — a "
+                              f"place a person can reach and never leave")
+            if not u.get("scope_label"):
+                breaks.append(f"surface '{u['id']}' folds in with no scope "
+                              f"label — a filter nobody can name")
+
     declared_verbs = {v["id"] for v in doc["contract"]["verbs"]}
     for sfc in doc["contract"]["surfaces"]:
         for called in sfc["calls"]:
@@ -787,6 +809,7 @@ def main() -> None:
         "every task kind is owned by a declared role",
         "no work is derived from a recommendation nobody makes",
         "every way of identifying a document target is declared",
+        "every surface is a tab or folds into one, and names itself either way",
         "no user-facing label uses a reserved domain word (appeal, case, ...)",
         "every action is owned by a declared role",
         "the page's own JavaScript parses — a rendered page is not a running one",

@@ -1,11 +1,11 @@
 {
  "generated_by": "scripts/platform/gen_coverage.py",
  "layer": "1 \u2014 reachability (Eval's Q5 ruling); Layer 2 tags are collected, and GUARDED requires Eval's audit of the tag",
- "tests_scanned": 175,
+ "tests_scanned": 176,
  "counts": {
-  "ABSENT": 6,
+  "ABSENT": 5,
   "IMPORTED-NOT-CALLED": 1,
-  "PERIPHERAL": 18,
+  "PERIPHERAL": 19,
   "REMOVED": 7
  },
  "nodes": [
@@ -55,15 +55,6 @@
    "rating": "green"
   },
   {
-   "node": "state_load",
-   "state": "ABSENT",
-   "module": "app.stages.state_load",
-   "direct": 0,
-   "reached": 0,
-   "tags": [],
-   "rating": "red"
-  },
-  {
    "node": "parsing",
    "state": "IMPORTED-NOT-CALLED",
    "module": "app.pipeline.react.parsing",
@@ -85,8 +76,8 @@
    "node": "context",
    "state": "PERIPHERAL",
    "module": "app.pipeline.context",
-   "direct": 45,
-   "reached": 43,
+   "direct": 46,
+   "reached": 44,
    "tags": [],
    "rating": "amber"
   },
@@ -224,6 +215,15 @@
    "reached": 1,
    "tags": [],
    "rating": "amber"
+  },
+  {
+   "node": "state_load",
+   "state": "PERIPHERAL",
+   "module": "app.stages.state_load",
+   "direct": 1,
+   "reached": 1,
+   "tags": [],
+   "rating": "red"
   },
   {
    "node": "tool_manifest",
