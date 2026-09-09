@@ -20,6 +20,34 @@
         "/private/tmp/claude-502/-Users-ananth-Mobius/6999871c-ecbf-40d0-b26c-92174f91c392/scratchpad"
       ],
       "port": 8791
+    },
+    {
+      "name": "payor-ask",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "app.main:app",
+        "--port",
+        "8792",
+        "--app-dir",
+        "/Users/ananth/Mobius/mobius-payor"
+      ],
+      "port": 8792
+    },
+    {
+      "name": "ask-harness",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "ask_harness:api",
+        "--port",
+        "8793",
+        "--app-dir",
+        "/private/tmp/claude-502/-Users-ananth-Mobius/6999871c-ecbf-40d0-b26c-92174f91c392/scratchpad"
+      ],
+      "port": 8793
     }
   ]
 }
