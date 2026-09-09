@@ -153,6 +153,7 @@ OUT_OF_PROGRAM = [
     ("POST /chat", "CORRECTION",           "correction",     "a correction to my own text, not work"),
     ("curator_tools", "LOOK INTO RAG'S WRITE SURFACE", "payor-policy", "unauthenticated corpus write in mobius-rag; 1 of 79 routes audited"),
     ("curator_tools", "ADMIN KEY IS NOT CHECKED", "payor-policy", "same"),
+    ("llm_manager", "LIVE MODEL LATENCY DEGRADATION", "LLM Agent", "upstream Vertex latency; a latency breaker doing its job, not a chat defect"),
     ("personalization", "PASS-THROUGH FOR PREFERENCES", "user-manager", "chat cannot act on preferences it forwards"),
     ("personalization", "DISPUTED ASSIGNMENT", "user-manager", "assignment itself is disputed"),
 ]

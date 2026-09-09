@@ -251,6 +251,16 @@ answer look complete, and reading a code default as deployed behaviour. In all t
 a faithful process runs against a lossy copy of the truth and produces a confident
 wrong answer.
 
+**Every deploy in this program builds from a DIRTY working tree.** P1a's image was
+built from `f2aac16` plus another session's uncommitted `frontend/platform.html` and
+`db/schema/051_*.sql`, because `gcloud builds submit` uploads the working directory,
+not the committed SHA — the deploy log says `working tree: DIRTY` outright. Chat
+Master flagged it rather than letting it pass. Neither file affects chat behaviour,
+but **a deployed revision is therefore not byte-identical to its commit**, so no
+revision is a clean before/after reference point while the shared checkout carries
+other sessions' work. Anyone reading a phase's live behaviour as attributable to that
+phase's commit alone is over-claiming.
+
 **Where the work lands.** P1a was committed to `main` in the shared `mobius-chat`
 checkout rather than a branch. Chat Master flagged the choice rather than making it
 silently: branching a checkout that other sessions and the schema generators read

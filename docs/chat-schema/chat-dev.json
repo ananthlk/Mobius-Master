@@ -49,7 +49,7 @@
     "n": 5
    }
   ],
-  "outside": 28
+  "outside": 29
  },
  "missing_content": [],
  "live_env_service": "mobius-chat (us-central1)",
@@ -686,6 +686,10 @@
     [
      "watch",
      "Six log-and-continue handlers. On a chokepoint, a swallowed failure means a degraded answer nobody is told about \u2014 the exact pattern that hid the appeals outage for 29 days."
+    ],
+    [
+     "bad",
+     "OUT OF PROGRAM \u2014 LIVE MODEL LATENCY DEGRADATION, 2026-09-08/09. Found while verifying P1a's deploy, not by looking for it, and logged at Ananth's direction. EVERY LLM stage is running on the least-bad fallback:\n\n  thread_summary        gemini-2.5-flash   recent avg  9,970ms vs ema  3,016ms\n  integrator_critic     gemini-2.5-flash   recent avg 10,435ms vs ema  2,724ms\n  integrator_enrichment gemini-2.5-flash   recent avg 10,435ms vs ema  2,724ms\n  phi_classify          gemini-2.5-flash   recent avg 13,180ms vs ema  2,500ms\n  adjudicator           gemini-2.5-pro     recent avg 28,669ms vs ema  8,000ms\n\nREAD THE MECHANISM BEFORE THE ALARM: this is a LATENCY breaker, not an availability one. The rule is `recent avg > 3.0x ema`, so it fires when a model gets three times slower than its own moving average. Flash has gone ~2.5-3.0s -> ~10s and Pro ~8s -> ~25-29s. 'All candidates tripped -> using least-bad' still calls a real model, just without breaker protection, so the effect is SLOWNESS, NOT WRONGNESS \u2014 a live turn during verification returned a correct 4,487-character answer with 13 sources on gemini-2.5-flash. I first reported this to Ananth as answers being produced by fallback selection rather than normal routing; true, but it read more alarming than the facts warranted, and the correction is recorded here.\n\nVolume: 74 occurrences on revision 00941, continuing on 00942. Zero on 00940, so it began during 00941's window (16:29 on 2026-09-08). NOT caused by P1a \u2014 deleting unreachable code cannot slow a provider \u2014 and P1a's own deploy sits inside the affected window, which is why the attribution matters.\n\nTHE CONSEQUENCE WORTH WATCHING is phi_classify, because the PHI gate is FAIL-CLOSED: sustained classifier latency produces BLOCKED turns, not leaked ones. That is the safe direction, and `[phi-feedback] redact unreachable (ReadTimeout) \u2014 dropping text` is already in the logs. A refusal during testing in this window is more likely this than a defect.\n\nOWNER: not chat and not this program \u2014 model routing and the bandit belong to the LLM Agent, and the cause is upstream Vertex latency. Logged so nobody re-derives it and so testing done in this window is not misread."
     ]
    ],
    "signals": {

@@ -12,7 +12,7 @@ program. That is what makes this a tracker and not a snapshot.
 Plan and gate definition: `docs/chat-refactor-program.md`. Nothing starts until
 its sign-off table is complete.
 
-**75 bugs · 47 sequenced into 5 phases · 28 explicitly outside · 0 unassigned**
+**76 bugs · 47 sequenced into 5 phases · 29 explicitly outside · 0 unassigned**
 
 ## Progress
 
@@ -156,6 +156,7 @@ Each carries a reason. Excluding by silence is the failure mode this guards agai
 | `POST /chat` | DB seat | same | RUNTIME LENS CORRECTS THE SCOPE LENS: live, the MCP hop DOES NOT HAPPE |
 | `POST /chat` | DB seat | same | THE FOURTH FK — mine to find, and I got two things wrong about it that |
 | `state_load` | DB seat | cross-node, storage governance | CROSS-NODE, invisible to any code read: mobius_chat has NO query guard |
+| `llm_manager` | LLM Agent | upstream Vertex latency; a latency breaker doing its job, not a chat defect | OUT OF PROGRAM — LIVE MODEL LATENCY DEGRADATION, 2026-09-08/09 |
 | `PHI gate` | compliance decision | same item, second node | THE AUDIT WRITE IS FAIL-OPEN |
 | `POST /chat` | compliance decision | fail-open write under a fail-closed gate; posture decision pending | THE HIPAA AUDIT WRITE IS FAIL-OPEN |
 | `POST /chat` | compliance decision | tracked as its own item by Tech Review | STRUCTURE RULING on the HIPAA audit — tracked as its OWN item, not fol |
