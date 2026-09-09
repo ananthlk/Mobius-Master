@@ -11,7 +11,7 @@ the POST half of the gate, not only as a report.
 
 | collected | passed | failed | errors | skipped | wall |
 |---:|---:|---:|---:|---:|---:|
-| 2517 | 2498 | 14 | 0 | 5 | 141.8s |
+| 2525 | 2506 | 14 | 0 | 5 | 145.8s |
 
 Known-failing baseline: **14** tests, frozen 2026-09-08 before any P1a
 deletion. Ananth's ruling — these predate the program, so the gate SUBTRACTS them.
@@ -48,10 +48,10 @@ name matches, not that the node's behaviour is asserted. Eval owns replacing it.
 | `run_pipeline` | amber | 5 | **none** | — |
 | `stages` | green | 0 | **none** | — |
 | `continuity` | red | 1 | `test_continuity_checks.py` | 2 |
-| `emit_envelope` | red | 12 | `test_emit_envelope.py`, `test_emit_envelope_fanout.py` | 37 |
+| `emit_envelope` | red | 15 | `test_emit_envelope.py`, `test_emit_envelope_fanout.py` | 37 |
 | `queue` | red | 4 | `test_queue_usage_breakdown_enrich.py` | 1 |
 | `react_loop` | red | 5 | `test_react_loop.py` | 52 |
-| `tool_manifest` | red | 3 | `test_tool_manifest.py` | 5 |
+| `tool_manifest` | red | 4 | `test_tool_manifest.py` | 5 |
 | `clarify` | green | 0 | `test_react_clarify_questions.py` | 23 |
 | `context` | amber | 2 | `test_message_resolver_and_skill_context.py`, `test_react_continuation_context.py`, `test_system_context.py` | 49 |
 | `critic` | amber | 3 | `test_critic_call_resilience.py`, `test_critic_skip_on_cache.py`, `test_react_completion_critic_stage_registration.py`, `test_react_critic.py`, `test_react_critic_integration.py` | 99 |
@@ -82,6 +82,6 @@ deterministic replay harness yet (P1.1). A flip would be unattributable.
 
 | modules | loc | except handlers | log-and-continue | bare except |
 |---:|---:|---:|---:|---:|
-| 202 | 64,408 | 674 | 393 | 0 |
+| 205 | 64,905 | 677 | 395 | 0 |
 
 I7 is monotonic: the log-and-continue count may fall, never rise.
