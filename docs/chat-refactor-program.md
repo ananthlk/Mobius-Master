@@ -202,6 +202,80 @@ invariant I1–I7 computable from emitted telemetry alone, without a DB join wri
 hand for the occasion. **The latency numbers at the end of this phase are the
 reference every later phase is measured against.**
 
+### P2a — Fallout cleanup  ·  owner: chat  ·  FIRST
+
+P1a orphaned more than its own sweep found, because `planner/__init__.py` re-exports
+`parse` and `Plan`/`SubQuestion` — so an "is anything importing this?" check saw the
+re-export and not the fact that nothing consumes it. **The import-graph check I
+specified is what failed**, which is why this leads P2 rather than sitting in a backlog.
+
+Verified closure, measured 2026-09-09 — importers outside the file itself:
+
+```
+  planner/blueprint.py        194   NONE                     ← orphan root
+  planner/parser.py           294   only planner/__init__.py ← the masking re-export
+  planner/mobius_parse.py     354   only parser.py
+  planner/adapter.py          109   only parser.py
+  planner/route_triggers.py   120   only blueprint.py
+  state/query_refinement.py   128   only blueprint.py
+  ------------------------------------------------------------
+  1,199 lines + the __init__ re-export
+```
+
+**`planner/schemas.py` (199) STAYS** — nine live importers including `react_loop.py`,
+`pipeline/context.py` and both responders. It is the one file in the package that is
+genuinely load-bearing, and it is the same shape as `query_refinement.py` in P1a: the
+file that looks like it goes with the others and does not.
+
+**Gate:** import-graph proof, suite no worse than the 14-failure baseline, zero
+invariant movement — and this time the proof must resolve re-exports rather than stop
+at the first `import` it finds.
+
+---
+
+### P2b — Latency telemetry across every module  ·  owner: chat + Eval  ·  NEW REQUIREMENT
+
+Ananth, 2026-09-09. This is a standing product requirement, not a phase deliverable:
+**every module reports its own timing, the result is displayed in diagnostics AND
+stored, and we can re-run it to prove we have not drifted.**
+
+**Why it is more than a stopwatch.** The stated purpose is to find *bad writes, bad DB
+calls and loops* — work that is silently repeated or silently slow. Today 19 of 25
+modules are untimed, so none of those are visible. Everything this review has found
+argues the same way: the system is structurally unable to report its own failures, and
+duration is the one signal that exposes repetition without needing anyone to have
+anticipated the specific bug.
+
+**What it must produce, per turn:**
+- a timing for every module the turn touched — not a total, a breakdown
+- **DB call count and cumulative DB time per module**, because a loop that issues the
+  same write forty times is the target and a single total hides it
+- LLM call count and time per stage, which `llm_calls` already has and nothing joins
+  to the turn's module breakdown
+- **stored**, not just emitted — a turn's timing must be readable after the fact, or it
+  is another producer without a consumer
+- **rendered in diagnostics**, so a slow turn is diagnosable by the person who saw it
+
+**The exercise, and why it is the right one.** Eval owns a 22-question bank already
+used for overlap calibration. Running that bank in **fast mode** — one question, then
+the series — gives a repeatable baseline across a fixed input set rather than a
+synthetic benchmark. It answers "what is actually working" and it re-runs, so drift
+becomes measurable instead of anecdotal. Same discipline as the refactor gate: a frozen
+corpus, compared against itself.
+
+**Open, for Eval:** whether the 22-question bank is the right instrument for a latency
+baseline as opposed to a quality one, what "fast mode" fixes and what it leaves
+variable, and how many runs before a difference is signal. Not my call.
+
+**Two constraints from this program's own findings:**
+1. **Instrument before optimising.** No latency claim is admissible until the baseline
+   exists — the same rule that made P1 forfeit its own latency claim.
+2. **The measurement must not be the thirteenth instance.** A timing emitter with no
+   reader, or a stored row nothing queries, reproduces the exact defect this phase
+   exists to remove. Reader and writer ship together.
+
+---
+
 ### P3 — One decision point  ·  owner: chat  ·  ratifier: Tech Review
 
 | Item | From node |
