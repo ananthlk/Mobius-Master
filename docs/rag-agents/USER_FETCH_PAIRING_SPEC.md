@@ -123,12 +123,14 @@ Every capture is gated by an explicit in-panel card (`beginPageIngest`):
 - **§1.2.3 PHI** — accepted and verified: the server PHI gate is authoritative and fail-closed
   (a PHI page returned `status:blocked … not stored`, surfaced in-panel + traced with `task_id`).
 - **§1.2.4 Laundering boundary** — accepted; §2.3 is built to it exactly.
-- **TODO-A (capture-side, mine): Content-Signals (§1.2.2).** `documents.content_signals` should
-  carry `X-Robots-Tag` / `ai-train` etc. Because you receive *bytes*, not our original response,
-  a header-only signal (e.g. `X-Robots-Tag: ai-train=no`) is **invisible to you unless the
-  extension forwards it.** I will capture the relevant response headers in the background fetch
-  and pass them as a `content_signals` Form field for rag to populate the column. **Not built
-  yet — named here so it lands before launch.**
+- **TODO-A (capture-side, mine): Content-Signals (§1.2.2) — ✅ BUILT (mobius-os, latest).**
+  The background fetch now forwards the relevant response headers verbatim (no client-side
+  parsing, per your §2.6) as Form field **`signal_headers`** — one line each for `x-robots-tag`,
+  `content-signal`, `content-usage`, `tdm-reservation`, `tdm-policy` when present. rag-side is the
+  single normalizer that merges these with the origin robots.txt Content-Signal lines
+  (most-restrictive-wins). Also added **`fetched_at`** (client fetch clock, two-clocks rule) as a
+  Form field. Both are additive and, like the other provenance fields, ride harmlessly until the
+  chat hop + rag params declare them (TODO-B).
 - **TODO-B (yours + Chat's): the three-field passthrough.** `/chat/upload` must forward
   `source_url` / `access` / `task_id` to rag `/upload`, and rag must stamp the
   `browser-extension:user-fetch` caller — else our first docs arrive provenance-bare. We send
