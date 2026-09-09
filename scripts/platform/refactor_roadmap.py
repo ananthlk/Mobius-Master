@@ -92,6 +92,7 @@ RULES = [
     ("P2", "emit_envelope", "A READ-BACK OF THE WRONG ARTIFACT"),
     ("P2", "react_loop", "_rich_evidence IS AN UNRECORDED BRANCH"),
     ("P2", "emit_envelope", "AN IMPORT EDGE IS NOT A CONSUMPTION EDGE"),
+    ("P2", "PHI gate", "'blocked_indeterminate' IS AMBIGUOUS BY CONSTRUCTION"),
     ("P2", "llm_manager", "45% OF llm_calls ROWS CANNOT BE JOINED"),
     ("P1", "run_pipeline", "~25 FRONTEND FETCHES ARE 404ing TODAY"),
     ("P1", "run_pipeline", "DELETING THE CREDENTIALING PLANNER PATH WOULD SILENTLY BREAK"),

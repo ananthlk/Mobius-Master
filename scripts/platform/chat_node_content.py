@@ -240,6 +240,24 @@ that is the file it lives in, and lost it from the node whose assessment it reco
  ("watch", "A 4-second default timeout against a remote classifier sits on the synchronous "
            "request path. It does not fail open, but it adds latency to every message before "
            "the user sees any acknowledgement."),
+ ("bad", "OWNER(chat): 'blocked_indeterminate' IS AMBIGUOUS BY CONSTRUCTION — the upload gate "
+         "emits the same verdict for at least three unrelated causes, and the emitted row "
+         "cannot tell them apart. app/main.py:1332 is the real classifier verdict "
+         "(gate='indeterminate' because the classifier could not decide). app/main.py:1777 is "
+         "the wrapper's `except Exception` around the whole gate call, which collapses ANY "
+         "failure — rag's /publish returning a duplicate-key 500, an audit-write failure, a "
+         "PHI_GATE_TIMEOUT_SEC=4 timeout against a phi_classify that averaged 3,584-4,209ms "
+         "all of 2026-09-08 — into action_taken='blocked_indeterminate' with "
+         "layers_run=['error'] and reason='Gate infrastructure error'. Two independent "
+         "diagnoses of the 2026-09-08 23:02 blocks on rev mobius-chat-00975-bpc (a classifier "
+         "timeout, and rag's duplicate-key 500) are BOTH consistent with the evidence, and "
+         "nothing in compliance.hipaa_analysis_log can adjudicate between them. Fail-closed is "
+         "correct; the loss of the cause is the bug. A storage failure and a HIPAA classifier "
+         "timeout are indistinguishable in the verdict, so neither can be alerted on or "
+         "counted. FIX: carry a distinct failure_class on the wrapper's path (gate_timeout / "
+         "publish_error / audit_error / classifier_indeterminate) and persist it. Fresh "
+         "instance of the producer-without-a-consumer class: the field that would make the "
+         "row assertable was never produced."),
 ]),
 
 "queue": dict(rating="red", depth="code", how="""
