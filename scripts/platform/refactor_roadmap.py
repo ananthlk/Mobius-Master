@@ -81,6 +81,8 @@ RULES = [
     ("P2", "emit_envelope", "THE CONFIRMED ROSTER"),
     ("P1", "run_pipeline",  "26 TESTS ARE ALREADY FAILING"),
     ("P1", "emit_envelope", "THE CREDENTIALING ROUTER WOULD SURVIVE LOSING ITS IMPLEMENTATION"),
+    ("P2", "emit_envelope", "TOOL SELECTION IS SPORADIC"),
+    ("P2", "emit_envelope", "A READ-BACK OF THE WRONG ARTIFACT"),
     ("P2", "emit_envelope", "_rich_evidence IS AN UNRECORDED BRANCH"),
     ("P2", "emit_envelope", "AN IMPORT EDGE IS NOT A CONSUMPTION EDGE"),
     ("P2", "emit_envelope", "45% OF llm_calls ROWS CANNOT BE JOINED"),

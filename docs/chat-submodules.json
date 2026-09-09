@@ -28,11 +28,11 @@
   ],
   "shared_post_guard": "ctx.react_bypass_integrate \u2014 set in react_loop, skips the integrator and publishes the ReAct answer directly",
   "shared_post_guard_lines": [
-   535,
-   782,
-   786,
-   911,
-   956
+   541,
+   790,
+   794,
+   921,
+   966
   ],
   "exit": "publish",
   "react_phases": [
@@ -187,7 +187,7 @@
    "module": "app.pipeline.orchestrator",
    "group": "pipeline",
    "path": "app/pipeline/orchestrator.py",
-   "loc": 1699,
+   "loc": 1753,
    "role": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).",
    "role_full": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).\n\nRuns stages in order; handles clarification/refinement early exit; publishes response.",
    "stage": null,

@@ -24,7 +24,7 @@
     "owner": "chat + Eval",
     "gate": "every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
-    "n": 19
+    "n": 21
    },
    {
     "id": "P3",
@@ -96,11 +96,11 @@
   ],
   "shared_post_guard": "ctx.react_bypass_integrate \u2014 set in react_loop, skips the integrator and publishes the ReAct answer directly",
   "shared_post_guard_lines": [
-   535,
-   782,
-   786,
-   911,
-   956
+   541,
+   790,
+   794,
+   921,
+   966
   ],
   "exit": "publish",
   "react_phases": [
@@ -804,6 +804,10 @@
    "findings": [
     [
      "bad",
+     "OWNER(chat): TOOL SELECTION IS SPORADIC, AND THE MODEL NARRATES A MISS AS A BROKEN TOOL. Ananth, live, 2026-09-09 \u2014 and his word for it, 'sporadic', is the accurate one and worse than 'broken'.\n\n  13:27:21  'can i offer some feedback'          -> model: 'my feedback tool isn't working right now'\n  13:28:34  'the feedback is the tool section...'-> tool fired FULLY: capture card rendered, category correctly classified Bug, verbatim stored, Done button\n\nSeventy seconds apart, same session, same user. The feedback service is healthy \u2014 I called /classify directly: HTTP 200 in 1.3s, mobius-feedback rev 00002-2xm ready. So the tool is not broken; it is INTERMITTENTLY NOT SELECTED, and when it is not, the model tells the user it is broken.\n\nTHAT IS HARDER TO DIAGNOSE THAN A DEAD TOOL, not easier. A tool that always fails gets reported and fixed. One that works most of the time and blames itself the rest produces user reports nobody can reproduce, and the last three such reports (appeals playbook, PHI verification, this) all had a healthy backend.\n\nAND THE TELEMETRY CANNOT TELL THE THREE APART. I pulled the failing turn's thinking_log: it carries NO TOOL ENVELOPES AT ALL \u2014 no tool_invoked, no tool_completed, and tool_failed is structurally impossible because make_tool_failed has zero callers. So 'never selected', 'selected and returned empty' and 'selected and errored' are indistinguishable after the fact. The model has the same problem in real time, which is why it guesses \u2014 and its own trace shows the guess hardening across rounds: 'failed... likely because it wasn't triggered correctly' becomes 'failed repeatedly, indicating it's not currently functional'.\n\nCORRECTION TO MY OWN EARLIER FRAMING: I told Ananth the model 'fabricated' a broken tool, comparing it to the appeals 'Unknown tool' case. That was half right. The tool genuinely did not fire; what was fabricated was the CAUSE, not the failure. His 'sporadic' is the better description and it points at selection, not at the service."
+    ],
+    [
+     "bad",
      "A READ-BACK OF THE WRONG ARTIFACT IS INDISTINGUISHABLE FROM A SUCCESSFUL ONE. Chat Master's sharpening of this node's class, earned from a failure we produced together on 2026-09-09 and worth more than the bug that caused it.\n\nThe PHI correlation_id fix failed in two independent halves. MINE: I traced classifier.py:301 passing `correlation_id=correlation_id` and read it as forwarding to the LLM call \u2014 it populates MessageCheckEnvelope, the diagnostics record. Two destinations; I did not check which. THEIRS: they verified end-to-end by reading a log line that contained the field \u2014\n  INFO phi_message_check {\"correlation_id\": \"f0927dcc-...\", \"gate\": \"clean\"}\n\u2014 which IS that same envelope. They performed a read-back and it PASSED, on the wrong row.\n\nEither half alone would have been caught by the other. Together they produced a green gate, a correct-looking diff, and a confident false claim that the fix worked. What caught it was querying the destination of record \u2014 llm_calls \u2014 after a real turn.\n\nTHE RULE THIS CHANGES: 'ship a reader with the writer' is not sufficient, because a reader can read the wrong thing and pass. The acceptance criterion must NAME THE ARTIFACT \u2014 for P2b, the test asserts against the stored span row that diagnostics actually renders from, not an emitter log, not an in-memory object, not the nearest thing that happens to carry the field. An unnamed read-back is a producer-consumer check that can be satisfied by a coincidence."
     ],
     [
@@ -1117,7 +1121,7 @@
    "module": "app.pipeline.orchestrator",
    "group": "pipeline",
    "path": "app/pipeline/orchestrator.py",
-   "loc": 1699,
+   "loc": 1753,
    "role": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).",
    "role_full": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).\n\nRuns stages in order; handles clarification/refinement early exit; publishes response.",
    "stage": null,
@@ -1180,6 +1184,7 @@
    ],
    "writes": [
     "publish_response",
+    "save_spans",
     "save_state_full",
     "save_turn",
     "save_turn_with_messages"
