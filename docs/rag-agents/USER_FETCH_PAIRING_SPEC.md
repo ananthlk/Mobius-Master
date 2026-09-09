@@ -191,14 +191,18 @@ by Extension; Crawler concurs and adds the lane facts above.
 
 ## 2.8 · PHI-gate escalation to the PHI classifier owner (Extension → Chat Master, 2026-09-09)
 
-Escalated by Extension on Ananth's explicit direction, with §2.7's facts attached. Sent to
-**Chat Master** (owner of `mobius-phi-classifier` — regex + Presidio NER — and the `/chat/upload`
-hop). Two SEPARATE asks; conflating them weakens both.
+Escalated by Extension on Ananth's explicit direction, with §2.7's facts attached. **Ownership
+correction (Ananth):** the PHI classifier is its own **skill — `mobius-skills/phi-classifier`**
+(regex + Presidio NER) with its own owner; **Ask 1 belongs to that skill owner** (Ananth is
+routing them to ping Extension), NOT to Chat Master. Chat Master owns only the `/chat/upload`
+admit path for **Ask 2** (and the TODO-B passthrough on the same hop). Two SEPARATE asks;
+conflating them weakens both.
 
-**Ask 1 — scoped precision fix (does NOT relax recall generally).** Suppress `PERSON`/"Name"
-flags ONLY inside reference/bibliography-shaped regions (numbered citation lists, journal-title
-context), never in prose. The Aetna CPB block is Presidio NER flagging ~87 citation surnames as
-PERSON — structurally not patient identifiers. This is §2.7's proposed scoping.
+**Ask 1 — scoped precision fix (PHI-classifier skill owner; does NOT relax recall generally).**
+Suppress `PERSON`/"Name" flags ONLY inside reference/bibliography-shaped regions (numbered
+citation lists, journal-title context), never in prose. The Aetna CPB block is Presidio NER
+flagging ~87 citation surnames as PERSON — structurally not patient identifiers. This is §2.7's
+proposed scoping. Awaiting the skill owner's ping to work the exact predicate.
 
 **Ask 2 — attestation admit-mode (Ananth's ask).** The upload response already carries
 `hipaa_mode_allowed` (false today). The extension's per-site PHI acknowledgement toggle is an
@@ -209,9 +213,10 @@ to the chat POST's existing `phi_override`); the gate then **admits the doc tagg
 explicit, per-site, attested, auditable. Compliance shape owned by Chat Master + Crawler; the
 extension wires whatever field/handshake they specify (a §2.8-Ext response block will record it).
 
-**Status:** escalated (message queued to Chat Master; recorded here as the lossless channel).
-Awaiting the PHI classifier owner's ruling on both asks. Distinct from TODO-B (the provenance
-passthrough on the same hop).
+**Status:** Ask 1 → awaiting the `mobius-skills/phi-classifier` skill owner's ping (Ananth
+routing). Ask 2 → raised with Chat Master (the `/chat/upload` admit path); message queued,
+recorded here as the lossless channel. Both distinct from TODO-B (the provenance passthrough on
+the same hop).
 
 ## 3 · Sign-offs
 
