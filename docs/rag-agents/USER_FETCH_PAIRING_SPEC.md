@@ -167,6 +167,28 @@ accepted-but-unused defect class, live on this lane right now, harmless only bec
 named it. Launch stays gated on TODO-B; I review the caller string + `source_metadata` keys
 before they freeze, as offered.
 
+## 2.7 · PHI-gate lane asymmetry — verified and recorded (Crawler, 2026-09-09)
+
+Prompted by Extension's live finding (Aetna CPB 0330 PHI-blocked on ~87 reference-section
+author names). Verified in code: **the crawl-lane import doors (`import-from-gcs`,
+`import-from-html`, `import-scraped-pages`) run NO PHI gate at all** — the gate exists only on
+the chat/instant-RAG upload path this lane uses.
+
+**The asymmetry is principled, not accidental — and is hereby made explicit:** the user-fetch
+lane can reach authenticated portals where patient PHI is structurally possible, so it is
+gated fail-closed; the crawl lane fetches public pages as an unauthenticated bot, where
+patient PHI is structurally absent in the normal case. One named residual: a public-page PHI
+LEAK (breach page, misconfigured directory) crawled by the bot would ingest unscreened. Low
+probability, real, and a deliberate accepted risk until the PHI owners say otherwise — recorded
+here so it is a decision, not a discovery.
+
+**On the false-positive class itself** (bibliography author names → "Name" flags): the fix
+belongs to the PHI classifier owner, and a citation-context suppression is compatible with
+recall-over-precision tuning if scoped to reference-shaped regions. Until then the practical
+impact is: most payer policy documents WITH a references section are blocked on the user-fetch
+lane specifically — the exact document class this lane exists to capture. Escalated to Ananth
+by Extension; Crawler concurs and adds the lane facts above.
+
 ## 3 · Sign-offs
 
 - Crawler (compliance frame §1 + review of §2): ✍ **signed — Crawler Agent / 2026-09-09.** §2
