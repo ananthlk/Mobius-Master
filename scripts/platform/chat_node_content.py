@@ -489,6 +489,27 @@ and nothing in the live path ever calls it, reads it back, or persists what it p
 Each instance looks healthy in isolation. The code is present, the tests pass, the docstring
 describes real intent. The capability is simply absent at runtime, and health stays green.
 """, findings=[
+ ("bad", "A READ-BACK OF THE WRONG ARTIFACT IS INDISTINGUISHABLE FROM A SUCCESSFUL ONE. "
+         "Chat Master's sharpening of this node's class, earned from a failure we produced "
+         "together on 2026-09-09 and worth more than the bug that caused it.\n\n"
+         "The PHI correlation_id fix failed in two independent halves. MINE: I traced "
+         "classifier.py:301 passing `correlation_id=correlation_id` and read it as forwarding "
+         "to the LLM call — it populates MessageCheckEnvelope, the diagnostics record. Two "
+         "destinations; I did not check which. THEIRS: they verified end-to-end by reading a "
+         "log line that contained the field —\n"
+         "  INFO phi_message_check {\"correlation_id\": \"f0927dcc-...\", \"gate\": \"clean\"}\n"
+         "— which IS that same envelope. They performed a read-back and it PASSED, on the "
+         "wrong row.\n\n"
+         "Either half alone would have been caught by the other. Together they produced a "
+         "green gate, a correct-looking diff, and a confident false claim that the fix worked. "
+         "What caught it was querying the destination of record — llm_calls — after a real "
+         "turn.\n\n"
+         "THE RULE THIS CHANGES: 'ship a reader with the writer' is not sufficient, because a "
+         "reader can read the wrong thing and pass. The acceptance criterion must NAME THE "
+         "ARTIFACT — for P2b, the test asserts against the stored span row that diagnostics "
+         "actually renders from, not an emitter log, not an in-memory object, not the nearest "
+         "thing that happens to carry the field. An unnamed read-back is a producer-consumer "
+         "check that can be satisfied by a coincidence."),
  ("bad", "OWNER(chat): _rich_evidence IS AN UNRECORDED BRANCH THAT CHANGES ROUND COUNT — "
          "invisible drift inside the latency instrument. Found by Chat Master while answering "
          "Eval's control-set question, verified by me at react_loop.py:357-358 and :5864.\n\n"

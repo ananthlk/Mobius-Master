@@ -321,9 +321,17 @@ agentic), warm state (discard a warm-up; RAG is min=max=1), serialized runs.
 1. **Label each count by its TARGET** — "40 writes to `chat_state`" is a loop, "40
    writes across 40 tables" is a busy turn, and a bare integer cannot tell them apart.
 2. `n` ships in v1, not v2.
-3. **Acceptance is a same-turn read-back**: one real turn on the live path → a row
-   exists → diagnostics renders it → one test asserts all three. A row in isolation is
-   instance 13.
+3. **Acceptance is a same-turn read-back AGAINST A NAMED ARTIFACT**: one real turn on
+   the live path → the stored span row exists → the diagnostics panel renders from that
+   row → one test asserts all three. A row in isolation is instance 13.
+
+   **The artifact must be named, not just required** (Chat Master, 2026-09-09, from the
+   PHI failure): they performed a read-back on the PHI fix and it PASSED — against a log
+   line that carried `correlation_id` because it was the *diagnostics envelope*, while
+   the `llm_calls` row the fix was meant to populate stayed NULL. **A read-back of the
+   wrong artifact is indistinguishable from a successful one.** So the test asserts
+   against the stored span row that diagnostics renders from — not an emitter log, not an
+   in-memory object, not the nearest thing that happens to have the field.
 4. **Stamp per MODEL, not per provider** (flash and Pro are 4× apart inside Vertex),
    and the stamp needs a READER — a baseline-compare that refuses or red-flags a run
    whose model mix differs. Without that consumer the stamp is a labelled producer
@@ -491,7 +499,14 @@ is precisely how the `cf_intent` and `query_refinement` near-misses happened.
 
 **What it does NOT change:** the gate still runs per change, the invariants still have
 to hold, and a fix that moves an invariant still needs a named, reviewed diff. Bundling
-a fix with a restructure does not bundle their evidence.
+a fix with a restructure does not bundle their evidence — otherwise "the module was
+refactored and the tests pass" silently becomes the proof for a behaviour change nobody
+reviewed on its own terms.
+
+**And a finding that turns out to need a PRODUCT decision leaves the pass and goes to
+Ananth** rather than being resolved by whoever is holding the file (Chat Master's
+condition, accepted). `/pipeline` is the precedent — a UI deletion wearing a refactor's
+clothes.
 
 **Carve-out:** cross-module and cross-repo items stay separate — the PHI classifier
 gap, the JWTs in request logs, the queue durability work, the RAG write surface. Those
