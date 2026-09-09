@@ -207,7 +207,8 @@ def main() -> None:
         f"<td class=n><b class=worth>{t.get('worth', 0)}</b></td>"
         f"<td><b>{esc(t['what'])}</b>"
         f"<span class=q>{esc(t.get('because') or '')}</span></td>"
-        f"<td><span class=pillx>{esc(t.get('owner_role') or 'anyone')}</span></td>"
+        f"<td><span class=pillx>{esc(t.get('owner_role') or 'anyone')}</span>"
+        f"<span class=q>found by: {esc(t.get('basis') or 'declared')}</span></td>"
         f"<td class=n>{len(t.get('questions') or []) or '—'}</td>"
         f"<td><span class='wait {'bad' if t.get('outside') else 'ok'}'>"
         + ("outside" if t.get("outside") else "here") + "</span></td></tr>"
@@ -426,10 +427,14 @@ looking. Nobody sees a different system — just a different slice of it.</p>
   <p class=filter>Work, not questions — most valuable first. What an item is
   worth is how many questions it unblocks, and it is derived, never typed.</p>
   <div class=card style="padding:14px 16px">
-  <table><thead><tr><th>worth</th><th>what to do</th><th>who</th>
+  <table><thead><tr><th>worth</th><th>what to do</th><th>who · how we knew</th>
   <th>closes</th><th>where</th></tr></thead>
   <tbody id=wl>{worklist_rows}</tbody></table></div>
   <div id=taskdetail class=card hidden></div>
+  <p class=note><b>How we knew which document</b> — extracted (the answer read
+  it), named (the drafter named it and never cited it), class (one document per
+  payer, which is why four handbook errands are one), or explore. That last is
+  not a failure to fetch; it is research, and it is the machine's own job.</p>
   <p class=note><b>One item here is worth twenty-three.</b> As twenty-three rows
   on a question list it looked like twenty-three problems. The bottom row has no
   question attached at all — work does not have to be about a question, and that
@@ -610,7 +615,8 @@ document.addEventListener('click', function(e){{
         + '<p class=says>' + esc((D.task_kinds[t.kind] || {{}}).says || t.kind)
         + (t.outside ? ' — <b>this happens outside this system; the machine can '
            + 'never mark it done on its own.</b>' : '') + '</p>'
-        + '<p class=closes>worth ' + (t.worth || 0) + ' · '
+        + '<p class=closes>found by ' + esc(t.basis || 'declared')
+        + ' · worth ' + (t.worth || 0) + ' · '
         + (qs.length ? 'closes ' + qs.length + ' question(s): ' + qs.join(', ')
                      : 'no question attached — work that stands on its own')
         + '</p>';

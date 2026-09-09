@@ -741,8 +741,18 @@ def main() -> None:
         if v.get("owner_role") not in (C.get("roles") or []):
             breaks.append(f"task kind '{k}' is owned by {v.get('owner_role')!r}, "
                           f"which is not a declared role")
+    # A worklist row whose target was identified on a basis nobody declared is
+    # a row a reader cannot weigh. Ananth's ladder — extract, name, class,
+    # explore — only helps if every row says which rung it stands on.
+    for k, v in (C.get("task_kinds") or {}).items():
+        pass
     acts = {a["id"] for a in C.get("actions", [])}
     kinds = set(C.get("task_kinds") or {})
+    for b in ("extracted", "named", "class", "explore"):
+        if b not in (C.get("target_basis") or {}):
+            breaks.append(f"the deriver stands work on basis '{b}', which the "
+                          f"contract does not declare — a worklist row a reader "
+                          f"cannot weigh")
     for rec, spec in (C.get("task_from_recommendation") or {}).items():
         if rec not in acts:
             breaks.append(f"work is derived from recommendation '{rec}', which is "
@@ -773,6 +783,7 @@ def main() -> None:
         "every decision defaults to a declared right",
         "every task kind is owned by a declared role",
         "no work is derived from a recommendation nobody makes",
+        "every way of identifying a document target is declared",
         "no user-facing label uses a reserved domain word (appeal, case, ...)",
         "every action is owned by a declared role",
         "the page's own JavaScript parses — a rendered page is not a running one",
