@@ -1062,6 +1062,18 @@ process rather than being triggered across the wire by SQL.
          "days does NOT mean unused: all four logger calls in this module are on FAILURE paths "
          "(logger.warning on HTTP error, logger.exception on failure) and nothing logs a "
          "success. So silence means no failures, not no calls. I had read it the other way."),
+ ("bad", "OWNER(payor-policy): LOOK INTO RAG'S WRITE SURFACE — an unauthenticated corpus "
+         "write, surfaced from this node but belonging to mobius-rag, which is my module not "
+         "chat's. VERIFIED: mobius-rag carries roles/run.invoker for allUsers, and "
+         "/documents/import-from-html's only Depends is get_db — no auth dependency of any "
+         "kind. An unauthenticated POST from this machine was accepted and the service went on "
+         "to fetch the URL; the 502 came from the probe URL 404ing, not from auth. So anyone "
+         "who can reach the service can have a URL fetched, classified, chunked, embedded and "
+         "queued into the corpus the whole product answers from.\n\n"
+         "SCOPE OF WHAT I CHECKED, stated so nobody reads more into it: that ONE route and the "
+         "service IAM. mobius-rag exposes 79 write routes and I have audited one. Whether this "
+         "is a single endpoint or the pattern is exactly what the audit is for, and I have not "
+         "done it — logged to look into, not investigated."),
  ("bad", "AND THE ADMIN KEY IS NOT CHECKED AT ALL. I recorded that MOBIUS_RAG_ADMIN_KEY being "
          "unset means 'rag may 401'. Tested it: RAG's /documents/import-from-html accepted an "
          "unauthenticated POST from this machine and proceeded to fetch the URL — the 502 came "
