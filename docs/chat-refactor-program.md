@@ -261,6 +261,35 @@ revision is a clean before/after reference point while the shared checkout carri
 other sessions' work. Anyone reading a phase's live behaviour as attributable to that
 phase's commit alone is over-claiming.
 
+**TWO SESSIONS ARE EDITING ONE WORKING TREE, and this is now a live hazard rather
+than a theoretical one.** Observed 2026-09-09 01:5x: while Chat Master's P1c
+deletions (`continuity.py`, `master_objective.py`, `objective_eval.py`,
+`user_context_resolution.py`, `user_leverage.py`) sat uncommitted in
+`mobius-chat`, the LLM Agent was concurrently editing `app/services/llm_analytics.py`
+and `tests/test_llm_analytics.py` in the same tree — wiring `module_key` /
+`variant_id` into the `llm_calls` writer.
+
+The specific danger is staging, not merging. P1a was staged as `git add app/ tests/`,
+which was safe **only because** no other session had touched those directories at
+that moment. It now has: `tests/test_llm_analytics.py` is under `tests/`. The same
+command today would sweep another team's uncommitted work into a refactor commit,
+which is a failure this fleet has already had once in a shared checkout.
+
+**Rule: stage refactor commits by explicit path, never by directory**, and read
+`git status` immediately before committing rather than trusting the state from when
+the work started.
+
+**It does NOT affect the gate.** I2 and I4 are computed from `chat_turns.thinking_log`;
+the LLM Agent's change writes `llm_calls`. Different table, no overlap with any
+invariant. Recorded so nobody assumes contamination that isn't there — and so nobody
+assumes safety on the next change either, since a concurrent edit to the LLM call
+path itself WOULD move latency and could move I5 once it is un-deferred.
+
+**Ananth's standing instruction, 2026-09-08: LOG findings, do not spin off work.**
+Cross-seat items get written down and handed over only when the owner is already
+engaged. The reason is this exact situation — a peer acting on a finding mid-flight
+changes the code underneath a running measurement.
+
 **Where the work lands.** P1a was committed to `main` in the shared `mobius-chat`
 checkout rather than a branch. Chat Master flagged the choice rather than making it
 silently: branching a checkout that other sessions and the schema generators read
