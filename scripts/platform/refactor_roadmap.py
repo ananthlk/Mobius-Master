@@ -80,6 +80,7 @@ RULES = [
     ("P2", "emit_envelope", "184 UNWIRED CANDIDATES"),
     ("P2", "emit_envelope", "THE CONFIRMED ROSTER"),
     ("P1", "run_pipeline",  "26 TESTS ARE ALREADY FAILING"),
+    ("P1", "emit_envelope", "THE CREDENTIALING ROUTER WOULD SURVIVE LOSING ITS IMPLEMENTATION"),
     ("P1", "emit_envelope", "~25 FRONTEND FETCHES ARE 404ing TODAY"),
     ("P1", "emit_envelope", "DELETING THE CREDENTIALING PLANNER PATH WOULD SILENTLY BREAK"),
     ("P2", "state_load",    "state_version is WRITE-ONLY"),

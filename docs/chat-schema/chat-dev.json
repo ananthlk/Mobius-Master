@@ -15,7 +15,7 @@
     "owner": "chat",
     "gate": "lines removed; handler count down; ZERO invariant movement",
     "blocks": "P2, P4",
-    "n": 8
+    "n": 9
    },
    {
     "id": "P2",
@@ -1193,6 +1193,10 @@
    "rating": "red",
    "depth": "code",
    "findings": [
+    [
+     "bad",
+     "OWNER(chat): THE CREDENTIALING ROUTER WOULD SURVIVE LOSING ITS IMPLEMENTATION, AND THAT IS THE PROBLEM. Chat Master found this and reversed a split I had already endorsed; I verified the mechanism and it holds, with one correction that makes it WORSE rather than better.\n\napi/credentialing.py has ZERO top-level credentialing imports \u2014 verified by AST, not grep. Every route imports its storage module INSIDE the function. Measured across the 15 decorated routes:\n\n  14 import a credentialing/roster module function-locally\n   8 of those sit inside a broad `except Exception:` that returns [] or a plausible value\n   6 have NO try at all \u2014 an ImportError would surface as a 500\n   1 imports nothing credentialing\n\nChat Master reported 'all 16 routes follow this shape'. They do not, and the mixed picture is the more dangerous one: delete the twelve service modules and EIGHT routes start lying (200 with an empty body, forever, indistinguishable from the empty-table state they already return) while SIX start 500ing. Two different failure modes from one deletion, one silent and one loud, and NOTHING TELLS THEM APART. A uniform failure would at least be diagnosable.\n\nAND THE GATE IS BLIND TO BOTH. I1/I2/I4/I7 are computed from chat_turns.thinking_log; these routes never touch the react loop. A green gate would prove nothing about fifteen hollowed-out routes. That retires my own earlier line that 'the gate's invariants are all we'd have' for the untested twelve \u2014 they are not thin here, they are absent.\n\nTHE DEEPER POINT, which is Chat Master's and is correct: the try/except MECHANISES the defect. We would ship eight routes that report success while their implementation is gone \u2014 instances thirteen through twenty of the class, created inside the phase meant to remove it. So api/credentialing.py and the twelve are ONE ATOMIC UNIT. The only orderings that leave no lie are 'delete router and services together' (routes 404 \u2014 honest) or 'delete nothing yet'. Holding."
+    ],
     [
      "bad",
      "OWNER(chat): ~25 FRONTEND FETCHES ARE 404ing TODAY AND NOBODY NOTICED \u2014 this node's class, live, not hypothetical. Found by Chat Master during the P1d sweep. app/api/roster.py was DELETED in 65c4751 and roughly 25 call sites in chat's own pipeline-*.js were never removed, so every fetch to /chat/roster-truth/* and /chat/roster-reconcile/* returns 404. The try/catch swallows it and the selector renders empty. The capability has been gone for as long as that commit is old and the page looks the same as it always did.\n\nWorth keeping beside the twelve confirmed instances because it is the only one where the producer was removed by a DELIBERATE deletion and the consumers were simply forgotten \u2014 which is precisely the risk this program runs every phase. It is also the argument for P1d taking the frontend with it rather than after it."

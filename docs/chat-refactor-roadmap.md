@@ -12,13 +12,13 @@ program. That is what makes this a tracker and not a snapshot.
 Plan and gate definition: `docs/chat-refactor-program.md`. Nothing starts until
 its sign-off table is complete.
 
-**87 bugs · 56 sequenced into 5 phases · 31 explicitly outside · 0 unassigned**
+**88 bugs · 57 sequenced into 5 phases · 31 explicitly outside · 0 unassigned**
 
 ## Progress
 
 | Phase | Name | Bugs | Owner | Gate metric | Blocks | Status |
 |---|---|---:|---|---|---|---|
-| **P1** | Delete | 8 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☐ not started |
+| **P1** | Delete | 9 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☐ not started |
 | **P2** | Make absent producers detectable | 16 | chat + Eval | every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☐ not started |
 | **P3** | One decision point | 12 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ☐ not started |
 | **P4** | Split | 15 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
@@ -31,10 +31,10 @@ complete, and P0 blocks all of the others.
 
 | Owner | Sequenced bugs |
 |---|---:|
-| chat | 30 |
+| chat | 31 |
 | unassigned-owner | 26 |
 
-## P1 — Delete  ·  8 items
+## P1 — Delete  ·  9 items
 
 **Owner** chat · **ratifier** DB seat, Tech Review
 **Gate** lines removed; handler count down; ZERO invariant movement  
@@ -47,6 +47,7 @@ The cost of leading with it, stated plainly: this phase CANNOT CLAIM A LATENCY W
 | ☐ | Node | Owner | Finding |
 |---|---|---|---|
 | ☐ | `clarification` | chat | FOUR CLARIFY MECHANISMS, THREE OF THEM DEAD, ALL FOUR STILL IN THE TREE |
+| ☐ | `emit_envelope` | chat | THE CREDENTIALING ROUTER WOULD SURVIVE LOSING ITS IMPLEMENTATION, AND THAT IS THE PROBLEM |
 | ☐ | `emit_envelope` | chat | ~25 FRONTEND FETCHES ARE 404ing TODAY AND NOBODY NOTICED — this node's class, live, not hypothetical |
 | ☐ | `emit_envelope` | chat | DELETING THE CREDENTIALING PLANNER PATH WOULD SILENTLY BREAK AN UNRELATED LIVE TOOL |
 | ☐ | `jurisdiction` | chat | THE JURISDICTION CLARIFICATION IS DEAD CODE ON THE LIVE PATH |
