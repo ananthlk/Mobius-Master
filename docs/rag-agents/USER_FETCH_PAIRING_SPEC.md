@@ -314,6 +314,37 @@ logs = metadata + masked labels only → compliant, `/redact` not required (we n
 egress/export = none (deeplink carries thread_id, not content) → no gate; CPT = Crawler's
 `cpt_screen`, acknowledged.
 
+### 2.8 · Ananth's ruling + TODO-B status + a security resolution (2026-09-09)
+
+**Ananth ruled (via Chat Master):** Ask 2 is NOT Chat Master's — it stays with the phi-classifier
+seat; Chat Master is off PHI entirely. (Instruction conflict resolved.) Enforcement ownership of
+the `/chat/upload` admit composition therefore needs settling at the three-way, since the endpoint
+is chat's code but the PHI rule is the classifier seat's — parked with Ask 2 behind the Key-1 BAA
+posture regardless.
+
+**TODO-B — half-fixed by design (Chat Master `9d41aff`, held for deploy).** Chat now DECLARES the
+five fields, so they stop vanishing on the chat hop. But rag's `/upload` (mobius-rag main.py:8076)
+declares only `source_url` — forwarding the other four would silently drop them *there*, the same
+trap one hop down. So today:
+- `source_url` → forwarded to rag, consumed, real.
+- `access`, `task_id`, `fetched_at`, `signal_headers` → held at chat, returned to the extension in
+  a `source_provenance` observability object: `{ received:[…5], forwarded_to_rag:["source_url"],
+  pending_rag_support:["access","fetched_at","signal_headers","task_id"] }`. **`pending_rag_support`
+  emptying is the Extension's signal that the rag side landed.**
+- **Now owned by Master RAG:** add a `source_metadata` passthrough for those four keys on rag
+  `/upload`. Chat Master forwards the moment the param exists. The caller string
+  (`browser-extension:user-fetch`) + `source_metadata` keys are intentionally left UNFROZEN for the
+  Crawler's review before they set.
+
+**Security — `signal_headers` (Chat Master raised; RESOLVED).** Chat Master flagged that raw
+response headers can carry `Set-Cookie` / `Authorization` and must not enter a corpus store.
+**The extension already prevents this: `signal_headers` is a strict 5-family allowlist**
+(`x-robots-tag`, `content-signal`, `content-usage`, `tdm-reservation`, `tdm-policy` — background.ts:150),
+never the raw header set, so no credential/session header is ever sent. Chat accepts but never
+logs/persists it either. If provenance headers (content-type, content-length, last-modified, etag)
+are wanted, the extension will add them as a **separate, equally-allowlisted** field — but only if
+Master RAG/Crawler ask; not shipping header bags. Principle affirmed: allowlist, never bag.
+
 ## 3 · Sign-offs
 
 - Crawler (compliance frame §1 + review of §2): ✍ **signed — Crawler Agent / 2026-09-09.** §2
