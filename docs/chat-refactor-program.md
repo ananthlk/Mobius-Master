@@ -249,10 +249,30 @@ specific ruling, not general agreement.
 |---|---|---|
 | **Chat Master** | that the 16 chat-assigned bugs are correctly theirs and correctly described; the P1→P5 order; the `master_objective` revive-or-retire call | ☐ |
 | **DB seat** | the table evidence behind the deletions (11 of 13 empty), the FK set, and that `chat_state` / `chat_turns` are safe to read as a replay corpus | ☐ |
-| **Technical Review** | the test gate itself — whether invariants I1–I7 are the right assertions and whether the phase order is sound | ☐ |
+| **Technical Review** | the test gate itself — invariants I1–I7 and the phase order | **☑ SIGNED 2026-09-08** — verified the frozen baseline artifact directly (fingerprint, strata, every cited number) rather than the writeup. Two items for the record below. |
 | **Eval** | the replay corpus design: stratification, sample size, and what it can and cannot prove — specifically that answer quality is out of scope for the invariant set | ☐ |
 | **Prompt Studio owner** | that the control plane is the right home for the governor's tables (Phase 4) | ☐ |
 | **Ananth** | the two open product calls: revive or retire `master_objective`, and whether removing the `use_react` API field is acceptable | ☐ |
+
+**Technical Review's two record items, not conditions on their signature:**
+
+1. **P1.1 is now load-bearing for the whole program.** If the deterministic harness
+   slips, I3 and I5 stay deferred indefinitely and the program ships without ever
+   gating the two invariants most likely to matter — PHI verdict and groundedness
+   floor — on anything but hope. The honest gap beats a fake tolerance, but the
+   dependency is stated here so a timeline slip is visible rather than discovered.
+2. **P3's acceptance criterion is structural, full stop.** P3 is done when there is
+   exactly **one writer** to `_pp_extension_rounds_used`. Not when the two constants
+   agree; not when one path defers to the other's number. An implementation that
+   reconciles 120 and 275 into a shared constant but leaves two call sites both
+   permitted to write the counter has **not** closed the finding, regardless of what
+   the numbers show at that gate.
+
+**First full-suite baseline, 2026-09-08: 26 tests already failing** (2,593 collected,
+2,561 passed, 6 skipped, 128s) — including this program's own guard,
+`TestReactLoopRatchet::test_react_loop_loc_under_ceiling`. The gate cannot read
+"tests pass" until those 26 are triaged into accepted-baseline or fixed. Filed as a
+P1 item.
 
 Open questions carried into sign-off, unresolved on purpose:
 
