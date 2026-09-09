@@ -1133,25 +1133,25 @@ WHAT IT DOES NOT LOAD, which is the part people assume:
     from versioned blocks in Postgres via MOBIUS_PROMPT_SOURCE=composition.
   * PHI. Checked at the API boundary, before the queue.
 """, findings=[
- ("bad", "A TRANSIENT READ FAILURE DESTROYS ACCUMULATED THREAD STATE. get_state returns None "
+ ("bad", "OWNER(chat): A TRANSIENT READ FAILURE DESTROYS ACCUMULATED THREAD STATE. get_state returns None "
          "for a DB error and None for no-row — identical, and its docstring says only 'or None "
          "if no row', never mentioning the error case. state_load does `raw = get_state(...) "
          "or {}`, builds ThreadState from DEFAULT_STATE, and if the message carries a delta "
          "calls save_state_full, whose UPSERT is a FULL REPLACE by design. One failed read plus "
          "any delta-bearing message overwrites the whole conversation with defaults plus that "
          "turn. Not skipped — destroyed."),
- ("bad", "AND NOTHING CAN DETECT IT AFTERWARDS. state_version increments on the same write, so "
+ ("bad", "OWNER(chat): AND NOTHING CAN DETECT IT AFTERWARDS. state_version increments on the same write, so "
          "the row goes 11 -> 12 exactly as a normal turn would. There is no artifact "
          "distinguishing 'turn 12 of a conversation' from 'state reset, now calling itself 12'."),
- ("bad", "THE FIX IS LOCAL, NOT A REDESIGN. The same file already uses the right pattern thirty "
+ ("bad", "OWNER(chat): THE FIX IS LOCAL, NOT A REDESIGN. The same file already uses the right pattern thirty "
          "lines down: _write_state_row warns and returns on connection_error but RAISES on "
          "anything else. Write path loud, read path silent, one module — and the silent one "
          "loses data. get_state is the one function not following its own file's convention."),
- ("bad", "state_version is WRITE-ONLY — inserted, incremented, never read or compared anywhere "
+ ("bad", "OWNER(chat): state_version is WRITE-ONLY — inserted, incremented, never read or compared anywhere "
          "in app/. So it cannot detect the above, AND read-modify-write through "
          "get_state/save_state_full is unguarded: two concurrent turns on one thread are a "
          "lost update."),
- ("bad", "CROSS-NODE, invisible to any code read: mobius_chat has NO query guards. "
+ ("bad", "OWNER(db-seat): CROSS-NODE, invisible to any code read: mobius_chat has NO query guards. "
          "statement_timeout = 0 and no idle-in-transaction guard. mobius_rag carries "
          "idle_in_transaction_session_timeout = 120s and is the ONLY per-database override on "
          "the instance. A pathological chat query runs unbounded holding a connection, and "

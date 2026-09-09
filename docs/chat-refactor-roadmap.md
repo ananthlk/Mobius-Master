@@ -31,8 +31,8 @@ complete, and P0 blocks all of the others.
 
 | Owner | Sequenced bugs |
 |---|---:|
-| chat | 38 |
-| unassigned-owner | 30 |
+| chat | 39 |
+| unassigned-owner | 29 |
 
 ## P1 — Delete  ·  9 items
 
@@ -95,7 +95,7 @@ BASELINE RULE: the latency numbers captured at the END of this phase are the ref
 | ☐ | `plan` | — | The parse-failure fallback is invisible |
 | ☐ | `react_loop` | chat | _rich_evidence IS AN UNRECORDED BRANCH THAT CHANGES ROUND COUNT — invisible drift inside the latency instrumen |
 | ☐ | `react_loop` | chat | THE CURATION DECISION IS NEVER PERSISTED, which makes evidence_review untestable after the fact |
-| ☐ | `state_load` | — | state_version is WRITE-ONLY — inserted, incremented, never read or compared anywhere in app/ |
+| ☐ | `state_load` | chat | state_version is WRITE-ONLY — inserted, incremented, never read or compared anywhere in app/ |
 
 ## P3 — One decision point  ·  14 items
 
