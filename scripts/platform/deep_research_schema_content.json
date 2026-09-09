@@ -298,5 +298,24 @@
     "Moving it changed the emitted page by zero bytes, which is the only evidence a refactor is a refactor."
    ]
   ]
+ },
+ "journey": {
+  "group": "the surface",
+  "rating": "green",
+  "how": "Answers the one question the status column answers worst: where is my request. Round by round — when each started, what it produced, how long it took, and which one stopped.",
+  "findings": [
+   [
+    "bad",
+    "Measured when it was written: 16 turns in flight, 10 started more than six hours ago and never came back, four `waiting` for 69 hours. The request-level status on every one of them reads `open`."
+   ],
+   [
+    "bad",
+    "20 turns say `complete` and carry no settled timestamp, so any duration computed from them is the age of the universe rather than the length of the round. The page says the clock was lost rather than showing the number."
+   ],
+   [
+    "good",
+    "Reads only. A page that quietly restarted a stalled round while somebody was looking at it would be a page nobody could trust to describe the machine."
+   ]
+  ]
  }
 }

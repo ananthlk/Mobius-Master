@@ -169,8 +169,9 @@ def main() -> None:
         + esc(acts_by_id.get(r.get("recommended"), {}).get("label",
               "Nothing we would advise")) + "</span>"
         f"<span class=q>{esc((r.get('why') or '')[:130])}</span></td>"
-        f"<td><span class='wait {WAIT_TONE.get((r.get('eta') or {}).get('waiting_on'),'')}'>"
-        f"{esc(r['wait_word'])}</span></td>"
+        f"<td class=where><span class='wait {esc((r.get('where') or {}).get('tone',''))}'>"
+        f"{esc(r['wait_word'])}</span>"
+        f"<span class=q>{esc((r.get('where') or {}).get('say') or '')}</span></td>"
         f"<td class=n>{r.get('rounds')}</td></tr>" for r in reqs)
 
     worklist_rows = "".join(
@@ -185,11 +186,19 @@ def main() -> None:
         + ("outside" if t.get("outside") else "here") + "</span></td></tr>"
         for t in tasks)
 
-    doors = "".join(
-        f"<button class='door{' live' if s['state']=='live' else ''}' "
-        f"data-door='{esc(s['id'])}'><b>{esc(s['title'])}</b>"
-        f"<span>{esc(s['audience'])}</span>"
-        f"<em>{' '.join(s['calls'])}</em></button>" for s in doc["surfaces"])
+    # THREE DOORS, AND THE REST ARE SCOPE. Six buttons implied six places; five
+    # of them were one queue with a different WHERE clause. The tabs are named
+    # for what a person came to DO; the folded ones become a choice of WHOSE.
+    tabs = "".join(
+        f"<button class=tab data-tab='{esc(u['id'])}'>"
+        f"<b>{esc(u['tab'])}</b><span>{esc(u['audience'])}</span></button>"
+        for u in doc["surfaces"] if u.get("primary"))
+    folded = [u for u in doc["surfaces"] if not u.get("primary")]
+    scopes = ("<button class='scope on' data-scope='my_requests'>"
+              + esc(next(u["filter_says"] for u in doc["surfaces"]
+                         if u["id"] == "my_requests")) + "</button>"
+              + "".join(f"<button class=scope data-scope='{esc(u['id'])}'>"
+                        f"{esc(u['scope_label'])}</button>" for u in folded))
 
     vtable = "".join(
         f"<tr><td><code>{esc(v['method'])} {esc(v['route'])}</code></td>"
@@ -249,6 +258,20 @@ border-radius:4px;padding:18px 22px;margin:0 0 26px}}
 .hero b{{font-family:var(--mono);font-size:24px;color:var(--bad);font-variant-numeric:tabular-nums}}
 .tally{{display:flex;flex-wrap:wrap;gap:13px;margin-top:13px;font-size:12px;color:var(--ink2)}}
 .tally .t b{{font-family:var(--mono);font-weight:500;color:var(--ink);font-size:12px}}
+.tabs{{display:flex;gap:2px;margin:0 0 22px;border-bottom:1px solid var(--line)}}
+.tab{{background:none;border:0;border-bottom:2px solid transparent;padding:10px 18px 12px;
+cursor:pointer;font-family:var(--sans);color:var(--muted);display:flex;flex-direction:column;
+gap:1px;text-align:left;margin-bottom:-1px}}
+.tab b{{font-size:15px;font-weight:600;color:var(--ink2)}}
+.tab span{{font-size:11.5px}}
+.tab:hover b{{color:var(--violet)}}
+.tab.on{{border-bottom-color:var(--violet)}}
+.tab.on b{{color:var(--violet)}}
+.scopes{{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 12px}}
+.scope{{font-family:var(--sans);font-size:12px;background:var(--card);color:var(--ink2);
+border:1px solid var(--line2);border-radius:99px;padding:4px 12px;cursor:pointer}}
+.scope:hover{{border-color:var(--violet);color:var(--violet)}}
+.scope.on{{background:var(--violet);color:#fff;border-color:var(--violet);font-weight:600}}
 .doors{{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:8px;margin:0 0 24px}}
 .door{{text-align:left;background:var(--card);border:1px solid var(--line);
 border-top:2px solid var(--line2);border-radius:5px;padding:12px 13px;cursor:pointer;
@@ -312,7 +335,21 @@ background:var(--sunk);color:var(--muted);display:inline-block}}
 .st.warn,.wait.warn{{background:var(--warn-soft);color:var(--warn)}}
 .st.bad,.wait.bad{{background:var(--bad-soft);color:var(--bad)}}
 .st{{margin-top:4px}}
-.advise{{max-width:330px}}
+.advise{{max-width:300px}}
+.where{{max-width:280px}}
+.stalled{{background:var(--bad-soft);border:1px solid var(--line);
+border-left:3px solid var(--bad);border-radius:4px;padding:11px 14px;
+margin:0 0 14px;font-size:13px;color:var(--ink2)}}
+.stalled b{{font-family:var(--mono);color:var(--bad)}}
+.wheresay{{margin:0 0 9px;font-size:13.5px;color:var(--ink)}}
+.wheresay.bad{{color:var(--bad)}} .wheresay.warn{{color:var(--warn)}}
+.rounds{{display:flex;flex-direction:column;gap:4px;margin-bottom:9px}}
+.rnd{{background:var(--sunk);border-left:2px solid var(--line2);border-radius:3px;
+padding:6px 9px;font-size:12px}}
+.rnd b{{font-family:var(--mono);font-size:12px}}
+.rnd.ok{{border-left-color:var(--ok)}}
+.rnd.warn{{border-left-color:var(--warn)}}
+.rnd.bad{{border-left-color:var(--bad);background:var(--bad-soft)}}
 .worth{{font-family:var(--mono);font-size:16px;color:var(--violet);font-weight:500}}
 #wl tr{{cursor:pointer}}
 .rec{{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:500;
@@ -371,10 +408,7 @@ check the answer — most closed before that check existed. Being finished is no
 the same as being right.
 <div class=tally>{tally}</div></div>
 
-<h2>Where do you come in?</h2>
-<p class=lede style="margin-bottom:14px">The same questions, shown to whoever is
-looking. Nobody sees a different system — just a different slice of it.</p>
-<div class=doors>{doors}</div>
+<div class=tabs>{tabs}</div>
 
 <div id=panel_ask class=card>
   <h2 style="margin-bottom:16px">Ask a question</h2>
@@ -384,10 +418,12 @@ looking. Nobody sees a different system — just a different slice of it.</p>
 </div>
 
 <div id=panel_queue hidden>
+  <div class=scopes>{scopes}</div>
+  <div class=stalled id=stalled hidden></div>
   <p class=filter id=filt></p>
   <div class=card style="padding:14px 16px">
   <table><thead><tr><th>#</th><th>question</th><th>where it stands</th>
-  <th>what we advise</th><th>waiting on</th><th>tries</th></tr></thead>
+  <th>what we advise</th><th>where it is</th><th>tries</th></tr></thead>
   <tbody id=tb>{rows}</tbody></table></div>
   <p class=note><b>The list triages; the page decides.</b> A row says what we
   advise and who it is waiting on. Open one for the evidence, everything you can
@@ -473,20 +509,14 @@ document.getElementById('go').addEventListener('click', function(){{
     + '\\n\\n// sent:\\n' + JSON.stringify(body, null, 2);
 }});
 
-// ---- the doors are filters over one queue -------------------------------
-function door(id){{
-  document.querySelectorAll('.door').forEach(function(b){{
-    b.classList.toggle('on', b.dataset.door === id); }});
-  var ask = id === 'ask', work = id === 'worklist';
-  document.getElementById('panel_ask').hidden = !ask;
-  document.getElementById('panel_work').hidden = !work;
-  document.getElementById('panel_queue').hidden = ask || work;
-  document.getElementById('panel_one').hidden = true;
-  if(ask || work) return;
-  var f = D.surfaces[id] || {{}};
+// ---- three tabs; the folded surfaces are a scope inside My requests ------
+var SCOPE = 'my_requests';
+
+function applyScope(){{
+  var f = D.surfaces[SCOPE] || {{}};
   var el = document.getElementById('filt');
-  el.textContent = (f.filter_says || 'Everything') + '   ·   can call: '
-    + (f.calls || []).join(', ');
+  el.textContent = (f.filter_says || f.scope_label || 'Everything')
+    + '   ·   can call: ' + (f.calls || []).join(', ');
   el.title = f.filter || 'no filter';
   document.querySelectorAll('#tb tr').forEach(function(tr){{
     var show = true, flt = f.filter || '';
@@ -495,10 +525,38 @@ function door(id){{
     if(flt.indexOf('resolution') >= 0) show = tr.dataset.dec !== '0';
     tr.hidden = !show;
   }});
+  document.querySelectorAll('.scope').forEach(function(b){{
+    b.classList.toggle('on', b.dataset.scope === SCOPE); }});
+
+  // WHERE IS MY REQUEST — counted over what this scope actually shows, so the
+  // number always describes the rows underneath it.
+  var shown = [...document.querySelectorAll('#tb tr')].filter(function(t){{ return !t.hidden; }});
+  var stuck = shown.filter(function(t){{
+    var q = REQ[t.dataset.id];
+    return q && (q.where || {{}}).tone === 'bad'; }});
+  var b = document.getElementById('stalled');
+  b.hidden = stuck.length === 0;
+  if(stuck.length){{
+    b.innerHTML = '<b>' + stuck.length + ' of ' + shown.length + '</b> have a '
+      + 'round that started and never came back. The status column calls them '
+      + 'Open, which is true and the least useful true thing available.';
+  }}
+}}
+
+function tab(id){{
+  document.querySelectorAll('.tab').forEach(function(b){{
+    b.classList.toggle('on', b.dataset.tab === id); }});
+  document.getElementById('panel_ask').hidden = id !== 'ask';
+  document.getElementById('panel_work').hidden = id !== 'worklist';
+  document.getElementById('panel_queue').hidden = id !== 'my_requests';
+  document.getElementById('panel_one').hidden = true;
+  if(id === 'my_requests') applyScope();
 }}
 document.addEventListener('click', function(e){{
-  var b = e.target.closest('.door');
-  if(b) door(b.dataset.door);
+  var t = e.target.closest('.tab');
+  if(t) tab(t.dataset.tab);
+  var sc = e.target.closest('.scope');
+  if(sc){{ SCOPE = sc.dataset.scope; applyScope(); }}
 }});
 
 // ---- the question page --------------------------------------------------
@@ -563,9 +621,24 @@ function fill(r){{
       + ' · ' + (n.outcome === 'used' ? 'carried into round ' + n.round
                  : n.outcome === 'unusable' ? 'could not be used'
                  : 'waiting on a person') + '</span></div>'; }}).join('');
+  var w = r.where || {{}};
+  var strip = (r.rounds_detail || []).map(function(x){{
+    var tone = x.stalled ? 'bad' : x.clock_lost ? 'warn'
+             : (x.status === 'complete' ? 'ok' : '');
+    var when = x.stalled ? Math.round(x.age_hours) + 'h ago, no answer'
+             : x.clock_lost ? 'finished; when was never recorded'
+             : (x.mins != null ? Math.round(x.mins) + ' min' : '');
+    return '<div class="rnd ' + tone + '"><b>Round ' + x.n + '</b> '
+      + '<span class=cur>' + esc(x.status) + (when ? ' · ' + when : '') + '</span>'
+      + (x.extract_note ? '<br><span class=cur>' + esc(x.extract_note) + '</span>' : '')
+      + (x.feedback_kind ? '<br><span class=cur>waiting on ' + esc(x.feedback_kind)
+         + '</span>' : '')
+      + '</div>'; }}).join('');
+
   document.getElementById('art_status').innerHTML =
-    '<b>' + esc(r.state_word) + '</b> · ' + esc(r.wait_word)
-    + '<br><span class=cur>' + esc((r.eta || {{}}).say || '') + '</span>'
+    '<p class="wheresay ' + esc(w.tone || '') + '">' + esc(w.say || '') + '</p>'
+    + '<div class=rounds>' + strip + '</div>'
+    + '<span class=cur>' + esc((r.eta || {{}}).say || '') + '</span>'
     + (r.answered_elsewhere_by ? '<br><span class=no>request '
         + r.answered_elsewhere_by + ' answered the same requirement</span>' : '')
     + '<div class=noterow><input id=notebox placeholder="Tell it what it was missing — '
@@ -636,7 +709,7 @@ document.addEventListener('click', function(e){{
       + '\\n// records whether it was actually used.';
   }}
 }});
-door('ask');
+tab('ask');
 </script>"""
     open(OUT, "w").write(html)
     if not check_script(html):
