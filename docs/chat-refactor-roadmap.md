@@ -19,7 +19,7 @@ its sign-off table is complete.
 | Phase | Name | Bugs | Owner | Gate metric | Blocks | Status |
 |---|---|---:|---|---|---|---|
 | **P1** | Delete | 6 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☐ not started |
-| **P2** | Instrument — latency and decisions | 14 | chat + Eval | every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☐ not started |
+| **P2** | Make absent producers detectable | 14 | chat + Eval | every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☐ not started |
 | **P3** | One decision point | 11 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ☐ not started |
 | **P4** | Split | 15 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
 | **P5** | Config UX | 5 | chat + Prompt Studio | max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped | — | ☐ not started |
@@ -53,13 +53,17 @@ The cost of leading with it, stated plainly: this phase CANNOT CLAIM A LATENCY W
 | ☐ | `run_pipeline` | chat | THE CLASSIC PATH IS DEAD AND IT IS 1,159 LINES |
 | ☐ | `run_pipeline` | chat | THE CREDENTIALING SURFACE IS 8,994 LINES IN CHAT AND ITS TABLES ARE EMPTY |
 
-## P2 — Instrument — latency and decisions  ·  14 items
+## P2 — Make absent producers detectable  ·  14 items
 
 **Owner** chat + Eval
 **Gate** every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join  
 **Blocks** P3, P4, P5
 
-> SECOND, per Ananth: 'add latency across, this way we can measure when we are done we should be better and faster.' This is the phase that makes 'faster' a provable claim rather than an impression — 19 of 25 modules are untimed today. It also closes the decision-visibility gaps: the governor has zero logger calls, keep is never persisted, 116 of 187 knobs run on invisible defaults.
+> REFRAMED 2026-09-09 on Chat Master's argument, better than my original 'instrument the gaps'. Every finding this program has produced is one shape: nothing here fails loudly when a PRODUCER disappears, because every consumer has a plausible default. master_objective degraded four readers to "resolved" for five months; variant_id made a refresh match nothing for a month; make_tool_failed has no caller so tool_failed is structurally impossible while tool_invoked and tool_completed emit normally; CallManager is wired in docstrings only. Framed as instrumenting the known gaps this phase fixes twelve instances; framed as making an absent producer detectable it fixes the class.
+
+SECOND in order, per Ananth: 'add latency across, this way we can measure when we are done we should be better and faster.' Latency lands here and is what makes 'faster' provable — but as an instance of the rule, not the point of the phase.
+
+are done we should be better and faster.' This is the phase that makes 'faster' a provable claim rather than an impression — 19 of 25 modules are untimed today. It also closes the decision-visibility gaps: the governor has zero logger calls, keep is never persisted, 116 of 187 knobs run on invisible defaults.
 
 BASELINE RULE: the latency numbers captured at the END of this phase are the reference every later phase measures against. P1 sits before that line and is measured on invariants only.
 

@@ -19,7 +19,7 @@
    },
    {
     "id": "P2",
-    "name": "Instrument \u2014 latency and decisions",
+    "name": "Make absent producers detectable",
     "owner": "chat + Eval",
     "gate": "every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
