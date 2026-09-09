@@ -47,6 +47,17 @@ READ_RE = re.compile(r'from\s+(research\.[a-z_]+)', re.I)
 # The discipline this module learned the hard way: does this actor REASON out
 # loud, or does it only file a receipt?
 THINKS_RE = re.compile(r'Thinking\(|from_verdicts\(')
+# A NAME-BASED SEARCH ANSWERS "IS THERE A SYMBOL CALLED X", NEVER "DOES X
+# HAPPEN". Chat Master, 2026-09-09, after nearly reporting a live node absent
+# because it is sixty lines inline with no symbol to grep.
+#
+# It bit here immediately: recorder.py — the module whose whole job is the
+# ledger — was badged "records nothing", because it writes the table with a raw
+# INSERT and never calls the helper the pattern looks for. The badge was wrong
+# and plausible, which is why nobody read it twice. So the derivation asks what
+# a module WRITES as well as what it calls.
+TRACE_WRITE_RE = re.compile(
+    r'insert\s+into\s+research\.(actor_thinking|ledger)', re.I)
 NOTES_RE = re.compile(r'\brec(?:order)?\.note\(|_rec\.note\(')
 
 
@@ -199,10 +210,11 @@ def derive(fname: str) -> dict:
     # nothing anywhere says what it saw. That sentence is the one worth
     # stealing from the chat schema, and here it is derived rather than
     # remembered.
-    if thinks:
+    writes_trace = TRACE_WRITE_RE.search(src)
+    if thinks or (writes_trace and "actor_thinking" in writes_trace.group(0).lower()):
         obs, note = "reasons", ("Writes a step-by-step trace to research.actor_thinking — "
                                 "what it saw, what it made of it, what it decided.")
-    elif notes:
+    elif notes or writes_trace:
         obs, note = "receipts", ("Files ledger events with an actor name, but records no "
                                  "reasoning: you can see WHAT it decided and not why.")
     else:
@@ -605,9 +617,15 @@ def main() -> None:
         "honest_limits": [
             "Ratings and the plain-language `how` are curated, not derived. Everything "
             "else on this page is read out of the code.",
-            "`observability` is derived from whether a module constructs a Thinking() "
-            "trace or calls recorder.note — it proves a call site exists, not that the "
-            "trace is complete or that anything reads it.",
+            "`observability` is derived from what a module CALLS and what it WRITES. "
+            "A name-based search answers \"is there a symbol called X\", never \"does X "
+            "happen\" — recorder.py was badged silent for months because it writes the "
+            "ledger with a raw INSERT rather than calling the helper the pattern looked "
+            "for. Either way it proves a write site exists, not that the trace is "
+            "complete or that anything reads it.",
+            "Anything that happens INLINE, with no symbol and no recognisable statement, "
+            "is invisible to every derivation on this page. For a state machine whose "
+            "transitions are often a few lines inside a loop, that is where the gap is.",
             "The gate list is stated, not walked. The issue vocabulary each gate emits "
             "IS derived, so the two can be compared and a drift caught.",
             "Module-level, not function-level. A file rated green can hold a red "
