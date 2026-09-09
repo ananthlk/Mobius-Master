@@ -216,10 +216,47 @@ extension wires whatever field/handshake they specify (a §2.8-Ext response bloc
 **Status:** PHI classifier / compliance owner engaged directly (2026-09-09) — both asks sent
 with the full data flow; they own the classifier skill + fleet PHI/HIPAA policy + the
 `/hipaa-mode` endpoint, so **both** Ask 1 (detector precision) and Ask 2's **policy ruling** are
-theirs; Chat Master owns only the `/chat/upload` admit path that honors their verdict. Awaiting
-their gate contract for Ask 1 + Ask 2 (to be recorded here). Both distinct from TODO-B (the
-provenance passthrough on the same hop). Classifier service (dev):
+theirs; Chat Master owns only the `/chat/upload` admit path that honors their verdict. Both
+distinct from TODO-B (the provenance passthrough on the same hop). Classifier service (dev):
 `mobius-phi-classifier-ortabkknqa-uc.a.run.app` — /classify, /message-check, /redact, /hipaa-mode.
+
+### 2.8 · Chat Master response — Ask 2 shape + a HOLD (2026-09-09)
+
+**HOLD, correctly: instruction conflict, surfaced to Ananth.** Ananth told Chat Master directly
+"do not touch PHI" (that he'd "asked them to pair with browser extension"), minutes before the
+Extension escalation arrived. Chat Master will not treat a relayed "Ananth asked" as overriding
+a direct instruction on a HIPAA control, and has put the question back to Ananth. This is the
+right call — a relay is not authorization. **Ask 2 (and the TODO-B change on the same endpoint)
+are paused until Ananth gives Chat Master the word directly.**
+
+**The admit path already exists — Ask 2 is smaller than proposed.** `mobius-chat main.py:1322`:
+`gate=="phi" and hipaa_mode_allowed → published_private` (admit-tagged, not hard-block). No new
+admit mode needed; the only question is what makes `hipaa_mode_allowed` true for an upload.
+
+**Design correction — accepted by Extension: NO client-supplied `phi_attested` boolean.** Today
+`hipaa_mode_allowed` is fetched server-side from the classifier's `GET /hipaa-mode`, fail-closed
+on error (`:1318`). A client boolean would move the admit decision from something chat verifies
+to something the caller asserts (settable by a bug/replay). And `phi_override` does NOT carry as
+precedent: it admits ONE ephemeral turn for the user who just saw the warning; Ask 2 admits a
+document into a durable, searchable, possibly-shared corpus — the exact case "PHI GATES
+ingestion" was written for.
+
+**The accepted shape:** the extension keeps sending only the `task_id` (already sent; TODO-B
+plumbs it). Chat **verifies the attestation server-side against the extension's authorization
+log** before setting `hipaa_mode_allowed` for that document — so the admit rests on a record chat
+checked, not a claim that arrived with the upload; fail-closed on lookup failure. Cleaner
+alternative: the classifier owns a scoped `/hipaa-mode?task_id=…` (user/site-scoped, one
+authority). **Action:** a three-way (Extension + PHI-classifier + Chat Master, Crawler on
+compliance) to pick between "chat verifies vs authz log" and "scoped /hipaa-mode" BEFORE the
+extension wires anything — Chat Master explicitly asked not to be handed a field they'd replace.
+The extension wires nothing for Ask 2 until that's settled.
+
+**TODO-B confirmed by Chat Master (`main.py:2091-2096`):** the endpoint declares only `file`,
+`thread_id`, `org_name`, `user_id` — every other Form field the extension sends is silently
+dropped (FastAPI ignores undeclared fields; upload still 200s). So provenance has been going
+nowhere. Not PHI work; Chat Master will do it, but is holding it behind Ananth's answer because
+it's the same endpoint. Crawler to send the caller string + `source_metadata` key review when
+ready; Chat Master will hold it against the change.
 
 ## 3 · Sign-offs
 
