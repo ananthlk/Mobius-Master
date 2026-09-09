@@ -49,11 +49,24 @@ if os.path.exists(JUNIT):
         tests["errors"] += int(ts.get("errors", 0))
         tests["skipped"] += int(ts.get("skipped", 0))
     for tc in root.iter("testcase"):
-        f = os.path.basename(tc.get("file") or "")
-        tests["by_file"][f] = tests["by_file"].get(f, 0) + 1
+        # junit here carries classname, NOT file — keying on file silently
+        # produced one empty bucket and made every coverage count read as zero.
+        cls = tc.get("classname") or ""
+        f = cls.replace("tests.", "").split(".")[0]
+        tests["by_file"][f + ".py"] = tests["by_file"].get(f + ".py", 0) + 1
         if tc.find("failure") is not None or tc.find("error") is not None:
-            tests["failures"].append(f"{f}::{tc.get('name')}")
+            tests["failures"].append(f"{cls}::{tc.get('name')}")
 tests["passed"] = tests["collected"] - tests["failed"] - tests["errors"] - tests["skipped"]
+
+# ── known-failing baseline (Ananth's ruling: these predate the program) ───
+KNOWN = os.path.join(ROOT, "docs", "chat-test-baseline.json")
+known, regressions, newly_passing = set(), [], []
+if os.path.exists(KNOWN):
+    kb = json.load(open(KNOWN))
+    known = set(kb.get("tests", []))
+    now = set(tests["failures"])
+    regressions = sorted(now - known)
+    newly_passing = sorted(known - now)
 
 # ── coverage per schema node ──────────────────────────────────────────────
 import importlib.util
@@ -153,12 +166,20 @@ w(f"| collected | passed | failed | errors | skipped | wall |")
 w(f"|---:|---:|---:|---:|---:|---:|")
 w(f"| {tests['collected']} | {tests['passed']} | {tests['failed']} | {tests['errors']} "
   f"| {tests['skipped']} | {tests['wall_s']}s |\n")
-if tests["failures"]:
-    w("**Failing:**\n")
-    for f in tests["failures"][:40]:
+w(f"Known-failing baseline: **{len(known)}** tests, frozen 2026-09-08 before any P1a")
+w("deletion. Ananth's ruling — these predate the program, so the gate SUBTRACTS them.")
+w("A failure not in that set is a regression. The list may shrink, never grow.\n")
+if regressions:
+    w(f"### REGRESSIONS — {len(regressions)} failing test(s) NOT in the baseline\n")
+    for f in regressions:
         w(f"- `{f}`")
-    if len(tests["failures"]) > 40:
-        w(f"- …and {len(tests['failures']) - 40} more")
+    w("")
+else:
+    w("**No regressions** — every failure is in the known-failing baseline.\n")
+if newly_passing:
+    w(f"**{len(newly_passing)} baseline failure(s) now PASS** — shrink the baseline:\n")
+    for f in newly_passing:
+        w(f"- `{f}`")
     w("")
 
 w("## A2 · What the tests actually cover, per schema node\n")
@@ -212,4 +233,8 @@ print(f"structure {struct['loc']:,} loc · {struct['swallow']} log-and-continue 
 for d in drift:
     print("DRIFT:", d)
 print(f"-> {args.out}")
-sys.exit(1 if (tests["failed"] or tests["errors"] or drift) else 0)
+print(f"regressions {len(regressions)} · newly passing {len(newly_passing)} "
+      f"· known-failing baseline {len(known)}")
+for f in regressions:
+    print("  REGRESSION:", f)
+sys.exit(1 if (regressions or drift) else 0)

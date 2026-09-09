@@ -269,10 +269,28 @@ specific ruling, not general agreement.
    the numbers show at that gate.
 
 **First full-suite baseline, 2026-09-08: 26 tests already failing** (2,593 collected,
-2,561 passed, 6 skipped, 128s) — including this program's own guard,
-`TestReactLoopRatchet::test_react_loop_loc_under_ceiling`. The gate cannot read
-"tests pass" until those 26 are triaged into accepted-baseline or fixed. Filed as a
-P1 item.
+2,561 passed, 6 skipped, 128s). **Ananth ruled these are long-standing and must not
+block the program**, so the gate handles them the way it handles swallows — a frozen
+set it subtracts, monotonic in one direction:
+
+> `docs/chat-test-baseline.json` — 26 tests, captured before any P1a deletion. A
+> failure IN the set is not a regression. A failure NOT in the set fails the gate. A
+> baseline test that starts passing is reported so the list can shrink. **The list may
+> shrink, never grow, without an explicit decision.**
+
+That is a stronger gate than "triage first would have given us", because it keeps
+working while the 26 are outstanding and it names any new failure immediately.
+
+**What the 26 actually are, characterised rather than assumed:** 12 of them are two
+missing local packages — `pythonjsonlogger` (7) and `opentelemetry` (5) — both
+declared in `requirements.txt` (lines 34, 46-50), so that is a local venv gap and not
+an unpinned dependency. The remaining 14 are uncharacterised.
+
+**TWO SIZE RATCHETS ARE BREACHED, not one.**
+`test_react_split_phase_1i.TestReactLoopRatchet` (react_loop line ceiling) and
+`test_api_hygiene_guard.TestMainPySizeRatchet` (main.py size). Somebody built guards
+against exactly the growth this program exists to reverse, and both are already
+failing. That is P4's acceptance criterion failing before P4 starts, twice.
 
 **ANANTH'S DECISIONS, 2026-09-08 — two of the three open questions are closed:**
 
@@ -300,8 +318,9 @@ still need the harness.
   P1.1 deterministic replay harness              DONE 2026-09-08, verified
   P1a  remove `use_react` -> classic path unreachable -> delete 1,159 lines
        gate: import-graph proof + suite green + zero invariant movement
-  P1b  triage the 26 pre-existing test failures (the gate cannot read
-       "tests pass" until this is done)
+  P1b  NOT BLOCKING — Ananth 2026-09-08: "we have had these failures for a
+       while." The 26 are frozen as an accepted baseline the gate SUBTRACTS
+       (docs/chat-test-baseline.json), rather than a queue to clear first.
   P1c  retire master_objective + continuity      needs the harness
   P1d  credentialing code removal                needs the harness + the two
        roster-skill items below

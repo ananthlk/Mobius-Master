@@ -13,34 +13,11 @@ the POST half of the gate, not only as a report.
 |---:|---:|---:|---:|---:|---:|
 | 2593 | 2561 | 26 | 0 | 6 | 0.0s |
 
-**Failing:**
+Known-failing baseline: **26** tests, frozen 2026-09-08 before any P1a
+deletion. Ananth's ruling — these predate the program, so the gate SUBTRACTS them.
+A failure not in that set is a regression. The list may shrink, never grow.
 
-- `::test_write_async_lands_via_one_shot`
-- `::test_main_py_loc_under_ceiling`
-- `::test_extracts_from_find_carc_matches_shape`
-- `::test_no_authority_shows_em_dash`
-- `::test_auth_off_returns_globally_recent`
-- `::test_excludes_current_thread`
-- `::test_call_site_uses_helper`
-- `::test_run_pipeline_emits_thinking_before_state_load`
-- `::test_severity_is_uppercase_python_levelname`
-- `::test_message_field_populated`
-- `::test_logger_name_in_output`
-- `::test_empty_context_fields_dropped`
-- `::test_populated_context_fields_included`
-- `::test_extra_kwargs_propagate`
-- `::test_json_handler_installed_when_requested`
-- `::test_manifest_still_renders_curated_builtins`
-- `::test_react_loop_loc_under_ceiling`
-- `::test_build_consolidator_includes_tool_section_hints`
-- `::test_manifest_contains_all_router_owned_tools`
-- `::test_follow_up_capable_derived_from_registry`
-- `::test_rate_limit_triggers_one_retry`
-- `::test_tracer_records_spans_when_enabled`
-- `::test_stamps_standard_attrs`
-- `::test_omits_attrs_when_not_supplied`
-- `::test_returns_populated_inside_span`
-- `::test_filter_stamps_trace_ids_when_span_active`
+**No regressions** — every failure is in the known-failing baseline.
 
 ## A2 · What the tests actually cover, per schema node
 
@@ -48,12 +25,13 @@ A total test count is not coverage of the thing you are about to change. This ma
 test files to nodes by name, which is a WEAK signal — it proves a file exists whose
 name matches, not that the node's behaviour is asserted. Eval owns replacing it.
 
-**18 of 35 nodes have a matching test file · 17 have none · 3 of those are RED**
+**17 of 35 nodes have a matching test file · 18 have none · 4 of those are RED**
 
 | Node | Rating | Bugs | Test files | Cases |
 |---|---|---:|---|---:|
 | `POST /chat` | red | 14 | **none** | — |
 | `clarification` | red | 2 | **none** | — |
+| `jurisdiction` | red | 2 | **none** | — |
 | `state_load` | red | 5 | **none** | — |
 | `PHI gate` | amber | 2 | **none** | — |
 | `active_context` | amber | 1 | **none** | — |
@@ -67,26 +45,25 @@ name matches, not that the node's behaviour is asserted. Eval owns replacing it.
 | `plan` | amber | 1 | **none** | — |
 | `prompts` | amber | 4 | **none** | — |
 | `round0` | amber | 0 | **none** | — |
-| `run_pipeline` | amber | 4 | **none** | — |
+| `run_pipeline` | amber | 5 | **none** | — |
 | `stages` | green | 0 | **none** | — |
-| `continuity` | red | 1 | `test_continuity_checks.py`, `test_intent_jurisdiction_continuity.py` | — |
-| `jurisdiction` | red | 2 | `test_intent_jurisdiction_continuity.py` | — |
-| `queue` | red | 4 | `test_queue_usage_breakdown_enrich.py` | — |
-| `react_loop` | red | 5 | `test_react_loop.py` | — |
-| `clarify` | green | 0 | `test_clarify.py`, `test_react_clarify_questions.py` | — |
-| `context` | amber | 2 | `test_message_resolver_and_skill_context.py`, `test_react_continuation_context.py`, `test_system_context.py` | — |
-| `critic` | amber | 3 | `test_critic_call_resilience.py`, `test_critic_skip_on_cache.py`, `test_react_completion_critic_stage_registration.py`, `test_react_critic.py`, `test_react_critic_integration.py` | — |
-| `curator_tools` | amber | 3 | `test_curator_tools.py` | — |
-| `governor` | amber | 6 | `test_governor_bandit_criteria.py` | — |
-| `integrate` | amber | 3 | `test_integrate_fallback.py` | — |
-| `llm_manager` | amber | 0 | `test_llm_manager.py`, `test_llm_manager_attachments.py`, `test_llm_manager_v2.py` | — |
-| `message_resolver` | amber | 1 | `test_message_resolver_and_skill_context.py` | — |
-| `orchestrator` | amber | 2 | `test_orchestrator.py` | — |
-| `react_retry_guard` | green | 0 | `test_react_retry_guard.py`, `test_react_retry_guard_exhaustion.py`, `test_react_retry_guard_zero_result.py` | — |
-| `resolve` | amber | 0 | `test_fetch_document_resolve_by_id.py`, `test_message_resolver_and_skill_context.py`, `test_prior_resolved_entities.py` | — |
-| `retrieval_budget` | green | 0 | `test_retrieval_budget.py` | — |
-| `tool_manifest` | green | 2 | `test_tool_manifest.py` | — |
-| `worker` | amber | 0 | `test_worker_run.py` | — |
+| `continuity` | red | 1 | `test_continuity_checks.py` | 2 |
+| `queue` | red | 4 | `test_queue_usage_breakdown_enrich.py` | 1 |
+| `react_loop` | red | 5 | `test_react_loop.py` | 52 |
+| `clarify` | green | 0 | `test_react_clarify_questions.py` | 23 |
+| `context` | amber | 2 | `test_message_resolver_and_skill_context.py`, `test_react_continuation_context.py`, `test_system_context.py` | 49 |
+| `critic` | amber | 3 | `test_critic_call_resilience.py`, `test_critic_skip_on_cache.py`, `test_react_completion_critic_stage_registration.py`, `test_react_critic.py`, `test_react_critic_integration.py` | 99 |
+| `curator_tools` | amber | 3 | `test_curator_tools.py` | 16 |
+| `governor` | amber | 6 | `test_governor_bandit_criteria.py` | 39 |
+| `integrate` | amber | 3 | `test_integrate_fallback.py` | 2 |
+| `llm_manager` | amber | 0 | `test_llm_manager.py`, `test_llm_manager_attachments.py`, `test_llm_manager_v2.py` | 51 |
+| `message_resolver` | amber | 1 | `test_message_resolver_and_skill_context.py` | 13 |
+| `orchestrator` | amber | 2 | `test_orchestrator.py` | 14 |
+| `react_retry_guard` | green | 0 | `test_react_retry_guard.py`, `test_react_retry_guard_exhaustion.py`, `test_react_retry_guard_zero_result.py` | 56 |
+| `resolve` | amber | 0 | `test_fetch_document_resolve_by_id.py`, `test_message_resolver_and_skill_context.py`, `test_prior_resolved_entities.py` | 57 |
+| `retrieval_budget` | green | 0 | `test_retrieval_budget.py` | 5 |
+| `tool_manifest` | green | 2 | `test_tool_manifest.py` | 5 |
+| `worker` | amber | 0 | `test_worker_run.py` | 4 |
 
 ## B · Refactor gate — frozen baseline invariants
 
@@ -104,6 +81,6 @@ deterministic replay harness yet (P1.1). A flip would be unattributable.
 
 | modules | loc | except handlers | log-and-continue | bare except |
 |---:|---:|---:|---:|---:|
-| 233 | 76,729 | 830 | 506 | 0 |
+| 227 | 75,478 | 822 | 502 | 0 |
 
 I7 is monotonic: the log-and-continue count may fall, never rise.
