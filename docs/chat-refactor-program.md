@@ -473,6 +473,30 @@ and not a habit. Chat also staged `app/` and `tests/` explicitly rather than `-A
 correctly leaving another session's `db/schema/051_*.sql` and `frontend/platform.html`
 uncommitted — the shared-checkout discipline this program needs.
 
+## 3c. Bugs are fixed inside their module's refactor
+
+**Ananth's ruling, 2026-09-09:** when we refactor a module, that module's logged bugs
+get fixed in the same pass. Not as a separate remediation phase, not as a backlog.
+
+This changes what the phases mean. P3/P4/P5 are no longer "restructure and move on" —
+each is **restructure + close that module's findings**, and the node's findings list is
+the checklist for its own refactor. A module is done when it is both restructured and
+its bugs are gone, and the roadmap's per-node bug count is the acceptance criterion.
+
+**Why it is the right sequencing rather than a convenience.** Every bug on this page is
+attached to a node, and the person restructuring a module is the only person who will
+ever hold its whole shape in their head at once. Deferring a fix to a later pass means
+paying the comprehension cost twice and re-deriving why the bug was safe to fix — which
+is precisely how the `cf_intent` and `query_refinement` near-misses happened.
+
+**What it does NOT change:** the gate still runs per change, the invariants still have
+to hold, and a fix that moves an invariant still needs a named, reviewed diff. Bundling
+a fix with a restructure does not bundle their evidence.
+
+**Carve-out:** cross-module and cross-repo items stay separate — the PHI classifier
+gap, the JWTs in request logs, the queue durability work, the RAG write surface. Those
+have their own owners and are already listed under "Not in this program".
+
 ## 4. Not in this program
 
 Named so they are not silently absorbed:

@@ -71,42 +71,42 @@ write any. Eval owns what happens to this column next.
 
 | Node | Rating | Test files | Bugs |
 |---|---|---|---|
-| `POST /chat` | red | api_chat_router, bench_chat_e2e, chat_mode_utils, chat_stream_post_complete_grace | 14 |
+| `POST /chat` | red | **none** | 14 |
 | `clarification` | red | **none** | 2 |
-| `continuity` | red | continuity_checks, intent_jurisdiction_continuity | 1 |
+| `continuity` | red | **none** | 1 |
 | `emit_envelope` | red | **none** | 13 |
 | `jurisdiction` | red | **none** | 2 |
 | `queue` | red | **none** | 4 |
-| `react_loop` | red | react_loop | 5 |
+| `react_loop` | red | **none** | 5 |
 | `state_load` | red | **none** | 5 |
-| `tool_manifest` | red | tool_manifest | 3 |
-| `PHI gate` | amber | phi_gate | 2 |
+| `tool_manifest` | red | **none** | 3 |
+| `PHI gate` | amber | **none** | 2 |
 | `active_context` | amber | **none** | 1 |
 | `capabilities` | amber | **none** | 0 |
-| `clarify` | green | clarify, react_clarify_questions | 0 |
+| `clarify` | green | **none** | 0 |
 | `classify` | amber | **none** | 1 |
 | `completion_extension_gate` | amber | **none** | 2 |
-| `context` | amber | message_resolver_and_skill_context, react_continuation_context, system_context | 2 |
+| `context` | amber | **none** | 2 |
 | `credentialing_envelope` | green | **none** | 0 |
-| `critic` | amber | critic_call_resilience, critic_skip_on_cache, react_completion_critic_stage_registration, react_critic, react_critic_integration | 3 |
-| `curator_tools` | amber | curator_tools | 3 |
+| `critic` | amber | **none** | 3 |
+| `curator_tools` | amber | **none** | 3 |
 | `feedback_signal` | amber | **none** | 1 |
-| `governor` | amber | governor_bandit_criteria | 6 |
-| `integrate` | amber | integrate_fallback | 3 |
-| `llm_manager` | amber | llm_manager, llm_manager_attachments, llm_manager_v2 | 2 |
-| `message_resolver` | amber | message_resolver_and_skill_context | 1 |
-| `orchestrator` | amber | orchestrator | 2 |
+| `governor` | amber | **none** | 6 |
+| `integrate` | amber | **none** | 3 |
+| `llm_manager` | amber | **none** | 2 |
+| `message_resolver` | amber | **none** | 1 |
+| `orchestrator` | amber | **none** | 2 |
 | `parsing` | amber | **none** | 1 |
 | `personalization` | amber | **none** | 2 |
 | `plan` | amber | **none** | 1 |
 | `prompts` | amber | **none** | 4 |
-| `react_retry_guard` | green | react_retry_guard, react_retry_guard_exhaustion, react_retry_guard_zero_result | 0 |
-| `resolve` | amber | fetch_document_resolve_by_id, message_resolver_and_skill_context, prior_resolved_entities | 0 |
-| `retrieval_budget` | green | retrieval_budget | 0 |
+| `react_retry_guard` | green | **none** | 0 |
+| `resolve` | amber | **none** | 0 |
+| `retrieval_budget` | green | **none** | 0 |
 | `round0` | amber | **none** | 0 |
-| `run_pipeline` | amber | orchestrator | 5 |
+| `run_pipeline` | amber | **none** | 5 |
 | `stages` | green | **none** | 0 |
-| `worker` | amber | post_run_adjudication_sampling, react_no_truncation, worker_run | 0 |
+| `worker` | amber | **none** | 0 |
 
 ## Bugs
 

@@ -247,67 +247,9 @@
      "RUNTIME LENS: the Redis claim holds \u2014 CHAT_QUEUE_TYPE=redis is set and takes precedence over QUEUE_TYPE in config.py. Worth recording that the code default is 'memory' and QUEUE_TYPE alone is unset, so reading only QUEUE_TYPE would have produced a confident, wrong 'it uses the in-memory queue'."
     ]
    ],
-   "signals": {
-    "loc": 591,
-    "except_handlers": 5,
-    "swallow": 4,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [
-     "CHAT_STREAM_POST_COMPLETE_GRACE_S",
-     "CHAT_STREAM_TIMEOUT_S",
-     "MOBIUS_POST_RUN_ADJUDICATE",
-     "PHI_GATE_URL"
-    ],
-    "tests": [
-     "test_api_chat_router.py",
-     "test_bench_chat_e2e.py",
-     "test_chat_mode_utils.py",
-     "test_chat_stream_post_complete_grace.py"
-    ],
-    "path": "app/api/chat.py",
-    "fan_in": 0,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [
-      "INSERT compliance.hipaa_message_check_log",
-      "INSERT compliance.hipaa_message_check_log.",
-      "SELECTION: a"
-     ],
-     "storage_fns": [
-      "ensure_thread",
-      "fetch_turn_qc_audit",
-      "get_adjudication_feedback",
-      "get_llm_performance_feedback",
-      "get_plan",
-      "get_response"
-     ],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [
-      "POST /chat",
-      "GET /chat/response/{correlation_id}",
-      "GET /chat/stream/{correlation_id}",
-      "GET /chat/plan/{correlation_id}",
-      "GET /chat/skills-manifest"
-     ],
-     "frontend_files": []
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "_PHI_GATE_URL",
-       "value": "<computed>"
-      }
-     ],
-     "keyword_defaults": []
-    }
-   }
+   "detail": {}
   },
   {
    "step": "PHI gate",
@@ -362,24 +304,7 @@
     ]
    ],
    "ux": "No surface of its own. The 422 body carries phi_blocked, identifier_labels and evidence so the UI can explain a block; the audit rows have no reader anywhere.",
-   "signals": {
-    "loc": 95,
-    "except_handlers": 2,
-    "swallow": 2,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [
-     "PHI_CLASSIFIER_URL",
-     "PHI_GATE_TIMEOUT_SEC",
-     "PHI_GATE_URL"
-    ],
-    "tests": [
-     "test_phi_gate.py"
-    ],
-    "path": "app/skills/phi_gate.py",
-    "fan_in": 0,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [
     {
      "name": "PHI_GATE_URL",
@@ -387,7 +312,7 @@
     },
     {
      "name": "PHI_CLASSIFIER_URL",
-     "live": "https://mobius-phi-classifier-ortabkknqa-uc.a.run.app"
+     "live": "(not set \u2014 code default)"
     },
     {
      "name": "PHI_GATE_TIMEOUT_SEC",
@@ -452,51 +377,9 @@
      "WHAT THIS EXTRACTION CANNOT SEE: whether anything outside mobius-chat writes to or drains mobius:chat:requests, and what the actual queue depth is on the live instance. Both are observable and neither has been checked, so treat this node's durability claims as code-true and runtime-unmeasured."
     ]
    ],
-   "signals": {
-    "loc": 195,
-    "except_handlers": 7,
-    "swallow": 3,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [],
-    "path": "app/queue/redis_queue.py",
-    "fan_in": 0,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [
-      "_request_key",
-      "_response_prefix",
-      "redis_request_key",
-      "redis_response_key_prefix"
-     ],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./src/app.ts"
-     ]
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "REDIS_CONNECT_RETRIES",
-       "value": "12"
-      },
-      {
-       "name": "REDIS_CONNECT_RETRY_DELAY",
-       "value": "5"
-      }
-     ],
-     "keyword_defaults": []
-    }
-   }
+   "detail": {}
   },
   {
    "step": "worker",
@@ -524,54 +407,14 @@
      "The deadline is implemented with a signal handler, which only works on the main thread of a process. Worth confirming that assumption holds under the deployed server model."
     ]
    ],
-   "signals": {
-    "loc": 409,
-    "except_handlers": 11,
-    "swallow": 7,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [
-     "MOBIUS_TURN_DEADLINE_S"
-    ],
-    "tests": [
-     "test_post_run_adjudication_sampling.py",
-     "test_react_no_truncation.py",
-     "test_worker_run.py"
-    ],
-    "path": "app/worker/run.py",
-    "fan_in": 0,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [
     {
      "name": "MOBIUS_TURN_DEADLINE_S",
-     "live": "300"
+     "live": "(not set \u2014 code default)"
     }
    ],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [
-      "get_checkpoint",
-      "try_finalize"
-     ],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": []
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "_DEFAULT_TURN_DEADLINE_S",
-       "value": "90"
-      }
-     ],
-     "keyword_defaults": []
-    }
-   }
+   "detail": {}
   },
   {
    "step": "run_pipeline",
@@ -609,24 +452,7 @@
      "OWNER(chat): THE CREDENTIALING SURFACE IS 8,994 LINES IN CHAT AND ITS TABLES ARE EMPTY. Ananth 2026-09-08: credentialing_envelope needs to go, this is not a chat thing, it is legacy we are carrying forward.\n\nTHE ENVELOPE ITSELF IS THE SMALL PART. credentialing_envelope.py is 177 lines with 8 public functions and SEVEN HAVE ZERO CALLERS anywhere in app/ \u2014 roster_uploads_from_active, thread_has_roster_reconciliation_data, message_requests_roster_reconciliation, message_prefers_outside_in_credentialing, envelope_routes_to_reconciliation, classify_org_vs_uploads, build_canonical_credentialing_message. The only live one is resolve_step3_roster_merge_context, imported at credentialing_run_service.py:496. Deleting the seven is a no-impact change; deleting the file is moving one function to its single caller.\n\nTHE SURFACE BEHIND IT IS NOT SMALL. 14 modules whose filename names the subject: roster_credentialing_orchestrator.py 4395, credentialing_run_service.py 1033, api/credentialing.py 688 (13 routes with roster_upload), roster_truth_pg.py 602, credentialing_assertions_pg.py 538, api/roster_upload.py 329, credentialing_runs_pg.py 325, plus 7 more at 1084 \u2014 8,994 lines. Plus 125 scattered references inside SHARED modules: 50 in react_loop.py, 43 in integrate.py, 22 in blueprint.py. Those are the expensive part; they are not removable by deleting a file.\n\nELEVEN OF THIRTEEN TABLES HAVE ZERO ROWS \u2014 credentialing_runs, credentialing_assertion, credentialing_report_runs, _step_outputs, _summaries, _documents, roster_uploads, roster_upload_members, roster_reconciliation_provider, roster_review_session, roster_line_item. The two with data are provider_roster (156 rows, last written 2026-08-12) and roster_events (260, last 2026-07-06).\n\nAND THE DOMAIN HAS ANOTHER OWNER. mobius-skills/provider-roster-credentialing/ is a separate skill service with its own roster_handler, org_discovery and roster routes, referencing provider_roster directly. Chat 4,395-line orchestrator duplicates a module that already exists. That is the strongest form of the point: not a preference that chat should not do this, but that something else already does.\n\nTHE 59 LIVE MENTIONS ARE NOT THE WORKFLOW. 59 turns in 60 days mention roster, credentialing or PML, but they read as ordinary policy questions (What must a practitioner submit to be credentialed by Sunshine Health; AHCA requirements for credentialing a CMHC) and the roster_report skill appears in ZERO of their thinking logs. The credentialing QUESTIONS are plain RAG and touch none of this. Removing the workflow does not remove the ability to answer those 59.\n\nRESOLVED 2026-09-08, and it inverts the conclusion. THERE IS NO PRODUCTION: three GCP projects exist and the only live chat is mobius-chat in mobius-os-dev; mobius-chat-api and -worker in both mobius-staging-mobius and mobiusos-new were last deployed 2026-02-05, seven months ago. So the dev row counts ARE the evidence, not a proxy for evidence elsewhere \u2014 I had imported a dev-vs-prod caveat without checking that the second half of the distinction exists.\n\nAND THE 13 ROUTES DO HAVE CALLERS, which the row counts were hiding. mobius-chat/frontend/static/app.js carries 114 credentialing references, with more in index.html, roster-unified.html, signin.html and pipeline.html. And mobius-skills/provider-roster-credentialing/static/pipeline-chat.js calls credentialing-runs/ \u2014 THE SKILL SERVICE THAT OWNS THE DOMAIN CALLS BACK INTO CHAT'S ROUTES, and it is live at revision 00094. So this is not clean duplication with chat as the redundant copy; the two are entangled.\n\nThe removal therefore takes a frontend surface and a sibling service's dependency with it. It needs the Chat FE seat. Partial signal, offered as a hint and not an audit: two of the element ids app.js binds to (credentialingPreferOutsideIn, credentialingUploadRoster) exist in NO html, so those listeners never attach \u2014 but that is 2 ids checked out of 114 references."
     ]
    ],
-   "signals": {
-    "loc": 1902,
-    "except_handlers": 42,
-    "swallow": 31,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [
-     "CACHE_ASSIST_DEFAULT_MAX_AGE_DAYS",
-     "MOBIUS_DEBUG_PLAN",
-     "MOBIUS_USE_REACT"
-    ],
-    "tests": [
-     "test_orchestrator.py"
-    ],
-    "path": "app/pipeline/orchestrator.py",
-    "fan_in": 3,
-    "emits": 7
-   },
+   "signals": {},
    "live_config": [],
    "detail": {}
   }
@@ -694,118 +520,9 @@
      "OUT OF PROGRAM \u2014 WHY THE 'ema' NEVER GETS RE-GROUNDED. The LLM Agent took my static-literal finding to its cause, and theirs is the deeper one. Verified by me against live data before recording it as fact.\n\nmodel_registry.py:2292-2293 refreshes the ema from model_performance_by_stage `WHERE variant_id = 'default'` \u2014 a filter migration 052 added and labelled a REQUIRED COUPLED CODE CHANGE. But the writer, llm_analytics.build_record(), never populated module_key or variant_id. Migration 051's backfill set existing rows ONCE; nothing in the ongoing write path ever set either column again.\n\nMEASURED: 1,820 of 1,822 llm_calls rows in the last 24h have variant_id NULL. The only two non-NULL rows are the LLM Agent's own verification write, minutes ago. So the refresh query has matched NOTHING for over a month and the roster's hardcoded seed (2500ms flash / 8000ms pro) is never overwritten \u2014 which is exactly why my 'the ema is a static literal' observation was true. Symptom and cause fit together: the value is static because the thing that would replace it selects on a column nobody writes.\n\nCallManager \u2014 the module whose own docstring names it as the intended home for this wiring \u2014 is referenced only in prompt_manager docstrings and its own tests. Built, unit-tested, never connected to the live path. That is the fifth instance on this page of the same class: a write path with no writer, a gate with no caller, an instruction nobody reads back.\n\nBLAST RADIUS BEYOND THE BREAKER: model_winner_by_stage and model_composite_scores (admin dashboards) have been frozen on pre-2026-08-05 data, and the 24h error-rate breaker cannot reflect the last 24h because its row set never advances.\n\nFIXED by the LLM Agent in de43bd2 (pushed, NOT deployed): build_record() now writes module_key=stage and variant_id='default'. I verified the commit is clean \u2014 two files, no P1c deletions swept \u2014 which matters, because it was authored into the same shared working tree as an in-flight refactor phase."
     ]
    ],
-   "signals": {
-    "loc": 432,
-    "except_handlers": 9,
-    "swallow": 6,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [
-     "test_llm_manager.py",
-     "test_llm_manager_attachments.py",
-     "test_llm_manager_v2.py"
-    ],
-    "path": "app/services/llm_manager.py",
-    "fan_in": 0,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [
-      "SELECT() app.services.llm_provider",
-      "SELECT() pipeline",
-      "SELECTED __future__",
-      "SELECTION. previous",
-      "UPDATE router"
-     ],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./src/app.ts"
-     ]
-    },
-    "parameters": {
-     "module_constants": [],
-     "keyword_defaults": [
-      {
-       "fn": "generate",
-       "param": "stage",
-       "default": "planner"
-      },
-      {
-       "fn": "generate",
-       "param": "max_tokens",
-       "default": "1000"
-      },
-      {
-       "fn": "generate",
-       "param": "config_sha",
-       "default": "None"
-      },
-      {
-       "fn": "generate",
-       "param": "correlation_id",
-       "default": "None"
-      },
-      {
-       "fn": "generate",
-       "param": "thread_id",
-       "default": "None"
-      },
-      {
-       "fn": "generate",
-       "param": "parser",
-       "default": "False"
-      },
-      {
-       "fn": "generate",
-       "param": "phi_detected",
-       "default": "False"
-      },
-      {
-       "fn": "generate",
-       "param": "complexity",
-       "default": "None"
-      },
-      {
-       "fn": "generate",
-       "param": "mode",
-       "default": "None"
-      },
-      {
-       "fn": "generate",
-       "param": "composition_id",
-       "default": "None"
-      },
-      {
-       "fn": "generate",
-       "param": "composition_hash",
-       "default": "None"
-      },
-      {
-       "fn": "generate",
-       "param": "reasoning_depth",
-       "default": "None"
-      },
-      {
-       "fn": "generate",
-       "param": "latency_budget_ms",
-       "default": "None"
-      },
-      {
-       "fn": "generate",
-       "param": "attachments",
-       "default": "None"
-      }
-     ]
-    }
-   }
+   "detail": {}
   },
   {
    "id": "phi_gate",
@@ -873,28 +590,11 @@
     ]
    ],
    "ux": "No surface of its own. The 422 body carries phi_blocked, identifier_labels and evidence so the UI can explain a block; the audit rows have no reader anywhere.",
-   "signals": {
-    "loc": 95,
-    "except_handlers": 2,
-    "swallow": 2,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [
-     "PHI_CLASSIFIER_URL",
-     "PHI_GATE_TIMEOUT_SEC",
-     "PHI_GATE_URL"
-    ],
-    "tests": [
-     "test_phi_gate.py"
-    ],
-    "path": "app/skills/phi_gate.py",
-    "fan_in": 0,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [
     {
      "name": "PHI_CLASSIFIER_URL",
-     "live": "https://mobius-phi-classifier-ortabkknqa-uc.a.run.app"
+     "live": "(not set \u2014 code default)"
     },
     {
      "name": "PHI_GATE_TIMEOUT_SEC",
@@ -905,46 +605,7 @@
      "live": "(not set \u2014 code default)"
     }
    ],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": []
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "_PHI_URL",
-       "value": "<computed>"
-      },
-      {
-       "name": "_TIMEOUT",
-       "value": "<computed>"
-      },
-      {
-       "name": "_DROP_MESSAGE",
-       "value": "I couldn't store that \u2014 it looked like it might contain patient information. Could you rep"
-      }
-     ],
-     "keyword_defaults": [
-      {
-       "fn": "gate_feedback_text",
-       "param": "thread_id",
-       "default": "None"
-      },
-      {
-       "fn": "gate_feedback_text",
-       "param": "user_id",
-       "default": "None"
-      }
-     ]
-    }
-   }
+   "detail": {}
   },
   {
    "id": "retrieval_budget",
@@ -984,62 +645,9 @@
     ]
    ],
    "ux": "No surface \u2014 the computed number rides in the RAG call payload; visible only in the retrieval trace if you look for token_budget_for_retrieval",
-   "signals": {
-    "loc": 116,
-    "except_handlers": 0,
-    "swallow": 0,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [
-     "test_retrieval_budget.py"
-    ],
-    "path": "app/services/retrieval_budget.py",
-    "fan_in": 0,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": []
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "_SYSTEM_PROMPT_RESERVE_TOKENS",
-       "value": "1500"
-      },
-      {
-       "name": "_ANSWER_GENERATION_RESERVE_TOKENS",
-       "value": "4096"
-      },
-      {
-       "name": "_MIN_BUDGET_FLOOR",
-       "value": "2000"
-      },
-      {
-       "name": "_FALLBACK_CONTEXT_WINDOW_TOKENS",
-       "value": "<computed>"
-      },
-      {
-       "name": "_HISTORY_TURN_WINDOW",
-       "value": "3"
-      },
-      {
-       "name": "_HISTORY_ASSISTANT_PREVIEW_CHARS",
-       "value": "400"
-      }
-     ],
-     "keyword_defaults": []
-    }
-   }
+   "detail": {}
   },
   {
    "id": "jurisdiction",
@@ -1303,46 +911,9 @@
      "No test file."
     ]
    ],
-   "signals": {
-    "loc": 60,
-    "except_handlers": 0,
-    "swallow": 0,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [],
-    "path": "app/pipeline/active_context.py",
-    "fan_in": 1,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": []
-    },
-    "parameters": {
-     "module_constants": [],
-     "keyword_defaults": [
-      {
-       "fn": "load_active_context",
-       "param": "last_turns",
-       "default": "None"
-      },
-      {
-       "fn": "load_failed_query",
-       "param": "last_turns",
-       "default": "None"
-      }
-     ]
-    }
-   }
+   "detail": {}
   },
   {
    "id": "app-pipeline-context",
@@ -1405,50 +976,9 @@
      "No test file of its own."
     ]
    ],
-   "signals": {
-    "loc": 305,
-    "except_handlers": 0,
-    "swallow": 0,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [
-     "test_message_resolver_and_skill_context.py",
-     "test_react_continuation_context.py",
-     "test_system_context.py"
-    ],
-    "path": "app/pipeline/context.py",
-    "fan_in": 16,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [
-      "UPDATE fields"
-     ],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./employees.html",
-      "./index.html",
-      "./src/app.ts",
-      "./src/card-render-model.test.ts",
-      "./src/render/bubble.test.ts",
-      "./src/render/bubble.ts",
-      "./static/app.js",
-      "./static/index.html"
-     ]
-    },
-    "parameters": {
-     "module_constants": [],
-     "keyword_defaults": []
-    }
-   }
+   "detail": {}
   },
   {
    "id": "app-pipeline-curator_tools",
@@ -1508,25 +1038,7 @@
      "Three swallows on calls crossing a service boundary; a failed ingest that logs and continues looks the same to the conversation as a successful one."
     ]
    ],
-   "signals": {
-    "loc": 328,
-    "except_handlers": 4,
-    "swallow": 3,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [
-     "ADMIN_API_KEY",
-     "MOBIUS_RAG_ADMIN_KEY",
-     "RAG_API_BASE",
-     "RAG_API_URL"
-    ],
-    "tests": [
-     "test_curator_tools.py"
-    ],
-    "path": "app/pipeline/curator_tools.py",
-    "fan_in": 1,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [
     {
      "name": "ADMIN_API_KEY",
@@ -1538,44 +1050,14 @@
     },
     {
      "name": "RAG_API_BASE",
-     "live": "https://mobius-rag-ortabkknqa-uc.a.run.app"
+     "live": "(not set \u2014 code default)"
     },
     {
      "name": "RAG_API_URL",
-     "live": "https://mobius-rag-ortabkknqa-uc.a.run.app"
+     "live": "(not set \u2014 code default)"
     }
    ],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./platform.html"
-     ]
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "_NO_SOURCES",
-       "value": "no_sources"
-      },
-      {
-       "name": "_CORPUS_HIT",
-       "value": "corpus_hit"
-      },
-      {
-       "name": "_STATE_NAME_TO_CODE",
-       "value": "{'alabama': 'AL', 'alaska': 'AK', 'arizona': 'AZ', 'arkansas': 'AR', 'california': 'CA', '"
-      }
-     ],
-     "keyword_defaults": []
-    }
-   }
+   "detail": {}
   },
   {
    "id": "app-pipeline-message_resolver",
@@ -1622,77 +1104,9 @@
      "The ordering dependency with classify is real and implicit."
     ]
    ],
-   "signals": {
-    "loc": 422,
-    "except_handlers": 0,
-    "swallow": 0,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [
-     "test_message_resolver_and_skill_context.py"
-    ],
-    "path": "app/pipeline/message_resolver.py",
-    "fan_in": 4,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": []
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "REFERENCE_SIGNALS",
-       "value": "<computed>"
-      },
-      {
-       "name": "QUESTION_SCAFFOLDING",
-       "value": "<computed>"
-      },
-      {
-       "name": "SKILL_REFERENCE_SIGNALS",
-       "value": "<computed>"
-      },
-      {
-       "name": "_NPI_LOOKUP_FOLLOWUP",
-       "value": "<computed>"
-      },
-      {
-       "name": "SKILL_TERMS",
-       "value": "<computed>"
-      },
-      {
-       "name": "_WORKFLOW_BILLING_NPI_LINE",
-       "value": "<computed>"
-      },
-      {
-       "name": "_LOCATION_FOLLOWUP_WITH_NPIS",
-       "value": "<computed>"
-      }
-     ],
-     "keyword_defaults": [
-      {
-       "fn": "resolve_pronouns",
-       "param": "prior_failed_question",
-       "default": "None"
-      },
-      {
-       "fn": "resolve_message_references",
-       "param": "prior_failed_question",
-       "default": "None"
-      }
-     ]
-    }
-   }
+   "detail": {}
   },
   {
    "id": "app-pipeline-orchestrator",
@@ -1784,151 +1198,18 @@
      "The stage sequence is explicit enough that this diagram's flow was parsed directly from it."
     ]
    ],
-   "signals": {
-    "loc": 1902,
-    "except_handlers": 42,
-    "swallow": 31,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [
-     "CACHE_ASSIST_DEFAULT_MAX_AGE_DAYS",
-     "MOBIUS_DEBUG_PLAN",
-     "MOBIUS_USE_REACT"
-    ],
-    "tests": [
-     "test_orchestrator.py"
-    ],
-    "path": "app/pipeline/orchestrator.py",
-    "fan_in": 3,
-    "emits": 7
-   },
+   "signals": {},
    "live_config": [
     {
      "name": "CACHE_ASSIST_DEFAULT_MAX_AGE_DAYS",
-     "live": "14"
+     "live": "(not set \u2014 code default)"
     },
     {
      "name": "MOBIUS_DEBUG_PLAN",
      "live": "(not set \u2014 code default)"
     }
    ],
-   "detail": {
-    "db": {
-     "sql": [
-      "INSERT chat_cache_shadow_log",
-      "SELECTION` a",
-      "SELECTOR merged_state",
-      "SELECT_CACHE_MODE app.skills.registry",
-      "UPDATE objective"
-     ],
-     "storage_fns": [
-      "append_draft_answer",
-      "get_allowed_tools_for_user",
-      "get_checkpoint",
-      "get_last_turn_question",
-      "register_open_slots",
-      "save_state_full",
-      "start_progress",
-      "store_plan",
-      "store_response",
-      "try_finalize",
-      "update_turn_cache_mode",
-      "upsert_thread_summary"
-     ],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./platform.html",
-      "./src/app.ts",
-      "./static/app.js",
-      "./static/pipeline-chat.js",
-      "./static/pipeline-core.js",
-      "./static/pipeline-enrollment.js",
-      "./static/pipeline-nppes.js",
-      "./static/pipeline-render.js"
-     ]
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "_RETRY_PHRASE_RE",
-       "value": "<computed>"
-      },
-      {
-       "name": "_MODEL_LABELS",
-       "value": "{'gemini-2.5-pro': 'Gemini Pro', 'gemini-2.5-flash': 'Gemini Flash', 'gemini-2.0-flash': '"
-      },
-      {
-       "name": "DEBUG_PLAN",
-       "value": "<computed>"
-      },
-      {
-       "name": "USE_REACT",
-       "value": "<computed>"
-      }
-     ],
-     "keyword_defaults": [
-      {
-       "fn": "run_pipeline",
-       "param": "t0_start",
-       "default": "None"
-      },
-      {
-       "fn": "run_pipeline",
-       "param": "use_react_override",
-       "default": "None"
-      },
-      {
-       "fn": "run_pipeline",
-       "param": "chat_mode",
-       "default": "None"
-      },
-      {
-       "fn": "run_pipeline",
-       "param": "force_citable_required",
-       "default": "None"
-      },
-      {
-       "fn": "run_pipeline",
-       "param": "user_id",
-       "default": "None"
-      },
-      {
-       "fn": "run_pipeline",
-       "param": "system_context",
-       "default": "None"
-      },
-      {
-       "fn": "run_pipeline",
-       "param": "cache_assist",
-       "default": "None"
-      },
-      {
-       "fn": "run_pipeline",
-       "param": "user_profile",
-       "default": "None"
-      },
-      {
-       "fn": "run_pipeline",
-       "param": "phi_gate_verdict",
-       "default": "None"
-      },
-      {
-       "fn": "run_pipeline",
-       "param": "is_continuation",
-       "default": "False"
-      },
-      {
-       "fn": "run_pipeline",
-       "param": "selection",
-       "default": "None"
-      }
-     ]
-    }
-   }
+   "detail": {}
   },
   {
    "id": "app-pipeline-personalization",
@@ -1997,45 +1278,14 @@
     ]
    ],
    "ux": "The personalization_applied envelope \u2014 the user sees their preferences were honoured. Preferences are AUTHORED in mobius-user, not here.",
-   "signals": {
-    "loc": 129,
-    "except_handlers": 0,
-    "swallow": 0,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [
-     "CHAT_PERSONALIZATION_ENABLED"
-    ],
-    "tests": [],
-    "path": "app/pipeline/personalization.py",
-    "fan_in": 7,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [
     {
      "name": "CHAT_PERSONALIZATION_ENABLED",
      "live": "(not set \u2014 code default)"
     }
    ],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./index.html",
-      "./src/app.ts"
-     ]
-    },
-    "parameters": {
-     "module_constants": [],
-     "keyword_defaults": []
-    }
-   }
+   "detail": {}
   },
   {
    "id": "app-pipeline-react-critic",
@@ -2106,110 +1356,18 @@
      "36 of 966 audited turns failed groundedness (3.7%). 34 shipped with the 'Groundedness notice' warning appended and 8 bought an extra round. So the floor's dominant live outcome is ship-with-warning, not retry \u2014 worth knowing before anyone tunes the prompt on the assumption that it mostly self-corrects."
     ]
    ],
-   "signals": {
-    "loc": 788,
-    "except_handlers": 6,
-    "swallow": 4,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [
-     "MOBIUS_REACT_CRITIC",
-     "MOBIUS_REACT_GROUNDEDNESS_HEURISTIC"
-    ],
-    "tests": [
-     "test_critic_call_resilience.py",
-     "test_critic_skip_on_cache.py",
-     "test_react_completion_critic_stage_registration.py",
-     "test_react_critic.py",
-     "test_react_critic_integration.py"
-    ],
-    "path": "app/pipeline/react/critic.py",
-    "fan_in": 2,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [
     {
      "name": "MOBIUS_REACT_CRITIC",
-     "live": "0"
+     "live": "(not set \u2014 code default)"
     },
     {
      "name": "MOBIUS_REACT_GROUNDEDNESS_HEURISTIC",
      "live": "(not set \u2014 code default)"
     }
    ],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./platform.html",
-      "./src/answer-card.ts",
-      "./src/app.ts",
-      "./static/app.js",
-      "./static/pipeline-enrollment.js",
-      "./static/pipeline-nppes.js",
-      "./static/task-manager.js",
-      "./static/vault-panel.js"
-     ]
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "_GOOGLE_SIGNAL",
-       "value": "google_only"
-      },
-      {
-       "name": "_DEFAULT_GROUNDEDNESS_PENALTY",
-       "value": "{'high': 0.5, 'medium': 0.2, 'low': 0.05}"
-      },
-      {
-       "name": "CRITIC_SYSTEM_PROMPT",
-       "value": "You are auditing a DRAFT ANSWER against RETRIEVED SOURCES.\n\nYour ONLY job: for each factua"
-      },
-      {
-       "name": "COMPLETION_CRITIC_SYSTEM_PROMPT",
-       "value": "You check whether an answer actually covers everything a question asked for -- not whether"
-      }
-     ],
-     "keyword_defaults": [
-      {
-       "fn": "should_run_critic",
-       "param": "user_message",
-       "default": ""
-      },
-      {
-       "fn": "compute_groundedness_heuristic",
-       "param": "weights",
-       "default": "None"
-      },
-      {
-       "fn": "build_critic_user_message",
-       "param": "tool_results",
-       "default": "None"
-      },
-      {
-       "fn": "build_critic_user_message",
-       "param": "last_turns",
-       "default": "None"
-      },
-      {
-       "fn": "build_critic_user_message",
-       "param": "previous_thread_summary",
-       "default": "None"
-      },
-      {
-       "fn": "build_critic_user_message",
-       "param": "last_turn_sources",
-       "default": "None"
-      }
-     ]
-    }
-   }
+   "detail": {}
   },
   {
    "id": "app-pipeline-react-feedback_signal",
@@ -2255,46 +1413,14 @@
      "No test file."
     ]
    ],
-   "signals": {
-    "loc": 77,
-    "except_handlers": 0,
-    "swallow": 0,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [
-     "FEEDBACK_PERIODIC_ENABLED"
-    ],
-    "tests": [],
-    "path": "app/pipeline/react/feedback_signal.py",
-    "fan_in": 2,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [
     {
      "name": "FEEDBACK_PERIODIC_ENABLED",
      "live": "(not set \u2014 code default)"
     }
    ],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [
-      "product_feedback as _pf"
-     ],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./platform.html"
-     ]
-    },
-    "parameters": {
-     "module_constants": [],
-     "keyword_defaults": []
-    }
-   }
+   "detail": {}
   },
   {
    "id": "app-pipeline-react-governor",
@@ -2384,98 +1510,18 @@
      "Has a test file, and replacing scattered round rules with one contract is the right direction."
     ]
    ],
-   "signals": {
-    "loc": 380,
-    "except_handlers": 1,
-    "swallow": 0,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [
-     "MOBIUS_PRODUCT_PROMISE_ENABLED",
-     "MOBIUS_TURN_DEADLINE_S"
-    ],
-    "tests": [
-     "test_governor_bandit_criteria.py"
-    ],
-    "path": "app/pipeline/react/governor.py",
-    "fan_in": 1,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [
     {
      "name": "MOBIUS_PRODUCT_PROMISE_ENABLED",
-     "live": "true"
+     "live": "(not set \u2014 code default)"
     },
     {
      "name": "MOBIUS_TURN_DEADLINE_S",
-     "live": "300"
+     "live": "(not set \u2014 code default)"
     }
    ],
-   "detail": {
-    "db": {
-     "sql": [
-      "SELECT a",
-      "SELECTION mode",
-      "SELECTION the",
-      "SELECTOR __future__"
-     ],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./platform.html",
-      "./src/app.ts",
-      "./static/app.js"
-     ]
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "_DEFAULT_TURN_DEADLINE_S",
-       "value": "90"
-      },
-      {
-       "name": "_TURN_DEADLINE_MIN_S",
-       "value": "10"
-      },
-      {
-       "name": "_TURN_DEADLINE_MAX_S",
-       "value": "900"
-      },
-      {
-       "name": "FINALIZE_MARGIN_S",
-       "value": "5.0"
-      },
-      {
-       "name": "_DEPTH_RANK",
-       "value": "{'fast': 0, 'normal': 1, 'thinking': 2}"
-      },
-      {
-       "name": "_THINKING_INTENT_KEYWORDS",
-       "value": "('report', 'analysis', 'breakdown', 'detailed', 'comprehensive', 'summary of', 'credential"
-      },
-      {
-       "name": "_CEILING_SCALE_ABSOLUTE_CAP_S",
-       "value": "600.0"
-      }
-     ],
-     "keyword_defaults": [
-      {
-       "fn": "default_contract_for_mode",
-       "param": "tone",
-       "default": ""
-      },
-      {
-       "fn": "default_contract_for_mode",
-       "param": "reasoning_visibility",
-       "default": "medium"
-      }
-     ]
-    }
-   }
+   "detail": {}
   },
   {
    "id": "app-pipeline-react-parsing",
@@ -2511,47 +1557,9 @@
      "The tiers are ordered, documented and bounded, and the one heuristic escape hatch is scoped to a single named question shape rather than being a general guess."
     ]
    ],
-   "signals": {
-    "loc": 165,
-    "except_handlers": 2,
-    "swallow": 2,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [],
-    "path": "app/pipeline/react/parsing.py",
-    "fan_in": 1,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./platform.html",
-      "./src/answer-card.test.ts",
-      "./src/answer-card.ts",
-      "./src/app.ts",
-      "./static/pipeline-nppes.js",
-      "./static/pipeline-render.js"
-     ]
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "_ORG_NPI_NAME_LOOKUP_HINT",
-       "value": "<computed>"
-      }
-     ],
-     "keyword_defaults": []
-    }
-   }
+   "detail": {}
   },
   {
    "id": "app-pipeline-react-prompts",
@@ -2625,126 +1633,9 @@
     ]
    ],
    "ux": "Prompt Composition Studio \u2014 LIVE at https://mobius-chat-ortabkknqa-uc.a.run.app/admin/prompts (served from frontend/prompts.html via main.py:3160, backed by app/api/admin_prompts.py). Blocks, compositions, versions and monitoring. Note the route is /admin/prompts \u2014 /prompts and /prompts.html both 404.",
-   "signals": {
-    "loc": 1365,
-    "except_handlers": 2,
-    "swallow": 2,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [],
-    "path": "app/pipeline/react/prompts.py",
-    "fan_in": 5,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./index.html",
-      "./platform.html",
-      "./prompts.html",
-      "./src/app.ts",
-      "./static/app.js",
-      "./static/grand-reveal.html",
-      "./static/index.html"
-     ]
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "REACT_MAX_ROUNDS_COPILOT",
-       "value": "3"
-      },
-      {
-       "name": "REACT_MAX_ROUNDS_AGENTIC",
-       "value": "10"
-      },
-      {
-       "name": "REACT_MAX_ROUNDS_QUICK",
-       "value": "2"
-      },
-      {
-       "name": "REACT_MAX_ROUNDS_TASK",
-       "value": "3"
-      },
-      {
-       "name": "QUICK_MODE_TRUNCATED_CHARS",
-       "value": "500"
-      },
-      {
-       "name": "_REACT_JINJA_ENV",
-       "value": "None"
-      },
-      {
-       "name": "REACT_NO_TOOLS_PROMPT",
-       "value": "You are a precise assistant operating in task mode.\n\nRules \u2014 follow ALL of them without ex"
-      },
-      {
-       "name": "REACT_MODE_BLOCK_QUICK",
-       "value": "\nCHAT MODE: **quick** (mini-container, max {{ max_iterations }} rounds \u2014 fail fast)\n\nQuali"
-      },
-      {
-       "name": "REACT_MODE_BLOCK_COPILOT",
-       "value": "\nCHAT MODE: **copilot** (fewer reasoning rounds: {{ max_iterations }})\n\nQuality bar for th"
-      },
-      {
-       "name": "REACT_MODE_BLOCK_AGENTIC",
-       "value": "\nCHAT MODE: **agentic** (more reasoning rounds: {{ max_iterations }})\n\nQuality bar for thi"
-      },
-      {
-       "name": "_REACT_MODE_BLOCK_TEMPLATES",
-       "value": "<computed>"
-      },
-      {
-       "name": "REACT_IDENTITY_TEXT",
-       "value": "You are Mobius \u2014 an AI assistant for CMHC billing coordinators in Florida.\nYou do NOT answ"
-      },
-      {
-       "name": "REACT_RESPONSE_SHAPE_TEXT",
-       "value": "Your response each round MUST be a single JSON object \u2014 nothing before `{`, nothing after "
-      },
-      {
-       "name": "REACT_FORMAT_RULES_TEXT",
-       "value": "FORMAT RULES for the \"answer\" field (structural defaults \u2014 USER PREFERENCES appended at th"
-      }
-     ],
-     "keyword_defaults": [
-      {
-       "fn": "build_reasoning_context",
-       "param": "max_iterations",
-       "default": "None"
-      },
-      {
-       "fn": "build_reasoning_context",
-       "param": "gap_status",
-       "default": "None"
-      },
-      {
-       "fn": "build_reasoning_context",
-       "param": "rag_call_history",
-       "default": "None"
-      },
-      {
-       "fn": "build_reasoning_context",
-       "param": "evidence_review_latest",
-       "default": "None"
-      },
-      {
-       "fn": "build_reasoning_context",
-       "param": "exhausted_tools",
-       "default": "None"
-      }
-     ]
-    }
-   }
+   "detail": {}
   },
   {
    "id": "app-pipeline-react-round0",
@@ -2784,62 +1675,9 @@
      "Its short-circuit is marked by preflight_round0_short_circuit_taken at react_loop.py:4223, but that is a logger.info gated on the step taking >= 50ms, not an EmitEnvelope. A fast short-circuit is not recorded, so the rate cannot be measured. Agreed with the Chat seat as one of two worth a real signal."
     ]
    ],
-   "signals": {
-    "loc": 196,
-    "except_handlers": 1,
-    "swallow": 1,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [],
-    "path": "app/pipeline/react/round0.py",
-    "fan_in": 1,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./platform.html"
-     ]
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "ROUND0_SENTINEL",
-       "value": "NEEDS_TOOLS"
-      },
-      {
-       "name": "ROUND0_SYSTEM_PROMPT",
-       "value": "<computed>"
-      }
-     ],
-     "keyword_defaults": [
-      {
-       "fn": "try_system_context_round0",
-       "param": "emitter",
-       "default": "None"
-      },
-      {
-       "fn": "try_system_context_round0",
-       "param": "llm_caller",
-       "default": "None"
-      },
-      {
-       "fn": "try_system_context_round0",
-       "param": "finalizer",
-       "default": "None"
-      }
-     ]
-    }
-   }
+   "detail": {}
   },
   {
    "id": "app-pipeline-react_loop",
@@ -2988,27 +1826,7 @@
      "It does have a test file, and the extraction programme is real and ratcheted."
     ]
    ],
-   "signals": {
-    "loc": 6113,
-    "except_handlers": 36,
-    "swallow": 21,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [
-     "APPEALS_AGENT_URL",
-     "CACHE_ASSIST_SKIP_CRITIC_WHEN_PREAUDITED",
-     "MOBIUS_PROMPT_SOURCE",
-     "MOBIUS_TURN_DEADLINE_S",
-     "MOBIUS_WEB_SCRAPE_TIMEOUT_S",
-     "PAYOR_API_URL"
-    ],
-    "tests": [
-     "test_react_loop.py"
-    ],
-    "path": "app/pipeline/react_loop.py",
-    "fan_in": 4,
-    "emits": 13
-   },
+   "signals": {},
    "live_config": [
     {
      "name": "APPEALS_AGENT_URL",
@@ -3020,11 +1838,11 @@
     },
     {
      "name": "MOBIUS_PROMPT_SOURCE",
-     "live": "composition"
+     "live": "(not set \u2014 code default)"
     },
     {
      "name": "MOBIUS_TURN_DEADLINE_S",
-     "live": "300"
+     "live": "(not set \u2014 code default)"
     },
     {
      "name": "MOBIUS_WEB_SCRAPE_TIMEOUT_S",
@@ -3032,100 +1850,10 @@
     },
     {
      "name": "PAYOR_API_URL",
-     "live": "https://mobius-payor-ortabkknqa-uc.a.run.app"
+     "live": "(not set \u2014 code default)"
     }
    ],
-   "detail": {
-    "db": {
-     "sql": [
-      "SELECTION). app.pipeline.react.governor",
-      "UPDATE your"
-     ],
-     "storage_fns": [
-      "append_evidence_checkpoint",
-      "append_message_chunk",
-      "get_state",
-      "save_state_full"
-     ],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./platform.html",
-      "./src/app.ts",
-      "./static/app.js"
-     ]
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "_REACT_FINAL_ROUND_INSTRUCTION",
-       "value": "This is your FINAL round \u2014 there is no round after this one, so do NOT request another too"
-      },
-      {
-       "name": "_REACT_STRUCTURAL_EXHAUSTION_OFFRAMP",
-       "value": "You've now tried multiple different approaches for this and none have worked (see the fail"
-      },
-      {
-       "name": "_CHUNK_HEADER_RE",
-       "value": "<computed>"
-      },
-      {
-       "name": "_SPARSE_EVIDENCE_CHUNK_THRESHOLD",
-       "value": "3"
-      },
-      {
-       "name": "_SPARSE_EVIDENCE_CHAR_THRESHOLD",
-       "value": "500"
-      },
-      {
-       "name": "_FAST_MODE_MIN_CHUNKS",
-       "value": "3"
-      },
-      {
-       "name": "_FAST_MODE_MIN_CHARS",
-       "value": "500"
-      },
-      {
-       "name": "_FAST_MODE_SYNTHESIS_SYSTEM",
-       "value": "You are Mobius, answering from LIMITED retrieved evidence in fast mode. Write a short, hon"
-      },
-      {
-       "name": "_FAST_MODE_RICH_SYNTHESIS_SYSTEM",
-       "value": "You are Mobius, answering from retrieved evidence in fast mode. Write a clear, direct, hum"
-      },
-      {
-       "name": "_CORPUS_CONFIDENCE_MIN_DEFAULT",
-       "value": "0.3"
-      },
-      {
-       "name": "_HCPCS_RE",
-       "value": "<computed>"
-      },
-      {
-       "name": "_CPT_RE",
-       "value": "<computed>"
-      },
-      {
-       "name": "_ICD10_RE",
-       "value": "<computed>"
-      },
-      {
-       "name": "_REV_RE",
-       "value": "<computed>"
-      }
-     ],
-     "keyword_defaults": [
-      {
-       "fn": "run_react",
-       "param": "emitter",
-       "default": "None"
-      }
-     ]
-    }
-   }
+   "detail": {}
   },
   {
    "id": "completion_extension_gate",
@@ -3184,11 +1912,11 @@
    "live_config": [
     {
      "name": "MOBIUS_PRODUCT_PROMISE_ENABLED",
-     "live": "true"
+     "live": "(not set \u2014 code default)"
     },
     {
      "name": "MOBIUS_TURN_DEADLINE_S",
-     "live": "300"
+     "live": "(not set \u2014 code default)"
     }
    ],
    "detail": {}
@@ -3245,52 +1973,9 @@
      "A typed refusal beats a hedged answer: the fail-fast path produces something the caller can branch on rather than prose that looks like an answer."
     ]
    ],
-   "signals": {
-    "loc": 342,
-    "except_handlers": 1,
-    "swallow": 0,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [
-     "test_react_retry_guard.py",
-     "test_react_retry_guard_exhaustion.py",
-     "test_react_retry_guard_zero_result.py"
-    ],
-    "path": "app/pipeline/react_retry_guard.py",
-    "fan_in": 1,
-    "emits": 1
-   },
+   "signals": {},
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./platform.html"
-     ]
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "_TOOL_EXHAUSTION_THRESHOLD",
-       "value": "2"
-      }
-     ],
-     "keyword_defaults": [
-      {
-       "fn": "structurally_exhausted",
-       "param": "min_distinct_tools",
-       "default": "2"
-      }
-     ]
-    }
-   }
+   "detail": {}
   },
   {
    "id": "app-pipeline-stages",
@@ -3322,74 +2007,9 @@
      "Constants in one place instead of string literals scattered through the pipeline."
     ]
    ],
-   "signals": {
-    "loc": 11,
-    "except_handlers": 0,
-    "swallow": 0,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [],
-    "path": "app/pipeline/stages.py",
-    "fan_in": 1,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./index.html",
-      "./platform.html",
-      "./src/app.ts",
-      "./src/render/bubble.ts",
-      "./static/app.js"
-     ]
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "STATE_LOAD",
-       "value": "state_load"
-      },
-      {
-       "name": "CLASSIFY",
-       "value": "classify"
-      },
-      {
-       "name": "PLAN",
-       "value": "plan"
-      },
-      {
-       "name": "CLARIFY",
-       "value": "clarify"
-      },
-      {
-       "name": "RESOLVE",
-       "value": "resolve"
-      },
-      {
-       "name": "INTEGRATE",
-       "value": "integrate"
-      },
-      {
-       "name": "PUBLISH",
-       "value": "publish"
-      },
-      {
-       "name": "STAGES",
-       "value": "<computed>"
-      }
-     ],
-     "keyword_defaults": []
-    }
-   }
+   "detail": {}
   },
   {
    "id": "app-pipeline-tool_manifest",
@@ -3449,102 +2069,9 @@
      "No config and no telemetry: you cannot tell from the trace what manifest the planner was shown on a given turn. The second of the two the Chat seat and I agreed are worth a real signal."
     ]
    ],
-   "signals": {
-    "loc": 694,
-    "except_handlers": 0,
-    "swallow": 0,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [
-     "test_tool_manifest.py"
-    ],
-    "path": "app/pipeline/tool_manifest.py",
-    "fan_in": 3,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./platform.html"
-     ]
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "_RETRIEVAL_METHODOLOGY_PRIMER",
-       "value": "RETRIEVAL \u2014 one tool: rag(query).\n\nrag is the single retrieval entry point. It handles cor"
-      },
-      {
-       "name": "_RAG_BLOCK",
-       "value": "rag(query)\n  Retrieves and cites facts, policy statements, and procedural content\n    from"
-      },
-      {
-       "name": "_RECALL_EVIDENCE_BLOCK",
-       "value": "recall_evidence(refs)\n  Pulls back the full original text of a chunk you set aside in an\n "
-      },
-      {
-       "name": "_SEARCH_CORPUS_BLOCK",
-       "value": ""
-      },
-      {
-       "name": "_RECALL_SEARCH_BLOCK",
-       "value": ""
-      },
-      {
-       "name": "_PRECISION_SEARCH_BLOCK",
-       "value": ""
-      },
-      {
-       "name": "_HEALTHCARE_NPI_LOOKUP_BLOCK",
-       "value": "healthcare_npi_lookup(question)\n  Looks up a provider or organization in the NPPES nationa"
-      },
-      {
-       "name": "_SEARCH_UPLOADED_DOCUMENT_BLOCK",
-       "value": "search_uploaded_document(upload_id optional, query)\n  **Instant-RAG** \u2014 search *inside* a "
-      },
-      {
-       "name": "_REFUSE_BLOCK",
-       "value": "refuse(reason)\n  Hard stop \u2014 no content returned.\n  Use for: any question about a specific"
-      },
-      {
-       "name": "_APPEALS_BLOCK",
-       "value": "\u26a0 APPEALS TOOLS \u2014 HIGHEST PRIORITY. Use these for ANY denial or appeal question.\nTRIGGER W"
-      },
-      {
-       "name": "_LOOKUP_AUTHORITATIVE_SOURCES_BLOCK",
-       "value": "lookup_authoritative_sources(payer?, state?, topic?, authority_level?)\n  Searches Mobius's"
-      },
-      {
-       "name": "_INGEST_URL_BLOCK",
-       "value": "ingest_url(url)\n  Fetch a single URL and add it to the indexed corpus right now. Goes\n    "
-      },
-      {
-       "name": "_SERVICE_LINE_CODE_LOOKUP_BLOCK",
-       "value": "service_line_code_lookup(code, modifier?)\n  What a HCPCS/CPT code is: every (code, modifie"
-      },
-      {
-       "name": "_SERVICE_LINE_LIMITS_BLOCK",
-       "value": "service_line_limits(code, modifier?)\n  How much may be billed for a (code, modifier) pair."
-      }
-     ],
-     "keyword_defaults": [
-      {
-       "fn": "get_tool_manifest",
-       "param": "allowed",
-       "default": "None"
-      }
-     ]
-    }
-   }
+   "detail": {}
   },
   {
    "id": "app-stages-agents-capabilities",
@@ -3593,55 +2120,9 @@
      "No test file, and four callers depend on its shape."
     ]
    ],
-   "signals": {
-    "loc": 333,
-    "except_handlers": 0,
-    "swallow": 0,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [],
-    "path": "app/stages/agents/capabilities.py",
-    "fan_in": 4,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./platform.html",
-      "./src/app.ts",
-      "./static/app.js"
-     ]
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "PATH_CAPABILITIES",
-       "value": "{'rag': ['policy lookup', 'appeals process', 'grievances', 'prior auth', 'eligibility crit"
-      }
-     ],
-     "keyword_defaults": [
-      {
-       "fn": "planner_input_json",
-       "param": "context",
-       "default": ""
-      },
-      {
-       "fn": "planner_input_json",
-       "param": "last_master_plan",
-       "default": "None"
-      }
-     ]
-    }
-   }
+   "detail": {}
   },
   {
    "id": "app-stages-integrate",
@@ -3720,26 +2201,7 @@
     ]
    ],
    "ux": "Answer card in the chat bubble; step labels 'Composing your answer' and 'Critique & citations'",
-   "signals": {
-    "loc": 1887,
-    "except_handlers": 29,
-    "swallow": 20,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [
-     "CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL",
-     "MOBIUS_ADJ_SOURCE_MAX_CHARS",
-     "MOBIUS_DYNAMIC_ENRICHMENT_PCT",
-     "MOBIUS_INTEGRATOR_MODE",
-     "MOBIUS_INTEGRATOR_PARALLEL_PCT"
-    ],
-    "tests": [
-     "test_integrate_fallback.py"
-    ],
-    "path": "app/stages/integrate.py",
-    "fan_in": 2,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [
     {
      "name": "CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL",
@@ -3751,84 +2213,18 @@
     },
     {
      "name": "MOBIUS_DYNAMIC_ENRICHMENT_PCT",
-     "live": "100"
+     "live": "(not set \u2014 code default)"
     },
     {
      "name": "MOBIUS_INTEGRATOR_MODE",
-     "live": "parallel"
+     "live": "(not set \u2014 code default)"
     },
     {
      "name": "MOBIUS_INTEGRATOR_PARALLEL_PCT",
      "live": "(not set \u2014 code default)"
     }
    ],
-   "detail": {
-    "db": {
-     "sql": [
-      "SELECT_KIND'S meta"
-     ],
-     "storage_fns": [
-      "append_detail_answer",
-      "append_message_chunk",
-      "audit_if_phi"
-     ],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./platform.html",
-      "./src/answer-card.ts",
-      "./src/app.ts",
-      "./src/render/bubble.ts"
-     ]
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "BADGE_APPROVED_AUTHORITATIVE",
-       "value": "approved_authoritative"
-      },
-      {
-       "name": "BADGE_APPROVED_INFORMATIONAL",
-       "value": "approved_informational"
-      },
-      {
-       "name": "BADGE_PROCEED_WITH_CAUTION",
-       "value": "proceed_with_caution"
-      },
-      {
-       "name": "BADGE_AUGMENTED_WITH_GOOGLE",
-       "value": "augmented_with_google"
-      },
-      {
-       "name": "BADGE_INFORMATIONAL_ONLY",
-       "value": "informational_only"
-      },
-      {
-       "name": "BADGE_NO_SOURCES",
-       "value": "no_sources"
-      },
-      {
-       "name": "_ANSWER_CARD_ENVELOPE_KEYS",
-       "value": "('citations', 'confidence_note', 'required_variables', 'followups', 'thread_summary', 'sug"
-      }
-     ],
-     "keyword_defaults": [
-      {
-       "fn": "breakdown_row_from_usage",
-       "param": "resolved_stage",
-       "default": "None"
-      },
-      {
-       "fn": "run_integrate",
-       "param": "emitter",
-       "default": "None"
-      }
-     ]
-    }
-   }
+   "detail": {}
   },
   {
    "id": "app-stages-state_load",
@@ -3921,58 +2317,9 @@
      "WHAT THIS CANNOT SEE: whether the data-loss path has ever fired. It leaves no artifact by construction, so its rate is not recoverable \u2014 absence of evidence here is guaranteed, not reassuring. Also unmeasured: whether concurrent turns on one thread occur, and whether any writer outside mobius-chat/app mutates chat_state."
     ]
    ],
-   "signals": {
-    "loc": 127,
-    "except_handlers": 0,
-    "swallow": 0,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [],
-    "path": "app/stages/state_load.py",
-    "fan_in": 1,
-    "emits": 0
-   },
+   "signals": {},
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [
-      "clear_tool_results",
-      "get_last_turn_sources",
-      "get_prior_resolved_entities"
-     ],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./platform.html",
-      "./src/app.ts"
-     ]
-    },
-    "parameters": {
-     "module_constants": [],
-     "keyword_defaults": [
-      {
-       "fn": "run_state_load",
-       "param": "emitter",
-       "default": "None"
-      },
-      {
-       "fn": "run_state_load",
-       "param": "parse1_output",
-       "default": "None"
-      },
-      {
-       "fn": "run_state_load",
-       "param": "answer_card",
-       "default": "None"
-      }
-     ]
-    }
-   }
+   "detail": {}
   },
   {
    "id": "clarify",
@@ -3994,15 +2341,13 @@
    "deleted": true,
    "signals": {
     "loc": 0,
+    "tests": [],
+    "emits": 0,
+    "fan_in": 0,
     "except_handlers": 0,
     "swallow": 0,
     "bare_except": 0,
     "todos": 0,
-    "config": [],
-    "tests": [],
-    "path": "app/stages/clarify.py",
-    "fan_in": 0,
-    "emits": 0,
     "deleted": true
    },
    "how": "The stage that turns a bad answer into a question. It returns resolvable \u2014 False means stop\nand ask rather than proceed.\n\nThree checks, in order. Route clash first: detect_route on the message, and when confidence\nis below 1.0 with competing choices, it asks outright \u2014 \"I can either search the web or\nsearch our policy materials\" \u2014 rather than guessing which the user meant. Then jurisdiction:\nneed_jurisdiction_clarification against the plan's subquestions and active state, consulting\nthe RAG lexicon URL so the tagger can judge scope. Then query refinement.\n\nThere is a deliberate exemption worth knowing: when the turn is a follow-up about a stored\ncredentialing report \u2014 an active roster_report skill, or a stored report_run_id \u2014 the\njurisdiction ask is skipped, because answering from a report we already produced needs no\nRAG scope. Asking \"which state?\" about a report already on screen is the failure that\nexemption exists to prevent.",
@@ -4027,30 +2372,7 @@
     ]
    ],
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./src/app.ts"
-     ]
-    },
-    "parameters": {
-     "module_constants": [],
-     "keyword_defaults": [
-      {
-       "fn": "run_clarify",
-       "param": "emitter",
-       "default": "None"
-      }
-     ]
-    }
-   }
+   "detail": {}
   },
   {
    "id": "classify",
@@ -4072,15 +2394,13 @@
    "deleted": true,
    "signals": {
     "loc": 0,
+    "tests": [],
+    "emits": 0,
+    "fan_in": 0,
     "except_handlers": 0,
     "swallow": 0,
     "bare_except": 0,
     "todos": 0,
-    "config": [],
-    "tests": [],
-    "path": "app/stages/classify.py",
-    "fan_in": 0,
-    "emits": 0,
     "deleted": true
    },
    "how": "Twenty-four lines, and the hinge on which conversational continuity turns.\n\nIt asks one question \u2014 is this a new question, or the user filling a blank we left? \u2014\nby calling classify_message(message, last_turn, open_slots, last_refined). Three outcomes\nmatter: slot_fill, jurisdiction_change, or neither.\n\nThe interesting branch is what happens on the first two. If there is a stored refined\nquery, it does NOT plan from what the user just typed. It rebuilds the whole thing:\nbuild_refined_query(last_refined, jurisdiction_from_active). So a one-word reply \u2014 \"Florida\"\n\u2014 becomes the entire previous question re-asked with Florida attached. That is why a slot\nfill does not lose the question.\n\nOtherwise it preserves an effective_message that message_resolver already set (pronoun\nresolution), falling back to the raw message. That fallback chain is an ordering\ndependency: message_resolver must have run first or \"it\" never gets resolved.",
@@ -4101,30 +2421,7 @@
     ]
    ],
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./src/app.ts"
-     ]
-    },
-    "parameters": {
-     "module_constants": [],
-     "keyword_defaults": [
-      {
-       "fn": "run_classify",
-       "param": "emitter",
-       "default": "None"
-      }
-     ]
-    }
-   }
+   "detail": {}
   },
   {
    "id": "continuity",
@@ -4146,15 +2443,13 @@
    "deleted": true,
    "signals": {
     "loc": 0,
+    "tests": [],
+    "emits": 0,
+    "fan_in": 0,
     "except_handlers": 0,
     "swallow": 0,
     "bare_except": 0,
     "todos": 0,
-    "config": [],
-    "tests": [],
-    "path": "app/stages/continuity.py",
-    "fan_in": 0,
-    "emits": 0,
     "deleted": true
    },
    "how": "The 'do not flail' stage. Three questions: should we ask the user for help (user-as-leverage),\nhas the user ended the pursuit, and have we hit the attempt ceiling.\n\nIt types its vocabulary rather than passing strings around. StuckReason is a Literal \u2014\nno_evidence, missing_code, conflicting_info, partial_answer, tool_failed \u2014 and there are five\nnamed objective end states (resolved, need_info, unable, user_ended, incomplete), so a stop is\nalways a stated kind of stop rather than an absence of an answer. MAX_ATTEMPTS_BEFORE_STOP\ncomes from MasterObjective. Spec'd in docs/RELENTLESS_CONTINUITY_PLAN.md.",
@@ -4179,45 +2474,7 @@
     ]
    ],
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./src/app.ts"
-     ]
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "OBJECTIVE_STATUS_RESOLVED",
-       "value": "resolved"
-      },
-      {
-       "name": "OBJECTIVE_STATUS_NEED_INFO",
-       "value": "need_info"
-      },
-      {
-       "name": "OBJECTIVE_STATUS_UNABLE",
-       "value": "unable"
-      },
-      {
-       "name": "OBJECTIVE_STATUS_USER_ENDED",
-       "value": "user_ended"
-      },
-      {
-       "name": "OBJECTIVE_STATUS_INCOMPLETE",
-       "value": "incomplete"
-      }
-     ],
-     "keyword_defaults": []
-    }
-   }
+   "detail": {}
   },
   {
    "id": "credentialing_envelope",
@@ -4239,15 +2496,13 @@
    "deleted": true,
    "signals": {
     "loc": 0,
+    "tests": [],
+    "emits": 0,
+    "fan_in": 0,
     "except_handlers": 0,
     "swallow": 0,
     "bare_except": 0,
     "todos": 0,
-    "config": [],
-    "tests": [],
-    "path": "app/pipeline/credentialing_envelope.py",
-    "fan_in": 0,
-    "emits": 0,
     "deleted": true
    },
    "how": "Routing helpers for credentialing conversations, shared between the classic and ReAct paths so\nboth agree on what a message is asking for.\n\nThe core is resolve_step3_roster_merge_context, which reads thread state and the credentialing\noptions and returns three things: the roster upload id, whether the user chose outside-in\n(external_only), and whether to include roster members. The rest are predicates \u2014 does this\nthread have reconciliation data, is the message asking for reconciliation, does the envelope\nroute there.",
@@ -4268,22 +2523,7 @@
     ]
    ],
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": []
-    },
-    "parameters": {
-     "module_constants": [],
-     "keyword_defaults": []
-    }
-   }
+   "detail": {}
   },
   {
    "id": "plan",
@@ -4305,15 +2545,13 @@
    "deleted": true,
    "signals": {
     "loc": 0,
+    "tests": [],
+    "emits": 0,
+    "fan_in": 0,
     "except_handlers": 0,
     "swallow": 0,
     "bare_except": 0,
     "todos": 0,
-    "config": [],
-    "tests": [],
-    "path": "app/stages/plan.py",
-    "fan_in": 0,
-    "emits": 0,
     "deleted": true
    },
    "how": "Turns the effective message into a Plan \u2014 a list of SubQuestions \u2014 plus a refined query and\na blueprint. Only the classic path runs it; ReAct plans as it goes.\n\nTwo shortcuts matter more than the main path.\n\n_plan_from_master_objective: on a slot fill, if a master objective is stored, it reuses the\nsub-objectives already agreed rather than re-parsing. A follow-up does not get re-decomposed\ninto a different set of questions than the one the user was answering.\n\n_minimal_plan: when parsing fails, rather than erroring it emits one subquestion carrying the\nraw message with kind=non_patient and intent_score 0.5. The turn continues on a degraded\nplan. That is a deliberate choice \u2014 a bad plan beats no answer \u2014 but it is silent.\n\nIt feeds capabilities_for_parser in, so the decomposition only produces sub-questions\nsomething can actually answer, and runs parse_credentialing_flow_intent over the text.",
@@ -4334,28 +2572,7 @@
     ]
    ],
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": []
-    },
-    "parameters": {
-     "module_constants": [],
-     "keyword_defaults": [
-      {
-       "fn": "run_plan",
-       "param": "emitter",
-       "default": "None"
-      }
-     ]
-    }
-   }
+   "detail": {}
   },
   {
    "id": "resolve",
@@ -4377,15 +2594,13 @@
    "deleted": true,
    "signals": {
     "loc": 0,
+    "tests": [],
+    "emits": 0,
+    "fan_in": 0,
     "except_handlers": 0,
     "swallow": 0,
     "bare_except": 0,
     "todos": 0,
-    "config": [],
-    "tests": [],
-    "path": "app/stages/resolve.py",
-    "fan_in": 0,
-    "emits": 0,
     "deleted": true
    },
    "how": "The classic path's dispatcher, and the only stage with an explicit, numbered escalation\nladder. Each subquestion is answered by walking layers until one succeeds:\n\n  0  hard stop\n  1  RAG \u2014 the corpus\n  2  system tool\n  3  web / scrape\n  4  reasoning \u2014 the model answering without retrieval\n  5  ask_user\n\nEvery hop is announced: emit_layer_attempt as each is tried, emit_fallback when one gives\nway to the next, so the thinking chain shows the escalation rather than only its outcome.\n\nThe guard worth knowing is on layer 4. Reasoning is allowed to answer only when sources are\npresent; if none are, layer 4 is skipped and the cascade falls through to ask_user. That is\nthe difference between an ungrounded answer and an honest question, and it is one comparison\nin the middle of a 595-line file.",
@@ -4410,62 +2625,7 @@
     ]
    ],
    "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [
-      "audit_if_phi",
-      "get_state",
-      "save_state_full"
-     ],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./index.html",
-      "./platform.html",
-      "./src/answer-card.ts",
-      "./src/app.ts",
-      "./static/app.js",
-      "./static/pipeline-chat.js",
-      "./static/pipeline-enrollment.js",
-      "./static/pipeline-nppes.js"
-     ]
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "URL_PATTERN",
-       "value": "<computed>"
-      },
-      {
-       "name": "_MIN_RAG_LEN",
-       "value": "80"
-      },
-      {
-       "name": "_MIN_SCRAPE_LEN",
-       "value": "150"
-      },
-      {
-       "name": "_MIN_SEARCH_LEN",
-       "value": "50"
-      },
-      {
-       "name": "_REQUIRES_SOURCE",
-       "value": "<computed>"
-      }
-     ],
-     "keyword_defaults": [
-      {
-       "fn": "run_resolve",
-       "param": "emitter",
-       "default": "None"
-      }
-     ]
-    }
-   }
+   "detail": {}
   }
  ],
  "telemetry_sink": "chat_turns.thinking_log (EmitEnvelope, discriminated by `signal`)"
