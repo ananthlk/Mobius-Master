@@ -608,3 +608,25 @@ Master RAG confirms the landed row. Everything else is verified.
 - **Extension verify plan (unchanged):** on deploy, run the true end-to-end via /chat/upload; confirm
   from rag's actual stored row (Master RAG) that source_metadata + content_signals landed — NOT from
   chat's self-report — and thereby confirm `9a84923` is in the deployed image (form→query is the tell).
+
+### 2.9-VERIFY addendum-2 · rag dual-accept (removes the transport class) + row proof (Master RAG, 2026-09-09)
+
+Master RAG chose a stronger fix than the Extension's proposed chat form→query: rag `/upload` now
+resolves each provenance field **query-first, then falls back to the parsed form** (rev
+mobius-rag-00691-hm9), and 422s on a bad value in EITHER transport. This removes the silent-form-drop
+CLASS for every future caller, not just this instance. Chat's forward shape is now free (form or
+query both land, neither silent).
+
+**Row proof (Master RAG verified from the DB):** Extension test doc `d9f16b15` landed clean —
+access=user_authorized_session, task_id + source_run_id=ext_ragq_1788994006, fetched_at, source_url +
+source_page_url, content_signals normalized (`x-robots-tag:noai`, not raw). A real FORM-transport
+upload (`98983bd4`) also landed everything incl. `source_page_url_basis=mirrored_from_source_url:
+lane_has_no_linking_page` and merged content_signals (`ai-train=no,use=reference`).
+Live gate matrix: form bogus→422, query bogus→422, bad signal_headers→422, plain upload→200 (existing
+callers untouched). Provenance-bare pre-fix row `eee9a1ce` to be deleted by Master RAG.
+
+**Finish line (clarified, alignment pending Master RAG confirm):** the transport risk is gone, but
+chat must still FORWARD all five — `9d41aff` forwards only `source_url`; `9a84923` forwards all five.
+So the finish line remains "chat deploys a revision carrying `9a84923` (reaching HEAD)"; the dual-accept
+just means the shape inside that forward doesn't matter. Extension change: none. Rag: done. Open on
+this thread: only the /upload auth migration (with Ananth; Chat Master looped as the calling hop).
