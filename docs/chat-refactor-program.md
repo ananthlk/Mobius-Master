@@ -167,9 +167,27 @@ behaviour if the measurements hold.
 movement. If any invariant moves, the deletion was not dead code. Explicitly NOT a
 latency metric — the baseline for that does not exist until P2.
 
-### P2 — Instrument: latency and decisions  ·  BLOCKING for P3–P5  ·  owner: chat + Eval
+### P2 — Make absent producers detectable  ·  BLOCKING for P3–P5  ·  owner: chat + Eval
 
-Nothing after this point can be measured without it.
+**Reframed 2026-09-09**, on Chat Master's argument rather than mine. I had scoped this
+as "instrument the known gaps." That fixes twelve instances. The evidence supports a
+stronger frame: **nothing in this codebase fails loudly when a producer disappears,
+because every consumer has a plausible default.**
+
+`master_objective`'s writer died and four readers quietly returned `"resolved"` on
+every turn for five months. `variant_id` was never written and a refresh query matched
+nothing for a month while serving a hardcoded seed. `make_tool_failed` has no caller,
+so `tool_failed` is not rare — it is impossible, while `tool_invoked` and
+`tool_completed` emit normally. `CallManager` is wired in docstrings only. In each
+case the absence is invisible precisely because the default is plausible.
+
+So the phase's job is not a list of instruments. It is: **when a producer stops, some
+consumer must fail loudly.** Same-change read-backs, emitters that assert a caller,
+and defaults that are distinguishable from real values. Latency instrumentation still
+lands here — 19 of 25 modules untimed, and "faster" is unprovable without it — but it
+is an instance of the rule, not the point of the phase.
+
+Nothing after this can be measured without it.
 
 | Item | From node | Why it blocks |
 |---|---|---|

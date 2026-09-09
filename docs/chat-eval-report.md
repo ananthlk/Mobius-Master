@@ -11,7 +11,7 @@ the POST half of the gate, not only as a report.
 
 | collected | passed | failed | errors | skipped | wall |
 |---:|---:|---:|---:|---:|---:|
-| 2555 | 2525 | 25 | 0 | 5 | 135.8s |
+| 2555 | 2525 | 25 | 0 | 5 | 0.0s |
 
 Known-failing baseline: **25** tests, frozen 2026-09-08 before any P1a
 deletion. Ananth's ruling — these predate the program, so the gate SUBTRACTS them.
@@ -25,7 +25,7 @@ A total test count is not coverage of the thing you are about to change. This ma
 test files to nodes by name, which is a WEAK signal — it proves a file exists whose
 name matches, not that the node's behaviour is asserted. Eval owns replacing it.
 
-**17 of 35 nodes have a matching test file · 18 have none · 4 of those are RED**
+**18 of 36 nodes have a matching test file · 18 have none · 4 of those are RED**
 
 | Node | Rating | Bugs | Test files | Cases |
 |---|---|---:|---|---:|
@@ -48,6 +48,7 @@ name matches, not that the node's behaviour is asserted. Eval owns replacing it.
 | `run_pipeline` | amber | 5 | **none** | — |
 | `stages` | green | 0 | **none** | — |
 | `continuity` | red | 1 | `test_continuity_checks.py` | 2 |
+| `emit_envelope` | red | 4 | `test_emit_envelope.py`, `test_emit_envelope_fanout.py` | 37 |
 | `queue` | red | 4 | `test_queue_usage_breakdown_enrich.py` | 1 |
 | `react_loop` | red | 5 | `test_react_loop.py` | 52 |
 | `clarify` | green | 0 | `test_react_clarify_questions.py` | 23 |
@@ -56,7 +57,7 @@ name matches, not that the node's behaviour is asserted. Eval owns replacing it.
 | `curator_tools` | amber | 3 | `test_curator_tools.py` | 16 |
 | `governor` | amber | 6 | `test_governor_bandit_criteria.py` | 39 |
 | `integrate` | amber | 3 | `test_integrate_fallback.py` | 2 |
-| `llm_manager` | amber | 1 | `test_llm_manager.py`, `test_llm_manager_attachments.py`, `test_llm_manager_v2.py` | 51 |
+| `llm_manager` | amber | 2 | `test_llm_manager.py`, `test_llm_manager_attachments.py`, `test_llm_manager_v2.py` | 51 |
 | `message_resolver` | amber | 1 | `test_message_resolver_and_skill_context.py` | 13 |
 | `orchestrator` | amber | 2 | `test_orchestrator.py` | 13 |
 | `react_retry_guard` | green | 0 | `test_react_retry_guard.py`, `test_react_retry_guard_exhaustion.py`, `test_react_retry_guard_zero_result.py` | 56 |
