@@ -1,6 +1,12 @@
 {
  "generated_by": "scripts/platform/gen_chat_dev.py",
- "deleted_modules": [],
+ "deleted_modules": [
+  "app/stages/classify.py",
+  "app/stages/plan.py",
+  "app/stages/clarify.py",
+  "app/stages/resolve.py",
+  "app/stages/continuity.py"
+ ],
  "roadmap": {
   "phases": [
    {
@@ -1141,7 +1147,17 @@
      "No test file found for state/clarification.py. The two filters in react_loop.py:961 are pure functions over strings \u2014 the cheapest possible unit tests, and exactly the kind of deterministic-rule case flagged on the critic node. Assigned to Eval's catalogue."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "loc": 0,
+    "tests": [],
+    "emits": 0,
+    "fan_in": 0,
+    "except_handlers": 0,
+    "swallow": 0,
+    "bare_except": 0,
+    "todos": 0,
+    "deleted": true
+   },
    "live_config": [],
    "detail": {}
   },
@@ -4002,6 +4018,433 @@
       {
        "fn": "run_state_load",
        "param": "answer_card",
+       "default": "None"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "clarify",
+   "key": "clarify",
+   "module": "clarify",
+   "group": "deleted",
+   "path": "app/stages/clarify.py",
+   "loc": 0,
+   "role": "(deleted by the refactor)",
+   "role_full": "",
+   "api": [],
+   "config": [],
+   "writes": [],
+   "telemetry": [],
+   "callers": [],
+   "fan_in": 0,
+   "surfaces": [],
+   "observability": "n/a",
+   "deleted": true,
+   "signals": {
+    "loc": 0,
+    "except_handlers": 0,
+    "swallow": 0,
+    "bare_except": 0,
+    "todos": 0,
+    "config": [],
+    "tests": [],
+    "path": "app/stages/clarify.py",
+    "fan_in": 0,
+    "emits": 0,
+    "deleted": true
+   },
+   "how": "The stage that turns a bad answer into a question. It returns resolvable \u2014 False means stop\nand ask rather than proceed.\n\nThree checks, in order. Route clash first: detect_route on the message, and when confidence\nis below 1.0 with competing choices, it asks outright \u2014 \"I can either search the web or\nsearch our policy materials\" \u2014 rather than guessing which the user meant. Then jurisdiction:\nneed_jurisdiction_clarification against the plan's subquestions and active state, consulting\nthe RAG lexicon URL so the tagger can judge scope. Then query refinement.\n\nThere is a deliberate exemption worth knowing: when the turn is a follow-up about a stored\ncredentialing report \u2014 an active roster_report skill, or a stored report_run_id \u2014 the\njurisdiction ask is skipped, because answering from a report we already produced needs no\nRAG scope. Asking \"which state?\" about a report already on screen is the failure that\nexemption exists to prevent.",
+   "rating": "green",
+   "depth": "code",
+   "findings": [
+    [
+     "good",
+     "Has tests, including one specifically for ReAct clarify questions."
+    ],
+    [
+     "good",
+     "Asking rather than guessing is a product stance and it lives in one small module with the three triggers visible in order."
+    ],
+    [
+     "watch",
+     "The report-context exemption is matched with lowercase substring checks on the message ('pml', 'npi', 'section', 'how many'). It works, but it is phrase matching standing in for intent, and it will not survive rewording."
+    ],
+    [
+     "watch",
+     "Delegates to app/state/clarification.py (88 loc) and query_refinement.py (128 loc), neither of which is in this catalogue."
+    ]
+   ],
+   "live_config": [],
+   "detail": {
+    "db": {
+     "sql": [],
+     "storage_fns": [],
+     "redis_keys": [],
+     "note": "SQL found by literal match; a query built at runtime is invisible here"
+    },
+    "ux": {
+     "routes_defined": [],
+     "frontend_files": [
+      "./src/app.ts"
+     ]
+    },
+    "parameters": {
+     "module_constants": [],
+     "keyword_defaults": [
+      {
+       "fn": "run_clarify",
+       "param": "emitter",
+       "default": "None"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "classify",
+   "key": "classify",
+   "module": "classify",
+   "group": "deleted",
+   "path": "app/stages/classify.py",
+   "loc": 0,
+   "role": "(deleted by the refactor)",
+   "role_full": "",
+   "api": [],
+   "config": [],
+   "writes": [],
+   "telemetry": [],
+   "callers": [],
+   "fan_in": 0,
+   "surfaces": [],
+   "observability": "n/a",
+   "deleted": true,
+   "signals": {
+    "loc": 0,
+    "except_handlers": 0,
+    "swallow": 0,
+    "bare_except": 0,
+    "todos": 0,
+    "config": [],
+    "tests": [],
+    "path": "app/stages/classify.py",
+    "fan_in": 0,
+    "emits": 0,
+    "deleted": true
+   },
+   "how": "Twenty-four lines, and the hinge on which conversational continuity turns.\n\nIt asks one question \u2014 is this a new question, or the user filling a blank we left? \u2014\nby calling classify_message(message, last_turn, open_slots, last_refined). Three outcomes\nmatter: slot_fill, jurisdiction_change, or neither.\n\nThe interesting branch is what happens on the first two. If there is a stored refined\nquery, it does NOT plan from what the user just typed. It rebuilds the whole thing:\nbuild_refined_query(last_refined, jurisdiction_from_active). So a one-word reply \u2014 \"Florida\"\n\u2014 becomes the entire previous question re-asked with Florida attached. That is why a slot\nfill does not lose the question.\n\nOtherwise it preserves an effective_message that message_resolver already set (pronoun\nresolution), falling back to the raw message. That fallback chain is an ordering\ndependency: message_resolver must have run first or \"it\" never gets resolved.",
+   "rating": "amber",
+   "depth": "code",
+   "findings": [
+    [
+     "bad",
+     "The stage is a 24-line wrapper; the actual logic is 226 lines in app/state/refined_query.py, which is NOT in this catalogue. Reading the node tells you almost nothing about the behaviour \u2014 the same boundary error as the PHI gate, a third time."
+    ],
+    [
+     "watch",
+     "No test file, for the code that decides whether a follow-up keeps its question."
+    ],
+    [
+     "good",
+     "Pure and side-effect free: reads merged_state, writes two ctx fields."
+    ]
+   ],
+   "live_config": [],
+   "detail": {
+    "db": {
+     "sql": [],
+     "storage_fns": [],
+     "redis_keys": [],
+     "note": "SQL found by literal match; a query built at runtime is invisible here"
+    },
+    "ux": {
+     "routes_defined": [],
+     "frontend_files": [
+      "./src/app.ts"
+     ]
+    },
+    "parameters": {
+     "module_constants": [],
+     "keyword_defaults": [
+      {
+       "fn": "run_classify",
+       "param": "emitter",
+       "default": "None"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "continuity",
+   "key": "continuity",
+   "module": "continuity",
+   "group": "deleted",
+   "path": "app/stages/continuity.py",
+   "loc": 0,
+   "role": "(deleted by the refactor)",
+   "role_full": "",
+   "api": [],
+   "config": [],
+   "writes": [],
+   "telemetry": [],
+   "callers": [],
+   "fan_in": 0,
+   "surfaces": [],
+   "observability": "n/a",
+   "deleted": true,
+   "signals": {
+    "loc": 0,
+    "except_handlers": 0,
+    "swallow": 0,
+    "bare_except": 0,
+    "todos": 0,
+    "config": [],
+    "tests": [],
+    "path": "app/stages/continuity.py",
+    "fan_in": 0,
+    "emits": 0,
+    "deleted": true
+   },
+   "how": "The 'do not flail' stage. Three questions: should we ask the user for help (user-as-leverage),\nhas the user ended the pursuit, and have we hit the attempt ceiling.\n\nIt types its vocabulary rather than passing strings around. StuckReason is a Literal \u2014\nno_evidence, missing_code, conflicting_info, partial_answer, tool_failed \u2014 and there are five\nnamed objective end states (resolved, need_info, unable, user_ended, incomplete), so a stop is\nalways a stated kind of stop rather than an absence of an answer. MAX_ATTEMPTS_BEFORE_STOP\ncomes from MasterObjective. Spec'd in docs/RELENTLESS_CONTINUITY_PLAN.md.",
+   "rating": "red",
+   "depth": "code",
+   "findings": [
+    [
+     "good",
+     "One of only four modules with telemetry of its own, and it has two test files."
+    ],
+    [
+     "good",
+     "Typed end states mean 'we stopped' always carries WHY \u2014 the difference between a product that gives up legibly and one that just goes quiet."
+    ],
+    [
+     "watch",
+     "Delegates detection to app/state/continuity_checks.py and master_objective.py, neither in this catalogue \u2014 the wrapper pattern again, though thin here."
+    ],
+    [
+     "bad",
+     "OWNER(chat): CONTINUITY RUNS EVERY TURN AND CANNOT DO ANYTHING, BECAUSE ITS INPUT IS NEVER CREATED ON THE LIVE PATH. Ananth 2026-09-08 read it as duplicative; it is worse than duplicative \u2014 it is inert, and it reports a fixed answer.\n\nBoth of its functions key off ctx.merged_state['master_objective']. That objective is created by create_or_update_objective(), which has EXACTLY ONE caller: orchestrator.py:819, inside the `if not use_react` legacy branch. On the ReAct path the objective is only ever READ (orchestrator.py:725 loads it out of merged_state) and nothing on that path ever writes one. So obj is None every turn, and:\n\n  should_ask_user_for_help()  -> (False, None) always. ctx.response_payload['user_ask'] is NEVER set. The frontend has a fallback at app.js:13338 that renders user_ask as the next question when the integrator returned none \u2014 that branch is unreachable.\n  get_objective_end_state()   -> ('resolved', None) always, by the `if not obj` early return at continuity.py:83-84.\n\nTHE SECOND ONE IS NOT MERELY DEAD, IT IS WRONG. Every turn sets response_payload['objective_status'] = 'resolved' \u2014 including refusals, clarify bypasses, groundedness failures shipped with a warning, and the 203 budget-exhausted turns that ran out of rounds without the planner ever being satisfied. The four other end states (need_info, unable, user_ended, incomplete) are unreachable. The module whose stated purpose is that 'a stop is always a stated kind of stop' currently states the same kind of stop for every outcome. I previously rated this node GREEN on the strength of its typed end states; that was rating the construction and not the guarantee, and the rating is corrected to RED here.\n\nTHE DUPLICATION IS REAL AND THE OTHER COPY IS THE LIVE ONE. react_loop already computes the same three judgements and its versions ARE wired: ctx.react_unfinished_reason (no_path_forward, incomplete_coverage, need_more_info, need_more_time \u2014 measured firing on live turns), ctx.react_unfinished_summary and ctx.react_unblock_ask. integrate.py reads react_unfinished_reason at four sites, orchestrator.py at one, progress.py at one. So the product does have typed stop reasons that work; they are react_loop's, not continuity's."
+    ]
+   ],
+   "live_config": [],
+   "detail": {
+    "db": {
+     "sql": [],
+     "storage_fns": [],
+     "redis_keys": [],
+     "note": "SQL found by literal match; a query built at runtime is invisible here"
+    },
+    "ux": {
+     "routes_defined": [],
+     "frontend_files": [
+      "./src/app.ts"
+     ]
+    },
+    "parameters": {
+     "module_constants": [
+      {
+       "name": "OBJECTIVE_STATUS_RESOLVED",
+       "value": "resolved"
+      },
+      {
+       "name": "OBJECTIVE_STATUS_NEED_INFO",
+       "value": "need_info"
+      },
+      {
+       "name": "OBJECTIVE_STATUS_UNABLE",
+       "value": "unable"
+      },
+      {
+       "name": "OBJECTIVE_STATUS_USER_ENDED",
+       "value": "user_ended"
+      },
+      {
+       "name": "OBJECTIVE_STATUS_INCOMPLETE",
+       "value": "incomplete"
+      }
+     ],
+     "keyword_defaults": []
+    }
+   }
+  },
+  {
+   "id": "plan",
+   "key": "plan",
+   "module": "plan",
+   "group": "deleted",
+   "path": "app/stages/plan.py",
+   "loc": 0,
+   "role": "(deleted by the refactor)",
+   "role_full": "",
+   "api": [],
+   "config": [],
+   "writes": [],
+   "telemetry": [],
+   "callers": [],
+   "fan_in": 0,
+   "surfaces": [],
+   "observability": "n/a",
+   "deleted": true,
+   "signals": {
+    "loc": 0,
+    "except_handlers": 0,
+    "swallow": 0,
+    "bare_except": 0,
+    "todos": 0,
+    "config": [],
+    "tests": [],
+    "path": "app/stages/plan.py",
+    "fan_in": 0,
+    "emits": 0,
+    "deleted": true
+   },
+   "how": "Turns the effective message into a Plan \u2014 a list of SubQuestions \u2014 plus a refined query and\na blueprint. Only the classic path runs it; ReAct plans as it goes.\n\nTwo shortcuts matter more than the main path.\n\n_plan_from_master_objective: on a slot fill, if a master objective is stored, it reuses the\nsub-objectives already agreed rather than re-parsing. A follow-up does not get re-decomposed\ninto a different set of questions than the one the user was answering.\n\n_minimal_plan: when parsing fails, rather than erroring it emits one subquestion carrying the\nraw message with kind=non_patient and intent_score 0.5. The turn continues on a degraded\nplan. That is a deliberate choice \u2014 a bad plan beats no answer \u2014 but it is silent.\n\nIt feeds capabilities_for_parser in, so the decomposition only produces sub-questions\nsomething can actually answer, and runs parse_credentialing_flow_intent over the text.",
+   "rating": "amber",
+   "depth": "code",
+   "findings": [
+    [
+     "bad",
+     "The parse-failure fallback is invisible. A turn planned from _minimal_plan looks identical downstream to one that parsed cleanly \u2014 same shape, no signal, nothing in the trace says the planner gave up. This is the appeals pattern in miniature."
+    ],
+    [
+     "watch",
+     "No test file, for the stage that decides what the classic path will try to answer."
+    ],
+    [
+     "good",
+     "Reusing the master objective on slot fill is the right call and is the reason a follow-up does not silently become a different question."
+    ]
+   ],
+   "live_config": [],
+   "detail": {
+    "db": {
+     "sql": [],
+     "storage_fns": [],
+     "redis_keys": [],
+     "note": "SQL found by literal match; a query built at runtime is invisible here"
+    },
+    "ux": {
+     "routes_defined": [],
+     "frontend_files": []
+    },
+    "parameters": {
+     "module_constants": [],
+     "keyword_defaults": [
+      {
+       "fn": "run_plan",
+       "param": "emitter",
+       "default": "None"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "resolve",
+   "key": "resolve",
+   "module": "resolve",
+   "group": "deleted",
+   "path": "app/stages/resolve.py",
+   "loc": 0,
+   "role": "(deleted by the refactor)",
+   "role_full": "",
+   "api": [],
+   "config": [],
+   "writes": [],
+   "telemetry": [],
+   "callers": [],
+   "fan_in": 0,
+   "surfaces": [],
+   "observability": "n/a",
+   "deleted": true,
+   "signals": {
+    "loc": 0,
+    "except_handlers": 0,
+    "swallow": 0,
+    "bare_except": 0,
+    "todos": 0,
+    "config": [],
+    "tests": [],
+    "path": "app/stages/resolve.py",
+    "fan_in": 0,
+    "emits": 0,
+    "deleted": true
+   },
+   "how": "The classic path's dispatcher, and the only stage with an explicit, numbered escalation\nladder. Each subquestion is answered by walking layers until one succeeds:\n\n  0  hard stop\n  1  RAG \u2014 the corpus\n  2  system tool\n  3  web / scrape\n  4  reasoning \u2014 the model answering without retrieval\n  5  ask_user\n\nEvery hop is announced: emit_layer_attempt as each is tried, emit_fallback when one gives\nway to the next, so the thinking chain shows the escalation rather than only its outcome.\n\nThe guard worth knowing is on layer 4. Reasoning is allowed to answer only when sources are\npresent; if none are, layer 4 is skipped and the cascade falls through to ask_user. That is\nthe difference between an ungrounded answer and an honest question, and it is one comparison\nin the middle of a 595-line file.",
+   "rating": "amber",
+   "depth": "code",
+   "findings": [
+    [
+     "good",
+     "The ladder is explicit and numbered, and layer_used is returned, so which layer answered is knowable per subquestion rather than inferred."
+    ],
+    [
+     "good",
+     "The layer-4 groundedness guard \u2014 no sources means no reasoning answer, ask instead \u2014 is exactly the right default."
+    ],
+    [
+     "watch",
+     "595 lines and only indirect test coverage; the tests named for it are about fetch_document and message resolution, not the cascade itself."
+    ],
+    [
+     "watch",
+     "validate_tool_result returns (is_valid, failure_reason) and an invalid result triggers the next layer \u2014 so a tool that returns something useless is indistinguishable downstream from one that failed outright."
+    ]
+   ],
+   "live_config": [],
+   "detail": {
+    "db": {
+     "sql": [],
+     "storage_fns": [
+      "audit_if_phi",
+      "get_state",
+      "save_state_full"
+     ],
+     "redis_keys": [],
+     "note": "SQL found by literal match; a query built at runtime is invisible here"
+    },
+    "ux": {
+     "routes_defined": [],
+     "frontend_files": [
+      "./index.html",
+      "./platform.html",
+      "./src/answer-card.ts",
+      "./src/app.ts",
+      "./static/app.js",
+      "./static/pipeline-chat.js",
+      "./static/pipeline-enrollment.js",
+      "./static/pipeline-nppes.js"
+     ]
+    },
+    "parameters": {
+     "module_constants": [
+      {
+       "name": "URL_PATTERN",
+       "value": "<computed>"
+      },
+      {
+       "name": "_MIN_RAG_LEN",
+       "value": "80"
+      },
+      {
+       "name": "_MIN_SCRAPE_LEN",
+       "value": "150"
+      },
+      {
+       "name": "_MIN_SEARCH_LEN",
+       "value": "50"
+      },
+      {
+       "name": "_REQUIRES_SOURCE",
+       "value": "<computed>"
+      }
+     ],
+     "keyword_defaults": [
+      {
+       "fn": "run_resolve",
+       "param": "emitter",
        "default": "None"
       }
      ]

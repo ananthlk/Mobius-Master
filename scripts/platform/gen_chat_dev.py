@@ -65,6 +65,19 @@ def module_record(relpath, kind, role_hint=""):
         "writes": stores_of(src),
     }
 
+# Module paths for nodes whose file the refactor deleted. Kept explicitly
+# rather than inferred: a node that disappears because someone RENAMED a file
+# must fail loudly, not be quietly tombstoned.
+_TOMBSTONE_PATHS = {
+    "clarify": "app/stages/clarify.py",
+    "classify": "app/stages/classify.py",
+    "plan": "app/stages/plan.py",
+    "resolve": "app/stages/resolve.py",
+    "continuity": "app/stages/continuity.py",
+    "credentialing_envelope": "app/pipeline/credentialing_envelope.py",
+}
+
+
 def main():
     deleted: list[str] = []
     cat = json.load(open("/Users/ananth/Mobius/docs/chat-submodules.json"))
@@ -77,7 +90,20 @@ def main():
             # A module the refactor has already deleted. The schema must keep
             # working DURING a deletion phase, not only before and after it —
             # otherwise the diagram goes dark exactly when the code is moving.
+            # The module is gone, so every measured figure the catalogue
+            # carries for it is now a HISTORICAL number, not a current one.
+            # Leaving loc=86 and tests=[test_clarify.py] on a node whose file
+            # and test file were both deleted is the same stale-artifact bug
+            # this page exists to catch — so zero them and keep the old values
+            # under `was_` where the record is still useful.
             m["deleted"] = True
+            m["was_loc"] = m.get("loc")
+            m["was_tests"] = list(m.get("tests") or [])
+            m["loc"] = 0
+            m["tests"] = []
+            m["telemetry"] = []
+            m["callers"] = []
+            m["fan_in"] = 0
             m.setdefault("config", []); m.setdefault("writes", [])
             deleted.append(m["path"])
             continue
@@ -194,6 +220,14 @@ def main():
             if c.get("ux"):
                 obj["ux"] = c["ux"]
         obj["signals"] = sigs.get(sig_alias.get(key, key), {})
+        if obj.get("deleted"):
+            # Same rule as the catalogue fields above: a deleted module's
+            # signals are history. readiness_signals already returns zeros for
+            # a missing file, but the pre-computed `sigs` map may predate the
+            # deletion, so force it rather than trusting whichever ran first.
+            obj["signals"] = {**obj["signals"], "loc": 0, "tests": [], "emits": 0,
+                              "fan_in": 0, "except_handlers": 0, "swallow": 0,
+                              "bare_except": 0, "todos": 0, "deleted": True}
         obj["live_config"] = [{"name": v, "live": live.get(v, "(not set — code default)")}
                               for v in (obj.get("config") or [])]
         obj["detail"] = detail.get(key, {})
@@ -226,6 +260,37 @@ def main():
         attach(c["id"], c)
     for st in chain:
         attach(st["step"], st)
+
+    # ── Tombstones ────────────────────────────────────────────────────────
+    # A node whose MODULE is gone must not vanish from the page. The findings
+    # that justified deleting it are the record of why the deletion was safe,
+    # and a diff of this page is how anyone sees what a phase removed.
+    #
+    # This exists because I broke it: adding gen_chat_submodules.py to the
+    # refresh chain (correctly — the flow was stale) meant the catalogue is now
+    # rebuilt from files on disk, so five deleted modules silently dropped out
+    # of the page while I was claiming they were deliberately kept. The
+    # findings survived in the log; the nodes did not.
+    known = set(by) | {c["id"] for c in cross} | {s["step"] for s in chain}
+    for key, rec in content.items():
+        if key in known:
+            continue
+        path = _TOMBSTONE_PATHS.get(key)
+        if path is None or os.path.exists(os.path.join(REPO, path)):
+            continue  # not a deleted module — a naming mismatch, leave it loud
+        tomb = {
+            "id": key, "key": key, "module": key, "group": "deleted",
+            "path": path, "loc": 0, "role": "(deleted by the refactor)",
+            "role_full": "", "api": [], "config": [], "writes": [],
+            "telemetry": [], "callers": [], "fan_in": 0, "surfaces": [],
+            "observability": "n/a", "deleted": True,
+            "signals": {"loc": 0, "except_handlers": 0, "swallow": 0,
+                        "bare_except": 0, "todos": 0, "config": [], "tests": [],
+                        "path": path, "fan_in": 0, "emits": 0, "deleted": True},
+        }
+        attach(key, tomb)
+        by[key] = tomb
+        deleted.append(path)
 
     missing = [k for k in list(by) + [c["id"] for c in cross] + [s["step"] for s in chain]
                if k not in content]

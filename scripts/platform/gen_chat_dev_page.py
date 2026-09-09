@@ -206,7 +206,17 @@ document.getElementById('chain').innerHTML = D.chain.map(function(c,i){
     '<div class="cs">'+esc(c.path)+(c.line?':'+c.line:'')+'</div></div>'+
     (i<D.chain.length-1?'<span class="arr">→</span>':''); }).join('');
 
-Object.keys(SUB).forEach(function(k){ if(SUB[k] && SUB[k].deleted) SUB[k].__del=1; });
+Object.keys(SUB).forEach(function(k){
+  var o=SUB[k]; if(!o || !o.deleted) return;
+  o.__del=1;
+  // The hand-written description was written while the module was live and
+  // still reads in the present tense. Rather than rewrite 5 descriptions into
+  // the past and lose what they said, stamp the node so a reader cannot mistake
+  // a historical description for a current one.
+  o.how = '**DELETED BY THE REFACTOR — `'+o.path+'` no longer exists.** The description and '+
+          'findings below are kept verbatim as the record of why removing it was safe. '+
+          'They describe the module as it WAS.\n\n' + (o.how||'');
+});
 
 document.getElementById('cross').innerHTML = D.cross_cutting.map(function(c){
   return '<div class="cnode'+rc(c)+'" data-k="'+esc(c.id)+'" tabindex="0" role="button">'+
