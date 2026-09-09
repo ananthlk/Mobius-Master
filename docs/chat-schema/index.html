@@ -208,9 +208,7 @@ Object.keys(SUB).forEach(function(k){
   // a historical description for a current one.
   o.how = '**DELETED BY THE REFACTOR — `'+o.path+'` no longer exists.** The description and '+
           'findings below are kept verbatim as the record of why removing it was safe. '+
-          'They describe the module as it WAS.
-
-' + (o.how||'');
+          'They describe the module as it WAS.' + String.fromCharCode(10,10) + (o.how||'');
 });
 
 document.getElementById('cross').innerHTML = D.cross_cutting.map(function(c){
