@@ -970,7 +970,7 @@ ReAct answer is published directly and none of this runs.
  ("good", "One swallow is explicitly reasoned — 'audit must never break the turn'."),
 ]),
 
-"continuity": dict(rating="green", depth="code", how="""
+"continuity": dict(rating="red", depth="code", how="""
 The 'do not flail' stage. Three questions: should we ask the user for help (user-as-leverage),
 has the user ended the pursuit, and have we hit the attempt ceiling.
 
@@ -985,6 +985,35 @@ comes from MasterObjective. Spec'd in docs/RELENTLESS_CONTINUITY_PLAN.md.
           "product that gives up legibly and one that just goes quiet."),
  ("watch", "Delegates detection to app/state/continuity_checks.py and master_objective.py, "
            "neither in this catalogue — the wrapper pattern again, though thin here."),
+ ("bad", "OWNER(chat): CONTINUITY RUNS EVERY TURN AND CANNOT DO ANYTHING, BECAUSE ITS INPUT IS "
+         "NEVER CREATED ON THE LIVE PATH. Ananth 2026-09-08 read it as duplicative; it is worse "
+         "than duplicative — it is inert, and it reports a fixed answer.\n\n"
+         "Both of its functions key off ctx.merged_state['master_objective']. That objective is "
+         "created by create_or_update_objective(), which has EXACTLY ONE caller: "
+         "orchestrator.py:819, inside the `if not use_react` legacy branch. On the ReAct path "
+         "the objective is only ever READ (orchestrator.py:725 loads it out of merged_state) "
+         "and nothing on that path ever writes one. So obj is None every turn, and:\n\n"
+         "  should_ask_user_for_help()  -> (False, None) always. ctx.response_payload['user_ask'] "
+         "is NEVER set. The frontend has a fallback at app.js:13338 that renders user_ask as the "
+         "next question when the integrator returned none — that branch is unreachable.\n"
+         "  get_objective_end_state()   -> ('resolved', None) always, by the `if not obj` early "
+         "return at continuity.py:83-84.\n\n"
+         "THE SECOND ONE IS NOT MERELY DEAD, IT IS WRONG. Every turn sets "
+         "response_payload['objective_status'] = 'resolved' — including refusals, clarify "
+         "bypasses, groundedness failures shipped with a warning, and the 203 budget-exhausted "
+         "turns that ran out of rounds without the planner ever being satisfied. The four other "
+         "end states (need_info, unable, user_ended, incomplete) are unreachable. The module "
+         "whose stated purpose is that 'a stop is always a stated kind of stop' currently states "
+         "the same kind of stop for every outcome. I previously rated this node GREEN on the "
+         "strength of its typed end states; that was rating the construction and not the "
+         "guarantee, and the rating is corrected to RED here.\n\n"
+         "THE DUPLICATION IS REAL AND THE OTHER COPY IS THE LIVE ONE. react_loop already "
+         "computes the same three judgements and its versions ARE wired: "
+         "ctx.react_unfinished_reason (no_path_forward, incomplete_coverage, need_more_info, "
+         "need_more_time — measured firing on live turns), ctx.react_unfinished_summary and "
+         "ctx.react_unblock_ask. integrate.py reads react_unfinished_reason at four sites, "
+         "orchestrator.py at one, progress.py at one. So the product does have typed stop "
+         "reasons that work; they are react_loop's, not continuity's."),
 ]),
 
 "react_loop": dict(rating="red", depth="code", how="""
