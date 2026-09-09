@@ -47,6 +47,85 @@ THINKS_RE = re.compile(r'Thinking\(|from_verdicts\(')
 NOTES_RE = re.compile(r'\brec(?:order)?\.note\(|_rec\.note\(')
 
 
+# ── THE CONTRACT: one declaration, two consumers ────────────────────────────
+#
+# Ananth, 2026-09-09: "store these contracts in your schema.. the ux also in
+# your schema .. this is what makes it real .. WE WILL DRIVE BOTH WITH THAT."
+#
+# So the four verbs and the surfaces that render them are read out of
+# deep_research/contract.py — the same file the router reads back through
+# research.contract. Declaring them here would be a third copy; deriving them
+# means this page cannot describe an API that does not exist, and the
+# invariants below make that a build failure rather than a discrepancy someone
+# notices later.
+ROUTER = "/Users/ananth/Mobius/mobius-payor/app/routers/research_console.py"
+# Every place in the repo that can create a request. A door nobody declared is
+# how fifteen unjudgeable requests got in.
+REQUEST_WRITERS = re.compile(r"insert\s+into\s+research\.request", re.I)
+# Ungated writers we KNOW about. A new one appearing fails the build — the same
+# discipline as KNOWN_TERMINATORS, applied to the entry side.
+KNOWN_UNGATED_WRITERS = {
+    "deep_research/service.py", "deep_research/run_research.py",
+    "deep_research/acquire.py", "deep_research/run_batch.py",
+    "deep_research/run_v2.py",
+    "docs/service-lines/scripts/run_sourcing.py",
+}
+
+
+def _contract_module() -> dict:
+    """Read the declaration without importing a database driver."""
+    sys.path.insert(0, os.path.dirname(PKG))
+    from deep_research import contract as ct   # noqa: E402
+    return ct.as_doc()
+
+
+def route_is_live(route: str, method: str) -> bool:
+    """Is this verb actually served? Derived, never asserted.
+
+    A route declared in the contract with nothing answering it is the same
+    defect as a gate with no caller — a promise in a schema that nothing
+    keeps. FastAPI's decorator carries the literal path, so the check is a
+    substring of the decorator line rather than a guess.
+    """
+    try:
+        src = open(ROUTER).read()
+    except OSError:
+        return False
+    # `{rid}` in the contract, `{rid}` in the decorator — same literal.
+    return f'@router.{method.lower()}("{route}"' in src
+
+
+def request_writers() -> list[dict]:
+    """Every file that can create a request, and whether it checks anything."""
+    roots = ["mobius-skills/deep-research", "docs/service-lines", "mobius-payor/app"]
+    base = "/Users/ananth/Mobius"
+    out = []
+    for root in roots:
+        for dirpath, dirnames, filenames in os.walk(os.path.join(base, root)):
+            dirnames[:] = [d for d in dirnames
+                           if d not in (".git", "__pycache__", "worktrees")]
+            for fn in filenames:
+                if not fn.endswith(".py"):
+                    continue
+                fp = os.path.join(dirpath, fn)
+                try:
+                    src = open(fp, encoding="utf-8", errors="ignore").read()
+                except OSError:
+                    continue
+                if not REQUEST_WRITERS.search(src):
+                    continue
+                rel = os.path.relpath(fp, base)
+                # Two ways to be gated, and both are real: refuse in code (the
+                # runner) or read the published contract and refuse in its words
+                # (the router). Anything else takes what it is handed.
+                gated = ("evaluator_prompt is required" in src
+                         or "research.contract" in src)
+                out.append({"file": rel, "gated": gated,
+                            "line": next((i + 1 for i, ln in enumerate(src.splitlines())
+                                          if REQUEST_WRITERS.search(ln)), None)})
+    return sorted(out, key=lambda x: (not x["gated"], x["file"]))
+
+
 def derive(fname: str) -> dict:
     path = os.path.join(PKG, fname)
     src = open(path, encoding="utf-8", errors="replace").read()
@@ -403,6 +482,11 @@ def main() -> None:
         m["group"] = c.get("group", "unplaced")
         m["findings"] = c.get("findings", [])
 
+    contract_doc = _contract_module()
+    for v in contract_doc["verbs"]:
+        v["live"] = route_is_live(v["route"], v["method"])
+    writers = request_writers()
+
     doc = {
         "generated_by": "scripts/platform/gen_deep_research_schema.py",
         "module": "mobius-skills/deep-research",
@@ -463,6 +547,13 @@ def main() -> None:
         "skills": skills(),
         "live": live(),
 
+        # THE CONTRACT AND THE UX, read out of one declaration. The router
+        # reads the same thing back through research.contract, so a verb here
+        # and a verb there cannot disagree — and the invariants below make that
+        # a build failure rather than a discrepancy somebody notices in a demo.
+        "contract": contract_doc,
+        "request_writers": writers,
+
         # Stated in the artefact rather than smoothed over, the way the chat
         # schema states its span-identity limit.
         "honest_limits": [
@@ -514,11 +605,36 @@ def main() -> None:
                       f"does not declare — the vocabulary and the telemetry "
                       f"disagree")
 
+    # THE CONTRACT MUST BE KEPT, not merely declared. Each of these fired while
+    # being written, which is the only evidence that a check is real.
+    for v in doc["contract"]["verbs"]:
+        if not v["live"]:
+            breaks.append(f"the contract declares {v['method']} {v['route']} and "
+                          f"nothing serves it — a promise in a schema that no "
+                          f"route keeps")
+    declared_verbs = {v["id"] for v in doc["contract"]["verbs"]}
+    for sfc in doc["contract"]["surfaces"]:
+        for called in sfc["calls"]:
+            if called not in declared_verbs:
+                breaks.append(f"surface '{sfc['id']}' calls '{called}', which the "
+                              f"contract does not declare — a UX rendering an API "
+                              f"that does not exist")
+    for w in doc["request_writers"]:
+        if w["gated"]:
+            continue
+        if not any(w["file"].endswith(k) for k in KNOWN_UNGATED_WRITERS):
+            breaks.append(f"{w['file']}:{w['line']} can create a request and checks "
+                          f"nothing, and is not in KNOWN_UNGATED_WRITERS — a new "
+                          f"door opened without anyone declaring it")
+
     doc["invariants_checked"] = [
         "every terminal state the loop promises is reachable from some module",
         "no module can end a request without being declared a terminator",
         "no curated prose describes a module that no longer exists",
         "no trace is written for an actor the vocabulary does not declare",
+        "every verb the contract declares is served by a live route",
+        "no surface calls a verb the contract does not declare",
+        "no undeclared, ungated way to create a request has appeared",
     ]
     doc["curated_on"] = content.get("_curated_on", "2026-09-09")
 
@@ -530,6 +646,11 @@ def main() -> None:
             print("  ✗ " + b)
         sys.exit(1)
     print("  invariants: " + str(len(doc["invariants_checked"])) + " checked, all hold")
+    gated = sum(1 for w in doc["request_writers"] if w["gated"])
+    print(f"  contract   : {len(doc['contract']['verbs'])} verbs, all served · "
+          f"{len(doc['contract']['surfaces'])} surfaces")
+    print(f"  ways to create a request: {len(doc['request_writers'])}, "
+          f"{gated} of them gated")
     r = doc["who_reasons"]
     print(f"{len(mods)} modules → {OUT}")
     print(f"  actors with a written trace: {', '.join(doc['traced_by']) or 'none'}")
@@ -752,6 +873,84 @@ def render(doc, path):
                  ("reasoning steps", str(r["thinking"])),
                  ("note", "Open the console for the full trace of this request.")])
 
+    # ---- details: the contract ---------------------------------------------
+    C = doc.get("contract") or {}
+    FIELDS = C.get("fields") or {}
+
+    def fieldrow(names, required):
+        if not names:
+            return ""
+        out = []
+        for n in names:
+            f = FIELDS.get(n) or {}
+            bits = [f"<b>{esc(n)}</b> <span class=cur>{esc(f.get('type',''))}</span>"]
+            if f.get("says"):
+                bits.append("<br>" + esc(f["says"]))
+            if f.get("because"):
+                bits.append(f"<br><span class=cur>{esc(f['because'])}</span>")
+            if f.get("measured"):
+                bits.append(f"<br><span class=cur>measured: {esc(f['measured'])}</span>")
+            out.append(f"<li class='f {'bad' if required else 'good'}'>"
+                       + "".join(bits) + "</li>")
+        return "<ul class=finds>" + "".join(out) + "</ul>"
+
+    for v in C.get("verbs", []):
+        refs = "<ul class=finds>" + "".join(
+            f"<li class='f bad'><b>{esc(str(r['status']))}</b> {esc(r['when'])} — "
+            f"“{esc(r['say'])}”</li>" for r in v.get("refusals", [])) + "</ul>"
+        warns = "".join(f"<li class='f unproven'>{esc(w['say'])}</li>"
+                        for w in v.get("warnings", []))
+        rets = "<ul class=finds>" + "".join(
+            f"<li class=f><b>{esc(k)}</b> — {esc(x)}</li>"
+            for k, x in (v.get("returns") or {}).items()) + "</ul>"
+        add(f"verb:{v['id']}", f"{v['method']} {v['route']}", v["says"],
+            [("live",
+              "<b class=ok>served</b>" if v["live"] else
+              "<b class=no>declared and NOT served</b>"),
+             ("why it exists", esc(v.get("because", ""))),
+             ("required", fieldrow(v.get("required", []), True)),
+             ("optional", fieldrow(v.get("optional", []), False)),
+             ("refuses", refs if v.get("refusals") else "—"),
+             ("warns", f"<ul class=finds>{warns}</ul>" if warns else "—"),
+             ("returns", rets),
+             ("enforced by", f"<code>{esc(v['enforced_by'])}</code>"
+                             if v.get("enforced_by") else "—"),
+             ("who calls it", esc(", ".join(v.get("audience", [])))),
+             ("declared in", "<code>deep_research/contract.py</code> → published to "
+                             "<code>research.contract</code> → read by the router at "
+                             "request time. One declaration, two consumers.")],
+            "ok" if v["live"] else "bad")
+
+    for sfc in C.get("surfaces", []):
+        add(f"ux:{sfc['id']}", sfc["title"], sfc["audience"],
+            [("shows", esc(sfc["shows"])),
+             ("who sees what", f"<code>{esc(sfc['filter'])}</code>" if sfc["filter"]
+                               else "everything — no filter"),
+             ("calls", " ".join(f"<code>{esc(x)}</code>" for x in sfc["calls"])),
+             ("state", f"<b>{esc(sfc['state'])}</b>"),
+             ("the point", "Five doors, one contract. What separates the audiences "
+                           "is the FILTER and which verbs they may call — not a "
+                           "different API underneath.")],
+            "ok" if sfc["state"] == "live" else "info")
+
+    W = doc.get("request_writers") or []
+    gated = [w for w in W if w["gated"]]
+    add("contract:doors", "Ways to create a request",
+        f"{len(W)} of them · {len(gated)} check anything",
+        [("", "<ul class=finds>" + "".join(
+            f"<li class='f {'good' if w['gated'] else 'bad'}'>"
+            f"<code>{esc(w['file'])}:{esc(str(w['line']))}</code>"
+            + ("" if w["gated"] else " <span class=cur>takes what it is handed</span>")
+            + "</li>" for w in W) + "</ul>"),
+         ("what it cost", "15 of 63 live requests carry no instruction on how to "
+                          "grade the answer — the one thing the gate exists to "
+                          "require — and 17 have no invoker, so their answers have "
+                          "nowhere to go."),
+         ("the fix", "Not a seventh check. One door with the gate underneath it, "
+                     "and an invariant that fails this build when a new ungated "
+                     "one appears.")],
+        "bad")
+
     # ---- details: the honest limits ----------------------------------------
     add("meta:limits", "What this page does not tell you", "read this before trusting it",
         [("", "<ul class=finds>" + "".join(f"<li class=f>{esc(x)}</li>"
@@ -807,6 +1006,17 @@ def render(doc, path):
              f"{len(sk.get('gaps', []))} missing",
              "warn" if sk.get("gaps") else "ok")
         for who, sk in doc.get("skills", {}).items() if "error" not in sk)
+
+    C = doc.get("contract") or {}
+    verbs = "".join(chip(f"verb:{v['id']}", f"{v['method']} {v['route']}",
+                         "served" if v["live"] else "NOT SERVED",
+                         "ok" if v["live"] else "bad") for v in C.get("verbs", []))
+    surfaces = "".join(chip(f"ux:{u['id']}", u["title"], u["state"],
+                            "ok" if u["state"] == "live" else "info")
+                       for u in C.get("surfaces", []))
+    W = doc.get("request_writers") or []
+    doors = chip("contract:doors", "Ways to create a request",
+                 f"{sum(1 for w in W if w['gated'])} of {len(W)} gated", "bad")
 
     L = doc["loop"]
     dj = json.dumps(detail)
@@ -899,7 +1109,20 @@ border-radius:99px;background:var(--bg2)}}
 <p class=band-s>{esc(L['opens'])}</p>
 {chip('meta:limits', 'Read this first — what the page cannot tell you', '?', 'info')}</div>
 
-<div class=band><div class=band-t>2 · The round — click any step</div>
+<div class=band><div class=band-t>2 · The contract — one declaration, two consumers</div>
+<p class=band-s>Four verbs, declared once in <code>deep_research/contract.py</code>,
+published to <code>research.contract</code>, and read back by the router at request
+time. The build fails if a verb here has no live route, or if a surface calls one
+that is not declared.</p>
+<div class=row>{verbs}</div>
+<div class=gl>the ux · five doors, one contract</div>
+<div class=row>{surfaces}</div>
+<div class=gl>and every way in</div>
+{doors}
+<p class=legend>What separates the audiences is a FILTER and which verbs they may
+call — not a different API underneath.</p></div>
+
+<div class=band><div class=band-t>3 · The round — click any step</div>
 <p class=band-s>This is what happens once, per round. It repeats until
 {esc(L['repeats_until'])}.</p>
 {steps}
@@ -907,34 +1130,34 @@ border-radius:99px;background:var(--bg2)}}
 ◦ records nothing of its own<br>
 Click a step for what it does and where it lives.</p></div>
 
-<div class=band><div class=band-t>3 · Five ways to run a turn — only one is complete</div>
+<div class=band><div class=band-t>4 · Five ways to run a turn — only one is complete</div>
 <p class=band-s>A turn can be started five ways and they do not offer the same
 protection. Derived from the code, because asserting parity is how it was lost.</p>
 <div class=row>{entries}</div></div>
 
-<div class=band><div class=band-t>4 · What ends a request</div>
+<div class=band><div class=band-t>5 · What ends a request</div>
 <p class=band-s>Four modules can independently finish a request, and one of them
 escalates from five separate lines. There is no single owner of the decision.</p>
 <div class=row>{ends}</div></div>
 
-<div class=band><div class=band-t>5 · What actually ran — the map with traffic on it</div>
+<div class=band><div class=band-t>6 · What actually ran — the map with traffic on it</div>
 <p class=band-s>Everything above is structure. This is counted from the state
 machine's own tables: which validator settled each field, why fields were dropped,
 how many reasoning steps each actor recorded, and what it cost.</p>
 {livechips}</div>
 
-<div class=band><div class=band-t>6 · What each actor can actually do</div>
+<div class=band><div class=band-t>7 · What each actor can actually do</div>
 <p class=band-s>The skills each one has and how it invokes them, read out of the
 code — the judge from its validator registry, the arbiter from its pattern list,
 the drafter from chat's tools. What it does NOT have is listed too, because an
 absent check is invisible otherwise.</p>
 <div class=row>{skl}</div></div>
 
-<div class=band><div class=band-t>7 · The modules</div>
+<div class=band><div class=band-t>8 · The modules</div>
 <p class=band-s>Rating and the plain-language line are curated prose.
 Everything else is read out of the code on every build.</p>{mods}</div>
 
-<div class=band><div class=band-t>8 · What we will need — proposed, not built</div>
+<div class=band><div class=band-t>9 · What we will need — proposed, not built</div>
 <p class=band-s>On the page rather than in somebody's head, and marked so nobody
 reads a proposal as a promise. Nothing here is agreed until it is agreed.</p>
 {future}</div>
