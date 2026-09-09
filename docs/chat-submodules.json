@@ -135,34 +135,6 @@
    "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator, app.pipeline.react_loop \u2014 its behaviour has no telemetry identity of its own."
   },
   {
-   "id": "app-pipeline-credentialing_envelope",
-   "module": "app.pipeline.credentialing_envelope",
-   "group": "pipeline",
-   "path": "app/pipeline/credentialing_envelope.py",
-   "loc": 177,
-   "role": "Credentialing envelope: canonical message + routing helpers (shared with ReAct).",
-   "role_full": "Credentialing envelope: canonical message + routing helpers (shared with ReAct).",
-   "stage": null,
-   "api": [
-    "resolve_step3_roster_merge_context()",
-    "roster_uploads_from_active()",
-    "thread_has_roster_reconciliation_data()",
-    "message_requests_roster_reconciliation()",
-    "message_prefers_outside_in_credentialing()",
-    "envelope_routes_to_reconciliation()",
-    "classify_org_vs_uploads()",
-    "build_canonical_credentialing_message()"
-   ],
-   "telemetry": [],
-   "callers": [
-    "app.services.credentialing_run_service"
-   ],
-   "fan_in": 1,
-   "surfaces": [],
-   "observability": "mediated",
-   "observability_note": "Emits nothing. Observable only through its callers \u2014 its behaviour has no telemetry identity of its own."
-  },
-  {
    "id": "app-pipeline-curator_tools",
    "module": "app.pipeline.curator_tools",
    "group": "pipeline",
@@ -679,7 +651,7 @@
    "module": "app.stages.agents.capabilities",
    "group": "stages/agents",
    "path": "app/stages/agents/capabilities.py",
-   "loc": 333,
+   "loc": 330,
    "role": "Path capabilities registry: what each agent path can answer.",
    "role_full": "Path capabilities registry: what each agent path can answer.\n\nFed to the parser/planner so it decomposes questions into subquestions\nthat match supported capabilities. Single source of truth.\n\nEach tool has explicit capability declarations so the parser/LLM can\nmatch questions to the right tool. If the first tool fails, ReAct can try another.",
    "stage": null,

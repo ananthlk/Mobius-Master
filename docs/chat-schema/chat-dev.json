@@ -5,7 +5,8 @@
   "app/stages/plan.py",
   "app/stages/clarify.py",
   "app/stages/resolve.py",
-  "app/stages/continuity.py"
+  "app/stages/continuity.py",
+  "app/pipeline/credentialing_envelope.py"
  ],
  "roadmap": {
   "phases": [
@@ -1426,83 +1427,6 @@
       "./static/app.js",
       "./static/index.html"
      ]
-    },
-    "parameters": {
-     "module_constants": [],
-     "keyword_defaults": []
-    }
-   }
-  },
-  {
-   "id": "app-pipeline-credentialing_envelope",
-   "module": "app.pipeline.credentialing_envelope",
-   "group": "pipeline",
-   "path": "app/pipeline/credentialing_envelope.py",
-   "loc": 177,
-   "role": "Credentialing envelope: canonical message + routing helpers (shared with ReAct).",
-   "role_full": "Credentialing envelope: canonical message + routing helpers (shared with ReAct).",
-   "stage": null,
-   "api": [
-    "resolve_step3_roster_merge_context()",
-    "roster_uploads_from_active()",
-    "thread_has_roster_reconciliation_data()",
-    "message_requests_roster_reconciliation()",
-    "message_prefers_outside_in_credentialing()",
-    "envelope_routes_to_reconciliation()",
-    "classify_org_vs_uploads()",
-    "build_canonical_credentialing_message()"
-   ],
-   "telemetry": [],
-   "callers": [
-    "app.services.credentialing_run_service"
-   ],
-   "fan_in": 1,
-   "surfaces": [],
-   "observability": "mediated",
-   "observability_note": "Emits nothing. Observable only through its callers \u2014 its behaviour has no telemetry identity of its own.",
-   "config": [],
-   "writes": [],
-   "key": "credentialing_envelope",
-   "how": "Routing helpers for credentialing conversations, shared between the classic and ReAct paths so\nboth agree on what a message is asking for.\n\nThe core is resolve_step3_roster_merge_context, which reads thread state and the credentialing\noptions and returns three things: the roster upload id, whether the user chose outside-in\n(external_only), and whether to include roster members. The rest are predicates \u2014 does this\nthread have reconciliation data, is the message asking for reconciliation, does the envelope\nroute there.",
-   "rating": "green",
-   "depth": "code",
-   "findings": [
-    [
-     "good",
-     "Zero exception handlers, and sharing it between both paths is what stops the two routes disagreeing about whether a message is a credentialing one."
-    ],
-    [
-     "good",
-     "Returns a typed tuple with each flag's meaning documented, rather than a dict the caller has to interpret."
-    ],
-    [
-     "watch",
-     "No test file, for logic that decides which of two workflows a message enters."
-    ]
-   ],
-   "signals": {
-    "loc": 177,
-    "except_handlers": 0,
-    "swallow": 0,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [],
-    "path": "app/pipeline/credentialing_envelope.py",
-    "fan_in": 1,
-    "emits": 0
-   },
-   "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": []
     },
     "parameters": {
      "module_constants": [],
@@ -3612,7 +3536,7 @@
    "module": "app.stages.agents.capabilities",
    "group": "stages/agents",
    "path": "app/stages/agents/capabilities.py",
-   "loc": 333,
+   "loc": 330,
    "role": "Path capabilities registry: what each agent path can answer.",
    "role_full": "Path capabilities registry: what each agent path can answer.\n\nFed to the parser/planner so it decomposes questions into subquestions\nthat match supported capabilities. Single source of truth.\n\nEach tool has explicit capability declarations so the parser/LLM can\nmatch questions to the right tool. If the first tool fails, ReAct can try another.",
    "stage": null,
@@ -4277,6 +4201,72 @@
        "value": "incomplete"
       }
      ],
+     "keyword_defaults": []
+    }
+   }
+  },
+  {
+   "id": "credentialing_envelope",
+   "key": "credentialing_envelope",
+   "module": "credentialing_envelope",
+   "group": "deleted",
+   "path": "app/pipeline/credentialing_envelope.py",
+   "loc": 0,
+   "role": "(deleted by the refactor)",
+   "role_full": "",
+   "api": [],
+   "config": [],
+   "writes": [],
+   "telemetry": [],
+   "callers": [],
+   "fan_in": 0,
+   "surfaces": [],
+   "observability": "n/a",
+   "deleted": true,
+   "signals": {
+    "loc": 0,
+    "except_handlers": 0,
+    "swallow": 0,
+    "bare_except": 0,
+    "todos": 0,
+    "config": [],
+    "tests": [],
+    "path": "app/pipeline/credentialing_envelope.py",
+    "fan_in": 0,
+    "emits": 0,
+    "deleted": true
+   },
+   "how": "Routing helpers for credentialing conversations, shared between the classic and ReAct paths so\nboth agree on what a message is asking for.\n\nThe core is resolve_step3_roster_merge_context, which reads thread state and the credentialing\noptions and returns three things: the roster upload id, whether the user chose outside-in\n(external_only), and whether to include roster members. The rest are predicates \u2014 does this\nthread have reconciliation data, is the message asking for reconciliation, does the envelope\nroute there.",
+   "rating": "green",
+   "depth": "code",
+   "findings": [
+    [
+     "good",
+     "Zero exception handlers, and sharing it between both paths is what stops the two routes disagreeing about whether a message is a credentialing one."
+    ],
+    [
+     "good",
+     "Returns a typed tuple with each flag's meaning documented, rather than a dict the caller has to interpret."
+    ],
+    [
+     "watch",
+     "No test file, for logic that decides which of two workflows a message enters."
+    ]
+   ],
+   "live_config": [],
+   "detail": {
+    "db": {
+     "sql": [],
+     "storage_fns": [],
+     "redis_keys": [],
+     "note": "SQL found by literal match; a query built at runtime is invisible here"
+    },
+    "ux": {
+     "routes_defined": [],
+     "frontend_files": []
+    },
+    "parameters": {
+     "module_constants": [],
      "keyword_defaults": []
     }
    }
