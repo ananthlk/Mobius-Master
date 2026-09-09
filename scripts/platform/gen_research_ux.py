@@ -178,13 +178,33 @@ def main() -> None:
         rec = r.get("recommended")
         eta = r.get("eta") or {}
         wait_word, _ = L.waiting(eta.get("waiting_on"))
-        recbits = (f"<span class=rec>{esc(by_action.get(rec, {}).get('label', rec))}</span>"
-                   if rec else "<span class=cur>Nothing we would advise</span>")
+        recbits = ("<span class=rec>What to do</span>" if rec
+                   else "<span class=cur>Nothing we would advise</span>")
+        acts = r.get("actions") or []
+        adv = next((a for a in acts if a["id"] == rec), None)
+        # THE ADVISED MOVE IS SPELT OUT; the rest are buttons. Ananth: "each
+        # action should give a recommendation .. else it is useless and generic
+        # language which is really a tool hover tip and not text." So the
+        # specific line is the text, the generic one is the title attribute, and
+        # every action says what CLOSING it looks like — because that is what
+        # each one is for.
+        lead = ""
+        if adv:
+            lead = (f"<div class=lead><button class='act adv' data-a='{esc(adv['id'])}' "
+                    f"data-r='{r['id']}' title='{esc(adv.get('does') or '')}'>"
+                    f"{esc(adv['label'])}</button>"
+                    + (f"<p class=spec>{esc(adv.get('specific'))}</p>"
+                       if adv.get("specific") else "")
+                    + f"<p class=closes>ends as — {esc(adv.get('closes_as') or '')}</p>"
+                    "</div>")
         btns = "".join(
-            f"<button class='act{' adv' if a == rec else ''}' data-a='{esc(a)}' "
-            f"data-r='{r['id']}' title='{esc(by_action.get(a, {}).get('does', ''))}'>"
-            f"{esc(by_action.get(a, {}).get('label', a))}</button>"
-            for a in (r.get("can") or []))
+            f"<button class=act data-a='{esc(a['id'])}' data-r='{r['id']}' "
+            f"title='{esc(a.get('specific') or a.get('does') or '')}'>"
+            f"{esc(a['label'])}"
+            + ("<i>·</i>" if a.get("specific") else "")
+            + "</button>"
+            for a in acts if a["id"] != rec)
+
         return ("<tr data-invoker='" + esc(r.get("invoker")) + "' "
                 "data-consumer='" + esc(r.get("consumer")) + "' "
                 "data-dec='" + str(r.get("dec") or 0) + "' "
@@ -200,7 +220,7 @@ def main() -> None:
                 f"<span class='wait {WAIT_TONE.get(eta.get('waiting_on'),'')}'>"
                 f"{esc(wait_word)}</span>"
                 f"<span class=q>{esc(eta.get('say') or '')}</span>"
-                f"<div class=acts>{btns}</div></td>"
+                f"{lead}<div class=acts>{btns}</div></td>"
                 f"<td class=n>{r.get('rounds')}</td>"
                 f"<td class=n>{r.get('dec') or ''}</td></tr>")
 
@@ -323,6 +343,13 @@ background:var(--sunk);color:var(--muted)}}
 .wait.bad{{background:var(--bad-soft);color:var(--bad)}}
 .wait.warn{{background:var(--warn-soft);color:var(--warn)}}
 .wait.ok{{background:var(--ok-soft);color:var(--ok)}}
+.lead{{margin-top:10px;padding:10px 12px;background:var(--violet-soft);
+border-radius:4px}}
+.lead .act.adv{{margin-bottom:6px}}
+.spec{{margin:0 0 6px;font-size:12.5px;color:var(--ink2);line-height:1.5}}
+.closes{{margin:0;font-family:var(--mono);font-size:10.5px;letter-spacing:.03em;
+color:var(--muted);text-transform:uppercase}}
+.act i{{font-style:normal;color:var(--violet);margin-left:4px;font-weight:700}}
 .acts{{display:flex;flex-wrap:wrap;gap:4px;margin-top:9px}}
 .act{{font-family:var(--sans);font-size:11.5px;background:var(--sunk);color:var(--ink2);
 border:1px solid var(--line2);border-radius:3px;padding:3px 8px;cursor:pointer}}
@@ -491,7 +518,11 @@ document.addEventListener('click', function(e){{
     because: 'one sentence a reader will see in a month'}};
   extra.forEach(function(n){{ bodyObj[n] = 'the ' + n; }});
   d.hidden = false;
+  var row = a.closest('tr');
+  var spec = a.title && a.title !== (A.does || '') ? a.title : '';
   d.innerHTML = '<h2>' + A.label + '</h2>'
+    + (spec ? '<p class=spec>' + spec + '</p>' : '')
+    + '<p class=closes>ends as — ' + (A.closes_as || '') + '</p>'
     + '<p class=says>' + (A.does || '') + '</p>'
     + '<p class=note><b>Moves it to:</b> ' + (A.moves || '') + '<br>'
     + '<b>Offered when:</b> ' + (A.when || '') + '</p>'
