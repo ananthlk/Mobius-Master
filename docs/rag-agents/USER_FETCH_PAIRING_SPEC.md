@@ -409,3 +409,43 @@ impossible to do silently.**
 - **Blocked on Ananth, and only Ananth:** the AMA licensing application / agreement.
   Until `CPT_LICENSE_REF` holds a real agreement, the screen stays `suppress` — on every lane,
   user-fetch included.
+
+---
+
+## 2.9 · TODO-B rag contract — STRAWMAN (Extension proposes; Crawler freezes; Master RAG implements)
+
+Driving the last hop. Chat declares the five fields (`9d41aff`); rag `/upload` accepts only
+`source_url` today, so four are held at chat (`pending_rag_support`). Below is one concrete
+contract so the Crawler reviews and Master RAG implements against the *same* frozen set — nobody
+invents keys twice.
+
+**Frozen key names (extension already SENDS these verbatim; do not rename without telling me):**
+`source_url`, `access`, `task_id`, `fetched_at`, `signal_headers`.
+
+**Proposed rag `/upload` additions (chat forwards these once the params exist):**
+
+| Field | Value (from the extension) | Proposed landing |
+|---|---|---|
+| `source_url` | the page the user was on | already consumed by rag (`source_page_url`) |
+| `access` | `"user_authorized_session"` | `documents.source_metadata.access` |
+| `task_id` | `ext_<uuid>` | `documents.source_metadata.task_id` **and** `source_run_id` (§1.3) |
+| `fetched_at` | client fetch ISO-8601 | `documents.source_metadata.fetched_at` |
+| `signal_headers` | 5-family Content-Signal allowlist (raw lines) | **NOT stored raw** → fed to the content_signals normalizer (Crawler-owned) → `documents.content_signals`, merged most-restrictive-wins with the origin robots.txt signals |
+
+**Classification caller:** `browser-extension:user-fetch` (replaces the hardcoded
+`mobius-rag:upload` for this lane; `payor_ingest_classification.caller`), so user-fetch docs stay
+distinguishable forever. May be set from an explicit caller param or inferred from
+`access=user_authorized_session` — Master RAG's choice, Crawler to confirm the string.
+
+**Review asks:**
+- **Crawler (compliance/provenance owner):** freeze the caller string + the `source_metadata` key
+  names + confirm `signal_headers → content_signals` is your normalizer. This is the review you
+  asked to do before anything sets.
+- **Master RAG (rag `/upload` owner):** declare the four params, write `source_metadata`, invoke
+  the content_signals normalizer, set the caller. Chat Master forwards the moment the params
+  exist; `pending_rag_support` emptying is the Extension's landed-signal.
+- **Extension:** wires nothing further here — the fields already ship; this hop is chat→rag. Will
+  re-verify end-to-end (a real upload's `source_provenance.pending_rag_support` goes empty) once
+  Master RAG lands it.
+
+**Status:** Extension proposed (2026-09-09). Awaiting Crawler freeze → Master RAG implementation.
