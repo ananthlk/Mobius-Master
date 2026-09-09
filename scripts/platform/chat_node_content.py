@@ -489,6 +489,32 @@ and nothing in the live path ever calls it, reads it back, or persists what it p
 Each instance looks healthy in isolation. The code is present, the tests pass, the docstring
 describes real intent. The capability is simply absent at runtime, and health stays green.
 """, findings=[
+ ("bad", "OWNER(chat): ~25 FRONTEND FETCHES ARE 404ing TODAY AND NOBODY NOTICED — this "
+         "node's class, live, not hypothetical. Found by Chat Master during the P1d sweep. "
+         "app/api/roster.py was DELETED in 65c4751 and roughly 25 call sites in chat's own "
+         "pipeline-*.js were never removed, so every fetch to /chat/roster-truth/* and "
+         "/chat/roster-reconcile/* returns 404. The try/catch swallows it and the selector "
+         "renders empty. The capability has been gone for as long as that commit is old and "
+         "the page looks the same as it always did.\n\n"
+         "Worth keeping beside the twelve confirmed instances because it is the only one where "
+         "the producer was removed by a DELIBERATE deletion and the consumers were simply "
+         "forgotten — which is precisely the risk this program runs every phase. It is also "
+         "the argument for P1d taking the frontend with it rather than after it."),
+ ("bad", "OWNER(chat): DELETING THE CREDENTIALING PLANNER PATH WOULD SILENTLY BREAK AN "
+         "UNRELATED LIVE TOOL. Chat Master caught this before touching anything. "
+         "list_thread_document_uploads is a working non-credentialing tool, and "
+         "blueprint.py:173 is its ONLY planner routing path — reached exclusively through "
+         "cf_intent, the object from the credentialing_flow_intent module P1d marks for "
+         "deletion. Remove cf_intent and the planner loses the ability to route there. "
+         "Nothing raises; the tool just stops being selected.\n\n"
+         "WE WOULD HAVE CREATED A NEW INSTANCE OF THE CLASS WE ARE CATALOGUING. That is the "
+         "finding: a deletion program aimed at producers-without-consumers is itself a machine "
+         "for manufacturing them, unless every removal asks what ELSE reads this.\n\n"
+         "blueprint.py is the one genuinely interleaved file — force_roster_tool_hint, "
+         "use_credentialing_qa and cf_intent are set in credentialing branches and read by the "
+         "GENERIC per-subquestion loop at :122-176, and the keyword gate at :71-84 fires on "
+         "'section', 'readiness' and 'revenue opportunity', generic phrases that happen to "
+         "serve credentialing today. Restructuring with harness coverage, not excision."),
  ("bad", "OWNER(chat): JWTs ARE IN THE REQUEST LOGS. Found 2026-09-09 while measuring "
          "credentialing route traffic, not by looking for it. Cloud Run request logs for "
          "mobius-chat contain entries like `%2F%23t%3DeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` "

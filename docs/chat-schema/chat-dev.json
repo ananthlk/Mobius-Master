@@ -15,7 +15,7 @@
     "owner": "chat",
     "gate": "lines removed; handler count down; ZERO invariant movement",
     "blocks": "P2, P4",
-    "n": 6
+    "n": 8
    },
    {
     "id": "P2",
@@ -1193,6 +1193,14 @@
    "rating": "red",
    "depth": "code",
    "findings": [
+    [
+     "bad",
+     "OWNER(chat): ~25 FRONTEND FETCHES ARE 404ing TODAY AND NOBODY NOTICED \u2014 this node's class, live, not hypothetical. Found by Chat Master during the P1d sweep. app/api/roster.py was DELETED in 65c4751 and roughly 25 call sites in chat's own pipeline-*.js were never removed, so every fetch to /chat/roster-truth/* and /chat/roster-reconcile/* returns 404. The try/catch swallows it and the selector renders empty. The capability has been gone for as long as that commit is old and the page looks the same as it always did.\n\nWorth keeping beside the twelve confirmed instances because it is the only one where the producer was removed by a DELIBERATE deletion and the consumers were simply forgotten \u2014 which is precisely the risk this program runs every phase. It is also the argument for P1d taking the frontend with it rather than after it."
+    ],
+    [
+     "bad",
+     "OWNER(chat): DELETING THE CREDENTIALING PLANNER PATH WOULD SILENTLY BREAK AN UNRELATED LIVE TOOL. Chat Master caught this before touching anything. list_thread_document_uploads is a working non-credentialing tool, and blueprint.py:173 is its ONLY planner routing path \u2014 reached exclusively through cf_intent, the object from the credentialing_flow_intent module P1d marks for deletion. Remove cf_intent and the planner loses the ability to route there. Nothing raises; the tool just stops being selected.\n\nWE WOULD HAVE CREATED A NEW INSTANCE OF THE CLASS WE ARE CATALOGUING. That is the finding: a deletion program aimed at producers-without-consumers is itself a machine for manufacturing them, unless every removal asks what ELSE reads this.\n\nblueprint.py is the one genuinely interleaved file \u2014 force_roster_tool_hint, use_credentialing_qa and cf_intent are set in credentialing branches and read by the GENERIC per-subquestion loop at :122-176, and the keyword gate at :71-84 fires on 'section', 'readiness' and 'revenue opportunity', generic phrases that happen to serve credentialing today. Restructuring with harness coverage, not excision."
+    ],
     [
      "bad",
      "OWNER(chat): JWTs ARE IN THE REQUEST LOGS. Found 2026-09-09 while measuring credentialing route traffic, not by looking for it. Cloud Run request logs for mobius-chat contain entries like `%2F%23t%3DeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` \u2014 that is `/#t=<access token>` URL-encoded into the request PATH. Decoded, the payload carries sub, tenant_id, exp and type=access.\n\nA fragment is not normally sent to a server, so something is encoding the token into the path rather than leaving it after the #. However it happens, the consequence is that live access tokens are written to Cloud Run request logs, where they are readable by anyone with log access and by anyone a log excerpt is pasted to. Two distinct tokens appear across 30 days.\n\nNOT INVESTIGATED \u2014 I have not established which client does this, whether the tokens are still within their exp, or whether the same pattern reaches other services' logs. Logged rather than chased, per Ananth's standing instruction, and flagged to Chat Master so nobody pastes a log excerpt before it is understood. Related to the CHAT_AUTH_MODE=optional item on the POST /chat node but a separate defect."
