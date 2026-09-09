@@ -1462,7 +1462,7 @@ Two jobs, and the second one is easy to miss.
          "and the trace does not record which source built a given turn's prompt."),
 ]),
 
-"tool_manifest": dict(rating="green", depth="code", how="""
+"tool_manifest": dict(rating="red", depth="code", how="""
 The menu of tools the planner is shown. If a tool is not described here the planner cannot
 choose it, which makes this file a control surface rather than a list.
 
@@ -1470,6 +1470,46 @@ It is mid-migration and says so: five tools are now registry-owned, their descri
 living on SkillSpec.description and rendered through registry.manifest_text(), so adding a
 skill is one file and no edit here. The rest are still described inline.
 """, findings=[
+ ("bad", "OWNER(chat): A TOOL RETURNED A REAL PLAYBOOK AND CHAT REPORTED THERE WAS NONE. "
+         "Found by Ananth testing live, 2026-09-09, cid 0985d25a and bb898cf5. Logged for the "
+         "tool node, NOT fixed — his ruling.\n\n"
+         "Query: 'how do I appeal a CARC 197 denial for Sunshine Health in Florida?' Chat "
+         "emitted 'No playbook — using FL Medicaid defaults' and, in copilot mode, gave up "
+         "after 3 rounds with unfinished_reason=no_path_forward.\n\n"
+         "THE PLAYBOOK EXISTS. I called the same endpoint chat calls:\n"
+         "  GET /playbook-guarded/Sunshine%20Health/197?audience=provider -> 200\n"
+         "  deadline_appeal_days 90 · submission_method portal · fax 1-833-504-0580\n"
+         "  mail Post Office Box 3070, Farmington MO 63640-3823\n"
+         "  appeal_levels: Internal Appeal (L1), Peer-to-Peer Review (L2), ...\n\n"
+         "So the answer the user wanted was one HTTP call away and the handler took its "
+         "found=False branch anyway. The suspect is react_loop.py:3127 — "
+         "`lookup = carc_group or str(carc) if carc else carc_group`. Python parses that as "
+         "`carc_group or (str(carc) if carc else carc_group)`, so whatever the planner passes "
+         "decides the path: a carc_group of 'PRECERT' builds /playbook-guarded/{payor}/PRECERT "
+         "while the row is keyed 197. NOT CONFIRMED — I did not capture the planner's actual "
+         "inputs, so this is the leading suspect and not the established cause.\n\n"
+         "THEN THE MODEL FABRICATED A TOOL ERROR AND TOLD THE USER. It reported "
+         "'Unknown tool: appeals_get_playbook' and 'the appeals tools are currently "
+         "unavailable'. I searched the stored turn: EVERY occurrence of that string is inside "
+         "the model's own thought field and NONE is in any tool result. The dispatcher is a "
+         "single function, the appeals branch at react_loop.py:3005 is reachable, its own emit "
+         "strings appear in the trace, and the service returns 200. The tool handed back "
+         "success=True with a useless payload; the model could not tell why it was not "
+         "helping, invented a mechanical explanation, and shipped that explanation to the "
+         "user as fact.\n\n"
+         "THIS IS THE SYSTEMIC FINDING TWICE IN ONE TURN. The tool reports success while its "
+         "payload is a failure, and tool_failed CANNOT be emitted because make_tool_failed has "
+         "no caller (see the emit_envelope node). So nothing in the system could report that "
+         "this tool was failing — the model was the only thing that noticed, and the only "
+         "thing it could do was guess. That is what reached the screen.\n\n"
+         "MODE MATTERS: agentic recovered by falling back to rag in round 3 and produced a "
+         "correct answer with the real deadlines and address; copilot's 3-round budget ran out "
+         "first. Same defect, different visibility.\n\n"
+         "NOT CAUSED BY P1a OR P1c — the appeals dispatch is untouched by both and the "
+         "found=False branch predates them. Not verified against the pre-refactor revision.\n\n"
+         "Node moved GREEN -> RED. A control surface that silently reports 'no data' when the "
+         "data exists is not green, however clean the migration around it is — rating the "
+         "guarantee, not the construction."),
  ("bad", "OWNER(chat): MOVE THE MANIFEST OUT OF CODE — Ananth's point, and the cost is "
          "measurable. 16 blocks are hardcoded here totalling 19,191 characters, roughly 4,800 "
          "TOKENS injected into the planner prompt. The biggest are _SERVICE_LINE_ROUTING "

@@ -123,6 +123,7 @@ RULES = [
 
     # ── P5 — config UX ────────────────────────────────────────────────────
     ("P5", "governor",      "IT IS A PYTHON DICT"),
+    ("P3", "tool_manifest", "A TOOL RETURNED A REAL PLAYBOOK AND CHAT REPORTED THERE WAS NONE"),
     ("P5", "tool_manifest", "MOVE THE MANIFEST OUT OF CODE"),
     ("P5", "tool_manifest", "CONTEXT-SPECIFIC TOOL SELECTION"),
     ("P5", "prompts",       "TWO PROMPTS EXIST IN BOTH PLACES"),

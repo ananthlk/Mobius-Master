@@ -29,9 +29,33 @@ ap.add_argument("--out", default=os.path.join(ROOT, "docs", "chat-eval-report.md
 args = ap.parse_args()
 
 # ── A. tests ──────────────────────────────────────────────────────────────
+def _pytest_python():
+    """Prefer mobius-chat/.venv over whatever interpreter launched this script.
+
+    2026-09-09 (P1b): the gate ran pytest via ``sys.executable``, so it
+    inherited the caller's interpreter. Everyone invokes this as
+    ``python3 scripts/platform/gen_eval_report.py`` — the Homebrew system
+    Python — which lacks ``pythonjsonlogger`` and ``opentelemetry`` even
+    though both are declared in requirements.txt (lines 34, 46-50) and both
+    are installed in .venv. That put 12 tests
+    (test_logging_config 7, test_tracing_config 5) into the known-failing
+    baseline as collection errors that had nothing to do with the code.
+    All 12 pass under .venv.
+
+    Measured: .venv is NOT slower — 65-test subset ran 54.4s under .venv vs
+    57.8s under system Python, both at ~8% CPU (these tests block on the
+    refused db-agent connection, which dominates either way).
+
+    Falls back to sys.executable when .venv is absent, so CI or a
+    container that installs requirements globally still works.
+    """
+    venv_py = os.path.join(CHAT, ".venv", "bin", "python")
+    return venv_py if os.path.exists(venv_py) else sys.executable
+
+
 def run_tests():
     t0 = time.time()
-    p = subprocess.run([sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider",
+    p = subprocess.run([_pytest_python(), "-m", "pytest", "-q", "-p", "no:cacheprovider",
                         f"--junitxml={JUNIT}"], cwd=CHAT, capture_output=True, text=True)
     return time.time() - t0, p.returncode
 

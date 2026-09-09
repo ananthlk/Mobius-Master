@@ -31,7 +31,7 @@
     "owner": "chat",
     "gate": "modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target",
     "blocks": "P5",
-    "n": 11
+    "n": 12
    },
    {
     "id": "P4",
@@ -639,7 +639,7 @@
    "id": "llm_manager",
    "path": "app/services/llm_manager.py",
    "kind": "cross-cutting",
-   "loc": 432,
+   "loc": 454,
    "role": "llm_manager.py \u2014 Single entry point for all LLM calls.",
    "role_full": "llm_manager.py \u2014 Single entry point for all LLM calls.\nSprint -1: wires ModelRouter for dynamic per-stage model selection.\n\nChanges from previous version:\n  - get_llm_provider(parser=parser) replaced by router.select()\n  - stage parameter now actually drives model selection\n  - phi_detected parameter added (passed from pipeline context)\n  - ab_variant set to selected model_id for analytics\n  - router.update_ema() called after each call\n  - auto_enable_from_env() called on first generate()",
    "api": [
@@ -3455,9 +3455,13 @@
    "writes": [],
    "key": "tool_manifest",
    "how": "The menu of tools the planner is shown. If a tool is not described here the planner cannot\nchoose it, which makes this file a control surface rather than a list.\n\nIt is mid-migration and says so: five tools are now registry-owned, their descriptions\nliving on SkillSpec.description and rendered through registry.manifest_text(), so adding a\nskill is one file and no edit here. The rest are still described inline.",
-   "rating": "green",
+   "rating": "red",
    "depth": "code",
    "findings": [
+    [
+     "bad",
+     "OWNER(chat): A TOOL RETURNED A REAL PLAYBOOK AND CHAT REPORTED THERE WAS NONE. Found by Ananth testing live, 2026-09-09, cid 0985d25a and bb898cf5. Logged for the tool node, NOT fixed \u2014 his ruling.\n\nQuery: 'how do I appeal a CARC 197 denial for Sunshine Health in Florida?' Chat emitted 'No playbook \u2014 using FL Medicaid defaults' and, in copilot mode, gave up after 3 rounds with unfinished_reason=no_path_forward.\n\nTHE PLAYBOOK EXISTS. I called the same endpoint chat calls:\n  GET /playbook-guarded/Sunshine%20Health/197?audience=provider -> 200\n  deadline_appeal_days 90 \u00b7 submission_method portal \u00b7 fax 1-833-504-0580\n  mail Post Office Box 3070, Farmington MO 63640-3823\n  appeal_levels: Internal Appeal (L1), Peer-to-Peer Review (L2), ...\n\nSo the answer the user wanted was one HTTP call away and the handler took its found=False branch anyway. The suspect is react_loop.py:3127 \u2014 `lookup = carc_group or str(carc) if carc else carc_group`. Python parses that as `carc_group or (str(carc) if carc else carc_group)`, so whatever the planner passes decides the path: a carc_group of 'PRECERT' builds /playbook-guarded/{payor}/PRECERT while the row is keyed 197. NOT CONFIRMED \u2014 I did not capture the planner's actual inputs, so this is the leading suspect and not the established cause.\n\nTHEN THE MODEL FABRICATED A TOOL ERROR AND TOLD THE USER. It reported 'Unknown tool: appeals_get_playbook' and 'the appeals tools are currently unavailable'. I searched the stored turn: EVERY occurrence of that string is inside the model's own thought field and NONE is in any tool result. The dispatcher is a single function, the appeals branch at react_loop.py:3005 is reachable, its own emit strings appear in the trace, and the service returns 200. The tool handed back success=True with a useless payload; the model could not tell why it was not helping, invented a mechanical explanation, and shipped that explanation to the user as fact.\n\nTHIS IS THE SYSTEMIC FINDING TWICE IN ONE TURN. The tool reports success while its payload is a failure, and tool_failed CANNOT be emitted because make_tool_failed has no caller (see the emit_envelope node). So nothing in the system could report that this tool was failing \u2014 the model was the only thing that noticed, and the only thing it could do was guess. That is what reached the screen.\n\nMODE MATTERS: agentic recovered by falling back to rag in round 3 and produced a correct answer with the real deadlines and address; copilot's 3-round budget ran out first. Same defect, different visibility.\n\nNOT CAUSED BY P1a OR P1c \u2014 the appeals dispatch is untouched by both and the found=False branch predates them. Not verified against the pre-refactor revision.\n\nNode moved GREEN -> RED. A control surface that silently reports 'no data' when the data exists is not green, however clean the migration around it is \u2014 rating the guarantee, not the construction."
+    ],
     [
      "bad",
      "OWNER(chat): MOVE THE MANIFEST OUT OF CODE \u2014 Ananth's point, and the cost is measurable. 16 blocks are hardcoded here totalling 19,191 characters, roughly 4,800 TOKENS injected into the planner prompt. The biggest are _SERVICE_LINE_ROUTING (~798 tok), _APPEALS (~736), _RAG (~705) and _SEARCH_UPLOADED_DOCUMENT (~636). Every wording change to any of them is a code edit and a redeploy.\n\nTHE TARGET ALREADY EXISTS IN TWO FORMS and this is half-built rather than unbuilt: five tools are registry-owned, their text living on SkillSpec.description and rendered through registry.manifest_text() \u2014 the module says adding one of those is one file and no edit here. And the Prompt Composition Studio already holds a react.tool_manifest BLOCK, so the manifest has a home in the versioned, UI-editable store. The remaining 16 blocks have simply not moved."
