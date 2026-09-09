@@ -1,12 +1,6 @@
 {
  "generated_by": "scripts/platform/gen_chat_dev.py",
- "deleted_modules": [
-  "app/stages/clarify.py",
-  "app/stages/classify.py",
-  "app/stages/continuity.py",
-  "app/stages/plan.py",
-  "app/stages/resolve.py"
- ],
+ "deleted_modules": [],
  "roadmap": {
   "phases": [
    {
@@ -83,27 +77,23 @@
   "shared_pre": [
    "run_state_load"
   ],
-  "branch_on": "use_react",
-  "branch_line": 761,
+  "branch_on": null,
+  "branch_line": null,
+  "branch_removed_by": "P1a, 2026-09-09 \u2014 use_react and the classic path deleted",
   "react_path": [
    "run_react"
   ],
-  "classic_path": [
-   "run_classify",
-   "run_plan",
-   "run_clarify",
-   "run_resolve"
-  ],
+  "classic_path": [],
   "shared_post": [
    "run_integrate"
   ],
   "shared_post_guard": "ctx.react_bypass_integrate \u2014 set in react_loop, skips the integrator and publishes the ReAct answer directly",
   "shared_post_guard_lines": [
-   569,
-   891,
-   895,
-   1050,
-   1095
+   535,
+   782,
+   786,
+   911,
+   956
   ],
   "exit": "publish",
   "react_phases": [
@@ -1302,7 +1292,7 @@
    "module": "app.pipeline.context",
    "group": "pipeline",
    "path": "app/pipeline/context.py",
-   "loc": 305,
+   "loc": 303,
    "role": "Pipeline context: correlation_id, thread_id, state, plan, and stage data.",
    "role_full": "Pipeline context: correlation_id, thread_id, state, plan, and stage data.\n\nHolds everything the pipeline stages need to read/write. Stages modify context\nin place; no patch merge\u2014explicit transitions via apply_delta on state.",
    "stage": null,
@@ -1319,19 +1309,13 @@
     "app.pipeline.react.round0",
     "app.pipeline.react_loop",
     "app.services.post_run_adjudication",
-    "app.stages.clarify",
-    "app.stages.classify",
-    "app.stages.continuity",
     "app.stages.integrate",
-    "app.stages.plan",
-    "app.stages.resolve",
-    "app.stages.state_load",
-    "app.state.user_context_resolution"
+    "app.stages.state_load"
    ],
-   "fan_in": 16,
+   "fan_in": 10,
    "surfaces": [],
    "observability": "mediated",
-   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator, app.pipeline.react_loop, app.stages.continuity \u2014 its behaviour has no telemetry identity of its own.",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator, app.pipeline.react_loop \u2014 its behaviour has no telemetry identity of its own.",
    "config": [],
    "writes": [],
    "key": "context",
@@ -1633,10 +1617,9 @@
    "callers": [
     "app.pipeline.orchestrator",
     "app.pipeline.react_loop",
-    "app.planner.blueprint",
-    "app.stages.resolve"
+    "app.planner.blueprint"
    ],
-   "fan_in": 4,
+   "fan_in": 3,
    "surfaces": [],
    "observability": "mediated",
    "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator, app.pipeline.react_loop \u2014 its behaviour has no telemetry identity of its own.",
@@ -1737,7 +1720,7 @@
    "module": "app.pipeline.orchestrator",
    "group": "pipeline",
    "path": "app/pipeline/orchestrator.py",
-   "loc": 1902,
+   "loc": 1699,
    "role": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).",
    "role_full": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).\n\nRuns stages in order; handles clarification/refinement early exit; publishes response.",
    "stage": null,
@@ -3606,10 +3589,9 @@
    "callers": [
     "app.pipeline.tool_manifest",
     "app.planner.parser",
-    "app.services.tool_agent",
-    "app.stages.plan"
+    "app.services.tool_agent"
    ],
-   "fan_in": 4,
+   "fan_in": 3,
    "surfaces": [],
    "observability": "mediated",
    "observability_note": "Emits nothing. Observable only through its callers \u2014 its behaviour has no telemetry identity of its own.",
@@ -3680,281 +3662,6 @@
        "default": "None"
       }
      ]
-    }
-   }
-  },
-  {
-   "id": "app-stages-clarify",
-   "module": "app.stages.clarify",
-   "group": "stages",
-   "path": "app/stages/clarify.py",
-   "loc": 86,
-   "role": "Stage: jurisdiction clarification, route clash, and query refinement. Sets resolvable? and messages.",
-   "role_full": "Stage: jurisdiction clarification, route clash, and query refinement. Sets resolvable? and messages.",
-   "stage": "clarify",
-   "api": [
-    "run_clarify()"
-   ],
-   "telemetry": [],
-   "callers": [
-    "app.pipeline.orchestrator"
-   ],
-   "fan_in": 1,
-   "surfaces": [],
-   "observability": "mediated",
-   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own.",
-   "deleted": true,
-   "config": [],
-   "writes": [],
-   "key": "clarify",
-   "how": "The stage that turns a bad answer into a question. It returns resolvable \u2014 False means stop\nand ask rather than proceed.\n\nThree checks, in order. Route clash first: detect_route on the message, and when confidence\nis below 1.0 with competing choices, it asks outright \u2014 \"I can either search the web or\nsearch our policy materials\" \u2014 rather than guessing which the user meant. Then jurisdiction:\nneed_jurisdiction_clarification against the plan's subquestions and active state, consulting\nthe RAG lexicon URL so the tagger can judge scope. Then query refinement.\n\nThere is a deliberate exemption worth knowing: when the turn is a follow-up about a stored\ncredentialing report \u2014 an active roster_report skill, or a stored report_run_id \u2014 the\njurisdiction ask is skipped, because answering from a report we already produced needs no\nRAG scope. Asking \"which state?\" about a report already on screen is the failure that\nexemption exists to prevent.",
-   "rating": "green",
-   "depth": "code",
-   "findings": [
-    [
-     "good",
-     "Has tests, including one specifically for ReAct clarify questions."
-    ],
-    [
-     "good",
-     "Asking rather than guessing is a product stance and it lives in one small module with the three triggers visible in order."
-    ],
-    [
-     "watch",
-     "The report-context exemption is matched with lowercase substring checks on the message ('pml', 'npi', 'section', 'how many'). It works, but it is phrase matching standing in for intent, and it will not survive rewording."
-    ],
-    [
-     "watch",
-     "Delegates to app/state/clarification.py (88 loc) and query_refinement.py (128 loc), neither of which is in this catalogue."
-    ]
-   ],
-   "signals": {
-    "loc": 86,
-    "except_handlers": 1,
-    "swallow": 0,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [
-     "test_clarify.py",
-     "test_react_clarify_questions.py"
-    ],
-    "path": "app/stages/clarify.py",
-    "fan_in": 1,
-    "emits": 0
-   },
-   "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./src/app.ts"
-     ]
-    },
-    "parameters": {
-     "module_constants": [],
-     "keyword_defaults": [
-      {
-       "fn": "run_clarify",
-       "param": "emitter",
-       "default": "None"
-      }
-     ]
-    }
-   }
-  },
-  {
-   "id": "app-stages-classify",
-   "module": "app.stages.classify",
-   "group": "stages",
-   "path": "app/stages/classify.py",
-   "loc": 24,
-   "role": "Stage: classify slot_fill vs new_question, compute effective_message.",
-   "role_full": "Stage: classify slot_fill vs new_question, compute effective_message.",
-   "stage": "classify",
-   "api": [
-    "run_classify()"
-   ],
-   "telemetry": [],
-   "callers": [
-    "app.pipeline.orchestrator"
-   ],
-   "fan_in": 1,
-   "surfaces": [],
-   "observability": "mediated",
-   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own.",
-   "deleted": true,
-   "config": [],
-   "writes": [],
-   "key": "classify",
-   "how": "Twenty-four lines, and the hinge on which conversational continuity turns.\n\nIt asks one question \u2014 is this a new question, or the user filling a blank we left? \u2014\nby calling classify_message(message, last_turn, open_slots, last_refined). Three outcomes\nmatter: slot_fill, jurisdiction_change, or neither.\n\nThe interesting branch is what happens on the first two. If there is a stored refined\nquery, it does NOT plan from what the user just typed. It rebuilds the whole thing:\nbuild_refined_query(last_refined, jurisdiction_from_active). So a one-word reply \u2014 \"Florida\"\n\u2014 becomes the entire previous question re-asked with Florida attached. That is why a slot\nfill does not lose the question.\n\nOtherwise it preserves an effective_message that message_resolver already set (pronoun\nresolution), falling back to the raw message. That fallback chain is an ordering\ndependency: message_resolver must have run first or \"it\" never gets resolved.",
-   "rating": "amber",
-   "depth": "code",
-   "findings": [
-    [
-     "bad",
-     "The stage is a 24-line wrapper; the actual logic is 226 lines in app/state/refined_query.py, which is NOT in this catalogue. Reading the node tells you almost nothing about the behaviour \u2014 the same boundary error as the PHI gate, a third time."
-    ],
-    [
-     "watch",
-     "No test file, for the code that decides whether a follow-up keeps its question."
-    ],
-    [
-     "good",
-     "Pure and side-effect free: reads merged_state, writes two ctx fields."
-    ]
-   ],
-   "signals": {
-    "loc": 24,
-    "except_handlers": 0,
-    "swallow": 0,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [],
-    "path": "app/stages/classify.py",
-    "fan_in": 1,
-    "emits": 0
-   },
-   "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./src/app.ts"
-     ]
-    },
-    "parameters": {
-     "module_constants": [],
-     "keyword_defaults": [
-      {
-       "fn": "run_classify",
-       "param": "emitter",
-       "default": "None"
-      }
-     ]
-    }
-   }
-  },
-  {
-   "id": "app-stages-continuity",
-   "module": "app.stages.continuity",
-   "group": "stages",
-   "path": "app/stages/continuity.py",
-   "loc": 105,
-   "role": "Continuity stage: detect when to ask user for help (user-as-leverage), when user ends pursuit, and when max attempts reached.",
-   "role_full": "Continuity stage: detect when to ask user for help (user-as-leverage), when user ends pursuit, and when max attempts reached.\n\nSee docs/RELENTLESS_CONTINUITY_PLAN.md.",
-   "stage": null,
-   "api": [
-    "should_ask_user_for_help()",
-    "get_objective_end_state()"
-   ],
-   "telemetry": [
-    {
-     "signal": "tool_failed",
-     "tier": "promoted",
-     "surface": "task-manager dashboard"
-    }
-   ],
-   "callers": [
-    "app.pipeline.orchestrator"
-   ],
-   "fan_in": 1,
-   "surfaces": [
-    "task-manager dashboard"
-   ],
-   "observability": "self-emitting",
-   "observability_note": "Emits its own signals; visible in chat_turns.thinking_log under its own name.",
-   "deleted": true,
-   "config": [],
-   "writes": [],
-   "key": "continuity",
-   "how": "The 'do not flail' stage. Three questions: should we ask the user for help (user-as-leverage),\nhas the user ended the pursuit, and have we hit the attempt ceiling.\n\nIt types its vocabulary rather than passing strings around. StuckReason is a Literal \u2014\nno_evidence, missing_code, conflicting_info, partial_answer, tool_failed \u2014 and there are five\nnamed objective end states (resolved, need_info, unable, user_ended, incomplete), so a stop is\nalways a stated kind of stop rather than an absence of an answer. MAX_ATTEMPTS_BEFORE_STOP\ncomes from MasterObjective. Spec'd in docs/RELENTLESS_CONTINUITY_PLAN.md.",
-   "rating": "red",
-   "depth": "code",
-   "findings": [
-    [
-     "good",
-     "One of only four modules with telemetry of its own, and it has two test files."
-    ],
-    [
-     "good",
-     "Typed end states mean 'we stopped' always carries WHY \u2014 the difference between a product that gives up legibly and one that just goes quiet."
-    ],
-    [
-     "watch",
-     "Delegates detection to app/state/continuity_checks.py and master_objective.py, neither in this catalogue \u2014 the wrapper pattern again, though thin here."
-    ],
-    [
-     "bad",
-     "OWNER(chat): CONTINUITY RUNS EVERY TURN AND CANNOT DO ANYTHING, BECAUSE ITS INPUT IS NEVER CREATED ON THE LIVE PATH. Ananth 2026-09-08 read it as duplicative; it is worse than duplicative \u2014 it is inert, and it reports a fixed answer.\n\nBoth of its functions key off ctx.merged_state['master_objective']. That objective is created by create_or_update_objective(), which has EXACTLY ONE caller: orchestrator.py:819, inside the `if not use_react` legacy branch. On the ReAct path the objective is only ever READ (orchestrator.py:725 loads it out of merged_state) and nothing on that path ever writes one. So obj is None every turn, and:\n\n  should_ask_user_for_help()  -> (False, None) always. ctx.response_payload['user_ask'] is NEVER set. The frontend has a fallback at app.js:13338 that renders user_ask as the next question when the integrator returned none \u2014 that branch is unreachable.\n  get_objective_end_state()   -> ('resolved', None) always, by the `if not obj` early return at continuity.py:83-84.\n\nTHE SECOND ONE IS NOT MERELY DEAD, IT IS WRONG. Every turn sets response_payload['objective_status'] = 'resolved' \u2014 including refusals, clarify bypasses, groundedness failures shipped with a warning, and the 203 budget-exhausted turns that ran out of rounds without the planner ever being satisfied. The four other end states (need_info, unable, user_ended, incomplete) are unreachable. The module whose stated purpose is that 'a stop is always a stated kind of stop' currently states the same kind of stop for every outcome. I previously rated this node GREEN on the strength of its typed end states; that was rating the construction and not the guarantee, and the rating is corrected to RED here.\n\nTHE DUPLICATION IS REAL AND THE OTHER COPY IS THE LIVE ONE. react_loop already computes the same three judgements and its versions ARE wired: ctx.react_unfinished_reason (no_path_forward, incomplete_coverage, need_more_info, need_more_time \u2014 measured firing on live turns), ctx.react_unfinished_summary and ctx.react_unblock_ask. integrate.py reads react_unfinished_reason at four sites, orchestrator.py at one, progress.py at one. So the product does have typed stop reasons that work; they are react_loop's, not continuity's."
-    ]
-   ],
-   "signals": {
-    "loc": 105,
-    "except_handlers": 0,
-    "swallow": 0,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [
-     "test_continuity_checks.py",
-     "test_intent_jurisdiction_continuity.py"
-    ],
-    "path": "app/stages/continuity.py",
-    "fan_in": 1,
-    "emits": 1
-   },
-   "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./src/app.ts"
-     ]
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "OBJECTIVE_STATUS_RESOLVED",
-       "value": "resolved"
-      },
-      {
-       "name": "OBJECTIVE_STATUS_NEED_INFO",
-       "value": "need_info"
-      },
-      {
-       "name": "OBJECTIVE_STATUS_UNABLE",
-       "value": "unable"
-      },
-      {
-       "name": "OBJECTIVE_STATUS_USER_ENDED",
-       "value": "user_ended"
-      },
-      {
-       "name": "OBJECTIVE_STATUS_INCOMPLETE",
-       "value": "incomplete"
-      }
-     ],
-     "keyword_defaults": []
     }
    }
   },
@@ -4138,204 +3845,6 @@
       },
       {
        "fn": "run_integrate",
-       "param": "emitter",
-       "default": "None"
-      }
-     ]
-    }
-   }
-  },
-  {
-   "id": "app-stages-plan",
-   "module": "app.stages.plan",
-   "group": "stages",
-   "path": "app/stages/plan.py",
-   "loc": 140,
-   "role": "Stage: parse message into plan, compute refined_query, build blueprint.",
-   "role_full": "Stage: parse message into plan, compute refined_query, build blueprint.",
-   "stage": "plan",
-   "api": [
-    "run_plan()"
-   ],
-   "telemetry": [],
-   "callers": [
-    "app.pipeline.orchestrator"
-   ],
-   "fan_in": 1,
-   "surfaces": [],
-   "observability": "mediated",
-   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own.",
-   "deleted": true,
-   "config": [],
-   "writes": [],
-   "key": "plan",
-   "how": "Turns the effective message into a Plan \u2014 a list of SubQuestions \u2014 plus a refined query and\na blueprint. Only the classic path runs it; ReAct plans as it goes.\n\nTwo shortcuts matter more than the main path.\n\n_plan_from_master_objective: on a slot fill, if a master objective is stored, it reuses the\nsub-objectives already agreed rather than re-parsing. A follow-up does not get re-decomposed\ninto a different set of questions than the one the user was answering.\n\n_minimal_plan: when parsing fails, rather than erroring it emits one subquestion carrying the\nraw message with kind=non_patient and intent_score 0.5. The turn continues on a degraded\nplan. That is a deliberate choice \u2014 a bad plan beats no answer \u2014 but it is silent.\n\nIt feeds capabilities_for_parser in, so the decomposition only produces sub-questions\nsomething can actually answer, and runs parse_credentialing_flow_intent over the text.",
-   "rating": "amber",
-   "depth": "code",
-   "findings": [
-    [
-     "bad",
-     "The parse-failure fallback is invisible. A turn planned from _minimal_plan looks identical downstream to one that parsed cleanly \u2014 same shape, no signal, nothing in the trace says the planner gave up. This is the appeals pattern in miniature."
-    ],
-    [
-     "watch",
-     "No test file, for the stage that decides what the classic path will try to answer."
-    ],
-    [
-     "good",
-     "Reusing the master objective on slot fill is the right call and is the reason a follow-up does not silently become a different question."
-    ]
-   ],
-   "signals": {
-    "loc": 140,
-    "except_handlers": 1,
-    "swallow": 1,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [],
-    "path": "app/stages/plan.py",
-    "fan_in": 1,
-    "emits": 0
-   },
-   "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": []
-    },
-    "parameters": {
-     "module_constants": [],
-     "keyword_defaults": [
-      {
-       "fn": "run_plan",
-       "param": "emitter",
-       "default": "None"
-      }
-     ]
-    }
-   }
-  },
-  {
-   "id": "app-stages-resolve",
-   "module": "app.stages.resolve",
-   "group": "stages",
-   "path": "app/stages/resolve.py",
-   "loc": 595,
-   "role": "Stage: route subquestions to agents, collect answers \u2014 with fallback cascade.",
-   "role_full": "Stage: route subquestions to agents, collect answers \u2014 with fallback cascade.",
-   "stage": "resolve",
-   "api": [
-    "extract_urls()",
-    "validate_tool_result()",
-    "run_resolve()"
-   ],
-   "telemetry": [],
-   "callers": [
-    "app.pipeline.orchestrator"
-   ],
-   "fan_in": 1,
-   "surfaces": [],
-   "observability": "mediated",
-   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own.",
-   "deleted": true,
-   "config": [],
-   "writes": [],
-   "key": "resolve",
-   "how": "The classic path's dispatcher, and the only stage with an explicit, numbered escalation\nladder. Each subquestion is answered by walking layers until one succeeds:\n\n  0  hard stop\n  1  RAG \u2014 the corpus\n  2  system tool\n  3  web / scrape\n  4  reasoning \u2014 the model answering without retrieval\n  5  ask_user\n\nEvery hop is announced: emit_layer_attempt as each is tried, emit_fallback when one gives\nway to the next, so the thinking chain shows the escalation rather than only its outcome.\n\nThe guard worth knowing is on layer 4. Reasoning is allowed to answer only when sources are\npresent; if none are, layer 4 is skipped and the cascade falls through to ask_user. That is\nthe difference between an ungrounded answer and an honest question, and it is one comparison\nin the middle of a 595-line file.",
-   "rating": "amber",
-   "depth": "code",
-   "findings": [
-    [
-     "good",
-     "The ladder is explicit and numbered, and layer_used is returned, so which layer answered is knowable per subquestion rather than inferred."
-    ],
-    [
-     "good",
-     "The layer-4 groundedness guard \u2014 no sources means no reasoning answer, ask instead \u2014 is exactly the right default."
-    ],
-    [
-     "watch",
-     "595 lines and only indirect test coverage; the tests named for it are about fetch_document and message resolution, not the cascade itself."
-    ],
-    [
-     "watch",
-     "validate_tool_result returns (is_valid, failure_reason) and an invalid result triggers the next layer \u2014 so a tool that returns something useless is indistinguishable downstream from one that failed outright."
-    ]
-   ],
-   "signals": {
-    "loc": 595,
-    "except_handlers": 3,
-    "swallow": 1,
-    "bare_except": 0,
-    "todos": 0,
-    "config": [],
-    "tests": [
-     "test_fetch_document_resolve_by_id.py",
-     "test_message_resolver_and_skill_context.py",
-     "test_prior_resolved_entities.py"
-    ],
-    "path": "app/stages/resolve.py",
-    "fan_in": 1,
-    "emits": 0
-   },
-   "live_config": [],
-   "detail": {
-    "db": {
-     "sql": [],
-     "storage_fns": [
-      "audit_if_phi",
-      "get_state",
-      "save_state_full"
-     ],
-     "redis_keys": [],
-     "note": "SQL found by literal match; a query built at runtime is invisible here"
-    },
-    "ux": {
-     "routes_defined": [],
-     "frontend_files": [
-      "./index.html",
-      "./platform.html",
-      "./src/answer-card.ts",
-      "./src/app.ts",
-      "./static/app.js",
-      "./static/pipeline-chat.js",
-      "./static/pipeline-enrollment.js",
-      "./static/pipeline-nppes.js"
-     ]
-    },
-    "parameters": {
-     "module_constants": [
-      {
-       "name": "URL_PATTERN",
-       "value": "<computed>"
-      },
-      {
-       "name": "_MIN_RAG_LEN",
-       "value": "80"
-      },
-      {
-       "name": "_MIN_SCRAPE_LEN",
-       "value": "150"
-      },
-      {
-       "name": "_MIN_SEARCH_LEN",
-       "value": "50"
-      },
-      {
-       "name": "_REQUIRES_SOURCE",
-       "value": "<computed>"
-      }
-     ],
-     "keyword_defaults": [
-      {
-       "fn": "run_resolve",
        "param": "emitter",
        "default": "None"
       }

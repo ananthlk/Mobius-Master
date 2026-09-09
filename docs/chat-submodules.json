@@ -16,27 +16,23 @@
   "shared_pre": [
    "run_state_load"
   ],
-  "branch_on": "use_react",
-  "branch_line": 761,
+  "branch_on": null,
+  "branch_line": null,
+  "branch_removed_by": "P1a, 2026-09-09 \u2014 use_react and the classic path deleted",
   "react_path": [
    "run_react"
   ],
-  "classic_path": [
-   "run_classify",
-   "run_plan",
-   "run_clarify",
-   "run_resolve"
-  ],
+  "classic_path": [],
   "shared_post": [
    "run_integrate"
   ],
   "shared_post_guard": "ctx.react_bypass_integrate \u2014 set in react_loop, skips the integrator and publishes the ReAct answer directly",
   "shared_post_guard_lines": [
-   569,
-   891,
-   895,
-   1050,
-   1095
+   535,
+   782,
+   786,
+   911,
+   956
   ],
   "exit": "publish",
   "react_phases": [
@@ -113,7 +109,7 @@
    "module": "app.pipeline.context",
    "group": "pipeline",
    "path": "app/pipeline/context.py",
-   "loc": 305,
+   "loc": 303,
    "role": "Pipeline context: correlation_id, thread_id, state, plan, and stage data.",
    "role_full": "Pipeline context: correlation_id, thread_id, state, plan, and stage data.\n\nHolds everything the pipeline stages need to read/write. Stages modify context\nin place; no patch merge\u2014explicit transitions via apply_delta on state.",
    "stage": null,
@@ -130,19 +126,13 @@
     "app.pipeline.react.round0",
     "app.pipeline.react_loop",
     "app.services.post_run_adjudication",
-    "app.stages.clarify",
-    "app.stages.classify",
-    "app.stages.continuity",
     "app.stages.integrate",
-    "app.stages.plan",
-    "app.stages.resolve",
-    "app.stages.state_load",
-    "app.state.user_context_resolution"
+    "app.stages.state_load"
    ],
-   "fan_in": 16,
+   "fan_in": 10,
    "surfaces": [],
    "observability": "mediated",
-   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator, app.pipeline.react_loop, app.stages.continuity \u2014 its behaviour has no telemetry identity of its own."
+   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator, app.pipeline.react_loop \u2014 its behaviour has no telemetry identity of its own."
   },
   {
    "id": "app-pipeline-credentialing_envelope",
@@ -214,10 +204,9 @@
    "callers": [
     "app.pipeline.orchestrator",
     "app.pipeline.react_loop",
-    "app.planner.blueprint",
-    "app.stages.resolve"
+    "app.planner.blueprint"
    ],
-   "fan_in": 4,
+   "fan_in": 3,
    "surfaces": [],
    "observability": "mediated",
    "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator, app.pipeline.react_loop \u2014 its behaviour has no telemetry identity of its own."
@@ -227,7 +216,7 @@
    "module": "app.pipeline.orchestrator",
    "group": "pipeline",
    "path": "app/pipeline/orchestrator.py",
-   "loc": 1902,
+   "loc": 1699,
    "role": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).",
    "role_full": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).\n\nRuns stages in order; handles clarification/refinement early exit; publishes response.",
    "stage": null,
@@ -642,78 +631,6 @@
    "observability_note": "Emits nothing. Observable only through app.pipeline.react_loop \u2014 its behaviour has no telemetry identity of its own."
   },
   {
-   "id": "app-stages-clarify",
-   "module": "app.stages.clarify",
-   "group": "stages",
-   "path": "app/stages/clarify.py",
-   "loc": 86,
-   "role": "Stage: jurisdiction clarification, route clash, and query refinement. Sets resolvable? and messages.",
-   "role_full": "Stage: jurisdiction clarification, route clash, and query refinement. Sets resolvable? and messages.",
-   "stage": "clarify",
-   "api": [
-    "run_clarify()"
-   ],
-   "telemetry": [],
-   "callers": [
-    "app.pipeline.orchestrator"
-   ],
-   "fan_in": 1,
-   "surfaces": [],
-   "observability": "mediated",
-   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own."
-  },
-  {
-   "id": "app-stages-classify",
-   "module": "app.stages.classify",
-   "group": "stages",
-   "path": "app/stages/classify.py",
-   "loc": 24,
-   "role": "Stage: classify slot_fill vs new_question, compute effective_message.",
-   "role_full": "Stage: classify slot_fill vs new_question, compute effective_message.",
-   "stage": "classify",
-   "api": [
-    "run_classify()"
-   ],
-   "telemetry": [],
-   "callers": [
-    "app.pipeline.orchestrator"
-   ],
-   "fan_in": 1,
-   "surfaces": [],
-   "observability": "mediated",
-   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own."
-  },
-  {
-   "id": "app-stages-continuity",
-   "module": "app.stages.continuity",
-   "group": "stages",
-   "path": "app/stages/continuity.py",
-   "loc": 105,
-   "role": "Continuity stage: detect when to ask user for help (user-as-leverage), when user ends pursuit, and when max attempts reached.",
-   "role_full": "Continuity stage: detect when to ask user for help (user-as-leverage), when user ends pursuit, and when max attempts reached.\n\nSee docs/RELENTLESS_CONTINUITY_PLAN.md.",
-   "stage": null,
-   "api": [
-    "should_ask_user_for_help()",
-    "get_objective_end_state()"
-   ],
-   "telemetry": [
-    {
-     "signal": "tool_failed",
-     "tier": "promoted",
-     "surface": "task-manager dashboard"
-    }
-   ],
-   "callers": [
-    "app.pipeline.orchestrator"
-   ],
-   "fan_in": 1,
-   "surfaces": [
-    "task-manager dashboard"
-   ],
-   "observability": "self-emitting",
-   "observability_note": "Emits its own signals; visible in chat_turns.thinking_log under its own name."
-  },
-  {
    "id": "app-stages-integrate",
    "module": "app.stages.integrate",
    "group": "stages",
@@ -732,50 +649,6 @@
     "app.services.post_run_adjudication"
    ],
    "fan_in": 2,
-   "surfaces": [],
-   "observability": "mediated",
-   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own."
-  },
-  {
-   "id": "app-stages-plan",
-   "module": "app.stages.plan",
-   "group": "stages",
-   "path": "app/stages/plan.py",
-   "loc": 140,
-   "role": "Stage: parse message into plan, compute refined_query, build blueprint.",
-   "role_full": "Stage: parse message into plan, compute refined_query, build blueprint.",
-   "stage": "plan",
-   "api": [
-    "run_plan()"
-   ],
-   "telemetry": [],
-   "callers": [
-    "app.pipeline.orchestrator"
-   ],
-   "fan_in": 1,
-   "surfaces": [],
-   "observability": "mediated",
-   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own."
-  },
-  {
-   "id": "app-stages-resolve",
-   "module": "app.stages.resolve",
-   "group": "stages",
-   "path": "app/stages/resolve.py",
-   "loc": 595,
-   "role": "Stage: route subquestions to agents, collect answers \u2014 with fallback cascade.",
-   "role_full": "Stage: route subquestions to agents, collect answers \u2014 with fallback cascade.",
-   "stage": "resolve",
-   "api": [
-    "extract_urls()",
-    "validate_tool_result()",
-    "run_resolve()"
-   ],
-   "telemetry": [],
-   "callers": [
-    "app.pipeline.orchestrator"
-   ],
-   "fan_in": 1,
    "surfaces": [],
    "observability": "mediated",
    "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own."
@@ -823,10 +696,9 @@
    "callers": [
     "app.pipeline.tool_manifest",
     "app.planner.parser",
-    "app.services.tool_agent",
-    "app.stages.plan"
+    "app.services.tool_agent"
    ],
-   "fan_in": 4,
+   "fan_in": 3,
    "surfaces": [],
    "observability": "mediated",
    "observability_note": "Emits nothing. Observable only through its callers \u2014 its behaviour has no telemetry identity of its own."

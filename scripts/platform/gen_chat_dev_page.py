@@ -237,16 +237,29 @@ if(RM){document.getElementById('roadmap').innerHTML=
 var f=D.flow, strip=function(x){return x.replace(/^run_/,'');};
 var h='<div class="schema">';
 (f.shared_pre||[]).forEach(function(x){ h+=node(strip(x),'always runs')+A; });
-h+='<div class="n" style="cursor:default;border-style:dashed"><div class="nn">'+f.branch_on+' ?</div>'+
-   '<div class="ns">orchestrator.py:'+f.branch_line+'</div></div>'+A+'<div class="lanes">';
-h+='<div class="lane"><div class="lt">ReAct path</div>'+node('react_loop','replaces plan + resolve');
+if(f.branch_on){
+  h+='<div class="n" style="cursor:default;border-style:dashed"><div class="nn">'+f.branch_on+' ?</div>'+
+     '<div class="ns">orchestrator.py:'+f.branch_line+'</div></div>'+A;
+}
+h+='<div class="lanes">';
+h+='<div class="lane">'+(f.branch_on?'<div class="lt">ReAct path</div>':'')+
+   node('react_loop',f.branch_on?'replaces plan + resolve':'the only path — the branch was deleted');
 (f.react_phases||[]).forEach(function(p){
   h+='<div class="ph"><div class="pn">'+esc(p.phase)+'</div><div class="pd">'+esc(p.note)+
      (p.cite?' <span style="opacity:.6">react_loop.py:'+p.cite+'</span>':'')+'</div>'+
      '<div class="chips">'+(p.modules||[]).map(chip).join('')+'</div></div>'; });
-h+='</div><div class="lane"><div class="lt">Classic path</div>';
-(f.classic_path||[]).forEach(function(x,i){ h+=node(strip(x))+(i<f.classic_path.length-1?A:''); });
-h+='</div></div>';
+h+='</div>';
+if((f.classic_path||[]).length){
+  h+='<div class="lane"><div class="lt">Classic path</div>';
+  (f.classic_path||[]).forEach(function(x,i){ h+=node(strip(x))+(i<f.classic_path.length-1?A:''); });
+  h+='</div>';
+}
+h+='</div>';
+if(f.branch_removed_by){
+  h+='<p class="legend" style="margin-top:.6rem">The <code>use_react</code> decision and the '+
+     'Classic path lane are gone — removed by '+esc(f.branch_removed_by)+'. Their nodes are kept '+
+     'below so the findings that justified the deletion stay readable.</p>';
+}
 (f.shared_post||[]).forEach(function(x){ h+=A+node(strip(x),'both paths');
   if(strip(x)==='integrate' && D.integrate_passes){
     h+='<div class="ph" style="max-width:420px;margin-top:6px"><div class="pn">three LLM calls, not one step</div>'+

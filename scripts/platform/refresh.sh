@@ -21,16 +21,25 @@ OUT="$ROOT/docs/chat-schema"
 DATA="$OUT/chat-dev.json"
 mkdir -p "$OUT"
 
-echo "── 1/4  extract + merge  ────────────────────────────────────────────"
+echo "── 1/5  parse the flow from orchestrator.py  ────────────────────────"
+# THIS STEP WAS MISSING and the page silently drew a deleted branch for hours.
+# gen_chat_submodules.py is what re-parses run_pipeline, so leaving it out of
+# the chain meant the flow (branch_on, classic_path, react_phases) was frozen
+# at whenever it was last run by hand — the schema kept showing a `use_react ?`
+# decision and a Classic path lane that P1a had already deleted. Exactly the
+# drift this whole file exists to prevent, in the tool meant to prevent it.
+python3 scripts/platform/gen_chat_submodules.py > docs/chat-submodules.json
+
+echo "── 2/5  extract + merge  ────────────────────────────────────────────"
 python3 scripts/platform/gen_chat_dev.py "$DATA"
 
-echo "── 2/4  page  ───────────────────────────────────────────────────────"
+echo "── 3/5  page  ───────────────────────────────────────────────────────"
 python3 scripts/platform/gen_chat_dev_page.py "$DATA" "$OUT/index.html"
 
-echo "── 3/4  bug log  ────────────────────────────────────────────────────"
+echo "── 4/5  bug log  ────────────────────────────────────────────────────"
 python3 scripts/platform/gen_findings_log.py
 
-echo "── 4/4  roadmap  ────────────────────────────────────────────────────"
+echo "── 5/5  roadmap  ────────────────────────────────────────────────────"
 python3 scripts/platform/gen_roadmap.py
 
 if [ "${1:-}" = "--eval" ]; then

@@ -121,19 +121,35 @@ def flow():
                         parent[child] = node
                         container[child] = val
 
+    # P1a (2026-09-09) DELETED the `if use_react:` branch — the classic path is
+    # gone and the ReAct path is now unconditional. Before that this parse
+    # raised SystemExit when the branch was missing, which was the right call
+    # then: a silently-stale flow is worse than a loud failure. Now the absence
+    # IS the truth, so it is recorded rather than raised on — and the page draws
+    # a single path instead of a decision that no longer exists.
     branch = next((n for n in ast.walk(fn)
                    if isinstance(n, ast.If) and isinstance(n.test, ast.Name)
                    and n.test.id == "use_react"), None)
+
     if branch is None:
-        raise SystemExit("`if use_react:` not found — the parse assumption is stale")
-
-    body = container[branch]
-    idx = body.index(branch)
-
-    pre   = calls_in(body[:idx])
-    react = calls_in(branch.body)
-    classic = calls_in(branch.orelse)
-    post  = calls_in(body[idx + 1:])
+        # No branch: everything in run_pipeline before the integrator is the
+        # one live path. Split on the react_loop call rather than an if-node.
+        all_calls = calls_in(fn.body)
+        names = [c["fn"] for c in all_calls]
+        cut = next((i for i, x in enumerate(names) if "react" in x.lower()), None)
+        pre = all_calls[:cut] if cut is not None else all_calls
+        react = [all_calls[cut]] if cut is not None else []
+        classic = []
+        post = all_calls[cut + 1:] if cut is not None else []
+        branch_removed = True
+    else:
+        body = container[branch]
+        idx = body.index(branch)
+        pre   = calls_in(body[:idx])
+        react = calls_in(branch.body)
+        classic = calls_in(branch.orelse)
+        post  = calls_in(body[idx + 1:])
+        branch_removed = False
 
     # Accessed as getattr(ctx, "react_bypass_integrate", False) — a string
     # constant, not an Attribute node, so an ast attribute walk finds nothing.
@@ -150,8 +166,10 @@ def flow():
     return {
         "entry": "POST /chat",
         "shared_pre": [c["fn"] for c in pre],
-        "branch_on": "use_react",
-        "branch_line": branch.lineno,
+        "branch_on": None if branch_removed else "use_react",
+        "branch_line": None if branch_removed else branch.lineno,
+        "branch_removed_by": "P1a, 2026-09-09 — use_react and the classic path deleted"
+                             if branch_removed else None,
         "react_path": [c["fn"] for c in react],
         "classic_path": [c["fn"] for c in classic],
         "shared_post": [c["fn"] for c in post],
