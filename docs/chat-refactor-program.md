@@ -247,7 +247,7 @@ specific ruling, not general agreement.
 
 | Seat | What they are ratifying | Status |
 |---|---|---|
-| **Chat Master** | that the 16 chat-assigned bugs are correctly theirs and correctly described; the P1→P5 order; the `master_objective` revive-or-retire call | ☐ |
+| **Chat Master** | that the chat-assigned bugs are correctly theirs and correctly described (count is generated — see `docs/chat-refactor-roadmap.md`, never hardcoded here); the P1→P5 order; the `master_objective` revive-or-retire call | ☐ |
 | **DB seat** | the table evidence behind the deletions (11 of 13 empty), the FK set, and that `chat_state` / `chat_turns` are safe to read as a replay corpus | ☐ |
 | **Technical Review** | the test gate itself — invariants I1–I7 and the phase order | **☑ SIGNED 2026-09-08** — verified the frozen baseline artifact directly (fingerprint, strata, every cited number) rather than the writeup. Two items for the record below. |
 | **Eval** | the replay corpus design: stratification, sample size, and what it can and cannot prove — specifically that answer quality is out of scope for the invariant set | ☐ |
@@ -297,14 +297,47 @@ still need the harness.
 
 **Sequencing consequence:** P1 splits.
 
+  P1.1 deterministic replay harness              DONE 2026-09-08, verified
   P1a  remove `use_react` -> classic path unreachable -> delete 1,159 lines
        gate: import-graph proof + suite green + zero invariant movement
-       does NOT need the harness
   P1b  triage the 26 pre-existing test failures (the gate cannot read
        "tests pass" until this is done)
-  P1.1 deterministic replay harness
   P1c  retire master_objective + continuity      needs the harness
-  P1d  credentialing code removal                needs the harness AND prod counts
+  P1d  credentialing code removal                needs the harness + the two
+       roster-skill items below
+
+**P1.1 verified 2026-09-08.** `tests/harness/`, 31/31 passing, covering I1/I2/I4/I7.
+It invokes the real `run_react` with `_call_llm_json` patched by responses keyed on
+call number — pinned inputs, code-only diffs, which is the mechanism Technical Review
+asked for. **Two limits, stated so "harness done" is not read as more than it is:**
+it tests invariant *logic* on ~10 synthetic scenarios and does NOT replay the frozen
+2,750 (the baseline supplies derived constants only); and its I7 is scoped to
+`react_loop` at ≤21 swallows, where the global count is 506 across 233 modules — a
+deletion elsewhere would not trip it.
+
+**`use_react` removal has no behavioural consumer.** `deep-research` sends the key at
+`run_research.py:54` and `run_turn.py:40`, but both send `True`, and `ChatRequest`
+carries `model_config = {"extra": "ignore"}` — added deliberately after the
+2026-04-18 disconnect. So the key is silently dropped and they land on the ReAct path,
+which is the only path. Tell deep-research to drop it as courtesy, not coordination.
+
+**P1d absorbs the roster-skill coupling** (Ananth's call, 2026-09-08). org-agent is
+closed out — it never calls chat's credentialing endpoints; it talks to the roster
+skill directly as its org master, and its only other references are two role labels.
+Outside mobius-chat there are exactly two callers, both in the roster skill:
+
+  1. `/chat/credentialing-runs/{runId}/validate` — `pipeline-chat.js:637,668`.
+     The one genuinely live coupling. Either the skill drops the call or absorbs
+     the logic.
+  2. `/chat/roster-truth/{org}/provider/{id}/summary` — `nppes_validation/
+     routes.py:2527`, a server-side proxy to **a path chat never registered**
+     (chat's is `/chat/credentialing-runs/{run_id}/roster-truth`). It has been
+     404ing. Their bug regardless of the deletion; fix or remove it.
+
+The 114 `app.js` references are chat's OWN frontend, not an external consumer — they
+come out with the workflow rather than blocking it. That is Chat FE work, not a veto.
+I had described this as a sibling service depending on the surface; it is one call
+site pair in one file.
 
 3. **Prod row counts — WITHDRAWN as a blocker. Ananth was right and I was wrong.**
    Two reasons, and I should have caught the second before writing it down.
