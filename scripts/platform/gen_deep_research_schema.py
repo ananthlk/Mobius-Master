@@ -623,7 +623,12 @@ def main() -> None:
     # written against a token the evaluator never sets is a button that is
     # declared, rendered nowhere, and impossible to notice missing.
     KNOWN_FACTS = {"any", "open", "settled", "running", "partial", "refused",
-                   "authority_can_widen", "decision_open", "unusable"}
+                   "authority_can_widen", "decision_open", "unusable",
+                   # Registry, 2026-09-09: two scopes is not a split. Two
+                   # identical values with different scope labels are a
+                   # repetition the field has no room to label — a rendering
+                   # problem, not a contradiction. So they are separate facts.
+                   "two_scopes", "scopes_differ"}
     action_ids = {a["id"] for a in doc["contract"].get("actions", [])}
     for a in doc["contract"].get("actions", []):
         for tok in a.get("offer_when") or []:
@@ -635,6 +640,34 @@ def main() -> None:
         if pair and pair[0] and pair[0] not in action_ids:
             breaks.append(f"stance '{stance}' recommends '{pair[0]}', which is not "
                           f"an action anybody can take")
+
+    # RESERVED DOMAIN WORDS. Two seats independently refused "case" for two
+    # different reasons — an appeal case with an id, and a patient episode —
+    # which is the strongest evidence these are real rather than fussy. Appeals
+    # named "appeal" as the highest-consequence word in their domain: it means
+    # filing against a denial, on a clock. A warning in a message stays a
+    # warning until somebody re-words a button; this fails the build instead.
+    reserved = doc["contract"].get("reserved_words") or {}
+    faces = ([(f"action {a['id']}", a.get("label", "")) for a in doc["contract"].get("actions", [])]
+             + [(f"action {a['id']} closes_as", a.get("closes_as", ""))
+                for a in doc["contract"].get("actions", [])]
+             + [(f"field {k}", (v or {}).get("label", ""))
+                for k, v in (doc["contract"].get("fields") or {}).items()]
+             + [(f"surface {u['id']}", u.get("title", ""))
+                for u in doc["contract"].get("surfaces", [])])
+    for where, text in faces:
+        for word, why in reserved.items():
+            if re.search(r"\b" + re.escape(word) + r"s?\b", str(text or ""), re.I):
+                breaks.append(f"{where} says “{text}” — “{word}” is reserved: "
+                              f"{why}")
+
+    # An action nobody is allowed to press is a button with no owner.
+    roles = set(doc["contract"].get("roles") or [])
+    for a in doc["contract"].get("actions", []):
+        if roles and a.get("owner") not in roles:
+            breaks.append(f"action '{a['id']}' is owned by "
+                          f"{a.get('owner')!r}, which is not a declared role — "
+                          f"a button with nobody entitled to press it")
 
     for w in doc["request_writers"]:
         if w["gated"]:
@@ -654,6 +687,8 @@ def main() -> None:
         "no undeclared, ungated way to create a request has appeared",
         "no action is offered on a condition nothing ever sets",
         "no stance recommends an action nobody can take",
+        "no user-facing label uses a reserved domain word (appeal, case, ...)",
+        "every action is owned by a declared role",
         "the page's own JavaScript parses — a rendered page is not a running one",
     ]
     doc["curated_on"] = content.get("_curated_on", "2026-09-09")
