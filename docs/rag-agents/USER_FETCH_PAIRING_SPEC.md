@@ -670,3 +670,26 @@ multipart FORM, novel content:
   awaiting Ananth's PHI-code clearance.
 - **Defect 3 (classifier seat's):** `phi_classify` circuit-breaker trips / LLM-layer slowness → intermittent
   `indeterminate` independent of publish. Passed to the classifier owner.
+
+### 2.8-RATIFIED · Ask 2 two-key model is final policy (Ananth, via PHI/compliance owner, 2026-09-09)
+
+Ananth ratified the TWO-KEY admit rule as the final policy — explicitly choosing two-key over
+"attestation-alone admits", with NO legal-exception path.
+
+    admit a gate==phi doc  ⟺  Key 1 (org HIPAA-allowed = a BAA is in place)
+                             AND Key 2 (per-site attestation, server-verified via task_id)
+
+- **Today `hipaa_mode_allowed=false` (no BAA) → attestation is RECORDED but PHI STILL BLOCKS.**
+  Attestation-admit only begins functioning when an org's BAA/allowed-mode lands. This is the
+  ratified line, not a gap.
+- **Handshake (unchanged):** extension sends `phi_attestation{attested,task_id,site_origin,attested_at}`
+  on /chat/upload — never a bare flag, never a call to /hipaa-mode. The admit path verifies task_id
+  server-side and composes verdict × Key1 × Key2.
+- **Extension action: NONE until a BAA posture exists** to satisfy Key 1 — wiring the phi_attestation
+  field before then ships a field that does nothing. Deferred by design.
+- **OPEN ownership (for Ananth, when a BAA lands, NOT auto-resolvable now):** the /chat/upload admit
+  composition is chat's endpoint but the PHI rule is the classifier seat's — and Chat Master is
+  currently OFF PHI code per Ananth. So implementing the admit path needs Ananth to either clear Chat
+  Master for it or assign an owner. Moot until Key 1 exists; flagged so it's not discovered late.
+- Also OPEN (Defect 2, §2.9-DONE): chat mislabeling a downstream storage failure as `blocked_indeterminate`
+  — an operability item awaiting Ananth's PHI-code clearance.
