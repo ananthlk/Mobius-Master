@@ -739,6 +739,28 @@ It also emits nearly all of the pipeline's telemetry — thirteen distinct signa
 of itself and of the sub-modules it drives. Every critic signal comes from here, not from
 critic.py.
 """, findings=[
+ ("watch", "WHERE GAPS AND CURATED EVIDENCE ARE KEPT — Ananth asked whether this is "
+           "post-RAG or after ReAct. Neither: it is INSIDE the loop, once per round, "
+           "immediately after each tool result, and it has no module of its own.\n\n"
+           "The mechanism is evidence_review, a block the MODEL emits in its own decision JSON "
+           "each round — the code comment is explicit that 'react now actively curates via "
+           "evidence_review (keep: [chunk numbers]) instead of us silently deciding for it'. "
+           "Four fields: keep (which chunk numbers from the LAST tool result actually matter), "
+           "running_answer (the best answer from kept evidence so far, recomputed from scratch "
+           "as a confidence check), gaps_closed (what THIS round resolved) and gaps_open (what "
+           "is still unresolved).\n\n"
+           "What is not kept is NOT deleted. _store_evidence_memory snapshots every chunk into "
+           "ctx._evidence_memory BEFORE any pruning, so a later round can pull a set-aside "
+           "chunk back with recall_evidence by ref '<call_idx>.<chunk_num>' without spending "
+           "one of the 3 rag-call budget slots re-querying for something already retrieved.\n\n"
+           "The parsing is deliberately regex over the '[N] header\\ntext' shape rather than a "
+           "structured chunk list, and the comment gives the reason: that rendered shape is the "
+           "only stable contract between corpus_search's _format_context and this file, so "
+           "reparsing it beats threading a parallel structured list through the whole "
+           "tool-dispatch path.\n\n"
+           "Where it persists: final_message.reasoning_trace[].gaps_closed on chat_turns, read "
+           "back up to 8 turns later by get_prior_resolved_entities — and only when "
+           "is_continuation is set."),
  ("bad", "OWNER(chat): REFACTOR react_loop — raised by Ananth as an item, and measuring it "
          "makes it far more tractable than 6,113 lines suggests. TWO FUNCTIONS ARE 69% OF THE "
          "FILE: _execute_tool is 2,253 lines (L1153) and run_react is 1,966 (L4149); with "
