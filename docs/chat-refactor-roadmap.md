@@ -12,7 +12,7 @@ program. That is what makes this a tracker and not a snapshot.
 Plan and gate definition: `docs/chat-refactor-program.md`. Nothing starts until
 its sign-off table is complete.
 
-**84 bugs · 54 sequenced into 5 phases · 30 explicitly outside · 0 unassigned**
+**85 bugs · 54 sequenced into 5 phases · 31 explicitly outside · 0 unassigned**
 
 ## Progress
 
@@ -189,5 +189,6 @@ Each carries a reason. Excluding by silence is the failure mode this guards agai
 | `curator_tools` | payor-policy | same | AND THE ADMIN KEY IS NOT CHECKED AT ALL |
 | `POST /chat` | rating | a rating ruling, not a unit of work | STRUCTURE LENS RULING (Technical Review, 2026-09-08): NODE 1 IS RED, n |
 | `POST /chat` | security posture | needs Ananth's authorisation + staging; no clean unauthenticated POST sent | RUNTIME LENS, 2026-09-08, mobius-chat in mobius-os-dev: CHAT_ENV=prod  |
+| `emit_envelope` | security posture | access tokens written to Cloud Run request logs; needs its own investigation, not a refactor phase | JWTs ARE IN THE REQUEST LOGS |
 | `personalization` | user-manager | chat cannot act on preferences it forwards | CHAT IS A PASS-THROUGH FOR PREFERENCES AND CANNOT ACT ON THEM |
 | `personalization` | user-manager | assignment itself is disputed | DISPUTED ASSIGNMENT |

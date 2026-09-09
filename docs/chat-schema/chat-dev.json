@@ -44,7 +44,7 @@
     "n": 5
    }
   ],
-  "outside": 30
+  "outside": 31
  },
  "missing_content": [],
  "live_env_service": "mobius-chat (us-central1)",
@@ -1177,6 +1177,10 @@
    "rating": "red",
    "depth": "code",
    "findings": [
+    [
+     "bad",
+     "OWNER(chat): JWTs ARE IN THE REQUEST LOGS. Found 2026-09-09 while measuring credentialing route traffic, not by looking for it. Cloud Run request logs for mobius-chat contain entries like `%2F%23t%3DeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` \u2014 that is `/#t=<access token>` URL-encoded into the request PATH. Decoded, the payload carries sub, tenant_id, exp and type=access.\n\nA fragment is not normally sent to a server, so something is encoding the token into the path rather than leaving it after the #. However it happens, the consequence is that live access tokens are written to Cloud Run request logs, where they are readable by anyone with log access and by anyone a log excerpt is pasted to. Two distinct tokens appear across 30 days.\n\nNOT INVESTIGATED \u2014 I have not established which client does this, whether the tokens are still within their exp, or whether the same pattern reaches other services' logs. Logged rather than chased, per Ananth's standing instruction, and flagged to Chat Master so nobody pastes a log excerpt before it is understood. Related to the CHAT_AUTH_MODE=optional item on the POST /chat node but a separate defect."
+    ],
     [
      "bad",
      "A STALE TEST WAS ASSERTING A VULNERABILITY. Found by Chat Master during P1b, verified by me at app/api/uploads.py:153-159 and tests/test_b1d_restoration_banner.py.\n\nTwo tests asserted `auth_scope == \"global\"` for an UNAUTHENTICATED caller \u2014 that the restoration banner returns cross-session uploads to someone with no identity. One user's filenames in another user's banner. The path was deliberately removed; the handler now returns `{auth_scope: \"none\", count: 0, uploads: []}` with the comment 'returning cross-session uploads to an unauthenticated caller is a data-isolation violation'.\n\nSo the tests documented the HOLE, not the requirement. Anyone triaging them the obvious way \u2014 make the failing test pass \u2014 restores the global path and reintroduces the leak, and THE SUITE GOES GREEN WHILE DOING IT. A failing test that looks like a chore is the most dangerous shape a security regression can take, because the fix and the exploit are the same edit. Rewritten to assert the secure behaviour with a DO NOT RESTORE note in the source and in the baseline's shrink_log.\n\nThis is a NEW VARIANT of this node's class and worth naming separately: not a producer without a consumer, but a TEST WHOSE ASSERTION OUTLIVED THE CONTRACT IT ENCODED. The producer changed correctly and the check kept demanding the old behaviour \u2014 pressure, pointed backwards.\n\nIt also vindicates the P1b framing. Had we treated the 25 as noise to be cleared, or 'fixed' them to get a green suite, this is the one that would have cost something real."

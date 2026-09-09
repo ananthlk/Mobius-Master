@@ -489,6 +489,21 @@ and nothing in the live path ever calls it, reads it back, or persists what it p
 Each instance looks healthy in isolation. The code is present, the tests pass, the docstring
 describes real intent. The capability is simply absent at runtime, and health stays green.
 """, findings=[
+ ("bad", "OWNER(chat): JWTs ARE IN THE REQUEST LOGS. Found 2026-09-09 while measuring "
+         "credentialing route traffic, not by looking for it. Cloud Run request logs for "
+         "mobius-chat contain entries like `%2F%23t%3DeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` "
+         "— that is `/#t=<access token>` URL-encoded into the request PATH. Decoded, the "
+         "payload carries sub, tenant_id, exp and type=access.\n\n"
+         "A fragment is not normally sent to a server, so something is encoding the token into "
+         "the path rather than leaving it after the #. However it happens, the consequence is "
+         "that live access tokens are written to Cloud Run request logs, where they are "
+         "readable by anyone with log access and by anyone a log excerpt is pasted to. Two "
+         "distinct tokens appear across 30 days.\n\n"
+         "NOT INVESTIGATED — I have not established which client does this, whether the tokens "
+         "are still within their exp, or whether the same pattern reaches other services' "
+         "logs. Logged rather than chased, per Ananth's standing instruction, and flagged to "
+         "Chat Master so nobody pastes a log excerpt before it is understood. Related to the "
+         "CHAT_AUTH_MODE=optional item on the POST /chat node but a separate defect."),
  ("bad", "A STALE TEST WAS ASSERTING A VULNERABILITY. Found by Chat Master during P1b, "
          "verified by me at app/api/uploads.py:153-159 and tests/test_b1d_restoration_banner.py.\n\n"
          "Two tests asserted `auth_scope == \"global\"` for an UNAUTHENTICATED caller — that "

@@ -160,6 +160,7 @@ OUT_OF_PROGRAM = [
     ("POST /chat", "CORRECTION",           "correction",     "a correction to my own text, not work"),
     ("curator_tools", "LOOK INTO RAG'S WRITE SURFACE", "payor-policy", "unauthenticated corpus write in mobius-rag; 1 of 79 routes audited"),
     ("curator_tools", "ADMIN KEY IS NOT CHECKED", "payor-policy", "same"),
+    ("emit_envelope", "JWTs ARE IN THE REQUEST LOGS", "security posture", "access tokens written to Cloud Run request logs; needs its own investigation, not a refactor phase"),
     ("llm_manager", "LIVE MODEL LATENCY DEGRADATION", "LLM Agent", "upstream Vertex latency; a latency breaker doing its job, not a chat defect"),
     ("llm_manager", "WHY THE 'ema' NEVER GETS RE-GROUNDED", "LLM Agent", "fixed in de43bd2, pushed not deployed; model routing is theirs"),
     ("personalization", "PASS-THROUGH FOR PREFERENCES", "user-manager", "chat cannot act on preferences it forwards"),
