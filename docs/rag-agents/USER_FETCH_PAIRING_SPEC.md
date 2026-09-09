@@ -527,8 +527,27 @@ most-restrictive-wins, fail-closed outside the 5 families, deterministic output;
 incl. every rejection path). Rule stays specced here; implementation stays rag-side; if the
 rule ever needs versioning shared, rag imports it rather than copying.
 
-**TODO-B state: rag side LANDED.** Remaining: Chat forwards (holding for exactly this) →
-`pending_rag_support` empties → Extension re-verifies end-to-end.
+**TRANSPORT AMENDMENT (2026-09-09, rev `00691-hm9`) — both transports, neither silent.**
+The first implementation declared the params as plain scalars, which FastAPI binds to the QUERY
+string on a multipart endpoint — so a FORM-transported `access` (the transport the extension
+actually uses, mirrored by chat) was **silently dropped with a 200**: the lane's original
+defect reintroduced inside the change meant to remove it, caught by Extension, fixed by Master
+RAG as class-not-instance (query-first with form fallback). Verified live on both sides:
+form-bogus → 422, query-bogus → 422, bad signal_headers form → 422, plain no-provenance upload
+→ 200 (existing callers untouched); Crawler independently re-probed form-transport bogus →
+422 on `00691-hm9`. **The contract of record is: both transports accepted, both validated,
+neither silent.**
+
+**Probe-pollution & the absence-proof:** both seats planted probe documents testing through
+the gate and both cleaned them (rows + chunks/embeddings/jobs/events/pages + blobs, read-back
+confirmed). Evidence worth keeping: Master RAG's three REJECTED probes left **zero rows to
+clean** — validation-before-side-effect confirmed by absence; the earlier version orphaned a
+blob behind every rejected request.
+
+**TODO-B state: rag side LANDED (00691-hm9).** Remaining: Chat forwards (holding for exactly
+this) → `pending_rag_support` empties → Extension re-verifies end-to-end. Four-door basis-param
++ OpenAPI alignment folds into Master RAG's auth-migration pass (one touch of those handlers,
+not three); Crawler flagged when it runs.
 
 ---
 
