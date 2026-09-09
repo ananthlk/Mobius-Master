@@ -206,10 +206,22 @@ document.getElementById('chain').innerHTML = D.chain.map(function(c,i){
     '<div class="cs">'+esc(c.path)+(c.line?':'+c.line:'')+'</div></div>'+
     (i<D.chain.length-1?'<span class="arr">→</span>':''); }).join('');
 
+Object.keys(SUB).forEach(function(k){ if(SUB[k] && SUB[k].deleted) SUB[k].__del=1; });
+
 document.getElementById('cross').innerHTML = D.cross_cutting.map(function(c){
   return '<div class="cnode'+rc(c)+'" data-k="'+esc(c.id)+'" tabindex="0" role="button">'+
     '<div class="cn">'+esc(c.id)+(c.config.length?' <span class="cfg">⚙</span>':'')+'</div>'+
     '<div class="cs">'+esc(c.path)+' · called by '+c.fan_in+'</div></div>'; }).join('');
+
+var DEL=D.deleted_modules||[];
+if(DEL.length){var b=document.createElement('div');b.className='band';
+ b.innerHTML='<div class="band-t">Deleted by the refactor — '+DEL.length+
+  ' module'+(DEL.length>1?'s':'')+' no longer on disk</div>'+
+  '<p class="legend">These were read from source when the schema was built and are gone now. '+
+  'Their nodes are kept so the findings that justified the deletion stay readable, and so a '+
+  'diff of this page shows what the refactor removed.</p><p class="legend" style="opacity:.85">'+
+  DEL.map(function(x){return '<code>'+esc(x)+'</code>';}).join(' &middot; ')+'</p>';
+ var mainEl=document.querySelector('.main'); if(mainEl) mainEl.appendChild(b);}
 
 var RM=D.roadmap||null;
 if(RM){document.getElementById('roadmap').innerHTML=

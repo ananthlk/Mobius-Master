@@ -1,0 +1,101 @@
+/**
+ * Mobius Design Tokens (light theme)
+ * Single source of truth for colors, typography, spacing, radius.
+ * Import in UIs: @import url('path/to/mobius-design/tokens.css');
+ */
+
+:root {
+  /* Logo (grey/white infinity) */
+  --mobius-logo-stroke-start: #555;
+  --mobius-logo-stroke-mid: #ffffff;
+  --mobius-logo-stroke-end: #555;
+
+  /* Core palette */
+  --mobius-text-primary: #1a1d21;
+  --mobius-text-secondary: #374151;
+  --mobius-text-muted: #64748b;
+  --mobius-text-tertiary: #6b7280;
+
+  --mobius-bg-primary: #fafbfc;
+  --mobius-bg-secondary: #f8fafc;
+  --mobius-bg-tertiary: #f1f5f9;
+  --mobius-bg-card: #ffffff;
+  --mobius-bg-hover: #f9fafb;
+
+  --mobius-border: #e2e8f0;
+  --mobius-border-light: #e5e7eb;
+  --mobius-border-medium: #d1d5db;
+
+  --mobius-accent: #3b82f6;
+  --mobius-accent-hover: #2563eb;
+  --mobius-accent-text: #ffffff;
+
+  /* Semantic accents (BRANDING.md §3) — meaning-bearing hues shared
+     across modules. Pick for meaning fit, never for style:
+       indigo   runs / pipeline / process state
+       violet   credentialing / policy of record
+       emerald  roster / operational data */
+  --mobius-indigo: #5b5ef4;
+  --mobius-indigo-hover: #4f52e0;
+  --mobius-violet: #7c3aed;
+  --mobius-violet-hover: #6d28d9;
+  --mobius-emerald: #10b981;
+  --mobius-emerald-hover: #059669;
+
+  /* Taxonomy / entity-kind chips (Procedural / Domain / Jurisdiction).
+     Named slots so modules stop inventing --clr-* palettes; aliased to
+     the semantic accents so hue governance stays in one place. */
+  --mobius-kind-procedural: var(--mobius-indigo);
+  --mobius-kind-domain: var(--mobius-violet);
+  --mobius-kind-jurisdiction: var(--mobius-emerald);
+
+  --mobius-success: #16a34a;
+  --mobius-warning: #f59e0b;
+  --mobius-error: #dc2626;
+  --mobius-info: #3b82f6;
+
+  /* Shadows */
+  --mobius-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --mobius-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --mobius-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+  /* Typography */
+  --mobius-font-sans: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --mobius-font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --mobius-font-system: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --mobius-text-xs: 0.7rem;
+  --mobius-text-sm: 0.8125rem;
+  --mobius-text-base: 0.9375rem;
+  --mobius-text-md: 1rem;
+  --mobius-text-lg: 1.125rem;
+  --mobius-text-xl: 1.25rem;
+  --mobius-text-2xl: 1.5rem;   /* KPI / scorecard numerals */
+  --mobius-text-display: 2rem; /* hero / landing only */
+
+  /* Spacing */
+  --mobius-space-xs: 0.25rem;
+  --mobius-space-sm: 0.5rem;
+  --mobius-space-base: 0.75rem;
+  --mobius-space-md: 1rem;
+  --mobius-space-lg: 1.25rem;
+  --mobius-space-xl: 1.5rem;
+
+  /* Radius */
+  --mobius-radius-sm: 6px;
+  --mobius-radius-base: 8px;
+  --mobius-radius-md: 12px;
+  --mobius-radius-lg: 16px;
+  --mobius-radius-full: 9999px;
+
+  /* Shorthand compat aliases — legacy call sites use the un-prefixed
+     names. They MUST resolve to --mobius-* (a raw hex here is a
+     regression; see BRANDING.md §8). */
+  --surface: var(--mobius-bg-card);
+  --surface-hover: var(--mobius-bg-hover);
+  --border: var(--mobius-border);
+  --border-light: var(--mobius-border-light);
+  --text-primary: var(--mobius-text-primary);
+  --text-secondary: var(--mobius-text-secondary);
+  --text-muted: var(--mobius-text-muted);
+}

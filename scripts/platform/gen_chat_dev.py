@@ -41,6 +41,10 @@ def stores_of(src):
 
 def module_record(relpath, kind, role_hint=""):
     p = os.path.join(REPO, relpath)
+    if not os.path.exists(p):
+        return {"id": os.path.basename(relpath)[:-3], "path": relpath, "kind": kind,
+                "loc": 0, "role": "(deleted)", "role_full": "", "api": [],
+                "config": [], "writes": [], "deleted": True}
     src = open(p, encoding="utf-8", errors="replace").read()
     try:
         tree = ast.parse(src); doc = (ast.get_docstring(tree) or "").strip()
@@ -62,12 +66,21 @@ def module_record(relpath, kind, role_hint=""):
     }
 
 def main():
+    deleted: list[str] = []
     cat = json.load(open("/Users/ananth/Mobius/docs/chat-submodules.json"))
     by = {m["module"].split(".")[-1]: m for m in cat["submodules"]}
 
     # Enrich the 25 with config + storage writes, both read from the file.
     for name, m in by.items():
         p = os.path.join(REPO, m["path"])
+        if not os.path.exists(p):
+            # A module the refactor has already deleted. The schema must keep
+            # working DURING a deletion phase, not only before and after it —
+            # otherwise the diagram goes dark exactly when the code is moving.
+            m["deleted"] = True
+            m.setdefault("config", []); m.setdefault("writes", [])
+            deleted.append(m["path"])
+            continue
         src = open(p, encoding="utf-8", errors="replace").read()
         m["config"] = env_of(src)
         m["writes"] = stores_of(src)
@@ -241,6 +254,7 @@ def main():
 
     print(json.dumps({
         "generated_by": "scripts/platform/gen_chat_dev.py",
+        "deleted_modules": deleted,
         "roadmap": roadmap,
         "missing_content": missing,
         "live_env_service": "mobius-chat (us-central1)",

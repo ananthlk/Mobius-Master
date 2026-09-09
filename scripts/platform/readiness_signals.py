@@ -33,6 +33,12 @@ def tests_for(stem):
 
 def signals(relpath):
     p = os.path.join(REPO, relpath)
+    if not os.path.exists(p):
+        # Deleted by an in-flight refactor phase — report zeros rather than
+        # crashing, so the schema stays generatable mid-deletion.
+        return {"loc": 0, "except_handlers": 0, "swallow": 0, "bare_except": 0,
+                "todos": 0, "config": [], "tests": [], "path": relpath,
+                "fan_in": 0, "emits": 0, "deleted": True}
     src = open(p, encoding="utf-8", errors="replace").read()
     stem = os.path.basename(relpath)[:-3]
     try:
