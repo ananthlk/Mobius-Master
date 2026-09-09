@@ -126,9 +126,54 @@ def request_writers() -> list[dict]:
     return sorted(out, key=lambda x: (not x["gated"], x["file"]))
 
 
+def mod_id(fname: str) -> str:
+    """`runner.py` -> runner; `contract` -> contract; `contract/actions.py` ->
+    contract/actions. A package is a module and so is each of its parts."""
+    return fname[:-3] if fname.endswith(".py") else fname
+
+
+def read_source(fname: str) -> str:
+    """The source of a module, whether it is a file or a package."""
+    path = os.path.join(PKG, fname)
+    if os.path.isdir(path):
+        return "\n".join(
+            open(os.path.join(path, f), encoding="utf-8", errors="replace").read()
+            for f in sorted(os.listdir(path)) if f.endswith(".py"))
+    return open(path, encoding="utf-8", errors="replace").read()
+
+
+def source_files() -> list[str]:
+    """Every module, including the ones inside packages.
+
+    Ananth, 2026-09-09: "we need to keep your code base really modular." So the
+    contract became a package split by the question each part answers — and this
+    generator promptly failed its own invariant, because it only ever walked
+    top-level .py files and the curated prose for `contract` suddenly described
+    nothing. That is the check doing its job: a refactor is exactly when a
+    schematic silently stops describing the code.
+
+    A package appears BOTH as itself — so it can carry one rating and one
+    plain-language line — and as its parts, so a reader can see what it is made
+    of and open any piece. Sub-modules are named `pkg/name`.
+    """
+    out = []
+    for entry in sorted(os.listdir(PKG)):
+        full = os.path.join(PKG, entry)
+        if entry.endswith(".py") and not entry.startswith("__"):
+            out.append(entry)
+        elif (os.path.isdir(full) and not entry.startswith("__")
+              and os.path.exists(os.path.join(full, "__init__.py"))):
+            out.append(entry)                       # the package itself
+            out += [f"{entry}/{f}" for f in sorted(os.listdir(full))
+                    if f.endswith(".py") and not f.startswith("__")]
+    return out
+
+
 def derive(fname: str) -> dict:
     path = os.path.join(PKG, fname)
-    src = open(path, encoding="utf-8", errors="replace").read()
+    # A package reads as everything in it: a rating on the package is a rating
+    # on the seam, which is the useful thing to grade.
+    src = read_source(fname)
     try:
         tree = ast.parse(src)
         doc = (ast.get_docstring(tree) or "").strip()
@@ -162,7 +207,7 @@ def derive(fname: str) -> dict:
                                "calls it — its behaviour has no identity in the trace.")
 
     return {
-        "id": fname[:-3],
+        "id": mod_id(fname),
         "path": f"deep_research/{fname}",
         "loc": len(src.splitlines()),
         "role": (doc.splitlines() or [""])[0],
@@ -195,8 +240,7 @@ def line_of(fname: str, pattern: str) -> int | None:
     WHERE sends you back to grep, which is the thing it was supposed to replace.
     """
     try:
-        src = open(os.path.join(PKG, fname), encoding="utf-8",
-                   errors="replace").read().splitlines()
+        src = read_source(fname).splitlines()
     except OSError:
         return None
     rx = re.compile(pattern)
@@ -209,7 +253,7 @@ def line_of(fname: str, pattern: str) -> int | None:
 def traced_actors(files: list[str]) -> dict:
     by_actor: dict[str, list[str]] = {}
     for f in files:
-        src = open(os.path.join(PKG, f), encoding="utf-8", errors="replace").read()
+        src = read_source(f)
         for actor in set(TRACE_CALL_RE.findall(src)):
             by_actor.setdefault(actor, []).append(f[:-3])
     return {a: sorted(set(v)) for a, v in sorted(by_actor.items())}
@@ -237,9 +281,9 @@ def actors() -> list[dict]:
 def entry_points(files: list[str]) -> list[dict]:
     out = []
     for f in files:
-        src = open(os.path.join(PKG, f), encoding="utf-8", errors="replace").read()
+        src = read_source(f)
         if '__name__ == "__main__"' in src or "argparse" in src:
-            out.append({"id": f[:-3],
+            out.append({"id": mod_id(f),
                         "cli": bool(re.search(r"add_argument\(", src)),
                         "loc": len(src.splitlines())})
     return sorted(out, key=lambda x: -x["loc"])
@@ -266,9 +310,9 @@ def entry_parity(files: list[str]) -> list[dict]:
                if re.match(r"run(ner|_v2|_batch|_research|_turn)\.py$", f)]
     out = []
     for f in drivers:
-        src = open(os.path.join(PKG, f), encoding="utf-8", errors="replace").read()
+        src = read_source(f)
         has = {name: bool(rx.search(src)) for name, rx in GUARANTEES.items()}
-        out.append({"id": f[:-3], "has": has, "at": f"deep_research/{f}",
+        out.append({"id": mod_id(f), "has": has, "at": f"deep_research/{f}",
                     "score": sum(has.values()), "of": len(GUARANTEES)})
     return sorted(out, key=lambda x: -x["score"])
 
@@ -292,10 +336,10 @@ KNOWN_TERMINATORS = {"runner", "run_v2", "run_research", "service", "resolution"
 def terminators(files: list[str]) -> list[dict]:
     out = []
     for f in files:
-        src = open(os.path.join(PKG, f), encoding="utf-8", errors="replace").read()
+        src = read_source(f)
         hits = {st: len(rx.findall(src)) for st, rx in END_RE.items()}
         if any(hits.values()):
-            out.append({"id": f[:-3], "ends": {k: v for k, v in hits.items() if v},
+            out.append({"id": mod_id(f), "ends": {k: v for k, v in hits.items() if v},
                         "at": f"deep_research/{f}:{line_of(f, 'set status')}"})
     return sorted(out, key=lambda x: -sum(x["ends"].values()))
 
@@ -313,7 +357,7 @@ FAIL_VOCAB = re.compile(
 
 
 def failure_capable(fname: str) -> bool:
-    src = open(os.path.join(PKG, fname), encoding="utf-8", errors="replace").read()
+    src = read_source(fname)
     return bool(FAIL_VOCAB.search(src))
 
 
@@ -466,8 +510,7 @@ def who_reasons(mods: list[dict]) -> dict:
 
 
 def main() -> None:
-    files = sorted(f for f in os.listdir(PKG)
-                   if f.endswith(".py") and not f.startswith("__"))
+    files = sorted(source_files())
     mods = [derive(f) for f in files]
 
     # Curated judgement, kept in its own file and merged here — never mixed with
