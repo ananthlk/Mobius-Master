@@ -477,6 +477,82 @@ turn needs clarification or refinement it publishes and returns without finishin
 
 # ── Cross-cutting ───────────────────────────────────────────────────────────
 CROSS = {
+"emit_envelope": dict(rating="red", depth="code", how="""
+Builds every telemetry envelope the pipeline emits — the typed events the frontend renders
+and the log everything downstream is reconstructed from.
+
+IT IS ALSO WHERE THE CODEBASE'S SIGNATURE DEFECT IS MOST MEASURABLE, which is why it has a
+node of its own. Ananth, 2026-09-08: log the CallManager pattern as a systemic finding.
+
+THE CLASS, stated once: a capability is implemented — often carefully, often with tests —
+and nothing in the live path ever calls it, reads it back, or persists what it produced.
+Each instance looks healthy in isolation. The code is present, the tests pass, the docstring
+describes real intent. The capability is simply absent at runtime, and health stays green.
+""", findings=[
+ ("bad", "OWNER(chat): THE FAILURE-PATH EMITTERS WERE BUILT, TESTED, AND NEVER WIRED. Four "
+         "envelope builders in this module have ZERO callers in app/ and one test file each:\n\n"
+         "  make_tool_failed                     0 callers, 1 test file\n"
+         "  make_rate_limit_hit                  0 callers, 1 test file\n"
+         "  make_turn_started                    0 callers, 1 test file\n"
+         "  make_confidence_filter_dropped_all   0 callers, 1 test file\n\n"
+         "NOW LOOK AT WHAT ACTUALLY EMITS. Across 400 live turns in 7 days: tool_invoked 13, "
+         "tool_completed 11, and tool_failed ZERO — not rare, STRUCTURALLY IMPOSSIBLE, because "
+         "nothing calls the builder. turn_completed 380, turn_started ZERO.\n\n"
+         "So the telemetry can record that a tool was invoked and that it completed, and has "
+         "no way to record that one failed. It can count completions and not starts, which "
+         "means A COMPLETION RATE CANNOT BE COMPUTED — only a completion count, which always "
+         "looks like success. The observability is biased toward health BY CONSTRUCTION.\n\n"
+         "That is the mechanism behind 'health stayed green' during the 29-day appeals "
+         "outage, and it is not a one-off: it is this module's shape."),
+ ("bad", "OWNER(chat): 184 UNWIRED CANDIDATES ACROSS app/, 86 OF THEM WITH TESTS. Measured by "
+         "scripts/platform/gen_unwired.py — public defs whose only references are their own "
+         "module and the tests covering them, after excluding what a name-grep can never see "
+         "called (FastAPI route handlers, Pydantic models, decorated hooks, enums). 620 public "
+         "defs scanned.\n\n"
+         "Stated as a CANDIDATE LIST, not a verdict: anything reached by getattr, a registry "
+         "or an entrypoint will false-positive, and I removed 160 such cases by hand-checking "
+         "the filter rather than shipping the raw 344. The 86 with tests are the strongest "
+         "signal — somebody verified it works and nothing uses it.\n\n"
+         "Concentration: bubble_backend 9, control_vocab 9, credentialing_envelope 7, "
+         "emit_envelope 7, workflow_selection 6, model_registry 5.\n\n"
+         "THE DETECTOR ONLY SEES THE MECHANICAL HALF. A column nobody writes and a JSON key "
+         "nobody emits leave no symbol to grep, so the confirmed instances below are mostly "
+         "INVISIBLE to it. The real count is higher and cannot be produced by this tool."),
+ ("bad", "OWNER(chat): THE CONFIRMED ROSTER — twelve instances of one class, each found "
+         "separately during this review before anyone was looking for a pattern:\n\n"
+         "  CallManager             built, unit-tested, never instantiated outside its own "
+         "file; its docstring names it as the home for the module_key/variant_id wiring\n"
+         "  variant_id              refresh filters WHERE variant_id='default'; writer never "
+         "set it. 1,820 of 1,822 rows NULL in 24h\n"
+         "  keep                    curator's decision never persisted. 0 occurrences in "
+         "5,713 turns\n"
+         "  critic                  0 of 575 stored messages carry the key\n"
+         "  cited_source_indices    parsed from model output, never computed. Non-empty on "
+         "~11% of turns for 3+ weeks\n"
+         "  master_objective        writer stranded inside the dead legacy branch; nothing "
+         "since April 2026\n"
+         "  user_ask                never set, so the frontend fallback at app.js:13338 is "
+         "unreachable\n"
+         "  objective_status        always 'resolved'; four other end states unreachable\n"
+         "  state_version           inserted and incremented, never read or compared\n"
+         "  blueprint_snapshot      declared column, 0 of 2,744 rows ever written\n"
+         "  tool-manifest filtering built to cut prompt length, gated off, unused\n"
+         "  make_tool_failed etc.   four failure-path emitters, tested, zero callers\n\n"
+         "WHY IT KEEPS HAPPENING, and this is the part worth acting on: in every case the "
+         "PRODUCING side was built and the CONSUMING side was assumed. Nobody asks 'who reads "
+         "what I told it to produce?' A test proves the producer works; nothing proves anyone "
+         "listens. That is why tests pass, code review passes, and the capability is absent.\n\n"
+         "THE CHEAPEST GUARD is a same-change read-back: no write path ships without a reader "
+         "in the same change, and no emitter ships without a caller. Not proposed as work "
+         "here — logged as the systemic finding Ananth asked for, and as the thing P2 "
+         "(instrument) should be designed against rather than around."),
+ ("watch", "This reframes several findings already on this page as one defect rather than "
+           "several. The governor being unobservable, the curation decision being unreadable, "
+           "the critic never persisting and the appeals outage lasting 29 days are not four "
+           "independent gaps in discipline — they are four instances of a producer shipped "
+           "without a consumer. Worth saying because fixing them one at a time treats the "
+           "symptom.")]),
+
 "llm_manager": dict(rating="amber", depth="code", how="""
 The single entry point for every LLM call in chat. Nothing should call a provider
 directly; everything goes through here.

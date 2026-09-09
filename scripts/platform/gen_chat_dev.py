@@ -138,7 +138,11 @@ def main():
              # finding — so they are attached here to get their own node rather
              # than staying invisible because the flow parser cannot see them.
              module_record("app/state/jurisdiction.py", "cross-cutting"),
-             module_record("app/state/clarification.py", "cross-cutting")]
+             module_record("app/state/clarification.py", "cross-cutting"),
+             # The epicentre of the built-but-never-wired class (Ananth 2026-09-08:
+             # "log it as a systemic finding"). Given its own node because the
+             # pattern is most measurable here.
+             module_record("app/communication/emit_envelope.py", "cross-cutting")]
     for c in cross:
         out = subprocess.run(
             ["grep", "-rl", c["id"], "--include=*.py", "app/"],

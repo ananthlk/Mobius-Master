@@ -1,0 +1,1290 @@
+[
+ {
+  "name": "chat_rag_database_url",
+  "kind": "FunctionDef",
+  "path": "app/config.py",
+  "line": 98,
+  "tested": true
+ },
+ {
+  "name": "resolved_vertex_project_id",
+  "kind": "FunctionDef",
+  "path": "app/config.py",
+  "line": 116,
+  "tested": true
+ },
+ {
+  "name": "set_request_context",
+  "kind": "FunctionDef",
+  "path": "app/logging_config.py",
+  "line": 49,
+  "tested": true
+ },
+ {
+  "name": "reset_request_context",
+  "kind": "FunctionDef",
+  "path": "app/logging_config.py",
+  "line": 69,
+  "tested": true
+ },
+ {
+  "name": "get_correlation_id",
+  "kind": "FunctionDef",
+  "path": "app/logging_config.py",
+  "line": 79,
+  "tested": true
+ },
+ {
+  "name": "get_user_id",
+  "kind": "FunctionDef",
+  "path": "app/logging_config.py",
+  "line": 83,
+  "tested": true
+ },
+ {
+  "name": "update_request_context",
+  "kind": "FunctionDef",
+  "path": "app/logging_config.py",
+  "line": 297,
+  "tested": true
+ },
+ {
+  "name": "tracing_enabled",
+  "kind": "FunctionDef",
+  "path": "app/tracing_config.py",
+  "line": 54,
+  "tested": true
+ },
+ {
+  "name": "trace_exited",
+  "kind": "FunctionDef",
+  "path": "app/trace_log.py",
+  "line": 62,
+  "tested": false
+ },
+ {
+  "name": "trace_calls",
+  "kind": "FunctionDef",
+  "path": "app/trace_log.py",
+  "line": 70,
+  "tested": false
+ },
+ {
+  "name": "run_single_prompt_test",
+  "kind": "FunctionDef",
+  "path": "app/prompts_test.py",
+  "line": 34,
+  "tested": false
+ },
+ {
+  "name": "flush_cache",
+  "kind": "FunctionDef",
+  "path": "app/secrets_loader.py",
+  "line": 118,
+  "tested": false
+ },
+ {
+  "name": "require_secret",
+  "kind": "FunctionDef",
+  "path": "app/secrets_loader.py",
+  "line": 212,
+  "tested": false
+ },
+ {
+  "name": "db_get_schema",
+  "kind": "FunctionDef",
+  "path": "app/db_client.py",
+  "line": 499,
+  "tested": false
+ },
+ {
+  "name": "get_canonical_payers",
+  "kind": "FunctionDef",
+  "path": "app/payer_normalization.py",
+  "line": 66,
+  "tested": false
+ },
+ {
+  "name": "detect_payer_from_text",
+  "kind": "FunctionDef",
+  "path": "app/payer_normalization.py",
+  "line": 80,
+  "tested": false
+ },
+ {
+  "name": "NoCacheStaticFiles",
+  "kind": "ClassDef",
+  "path": "app/main.py",
+  "line": 39,
+  "tested": false
+ },
+ {
+  "name": "append_run",
+  "kind": "FunctionDef",
+  "path": "app/test_runs.py",
+  "line": 26,
+  "tested": true
+ },
+ {
+  "name": "list_runs",
+  "kind": "FunctionDef",
+  "path": "app/test_runs.py",
+  "line": 62,
+  "tested": true
+ },
+ {
+  "name": "get_run",
+  "kind": "FunctionDef",
+  "path": "app/test_runs.py",
+  "line": 92,
+  "tested": true
+ },
+ {
+  "name": "save_prompts_llm_config",
+  "kind": "FunctionDef",
+  "path": "app/prompts_llm_config.py",
+  "line": 69,
+  "tested": false
+ },
+ {
+  "name": "roster_uploads_from_active",
+  "kind": "FunctionDef",
+  "path": "app/pipeline/credentialing_envelope.py",
+  "line": 41,
+  "tested": false
+ },
+ {
+  "name": "thread_has_roster_reconciliation_data",
+  "kind": "FunctionDef",
+  "path": "app/pipeline/credentialing_envelope.py",
+  "line": 49,
+  "tested": false
+ },
+ {
+  "name": "message_requests_roster_reconciliation",
+  "kind": "FunctionDef",
+  "path": "app/pipeline/credentialing_envelope.py",
+  "line": 61,
+  "tested": false
+ },
+ {
+  "name": "message_prefers_outside_in_credentialing",
+  "kind": "FunctionDef",
+  "path": "app/pipeline/credentialing_envelope.py",
+  "line": 97,
+  "tested": false
+ },
+ {
+  "name": "envelope_routes_to_reconciliation",
+  "kind": "FunctionDef",
+  "path": "app/pipeline/credentialing_envelope.py",
+  "line": 114,
+  "tested": false
+ },
+ {
+  "name": "classify_org_vs_uploads",
+  "kind": "FunctionDef",
+  "path": "app/pipeline/credentialing_envelope.py",
+  "line": 144,
+  "tested": false
+ },
+ {
+  "name": "build_canonical_credentialing_message",
+  "kind": "FunctionDef",
+  "path": "app/pipeline/credentialing_envelope.py",
+  "line": 165,
+  "tested": false
+ },
+ {
+  "name": "persist_active_context",
+  "kind": "FunctionDef",
+  "path": "app/pipeline/active_context.py",
+  "line": 8,
+  "tested": false
+ },
+ {
+  "name": "inputs_signature",
+  "kind": "FunctionDef",
+  "path": "app/pipeline/react_retry_guard.py",
+  "line": 52,
+  "tested": true
+ },
+ {
+  "name": "resolve_message_references",
+  "kind": "FunctionDef",
+  "path": "app/pipeline/message_resolver.py",
+  "line": 185,
+  "tested": false
+ },
+ {
+  "name": "extract_roster_skill_data",
+  "kind": "FunctionDef",
+  "path": "app/pipeline/message_resolver.py",
+  "line": 355,
+  "tested": true
+ },
+ {
+  "name": "guidance_mode_threshold",
+  "kind": "FunctionDef",
+  "path": "app/pipeline/react/prompts.py",
+  "line": 117,
+  "tested": true
+ },
+ {
+  "name": "build_round0_user_message",
+  "kind": "FunctionDef",
+  "path": "app/pipeline/react/round0.py",
+  "line": 84,
+  "tested": true
+ },
+ {
+  "name": "capabilities_for_parser",
+  "kind": "FunctionDef",
+  "path": "app/stages/agents/capabilities.py",
+  "line": 191,
+  "tested": false
+ },
+ {
+  "name": "available_capabilities_json",
+  "kind": "FunctionDef",
+  "path": "app/stages/agents/capabilities.py",
+  "line": 219,
+  "tested": false
+ },
+ {
+  "name": "defaults_policy_json",
+  "kind": "FunctionDef",
+  "path": "app/stages/agents/capabilities.py",
+  "line": 256,
+  "tested": false
+ },
+ {
+  "name": "slim_master_plan",
+  "kind": "FunctionDef",
+  "path": "app/stages/agents/capabilities.py",
+  "line": 268,
+  "tested": true
+ },
+ {
+  "name": "build_blueprint",
+  "kind": "FunctionDef",
+  "path": "app/planner/blueprint.py",
+  "line": 37,
+  "tested": true
+ },
+ {
+  "name": "answer_card_to_open_slots",
+  "kind": "FunctionDef",
+  "path": "app/state/state_extractor.py",
+  "line": 265,
+  "tested": true
+ },
+ {
+  "name": "extract_state_patch",
+  "kind": "FunctionDef",
+  "path": "app/state/state_extractor.py",
+  "line": 312,
+  "tested": true
+ },
+ {
+  "name": "get_options_for_slot",
+  "kind": "FunctionDef",
+  "path": "app/state/clarification_options.py",
+  "line": 34,
+  "tested": false
+ },
+ {
+  "name": "need_query_refinement",
+  "kind": "FunctionDef",
+  "path": "app/state/query_refinement.py",
+  "line": 39,
+  "tested": true
+ },
+ {
+  "name": "get_jurisdiction_obj",
+  "kind": "FunctionDef",
+  "path": "app/state/jurisdiction.py",
+  "line": 69,
+  "tested": false
+ },
+ {
+  "name": "resolve_task_remote",
+  "kind": "FunctionDef",
+  "path": "app/sub_skills/task_management.py",
+  "line": 193,
+  "tested": false
+ },
+ {
+  "name": "dismiss_task_remote",
+  "kind": "FunctionDef",
+  "path": "app/sub_skills/task_management.py",
+  "line": 198,
+  "tested": false
+ },
+ {
+  "name": "patch_task_remote",
+  "kind": "FunctionDef",
+  "path": "app/sub_skills/task_management.py",
+  "line": 203,
+  "tested": false
+ },
+ {
+  "name": "read_upload",
+  "kind": "FunctionDef",
+  "path": "app/sub_skills/doc_reader.py",
+  "line": 96,
+  "tested": false
+ },
+ {
+  "name": "read_envelope_to_blocks",
+  "kind": "FunctionDef",
+  "path": "app/sub_skills/doc_reader.py",
+  "line": 128,
+  "tested": false
+ },
+ {
+  "name": "detect_phi",
+  "kind": "FunctionDef",
+  "path": "app/storage/phi_audit_log.py",
+  "line": 74,
+  "tested": false
+ },
+ {
+  "name": "write_phi_audit_event",
+  "kind": "FunctionDef",
+  "path": "app/storage/phi_audit_log.py",
+  "line": 123,
+  "tested": false
+ },
+ {
+  "name": "save_tool_result",
+  "kind": "FunctionDef",
+  "path": "app/storage/results.py",
+  "line": 24,
+  "tested": false
+ },
+ {
+  "name": "get_tool_result",
+  "kind": "FunctionDef",
+  "path": "app/storage/results.py",
+  "line": 57,
+  "tested": false
+ },
+ {
+  "name": "format_cached_result",
+  "kind": "FunctionDef",
+  "path": "app/storage/results.py",
+  "line": 106,
+  "tested": true
+ },
+ {
+  "name": "mark_status",
+  "kind": "FunctionDef",
+  "path": "app/storage/instant_rag_catalog.py",
+  "line": 207,
+  "tested": true
+ },
+ {
+  "name": "touch_last_queried",
+  "kind": "FunctionDef",
+  "path": "app/storage/instant_rag_catalog.py",
+  "line": 263,
+  "tested": false
+ },
+ {
+  "name": "update_confirmed_tags",
+  "kind": "FunctionDef",
+  "path": "app/storage/instant_rag_catalog.py",
+  "line": 277,
+  "tested": false
+ },
+ {
+  "name": "get_by_upload_id",
+  "kind": "FunctionDef",
+  "path": "app/storage/instant_rag_catalog.py",
+  "line": 367,
+  "tested": false
+ },
+ {
+  "name": "list_expiring_before",
+  "kind": "FunctionDef",
+  "path": "app/storage/instant_rag_catalog.py",
+  "line": 393,
+  "tested": true
+ },
+ {
+  "name": "delete_roster_truth_for_org",
+  "kind": "FunctionDef",
+  "path": "app/storage/roster_truth_pg.py",
+  "line": 106,
+  "tested": false
+ },
+ {
+  "name": "get_org_summary",
+  "kind": "FunctionDef",
+  "path": "app/storage/roster_truth_pg.py",
+  "line": 485,
+  "tested": false
+ },
+ {
+  "name": "wake_up_stale_snoozes",
+  "kind": "FunctionDef",
+  "path": "app/storage/roster_truth_pg.py",
+  "line": 553,
+  "tested": false
+ },
+ {
+  "name": "FeedbackPersistenceError",
+  "kind": "ClassDef",
+  "path": "app/storage/feedback.py",
+  "line": 44,
+  "tested": true
+ },
+ {
+  "name": "ProductFeedbackError",
+  "kind": "ClassDef",
+  "path": "app/storage/product_feedback.py",
+  "line": 91,
+  "tested": true
+ },
+ {
+  "name": "append_user_message",
+  "kind": "FunctionDef",
+  "path": "app/storage/threads.py",
+  "line": 440,
+  "tested": false
+ },
+ {
+  "name": "append_assistant_message",
+  "kind": "FunctionDef",
+  "path": "app/storage/threads.py",
+  "line": 449,
+  "tested": false
+ },
+ {
+  "name": "is_noise",
+  "kind": "FunctionDef",
+  "path": "app/storage/thread_title.py",
+  "line": 52,
+  "tested": true
+ },
+ {
+  "name": "material_hash_for",
+  "kind": "FunctionDef",
+  "path": "app/storage/credentialing_assertions_pg.py",
+  "line": 26,
+  "tested": false
+ },
+ {
+  "name": "facts_from_credentialing_state",
+  "kind": "FunctionDef",
+  "path": "app/storage/credentialing_assertions_pg.py",
+  "line": 72,
+  "tested": false
+ },
+ {
+  "name": "assertion_sync_summary_line",
+  "kind": "FunctionDef",
+  "path": "app/storage/credentialing_assertions_pg.py",
+  "line": 189,
+  "tested": false
+ },
+ {
+  "name": "stable_row_key",
+  "kind": "FunctionDef",
+  "path": "app/storage/roster_review_pg.py",
+  "line": 19,
+  "tested": false
+ },
+ {
+  "name": "shape_answer_card",
+  "kind": "FunctionDef",
+  "path": "app/ux/bubble_backend.py",
+  "line": 47,
+  "tested": true
+ },
+ {
+  "name": "shape_answer_card_json",
+  "kind": "FunctionDef",
+  "path": "app/ux/bubble_backend.py",
+  "line": 70,
+  "tested": true
+ },
+ {
+  "name": "build_correction_block",
+  "kind": "FunctionDef",
+  "path": "app/ux/bubble_backend.py",
+  "line": 94,
+  "tested": true
+ },
+ {
+  "name": "build_takeaways_block",
+  "kind": "FunctionDef",
+  "path": "app/ux/bubble_backend.py",
+  "line": 105,
+  "tested": true
+ },
+ {
+  "name": "build_gaps_callout_block",
+  "kind": "FunctionDef",
+  "path": "app/ux/bubble_backend.py",
+  "line": 115,
+  "tested": true
+ },
+ {
+  "name": "build_action_chips_block",
+  "kind": "FunctionDef",
+  "path": "app/ux/bubble_backend.py",
+  "line": 129,
+  "tested": true
+ },
+ {
+  "name": "followup_items",
+  "kind": "FunctionDef",
+  "path": "app/ux/bubble_backend.py",
+  "line": 145,
+  "tested": false
+ },
+ {
+  "name": "build_next_steps_block",
+  "kind": "FunctionDef",
+  "path": "app/ux/bubble_backend.py",
+  "line": 164,
+  "tested": true
+ },
+ {
+  "name": "build_next_questions_block",
+  "kind": "FunctionDef",
+  "path": "app/ux/bubble_backend.py",
+  "line": 172,
+  "tested": true
+ },
+ {
+  "name": "make_request_payload",
+  "kind": "FunctionDef",
+  "path": "app/queue/schemas.py",
+  "line": 15,
+  "tested": false
+ },
+ {
+  "name": "make_response_payload",
+  "kind": "FunctionDef",
+  "path": "app/queue/schemas.py",
+  "line": 23,
+  "tested": false
+ },
+ {
+  "name": "run_copy",
+  "kind": "FunctionDef",
+  "path": "app/db/copy_from_rag.py",
+  "line": 53,
+  "tested": false
+ },
+ {
+  "name": "run_seed",
+  "kind": "FunctionDef",
+  "path": "app/db/seed.py",
+  "line": 29,
+  "tested": false
+ },
+ {
+  "name": "run_migrations",
+  "kind": "FunctionDef",
+  "path": "app/db/run_migrations.py",
+  "line": 164,
+  "tested": false
+ },
+ {
+  "name": "build_pre_built_sections",
+  "kind": "FunctionDef",
+  "path": "app/responder/final.py",
+  "line": 206,
+  "tested": false
+ },
+ {
+  "name": "bold_key_facts",
+  "kind": "FunctionDef",
+  "path": "app/responder/deterministic_format.py",
+  "line": 60,
+  "tested": true
+ },
+ {
+  "name": "unregister",
+  "kind": "FunctionDef",
+  "path": "app/skills/registry.py",
+  "line": 288,
+  "tested": true
+ },
+ {
+  "name": "all_names",
+  "kind": "FunctionDef",
+  "path": "app/skills/registry.py",
+  "line": 301,
+  "tested": true
+ },
+ {
+  "name": "names_by_category",
+  "kind": "FunctionDef",
+  "path": "app/skills/registry.py",
+  "line": 343,
+  "tested": false
+ },
+ {
+  "name": "registry_enabled",
+  "kind": "FunctionDef",
+  "path": "app/skills/registry.py",
+  "line": 454,
+  "tested": true
+ },
+ {
+  "name": "has_corpus_sources",
+  "kind": "FunctionDef",
+  "path": "app/communication/followup_next_steps_quality.py",
+  "line": 38,
+  "tested": false
+ },
+ {
+  "name": "normalize_followup_line_item",
+  "kind": "FunctionDef",
+  "path": "app/communication/followup_next_steps_quality.py",
+  "line": 49,
+  "tested": true
+ },
+ {
+  "name": "answer_card_needs_user_documents",
+  "kind": "FunctionDef",
+  "path": "app/communication/followup_next_steps_quality.py",
+  "line": 85,
+  "tested": false
+ },
+ {
+  "name": "split_mobius_tool_envelope",
+  "kind": "FunctionDef",
+  "path": "app/communication/tool_output_envelope.py",
+  "line": 69,
+  "tested": true
+ },
+ {
+  "name": "emit_line_for",
+  "kind": "FunctionDef",
+  "path": "app/communication/error_emit.py",
+  "line": 233,
+  "tested": false
+ },
+ {
+  "name": "make_web_trace",
+  "kind": "FunctionDef",
+  "path": "app/communication/emit_envelope.py",
+  "line": 317,
+  "tested": false
+ },
+ {
+  "name": "make_tool_failed",
+  "kind": "FunctionDef",
+  "path": "app/communication/emit_envelope.py",
+  "line": 646,
+  "tested": true
+ },
+ {
+  "name": "make_rate_limit_hit",
+  "kind": "FunctionDef",
+  "path": "app/communication/emit_envelope.py",
+  "line": 685,
+  "tested": true
+ },
+ {
+  "name": "make_confidence_filter_dropped_all",
+  "kind": "FunctionDef",
+  "path": "app/communication/emit_envelope.py",
+  "line": 805,
+  "tested": true
+ },
+ {
+  "name": "make_turn_started",
+  "kind": "FunctionDef",
+  "path": "app/communication/emit_envelope.py",
+  "line": 842,
+  "tested": true
+ },
+ {
+  "name": "make_cache_influenced_decision",
+  "kind": "FunctionDef",
+  "path": "app/communication/emit_envelope.py",
+  "line": 1044,
+  "tested": false
+ },
+ {
+  "name": "make_cache_rejected_by_llm",
+  "kind": "FunctionDef",
+  "path": "app/communication/emit_envelope.py",
+  "line": 1074,
+  "tested": false
+ },
+ {
+  "name": "create_emitter",
+  "kind": "FunctionDef",
+  "path": "app/communication/gate.py",
+  "line": 76,
+  "tested": false
+ },
+ {
+  "name": "sanitize_direct_answer_string",
+  "kind": "FunctionDef",
+  "path": "app/communication/json_display_sanitize.py",
+  "line": 92,
+  "tested": true
+ },
+ {
+  "name": "sanitize_answer_card_dict",
+  "kind": "FunctionDef",
+  "path": "app/communication/json_display_sanitize.py",
+  "line": 120,
+  "tested": false
+ },
+ {
+  "name": "parse_loose_integrator_json",
+  "kind": "FunctionDef",
+  "path": "app/communication/json_display_sanitize.py",
+  "line": 182,
+  "tested": false
+ },
+ {
+  "name": "looks_like_raw_json_bleed",
+  "kind": "FunctionDef",
+  "path": "app/communication/json_display_sanitize.py",
+  "line": 264,
+  "tested": false
+ },
+ {
+  "name": "wrap_as_answer_card",
+  "kind": "FunctionDef",
+  "path": "app/communication/agent.py",
+  "line": 19,
+  "tested": false
+ },
+ {
+  "name": "normalize_selection_group",
+  "kind": "FunctionDef",
+  "path": "app/communication/workflow_selection.py",
+  "line": 38,
+  "tested": true
+ },
+ {
+  "name": "workflow_selection_group",
+  "kind": "FunctionDef",
+  "path": "app/communication/workflow_selection.py",
+  "line": 104,
+  "tested": true
+ },
+ {
+  "name": "attach_workflow_selection",
+  "kind": "FunctionDef",
+  "path": "app/communication/workflow_selection.py",
+  "line": 153,
+  "tested": false
+ },
+ {
+  "name": "format_npi_org_search_markdown",
+  "kind": "FunctionDef",
+  "path": "app/communication/workflow_selection.py",
+  "line": 181,
+  "tested": false
+ },
+ {
+  "name": "format_npi_org_search_summary_for_disambiguation",
+  "kind": "FunctionDef",
+  "path": "app/communication/workflow_selection.py",
+  "line": 231,
+  "tested": false
+ },
+ {
+  "name": "build_npi_org_disambiguation_groups",
+  "kind": "FunctionDef",
+  "path": "app/communication/workflow_selection.py",
+  "line": 249,
+  "tested": true
+ },
+ {
+  "name": "tool_attribution_block",
+  "kind": "FunctionDef",
+  "path": "app/communication/assistant_envelope.py",
+  "line": 47,
+  "tested": false
+ },
+ {
+  "name": "emit_fallback",
+  "kind": "FunctionDef",
+  "path": "app/communication/plan_display.py",
+  "line": 118,
+  "tested": false
+ },
+ {
+  "name": "format_step_done",
+  "kind": "FunctionDef",
+  "path": "app/communication/plan_display.py",
+  "line": 219,
+  "tested": false
+ },
+ {
+  "name": "retrieval_signal_to_fallback_note",
+  "kind": "FunctionDef",
+  "path": "app/communication/plan_display.py",
+  "line": 237,
+  "tested": false
+ },
+ {
+  "name": "is_shutting_down",
+  "kind": "FunctionDef",
+  "path": "app/worker/run.py",
+  "line": 363,
+  "tested": false
+ },
+ {
+  "name": "gate_event_emit_line",
+  "kind": "FunctionDef",
+  "path": "app/services/credentialing_gate_event.py",
+  "line": 156,
+  "tested": false
+ },
+ {
+  "name": "get_retrieval_blend",
+  "kind": "FunctionDef",
+  "path": "app/services/retrieval_calibration.py",
+  "line": 90,
+  "tested": false
+ },
+ {
+  "name": "get_retrieval_params",
+  "kind": "FunctionDef",
+  "path": "app/services/retrieval_calibration.py",
+  "line": 110,
+  "tested": false
+ },
+ {
+  "name": "sanitize_steer",
+  "kind": "FunctionDef",
+  "path": "app/services/turn_context.py",
+  "line": 41,
+  "tested": true
+ },
+ {
+  "name": "gate_steer",
+  "kind": "FunctionDef",
+  "path": "app/services/turn_context.py",
+  "line": 63,
+  "tested": true
+ },
+ {
+  "name": "LLMCallError",
+  "kind": "ClassDef",
+  "path": "app/services/llm_manager_errors.py",
+  "line": 27,
+  "tested": false
+ },
+ {
+  "name": "set_judge",
+  "kind": "FunctionDef",
+  "path": "app/services/claim_verification.py",
+  "line": 51,
+  "tested": true
+ },
+ {
+  "name": "configure_judge_from_env",
+  "kind": "FunctionDef",
+  "path": "app/services/claim_verification.py",
+  "line": 155,
+  "tested": true
+ },
+ {
+  "name": "retrieve_via_rag_api",
+  "kind": "FunctionDef",
+  "path": "app/services/retriever_backend.py",
+  "line": 114,
+  "tested": true
+ },
+ {
+  "name": "search_factual",
+  "kind": "FunctionDef",
+  "path": "app/services/published_rag_search.py",
+  "line": 399,
+  "tested": false
+ },
+ {
+  "name": "search_hierarchical",
+  "kind": "FunctionDef",
+  "path": "app/services/published_rag_search.py",
+  "line": 409,
+  "tested": false
+ },
+ {
+  "name": "retrieve_with_blend",
+  "kind": "FunctionDef",
+  "path": "app/services/published_rag_search.py",
+  "line": 451,
+  "tested": false
+ },
+ {
+  "name": "extract_draft_for_step",
+  "kind": "FunctionDef",
+  "path": "app/services/credentialing_run_service.py",
+  "line": 225,
+  "tested": false
+ },
+ {
+  "name": "apply_validated_output",
+  "kind": "FunctionDef",
+  "path": "app/services/credentialing_run_service.py",
+  "line": 431,
+  "tested": false
+ },
+ {
+  "name": "list_runs_for_tests",
+  "kind": "FunctionDef",
+  "path": "app/services/credentialing_run_service.py",
+  "line": 973,
+  "tested": false
+ },
+ {
+  "name": "clear_runs_for_tests",
+  "kind": "FunctionDef",
+  "path": "app/services/credentialing_run_service.py",
+  "line": 978,
+  "tested": false
+ },
+ {
+  "name": "downstream_providers_for_steps",
+  "kind": "FunctionDef",
+  "path": "app/services/roster_credentialing_orchestrator.py",
+  "line": 192,
+  "tested": false
+ },
+ {
+  "name": "discover_locations_search_mode",
+  "kind": "FunctionDef",
+  "path": "app/services/roster_credentialing_orchestrator.py",
+  "line": 202,
+  "tested": false
+ },
+ {
+  "name": "CoherenceError",
+  "kind": "ClassDef",
+  "path": "app/services/prompt_blocks.py",
+  "line": 53,
+  "tested": true
+ },
+ {
+  "name": "AssemblyRefused",
+  "kind": "ClassDef",
+  "path": "app/services/prompt_blocks.py",
+  "line": 58,
+  "tested": false
+ },
+ {
+  "name": "UnvalidatedAuthorityError",
+  "kind": "ClassDef",
+  "path": "app/services/prompt_blocks.py",
+  "line": 64,
+  "tested": true
+ },
+ {
+  "name": "AuthorityOrderError",
+  "kind": "ClassDef",
+  "path": "app/services/prompt_blocks.py",
+  "line": 68,
+  "tested": true
+ },
+ {
+  "name": "replace_system_follow_ups",
+  "kind": "FunctionDef",
+  "path": "app/services/credentialing_workflow_followups.py",
+  "line": 55,
+  "tested": false
+ },
+ {
+  "name": "system_suggest_follow_ups",
+  "kind": "FunctionDef",
+  "path": "app/services/credentialing_workflow_followups.py",
+  "line": 65,
+  "tested": false
+ },
+ {
+  "name": "get_weights",
+  "kind": "FunctionDef",
+  "path": "app/services/bandit_weights.py",
+  "line": 105,
+  "tested": true
+ },
+ {
+  "name": "UnmappedControlValue",
+  "kind": "ClassDef",
+  "path": "app/services/control_vocab.py",
+  "line": 53,
+  "tested": true
+ },
+ {
+  "name": "StrategyAxisValue",
+  "kind": "ClassDef",
+  "path": "app/services/control_vocab.py",
+  "line": 57,
+  "tested": true
+ },
+ {
+  "name": "UnknownSpeedValue",
+  "kind": "ClassDef",
+  "path": "app/services/control_vocab.py",
+  "line": 63,
+  "tested": true
+ },
+ {
+  "name": "normalize_autonomy",
+  "kind": "FunctionDef",
+  "path": "app/services/control_vocab.py",
+  "line": 82,
+  "tested": true
+ },
+ {
+  "name": "normalize_speed",
+  "kind": "FunctionDef",
+  "path": "app/services/control_vocab.py",
+  "line": 86,
+  "tested": true
+ },
+ {
+  "name": "normalize_speed_lenient",
+  "kind": "FunctionDef",
+  "path": "app/services/control_vocab.py",
+  "line": 102,
+  "tested": true
+ },
+ {
+  "name": "split_legacy_mode",
+  "kind": "FunctionDef",
+  "path": "app/services/control_vocab.py",
+  "line": 148,
+  "tested": true
+ },
+ {
+  "name": "coverage_report",
+  "kind": "FunctionDef",
+  "path": "app/services/control_vocab.py",
+  "line": 166,
+  "tested": true
+ },
+ {
+  "name": "temperature_for_role",
+  "kind": "FunctionDef",
+  "path": "app/services/control_vocab.py",
+  "line": 185,
+  "tested": true
+ },
+ {
+  "name": "normalize_web_scrape_mode",
+  "kind": "FunctionDef",
+  "path": "app/services/tool_agent.py",
+  "line": 68,
+  "tested": false
+ },
+ {
+  "name": "web_scrape_review_mcp_arguments",
+  "kind": "FunctionDef",
+  "path": "app/services/tool_agent.py",
+  "line": 82,
+  "tested": true
+ },
+ {
+  "name": "LlmHealthState",
+  "kind": "ClassDef",
+  "path": "app/services/llm_health.py",
+  "line": 66,
+  "tested": true
+ },
+ {
+  "name": "register_rate",
+  "kind": "FunctionDef",
+  "path": "app/services/cost_model.py",
+  "line": 86,
+  "tested": false
+ },
+ {
+  "name": "expand_vertex_ai_search_datastore_path",
+  "kind": "FunctionDef",
+  "path": "app/services/llm_provider.py",
+  "line": 80,
+  "tested": true
+ },
+ {
+  "name": "should_attach_vertex_search_grounding",
+  "kind": "FunctionDef",
+  "path": "app/services/llm_provider.py",
+  "line": 110,
+  "tested": true
+ },
+ {
+  "name": "build_vertex_ai_search_tools",
+  "kind": "FunctionDef",
+  "path": "app/services/llm_provider.py",
+  "line": 130,
+  "tested": false
+ },
+ {
+  "name": "register_provider",
+  "kind": "FunctionDef",
+  "path": "app/services/llm_provider.py",
+  "line": 142,
+  "tested": false
+ },
+ {
+  "name": "roster_skill_base_url",
+  "kind": "FunctionDef",
+  "path": "app/services/roster_source_of_truth.py",
+  "line": 13,
+  "tested": false
+ },
+ {
+  "name": "normalize_billing_npi",
+  "kind": "FunctionDef",
+  "path": "app/services/roster_source_of_truth.py",
+  "line": 17,
+  "tested": false
+ },
+ {
+  "name": "fetch_latest_resolved_upload_for_org",
+  "kind": "FunctionDef",
+  "path": "app/services/roster_source_of_truth.py",
+  "line": 24,
+  "tested": false
+ },
+ {
+  "name": "get_active_profile",
+  "kind": "FunctionDef",
+  "path": "app/services/model_profile.py",
+  "line": 229,
+  "tested": false
+ },
+ {
+  "name": "pinned_model_for_stage",
+  "kind": "FunctionDef",
+  "path": "app/services/model_profile.py",
+  "line": 239,
+  "tested": true
+ },
+ {
+  "name": "fallback_model_name",
+  "kind": "FunctionDef",
+  "path": "app/services/model_profile.py",
+  "line": 251,
+  "tested": false
+ },
+ {
+  "name": "get_used_today",
+  "kind": "FunctionDef",
+  "path": "app/services/tpd_tracker.py",
+  "line": 97,
+  "tested": true
+ },
+ {
+  "name": "promotion_enabled",
+  "kind": "FunctionDef",
+  "path": "app/services/task_manager_promotion.py",
+  "line": 48,
+  "tested": true
+ },
+ {
+  "name": "react_round_from_stage",
+  "kind": "FunctionDef",
+  "path": "app/services/model_registry.py",
+  "line": 373,
+  "tested": true
+ },
+ {
+  "name": "composite_stage_bucket",
+  "kind": "FunctionDef",
+  "path": "app/services/model_registry.py",
+  "line": 385,
+  "tested": true
+ },
+ {
+  "name": "composite_norm_caps_for_stage",
+  "kind": "FunctionDef",
+  "path": "app/services/model_registry.py",
+  "line": 411,
+  "tested": true
+ },
+ {
+  "name": "vertex_roster_eligible_stages",
+  "kind": "FunctionDef",
+  "path": "app/services/model_registry.py",
+  "line": 957,
+  "tested": true
+ },
+ {
+  "name": "enable_model",
+  "kind": "FunctionDef",
+  "path": "app/services/model_registry.py",
+  "line": 2326,
+  "tested": false
+ },
+ {
+  "name": "to_jinja_system",
+  "kind": "FunctionDef",
+  "path": "app/services/prompt_seed.py",
+  "line": 34,
+  "tested": true
+ },
+ {
+  "name": "to_jinja_user_template",
+  "kind": "FunctionDef",
+  "path": "app/services/prompt_seed.py",
+  "line": 46,
+  "tested": true
+ },
+ {
+  "name": "assert_parity",
+  "kind": "FunctionDef",
+  "path": "app/services/prompt_seed.py",
+  "line": 71,
+  "tested": true
+ },
+ {
+  "name": "assign_confidence",
+  "kind": "FunctionDef",
+  "path": "app/services/doc_assembly.py",
+  "line": 48,
+  "tested": true
+ },
+ {
+  "name": "assign_confidence_batch",
+  "kind": "FunctionDef",
+  "path": "app/services/doc_assembly.py",
+  "line": 82,
+  "tested": true
+ },
+ {
+  "name": "filter_abstain",
+  "kind": "FunctionDef",
+  "path": "app/services/doc_assembly.py",
+  "line": 94,
+  "tested": true
+ },
+ {
+  "name": "apply_google_fallback",
+  "kind": "FunctionDef",
+  "path": "app/services/doc_assembly.py",
+  "line": 187,
+  "tested": true
+ },
+ {
+  "name": "assemble_with_neighbors",
+  "kind": "FunctionDef",
+  "path": "app/services/doc_assembly.py",
+  "line": 414,
+  "tested": true
+ },
+ {
+  "name": "has_freshness_markers",
+  "kind": "FunctionDef",
+  "path": "app/services/cache_mode.py",
+  "line": 66,
+  "tested": true
+ }
+]
