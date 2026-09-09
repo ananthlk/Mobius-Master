@@ -330,6 +330,40 @@ turn needs clarification or refinement it publishes and returns without finishin
          "the turn still looks healthy."),
  ("good", "The branch and the stage sequence are explicit and readable; the flow in this "
           "diagram was parsed straight out of it."),
+ ("bad", "OWNER(chat): THE CLASSIC PATH IS DEAD AND IT IS 1,159 LINES. Ananth's directive "
+         "2026-09-08: find the dead code and remove it, we are not moving off ReAct.\n\n"
+         "MEASURED CLOSURE — every module below is imported by NOTHING except the legacy "
+         "branch or another module in this list, verified by import grep, not by reading:\n\n"
+         "  app/stages/resolve.py          595   imported only by orchestrator.py\n"
+         "  app/state/refined_query.py     226   only by stages/plan.py + stages/classify.py\n"
+         "  app/stages/plan.py             140   only by orchestrator.py\n"
+         "  app/state/clarification.py      88   only by stages/clarify.py\n"
+         "  app/stages/clarify.py           86   only by orchestrator.py\n"
+         "  app/stages/classify.py          24   only by orchestrator.py\n"
+         "  ------------------------------------\n"
+         "  1,159 lines, plus the 54-line branch at orchestrator.py:807-860.\n\n"
+         "NOT IN THE CLOSURE, and this is the kind of thing that makes a bulk delete go wrong: "
+         "app/state/query_refinement.py (128 lines) LOOKS legacy — it is called from "
+         "stages/clarify.py — but app/planner/blueprint.py imports it too, so it stays. "
+         "Removing it with the rest would break the live planner.\n\n"
+         "THE REAL SIZE IS LARGER THAN 1,159. resolve.py has its own downstream callees "
+         "(plan_display.py's helper documents itself as 'called from run_resolve()', and "
+         "message_resolver.py references run_resolve in its contract) which may become "
+         "orphaned in turn. The transitive sweep has NOT been done — this figure is the first "
+         "layer only, and I am labelling it as such rather than presenting it as the total.\n\n"
+         "THE ONE THING THAT MAKES THIS NOT A PURE DELETE: the path is not unreachable. "
+         "POST /chat accepts a per-request `use_react: bool | None` (chat.py:84, forwarded at "
+         ":330, applied at orchestrator.py:471 via use_react_override). MOBIUS_USE_REACT is "
+         "unset live and defaults to 1, so no turn takes the branch by configuration — but any "
+         "caller sending use_react=false still routes into it. Removing the branch means "
+         "removing that API field, which is a contract change, not a cleanup. Whether any "
+         "client sends it has NOT been established.\n\n"
+         "The cost of leaving it is not disk. It is that ctx.classification is set only on the "
+         "dead branch, so five live-looking `if ctx.classification in (...)` tests in plan.py, "
+         "clarify.py and orchestrator.py read a field that is always None and always take the "
+         "same arm — and that the jurisdiction ask, the route-clash ask and query refinement "
+         "all sit behind it, so a reader reasonably concludes chat asks for jurisdiction when "
+         "it does not (see the jurisdiction and clarification nodes)."),
 ]),
 }
 
@@ -660,6 +694,126 @@ in the middle of a 595-line file.
            "triggers the next layer — so a tool that returns something useless is "
            "indistinguishable downstream from one that failed outright."),
 ]),
+
+"jurisdiction": dict(rating="red", depth="code", how="""
+WHO THE ANSWER IS SCOPED TO — which payer, state, program, regulatory agency. Everything
+downstream filters on it: RAG's retrieval filters are built from it (rag_filters_from_active),
+the clarify guard reads it, and the answer's correctness depends on it. 137 lines.
+
+AND THE MODULE THAT DECIDES IT IS NOT ON THE LIVE PATH.
+
+There are three separate places jurisdiction is settled, and they do not run together:
+
+  1. classify_message()          state/refined_query.py:85 — regex patterns decide whether
+                                 this turn is a jurisdiction_change ("how about for United")
+                                 versus a new question or a slot fill.
+  2. need_jurisdiction_clarification()  state/clarification.py:30 — decides whether to STOP and
+                                 ask the user. Primary signal is the JPD tag matcher against
+                                 the RAG lexicon; the parsed payor/state/program is only a
+                                 fallback when the tagger returns nothing.
+  3. get_jurisdiction_from_active()  state/jurisdiction.py:62 — reads the carried-forward
+                                 jurisdiction out of merged_state["active"].
+
+Only (3) runs on the live ReAct path. (1) and (2) are reached ONLY from run_classify and
+run_clarify, and both of those are inside the `if not use_react:` branch at
+orchestrator.py:807. The live service does not set MOBIUS_USE_REACT, the code default is "1",
+and orchestrator.py:763 logs "USE_REACT=true — taking ReAct path (no clarify/plan steps)".
+""", findings=[
+ ("bad", "OWNER(chat): THE JURISDICTION CLARIFICATION IS DEAD CODE ON THE LIVE PATH. "
+         "need_jurisdiction_clarification() decides whether chat should stop and ask 'Which "
+         "health plan or payer are you asking about?' before answering. It is called from "
+         "run_clarify, which is called from ONE site — orchestrator.py:826 — inside the "
+         "`if not use_react` branch. MOBIUS_USE_REACT is unset on the deployed service and the "
+         "code default is 1, so that branch never executes.\n\n"
+         "CONFIRMED AGAINST LIVE DATA, not just by reading the branch: across 2,741 turns in 60 "
+         "days, the string 'Which health plan or payer are you asking about' appears in ZERO "
+         "final_messages. So does 'could you please specify' (the multi-slot variant). So does "
+         "the route-clash question 'I can either search the web or search our policy materials'. "
+         "Three user-facing asks, all reachable only through run_clarify, all with zero live "
+         "occurrences.\n\n"
+         "The consequence is not that a stage is missing — it is that NOTHING on the live path "
+         "asks for jurisdiction before answering. A question with no payer, no state and no "
+         "program gets answered anyway, scoped by whatever happens to be carried forward in "
+         "merged_state['active'] from an earlier turn, or by nothing at all. The guard that "
+         "existed for exactly this was left behind on the other branch."),
+ ("bad", "OWNER(chat): jurisdiction_change is decided by regex on the raw message and only "
+         "matters on a path that does not run. classify_message() at refined_query.py:85 is a "
+         "cascade of literal patterns — INFO_PROVISION_PATTERNS, JURISDICTION_CHANGE_PATTERNS, "
+         "SLOT_ANSWER_PATTERNS, NEW_QUESTION_PATTERNS — plus word-count thresholds (>=5 words, "
+         "<=5 words, <=4 words). ctx.classification is set at exactly one site, "
+         "stages/classify.py:15, which is again inside the legacy branch. Every downstream "
+         "reader of ctx.classification (plan.py:51, clarify.py:74, classify.py:17, "
+         "orchestrator.py:835 and :866) is therefore reading a field that is never set on the "
+         "live path — it falls through as None and every `in (\"slot_fill\", "
+         "\"jurisdiction_change\")` test silently evaluates False.\n\n"
+         "That is the worst version of dead code: not unreachable, but reachable and always "
+         "answering the same way. A reader of plan.py or clarify.py sees a live-looking branch."),
+ ("watch", "What DOES survive on the live path is get_jurisdiction_from_active() and "
+           "rag_filters_from_active() — the carried-forward jurisdiction is read every turn and "
+           "does shape retrieval. So jurisdiction is not absent; it is INHERITED WITHOUT EVER "
+           "BEING ESTABLISHED. Worth stating precisely, because 'jurisdiction is broken' would "
+           "be wrong — the read path works, the acquisition path is on the dead branch."),
+ ("watch", "Rated RED on the strength of the acquisition gap, not the code. state/jurisdiction.py "
+           "itself is 137 clean lines with a clear API and no findings against it. The rating is "
+           "the guarantee, not the construction — per Technical Review's ruling. Test files: "
+           "none found for clarification.py.")]),
+
+"clarification": dict(rating="red", depth="code", how="""
+WHEN CHAT STOPS AND ASKS INSTEAD OF ANSWERING. There are FOUR mechanisms and they belong to
+three different owners.
+
+  A. Jurisdiction ask      state/clarification.py — "Which health plan or payer?"  DEAD (legacy branch)
+  B. Route-clash ask       stages/clarify.py:30 — "web or policy materials?"        DEAD (legacy branch)
+  C. Query refinement      state/query_refinement.py                                DEAD (legacy branch)
+  D. RAG clarify bypass    react_loop.py:1760 — terminal stop mid-loop              THE ONLY LIVE ONE
+
+D is the one the user actually experiences, and it does not originate in chat at all. RAG
+returns routing_keys.clarify_questions in its corpus telemetry; when RAG's status is
+"no_retrieval" AND those questions survive two chat-side filters, react_loop sets
+react_bypass_integrate, puts the clarify text in final_message and exits the loop. So the
+question the user is asked was WRITTEN BY THE RETRIEVER, and chat's only role is to decide
+whether to relay it.
+
+The two filters (react_loop.py:961, added 2026-08-08 on a Chat Master directive because RAG
+was firing CLARIFY on well-formed queries) are:
+
+  1. SPECIFICITY — reject if the text matches any of 15 generic templates
+     ("could you clarify", "please specify", "more details"...); accept if it contains one of
+     20 domain terms (payer, plan, code, cpt, hcpcs, icd, state...), OR any digit, OR any
+     capitalised word after the first.
+  2. CONTEXT — reject if chat's own carried-forward state/payor already appears in the query
+     text, i.e. don't ask what we already know.
+""", findings=[
+ ("bad", "OWNER(chat): THE ONLY LIVE CLARIFY IS WRITTEN BY ANOTHER MODULE AND FILTERED BY "
+         "KEYWORDS. 83 turns in 60 days took the RAG clarify bypass — measured from "
+         "thinking_log, and every one of them skipped the integrator entirely (see the "
+         "integrate node). Chat does not compose the question, does not know why RAG thinks "
+         "the query is ambiguous, and cannot tell a genuine ambiguity from a retrieval miss: "
+         "the trigger is RAG's status=='no_retrieval', which is also exactly what an empty "
+         "corpus looks like. A question the corpus simply does not cover and a question that "
+         "is genuinely ambiguous produce the same user-facing behaviour.\n\n"
+         "The guard is a keyword heuristic doing semantic work, and it is honest about it — "
+         "the code says 'deliberately keyword/substring heuristics, not new inference'. But "
+         "_is_specific_clarify_question() accepts on ANY DIGIT or ANY capitalised word after "
+         "the first. 'Which Sunshine plan?' passes on the capital S; so does almost any clarify "
+         "text a model writes with a proper noun in it. The generic-template list is 15 literal "
+         "strings — a sixteenth phrasing passes the filter by not being on the list. This is a "
+         "denylist standing where a decision belongs."),
+ ("bad", "OWNER(chat): FOUR CLARIFY MECHANISMS, THREE OF THEM DEAD, ALL FOUR STILL IN THE TREE. "
+         "A, B and C above are reachable only from run_clarify inside the `if not use_react` "
+         "branch at orchestrator.py:807. Zero live occurrences of any of their three user-facing "
+         "strings across 2,741 turns. Meanwhile the live mechanism D lives in react_loop and "
+         "shares no code, no message format and no telemetry with them. Anyone asked to 'change "
+         "how chat asks for clarification' has a 1-in-4 chance of editing the live one."),
+ ("watch", "The clarify bypass is terminal and unlogged as a decision: _should_bypass_on_clarify "
+           "returns a bare bool. When it returns False the clarify questions are treated as "
+           "advisory and the loop continues — a real branch in behaviour with no counter, no "
+           "reason string and no trace field. The critic and governor both got reason strings; "
+           "this one did not."),
+ ("watch", "No test file found for state/clarification.py. The two filters in react_loop.py:961 "
+           "are pure functions over strings — the cheapest possible unit tests, and exactly the "
+           "kind of deterministic-rule case flagged on the critic node. Assigned to Eval's "
+           "catalogue.")]),
 
 "integrate": dict(rating="amber", depth="code", ux="Answer card in the chat bubble; step labels 'Composing your answer' and 'Critique & citations'", how="""
 Not one step — THREE LLM calls plus a mode switch, which is why it is 1,887 lines.

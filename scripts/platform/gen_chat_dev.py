@@ -119,7 +119,13 @@ def main():
     # Cross-cutting: not steps, but under every step that generates.
     cross = [module_record("app/services/llm_manager.py", "cross-cutting"),
              module_record("app/skills/phi_gate.py", "cross-cutting"),
-             module_record("app/services/retrieval_budget.py", "cross-cutting")]
+             module_record("app/services/retrieval_budget.py", "cross-cutting"),
+             # Two decision modules Ananth called out (2026-09-08) as "definitely
+             # off". Neither is a step in the drawn flow — that is exactly the
+             # finding — so they are attached here to get their own node rather
+             # than staying invisible because the flow parser cannot see them.
+             module_record("app/state/jurisdiction.py", "cross-cutting"),
+             module_record("app/state/clarification.py", "cross-cutting")]
     for c in cross:
         out = subprocess.run(
             ["grep", "-rl", c["id"], "--include=*.py", "app/"],
