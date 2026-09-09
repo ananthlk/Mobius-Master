@@ -512,3 +512,25 @@ Classifier rev `mobius-phi-classifier-00025-7bk`. Re-ran the REAL Aetna CPB 0330
   Ask 1. (c) All false positives (no patient PHI) → the fix is precision, NOT the Ask-2
   attestation-admit (that's for real PHI + a BAA; mis-tagging clean policy docs as PHI-attested
   would be wrong). Spans handed to the classifier owner; their call on scoping the Title-Case class.
+
+---
+
+## 2.9-VERIFY · rag deployed; a query-vs-form transport catch (Extension, 2026-09-09)
+
+Master RAG landed + deployed the rag `/upload` params (rev mobius-rag-00689-66k, 6f48fd0). Direct
+verification against the deployed service:
+- **Provenance lands** when sent as QUERY params: doc `d9f16b15` (task_id `ext_ragq_1788994006`,
+  access=user_authorized_session, signal_headers=`x-robots-tag: noai`) → status completed; Master
+  RAG confirming source_metadata + normalized content_signals from their side.
+- **TRANSPORT CATCH:** rag declares the five fields (`source_url`, `access`, `task_id`,
+  `fetched_at`, `signal_headers`) as **`in: query`**. A multipart FORM field is silently ignored
+  (`?access=bogus`→422; form `access=bogus`→200; openapi confirms). My first direct test
+  (`eee9a1ce`, form fields) landed provenance-bare.
+- **Fix is the chat→rag forward only.** Extension→chat stays multipart FORM (chat declared them
+  Form, correct). Chat's TODO-B forward (undeployed) must send the five on the **query string** to
+  rag, not as form — else the silent drop relocates to the last hop and `pending_rag_support` never
+  empties even after both deploy. Flagged to Chat Master + Master RAG. No extension change.
+
+**Finish line:** Chat Master deploys TODO-B (Ananth's gate) with the form→query forward → Extension
+runs the true end-to-end via /chat/upload → `source_provenance.pending_rag_support` empties →
+Master RAG confirms the landed row. Everything else is verified.
