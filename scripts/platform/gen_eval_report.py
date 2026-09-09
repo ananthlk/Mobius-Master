@@ -30,27 +30,40 @@ args = ap.parse_args()
 
 # ── A. tests ──────────────────────────────────────────────────────────────
 def _pytest_python():
-    """Prefer mobius-chat/.venv over whatever interpreter launched this script.
+    """Which interpreter runs pytest.
 
-    2026-09-09 (P1b): the gate ran pytest via ``sys.executable``, so it
-    inherited the caller's interpreter. Everyone invokes this as
+    KNOWN ISSUE, 2026-09-09 (P1b), deliberately NOT fixed by switching here.
+
+    The gate runs pytest via ``sys.executable``, inheriting the caller's
+    interpreter. Everyone invokes this as
     ``python3 scripts/platform/gen_eval_report.py`` — the Homebrew system
     Python — which lacks ``pythonjsonlogger`` and ``opentelemetry`` even
     though both are declared in requirements.txt (lines 34, 46-50) and both
-    are installed in .venv. That put 12 tests
-    (test_logging_config 7, test_tracing_config 5) into the known-failing
-    baseline as collection errors that had nothing to do with the code.
-    All 12 pass under .venv.
+    ARE installed in mobius-chat/.venv. That is why 12 tests
+    (test_logging_config 7, test_tracing_config 5) sit in the known-failing
+    baseline: they are interpreter artifacts, not code defects. All 12 pass
+    under .venv.
 
-    Measured: .venv is NOT slower — 65-test subset ran 54.4s under .venv vs
-    57.8s under system Python, both at ~8% CPU (these tests block on the
-    refused db-agent connection, which dominates either way).
+    Switching this to .venv was tried and REVERTED, because the full suite
+    under .venv does not finish:
 
-    Falls back to sys.executable when .venv is absent, so CI or a
-    container that installs requirements globally still works.
+        full suite, system python      187s   (25 failed)
+        full suite, .venv              >28 min, killed
+        test files 71-88, system       20s
+        test files 71-88, .venv        >500s, killed
+        each of those files ALONE      <30s total
+
+    So it is an interaction between files under .venv, not one slow test.
+    Prime suspect: test_logging_config installs a global JSON log handler
+    that only constructs when pythonjsonlogger is importable; background
+    threads then log into a closed pytest capture stream
+    ("ValueError: I/O operation on closed file"). NOT CONFIRMED.
+
+    Until that is root-caused, system Python is the correct choice: a
+    3-minute gate with 12 known-subtracted failures beats a 30-minute gate
+    that may hang. Do not flip this without re-measuring the full suite.
     """
-    venv_py = os.path.join(CHAT, ".venv", "bin", "python")
-    return venv_py if os.path.exists(venv_py) else sys.executable
+    return sys.executable
 
 
 def run_tests():
