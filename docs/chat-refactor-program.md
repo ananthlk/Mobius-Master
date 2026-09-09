@@ -263,6 +263,32 @@ synthetic benchmark. It answers "what is actually working" and it re-runs, so dr
 becomes measurable instead of anecdotal. Same discipline as the refactor gate: a frozen
 corpus, compared against itself.
 
+**PROVIDER STATE: CAPTURE NOW AND LABEL IT — Ananth's ruling, 2026-09-09**, in answer
+to whether to wait for the Anthropic credit issue to clear. And his aim makes the label
+the control rather than a caveat: **lower latency with the SAME provider through the
+refactor.** So every later run is compared like-for-like against a Vertex-only fleet,
+and a provider change invalidates a comparison rather than explaining it.
+
+**The label must live in the DATA, not in this document.** A note here is not
+queryable; a stamp on the row is. `docs/chat-latency-provider-stamp.json` holds the
+baseline stamp, and the per-turn telemetry must carry the same fields, or in six weeks
+nobody can tell which runs are comparable.
+
+Stamp as captured, 24h to 2026-09-09 — 1,975 calls, 309 failures:
+
+```
+  vertex  gemini-2.5-flash   978 calls,  1 fail   avg  5,544ms  p50  4,669  p95 15,608
+  vertex  gemini-2.5-pro     691 calls,  9 fail   avg 21,172ms  p50 20,034  p95 38,486
+  anthropic  ALL 11 models — 100% failing since 2026-09-07T00:58:43Z
+  groq       126 of 133 failing; openai/gpt-oss-20b served 7 of 7
+```
+
+Two things I got wrong earlier and corrected in the stamp: groq is **per-model**
+failing, not per-provider — I had recorded it as 100% down. And the pro numbers are not
+a mean hiding a tail: **p50 is 20.0 seconds and p95 is 38.5.** The whole distribution
+is slow. Any per-module breakdown has to explain where a 20-second median call sits
+inside a turn, because that is the number a user feels.
+
 **Open, for Eval:** whether the 22-question bank is the right instrument for a latency
 baseline as opposed to a quality one, what "fast mode" fixes and what it leaves
 variable, and how many runs before a difference is signal. Not my call.

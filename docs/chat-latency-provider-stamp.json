@@ -1,0 +1,65 @@
+{
+ "captured_at": "2026-09-09T05:46:37.902300+00:00",
+ "why": "Ananth 2026-09-09: capture the latency baseline now and LABEL the provider state, rather than waiting for the credit issue to clear. The label must live in the DATA so a later comparison can filter on it \u2014 a note in a document is not queryable.",
+ "providers_serving": [
+  "vertex"
+ ],
+ "providers_failing_100pct": [
+  "anthropic"
+ ],
+ "anthropic_last_success": "2026-09-07T00:58:43Z",
+ "breaker_state": "open on every stage \u2014 recent avg exceeds 3.0x the MODEL_ROSTER seed, and the seed never re-grounds because model_performance_by_stage is filtered on variant_id='default' which the writer never populated",
+ "calls_24h": 1975,
+ "failures_24h": 309,
+ "served": [
+  {
+   "provider": "vertex",
+   "model": "gemini-2.5-flash",
+   "calls": 978,
+   "ok": 977,
+   "avg_ms": 5544.0,
+   "p50_ms": 4669.0,
+   "p95_ms": 15608.0
+  },
+  {
+   "provider": "vertex",
+   "model": "gemini-2.5-pro",
+   "calls": 691,
+   "ok": 682,
+   "avg_ms": 21172.0,
+   "p50_ms": 20034.0,
+   "p95_ms": 38486.0
+  },
+  {
+   "provider": "groq",
+   "model": "openai/gpt-oss-20b",
+   "calls": 7,
+   "ok": 7,
+   "avg_ms": 753.0,
+   "p50_ms": 769.0,
+   "p95_ms": 1023.0
+  }
+ ],
+ "comparability_rule": "A later latency run is comparable to this baseline ONLY when its own provider stamp matches: same providers_serving, and anthropic/groq still absent. If the credit issue clears, the fleet regains fast candidates and every number here becomes an upper bound, not a reference.",
+ "providers_partial": {
+  "groq": "126 of 133 calls fail across llama-3.3-70b, llama-4-scout and llama-3.1-8b; openai/gpt-oss-20b served 7 of 7. So groq is per-MODEL failing, not per-provider \u2014 I initially recorded it as 100% failing and that was wrong."
+ },
+ "aim": "Ananth 2026-09-09: lower latency with the SAME provider through the refactor. So this stamp is not a caveat, it is the control \u2014 every later run is compared like-for-like against a Vertex-only fleet, and a provider change invalidates the comparison rather than explaining it.",
+ "reference_numbers": {
+  "gemini-2.5-flash": {
+   "calls": 978,
+   "fail": 1,
+   "avg_ms": 5544,
+   "p50_ms": 4669,
+   "p95_ms": 15608
+  },
+  "gemini-2.5-pro": {
+   "calls": 691,
+   "fail": 9,
+   "avg_ms": 21172,
+   "p50_ms": 20034,
+   "p95_ms": 38486
+  }
+ },
+ "what_to_watch": "gemini-2.5-pro p95 is 38.5 SECONDS and its p50 is 20.0s \u2014 the mean is not hiding a tail, the whole distribution is slow. flash p50 4.7s / p95 15.6s. Any per-module breakdown has to explain where a 20-second median call sits inside a turn, because that is the number a user feels."
+}
