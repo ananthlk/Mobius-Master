@@ -489,6 +489,32 @@ and nothing in the live path ever calls it, reads it back, or persists what it p
 Each instance looks healthy in isolation. The code is present, the tests pass, the docstring
 describes real intent. The capability is simply absent at runtime, and health stays green.
 """, findings=[
+ ("bad", "OWNER(chat): _rich_evidence IS AN UNRECORDED BRANCH THAT CHANGES ROUND COUNT — "
+         "invisible drift inside the latency instrument. Found by Chat Master while answering "
+         "Eval's control-set question, verified by me at react_loop.py:357-358 and :5864.\n\n"
+         "  _FAST_MODE_MIN_CHUNKS = 3 · _FAST_MODE_MIN_CHARS = 500\n"
+         "  _rich_evidence = (_chunk_count >= 3 and _total_chars >= 500) -> early-exit synthesis\n\n"
+         "It is NOT SELECTABLE: no request field, no env var — grepped and confirmed. It fires "
+         "on what RETRIEVAL HAPPENS TO RETURN, so the same question takes the early exit or "
+         "does not depending on the corpus that day. Early exit means fewer rounds, fewer "
+         "rounds means fewer LLM calls, and LLM call count is the routing multiplier the "
+         "latency baseline is trying to hold still.\n\n"
+         "So a run where 8 of 22 questions exit early is NOT COMPARABLE to one where 3 did, "
+         "and NOTHING IN TODAY'S DATA WOULD REVEAL THAT HAPPENED. A branch that changes round "
+         "count and is never recorded is drift you cannot see — the same shape as every other "
+         "finding on this node, sitting inside the instrument built to detect drift.\n\n"
+         "RECORD IT PER TURN, do not try to force it. You cannot pin a content-triggered "
+         "branch; you can log whether it fired, which makes two runs comparable or honestly "
+         "incomparable."),
+ ("watch", "NAMING COLLISION, recorded so the next reader is not misled: 'fast mode' means TWO "
+           "DIFFERENT THINGS. To Ananth it means chat_mode=copilot — the fast caller mode, "
+           "selectable per request, and that is the settled meaning for the latency exercise. "
+           "In react_loop.py it names the _rich_evidence early exit above, plus "
+           "_build_fast_mode_hedge, _fast_mode_synthesize_answer and "
+           "_FAST_MODE_SYNTHESIS_SYSTEM. Both are real and they are not the same mechanism. "
+           "Eval's P2b answer inferred the first from the phrase and the inference was right "
+           "about intent while the code says something else — which is exactly how a reader "
+           "arrives at _FAST_MODE_MIN_CHUNKS and concludes it configures copilot."),
  ("bad", "AN IMPORT EDGE IS NOT A CONSUMPTION EDGE — Chat Master's generalisation of the "
          "P1a orphan, and it belongs beside the producer/consumer class because it is how that "
          "class hides from a sweep.\n\n"

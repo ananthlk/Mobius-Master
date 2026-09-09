@@ -24,7 +24,7 @@
     "owner": "chat + Eval",
     "gate": "every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
-    "n": 18
+    "n": 19
    },
    {
     "id": "P3",
@@ -811,7 +811,7 @@
    "id": "phi_gate",
    "path": "app/skills/phi_gate.py",
    "kind": "cross-cutting",
-   "loc": 95,
+   "loc": 106,
    "role": "PHI gate for feedback capture \u2014 scrub-and-keep before free-text feedback",
    "role_full": "PHI gate for feedback capture \u2014 scrub-and-keep before free-text feedback\nspreads to the classifier LLM, the DB, or task-manager.\n\nContract (PHI Classifier agent, docs/hipaa-phi-policy.md):\n  1. /message-check(verbatim) \u2192 gate \u2208 {clean, phi, indeterminate}.\n  2. clean            \u2192 pass the raw text through.\n  3. phi | indeterminate \u2192 /redact(verbatim):\n       redaction \u2208 {clean, masked} \u2192 use the REDACTED text downstream (scrubbed).\n       redaction = suppressed OR /redact unreachable \u2192 DROP the text (keep only\n                   category/metadata).\nFail-closed: any classifier error/timeout/non-200 is treated as PHI (never\nsilently pass unverified text). We scrub REGARDLESS of hipaa-mode for ",
    "api": [
@@ -1194,6 +1194,14 @@
    "rating": "red",
    "depth": "code",
    "findings": [
+    [
+     "bad",
+     "OWNER(chat): _rich_evidence IS AN UNRECORDED BRANCH THAT CHANGES ROUND COUNT \u2014 invisible drift inside the latency instrument. Found by Chat Master while answering Eval's control-set question, verified by me at react_loop.py:357-358 and :5864.\n\n  _FAST_MODE_MIN_CHUNKS = 3 \u00b7 _FAST_MODE_MIN_CHARS = 500\n  _rich_evidence = (_chunk_count >= 3 and _total_chars >= 500) -> early-exit synthesis\n\nIt is NOT SELECTABLE: no request field, no env var \u2014 grepped and confirmed. It fires on what RETRIEVAL HAPPENS TO RETURN, so the same question takes the early exit or does not depending on the corpus that day. Early exit means fewer rounds, fewer rounds means fewer LLM calls, and LLM call count is the routing multiplier the latency baseline is trying to hold still.\n\nSo a run where 8 of 22 questions exit early is NOT COMPARABLE to one where 3 did, and NOTHING IN TODAY'S DATA WOULD REVEAL THAT HAPPENED. A branch that changes round count and is never recorded is drift you cannot see \u2014 the same shape as every other finding on this node, sitting inside the instrument built to detect drift.\n\nRECORD IT PER TURN, do not try to force it. You cannot pin a content-triggered branch; you can log whether it fired, which makes two runs comparable or honestly incomparable."
+    ],
+    [
+     "watch",
+     "NAMING COLLISION, recorded so the next reader is not misled: 'fast mode' means TWO DIFFERENT THINGS. To Ananth it means chat_mode=copilot \u2014 the fast caller mode, selectable per request, and that is the settled meaning for the latency exercise. In react_loop.py it names the _rich_evidence early exit above, plus _build_fast_mode_hedge, _fast_mode_synthesize_answer and _FAST_MODE_SYNTHESIS_SYSTEM. Both are real and they are not the same mechanism. Eval's P2b answer inferred the first from the phrase and the inference was right about intent while the code says something else \u2014 which is exactly how a reader arrives at _FAST_MODE_MIN_CHUNKS and concludes it configures copilot."
+    ],
     [
      "bad",
      "AN IMPORT EDGE IS NOT A CONSUMPTION EDGE \u2014 Chat Master's generalisation of the P1a orphan, and it belongs beside the producer/consumer class because it is how that class hides from a sweep.\n\nP1a asked 'does anything IMPORT this?' The question that establishes liveness is 'does anything CONSUME this?' A re-export makes those two give opposite answers: planner/__init__.py re-exported `parse`, so parser.py had an importer for its entire dead life. The same trick works three other ways \u2014 a module imported by something itself unreached, a package nobody imports, a name referenced only from a fixture. All four look live to a grep.\n\nTHE FIX IS REACHABILITY, NOT HOPS: resolve __init__ re-exports to the defining module, then ask whether any module TRANSITIVELY IMPORTED FROM AN ENTRY POINT (app/main.py, app/worker/run.py) consumes the name. Present-in-the-tree is not reachable. Chat Master's own note is the strongest argument for it: this check would have flagged the entire planner subtree the INSTANT stages/plan.py was deleted, so it pays for itself on the very phase that created the orphan rather than a phase later.\n\nSame family as the swallowed ImportError in the credentialing router \u2014 a signal that reports CONNECTED while nothing flows."
