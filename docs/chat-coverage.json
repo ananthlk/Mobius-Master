@@ -1,0 +1,286 @@
+{
+ "generated_by": "scripts/platform/gen_coverage.py",
+ "layer": "1 \u2014 reachability (Eval's Q5 ruling); Layer 2 tags are collected, and GUARDED requires Eval's audit of the tag",
+ "tests_scanned": 173,
+ "counts": {
+  "ABSENT": 6,
+  "IMPORTED-NOT-CALLED": 1,
+  "PERIPHERAL": 17,
+  "REMOVED": 7
+ },
+ "nodes": [
+  {
+   "node": "active_context",
+   "state": "ABSENT",
+   "module": "app.pipeline.active_context",
+   "direct": 0,
+   "reached": 0,
+   "tags": [],
+   "rating": "amber"
+  },
+  {
+   "node": "curator_tools",
+   "state": "ABSENT",
+   "module": "app.pipeline.curator_tools",
+   "direct": 0,
+   "reached": 0,
+   "tags": [],
+   "rating": "amber"
+  },
+  {
+   "node": "jurisdiction",
+   "state": "ABSENT",
+   "module": "app.state.jurisdiction",
+   "direct": 0,
+   "reached": 0,
+   "tags": [],
+   "rating": "red"
+  },
+  {
+   "node": "personalization",
+   "state": "ABSENT",
+   "module": "app.pipeline.personalization",
+   "direct": 0,
+   "reached": 0,
+   "tags": [],
+   "rating": "amber"
+  },
+  {
+   "node": "stages",
+   "state": "ABSENT",
+   "module": "app.pipeline.stages",
+   "direct": 0,
+   "reached": 0,
+   "tags": [],
+   "rating": "green"
+  },
+  {
+   "node": "state_load",
+   "state": "ABSENT",
+   "module": "app.stages.state_load",
+   "direct": 0,
+   "reached": 0,
+   "tags": [],
+   "rating": "red"
+  },
+  {
+   "node": "parsing",
+   "state": "IMPORTED-NOT-CALLED",
+   "module": "app.pipeline.react.parsing",
+   "direct": 1,
+   "reached": 0,
+   "tags": [],
+   "rating": "amber"
+  },
+  {
+   "node": "capabilities",
+   "state": "PERIPHERAL",
+   "module": "app.stages.agents.capabilities",
+   "direct": 2,
+   "reached": 1,
+   "tags": [],
+   "rating": "amber"
+  },
+  {
+   "node": "context",
+   "state": "PERIPHERAL",
+   "module": "app.pipeline.context",
+   "direct": 45,
+   "reached": 43,
+   "tags": [],
+   "rating": "amber"
+  },
+  {
+   "node": "critic",
+   "state": "PERIPHERAL",
+   "module": "app.pipeline.react.critic",
+   "direct": 1,
+   "reached": 1,
+   "tags": [],
+   "rating": "amber"
+  },
+  {
+   "node": "emit_envelope",
+   "state": "PERIPHERAL",
+   "module": "app.communication.emit_envelope",
+   "direct": 4,
+   "reached": 4,
+   "tags": [],
+   "rating": "red"
+  },
+  {
+   "node": "feedback_signal",
+   "state": "PERIPHERAL",
+   "module": "app.pipeline.react.feedback_signal",
+   "direct": 1,
+   "reached": 1,
+   "tags": [],
+   "rating": "amber"
+  },
+  {
+   "node": "governor",
+   "state": "PERIPHERAL",
+   "module": "app.pipeline.react.governor",
+   "direct": 1,
+   "reached": 1,
+   "tags": [],
+   "rating": "amber"
+  },
+  {
+   "node": "integrate",
+   "state": "PERIPHERAL",
+   "module": "app.stages.integrate",
+   "direct": 10,
+   "reached": 7,
+   "tags": [],
+   "rating": "amber"
+  },
+  {
+   "node": "llm_manager",
+   "state": "PERIPHERAL",
+   "module": "app.services.llm_manager",
+   "direct": 2,
+   "reached": 2,
+   "tags": [],
+   "rating": "amber"
+  },
+  {
+   "node": "message_resolver",
+   "state": "PERIPHERAL",
+   "module": "app.pipeline.message_resolver",
+   "direct": 1,
+   "reached": 1,
+   "tags": [],
+   "rating": "amber"
+  },
+  {
+   "node": "orchestrator",
+   "state": "PERIPHERAL",
+   "module": "app.pipeline.orchestrator",
+   "direct": 3,
+   "reached": 1,
+   "tags": [],
+   "rating": "amber"
+  },
+  {
+   "node": "phi_gate",
+   "state": "PERIPHERAL",
+   "module": "app.skills.phi_gate",
+   "direct": 1,
+   "reached": 1,
+   "tags": [],
+   "rating": "amber"
+  },
+  {
+   "node": "prompts",
+   "state": "PERIPHERAL",
+   "module": "app.pipeline.react.prompts",
+   "direct": 13,
+   "reached": 10,
+   "tags": [],
+   "rating": "amber"
+  },
+  {
+   "node": "react_loop",
+   "state": "PERIPHERAL",
+   "module": "app.pipeline.react_loop",
+   "direct": 38,
+   "reached": 19,
+   "tags": [],
+   "rating": "red"
+  },
+  {
+   "node": "react_retry_guard",
+   "state": "PERIPHERAL",
+   "module": "app.pipeline.react_retry_guard",
+   "direct": 4,
+   "reached": 4,
+   "tags": [],
+   "rating": "green"
+  },
+  {
+   "node": "retrieval_budget",
+   "state": "PERIPHERAL",
+   "module": "app.services.retrieval_budget",
+   "direct": 1,
+   "reached": 1,
+   "tags": [],
+   "rating": "green"
+  },
+  {
+   "node": "round0",
+   "state": "PERIPHERAL",
+   "module": "app.pipeline.react.round0",
+   "direct": 1,
+   "reached": 1,
+   "tags": [],
+   "rating": "amber"
+  },
+  {
+   "node": "tool_manifest",
+   "state": "PERIPHERAL",
+   "module": "app.pipeline.tool_manifest",
+   "direct": 5,
+   "reached": 2,
+   "tags": [],
+   "rating": "red"
+  },
+  {
+   "node": "clarification",
+   "state": "REMOVED",
+   "module": "app.state.clarification",
+   "direct": 0,
+   "reached": 0,
+   "tags": []
+  },
+  {
+   "node": "clarify",
+   "state": "REMOVED",
+   "module": "app.stages.clarify",
+   "direct": 0,
+   "reached": 0,
+   "tags": []
+  },
+  {
+   "node": "classify",
+   "state": "REMOVED",
+   "module": "app.stages.classify",
+   "direct": 0,
+   "reached": 0,
+   "tags": []
+  },
+  {
+   "node": "continuity",
+   "state": "REMOVED",
+   "module": "app.stages.continuity",
+   "direct": 0,
+   "reached": 0,
+   "tags": []
+  },
+  {
+   "node": "credentialing_envelope",
+   "state": "REMOVED",
+   "module": "app.pipeline.credentialing_envelope",
+   "direct": 0,
+   "reached": 0,
+   "tags": []
+  },
+  {
+   "node": "plan",
+   "state": "REMOVED",
+   "module": "app.stages.plan",
+   "direct": 0,
+   "reached": 0,
+   "tags": []
+  },
+  {
+   "node": "resolve",
+   "state": "REMOVED",
+   "module": "app.stages.resolve",
+   "direct": 0,
+   "reached": 0,
+   "tags": []
+  }
+ ],
+ "tags_found": {}
+}

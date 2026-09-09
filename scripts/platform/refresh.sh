@@ -21,7 +21,7 @@ OUT="$ROOT/docs/chat-schema"
 DATA="$OUT/chat-dev.json"
 mkdir -p "$OUT"
 
-echo "── 1/5  parse the flow from orchestrator.py  ────────────────────────"
+echo "── 1/6  parse the flow from orchestrator.py  ────────────────────────"
 # THIS STEP WAS MISSING and the page silently drew a deleted branch for hours.
 # gen_chat_submodules.py is what re-parses run_pipeline, so leaving it out of
 # the chain meant the flow (branch_on, classic_path, react_phases) was frozen
@@ -30,16 +30,19 @@ echo "── 1/5  parse the flow from orchestrator.py  ────────�
 # drift this whole file exists to prevent, in the tool meant to prevent it.
 python3 scripts/platform/gen_chat_submodules.py > docs/chat-submodules.json
 
-echo "── 2/5  extract + merge  ────────────────────────────────────────────"
+echo "── 2/6  extract + merge  ────────────────────────────────────────────"
 python3 scripts/platform/gen_chat_dev.py "$DATA"
 
-echo "── 3/5  page  ───────────────────────────────────────────────────────"
+echo "── 3/6  page  ───────────────────────────────────────────────────────"
 python3 scripts/platform/gen_chat_dev_page.py "$DATA" "$OUT/index.html"
 
-echo "── 4/5  bug log  ────────────────────────────────────────────────────"
+echo "── 4/6  bug log  ────────────────────────────────────────────────────"
 python3 scripts/platform/gen_findings_log.py
 
-echo "── 5/5  roadmap  ────────────────────────────────────────────────────"
+echo "── 5/6  coverage (Eval Layer 1: reachability)  ──────────────────────"
+python3 scripts/platform/gen_coverage.py
+
+echo "── 6/6  roadmap  ────────────────────────────────────────────────────"
 python3 scripts/platform/gen_roadmap.py
 
 if [ "${1:-}" = "--eval" ]; then
