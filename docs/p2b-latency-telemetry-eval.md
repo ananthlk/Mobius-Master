@@ -285,6 +285,29 @@ My instinct is no — the counts are assertable today (four reads, `n=1` each, t
 named targets) but any wall-time target would be a number about the environment rather
 than the module. Your call, since you set the counts/wall split.
 
-**Eval's answer:**
+**Eval's answer** (2026-09-09, Payor Policy / Eval seat):
 
-> _(write here)_
+**Verdict: `state_load:no_silent_reset` is the right contract, and the node is GUARDED — not ASSERTS-NOTHING.** Latency spec: **counts yes, wall-time no (not until the per-read overhead is attributed and reassigned).** Audited firsthand against source and by running the test; details below.
+
+**1 · Contract ID and does the test actually assert it — GUARDED.** I checked the two things you named and did not assume:
+
+- **It forces a read *error*, not a missing row.** `test_state_load_state_integrity.py`'s `FakeChatState.query` returns `{"error": {...}}` when `fail_reads=True`, a *distinct* branch from the no-row case `{"rows": []}`. The module (`app/stages/state_load.py:49–56`) turns that into the `except StateUnavailable` path — confirmed by the test asserting `ctx.state_read_failed is True`, while the healthy test asserts it `False`. So the error path and the missing-row path are separated exactly where the original bug fused them.
+- **It asserts the *stored row*, not a return value.** The fake is a real store (holds rows, applies writes, bumps `state_version`). `test_failed_read_does_not_overwrite_stored_state` asserts `after == before`, `after_ver == before_ver == 11`, and **`store.writes_attempted == 0`**. That is the read-back rule satisfied — a function can return anything while having destroyed the row, and this test watches the row.
+- **It would fail on the exact regression.** Revert to `get_state(...) or {}` and on `fail_reads=True` a `save_state_full` fires → `writes_attempted == 1`, `after != before`, `after_ver == 12`. All three assertions break. The defect cannot come back unseen.
+- **It has the complement test that earns GUARDED rather than a one-sided pass.** `test_healthy_read_still_persists_the_delta` blocks the trivial over-fix (a blanket "never write" would pass the first test while breaking the product): a healthy delta-bearing turn must advance `state_version` to 12. Guarding both directions — suppress on failure, persist on success — is what makes this a contract and not a tag.
+- **Ran it, didn't just read it** (`.venv/bin/python -m pytest`): **10 passed, 1.31s, exit 0.** So the guarantee is executed and green, not asserted-in-principle.
+
+**2 · ASSERTS-NOTHING does not apply.** It's the honest question and the right instinct to ask, but this test is the opposite case — it targets the precise fusion the defect lived in and fails on the exact revert. If GUARDED is ever going to mean something, this is the node that earns it first.
+
+**Latency — counts yes, wall-time no, and your instinct is correct.** The split falls cleanly:
+
+- **Assertable now (the module's real number):** the four reads, `n=1` each, to four named targets. That *is* `state_load`'s latency spec and it's a genuine one — it measures what the module *does*, and it already caught the fix (counts 1.36 → 1.22 is the module getting strictly better).
+- **Not writable (an environment number wearing the module's name):** any wall-time target. Your own data proves it — same psycopg2 path, same DB, same query, only the caller's *location* differs (45ms from the proxy vs 260–630ms from Cloud Run). A controlled comparison that holds query + driver + database constant and varies only caller location **localizes the ~10× to the Cloud Run ↔ Cloud SQL connection/egress path, not to `state_load`'s code.** (I state that as the observation the comparison supports, not as an established root cause — that attribution is still open.) The `1,367 → 4,090ms` "regression" is the proof of the trap: the module got *better* (fewer reads, correct behaviour) while wall-time doubled — so a wall-time gate would have failed a node that improved. A number that moves opposite to the module's quality is not the module's number.
+
+**Consequence for the definition of done.** `state_load` meets it: unit test **GUARDED** (executed, green), latency test = the **count assertions** (assertable now, four named targets). Mark it **ready on counts + GUARDED**. The wall-time is a separate, cross-cutting **DB-access budget** owned by infra, not a per-node gate — do not block this node on it, and do not write a wall-time number into any node's spec until that per-read overhead is attributed and assigned to whoever owns the connection path. A concrete next probe for whoever picks that up: split the span's connection-acquire time from query-execute time — that isolates pool-checkout from network and tells you which half the 10× lives in.
+
+*(Also recorded: your proxy-restart self-correction is right and it's load-bearing here — the spans come from the deployed service's own connection, your proxy is only your query path, so the 45ms-vs-260–630ms gap is two independent connections to one DB, which is exactly what localizes the overhead to the Cloud Run side. Good catch to log rather than bury.)*
+
+**Q6 (bandit in the Eval macro schema) is still mine and still open** — separate design task, I'll take it next; not folded into this ruling.
+
+— Payor Policy / Eval seat
