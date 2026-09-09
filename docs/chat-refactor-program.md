@@ -3,6 +3,11 @@
 **Status: DRAFT, awaiting sign-off. No refactor work starts until the sign-off table
 at the end is complete.**
 
+Tracked in **`docs/chat-refactor-roadmap.md`**, which is generated from the same
+findings and **fails the build when a bug is unassigned** — so a new finding is either
+sequenced into a phase or given an explicit reason for sitting outside the program.
+Phase definitions live in `scripts/platform/refactor_roadmap.py`.
+
 Companion to `docs/chat-schema-findings.md` (73 bugs · 66 checks · 60 verified-ok
 across 35 nodes), which is generated and must not be hand-edited. This document is
 hand-written: it sequences that inventory into work, and defines the pre-test /
@@ -13,8 +18,7 @@ eval / post-test gate every phase has to pass.
 ## 0. The finding that shapes the whole plan
 
 **Most of what we want to change is currently unobservable, so it cannot be
-baselined.** This is not a caveat — it is the reason Phase 0 exists and blocks
-everything else.
+baselined.** This is why instrumentation is P2 and blocks everything after it.
 
 Concretely, from the findings log:
 
@@ -29,8 +33,20 @@ Concretely, from the findings log:
 - **16 of 35 nodes have no test file**, including 2 of the 5 reds.
 
 A refactor measured against a baseline this thin will look successful whether or not
-it is. Phase 0 is not preparation for the work; it is the work that makes the rest
-provable.
+it is. Instrumentation is not preparation for the work; it is the work that makes the
+rest provable.
+
+**Why deletion still goes first (Ananth, 2026-09-08).** Two reasons, and the second
+is the stronger one. Clearing dead code makes the remaining list legible — you stop
+reasoning about code that will not exist. And deletion is the one phase whose gate
+needs nothing we do not already emit: I1–I7 are all computable from today's
+telemetry, which is how every measurement in the findings log was taken.
+
+**What that ordering costs, stated rather than hidden: P1 cannot claim a latency
+win.** The latency baseline does not exist until P2. Deleting unreachable code should
+not move latency at all — that is the argument for it being safe to lead, and it is
+also exactly why it forfeits the claim. The reference numbers for "better and faster"
+are captured at the END of P2, and every phase after that is measured against them.
 
 ---
 
@@ -82,8 +98,10 @@ do.
 
 Ordered by **what unblocks what**, not by severity:
 
-1. Anything that makes the system observable comes first — you cannot baseline blind.
-2. Deletion before restructuring — do not refactor code you are about to remove.
+1. Deletion first — it makes the rest of the list legible, and its gate needs only
+   telemetry we already have.
+2. Instrumentation second — nothing after this point can be measured without it, and
+   "faster" is unprovable until it lands.
 3. Unify a decision before moving it — do not build a UX over a policy that lives in
    two places.
 4. Split large modules last — the highest-risk, highest-blast-radius work, done when
@@ -93,22 +111,7 @@ Ordered by **what unblocks what**, not by severity:
 
 ## 3. Phases
 
-### Phase 0 — Make it measurable  ·  BLOCKING  ·  owner: chat + Eval
-
-Nothing else starts until this lands.
-
-| Item | From node | Why it blocks |
-|---|---|---|
-| governor emits its own decisions | `governor` | the round policy is invisible; I4 cannot be asserted from a module that logs nothing |
-| `react_trace` emit failure stops being a `logger.debug` swallow | `react_loop` | the single observability window can fail silently |
-| persist `keep` | `react_loop` | curation is untestable retrospectively without it |
-| effective-config surface | `governor` | 116 knobs on invisible defaults; "what was deployed" is unanswerable at baseline time |
-| latency per segment | `orchestrator` | 19 of 25 modules untimed; no phase can claim a latency effect |
-
-**Metric:** every invariant I1–I7 computable from emitted telemetry alone, without a
-DB join written by hand for the occasion.
-
-### Phase 1 — Delete  ·  owner: chat  ·  ratifier: DB seat (tables), Tech Review (contract)
+### P1 — Delete  ·  LEADS  ·  owner: chat  ·  ratifier: DB seat (tables), Tech Review (contract)
 
 Lowest risk in the program and the largest clarity gain. Nothing here changes live
 behaviour if the measurements hold.
@@ -120,9 +123,27 @@ behaviour if the measurements hold.
 | credentialing workflow | 8,994 lines + 125 refs in shared modules | 11 of 13 tables empty; `provider-roster-credentialing` skill owns the domain | **dev DB only** — prod row counts and route callers not checked; the 125 scattered refs are the real work, not the file deletions |
 
 **Metric:** lines removed; `log-and-continue` handler count down; **zero** invariant
-movement. If any invariant moves, the deletion was not dead code.
+movement. If any invariant moves, the deletion was not dead code. Explicitly NOT a
+latency metric — the baseline for that does not exist until P2.
 
-### Phase 2 — One decision point  ·  owner: chat  ·  ratifier: Tech Review
+### P2 — Instrument: latency and decisions  ·  BLOCKING for P3–P5  ·  owner: chat + Eval
+
+Nothing after this point can be measured without it.
+
+| Item | From node | Why it blocks |
+|---|---|---|
+| governor emits its own decisions | `governor` | the round policy is invisible; I4 cannot be asserted from a module that logs nothing |
+| `react_trace` emit failure stops being a `logger.debug` swallow | `react_loop` | the single observability window can fail silently |
+| persist `keep` | `react_loop` | curation is untestable retrospectively without it |
+| effective-config surface | `governor` | 116 knobs on invisible defaults; "what was deployed" is unanswerable at baseline time |
+| latency per segment | `orchestrator` | 19 of 25 modules untimed; no phase can claim a latency effect |
+
+**Metric:** every segment timed — 19 of 25 modules are untimed today — and every
+invariant I1–I7 computable from emitted telemetry alone, without a DB join written by
+hand for the occasion. **The latency numbers at the end of this phase are the
+reference every later phase is measured against.**
+
+### P3 — One decision point  ·  owner: chat  ·  ratifier: Tech Review
 
 | Item | From node |
 |---|---|
@@ -136,9 +157,9 @@ audited where `terminated_by == budget_exhausted`: 0 → the rule's stated targe
 I4 and I5 will move **by design** here — this is the one phase where that is the
 point, and the expected delta must be predicted before the cut and compared after.
 
-### Phase 3 — Split  ·  owner: chat  ·  ratifier: Tech Review + Eval
+### P4 — Split  ·  owner: chat  ·  ratifier: Tech Review + Eval
 
-Only after the gate has worked three times.
+Only after the gate has worked three times, and with the P2 latency baseline in hand.
 
 | Target | Size | Split named in the findings |
 |---|---|---|
@@ -150,7 +171,7 @@ Only after the gate has worked three times.
 **Metric:** every extracted unit has a test file; total lines roughly flat (a split
 that shrinks the total is doing something else too, and should be a separate change).
 
-### Phase 4 — Config UX  ·  owner: chat + Prompt Studio owner  ·  ratifier: Tech Review
+### P5 — Config UX  ·  owner: chat + Prompt Studio owner  ·  ratifier: Tech Review
 
 The governor's `_MODE_DEFAULTS`, the directive→composition map and the
 role→reasoning_depth map move to the control plane the Prompt Composition Studio
@@ -185,7 +206,7 @@ specific ruling, not general agreement.
 
 | Seat | What they are ratifying | Status |
 |---|---|---|
-| **Chat Master** | that the 16 chat-assigned bugs are correctly theirs and correctly described; the Phase 1→4 order; the `master_objective` revive-or-retire call | ☐ |
+| **Chat Master** | that the 16 chat-assigned bugs are correctly theirs and correctly described; the P1→P5 order; the `master_objective` revive-or-retire call | ☐ |
 | **DB seat** | the table evidence behind the deletions (11 of 13 empty), the FK set, and that `chat_state` / `chat_turns` are safe to read as a replay corpus | ☐ |
 | **Technical Review** | the test gate itself — whether invariants I1–I7 are the right assertions and whether the phase order is sound | ☐ |
 | **Eval** | the replay corpus design: stratification, sample size, and what it can and cannot prove — specifically that answer quality is out of scope for the invariant set | ☐ |

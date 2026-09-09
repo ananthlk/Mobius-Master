@@ -215,8 +215,33 @@ def main():
     if missing:
         print("NO CONTENT WRITTEN FOR:", missing, file=sys.stderr)
 
+    # Roadmap rollup — imported from the same mapping gen_roadmap.py uses, so the
+    # page and the tracker cannot disagree about how many bugs a phase holds.
+    roadmap = None
+    try:
+        from refactor_roadmap import PHASES as _RM_PHASES, RULES as _RM_RULES, OUT_OF_PROGRAM as _RM_OUT
+        _counts = {p["id"]: 0 for p in _RM_PHASES}
+        _outside = 0
+        for _node, _rec in content.items():
+            for _kind, _txt in _rec.get("findings", []):
+                if _kind != "bad":
+                    continue
+                _t = re.sub(r"^OWNER\([a-z-]+\):\s*", "", _txt)
+                _hit = next((ph for ph, nd, sub in _RM_RULES
+                             if (nd is None or nd == _node) and sub in _t), None)
+                if _hit:
+                    _counts[_hit] += 1
+                elif any(nd == _node and sub in _t for nd, sub, _b, _r in _RM_OUT):
+                    _outside += 1
+        roadmap = {"phases": [{**{k: p.get(k) for k in ("id", "name", "owner", "gate", "blocks")},
+                               "n": _counts[p["id"]]} for p in _RM_PHASES],
+                   "outside": _outside}
+    except Exception as _rm_exc:
+        print(f"roadmap rollup skipped: {_rm_exc}", file=sys.stderr)
+
     print(json.dumps({
         "generated_by": "scripts/platform/gen_chat_dev.py",
+        "roadmap": roadmap,
         "missing_content": missing,
         "live_env_service": "mobius-chat (us-central1)",
         "integrate_passes": integrate_passes,
