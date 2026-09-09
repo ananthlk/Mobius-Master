@@ -189,6 +189,30 @@ impact is: most payer policy documents WITH a references section are blocked on 
 lane specifically — the exact document class this lane exists to capture. Escalated to Ananth
 by Extension; Crawler concurs and adds the lane facts above.
 
+## 2.8 · PHI-gate escalation to the PHI classifier owner (Extension → Chat Master, 2026-09-09)
+
+Escalated by Extension on Ananth's explicit direction, with §2.7's facts attached. Sent to
+**Chat Master** (owner of `mobius-phi-classifier` — regex + Presidio NER — and the `/chat/upload`
+hop). Two SEPARATE asks; conflating them weakens both.
+
+**Ask 1 — scoped precision fix (does NOT relax recall generally).** Suppress `PERSON`/"Name"
+flags ONLY inside reference/bibliography-shaped regions (numbered citation lists, journal-title
+context), never in prose. The Aetna CPB block is Presidio NER flagging ~87 citation surnames as
+PERSON — structurally not patient identifiers. This is §2.7's proposed scoping.
+
+**Ask 2 — attestation admit-mode (Ananth's ask).** The upload response already carries
+`hipaa_mode_allowed` (false today). The extension's per-site PHI acknowledgement toggle is an
+attestation, recorded in the authorization log with a `task_id`. When the user has attested,
+the extension will signal it on `/chat/upload` (a `phi_attested`/`hipaa_mode` field, analogous
+to the chat POST's existing `phi_override`); the gate then **admits the doc tagged PHI-attested
++ attributed + logged** instead of hard-blocking. Fail-closed stays the default; the override is
+explicit, per-site, attested, auditable. Compliance shape owned by Chat Master + Crawler; the
+extension wires whatever field/handshake they specify (a §2.8-Ext response block will record it).
+
+**Status:** escalated (message queued to Chat Master; recorded here as the lossless channel).
+Awaiting the PHI classifier owner's ruling on both asks. Distinct from TODO-B (the provenance
+passthrough on the same hop).
+
 ## 3 · Sign-offs
 
 - Crawler (compliance frame §1 + review of §2): ✍ **signed — Crawler Agent / 2026-09-09.** §2
