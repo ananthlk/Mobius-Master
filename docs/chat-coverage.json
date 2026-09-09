@@ -1,7 +1,7 @@
 {
  "generated_by": "scripts/platform/gen_coverage.py",
  "layer": "1 \u2014 reachability (Eval's Q5 ruling); Layer 2 tags are collected, and GUARDED requires Eval's audit of the tag",
- "tests_scanned": 174,
+ "tests_scanned": 175,
  "counts": {
   "ABSENT": 6,
   "IMPORTED-NOT-CALLED": 1,

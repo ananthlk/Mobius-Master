@@ -11,7 +11,7 @@ the POST half of the gate, not only as a report.
 
 | collected | passed | failed | errors | skipped | wall |
 |---:|---:|---:|---:|---:|---:|
-| 2534 | 2515 | 14 | 0 | 5 | 165.6s |
+| 2543 | 2524 | 14 | 0 | 5 | 198.4s |
 
 Known-failing baseline: **14** tests, frozen 2026-09-08 before any P1a
 deletion. Ananth's ruling — these predate the program, so the gate SUBTRACTS them.
@@ -83,6 +83,6 @@ deterministic replay harness yet (P1.1). A flip would be unattributable.
 
 | modules | loc | except handlers | log-and-continue | bare except |
 |---:|---:|---:|---:|---:|
-| 205 | 65,524 | 687 | 403 | 0 |
+| 205 | 66,157 | 694 | 407 | 0 |
 
 I7 is monotonic: the log-and-continue count may fall, never rise.

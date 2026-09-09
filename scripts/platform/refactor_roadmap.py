@@ -85,6 +85,7 @@ RULES = [
     ("P2", "model_registry", "THE CIRCUIT BREAKER DID NOT PULL A PROVIDER"),
     ("P2", "model_registry", "THE BANDIT HAS NO SURFACE"),
     ("P2", "emit_envelope", "TOOL SELECTION IS SPORADIC"),
+    ("P2", "emit_envelope", "AN UN-INSTRUMENTED EXTERNAL WAIT"),
     ("P2", "emit_envelope", "A READ-BACK OF THE WRONG ARTIFACT"),
     ("P2", "emit_envelope", "_rich_evidence IS AN UNRECORDED BRANCH"),
     ("P2", "emit_envelope", "AN IMPORT EDGE IS NOT A CONSUMPTION EDGE"),
