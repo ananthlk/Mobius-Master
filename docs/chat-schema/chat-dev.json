@@ -24,7 +24,7 @@
     "owner": "chat + Eval",
     "gate": "every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
-    "n": 21
+    "n": 23
    },
    {
     "id": "P3",
@@ -97,10 +97,10 @@
   "shared_post_guard": "ctx.react_bypass_integrate \u2014 set in react_loop, skips the integrator and publishes the ReAct answer directly",
   "shared_post_guard_lines": [
    541,
-   790,
-   794,
-   921,
-   966
+   820,
+   824,
+   951,
+   996
   ],
   "exit": "publish",
   "react_phases": [
@@ -129,7 +129,7 @@
      "react_retry_guard",
      "curator_tools"
     ],
-    "cite": 5648,
+    "cite": 5670,
     "note": "Dispatches tools, and refuses a repeat of a call that already failed."
    },
    {
@@ -140,7 +140,7 @@
      "feedback_signal",
      "completion_extension_gate"
     ],
-    "cite": 5280,
+    "cite": 5302,
     "note": "Audits the draft against sources and decides whether to go round again."
    }
   ],
@@ -620,9 +620,10 @@
    "config": [],
    "writes": [],
    "callers": [
-    "app.pipeline.react_loop"
+    "app.pipeline.react_loop",
+    "app.telemetry.spans"
    ],
-   "fan_in": 1,
+   "fan_in": 2,
    "how": "The token adjuster. Task #98, and it exists because RAG was guessing.\n\nRAG's Structure stage used a static per-caller_mode table (chat.default 3000,\nchat.thinking 16000) for how many tokens of retrieved context it could afford, because\nchat never sent a real number. Ananth's correction was that RAG does not have to guess:\nchat knows its own context window, its system prompt, the conversation so far, and how\nmuch it must reserve to generate an answer.\n\n  token_budget_for_retrieval = context_window\n                             - system_prompt_tokens\n                             - conversation_history_tokens\n                             - answer_generation_reserve\n\nconversation_history_tokens is the term that moves \u2014 a thread's first turn and its\ntwentieth differ by thousands of tokens \u2014 so the budget is genuinely per-turn rather than\nper-mode. react_loop computes it at five separate call sites and passes it with the RAG\nrequest.",
    "rating": "green",
    "depth": "code",
@@ -795,9 +796,10 @@
     "app.pipeline.react_loop",
     "app.services.post_run_adjudication",
     "app.skills.builtin.corpus_search",
+    "app.telemetry.spans",
     "app.worker.run"
    ],
-   "fan_in": 6,
+   "fan_in": 7,
    "how": "Builds every telemetry envelope the pipeline emits \u2014 the typed events the frontend renders\nand the log everything downstream is reconstructed from.\n\nIT IS ALSO WHERE THE CODEBASE'S SIGNATURE DEFECT IS MOST MEASURABLE, which is why it has a\nnode of its own. Ananth, 2026-09-08: log the CallManager pattern as a systemic finding.\n\nTHE CLASS, stated once: a capability is implemented \u2014 often carefully, often with tests \u2014\nand nothing in the live path ever calls it, reads it back, or persists what it produced.\nEach instance looks healthy in isolation. The code is present, the tests pass, the docstring\ndescribes real intent. The capability is simply absent at runtime, and health stays green.",
    "rating": "red",
    "depth": "code",
@@ -873,6 +875,117 @@
    ],
    "signals": {},
    "live_config": [],
+   "detail": {}
+  },
+  {
+   "id": "model_registry",
+   "path": "app/services/model_registry.py",
+   "kind": "cross-cutting",
+   "loc": 2411,
+   "role": "Model registry and dynamic router for Mobius LLM calls.",
+   "role_full": "Model registry and dynamic router for Mobius LLM calls.\n\nSprint -1 infrastructure. Replaces hardcoded get_llm_provider() with\ndata-driven selection across all available models per stage.\n\nDesign:\n  - MODEL_ROSTER: every available model with capabilities + benchmark priors\n  - ModelRouter: selects model per stage using Thompson sampling (Beta distribution)\n  - Phase 1 (< 10 quality samples): explore using per-model benchmark priors (ema_quality)\n  - Phase 2 (10-100 samples): weighted by blended prior + real data\n  - Phase 3 (100+ samples, confidence=locked): exploit best, 5% drift detection\n  - Circuit breaker: immediate pull if error_rate_24h > 15% or hard_error_rate > 20%\n  - Forced explora",
+   "api": [
+    "classify_permanent_failure()",
+    "react_round_from_stage()",
+    "composite_stage_bucket()",
+    "composite_norm_caps_for_stage()",
+    "composite_score_api_spec()",
+    "composite_router_signal()",
+    "per_call_router_composite()",
+    "vertex_roster_eligible_stages()"
+   ],
+   "config": [
+    "ANTHROPIC_API_KEY",
+    "GROQ_API_KEY",
+    "MOBIUS_BANDIT_PRIORS_ONLY",
+    "MOBIUS_REACT_DEEP_ROUNDS_MIN_CONTEXT_K",
+    "OLLAMA_HOST",
+    "OPENAI_API_KEY",
+    "PERPLEXITY_API_KEY",
+    "TOGETHER_API_KEY"
+   ],
+   "writes": [
+    "record_call_failure",
+    "record_outcome"
+   ],
+   "callers": [
+    "app.api.admin",
+    "app.main",
+    "app.pipeline.react.governor",
+    "app.pipeline.react_loop",
+    "app.services.call_manager",
+    "app.services.llm_analytics",
+    "app.services.llm_health",
+    "app.services.llm_manager",
+    "app.services.llm_provider",
+    "app.services.model_profile",
+    "app.services.promise_kept",
+    "app.services.retrieval_budget",
+    "app.stages.integrate",
+    "app.storage.llm_router_report"
+   ],
+   "fan_in": 14,
+   "how": "THE MODEL BANDIT \u2014 the thing that decides which model serves each call. Ananth,\n2026-09-09: \"it is one of the silent yet effective instruments we have.\" Silent is\nexactly the problem, which is why it earns a node instead of a paragraph inside\nllm_manager.\n\nIt is a real Thompson-sampling bandit over a Beta posterior, not a config table:\n\n  Phase 1  < 10 quality samples    explore on per-model benchmark priors (ema_quality)\n  Phase 2  10-100 samples          blend prior with observed data\n  Phase 3  100+, confidence=locked exploit the best, with 5% drift detection\n  plus     forced exploration      every EXPLORATION_INTERVAL turns the least-sampled\n                                   model gets a slot, so a model can never starve out\n\nHard constraints are applied BEFORE the draw and are technical, not quality judgements:\nphi_detected routes to hipaa_eligible models only; the planner and react_* rounds\nrequire spec_context_k >= MIN_PLANNER_CONTEXT_K; small-context models are confined to\nCHEAP_STAGES; and mode=copilot excludes heavy benchmark_category values so only\nFlash-class tiers compete. ReAct rounds are separate arms \u2014 react_1..react_4 carry\ntheir own caps and their own PG rows, so round 1 and round 4 learn independently.\n\nIT IS DOING REAL WORK, measured over 7 days: 8,104 calls, of which 3,244 were\nhard-pinned and 4,860 \u2014 60% \u2014 were chosen by the bandit.",
+   "rating": "red",
+   "depth": "code",
+   "findings": [
+    [
+     "good",
+     "This is the right shape for the problem. A per-stage Beta posterior with forced exploration and a benchmark prior is a genuine solution to cold-start, and the hard constraints being applied before the draw \u2014 rather than as low weights \u2014 is the correct way to express 'never route PHI off BAA infrastructure'. A weight can be overcome by evidence; a filter cannot."
+    ],
+    [
+     "bad",
+     "OWNER(chat): THE CIRCUIT BREAKER DID NOT PULL A PROVIDER THAT FAILS 100% OF THE TIME, FOR TWO DAYS. The module documents 'immediate pull if error_rate_24h > 15% or hard_error_rate > 20%'. Measured against llm_calls:\n\n  2026-09-06   471 anthropic selections, 469 succeeded\n  2026-09-07   132 selections,  70 succeeded  <- outage begins 00:58Z\n  2026-09-08   130 selections,   0 succeeded\n  2026-09-09    73 selections,   0 succeeded\n\n203 selections across two full days at a 100% failure rate, and the breaker never fired. Every one of those turns paid a round-trip to a dead provider before falling back.\n\nTHE LIKELY MECHANISM IS THE SAME NULL COLUMN THAT BROKE THE ema. The 24h error-rate breaker reads model_performance_by_stage, which model_registry.py:2293 filters `WHERE variant_id = 'default'` \u2014 the column the writer never populated until the LLM Agent's fix landed on 2026-09-09. A matview whose row set never advances cannot report the last 24 hours of anything. So the bandit's safety mechanism was reading a frozen snapshot while live traffic failed.\n\nNOT CONFIRMED end to end \u2014 I have not traced the breaker's read path to that matview myself, and the LLM Agent's fix may have already changed the picture. Recorded as the leading mechanism with the failure measured, not as a proven chain."
+    ],
+    [
+     "bad",
+     "OWNER(chat): THE BANDIT HAS NO SURFACE. It picks the model for 60% of calls, learns a posterior per model per stage, runs forced exploration on a schedule, and there is NOWHERE to see any of it. Its only trace is ab_variant on an llm_calls row. Nobody can answer 'which model does the bandit currently prefer for the planner', 'is it still exploring or has it locked', or 'when did it last change its mind' without writing SQL.\n\nThat matters more here than for a quiet module, because a bandit is SUPPOSED to change its behaviour over time. An instrument that silently changes what it does and reports nothing is indistinguishable from one that has stopped working \u2014 which is precisely what the two days above look like."
+    ],
+    [
+     "watch",
+     "It is the natural consumer of P2b's per-model latency stamp, and nobody has connected them. The bandit optimises on a quality posterior; the stamp measures that gemini-2.5-pro has a p50 of 20.0s against flash at 4.7s. A bandit that cannot see a 4x latency difference will happily pick the slow model on quality grounds \u2014 which is one candidate explanation for the routing-latency layer Eval identified. Flagged as a connection to make, not a defect to fix."
+    ],
+    [
+     "watch",
+     "2,411 lines, and it holds the roster, the sampler, the constraints, the circuit breakers and the stage eligibility tables. Its own docstring is 30 lines of operating rules \u2014 the module is doing five jobs and the docstring is the only place the shape is written down."
+    ]
+   ],
+   "ux": "No surface. The bandit's choices appear only as ab_variant on an llm_calls row \u2014 there is no page that shows what it is learning or which model it currently prefers.",
+   "signals": {},
+   "live_config": [
+    {
+     "name": "ANTHROPIC_API_KEY",
+     "live": "(not set \u2014 code default)"
+    },
+    {
+     "name": "GROQ_API_KEY",
+     "live": "(not set \u2014 code default)"
+    },
+    {
+     "name": "MOBIUS_BANDIT_PRIORS_ONLY",
+     "live": "(not set \u2014 code default)"
+    },
+    {
+     "name": "MOBIUS_REACT_DEEP_ROUNDS_MIN_CONTEXT_K",
+     "live": "(not set \u2014 code default)"
+    },
+    {
+     "name": "OLLAMA_HOST",
+     "live": "(not set \u2014 code default)"
+    },
+    {
+     "name": "OPENAI_API_KEY",
+     "live": "(not set \u2014 code default)"
+    },
+    {
+     "name": "PERPLEXITY_API_KEY",
+     "live": "(not set \u2014 code default)"
+    },
+    {
+     "name": "TOGETHER_API_KEY",
+     "live": "(not set \u2014 code default)"
+    }
+   ],
    "detail": {}
   }
  ],
@@ -1121,7 +1234,7 @@
    "module": "app.pipeline.orchestrator",
    "group": "pipeline",
    "path": "app/pipeline/orchestrator.py",
-   "loc": 1753,
+   "loc": 1783,
    "role": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).",
    "role_full": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).\n\nRuns stages in order; handles clarification/refinement early exit; publishes response.",
    "stage": null,
@@ -1693,7 +1806,7 @@
    "module": "app.pipeline.react_loop",
    "group": "pipeline",
    "path": "app/pipeline/react_loop.py",
-   "loc": 6113,
+   "loc": 6147,
    "role": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.",
    "role_full": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.\n\nReplaces (when enabled): run_plan() + _answer_for_subquestion() + run_integrate().\n\nKeeps: answer_non_patient(), answer_tool(), answer_reasoning(),\n       emitter system, badge system, jurisdiction system.\n\nEmission map (thinking chunks sent to UI via emitter=on_thinking):\n  Pre-loop:\n    [if pronoun enriched] \"\u21ba Understood: <resolved message>\"\n    [if follow-up to active context] \"\u25cc Answering from the report we just generated\u2026\"\n    [jurisdiction] emit_jurisdiction_context: \"\u2713 Confirmed: \u2026\" | \"? Payer not identified\u2026\" | etc.\n    \"I'm breaking down",
    "stage": null,

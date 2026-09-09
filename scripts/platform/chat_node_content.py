@@ -792,6 +792,79 @@ describes real intent. The capability is simply absent at runtime, and health st
            "without a consumer. Worth saying because fixing them one at a time treats the "
            "symptom.")]),
 
+"model_registry": dict(rating="red", depth="code",
+ ux="No surface. The bandit's choices appear only as ab_variant on an llm_calls row — "
+    "there is no page that shows what it is learning or which model it currently prefers.",
+ how="""
+THE MODEL BANDIT — the thing that decides which model serves each call. Ananth,
+2026-09-09: "it is one of the silent yet effective instruments we have." Silent is
+exactly the problem, which is why it earns a node instead of a paragraph inside
+llm_manager.
+
+It is a real Thompson-sampling bandit over a Beta posterior, not a config table:
+
+  Phase 1  < 10 quality samples    explore on per-model benchmark priors (ema_quality)
+  Phase 2  10-100 samples          blend prior with observed data
+  Phase 3  100+, confidence=locked exploit the best, with 5% drift detection
+  plus     forced exploration      every EXPLORATION_INTERVAL turns the least-sampled
+                                   model gets a slot, so a model can never starve out
+
+Hard constraints are applied BEFORE the draw and are technical, not quality judgements:
+phi_detected routes to hipaa_eligible models only; the planner and react_* rounds
+require spec_context_k >= MIN_PLANNER_CONTEXT_K; small-context models are confined to
+CHEAP_STAGES; and mode=copilot excludes heavy benchmark_category values so only
+Flash-class tiers compete. ReAct rounds are separate arms — react_1..react_4 carry
+their own caps and their own PG rows, so round 1 and round 4 learn independently.
+
+IT IS DOING REAL WORK, measured over 7 days: 8,104 calls, of which 3,244 were
+hard-pinned and 4,860 — 60% — were chosen by the bandit.
+""", findings=[
+ ("good", "This is the right shape for the problem. A per-stage Beta posterior with forced "
+          "exploration and a benchmark prior is a genuine solution to cold-start, and the "
+          "hard constraints being applied before the draw — rather than as low weights — is "
+          "the correct way to express 'never route PHI off BAA infrastructure'. A weight can "
+          "be overcome by evidence; a filter cannot."),
+ ("bad", "OWNER(chat): THE CIRCUIT BREAKER DID NOT PULL A PROVIDER THAT FAILS 100% OF THE "
+         "TIME, FOR TWO DAYS. The module documents 'immediate pull if error_rate_24h > 15% or "
+         "hard_error_rate > 20%'. Measured against llm_calls:\n\n"
+         "  2026-09-06   471 anthropic selections, 469 succeeded\n"
+         "  2026-09-07   132 selections,  70 succeeded  <- outage begins 00:58Z\n"
+         "  2026-09-08   130 selections,   0 succeeded\n"
+         "  2026-09-09    73 selections,   0 succeeded\n\n"
+         "203 selections across two full days at a 100% failure rate, and the breaker never "
+         "fired. Every one of those turns paid a round-trip to a dead provider before falling "
+         "back.\n\n"
+         "THE LIKELY MECHANISM IS THE SAME NULL COLUMN THAT BROKE THE ema. The 24h "
+         "error-rate breaker reads model_performance_by_stage, which model_registry.py:2293 "
+         "filters `WHERE variant_id = 'default'` — the column the writer never populated "
+         "until the LLM Agent's fix landed on 2026-09-09. A matview whose row set never "
+         "advances cannot report the last 24 hours of anything. So the bandit's safety "
+         "mechanism was reading a frozen snapshot while live traffic failed.\n\n"
+         "NOT CONFIRMED end to end — I have not traced the breaker's read path to that "
+         "matview myself, and the LLM Agent's fix may have already changed the picture. "
+         "Recorded as the leading mechanism with the failure measured, not as a proven "
+         "chain."),
+ ("bad", "OWNER(chat): THE BANDIT HAS NO SURFACE. It picks the model for 60% of calls, learns "
+         "a posterior per model per stage, runs forced exploration on a schedule, and there "
+         "is NOWHERE to see any of it. Its only trace is ab_variant on an llm_calls row. "
+         "Nobody can answer 'which model does the bandit currently prefer for the planner', "
+         "'is it still exploring or has it locked', or 'when did it last change its mind' "
+         "without writing SQL.\n\n"
+         "That matters more here than for a quiet module, because a bandit is SUPPOSED to "
+         "change its behaviour over time. An instrument that silently changes what it does "
+         "and reports nothing is indistinguishable from one that has stopped working — which "
+         "is precisely what the two days above look like."),
+ ("watch", "It is the natural consumer of P2b's per-model latency stamp, and nobody has "
+           "connected them. The bandit optimises on a quality posterior; the stamp measures "
+           "that gemini-2.5-pro has a p50 of 20.0s against flash at 4.7s. A bandit that "
+           "cannot see a 4x latency difference will happily pick the slow model on quality "
+           "grounds — which is one candidate explanation for the routing-latency layer Eval "
+           "identified. Flagged as a connection to make, not a defect to fix."),
+ ("watch", "2,411 lines, and it holds the roster, the sampler, the constraints, the circuit "
+           "breakers and the stage eligibility tables. Its own docstring is 30 lines of "
+           "operating rules — the module is doing five jobs and the docstring is the only "
+           "place the shape is written down.")]),
+
 "llm_manager": dict(rating="amber", depth="code", how="""
 The single entry point for every LLM call in chat. Nothing should call a provider
 directly; everything goes through here.

@@ -5,7 +5,7 @@
  "counts": {
   "ABSENT": 6,
   "IMPORTED-NOT-CALLED": 1,
-  "PERIPHERAL": 17,
+  "PERIPHERAL": 18,
   "REMOVED": 7
  },
  "nodes": [
@@ -152,6 +152,15 @@
    "reached": 1,
    "tags": [],
    "rating": "amber"
+  },
+  {
+   "node": "model_registry",
+   "state": "PERIPHERAL",
+   "module": "app.services.model_registry",
+   "direct": 10,
+   "reached": 9,
+   "tags": [],
+   "rating": "red"
   },
   {
    "node": "orchestrator",

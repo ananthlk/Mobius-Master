@@ -168,7 +168,12 @@ def main():
              # The epicentre of the built-but-never-wired class (Ananth 2026-09-08:
              # "log it as a systemic finding"). Given its own node because the
              # pattern is most measurable here.
-             module_record("app/communication/emit_envelope.py", "cross-cutting")]
+             module_record("app/communication/emit_envelope.py", "cross-cutting"),
+             # The model bandit. Ananth 2026-09-09: "it is one of the silent yet
+             # effective instruments we have" — and silent is the problem, which
+             # is why it gets a node rather than staying a paragraph inside
+             # llm_manager.
+             module_record("app/services/model_registry.py", "cross-cutting")]
     for c in cross:
         out = subprocess.run(
             ["grep", "-rl", c["id"], "--include=*.py", "app/"],

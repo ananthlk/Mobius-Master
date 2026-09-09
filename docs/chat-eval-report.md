@@ -11,13 +11,15 @@ the POST half of the gate, not only as a report.
 
 | collected | passed | failed | errors | skipped | wall |
 |---:|---:|---:|---:|---:|---:|
-| 2525 | 2506 | 14 | 0 | 5 | 145.8s |
+| 2532 | 2512 | 15 | 0 | 5 | 141.1s |
 
 Known-failing baseline: **14** tests, frozen 2026-09-08 before any P1a
 deletion. Ananth's ruling — these predate the program, so the gate SUBTRACTS them.
 A failure not in that set is a regression. The list may shrink, never grow.
 
-**No regressions** — every failure is in the known-failing baseline.
+### REGRESSIONS — 1 failing test(s) NOT in the baseline
+
+- `tests.test_model_router_bandit::test_beta_prior_uses_per_model_benchmark`
 
 ## A2 · What the tests actually cover, per schema node
 
@@ -82,6 +84,6 @@ deterministic replay harness yet (P1.1). A flip would be unattributable.
 
 | modules | loc | except handlers | log-and-continue | bare except |
 |---:|---:|---:|---:|---:|
-| 205 | 64,905 | 677 | 395 | 0 |
+| 205 | 65,058 | 680 | 398 | 0 |
 
 I7 is monotonic: the log-and-continue count may fall, never rise.

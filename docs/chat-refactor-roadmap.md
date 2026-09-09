@@ -12,14 +12,14 @@ program. That is what makes this a tracker and not a snapshot.
 Plan and gate definition: `docs/chat-refactor-program.md`. Nothing starts until
 its sign-off table is complete.
 
-**94 bugs · 63 sequenced into 5 phases · 31 explicitly outside · 0 unassigned**
+**96 bugs · 65 sequenced into 5 phases · 31 explicitly outside · 0 unassigned**
 
 ## Progress
 
 | Phase | Name | Bugs | Owner | Gate metric | Blocks | Status |
 |---|---|---:|---|---|---|---|
 | **P1** | Delete | 9 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☐ not started |
-| **P2** | Make absent producers detectable | 21 | chat + Eval | every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☐ not started |
+| **P2** | Make absent producers detectable | 23 | chat + Eval | every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☐ not started |
 | **P3** | One decision point | 13 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ☐ not started |
 | **P4** | Split | 15 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
 | **P5** | Config UX | 5 | chat + Prompt Studio | max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped | — | ☐ not started |
@@ -31,7 +31,7 @@ complete, and P0 blocks all of the others.
 
 | Owner | Sequenced bugs |
 |---|---:|
-| chat | 35 |
+| chat | 37 |
 | unassigned-owner | 28 |
 
 ## P1 — Delete  ·  9 items
@@ -56,7 +56,7 @@ The cost of leading with it, stated plainly: this phase CANNOT CLAIM A LATENCY W
 | ☐ | `run_pipeline` | chat | THE CLASSIC PATH IS DEAD AND IT IS 1,159 LINES |
 | ☐ | `run_pipeline` | chat | THE CREDENTIALING SURFACE IS 8,994 LINES IN CHAT AND ITS TABLES ARE EMPTY |
 
-## P2 — Make absent producers detectable  ·  21 items
+## P2 — Make absent producers detectable  ·  23 items
 
 **Owner** chat + Eval
 **Gate** every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join  
@@ -89,6 +89,8 @@ BASELINE RULE: the latency numbers captured at the END of this phase are the ref
 | ☐ | `governor` | — | SCOPE LENS (DB seat, 2026-09-08): chat_turns.blueprint_snapshot is 0 of 2,744 — a DECLARED COLUMN NOTHING HAS  |
 | ☐ | `governor` | chat | 116 OF 187 CONFIG KNOBS RUN ON INVISIBLE CODE DEFAULTS |
 | ☐ | `governor` | chat | THE GOVERNOR IS STRUCTURALLY UNOBSERVABLE |
+| ☐ | `model_registry` | chat | THE CIRCUIT BREAKER DID NOT PULL A PROVIDER THAT FAILS 100% OF THE TIME, FOR TWO DAYS |
+| ☐ | `model_registry` | chat | THE BANDIT HAS NO SURFACE |
 | ☐ | `orchestrator` | chat | LATENCY MEASUREMENT ACROSS THE PIPELINE — Ananth's item, and the gap is measurable |
 | ☐ | `plan` | — | The parse-failure fallback is invisible |
 | ☐ | `react_loop` | chat | THE CURATION DECISION IS NEVER PERSISTED, which makes evidence_review untestable after the fact |
