@@ -44,6 +44,18 @@ manual flow, or something you're mid-build on would look identical to dead code.
 is that your pipeline has "morphed" and looks very different now — if that's right, most of
 this is safe. I'd rather confirm than infer.
 
+> **And traffic logs are worse than "might have missed a window" — they are structurally blind
+> in one direction.** Established while answering Q2 below, and it generalises past this phase:
+>
+> The appeals call site is a **CLI on a developer's laptop** whose `CHAT_BASE` is hardcoded to
+> the live Cloud Run URL. So it can *never* appear as a deployed caller in prod request logs —
+> it isn't deployed — yet if someone ran it tomorrow it would hit the **live** service. For
+> dev-tool callers, "zero traffic in 30 days" cannot distinguish *"nobody calls this"* from
+> *"the caller is a script on someone's machine."*
+>
+> Absence of traffic is therefore not evidence of absence of callers. It has to be paired with
+> asking owners — which is what this file is for.
+
 ---
 
 ## Q1 — Does your skill call any of chat's credentialing routes? **[most important]**
@@ -97,6 +109,47 @@ instant-RAG handler. I am **keeping it** until someone confirms it's dead — it
 against a non-zero chance of breaking a loop nobody is watching.
 
 Note your skill has its own `/roster-uploads` (hyphen-plural) surface, which is unaffected.
+
+**ANSWER — from the Appeals Agent owner, 2026-09-09: DEAD, and it was never a credentialing
+call in the first place.**
+
+Three independent proofs, checked firsthand on their side:
+
+- `appeals-agent/.dockerignore:12` **excludes `loop/run_loop.py` from the deployed image.**
+  The live appeals service physically cannot execute it. This is the decisive one.
+- It is a manual CLI, not a service path — `argparse` with `--carc`, `--payor`, `--state`.
+  Nothing schedules it: no cron, no Cloud Scheduler, no caller anywhere in mobius-skills.
+- Last git touch 2026-07-06; the only run artifact on disk is one PDF dated 2026-05-07.
+
+**And it is not credentialing at all.** `run_loop.py:164` posts `file_purpose="instant_rag"`.
+The only caller is `follow_ref()` at `:484`: when the appeals loop hits an external citation
+(a CMS manual chapter, a `url:` reference ending in `.pdf`) it downloads and ingests it into
+the corpus. It was using `/chat/roster-upload` as a **generic document-ingest endpoint** —
+precisely the alias behaviour chat's own `main.py:2232` docstring describes.
+
+So the route name was the only signal available from chat's side, and it was misleading.
+I inferred a credentialing dependency from a path called `roster-upload` that was actually
+doing instant-RAG ingest. Only reading their side could have shown that.
+
+They also grepped all eight routes across the whole appeals-agent repo: zero other hits.
+
+**Their verdict: delete it, and do not keep `/chat/roster-upload` on their account.** Whether
+that route survives should be decided by the instant-RAG handler behind it and by YOUR needs —
+which makes it a question for you rather than a settled point. **See Q2b below.**
+
+---
+
+## Q2b — Do YOU need `POST /chat/roster-upload` to keep existing?
+
+With appeals ruled out, this route's only remaining justification is the instant-RAG document
+ingest behind it, plus anything you might use it for.
+
+One thing worth knowing if you *do* use it and I later sunset it: `/chat/upload`, the canonical
+replacement, is **not** a free swap. It is `Depends(require_user)` and takes
+`file`/`thread_id`/`org_name` with **no `file_purpose` field**. An unauthenticated caller
+migrating naively would 401 — and in appeals' case that 401 would have been swallowed by a
+`try/except Exception` returning `{"error": "exception"}` while the loop carried on. If you
+have callers, they need auth headers and a field-shape change, not a path substitution.
 
 **ANSWER:**
 
