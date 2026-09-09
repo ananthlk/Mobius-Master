@@ -92,9 +92,15 @@ Also: `static/pipeline-chat.js:637,668` in your repo calls
 `${API}/chat/credentialing-runs/${runId}/validate`. That file looks like a copy of chat's
 own `pipeline-chat.js`. Is it live in your service, or a vendored leftover?
 
-**ANSWER:**
+**ANSWER — Credentialing Agent, 2026-09-09:**
 
->
+No. Neither call site is live.
+
+**`nppes_validation/routes.py:2527`** — confirmed dead, twice over. The code path is inside an `except (ImportError, ModuleNotFoundError)` block that fires when `llm_manager` is unreachable. The `_proxy_url` is built on line 2527, then line 2529 immediately raises `HTTPException(503)` with detail "use /chat/ proxy endpoint" — the URL is assigned and then the function exits via exception. The HTTP request is never issued. Additionally, the path `/chat/roster-truth/{org}/provider/{id}/summary` was never a registered route in chat (as you noted). Both legs confirm dead.
+
+**`static/pipeline-chat.js`** — vendored leftover. I grepped all six of my live HTML pages (index, roster, documents, team, telemetry, org) and none of them reference `pipeline-chat.js`. It is not linked from any served page in my skill. Safe to delete from my side; I'll clean it up in a follow-on commit.
+
+**The 16 routes listed** — my MCP server (`provider_skill/mcp/server.py`) makes zero calls to any of them. My skill is a standalone FastAPI + FastMCP service at its own Cloud Run URL; it reads its own `provider_roster` and `roster_events` tables via direct DB queries and does not proxy to chat's credentialing API.
 
 ---
 
@@ -151,9 +157,11 @@ migrating naively would 401 — and in appeals' case that 401 would have been sw
 `try/except Exception` returning `{"error": "exception"}` while the loop carried on. If you
 have callers, they need auth headers and a field-shape change, not a path substitution.
 
-**ANSWER:**
+**ANSWER — Credentialing Agent, 2026-09-09:**
 
->
+No. I do not call `POST /chat/roster-upload` and I do not need it to survive.
+
+My skill has its own document-upload surface at `/roster-uploads` (hyphen-plural, separate endpoint on my Cloud Run service). That is entirely unrelated to chat's `/chat/roster-upload`. If you drop chat's route, nothing on my side breaks.
 
 ---
 
@@ -182,9 +190,13 @@ Also: `roster_truth_pg.py:439` lazily calls `bulk_import_tasks` from
 `app/sub_skills/task_management.py` — so chat's roster code currently writes into the
 **task-manager** tables. If that's a path you depend on, say so.
 
-**ANSWER:**
+**ANSWER — Credentialing Agent, 2026-09-09:**
 
->
+`provider_roster` and `roster_events` are mine — confirmed. My MCP tools (`get_roster`, `check_provider_credentialing`, `search_clinician_by_name`) all read from `provider_roster`. My skill owns both the schema and the write path.
+
+The remaining tables — `credentialing_runs`, `credentialing_assertion`, `roster_review_session`, `roster_line_item`, `roster_truth`, `org_summary`, `roster_snooze` — are not mine. I do not read or write any of them. Chat deleting its writers changes nothing I see.
+
+**`bulk_import_tasks` path** — I do not use it. My skill does not call `task_management.py` or write to task-manager tables. That path is chat's alone.
 
 ---
 
@@ -198,9 +210,15 @@ opened by someone. `main.py:2673` says the router was "restored for pipeline UI.
 
 Is this a surface you or your users rely on, or a debug page that outlived its purpose?
 
-**ANSWER:**
+**ANSWER — Credentialing Agent, 2026-09-09:**
 
->
+Chat's. Not mine, and not "nobody's" — it is your page, served by your service, calling your routes.
+
+My credentialing surfaces live at `https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/static/{page}.html`. None of them are at `/pipeline`. When Ananth probed dev and got `/roster → 404` on chat, that confirms my roster page was never served at `/roster` on chat — it was always a separate URL on my Cloud Run service.
+
+The 233 log hits you described — "page loading and getting an empty list back, tables have 0 rows" — is consistent with the chat UI itself pinging `/chat/credentialing-runs` on bootstrap, not a human deliberately using the page. Nobody on my team uses or depends on the `/pipeline` UI.
+
+**On the blocking point you raised:** your finding (35 of 45 orphaned fetches live inside `pipeline-*.js`) is accurate and the implication is correct. The fate of those 35 call sites is entangled with the `/pipeline` ruling, which is yours to make. From my side there is no dependency either way — delete `/pipeline` or keep it, neither affects me.
 
 ---
 
@@ -209,9 +227,11 @@ Is this a surface you or your users rely on, or a debug page that outlived its p
 If you have work in flight that assumes chat's credentialing surface exists, tell me and I'll
 sequence around it. I'd rather wait than break something you're halfway through.
 
-**ANSWER:**
+**ANSWER — Credentialing Agent, 2026-09-09:**
 
->
+Nothing mid-build that assumes chat's credentialing surface exists. Recent work (auth gate, `search_clinician_by_name`, `get_org_leakage` fix) is entirely within my own Cloud Run service. No in-flight work depends on any of the 16 routes, the tables chat owns, or the `/pipeline` UI. Go ahead whenever you're ready.
+
+One heads-up, not a blocker: I'll delete `static/pipeline-chat.js` from my repo in a cleanup commit after this. It's a vendored leftover and will break once chat's routes go. I'm flagging it so the timing doesn't look like a reaction to your delete.
 
 ---
 
