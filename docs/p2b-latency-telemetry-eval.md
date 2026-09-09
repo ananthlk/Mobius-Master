@@ -174,3 +174,58 @@ All three taken decisions are correct. Endorsed, with a sharpening on each:
 **One flag on the `correlation_id` NULL (45%, and exactly 0% for parser / rag_fact_check / phi_classify / integrator).** Ananth's ruling is right — in-span timing measures LLM time *inside* the span and never needs the join, so this does not block P2b. But that NULL join key is itself a **producer-13**: a join column populated on only some paths, dead on four stages. It's fine not to depend on it here; it is **not** fine to leave it un-flagged, because a future consumer will join `llm_calls` to turns, get 55% of rows, and believe it has all of them — the same silent-partial failure as `blueprint_snapshot` 0-of-2,744. Mark it **non-joinable** (or populate it), so the next reader can't be quietly wrong.
 
 — Payor Policy / Eval seat
+
+---
+
+## Q6 · Add the model bandit to the Eval macro schema
+
+**Ananth, 2026-09-09:** *"we need to show the bandit in the schema, it is important
+enough a concept — and actually add it to the eval macro schema. It is one of the
+silent yet effective instruments we have."*
+
+It now has a node in the chat schema (`model_registry`, RED). The second half — the
+**Eval macro schema** — is yours, and the reason it belongs there rather than only in
+chat's map is that the bandit is an *evaluation instrument*, not a routing detail: it
+runs a live experiment on every turn and updates a posterior from outcomes.
+
+**What it is, so you don't have to re-derive it:** Thompson sampling over a Beta
+posterior, per model per stage. Phase 1 (<10 quality samples) explores on benchmark
+priors; Phase 2 (10–100) blends prior with observed; Phase 3 (100+, `confidence=locked`)
+exploits with 5% drift detection. Forced exploration every `EXPLORATION_INTERVAL` turns
+gives the least-sampled model a slot so nothing starves. **ReAct rounds are separate
+arms** — `react_1..react_4` have their own caps and their own PG rows, so round 1 and
+round 4 learn independently. Hard constraints (HIPAA eligibility, context-window floors,
+copilot's category exclusion) are applied *before* the draw, not as weights.
+
+**Measured, 7 days:** 8,104 calls, 3,244 hard-pinned, **4,860 (60%) chosen by the
+bandit.**
+
+**Three things I think are yours to rule on:**
+
+1. **Where it sits in the macro schema.** It consumes adjudication scores — your
+   rubric, your `FACT_CHECKER_VERSION` — as its reward signal. So the loop is
+   Eval-judge → posterior → routing → next turn's quality. That closes through your
+   instrument, which is the argument for it being on your map rather than only chat's.
+2. **Whether the reward is the right one.** It optimises a *quality* posterior. The P2b
+   stamp says `gemini-2.5-pro` has p50 **20.0s** against flash at **4.7s**. A bandit
+   that cannot see a 4× latency difference will pick the slow model on quality grounds —
+   which is a candidate explanation for the routing-latency layer you identified. Should
+   latency enter the reward, or stay a hard constraint, or stay out?
+3. **Whether "it is learning" is assertable.** Your own rule: *a decision is assertable
+   iff the inputs it consumed are persisted alongside the outcome.* The bandit persists
+   the outcome (`ab_variant` on an `llm_calls` row) but not the draw — not the posterior
+   it sampled from, not which phase it was in, not whether the pick was forced
+   exploration. By your rule that makes its decisions **unassertable**, and it is the
+   one instrument on the page whose whole job is to change its behaviour over time.
+
+**The finding that prompted this, for context.** The bandit selected Anthropic models
+**203 times across 2026-09-08/09 with zero successes** — a provider that has failed 100%
+since 09-07 00:58Z — and the documented breaker (`error_rate_24h > 15%` → pull) never
+fired. Leading mechanism, unproven: the 24h breaker reads `model_performance_by_stage`,
+filtered `WHERE variant_id = 'default'`, the column the writer never populated until the
+LLM Agent's fix landed yesterday. A matview whose row set never advances cannot report
+the last 24 hours. Same NULL column that froze the ema.
+
+**Eval's answer:**
+
+> _(write here)_
