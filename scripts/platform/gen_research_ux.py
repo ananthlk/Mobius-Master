@@ -168,7 +168,9 @@ def artifact_sections(doc) -> str:
 
 def main() -> None:
     doc = ct.as_doc()
-    reqs = load_rows().get("requests") or []
+    data = load_rows()
+    reqs = data.get("requests") or []
+    tasks = data.get("tasks") or []
     for r in reqs:
         st = r.get("stance")
         r["stance_word"], r["stance_help"] = L.stance(st)
@@ -200,6 +202,17 @@ def main() -> None:
         f"{esc(r['wait_word'])}</span></td>"
         f"<td class=n>{r.get('rounds')}</td></tr>" for r in reqs)
 
+    worklist_rows = "".join(
+        "<tr data-task='" + str(t["id"]) + "'>"
+        f"<td class=n><b class=worth>{t.get('worth', 0)}</b></td>"
+        f"<td><b>{esc(t['what'])}</b>"
+        f"<span class=q>{esc(t.get('because') or '')}</span></td>"
+        f"<td><span class=pillx>{esc(t.get('owner_role') or 'anyone')}</span></td>"
+        f"<td class=n>{len(t.get('questions') or []) or '—'}</td>"
+        f"<td><span class='wait {'bad' if t.get('outside') else 'ok'}'>"
+        + ("outside" if t.get("outside") else "here") + "</span></td></tr>"
+        for t in tasks)
+
     doors = "".join(
         f"<button class='door{' live' if s['state']=='live' else ''}' "
         f"data-door='{esc(s['id'])}'><b>{esc(s['title'])}</b>"
@@ -215,7 +228,9 @@ def main() -> None:
     from collections import Counter as C2
     astate = C2(a["state"] for a in doc["artifacts"])
 
-    payload = json.dumps({"requests": reqs, "actions": acts_by_id,
+    payload = json.dumps({"requests": reqs, "tasks": tasks,
+                          "task_kinds": doc.get("task_kinds") or {},
+                          "actions": acts_by_id,
                           "artifacts": doc["artifacts"],
                           "surfaces": {s["id"]: s for s in doc["surfaces"]},
                           "note_uses": doc.get("note_uses") or {},
@@ -326,6 +341,8 @@ background:var(--sunk);color:var(--muted);display:inline-block}}
 .st.bad,.wait.bad{{background:var(--bad-soft);color:var(--bad)}}
 .st{{margin-top:4px}}
 .advise{{max-width:330px}}
+.worth{{font-family:var(--mono);font-size:16px;color:var(--violet);font-weight:500}}
+#wl tr{{cursor:pointer}}
 .rec{{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:500;
 letter-spacing:.04em;text-transform:uppercase;background:var(--violet-soft);
 color:var(--violet);padding:2px 8px;border-radius:3px}}
@@ -405,6 +422,20 @@ looking. Nobody sees a different system — just a different slice of it.</p>
   do about it, and the conversation.</p>
 </div>
 
+<div id=panel_work hidden>
+  <p class=filter>Work, not questions — most valuable first. What an item is
+  worth is how many questions it unblocks, and it is derived, never typed.</p>
+  <div class=card style="padding:14px 16px">
+  <table><thead><tr><th>worth</th><th>what to do</th><th>who</th>
+  <th>closes</th><th>where</th></tr></thead>
+  <tbody id=wl>{worklist_rows}</tbody></table></div>
+  <div id=taskdetail class=card hidden></div>
+  <p class=note><b>One item here is worth twenty-three.</b> As twenty-three rows
+  on a question list it looked like twenty-three problems. The bottom row has no
+  question attached at all — work does not have to be about a question, and that
+  is the case this list exists to make expressible.</p>
+</div>
+
 <div id=panel_one hidden>
   <button class=back id=back>← back to the list</button>
   <div class=card><h2 id=one_title></h2><p class=says id=one_q></p>
@@ -470,11 +501,12 @@ document.getElementById('go').addEventListener('click', function(){{
 function door(id){{
   document.querySelectorAll('.door').forEach(function(b){{
     b.classList.toggle('on', b.dataset.door === id); }});
-  var ask = id === 'ask';
+  var ask = id === 'ask', work = id === 'worklist';
   document.getElementById('panel_ask').hidden = !ask;
-  document.getElementById('panel_queue').hidden = ask;
+  document.getElementById('panel_work').hidden = !work;
+  document.getElementById('panel_queue').hidden = ask || work;
   document.getElementById('panel_one').hidden = true;
-  if(ask) return;
+  if(ask || work) return;
   var f = D.surfaces[id] || {{}};
   var el = document.getElementById('filt');
   el.textContent = (f.filter_says || 'Everything') + '   ·   can call: '
@@ -567,6 +599,25 @@ function fill(r){{
 }}
 
 document.addEventListener('click', function(e){{
+  var wt = e.target.closest('#wl tr');
+  if(wt){{
+    var t = (D.tasks || []).filter(function(x){{ return String(x.id) === wt.dataset.task; }})[0];
+    if(t){{
+      var qs = (t.questions || []);
+      var box = document.getElementById('taskdetail');
+      box.hidden = false;
+      box.innerHTML = '<h2>' + esc(t.what) + '</h2>'
+        + '<p class=says>' + esc((D.task_kinds[t.kind] || {{}}).says || t.kind)
+        + (t.outside ? ' — <b>this happens outside this system; the machine can '
+           + 'never mark it done on its own.</b>' : '') + '</p>'
+        + '<p class=closes>worth ' + (t.worth || 0) + ' · '
+        + (qs.length ? 'closes ' + qs.length + ' question(s): ' + qs.join(', ')
+                     : 'no question attached — work that stands on its own')
+        + '</p>';
+      box.scrollIntoView({{behavior: 'smooth', block: 'nearest'}});
+    }}
+    return;
+  }}
   var tr = e.target.closest('#tb tr');
   if(tr){{
     fill(REQ[tr.dataset.id]);

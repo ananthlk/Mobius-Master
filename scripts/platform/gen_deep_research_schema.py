@@ -735,6 +735,22 @@ def main() -> None:
             breaks.append(f"decision '{d}' defaults to {spec.get('default')!r}, "
                           f"which is not a declared right")
 
+    # A worklist item nobody is entitled to do, or that maps from a
+    # recommendation nobody makes, is an item that will sit there forever.
+    for k, v in (C.get("task_kinds") or {}).items():
+        if v.get("owner_role") not in (C.get("roles") or []):
+            breaks.append(f"task kind '{k}' is owned by {v.get('owner_role')!r}, "
+                          f"which is not a declared role")
+    acts = {a["id"] for a in C.get("actions", [])}
+    kinds = set(C.get("task_kinds") or {})
+    for rec, spec in (C.get("task_from_recommendation") or {}).items():
+        if rec not in acts:
+            breaks.append(f"work is derived from recommendation '{rec}', which is "
+                          f"not an action anybody can be advised to take")
+        if spec.get("kind") not in kinds:
+            breaks.append(f"recommendation '{rec}' derives task kind "
+                          f"{spec.get('kind')!r}, which is not declared")
+
     for w in doc["request_writers"]:
         if w["gated"]:
             continue
@@ -755,6 +771,8 @@ def main() -> None:
         "no stance recommends an action nobody can take",
         "no artifact claims to exist without naming what carries it",
         "every decision defaults to a declared right",
+        "every task kind is owned by a declared role",
+        "no work is derived from a recommendation nobody makes",
         "no user-facing label uses a reserved domain word (appeal, case, ...)",
         "every action is owned by a declared role",
         "the page's own JavaScript parses — a rendered page is not a running one",
