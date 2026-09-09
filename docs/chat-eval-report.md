@@ -11,7 +11,7 @@ the POST half of the gate, not only as a report.
 
 | collected | passed | failed | errors | skipped | wall |
 |---:|---:|---:|---:|---:|---:|
-| 2532 | 2513 | 14 | 0 | 5 | 147.9s |
+| 2534 | 2515 | 14 | 0 | 5 | 165.6s |
 
 Known-failing baseline: **14** tests, frozen 2026-09-08 before any P1a
 deletion. Ananth's ruling — these predate the program, so the gate SUBTRACTS them.
@@ -32,7 +32,7 @@ name matches, not that the node's behaviour is asserted. Eval owns replacing it.
 | `POST /chat` | red | 14 | **none** | — |
 | `clarification` | red | 2 | **none** | — |
 | `jurisdiction` | red | 2 | **none** | — |
-| `model_registry` | red | 2 | **none** | — |
+| `model_registry` | red | 3 | **none** | — |
 | `state_load` | red | 5 | **none** | — |
 | `PHI gate` | amber | 2 | **none** | — |
 | `active_context` | amber | 1 | **none** | — |
@@ -83,6 +83,6 @@ deterministic replay harness yet (P1.1). A flip would be unattributable.
 
 | modules | loc | except handlers | log-and-continue | bare except |
 |---:|---:|---:|---:|---:|
-| 205 | 65,058 | 680 | 398 | 0 |
+| 205 | 65,524 | 687 | 403 | 0 |
 
 I7 is monotonic: the log-and-continue count may fall, never rise.

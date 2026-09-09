@@ -96,11 +96,11 @@
   ],
   "shared_post_guard": "ctx.react_bypass_integrate \u2014 set in react_loop, skips the integrator and publishes the ReAct answer directly",
   "shared_post_guard_lines": [
-   541,
-   820,
-   824,
-   951,
-   996
+   564,
+   844,
+   848,
+   975,
+   1020
   ],
   "exit": "publish",
   "react_phases": [
@@ -462,7 +462,7 @@
    "id": "llm_manager",
    "path": "app/services/llm_manager.py",
    "kind": "cross-cutting",
-   "loc": 454,
+   "loc": 469,
    "role": "llm_manager.py \u2014 Single entry point for all LLM calls.",
    "role_full": "llm_manager.py \u2014 Single entry point for all LLM calls.\nSprint -1: wires ModelRouter for dynamic per-stage model selection.\n\nChanges from previous version:\n  - get_llm_provider(parser=parser) replaced by router.select()\n  - stage parameter now actually drives model selection\n  - phi_detected parameter added (passed from pipeline context)\n  - ab_variant set to selected model_id for analytics\n  - router.update_ema() called after each call\n  - auto_enable_from_env() called on first generate()",
    "api": [
@@ -471,12 +471,14 @@
    ],
    "config": [],
    "writes": [
+    "record_ambient",
     "record_call_failure",
     "record_usage"
    ],
    "callers": [
     "app.api.email_thread",
     "app.main",
+    "app.pipeline.orchestrator",
     "app.pipeline.react.governor",
     "app.pipeline.react.prompts",
     "app.responder.final",
@@ -487,8 +489,7 @@
     "app.services.config_manager",
     "app.services.llm_analytics",
     "app.services.llm_provider",
-    "app.services.model_registry",
-    "app.services.non_patient_rag"
+    "app.services.model_registry"
    ],
    "fan_in": 14,
    "how": "The single entry point for every LLM call in chat. Nothing should call a provider\ndirectly; everything goes through here.\n\nIt does more than proxy. It wires a ModelRouter that picks the model per stage rather than\nper process, so the planner and the integrator can run on different models in the same\nturn. It takes phi_detected from pipeline context so a turn carrying PHI can be routed\ndifferently. It sets ab_variant to the selected model id for analytics, and calls\nrouter.update_ema() after each call so the bandit learns from what actually happened.",
@@ -939,7 +940,7 @@
     ],
     [
      "bad",
-     "OWNER(chat): THE TEST SUITE MUTATES THE BANDIT'S LIVE STATE \u2014 TO BE TESTED IN THE BANDIT'S OWN PASS (Ananth, 2026-09-09). Found by Chat Master while a P2b test file shifted collection order; root cause verified by me independently.\n\nMODEL_ROSTER is a process-wide MUTABLE SINGLETON and the specs are written in place at runtime: spec.ema_quality (model_registry.py:1987, 2030), spec.call_count += 1 (:1983), spec.quality_samples += 1 (:1988, 2031), plus a PG refresh overwriting both at :2317-2323.\n\nMeasured during ONE full-suite run: gemini-2.5-flash accumulated call_count=38 and quality_samples=37, dragging its ema_quality from a seeded 0.78 down to 0.609 \u2014 below gemini-2.0-flash-lite's untouched 0.65, inverting the model ordering a test asserts on.\n\nTHE BROKEN TEST IS THE SMALL HALF. The counters the suite moves are the SAME ONES THAT DRIVE THE BANDIT'S PHASE TRANSITIONS: Phase 1->2 at 10 quality samples, Phase 2->3 (locked exploitation) at 100. A test run that adds 37 samples to one model is pushing it toward exploitation on evidence that is not traffic. Whether that leaks beyond the process is the open question \u2014 the in-process roster does not persist, but :2317-2323 reads FROM Postgres, so the direction of contamination needs establishing rather than assuming.\n\nWHAT THE BANDIT'S PASS MUST TEST, recorded now so it is not re-derived:\n  1. a full-suite run leaves MODEL_ROSTER's seeded values unchanged\n  2. phase transitions are driven by persisted traffic, not by in-process accumulation from any source\n  3. the beta_prior test asserts its stated intent (per-model ema_quality, not a constant) without depending on unmutated seeds \u2014 the incidental ordering assertion is a property of test order, not of the code under test\n  4. a sibling file already documents this hazard and works around it with source inspection (test_claude_current_gen_models.py:29-35). One test file knew and the bandit's did not \u2014 the workaround should be the rule, not local knowledge.\n\nAnanth ruled the immediate test fix proceeds so P2b is not blocked. A GREEN TEST DOES NOT CLOSE THIS."
+     "OWNER(chat): THE TEST SUITE MUTATES THE BANDIT'S LIVE STATE \u2014 TO BE TESTED IN THE BANDIT'S OWN PASS (Ananth, 2026-09-09). Found by Chat Master while a P2b test file shifted collection order; root cause verified by me independently.\n\nMODEL_ROSTER is a process-wide MUTABLE SINGLETON and the specs are written in place at runtime: spec.ema_quality (model_registry.py:1987, 2030), spec.call_count += 1 (:1983), spec.quality_samples += 1 (:1988, 2031), plus a PG refresh overwriting both at :2317-2323.\n\nMeasured during ONE full-suite run: gemini-2.5-flash accumulated call_count=38 and quality_samples=37, dragging its ema_quality from a seeded 0.78 down to 0.609 \u2014 below gemini-2.0-flash-lite's untouched 0.65, inverting the model ordering a test asserts on.\n\nTHE BROKEN TEST IS THE SMALL HALF \u2014 but narrower than Chat Master and I first framed it, and the correction is worth keeping. They reported that 37 samples promotes a model to 'medium' confidence, two tiers above cold start, and called that an input to selection. I checked: `confidence` (model_registry.py:861-865) is read in exactly ONE place, :2042, where it is REPORTED in a stats dict. Nothing selects on it. `spec.quality_samples` is likewise never read by the selection path. So the confidence tier moving is COSMETIC \u2014 a changed label, not a changed decision.\n\nWHAT IS REAL, AND IT IS ENOUGH: the suite corrupts `ema_quality`, which feeds `beta_prior` (:868), which is the PRIOR IN EVERY DRAW at :1626. That is genuine contamination of model selection.\n\nIT ALSO BOUNDS THE BLAST RADIUS, which the first framing did not. The draw's observation weight comes from PG \u2014 `total_calls = int(stats.get(\"total_calls\"))` at :1627, not from the in-process spec \u2014 and the roster does not persist. So the damage is one process's priors for the life of that process: contained in a test run, and a real concern only in a long-lived Cloud Run instance.WHAT THE BANDIT'S PASS MUST TEST, recorded now so it is not re-derived:\n  1. a full-suite run leaves MODEL_ROSTER's seeded values unchanged\n  2. phase transitions are driven by persisted traffic, not by in-process accumulation from any source\n  3. the beta_prior test asserts its stated intent (per-model ema_quality, not a constant) without depending on unmutated seeds \u2014 the incidental ordering assertion is a property of test order, not of the code under test\n  4. a sibling file already documents this hazard and works around it with source inspection (test_claude_current_gen_models.py:29-35). One test file knew and the bandit's did not \u2014 the workaround should be the rule, not local knowledge.\n\nAnanth ruled the immediate test fix proceeds so P2b is not blocked. A GREEN TEST DOES NOT CLOSE THIS."
     ],
     [
      "bad",
@@ -1238,7 +1239,7 @@
    "module": "app.pipeline.orchestrator",
    "group": "pipeline",
    "path": "app/pipeline/orchestrator.py",
-   "loc": 1783,
+   "loc": 1835,
    "role": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).",
    "role_full": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).\n\nRuns stages in order; handles clarification/refinement early exit; publishes response.",
    "stage": null,
@@ -1810,7 +1811,7 @@
    "module": "app.pipeline.react_loop",
    "group": "pipeline",
    "path": "app/pipeline/react_loop.py",
-   "loc": 6147,
+   "loc": 6165,
    "role": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.",
    "role_full": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.\n\nReplaces (when enabled): run_plan() + _answer_for_subquestion() + run_integrate().\n\nKeeps: answer_non_patient(), answer_tool(), answer_reasoning(),\n       emitter system, badge system, jurisdiction system.\n\nEmission map (thinking chunks sent to UI via emitter=on_thinking):\n  Pre-loop:\n    [if pronoun enriched] \"\u21ba Understood: <resolved message>\"\n    [if follow-up to active context] \"\u25cc Answering from the report we just generated\u2026\"\n    [jurisdiction] emit_jurisdiction_context: \"\u2713 Confirmed: \u2026\" | \"? Payer not identified\u2026\" | etc.\n    \"I'm breaking down",
    "stage": null,
