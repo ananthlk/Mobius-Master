@@ -47,22 +47,100 @@ webpage and that context allows more freedom than a robot.
   authorization log's `task_id`).
 - Dedup is free: content-identity 409s make a user re-fetch of a held page `already_held`.
 
-## 2 · Capture side — BROWSER EXTENSION TO DRAFT
+## 2 · Capture side — Browser Extension (DRAFTED, from shipped code)
 
-Open questions from Crawler:
-- What is captured: rendered DOM, raw HTML, or both? (Main-content extraction differs; the CPT
-  screen wants FULL html — licence notices live in footers that content extraction strips.)
-- User/task provenance fields available at capture time?
-- How does a user-clicked PDF flow — bytes through the extension, or URL handed to a fetcher?
-  (If a URL is handed to a server-side fetcher, that fetch leaves the user's session and
-  becomes robot-lane — needs care: prefer capturing the bytes the user's browser already has.)
-- Consent surface: what does the user see/approve per capture?
+Built and verified live (mobius-os `cf2d2ce`): `src/background.ts`
+(`mobius:ingest:fetchUpload`), `src/services/ingest.ts`, `src/content.ts` (`beginPageIngest`).
+Answers to §2's open questions, grounded in what the code actually emits today.
+
+### 2.1 What is captured — RAW BYTES as served, full document (not the rendered DOM)
+
+The extension captures the **raw response bytes at the current URL**, via
+`fetch(window.location.href, { credentials: 'include' })` in the **background worker**
+(extension context). It does **not** send the mutated/rendered DOM and does **not**
+content-extract — the CPT screen gets the **full document** it wants:
+
+- **A PDF the user is viewing** → `location.href` is the PDF → the raw PDF bytes.
+- **A server-rendered HTML page** → the server's full HTML **including footers** (where CPT /
+  licence notices live). Nothing is stripped or re-flowed client-side.
+- **Content-type** is taken from the response headers; **filename** from the URL's last path
+  segment, else a content-type default (`filenameFromUrl` in background.ts).
+
+Known limit (named, not hidden): for **client-rendered SPAs** the raw HTML may not contain the
+visible text (it's assembled by JS). The dominant target — a PDF or server-rendered doc behind
+auth — is fully covered. A rendered-DOM capture path is deliberately **out of v1** (it reopens
+the footer-stripping question your CPT screen cares about); if we add it later it comes back to
+this spec first.
+
+### 2.2 Provenance fields emitted at capture time
+
+Sent as multipart Form fields alongside `file` (background.ts), matching §1.3:
+
+| Field | Value | Source |
+|---|---|---|
+| `source_url` | the page the user was on | `window.location.href` |
+| `access` | `"user_authorized_session"` (verbatim, your §1.3) | constant on this lane |
+| `task_id` | `ext_<uuid>` — correlates with the extension's authorization log | `src/services/invocation.ts` `newTaskId()` |
+| `initiated_by` | the Mobius user | **derived server-side from the `Authorization: Bearer` token** the extension already sends — we do not put a raw user id in the form; the token is the source of truth |
+| `file` | the raw bytes (Blob) | the in-session fetch |
+
+`fetched_at` (client capture time) is available if you want it stamped client-side; today we
+let the server stamp receipt. Map `source_run_id` = `task_id` as you proposed.
+
+### 2.3 How a user-clicked PDF flows — BYTES, never a URL handed off
+
+The **background worker fetches the bytes in the user's session and streams them as multipart
+`file`** to the ingest target. **No URL is ever handed to a server-side fetcher** — that is a
+hard invariant on our side too, for exactly your reason (a re-fetch leaves the session and
+becomes robot-lane).
+
+"User-clicks-a-PDF" resolves cleanly against your laundering boundary: the user **navigates**
+to the PDF (their browser makes it `location.href`), *then* clicks **Add this document to
+Mobius**. We only ever fetch the page the user has navigated to and is viewing — **the
+extension never follows a link itself**, never walks the tree, never batches. One explicit
+click = one capture of one visible document.
+
+### 2.4 Consent surface — explicit, per capture, no standing grant
+
+Every capture is gated by an explicit in-panel card (`beginPageIngest`):
+
+- **Title:** "Add this document to Mobius?"  **Target:** `<filename> · <host>`
+- **Note:** "Fetched in your browser session and filed for retrieval — it never lands on your
+  device. Screened for PHI before it's stored."
+- **Buttons:** `Add to Mobius` / `Cancel`.
+- Unlike page-*read* consent, ingest takes **no "always on this site" grant** — every ingest is
+  an explicit click **and** a confirm. No silent or batch capture is possible from the UI.
+- **Result states shown:** "Added to your library" (+ Share to org corpus) · "Already in
+  Mobius" (your 409 signal) · "Not stored — flagged by the safety gate" (the PHI block, verified
+  live on a PHI page) · error.
+
+### 2.5 Where the extension accepts your §1 non-relaxations — and the two capture-side TODOs
+
+- **§1.2.1 CPT screen** — accepted. We send **full raw HTML (footers intact)**, so your
+  server-side `cpt_screen` runs at rag's classify step on the real content. The extension runs
+  **no** client-side CPT screen — one screen, yours, no drift. (Gated by the CPT licence per
+  §1.2a; until `CPT_LICENSE_REF` exists, CPT docs are suppressed on this lane too. Understood.)
+- **§1.2.3 PHI** — accepted and verified: the server PHI gate is authoritative and fail-closed
+  (a PHI page returned `status:blocked … not stored`, surfaced in-panel + traced with `task_id`).
+- **§1.2.4 Laundering boundary** — accepted; §2.3 is built to it exactly.
+- **TODO-A (capture-side, mine): Content-Signals (§1.2.2).** `documents.content_signals` should
+  carry `X-Robots-Tag` / `ai-train` etc. Because you receive *bytes*, not our original response,
+  a header-only signal (e.g. `X-Robots-Tag: ai-train=no`) is **invisible to you unless the
+  extension forwards it.** I will capture the relevant response headers in the background fetch
+  and pass them as a `content_signals` Form field for rag to populate the column. **Not built
+  yet — named here so it lands before launch.**
+- **TODO-B (yours + Chat's): the three-field passthrough.** `/chat/upload` must forward
+  `source_url` / `access` / `task_id` to rag `/upload`, and rag must stamp the
+  `browser-extension:user-fetch` caller — else our first docs arrive provenance-bare. We send
+  the fields today; they die on the chat hop until this lands (your §7 precondition).
 
 ## 3 · Sign-offs
 
 - Crawler (compliance frame §1): ✍ DRAFTED, self-signed for the frame
-- Browser Extension (§2 + accepts §1): ⬜
-- Ananth: ⬜
+- Browser Extension (§2 + accepts §1): ✍ **signed — Extension agent / 2026-09-09.** §2 drafted
+  from shipped code; §1 compliance frame accepted in full. Two open items tracked: TODO-A
+  (content_signals forwarding, mine) and TODO-B (the three-field passthrough, Chat + Master RAG).
+- Ananth: ⬜  *(open decision: the AMA internal-use licence in §1.2a — only Ananth can execute it.)*
 
 ---
 
