@@ -693,3 +693,33 @@ Ananth ratified the TWO-KEY admit rule as the final policy — explicitly choosi
   Master for it or assign an owner. Moot until Key 1 exists; flagged so it's not discovered late.
 - Also OPEN (Defect 2, §2.9-DONE): chat mislabeling a downstream storage failure as `blocked_indeterminate`
   — an operability item awaiting Ananth's PHI-code clearance.
+
+### 2.9-CLOSED · provenance lane DB-verified + caller defect fixed (2026-09-09)
+
+Master RAG verified doc `a11582c5` from the DB: access, task_id, source_run_id, fetched_at, source_url,
+source_page_url, source_page_url_basis, and **content_signals NORMALIZED** (`x-robots-tag:noai`, not raw —
+the passthrough tell is clean). One defect the Extension's "confirm the caller" check surfaced: the
+`browser-extension:user-fetch` caller was computed then DISCARDED (producer-without-a-consumer in the field
+meant to keep user-fetch docs distinguishable forever). Master RAG fixed it (rev 00692-qgx), threaded through
+EVERY call site (upload, import-from-html, import-scraped-pages), verified both reads. **Provenance lane
+CLOSED, verified from documents not self-report.** (Defect 1, non-idempotent publish, remains Master RAG's
+with Ananth's sequencing.)
+
+### 2.8 · Ask 1 heading/chrome fix shipped + Option A proposed (PHI classifier, 2026-09-09)
+
+Classifier rev `00026-w8t`: web-UI-chrome + section-heading false positives suppressed (6 of 8 name spans on
+CPB 0330 gone — "Main Content", "Table Of Contents", "Share Link", "Print", "Policy Scope", "Policy
+Applicable"; references authors already suppressed). Recall intact (real patient names still flag). **Residual
+on CPB 0330:** 2 medical-TITLE fragments ("Multiple Sleep Latency", "Wakefulness Test") + Address + an `ssn`
+token (Extension confirmed: NO SSN-format or 9-digit token in the doc's visible text → it's a chat
+HTML→text EXTRACTION artifact, not a real identifier, upstream of the classifier's regex).
+
+**OPTION A — the durable policy-doc fix, AWAITING ANANTH.** Classifier proposes caller-scoped LLM-arbitration:
+`/classify` takes a caller hint; for `caller=browser-extension:user-fetch`, LOW-confidence uncorroborated
+heuristic-only name/address findings become LLM-OVERRIDABLE (the already-running LLM pass clears them when it
+confirms no patient PHI). Global default UNCHANGED; recall FLOOR preserved (Presidio names, clinical-context,
+regex identifiers, real SSN, LLM patient-detection all still hard-block). Scales to every CPB, no per-doc
+dictionary. **Two coupled decisions for Ananth:** (1) the recall-policy carve-out (classifier flagged it —
+Extension endorses the shape but won't approve a recall exception); (2) it needs the caller passed chat →
+/classify, which is chat-side PHI code while Chat Master is OFF PHI — the SAME ownership question as the Ask-2
+admit path. Bundle both.
