@@ -263,6 +263,43 @@ synthetic benchmark. It answers "what is actually working" and it re-runs, so dr
 becomes measurable instead of anecdotal. Same discipline as the refactor gate: a frozen
 corpus, compared against itself.
 
+
+**SPAN IDENTITY IS THE NODE KEY — Ananth, 2026-09-09: "shouldn't the span also map to
+our schema in some regards, else what is the point of those modules?"**
+
+He is right, and it is the difference between telemetry and instrumentation. If spans
+carry their own ad-hoc names we end up with **two independent decompositions of the
+same system** — 36 schema nodes and N arbitrary spans — and neither can check the
+other. Span `name` must be the node key from `docs/chat-schema/chat-dev.json`.
+
+**What that buys, beyond tidiness:**
+
+1. **The schema becomes instrumented.** Every node gets real p50/p95 and real call
+   counts beside its findings and its rating. A red node stops being a judgement and
+   starts carrying a number.
+2. **The two artifacts become RECIPROCALLY FALSIFIABLE**, which is the part that
+   matters. A span with no matching node means the schema is incomplete — we are
+   modelling something that does not exist and missing something that does. A live node
+   that never produces a span is dead or mis-modelled. **Today neither error is
+   detectable:** the schema is hand-written and nothing contradicts it, which is the
+   same "nothing fails loudly" shape as every finding on this page, applied to our own
+   map.
+3. **The readiness ratings get evidence.** A node rated amber on suspicion can be
+   confirmed or refuted.
+4. **It closes the loop on the phase's own purpose.** P2b exists to make absent
+   producers detectable; a span set that cannot be checked against the model of the
+   system is itself an unverifiable producer.
+
+**Concretely:** `span.name ∈ node keys`, with a generator check that fails when a span
+name is not a known node, or when a live node produces no span across a corpus run.
+That check belongs in `refresh.sh` beside the roadmap's unassigned-bug check — same
+rule, same failure mode.
+
+**One honest limit:** some spans are finer than any node — a single tool call inside
+`react_loop`, a single DB write inside `state_load`. Those are CHILD spans carrying the
+parent's node key plus their own local label. The mapping is node → span *tree*, not
+node → span. A child span whose parent is not a node is still a schema gap.
+
 **PROVIDER STATE: CAPTURE NOW AND LABEL IT — Ananth's ruling, 2026-09-09**, in answer
 to whether to wait for the Anthropic credit issue to clear. And his aim makes the label
 the control rather than a caveat: **lower latency with the SAME provider through the
