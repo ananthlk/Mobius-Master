@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobius Architecture: Five-Layer Stack</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0f0f11;
+      color: #f1f0ee;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      padding: 40px 20px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 { font-size: 28px; margin-bottom: 8px; font-weight: 700; }
+    .subtitle { color: rgba(255,255,255,0.6); margin-bottom: 40px; font-size: 14px; }
+
+    .stack {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 40px;
+    }
+
+    .layer {
+      padding: 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .layer:last-child { border-bottom: none; }
+    .layer:nth-child(1) { background: #1a1a1e; }
+    .layer:nth-child(2) { background: #0f0f11; }
+    .layer:nth-child(3) { background: #1a1a1e; }
+    .layer:nth-child(4) { background: #0f0f11; }
+    .layer:nth-child(5) { background: #1a1a1e; }
+
+    .layer-num {
+      font-size: 36px;
+      font-weight: 700;
+      color: #7c3aed;
+      line-height: 1;
+    }
+
+    .layer-content h2 {
+      font-size: 16px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .layer-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .layer-items {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .item {
+      background: rgba(124, 58, 237, 0.1);
+      color: #a78bfa;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      border: 0.5px solid rgba(124, 58, 237, 0.3);
+    }
+
+    .flow-section {
+      background: #1a1a1e;
+      border: 0.5px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 40px;
+    }
+
+    .flow-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #f1f0ee;
+    }
+
+    .flow-step {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+
+    .flow-num {
+      background: #7c3aed;
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .flow-text {
+      flex: 1;
+      padding-top: 2px;
+    }
+
+    .flow-text .label {
+      font-weight: 600;
+      color: #f1f0ee;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .flow-text .detail {
+      color: rgba(255,255,255,0.5);
+      font-size: 12px;
+    }
+
+    .gates-section {
+      background: #1a1a1e;
+      border: 0.5px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    .gates-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .gates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .gate-card {
+      background: #252529;
+      border: 0.5px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 12px;
+    }
+
+    .gate-num { font-weight: 700; color: #7c3aed; font-size: 13px; }
+    .gate-name { font-weight: 600; color: #f1f0ee; margin: 4px 0; }
+    .gate-status { font-size: 10px; color: rgba(255,255,255,0.5); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Mobius Architecture: Five-Layer Stack</h1>
+    <p class="subtitle">How the network brain works, layer by layer</p>
+
+    <div class="stack">
+      <div class="layer">
+        <div class="layer-num">1</div>
+        <div class="layer-content">
+          <h2>User Interface</h2>
+          <p class="layer-desc">The operator's voice. Ask anything about policies, denials, appeals. Get instant answers with citations.</p>
+          <div class="layer-items">
+            <span class="item">Chat</span>
+            <span class="item">Conversational Interface</span>
+            <span class="item">Citations</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="layer">
+        <div class="layer-num">2</div>
+        <div class="layer-content">
+          <h2>Router (Reasoning Engine)</h2>
+          <p class="layer-desc">Decides which strategy works best. Facts? RAG? Web? Reasoning? Learns from feedback what strategy wins.</p>
+          <div class="layer-items">
+            <span class="item">Strategy A: Facts</span>
+            <span class="item">Strategy B: RAG</span>
+            <span class="item">Strategy C: Web</span>
+            <span class="item">Strategy D: Reasoning</span>
+            <span class="item">Bandit Learning</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="layer">
+        <div class="layer-num">3</div>
+        <div class="layer-content">
+          <h2>Intelligence (RAG + Facts)</h2>
+          <p class="layer-desc">Two-tier knowledge. Certified facts first (instant). Rich corpus second (detailed). Never guesses.</p>
+          <div class="layer-items">
+            <span class="item">Fact Store</span>
+            <span class="item">Embeddings</span>
+            <span class="item">Vector Index</span>
+            <span class="item">ReAct Reasoning</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="layer">
+        <div class="layer-num">4</div>
+        <div class="layer-content">
+          <h2>Sourcing & Curation</h2>
+          <p class="layer-desc">Keeps knowledge alive. Scrapes policies, classifies documents, embeds chunks, culls outdated content.</p>
+          <div class="layer-items">
+            <span class="item">Sourcing Agent</span>
+            <span class="item">Curation Agent</span>
+            <span class="item">Deep Research</span>
+            <span class="item">Metadata Tags</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="layer">
+        <div class="layer-num">5</div>
+        <div class="layer-content">
+          <h2>Evaluation & Feedback</h2>
+          <p class="layer-desc">Grades every answer. Tells Router what works. Tells Sourcing what's missing. The system learns.</p>
+          <div class="layer-items">
+            <span class="item">Eval Command Center</span>
+            <span class="item">Accuracy Grading</span>
+            <span class="item">Latency Tracking</span>
+            <span class="item">Coverage Analysis</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-section">
+      <div class="flow-title">How a Question Flows Through the Stack</div>
+
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-text">
+          <span class="label">Operator asks (Layer 1)</span>
+          <span class="detail">"Can FL Medicaid deny for audio-only ADHD telehealth?"</span>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-text">
+          <span class="label">Router decides strategy (Layer 2)</span>
+          <span class="detail">Strategy: Try Facts first → RAG with reasoning</span>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-text">
+          <span class="label">Facts checked (Layer 3a)</span>
+          <span class="detail">No exact fact → escalate</span>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-text">
+          <span class="label">RAG searches (Layer 3b)</span>
+          <span class="detail">Finds: 3 Medicaid policies + 2 telehealth addenda + ADHD guidance</span>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-num">5</div>
+        <div class="flow-text">
+          <span class="label">ReAct chains them (Layer 3)</span>
+          <span class="detail">Policy X + Addendum Y + Addendum Z → "Can deny if violates real-time requirement"</span>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-num">6</div>
+        <div class="flow-text">
+          <span class="label">Chat answers (Layer 1)</span>
+          <span class="detail">User gets answer in 2 seconds with 3 citations + page numbers</span>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-num">7</div>
+        <div class="flow-text">
+          <span class="label">Eval grades (Layer 5)</span>
+          <span class="detail">✓ Correct. ✓ Good citations. ✓ Fast. → Router learns: RAG+reasoning works for this type</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="gates-section">
+      <div class="gates-title">The 8 RCM Gates (What Mobius Unlocks)</div>
+      <div class="gates-grid">
+        <div class="gate-card">
+          <div class="gate-num">1</div>
+          <div class="gate-name">Claim Closure</div>
+          <div class="gate-status">✅ Live</div>
+        </div>
+        <div class="gate-card">
+          <div class="gate-num">2</div>
+          <div class="gate-name">Denial Management</div>
+          <div class="gate-status">✅ Live</div>
+        </div>
+        <div class="gate-card">
+          <div class="gate-num">3</div>
+          <div class="gate-name">Eligibility</div>
+          <div class="gate-status">✅ Live</div>
+        </div>
+        <div class="gate-card">
+          <div class="gate-num">4</div>
+          <div class="gate-name">Payor Policies</div>
+          <div class="gate-status">✅ Live</div>
+        </div>
+        <div class="gate-card">
+          <div class="gate-num">5</div>
+          <div class="gate-name">Credentialing</div>
+          <div class="gate-status">✅ Live</div>
+        </div>
+        <div class="gate-card">
+          <div class="gate-num">6</div>
+          <div class="gate-name">Appeals / Auth</div>
+          <div class="gate-status">🔨 Building</div>
+        </div>
+        <div class="gate-card">
+          <div class="gate-num">7</div>
+          <div class="gate-name">Coding & Claims</div>
+          <div class="gate-status">🔨 Building</div>
+        </div>
+        <div class="gate-card">
+          <div class="gate-num">8</div>
+          <div class="gate-name">Network Effects</div>
+          <div class="gate-status">📋 Roadmap</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

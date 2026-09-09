@@ -12,14 +12,14 @@ program. That is what makes this a tracker and not a snapshot.
 Plan and gate definition: `docs/chat-refactor-program.md`. Nothing starts until
 its sign-off table is complete.
 
-**74 bugs · 45 sequenced into 5 phases · 28 explicitly outside · 1 unassigned**
+**74 bugs · 46 sequenced into 5 phases · 28 explicitly outside · 0 unassigned**
 
 ## Progress
 
 | Phase | Name | Bugs | Owner | Gate metric | Blocks | Status |
 |---|---|---:|---|---|---|---|
 | **P1** | Delete | 5 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☐ not started |
-| **P2** | Instrument — latency and decisions | 9 | chat + Eval | every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☐ not started |
+| **P2** | Instrument — latency and decisions | 10 | chat + Eval | every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☐ not started |
 | **P3** | One decision point | 11 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ☐ not started |
 | **P4** | Split | 15 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
 | **P5** | Config UX | 5 | chat + Prompt Studio | max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped | — | ☐ not started |
@@ -31,7 +31,7 @@ complete, and P0 blocks all of the others.
 
 | Owner | Sequenced bugs |
 |---|---:|
-| unassigned-owner | 23 |
+| unassigned-owner | 24 |
 | chat | 22 |
 
 ## P1 — Delete  ·  5 items
@@ -52,7 +52,7 @@ The cost of leading with it, stated plainly: this phase CANNOT CLAIM A LATENCY W
 | ☐ | `run_pipeline` | chat | THE CLASSIC PATH IS DEAD AND IT IS 1,159 LINES |
 | ☐ | `run_pipeline` | chat | THE CREDENTIALING SURFACE IS 8,994 LINES IN CHAT AND ITS TABLES ARE EMPTY |
 
-## P2 — Instrument — latency and decisions  ·  9 items
+## P2 — Instrument — latency and decisions  ·  10 items
 
 **Owner** chat + Eval
 **Gate** every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join  
@@ -67,6 +67,7 @@ BASELINE RULE: the latency numbers captured at the END of this phase are the ref
 | ☐ | `active_context` | — | It writes two keys into the turn record by name — active_context and failed_query — and both are among the thr |
 | ☐ | `curator_tools` | — | DOES IT DO ANYTHING? Yes — and answering that properly corrected two of my own claims |
 | ☐ | `feedback_signal` | — | The module states that inputs it cannot cheaply obtain at plan time — thread turn count, last-turn QC, whether |
+| ☐ | `governor` | — | SCOPE LENS (DB seat, 2026-09-08): chat_turns.blueprint_snapshot is 0 of 2,744 — a DECLARED COLUMN NOTHING HAS  |
 | ☐ | `governor` | chat | 116 OF 187 CONFIG KNOBS RUN ON INVISIBLE CODE DEFAULTS |
 | ☐ | `governor` | chat | THE GOVERNOR IS STRUCTURALLY UNOBSERVABLE |
 | ☐ | `orchestrator` | chat | LATENCY MEASUREMENT ACROSS THE PIPELINE — Ananth's item, and the gap is measurable |
@@ -176,7 +177,3 @@ Each carries a reason. Excluding by silence is the failure mode this guards agai
 | `POST /chat` | security posture | needs Ananth's authorisation + staging; no clean unauthenticated POST sent | RUNTIME LENS, 2026-09-08, mobius-chat in mobius-os-dev: CHAT_ENV=prod  |
 | `personalization` | user-manager | chat cannot act on preferences it forwards | CHAT IS A PASS-THROUGH FOR PREFERENCES AND CANNOT ACT ON THEM |
 | `personalization` | user-manager | assignment itself is disputed | DISPUTED ASSIGNMENT |
-
-## UNASSIGNED — the roadmap is incomplete
-
-- `governor` — SCOPE LENS (DB seat, 2026-09-08): chat_turns.blueprint_snapshot is 0 of 2,744 — a DECLARED COLUMN NOTHING HAS 

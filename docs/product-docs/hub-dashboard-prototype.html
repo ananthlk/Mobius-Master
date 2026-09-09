@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quarterly Vision Alignment Hub — Dashboard Prototype</title>
+  <style>
+    :root {
+      --tier-a: #f97316;
+      --tier-b: #3b82f6;
+      --tier-c: #7c3aed;
+      --live: #16a34a;
+      --building: #eab308;
+      --roadmap: #94a3b8;
+      --blocked: #dc2626;
+      --surface-0: #f8f7fb;
+      --surface-1: #ffffff;
+      --text-primary: #1c1a27;
+      --text-secondary: #6b6880;
+      --border: #e2dff0;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --surface-0: #141220;
+        --surface-1: #1d1a2e;
+        --text-primary: #eceaf6;
+        --text-secondary: #9d99b5;
+        --border: #332e4d;
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: var(--surface-0);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+    }
+    h1 {
+      margin: 0 0 0.5rem 0;
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .header-sub {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+    h2 {
+      margin: 2rem 0 1rem 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .agent-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .agent-card {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .agent-card:hover {
+      border-color: var(--tier-b);
+      transform: translateY(-2px);
+    }
+    .agent-card.selected {
+      border: 2px solid var(--tier-b);
+      background: rgba(59, 130, 246, 0.05);
+    }
+    .agent-name {
+      font-size: 15px;
+      font-weight: 600;
+      margin: 0 0 0.5rem 0;
+    }
+    .agent-role {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin: 0 0 1rem 0;
+    }
+    .progress-bar {
+      background: var(--border);
+      height: 4px;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--tier-b);
+      transition: width 0.3s;
+    }
+    .progress-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+    }
+    .status-summary {
+      display: flex;
+      gap: 12px;
+      margin-top: 1rem;
+      font-size: 12px;
+    }
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .detail-pane {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem;
+      display: none;
+    }
+    .detail-pane.active {
+      display: block;
+    }
+    .detail-section {
+      margin-bottom: 1.5rem;
+    }
+    .detail-section h3 {
+      margin: 0 0 0.75rem 0;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      letter-spacing: 0.05em;
+    }
+    .detail-section p {
+      margin: 0.5rem 0;
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+    .blocker-list, .dependency-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .blocker-list li, .dependency-list li {
+      padding: 0.5rem 0;
+      padding-left: 1.5rem;
+      position: relative;
+      color: var(--text-primary);
+    }
+    .blocker-list li::before {
+      content: "⏸";
+      position: absolute;
+      left: 0;
+    }
+    .dependency-list li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+    }
+    .gate-status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .status-live {
+      background: rgba(22, 163, 74, 0.2);
+      color: var(--live);
+    }
+    .status-building {
+      background: rgba(234, 179, 8, 0.2);
+      color: var(--building);
+    }
+    .status-roadmap {
+      background: rgba(148, 163, 184, 0.2);
+      color: var(--roadmap);
+    }
+    .status-blocked {
+      background: rgba(220, 38, 38, 0.2);
+      color: var(--blocked);
+    }
+    .tabs {
+      display: flex;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    .tab-button {
+      padding: 0.75rem 1rem;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-button.active {
+      border-bottom-color: var(--tier-b);
+      color: var(--text-primary);
+    }
+    .tab-button:hover:not(.active) {
+      color: var(--text-primary);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Quarterly Vision Alignment Hub</h1>
+      <p class="header-sub">Q3 2026 Status Review · All agents reporting live · Last updated 2026-07-30</p>
+    </header>
+
+    <div class="tabs">
+      <button class="tab-button active" onclick="switchTab(event, 'dashboard')">Dashboard</button>
+      <button class="tab-button" onclick="switchTab(event, 'matrix')">Status matrix</button>
+      <button class="tab-button" onclick="switchTab(event, 'blockers')">Fleet blockers</button>
+    </div>
+
+    <div id="dashboard" class="tab-content active">
+      <h2>Agent progress tracker</h2>
+      <p style="color: var(--text-secondary); margin: 0 0 1.5rem 0;">Click any agent to see detailed status, blockers, and dependencies.</p>
+
+      <div class="agent-grid">
+        <div class="agent-card" onclick="selectAgent(event, 'pa', {name: 'Product-Awareness', role: 'RCM gates', gates: 8, live: 5, building: 1, roadmap: 2})">
+          <div class="agent-name">Product-Awareness</div>
+          <div class="agent-role">RCM gates (8 total)</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 75%;"></div>
+          </div>
+          <div class="progress-label">
+            <span>5 live · 1 building · 2 roadmap</span>
+            <span>62.5%</span>
+          </div>
+          <div class="status-summary">
+            <div class="status-item">
+              <div class="status-dot" style="background: var(--live);"></div>
+              <span>Tier B signal</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="agent-card" onclick="selectAgent(event, 'appeals', {name: 'Appeals', role: 'Roadmap phases (V1/V2/V3)', gates: 3, live: 0, building: 1, roadmap: 2})">
+          <div class="agent-name">Appeals Agent</div>
+          <div class="agent-role">V1 Core / V2 Auto / V3 Network</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 33%;"></div>
+          </div>
+          <div class="progress-label">
+            <span>Spec signed · In progress</span>
+            <span>33%</span>
+          </div>
+          <div class="status-summary">
+            <div class="status-item">
+              <div class="status-dot" style="background: var(--building);"></div>
+              <span>V1 Building</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="agent-card" onclick="selectAgent(event, 'router', {name: 'Router', role: 'Optimization phases', gates: 3, live: 1, building: 1, roadmap: 1})">
+          <div class="agent-name">Router Agent</div>
+          <div class="agent-role">Phase 1/2/3 optimization</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 67%;"></div>
+          </div>
+          <div class="progress-label">
+            <span>1 live · 1 building · 1 roadmap</span>
+            <span>67%</span>
+          </div>
+          <div class="status-summary">
+            <div class="status-item">
+              <div class="status-dot" style="background: var(--live);"></div>
+              <span>Phase 1 live</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="agent-card" onclick="selectAgent(event, 'payor', {name: 'Payor Platform', role: 'Policy gates', gates: 4, live: 3, building: 1, roadmap: 0})">
+          <div class="agent-name">Payor Platform Agent</div>
+          <div class="agent-role">Policy coverage gates</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 100%;"></div>
+          </div>
+          <div class="progress-label">
+            <span>3 live · 1 building</span>
+            <span>75%</span>
+          </div>
+          <div class="status-summary">
+            <div class="status-item">
+              <div class="status-dot" style="background: var(--live);"></div>
+              <span>FL Medicaid live</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="agent-card" onclick="selectAgent(event, 'curation', {name: 'Curation', role: 'Corpus quality', gates: 3, live: 2, building: 1, roadmap: 0})">
+          <div class="agent-name">Curation Agent</div>
+          <div class="agent-role">Corpus quality gates</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 100%;"></div>
+          </div>
+          <div class="progress-label">
+            <span>2 live · 1 in progress (9.6% junk cleanup)</span>
+            <span>67%</span>
+          </div>
+          <div class="status-summary">
+            <div class="status-item">
+              <div class="status-dot" style="background: var(--building);"></div>
+              <span>Quality gate open</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="detail-pane" class="detail-pane">
+        <h3 id="detail-name" style="margin: 0 0 1.5rem 0; font-size: 18px; font-weight: 600;"></h3>
+
+        <div class="detail-section">
+          <h3>Current status</h3>
+          <p id="detail-status"></p>
+        </div>
+
+        <div class="detail-section">
+          <h3>What's blocking the next milestone</h3>
+          <ul class="blocker-list" id="detail-blockers"></ul>
+        </div>
+
+        <div class="detail-section">
+          <h3>Dependencies</h3>
+          <ul class="dependency-list" id="detail-dependencies"></ul>
+        </div>
+
+        <div class="detail-section">
+          <h3>Next steps</h3>
+          <p id="detail-next"></p>
+        </div>
+      </div>
+    </div>
+
+    <div id="matrix" class="tab-content">
+      <h2>Gate status matrix (all agents)</h2>
+      <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+        <tr style="border-bottom: 2px solid var(--border);">
+          <th style="text-align: left; padding: 0.75rem; font-weight: 600;">Agent</th>
+          <th style="text-align: center; padding: 0.75rem;">Live</th>
+          <th style="text-align: center; padding: 0.75rem;">Building</th>
+          <th style="text-align: center; padding: 0.75rem;">Roadmap</th>
+          <th style="text-align: center; padding: 0.75rem;">Blocked</th>
+          <th style="text-align: center; padding: 0.75rem;">Overall</th>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 0.75rem;">Product-Awareness (RCM)</td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge status-live">5</span></td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge status-building">1</span></td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge status-roadmap">2</span></td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge">—</span></td>
+          <td style="text-align: center; padding: 0.75rem;">Tier B signal</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 0.75rem;">Appeals</td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge">—</span></td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge status-building">V1 Core</span></td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge status-roadmap">V2, V3</span></td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge">—</span></td>
+          <td style="text-align: center; padding: 0.75rem;">On track</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 0.75rem;">Router</td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge status-live">Ph1</span></td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge status-building">Ph2</span></td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge status-roadmap">Ph3</span></td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge">—</span></td>
+          <td style="text-align: center; padding: 0.75rem;">On track</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 0.75rem;">Payor Platform</td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge status-live">3</span></td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge status-building">1</span></td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge">—</span></td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge">—</span></td>
+          <td style="text-align: center; padding: 0.75rem;">On track</td>
+        </tr>
+        <tr>
+          <td style="padding: 0.75rem;">Curation</td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge status-live">2</span></td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge status-building">1</span></td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge">—</span></td>
+          <td style="text-align: center; padding: 0.75rem;"><span class="gate-status-badge">—</span></td>
+          <td style="text-align: center; padding: 0.75rem;">Quality work</td>
+        </tr>
+      </table>
+    </div>
+
+    <div id="blockers" class="tab-content">
+      <h2>Cross-fleet blocker list</h2>
+      <p style="color: var(--text-secondary); margin: 0 0 1.5rem 0;">What's preventing forward motion across agents. Owned by product-awareness for weekly tracking.</p>
+
+      <div style="display: grid; gap: 1rem;">
+        <div style="background: var(--surface-1); border: 1px solid var(--border); border-left: 3px solid var(--blocked); border-radius: 4px; padding: 1rem;">
+          <div style="font-weight: 600; margin-bottom: 0.5rem;">Product-Awareness: 9.6% corpus junk (Curation owns fix)</div>
+          <div style="font-size: 12px; color: var(--text-secondary);">Impact: Grounding promise weakened; recall on edge cases. Blocker: in-progress cleanup. ETA: 2026-08-15.</div>
+        </div>
+        <div style="background: var(--surface-1); border: 1px solid var(--border); border-left: 3px solid var(--building); border-radius: 4px; padding: 1rem;">
+          <div style="font-weight: 600; margin-bottom: 0.5rem;">Appeals: Appeal-letter UX spec (UX Architect owns)</div>
+          <div style="font-size: 12px; color: var(--text-secondary);">Impact: V1 Core can't ship without this. Blocker: UX bandwidth. ETA: 2026-08-05.</div>
+        </div>
+        <div style="background: var(--surface-1); border: 1px solid var(--border); border-left: 3px solid var(--building); border-radius: 4px; padding: 1rem;">
+          <div style="font-weight: 600; margin-bottom: 0.5rem;">Router: Bandit training data (Chat owns)</div>
+          <div style="font-size: 12px; color: var(--text-secondary);">Impact: Phase 3 learning can't start. Blocker: Schema + telemetry wiring. ETA: 2026-08-22.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const agentData = {
+      pa: {
+        name: 'Product-Awareness',
+        status: 'Tier B signal phase: Gates 1–5 live (claim closure, denial mgmt, eligibility, policies, credentialing). Gate 6 (appeals) building. Gate 7 (coding) partial.',
+        blockers: [
+          '9.6% corpus junk chunks (Curation owns cleanup)',
+          'Hub dashboard UI spec (awaiting UX sign-off)',
+          'Corpus linking (go through existing docs + add gate callouts)'
+        ],
+        dependencies: [
+          'Curation: corpus quality fix must land before grounding promise holds',
+          'UX: Governance Surface pattern spec review',
+          'All gate owners: first Quarterly Alignment review (Q4 first week)'
+        ],
+        next: 'Coordinate with UX Architect on pattern spec; finalize corpus linking template; schedule Q4 first-week Quarterly Alignment review.'
+      },
+      appeals: {
+        name: 'Appeals Agent',
+        status: 'V1 Core (Denial rules + appeal drafting) spec signed; active. V2 (routing automation) and V3 (network patterns) roadmap.',
+        blockers: [
+          'Appeal-letter UX spec (needed for V1 to ship)',
+          'Denial rule tagging (cross-payor consistency)'
+        ],
+        dependencies: [
+          'Product-Awareness: RCM framework live (gates 1–5 stable)',
+          'UX: approval-letter UI pattern',
+          'Payor Platform: denial codes + CARC mappings'
+        ],
+        next: 'Request UX spec for appeal-letter surface; finalize denial rule scoring; aim for V1 ship 2026-08-30.'
+      },
+      router: {
+        name: 'Router Agent',
+        status: 'Phase 1 (Consolidation) live on main; Phase 2 (Escalation) in dev; Phase 3 (Optimization via bandit) roadmap.',
+        blockers: [
+          'Bandit training data schema (Chat telemetry)'
+        ],
+        dependencies: [
+          'Eval: bandit reward signal stable',
+          'Chat: llm_call_log schema + telemetry wiring',
+          'Product-Awareness: RCM gates stable (don\'t break mid-phase)'
+        ],
+        next: 'Verify Phase 2 eval ceiling (oracle 0.628); finalize bandit data contract with Chat; aim for Phase 2 ship 2026-09-15.'
+      }
+    };
+
+    function selectAgent(e, agentId, data) {
+      document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('selected'));
+      e.currentTarget.classList.add('selected');
+
+      const agent = agentData[agentId];
+      if (!agent) return;
+
+      document.getElementById('detail-name').textContent = agent.name;
+      document.getElementById('detail-status').textContent = agent.status;
+
+      const blockersList = document.getElementById('detail-blockers');
+      blockersList.innerHTML = agent.blockers.map(b => `<li>${b}</li>`).join('');
+
+      const depsList = document.getElementById('detail-dependencies');
+      depsList.innerHTML = agent.dependencies.map(d => `<li>${d}</li>`).join('');
+
+      document.getElementById('detail-next').textContent = agent.next;
+
+      document.getElementById('detail-pane').classList.add('active');
+      document.getElementById('detail-pane').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function switchTab(e, tab) {
+      document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+
+      e.target.classList.add('active');
+      document.getElementById(tab).classList.add('active');
+    }
+  </script>
+</body>
+</html>

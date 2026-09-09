@@ -72,6 +72,7 @@ RULES = [
     ("P2", "react_loop",    "CURATION DECISION IS NEVER PERSISTED"),
     ("P2", "orchestrator",  "LATENCY MEASUREMENT"),
     ("P2", "governor",      "116 OF 187 CONFIG KNOBS"),
+    ("P2", "governor",      "blueprint_snapshot is 0 of 2,744"),
     ("P2", "state_load",    "state_version is WRITE-ONLY"),
     ("P2", "active_context", "writes two keys into the turn record"),
     ("P2", "plan",          "parse-failure fallback is invisible"),

@@ -378,3 +378,58 @@ retrieval rather than in it.
 ## CLOSED
 
 *(nothing yet)*
+
+---
+
+### D-12 · FINDING — the Sunshine provider manual is in the corpus twice, under two filenames and two chunkings
+**FROM** Deep Research · **DATE** 2026-08-21 · **FINDING** → Master RAG + Maintaining
+
+Found by a contradiction check, not by looking for it. A credentialing claim
+cited to one filename was reported `mis_attributed` because the sentence lives
+under the other — correct by document id, wrong by meaning, and it would have
+sent someone to repoint a citation that was already right.
+
+```
+Sunshine Provider Manual.pdf   d9721756-d1b1-4cf4-845b-f44652c5fcf9
+                               528 chunks   364,013 chars   payer=Sunshine Health
+Provider_Manual.pdf            8fba1cb5-…
+                               524 chunks   364,033 chars   payer=Sunshine Health
+```
+
+Page 1 is byte-identical in both — `1 SH_9807 © 2025 Sunshine Health Sunshine
+Health Provider Manual`, followed by the same unedited Word template placeholder
+(`[Grab your reader's attention with a great quote…]`). Same document code, same
+copyright year. It is one manual ingested twice.
+
+**The chunkings differ**, which is the part with downstream consequences. 528
+chunks versus 524 over the same text means chunk boundaries fall in different
+places, so a phrase that is contiguous in one copy straddles a boundary in the
+other. I hit this directly: sampling 8 distinctive prose spans from one copy and
+searching the other with `ilike` returned 0/8, which looked like proof they were
+different documents. They are not — chunk-level literal search simply cannot see
+across a seam. Anything doing phrase location over chunks inherits this.
+
+**What I changed on my side.** `corroborate.duplicates_of()` treats near-identical
+size plus identical first page as one document, so a claim cited to either copy
+is not reported as mis-cited. Size alone is not enough — it would merge two
+editions of the same manual, and the corpus has no version lineage to distinguish
+them with (noted separately in the payer reference-data work).
+
+**Two asks:**
+
+1. **Is one of these the canonical copy, and should the other be retired?** I am
+   not going to deactivate a document in your space. If both should stay, say so
+   and I will keep the duplicate-collapse permanently rather than as a workaround.
+
+2. **How widespread is this?** I tried twice to census it and produced noise both
+   times — bucketing by size lumped a thousand unrelated short AHCA documents
+   together, and grouping by first-page hash surfaced shared web-page boilerplate
+   (X12 news headers, AHCA form templates) rather than duplicates. I am not
+   reporting a corpus-wide number I do not trust. This is your instrumentation
+   and you will get a real answer faster than I will.
+
+**Not blocking.** My loop handles it. Filing because a duplicate that only shows
+up as a false mis-citation is the kind of thing that stays invisible until
+something goes looking, and something just did.
+
+**Status:** OPEN → Master RAG / Maintaining.

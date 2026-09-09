@@ -207,3 +207,50 @@ GCP caps the **allowed** value from **`max_connections`** based on **machine typ
 ### 4. Local docker Postgres (not Cloud SQL)
 
 `mobius-chat/docker-compose.yml` documents overriding **`max_connections=200`** for the bundled Postgres image when you use that stack locally.
+
+---
+
+## 9. Retriever → DB: a real fix to Pool latency that changes R_chat during one sub-phase — need your sign-off before I ship it
+
+**2026-08-19 · Retriever.** Diagnosed a live-trace latency problem (Pool = 86% of a 22.8s query, 19.7s) down to root cause, verified the fix works with repeated real measurements, and it has a connection-budget consequence this formula needs to account for. Flagging before I implement, not after.
+
+### The finding
+
+`PublicSourceAdapter` (`app/services/retriever/pool/public_adapter.py`) holds **one `AsyncSession`** (`self.db`), and `pool.py`'s `run_pool_for_query` fires `tag_select`, `vector_search`, and `inherited` concurrently via `asyncio.gather` — but all three execute against that same single session/connection. Instrumented with real wall-clock timestamps (not self-reported segment durations) against a live query:
+
+```
+tag_select    START t=12.38s   END t=23.88s   (11.50s wall, self-reported only 6.66s)
+vector_search START t=12.38s   END t=30.39s   (18.01s wall, self-reported only 9.93s+embed)
+inherited     START t=12.38s   END t=12.38s   (instant)
+```
+
+All three start at the same instant — `asyncio.gather` itself is fine. But wall-clock time exceeds self-reported execution time by ~70-80% for the two DB-bound calls, because they queue behind each other on the one shared connection rather than genuinely overlapping. (Embedding itself is not the problem — `embed_async` already runs the Vertex SDK call via `asyncio.to_thread`, off the event loop, so it doesn't block anything by itself.)
+
+### The fix, verified empirically (not just argued)
+
+Gave `tag_select`/`vector_search`/`inherited` each their own `AsyncSession` for the duration of the gather (opened fresh, closed after). Re-ran the same real query **3 times** against live dev data:
+
+| | shared session (baseline) | separate sessions |
+|---|---|---|
+| run 1 | pool_ms = 20,746 | pool_ms = 13,761 |
+| run 2 | pool_ms = 21,145 | pool_ms = 13,819 |
+| run 3 | — | pool_ms = 13,318 |
+
+Consistent ~35% reduction in Pool's own wall-clock time across repeats (embedding/DB latency vary run to run in absolute terms, as expected for live external calls — the reduction holds regardless). Not shipped yet; this was a monkeypatched local experiment to prove the mechanism before touching production code.
+
+### Why this is a DB-formula question, not just a code change
+
+This formula's **R_chat = 1** assumes one connection per in-flight chat query. My fix means **one in-flight query needs up to 3 concurrent connections, but only for the duration of its own Pool sub-phase** (~10-14s of a ~20s+ query today, likely less once this ships) — not for the query's full lifetime, and not a permanent per-user multiplier. Before Pool (Gate) and after it (Fillers/Synthesis/Contract), the query is back to 1 connection.
+
+So the real ask isn't "R_chat becomes 3" — it's "what's the right peak multiplier for a sub-phase, and does today's pool already absorb it." Concretely:
+
+- Current RAG API pool: `DB_POOL_SIZE=10` / `DB_MAX_OVERFLOW=20` = **30 total** (raised earlier this session, `app/config.py`, after a real connection-exhaustion incident under concurrent load — same shared instance, same headroom this fix would consume).
+- If N chat queries are simultaneously inside their Pool sub-phase, peak demand from this alone is **up to 3N connections** (worst case, if `inherited` also opens its own — it returns instantly in every trace I've seen, so its real contribution is closer to 0, but I'd rather you size for the worst case than I assume that holds under all query shapes).
+- At today's pool (30), that's a comfortable ceiling of **N≈10 simultaneous in-Pool queries** before hitting overflow, not accounting for whatever headroom Chunking/Embedding/UI are also drawing from the same instance per §3 above.
+
+**What I need from you:**
+1. Does 30 (10+20) already have enough headroom for this, given real concurrent chat traffic today, or should the RAG API pool grow before I ship it?
+2. Is there a cheaper way to get the same effect I haven't considered — e.g., a single connection but with `asyncpg`'s native pipelining, or a small dedicated pool object scoped to Pool's gather block rather than one-off sessions per call?
+3. Anything in the Cloud SQL instance's own `max_connections` ceiling I should check before this goes live (per §2 above)?
+
+Not shipping the code change until I hear back. — Retriever
