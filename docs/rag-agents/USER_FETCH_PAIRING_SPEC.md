@@ -723,3 +723,21 @@ dictionary. **Two coupled decisions for Ananth:** (1) the recall-policy carve-ou
 Extension endorses the shape but won't approve a recall exception); (2) it needs the caller passed chat →
 /classify, which is chat-side PHI code while Chat Master is OFF PHI — the SAME ownership question as the Ask-2
 admit path. Bundle both.
+
+### 2.8 · Real-world evidence — the PHI gate blocks EVERY payer page (Extension, 2026-09-09)
+
+Ananth tested the REAL extension on Molina's FL Medicaid PROVIDER HOMEPAGE (public, zero patient data),
+"Add this document to Mobius" → BLOCKED. /classify on the page: gate=phi, labels=[Address, Date, Email,
+MRN, Name, Phone, ZIP]. Every flag is page furniture, not PHI: `name`=nav/headings ("Florida Providers
+Home", "Read More", "About Molina…"); Address/Email/Phone/ZIP = Molina's own corporate contact block;
+MRN = a plan/provider ID matching the regex (same shape as the phantom-ssn).
+
+**Implication:** the false-positive class is bigger than document TITLES — it's the public CHROME + CONTACT
+block of essentially EVERY payer website. As tuned, the gate blocks all real payer pages → the fetch-to-RAG
+lane is INERT on real content until precision is fixed. This is the difference between demo and usable.
+
+**Option A scope WIDENED (requested):** caller-scoped LLM-arbitration on caller=browser-extension:user-fetch
+should cover the full LOW-confidence uncorroborated heuristic-only set — Name, Address, Email, Phone, ZIP,
+Date, MRN — in structural/contact/nav context. Recall FLOOR unchanged (Presidio-strong, clinical-context,
+real SSN, LLM patient-detection still hard-block). Still gated on Ananth's coupled decision (recall carve-out
++ chat-PHI owner). This real-user case is the argument that Option A is load-bearing, not optional.
