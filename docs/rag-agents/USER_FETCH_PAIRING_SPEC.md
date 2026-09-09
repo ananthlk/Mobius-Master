@@ -213,10 +213,13 @@ to the chat POST's existing `phi_override`); the gate then **admits the doc tagg
 explicit, per-site, attested, auditable. Compliance shape owned by Chat Master + Crawler; the
 extension wires whatever field/handshake they specify (a §2.8-Ext response block will record it).
 
-**Status:** Ask 1 → awaiting the `mobius-skills/phi-classifier` skill owner's ping (Ananth
-routing). Ask 2 → raised with Chat Master (the `/chat/upload` admit path); message queued,
-recorded here as the lossless channel. Both distinct from TODO-B (the provenance passthrough on
-the same hop).
+**Status:** PHI classifier / compliance owner engaged directly (2026-09-09) — both asks sent
+with the full data flow; they own the classifier skill + fleet PHI/HIPAA policy + the
+`/hipaa-mode` endpoint, so **both** Ask 1 (detector precision) and Ask 2's **policy ruling** are
+theirs; Chat Master owns only the `/chat/upload` admit path that honors their verdict. Awaiting
+their gate contract for Ask 1 + Ask 2 (to be recorded here). Both distinct from TODO-B (the
+provenance passthrough on the same hop). Classifier service (dev):
+`mobius-phi-classifier-ortabkknqa-uc.a.run.app` — /classify, /message-check, /redact, /hipaa-mode.
 
 ## 3 · Sign-offs
 
