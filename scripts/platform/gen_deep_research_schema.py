@@ -712,6 +712,29 @@ def main() -> None:
                           f"{a.get('owner')!r}, which is not a declared role — "
                           f"a button with nobody entitled to press it")
 
+    # THE FRAMEWORK MUST BE HONEST ABOUT ITSELF. An artifact claimed `present`
+    # with nothing carrying it is a diagram, and this page's whole job is not
+    # being one. `absent` is a legal, expected answer — two of the seven are —
+    # so the check is on the CLAIM, not on the coverage.
+    C = doc["contract"]
+    for a in C.get("artifacts", []):
+        if a.get("state") in ("present", "partial") and not a.get("carried_by"):
+            breaks.append(f"artifact '{a['id']}' claims to be {a['state']} and "
+                          f"names nothing that carries it — a framework "
+                          f"describing itself rather than the code")
+        if a.get("state") == "absent" and a.get("carried_by"):
+            breaks.append(f"artifact '{a['id']}' is marked absent and names "
+                          f"{a['carried_by']} — one of the two is stale")
+        if a.get("state") not in (C.get("artifact_states") or
+                                  ["present", "partial", "absent"]):
+            breaks.append(f"artifact '{a['id']}' is in state {a.get('state')!r}, "
+                          f"which is not a declared state")
+    # A decision right the arbiter cannot act on is a rule nobody reasons with.
+    for d, spec in (C.get("decisions") or {}).items():
+        if spec.get("default") not in (C.get("rights") or []):
+            breaks.append(f"decision '{d}' defaults to {spec.get('default')!r}, "
+                          f"which is not a declared right")
+
     for w in doc["request_writers"]:
         if w["gated"]:
             continue
@@ -730,6 +753,8 @@ def main() -> None:
         "no undeclared, ungated way to create a request has appeared",
         "no action is offered on a condition nothing ever sets",
         "no stance recommends an action nobody can take",
+        "no artifact claims to exist without naming what carries it",
+        "every decision defaults to a declared right",
         "no user-facing label uses a reserved domain word (appeal, case, ...)",
         "every action is owned by a declared role",
         "the page's own JavaScript parses — a rendered page is not a running one",
@@ -1107,6 +1132,71 @@ def render(doc, path):
           "<li class='f bad'><b>nothing</b> — it will not progress on its own</li></ul>")],
         "info")
 
+    # ---- details: the seven artifacts --------------------------------------
+    TONE_ART = {"present": "ok", "partial": "warn", "absent": "bad"}
+    for a in C.get("artifacts", []):
+        add(f"art:{a['id']}", a["title"], a["says"],
+            [("state", f"<b class={'no' if a['state']=='absent' else ''}>"
+                       f"{esc(a['state'])}</b>"),
+             ("supplied by", esc(a["supplied_by"])),
+             ("carried by", ", ".join(f"<code>{esc(x)}</code>"
+                                      for x in a.get("carried_by") or [])
+                            or "<b class=no>nothing — it does not exist yet</b>"),
+             ("declared in", f"<code>deep_research/{esc(a['declared_in'])}</code>"
+                             if a.get("declared_in") else "—"),
+             ("what is missing", esc(a.get("gap", "")))],
+            TONE_ART.get(a["state"], ""))
+
+    sc = C.get("source_classes") or {}
+    add("art:sources", "What a source can BE",
+        f"{len(sc)} classes, in the words the gates emit",
+        [("", "<ul class=finds>" + "".join(
+            f"<li class='f {'bad' if k in ('payer_policy','inferred_source') else 'good'}'>"
+            f"<b>{esc(k)}</b> — {esc(v.get('says'))}<br>"
+            f"<span class=cur>basis: {esc(v.get('basis'))}</span>"
+            + (f"<br><span class=cur>{esc(v['note'])}</span>" if v.get("note") else "")
+            + "</li>" for k, v in sc.items()) + "</ul>"),
+         ("the default grant", esc((C.get("authority_default") or {}).get("why", ""))),
+         ("why the basis matters", "A grant conditioned on evidence rather than "
+          "on a label: a payer manual is admissible where the corpus says so and "
+          "refused where it was inferred from a filename. A tier alone cannot "
+          "say that, which is part of why the tier field sat unused on 64 of 68 "
+          "requests.")], "warn")
+
+    tl = C.get("tools") or {}
+    add("art:tools", "What it may use", f"{len(tl)} capabilities, none declared yet",
+        [("", "<ul class=finds>" + "".join(
+            f"<li class='f {'bad' if v.get('default')=='ask' else 'good'}'>"
+            f"<b>{esc(k)}</b> <span class=cur>default {esc(v.get('default'))}</span>"
+            f"<br>{esc(v.get('says'))} <span class=cur>· costs {esc(v.get('costs'))}</span>"
+            + (f"<br><span class=cur>{esc(v['note'])}</span>" if v.get("note") else "")
+            + "</li>" for k, v in tl.items()) + "</ul>"),
+         ("note", "No column, no table, no declaration. What a request GETS "
+                  "depends on which entry point it came through, and nothing on "
+                  "the result says which — the five-ways-to-run-a-turn problem "
+                  "seen from the caller's side.")], "bad")
+
+    dc = C.get("decisions") or {}
+    add("art:decisions", "What you keep and what you delegate",
+        f"{len(dc)} decisions · undeclared defaults to ask",
+        [("", "<ul class=finds>" + "".join(
+            f"<li class='f {'good' if v.get('default')=='machine' else 'bad' if v.get('default')=='caller' else 'unproven'}'>"
+            f"<b>{esc(k)}</b> <span class=cur>default {esc(v.get('default'))}</span>"
+            f"<br>{esc(v.get('says'))}"
+            + (f"<br><span class=cur>measured: {esc(v['measured'])}</span>"
+               if v.get("measured") else "")
+            + (f"<br><span class=cur>{esc(v['note'])}</span>" if v.get("note") else "")
+            + "</li>" for k, v in dc.items()) + "</ul>"),
+         ("why it changes the arbiter", "The judge is the only actor with a "
+          "declared standard and it visibly cites it — \"this caller allows "
+          "published_standard, incorporated_by_reference\". The arbiter has none, "
+          "so it reasons from patterns it carries itself: \"no pattern matched\". "
+          "13 reasoning steps between the arbiter and the diagnoser, against the "
+          "judge's dozens."),
+         ("the meter", "An undeclared decision defaults to ASK. Every time that "
+          "fires it is a decision the request type should have covered — so the "
+          "types get derived from what happens rather than invented.")], "bad")
+
     W = doc.get("request_writers") or []
     gated = [w for w in W if w["gated"]]
     add("contract:doors", "Ways to create a request",
@@ -1188,6 +1278,17 @@ def render(doc, path):
     surfaces = "".join(chip(f"ux:{u['id']}", u["title"], u["state"],
                             "ok" if u["state"] == "live" else "info")
                        for u in C.get("surfaces", []))
+    TONE_ART = {"present": "ok", "partial": "warn", "absent": "bad"}
+    arts = "".join(chip(f"art:{a['id']}", a["title"], a["state"],
+                        TONE_ART.get(a["state"], ""))
+                   for a in C.get("artifacts", []))
+    arts += chip("art:sources", "What a source can be",
+                 f"{len(C.get('source_classes') or {})} classes", "warn")
+    arts += chip("art:tools", "What it may use",
+                 f"{len(C.get('tools') or {})} tools", "bad")
+    arts += chip("art:decisions", "Kept or delegated",
+                 f"{len(C.get('decisions') or {})} decisions", "bad")
+
     acts = "".join(chip(f"act:{a['id']}", a["label"], a["id"],
                         "ok" if any((p or [None])[0] == a["id"]
                                     for p in (C.get("recommended") or {}).values())
@@ -1290,7 +1391,14 @@ border-radius:99px;background:var(--bg2)}}
 <p class=band-s>{esc(L['opens'])}</p>
 {chip('meta:limits', 'Read this first — what the page cannot tell you', '?', 'info')}</div>
 
-<div class=band><div class=band-t>2 · The contract — one declaration, two consumers</div>
+<div class=band><div class=band-t>2 · What every request carries</div>
+<p class=band-s>Seven artifacts. Two exist in full, two partly, and three not at
+all — and the three missing ones are where the arbiter has been improvising.
+State is read against what actually carries each: an artifact claiming to exist
+without naming a column fails this build.</p>
+<div class=row>{arts}</div></div>
+
+<div class=band><div class=band-t>3 · The contract — one declaration, several consumers</div>
 <p class=band-s>Four verbs, declared once in <code>deep_research/contract.py</code>,
 published to <code>research.contract</code>, and read back by the router at request
 time. The build fails if a verb here has no live route, or if a surface calls one
@@ -1305,7 +1413,7 @@ that is not declared.</p>
 <p class=legend>What separates the audiences is a FILTER and which verbs they may
 call — not a different API underneath.</p></div>
 
-<div class=band><div class=band-t>3 · The round — click any step</div>
+<div class=band><div class=band-t>4 · The round — click any step</div>
 <p class=band-s>This is what happens once, per round. It repeats until
 {esc(L['repeats_until'])}.</p>
 {steps}
@@ -1313,34 +1421,34 @@ call — not a different API underneath.</p></div>
 ◦ records nothing of its own<br>
 Click a step for what it does and where it lives.</p></div>
 
-<div class=band><div class=band-t>4 · Five ways to run a turn — only one is complete</div>
+<div class=band><div class=band-t>5 · Five ways to run a turn — only one is complete</div>
 <p class=band-s>A turn can be started five ways and they do not offer the same
 protection. Derived from the code, because asserting parity is how it was lost.</p>
 <div class=row>{entries}</div></div>
 
-<div class=band><div class=band-t>5 · What ends a request</div>
+<div class=band><div class=band-t>6 · What ends a request</div>
 <p class=band-s>Four modules can independently finish a request, and one of them
 escalates from five separate lines. There is no single owner of the decision.</p>
 <div class=row>{ends}</div></div>
 
-<div class=band><div class=band-t>6 · What actually ran — the map with traffic on it</div>
+<div class=band><div class=band-t>7 · What actually ran — the map with traffic on it</div>
 <p class=band-s>Everything above is structure. This is counted from the state
 machine's own tables: which validator settled each field, why fields were dropped,
 how many reasoning steps each actor recorded, and what it cost.</p>
 {livechips}</div>
 
-<div class=band><div class=band-t>7 · What each actor can actually do</div>
+<div class=band><div class=band-t>8 · What each actor can actually do</div>
 <p class=band-s>The skills each one has and how it invokes them, read out of the
 code — the judge from its validator registry, the arbiter from its pattern list,
 the drafter from chat's tools. What it does NOT have is listed too, because an
 absent check is invisible otherwise.</p>
 <div class=row>{skl}</div></div>
 
-<div class=band><div class=band-t>8 · The modules</div>
+<div class=band><div class=band-t>9 · The modules</div>
 <p class=band-s>Rating and the plain-language line are curated prose.
 Everything else is read out of the code on every build.</p>{mods}</div>
 
-<div class=band><div class=band-t>9 · What we will need — proposed, not built</div>
+<div class=band><div class=band-t>10 · What we will need — proposed, not built</div>
 <p class=band-s>On the page rather than in somebody's head, and marked so nobody
 reads a proposal as a promise. Nothing here is agreed until it is agreed.</p>
 {future}</div>
