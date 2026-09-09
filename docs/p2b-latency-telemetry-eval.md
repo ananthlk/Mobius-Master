@@ -229,3 +229,62 @@ the last 24 hours. Same NULL column that froze the ema.
 **Eval's answer:**
 
 > _(write here)_
+
+---
+
+## Q7 · Audit the first contract tag — `state_load`, and the gate on calling any node ready
+
+**Ananth, 2026-09-09:** re-measure, then get Eval to audit the tag.
+
+`state_load` is the first node through a P3 pass under the new definition of done. It
+needs your Layer-2 audit to move from **PERIPHERAL → GUARDED**, and by our own rule a
+node cannot mark itself.
+
+**What was fixed** (`c8fc7c8`, `5979558`, `7e6b9e1`): `get_state` returned `None` for a
+DB error *and* for no-row, with a docstring mentioning only the second — so
+`state_load`'s `raw = get_state(...) or {}` built a default `ThreadState` and, on any
+delta-bearing message, called `save_state_full`, a full replace. **One failed read
+destroyed the conversation**, and `state_version` incremented on that same write so the
+reset was indistinguishable from turn 12. It now raises `StateUnavailable`, with the
+rule stated in the docstring: *state is only replaced from state that was actually read.*
+
+**Current state:** coverage **PERIPHERAL** — `test_state_load_state_integrity.py` exists
+and calls the node, no contract tag. Suite 2,541 passed / 14 failed = baseline, 0
+regressions.
+
+### What I need from you
+
+**1 · Is `state_load:no_silent_reset` the right contract ID**, and does the test actually
+assert it? Your own bar: reachability proves *executed*, not that the test would *fail*
+if the contract regressed. The specific question — does the test force a **read error**
+(not a missing row) and assert the **stored row** is unchanged, or does it assert on a
+return value? Per your read-back rule, only the first counts. I have not audited it
+myself; that is deliberately yours.
+
+**2 · Should ASSERTS-NOTHING apply here?** If the test passes but could not catch the
+original defect, that is the state you defined for exactly this case, and I would rather
+this node be the first to carry it honestly than have GUARDED mean "someone added a tag".
+
+### And a latency question that is yours, because it decides whether a spec is writable
+
+`state_load` measured p50 **1,367ms** before the fix, **4,090ms** after — but read
+*counts* went **down** (chat_state 1.36 → 1.22 per span). It is not the fix. Measured
+just now:
+
+```
+my direct read via cloud-sql-proxy       45ms median
+the service's own reads, same tables    260–630ms
+```
+
+`CHAT_DB_MODE=direct` is set live, so this is **not** an MCP hop — it is the same
+psycopg2 path to the same database, ~10× slower from Cloud Run. I have not established
+why, and I am not going to guess.
+
+**So: can a latency spec be written against a per-read overhead nobody has attributed?**
+My instinct is no — the counts are assertable today (four reads, `n=1` each, to four
+named targets) but any wall-time target would be a number about the environment rather
+than the module. Your call, since you set the counts/wall split.
+
+**Eval's answer:**
+
+> _(write here)_
