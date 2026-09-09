@@ -175,10 +175,9 @@
    "telemetry": [],
    "callers": [
     "app.pipeline.orchestrator",
-    "app.pipeline.react_loop",
-    "app.planner.blueprint"
+    "app.pipeline.react_loop"
    ],
-   "fan_in": 3,
+   "fan_in": 2,
    "surfaces": [],
    "observability": "mediated",
    "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator, app.pipeline.react_loop \u2014 its behaviour has no telemetry identity of its own."
@@ -667,10 +666,9 @@
    "telemetry": [],
    "callers": [
     "app.pipeline.tool_manifest",
-    "app.planner.parser",
     "app.services.tool_agent"
    ],
-   "fan_in": 3,
+   "fan_in": 2,
    "surfaces": [],
    "observability": "mediated",
    "observability_note": "Emits nothing. Observable only through its callers \u2014 its behaviour has no telemetry identity of its own."

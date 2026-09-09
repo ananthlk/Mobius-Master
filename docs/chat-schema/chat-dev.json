@@ -24,7 +24,7 @@
     "owner": "chat + Eval",
     "gate": "every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
-    "n": 16
+    "n": 18
    },
    {
     "id": "P3",
@@ -653,7 +653,6 @@
     "app.main",
     "app.pipeline.react.governor",
     "app.pipeline.react.prompts",
-    "app.planner.parser",
     "app.responder.final",
     "app.responder.final_parallel",
     "app.responder.thread_summarizer",
@@ -662,7 +661,8 @@
     "app.services.config_manager",
     "app.services.llm_analytics",
     "app.services.llm_provider",
-    "app.services.model_registry"
+    "app.services.model_registry",
+    "app.services.non_patient_rag"
    ],
    "fan_in": 14,
    "how": "The single entry point for every LLM call in chat. Nothing should call a provider\ndirectly; everything goes through here.\n\nIt does more than proxy. It wires a ModelRouter that picks the model per stage rather than\nper process, so the planner and the integrator can run on different models in the same\nturn. It takes phi_detected from pipeline context so a turn carrying PHI can be routed\ndifferently. It sets ab_variant to the selected model id for analytics, and calls\nrouter.update_ema() after each call so the bandit learns from what actually happened.",
@@ -1070,8 +1070,8 @@
     "app.pipeline.react.prompts",
     "app.pipeline.react_loop",
     "app.pipeline.tool_manifest",
-    "app.planner.adapter",
-    "app.planner.blueprint"
+    "app.planner.schemas",
+    "app.responder.final"
    ],
    "fan_in": 14,
    "how": "WHO THE ANSWER IS SCOPED TO \u2014 which payer, state, program, regulatory agency. Everything\ndownstream filters on it: RAG's retrieval filters are built from it (rag_filters_from_active),\nthe clarify guard reads it, and the answer's correctness depends on it. 137 lines.\n\nAND THE MODULE THAT DECIDES IT IS NOT ON THE LIVE PATH.\n\nThere are three separate places jurisdiction is settled, and they do not run together:\n\n  1. classify_message()          state/refined_query.py:85 \u2014 regex patterns decide whether\n                                 this turn is a jurisdiction_change (\"how about for United\")\n                                 versus a new question or a slot fill.\n  2. need_jurisdiction_clarification()  state/clarification.py:30 \u2014 decides whether to STOP and\n                                 ask the user. Primary signal is the JPD tag matcher against\n                                 the RAG lexicon; the parsed payor/state/program is only a\n                                 fallback when the tagger returns nothing.\n  3. get_jurisdiction_from_active()  state/jurisdiction.py:62 \u2014 reads the carried-forward\n                                 jurisdiction out of merged_state[\"active\"].\n\nOnly (3) runs on the live ReAct path. (1) and (2) are reached ONLY from run_classify and\nrun_clarify, and both of those are inside the `if not use_react:` branch at\norchestrator.py:807. The live service does not set MOBIUS_USE_REACT, the code default is \"1\",\nand orchestrator.py:763 logs \"USE_REACT=true \u2014 taking ReAct path (no clarify/plan steps)\".",
@@ -1120,11 +1120,11 @@
     "app.pipeline.react.prompts",
     "app.pipeline.react_loop",
     "app.pipeline.tool_manifest",
-    "app.planner.mobius_parse",
     "app.planner.schemas",
     "app.services.adjudication.utils",
     "app.services.react_block_seed",
-    "app.services.tool_agent"
+    "app.services.tool_agent",
+    "app.skills.builtin.corpus_search"
    ],
    "fan_in": 14,
    "how": "WHEN CHAT STOPS AND ASKS INSTEAD OF ANSWERING. There are FOUR mechanisms and they belong to\nthree different owners.\n\n  A. Jurisdiction ask      state/clarification.py \u2014 \"Which health plan or payer?\"  DEAD (legacy branch)\n  B. Route-clash ask       stages/clarify.py:30 \u2014 \"web or policy materials?\"        DEAD (legacy branch)\n  C. Query refinement      state/query_refinement.py                                DEAD (legacy branch)\n  D. RAG clarify bypass    react_loop.py:1760 \u2014 terminal stop mid-loop              THE ONLY LIVE ONE\n\nD is the one the user actually experiences, and it does not originate in chat at all. RAG\nreturns routing_keys.clarify_questions in its corpus telemetry; when RAG's status is\n\"no_retrieval\" AND those questions survive two chat-side filters, react_loop sets\nreact_bypass_integrate, puts the clarify text in final_message and exits the loop. So the\nquestion the user is asked was WRITTEN BY THE RETRIEVER, and chat's only role is to decide\nwhether to relay it.\n\nThe two filters (react_loop.py:961, added 2026-08-08 on a Chat Master directive because RAG\nwas firing CLARIFY on well-formed queries) are:\n\n  1. SPECIFICITY \u2014 reject if the text matches any of 15 generic templates\n     (\"could you clarify\", \"please specify\", \"more details\"...); accept if it contains one of\n     20 domain terms (payer, plan, code, cpt, hcpcs, icd, state...), OR any digit, OR any\n     capitalised word after the first.\n  2. CONTEXT \u2014 reject if chat's own carried-forward state/payor already appears in the query\n     text, i.e. don't ask what we already know.",
@@ -1194,6 +1194,14 @@
    "rating": "red",
    "depth": "code",
    "findings": [
+    [
+     "bad",
+     "AN IMPORT EDGE IS NOT A CONSUMPTION EDGE \u2014 Chat Master's generalisation of the P1a orphan, and it belongs beside the producer/consumer class because it is how that class hides from a sweep.\n\nP1a asked 'does anything IMPORT this?' The question that establishes liveness is 'does anything CONSUME this?' A re-export makes those two give opposite answers: planner/__init__.py re-exported `parse`, so parser.py had an importer for its entire dead life. The same trick works three other ways \u2014 a module imported by something itself unreached, a package nobody imports, a name referenced only from a fixture. All four look live to a grep.\n\nTHE FIX IS REACHABILITY, NOT HOPS: resolve __init__ re-exports to the defining module, then ask whether any module TRANSITIVELY IMPORTED FROM AN ENTRY POINT (app/main.py, app/worker/run.py) consumes the name. Present-in-the-tree is not reachable. Chat Master's own note is the strongest argument for it: this check would have flagged the entire planner subtree the INSTANT stages/plan.py was deleted, so it pays for itself on the very phase that created the orphan rather than a phase later.\n\nSame family as the swallowed ImportError in the credentialing router \u2014 a signal that reports CONNECTED while nothing flows."
+    ],
+    [
+     "bad",
+     "OWNER(chat): 45% OF llm_calls ROWS CANNOT BE JOINED TO A TURN. Measured 2026-09-09 while designing the latency telemetry: correlation_id is NULL on 790 of 1,979 rows in 24h. It is not random \u2014 FOUR STAGES ARE AT ZERO PERCENT:\n\n  parser           360 rows, 0 with correlation_id\n  rag_fact_check   164 rows, 0\n  phi_classify      98 rows, 0\n  integrator        23 rows, 0\n  react_1          233 rows, 94 (40%)\n  ...every other stage is at 97-100%\n\nSo the per-stage LLM cost of PHI classification, fact-checking and parsing is attributable to no turn at all. The column exists, the writer populates it for most stages, and these four never pass it. Note `parser` still logs 360 calls a day after P2a deleted the planner subtree \u2014 worth someone checking what is still calling it.\n\nNOT A BLOCKER FOR THE LATENCY WORK, per Ananth 2026-09-09: module-level telemetry measures LLM time INSIDE the module span, so duration does not depend on this join. The join is for attribution \u2014 which model, which variant \u2014 not for timing. Logged as its own defect rather than folded into the telemetry design, and the telemetry is explicitly designed not to need it."
+    ],
     [
      "bad",
      "OWNER(chat): THE CREDENTIALING ROUTER WOULD SURVIVE LOSING ITS IMPLEMENTATION, AND THAT IS THE PROBLEM. Chat Master found this and reversed a split I had already endorsed; I verified the mechanism and it holds, with one correction that makes it WORSE rather than better.\n\napi/credentialing.py has ZERO top-level credentialing imports \u2014 verified by AST, not grep. Every route imports its storage module INSIDE the function. Measured across the 15 decorated routes:\n\n  14 import a credentialing/roster module function-locally\n   8 of those sit inside a broad `except Exception:` that returns [] or a plausible value\n   6 have NO try at all \u2014 an ImportError would surface as a 500\n   1 imports nothing credentialing\n\nChat Master reported 'all 16 routes follow this shape'. They do not, and the mixed picture is the more dangerous one: delete the twelve service modules and EIGHT routes start lying (200 with an empty body, forever, indistinguishable from the empty-table state they already return) while SIX start 500ing. Two different failure modes from one deletion, one silent and one loud, and NOTHING TELLS THEM APART. A uniform failure would at least be diagnosable.\n\nAND THE GATE IS BLIND TO BOTH. I1/I2/I4/I7 are computed from chat_turns.thinking_log; these routes never touch the react loop. A green gate would prove nothing about fifteen hollowed-out routes. That retires my own earlier line that 'the gate's invariants are all we'd have' for the untested twelve \u2014 they are not thin here, they are absent.\n\nTHE DEEPER POINT, which is Chat Master's and is correct: the try/except MECHANISES the defect. We would ship eight routes that report success while their implementation is gone \u2014 instances thirteen through twenty of the class, created inside the phase meant to remove it. So api/credentialing.py and the twelve are ONE ATOMIC UNIT. The only orderings that leave no lie are 'delete router and services together' (routes 404 \u2014 honest) or 'delete nothing yet'. Holding."
@@ -1580,10 +1588,9 @@
    "telemetry": [],
    "callers": [
     "app.pipeline.orchestrator",
-    "app.pipeline.react_loop",
-    "app.planner.blueprint"
+    "app.pipeline.react_loop"
    ],
-   "fan_in": 3,
+   "fan_in": 2,
    "surfaces": [],
    "observability": "mediated",
    "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator, app.pipeline.react_loop \u2014 its behaviour has no telemetry identity of its own.",
@@ -3552,10 +3559,9 @@
    "telemetry": [],
    "callers": [
     "app.pipeline.tool_manifest",
-    "app.planner.parser",
     "app.services.tool_agent"
    ],
-   "fan_in": 3,
+   "fan_in": 2,
    "surfaces": [],
    "observability": "mediated",
    "observability_note": "Emits nothing. Observable only through its callers \u2014 its behaviour has no telemetry identity of its own.",
