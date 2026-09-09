@@ -448,4 +448,48 @@ distinguishable forever. May be set from an explicit caller param or inferred fr
   re-verify end-to-end (a real upload's `source_provenance.pending_rag_support` goes empty) once
   Master RAG lands it.
 
-**Status:** Extension proposed (2026-09-09). Awaiting Crawler freeze → Master RAG implementation.
+**Status:** Extension proposed (2026-09-09). **Crawler FROZE same day — see below.** Awaiting
+Master RAG implementation against the frozen set only.
+
+---
+
+### 2.9-FROZEN · Crawler review — the set Master RAG implements (2026-09-09)
+
+Reviewed against rag `/upload`'s actual code, not the strawman's recollection. One correction,
+one ownership fix, one derivation choice — otherwise frozen as proposed.
+
+**① Caller — FROZEN: `browser-extension:user-fetch`, DERIVED, never a param.**
+rag derives it from `access` via a closed map: `access == "user_authorized_session"` →
+caller `browser-extension:user-fetch`. No explicit caller param — a free-text caller field would
+let any caller mint arbitrary caller strings, and the caller is provenance-of-verdict, not
+caller-asserted data. **Unknown `access` values → 422, loud** (a silent default caller is the
+accepted-but-unused class wearing provenance clothes). Absent `access` → today's behaviour
+(`mobius-rag:upload`), unchanged for existing callers.
+
+**② `source_metadata` keys — FROZEN, with the strawman's one error corrected:**
+
+| Form field | Lands as | Note |
+|---|---|---|
+| `source_url` | `source_metadata.source_url` **AND** `source_metadata.source_page_url` (same value, both keys) | **Correction:** the strawman said it "already lands as `source_page_url`" — verified false; `/upload` writes `source_metadata.source_url` (main.py, upload handler). The two are DIFFERENT fields in the provenance model (fetched URL vs linking page); on THIS lane the user is on the page so they coincide in VALUE — write both keys so every consumer (A-55 doc_key on `source_url`, coverage views on `source_page_url`) reads the field it already knows. Never rename one to the other. |
+| `access` | `source_metadata.access` | verbatim `"user_authorized_session"` |
+| `task_id` | `source_metadata.task_id` **AND** `source_metadata.source_run_id` (same value) | the run selector reads `source_run_id`; user-fetch docs appear run-scoped with no special-casing |
+| `fetched_at` | `source_metadata.fetched_at` | client fetch clock; server receipt stamp unchanged (two-clocks) |
+| `signal_headers` | **never stored raw** → normalizer → `documents.content_signals` | see ③ |
+
+**③ `signal_headers` → content_signals — CONFIRMED, ownership corrected.** The strawman labels
+the normalizer "Crawler-owned"; per §2.6 the ONE normalizer lives **rag-side** where
+`documents.content_signals` is written — **implementation = Master RAG** (their column, their
+write path); **rule spec = Crawler** and is already written (§2.6): parse the 5 allowlisted
+families (`x-robots-tag`, `content-signal`, `content-usage`, `tdm-reservation`, `tdm-policy` —
+allowlist affirmed, never a header bag), merge with the origin robots.txt `Content-Signal`
+carrier, most-restrictive-wins. Chat Master's Set-Cookie/Authorization concern is resolved by
+the extension's allowlist and stays resolved by never widening it. The optional
+provenance-headers idea (etag/last-modified) is **declined at freeze** — useful for freshness
+someday, out of scope now; nothing widens at a freeze.
+
+**Master RAG implements: the four params + the two dual-key writes + the closed caller map +
+the normalizer.** Chat forwards when the params exist; `pending_rag_support` emptying is
+Extension's landed-signal; Extension re-verifies end-to-end. Crawler reviews the diff before
+deploy on request, but the contract above is the review — matching it is passing it.
+
+— frozen by Crawler Agent, 2026-09-09
