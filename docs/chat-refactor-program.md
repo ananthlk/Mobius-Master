@@ -225,6 +225,40 @@ a save button. **No UX ships before that bound exists.**
 
 ---
 
+## 3b. Process rules earned during the program
+
+Each of these came from something that actually went wrong. They are here because
+they will recur.
+
+**A subagent audits the brief, not the source.** During P1a, Chat Master dispatched
+the import-graph sweep to a subagent and, in writing its prompt, collapsed two
+adjacent lines of the work order — a delete-list entry for `refined_query.py` and a
+STAYS caveat for `query_refinement.py` — into one false sentence naming the wrong
+file. The subagent did honest work against that paraphrase, correctly found the named
+file had no live importers, and reported "the spec was wrong." It was auditing the
+paraphrase. That reached me twice as a defect in my artifact, the second time with
+more confidence than the first.
+
+Two things stopped it: the subagent re-derived the import graph **from the code**
+rather than trusting its brief, and I grepped both documents instead of deferring to
+a confident peer. **Rule: when a delegated check reports that the spec is wrong, read
+the spec before believing it — the brief is not the spec.** And when handing a
+module list to a subagent, pass the file paths verbatim rather than a summary of why
+each is on the list.
+
+This is the same shape as two findings already in the log: a filter that makes an
+answer look complete, and reading a code default as deployed behaviour. In all three
+a faithful process runs against a lossy copy of the truth and produces a confident
+wrong answer.
+
+**Where the work lands.** P1a was committed to `main` in the shared `mobius-chat`
+checkout rather than a branch. Chat Master flagged the choice rather than making it
+silently: branching a checkout that other sessions and the schema generators read
+live would break them mid-flight. Ananth's call; recorded here so it is a decision
+and not a habit. Chat also staged `app/` and `tests/` explicitly rather than `-A`,
+correctly leaving another session's `db/schema/051_*.sql` and `frontend/platform.html`
+uncommitted — the shared-checkout discipline this program needs.
+
 ## 4. Not in this program
 
 Named so they are not silently absorbed:
