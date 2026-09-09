@@ -570,3 +570,22 @@ verification against the deployed service:
 **Finish line:** Chat Master deploys TODO-B (Ananth's gate) with the form→query forward → Extension
 runs the true end-to-end via /chat/upload → `source_provenance.pending_rag_support` empties →
 Master RAG confirms the landed row. Everything else is verified.
+
+### 2.9-VERIFY addendum · chat→rag forward fixed + an access failure-path change (Chat Master, 2026-09-09)
+
+- **Query-vs-form fixed (`9a84923`, gate-green, held):** chat now forwards all five provenance
+  fields on the QUERY string (url-encoded), matching rag's `in: query` contract. `pending_rag_support`
+  is `[]`, making it (plus a populated `forwarded_to_rag`) the true landed signal. Chat Master
+  confirmed against rag's DEPLOYED OpenAPI (not source — their local checkout had moved under a
+  shared session; the deployed contract is the authority, the method the Extension used). Write-up:
+  `docs/skill-llm-stage-registry.md` "The same trap, three hops" (undeclared Form field → wrong hop
+  shape → stale-source read; two 200s proved nothing arrived).
+- **Failure-path behaviour change:** chat forwards `access` verbatim + UNVALIDATED (deliberately —
+  the closed map is rag's RULE, and a duplicated rule drifts). So an unknown `access` now **422s the
+  whole upload** (rag's 422 surfaces through chat), where before it silently succeeded provenance-bare.
+  Intended. **Extension impact: none** — the extension always sends the constant
+  `access="user_authorized_session"`; if we ever add an access mode it MUST be in rag's frozen map or
+  the upload fails loud (which is correct).
+- **Extension verify plan (unchanged):** on deploy, run the true end-to-end via /chat/upload; confirm
+  from rag's actual stored row (Master RAG) that source_metadata + content_signals landed — NOT from
+  chat's self-report — and thereby confirm `9a84923` is in the deployed image (form→query is the tell).
