@@ -1055,10 +1055,19 @@ Both are HTTP rather than direct DB, deliberately and with the reasoning written
 a future split-out curator service, and ingest_url has side effects that belong in RAG's
 process rather than being triggered across the wire by SQL.
 """, findings=[
- ("bad", "MOBIUS_RAG_ADMIN_KEY is optional and the module says 'if unset we still try the call; "
-         "rag may 401 and the tool reports the failure cleanly'. An unauthenticated write "
-         "attempt is the designed behaviour, and the difference between 'not configured' and "
-         "'refused' is visible only in the tool's own failure text."),
+ ("bad", "DOES IT DO ANYTHING? Yes — and answering that properly corrected two of my own "
+         "claims. It is fully wired: both tools are in _execute_tool's dispatch, both have "
+         "manifest blocks and router entries, and since no mode except `task` restricts tools, "
+         "the planner is offered them on every copilot and agentic turn. Zero log lines in 30 "
+         "days does NOT mean unused: all four logger calls in this module are on FAILURE paths "
+         "(logger.warning on HTTP error, logger.exception on failure) and nothing logs a "
+         "success. So silence means no failures, not no calls. I had read it the other way."),
+ ("bad", "AND THE ADMIN KEY IS NOT CHECKED AT ALL. I recorded that MOBIUS_RAG_ADMIN_KEY being "
+         "unset means 'rag may 401'. Tested it: RAG's /documents/import-from-html accepted an "
+         "unauthenticated POST from this machine and proceeded to fetch the URL — the 502 came "
+         "from the probe URL being a 404, not from auth. /sources/search likewise returns 200 "
+         "unauthenticated. So the tool is not degraded by the missing key; the key is simply "
+         "not a factor. That is a finding about RAG, not about chat — see below."),
  ("good", "The HTTP-not-SQL choice is argued in the module rather than assumed, and it "
           "anticipates a service split that has not happened yet."),
  ("good", "Reuses RAG_API_URL rather than adding env vars — the file says so explicitly."),
