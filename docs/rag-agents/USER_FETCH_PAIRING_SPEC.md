@@ -648,3 +648,25 @@ gate blocks every upload before the provenance forward.**
 - **Owner:** chat's classifier-call path (Chat Master; Product Awareness looped). Extension not involved
   (server-side, pre-forward). Provenance work itself is unverified-not-broken; re-runs the instant a benign
   upload returns `gate: clean`. Repro handed over (blocked_phi transaction_id fa43b766-...).
+
+### 2.9-DONE · end-to-end provenance VERIFIED (Extension, 2026-09-09)
+
+Chat rev `00975-bpc` (image digest = the ten commits, incl. `9a84923`; Chat Master verified by digest —
+no uncommitted delta; my earlier "gate regression" was a MISDIAGNOSIS). Real /chat/upload, extension-shape
+multipart FORM, novel content:
+- `gate: clean`, `status: processing`, doc `a11582c5-7d1d-49b7-9db6-e1d93db651d9`, task_id `ext_ok_733eb54485`.
+- **source_provenance: received=all 5, forwarded_to_rag=all 5, pending_rag_support=[]** ← the finish-line
+  signal, green. Provenance flows extension→chat→rag. Master RAG confirming the landed row (content_signals
+  normalized) as the DB-side arbiter.
+
+**Two defects surfaced during verify (neither in the extension; both traced by Chat Master):**
+- **Defect 1 (Master RAG's, pre-existing):** rag publish not idempotent — `rag_published_embeddings_pkey`
+  duplicate-key 500 when repeated docs share chunks; 9x/24h. Mislabeled repeated test docs as blocked.
+  Workaround for verify: novel content. Candidate fix: idempotent-publish guard.
+- **Defect 2 (Chat Master's, deferred to Ananth per PHI-off):** chat's gate wrapper reports ANY downstream
+  exception (incl. a publish 500) as `blocked_indeterminate` — a storage failure indistinguishable from a
+  PHI edge case, in the one surface where that distinction is the point. Narrow fix: distinguish
+  "classifier said indeterminate" from "pipeline failed downstream of a clean verdict." OPERABILITY item,
+  awaiting Ananth's PHI-code clearance.
+- **Defect 3 (classifier seat's):** `phi_classify` circuit-breaker trips / LLM-layer slowness → intermittent
+  `indeterminate` independent of publish. Passed to the classifier owner.
