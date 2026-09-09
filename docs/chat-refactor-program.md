@@ -274,12 +274,40 @@ specific ruling, not general agreement.
 "tests pass" until those 26 are triaged into accepted-baseline or fixed. Filed as a
 P1 item.
 
-Open questions carried into sign-off, unresolved on purpose:
+**ANANTH'S DECISIONS, 2026-09-08 — two of the three open questions are closed:**
 
-1. Revive `master_objective` on the ReAct path, or retire it in favour of
-   `react_unfinished_reason` / `react_unblock_ask`? Opposite work either way.
-2. Is removing the per-request `use_react` field an acceptable contract change, and
-   does any client send it?
-3. Prod row counts for the credentialing tables — dev being empty is not a mandate.
+1. **`master_objective`: RETIRE.** Not revived on the ReAct path. `continuity` and
+   its readers come out in favour of `react_unfinished_reason` /
+   `react_unblock_ask`, which already work and are wired at six sites. This moves
+   from P3 (decide) to P1 (delete) — it is now a removal, not a reconciliation.
+2. **`use_react`: REMOVE the field.** The contract change is accepted.
+
+**And decision 2 changes the evidence the classic-path deletion needs.** While
+`POST /chat` accepts `use_react`, the classic path is *reachable but unused* — so
+proving a deletion safe means running turns through the new code, which needs the
+P1.1 harness. Remove the field and the path becomes **statically unreachable**: no
+configuration and no request can enter it. The deletion is then justified by an
+import-graph proof plus a green suite, not by empirical replay.
+
+That is a real unblock, and it must not be over-claimed. It licenses **this
+deletion**, whose targets are provably unreachable. It does NOT generalise: the
+credentialing removal touches 125 references inside live shared modules, and
+`master_objective`'s retirement deletes readers that live code still calls. Those
+still need the harness.
+
+**Sequencing consequence:** P1 splits.
+
+  P1a  remove `use_react` -> classic path unreachable -> delete 1,159 lines
+       gate: import-graph proof + suite green + zero invariant movement
+       does NOT need the harness
+  P1b  triage the 26 pre-existing test failures (the gate cannot read
+       "tests pass" until this is done)
+  P1.1 deterministic replay harness
+  P1c  retire master_objective + continuity      needs the harness
+  P1d  credentialing code removal                needs the harness AND prod counts
+
+3. **Prod row counts for the credentialing tables — Ananth is getting these.** The
+   code deletion stays blocked until they land; dev being empty is not a mandate.
+   Per the DB seat, the tables are not dropped either way.
 4. What the 83 integrator-bypass turns matching no known bypass actually are.
 5. Whether `should_run_critic`'s rule is per-mode or global.
