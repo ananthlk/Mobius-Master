@@ -63,3 +63,59 @@ Open questions from Crawler:
 - Crawler (compliance frame §1): ✍ DRAFTED, self-signed for the frame
 - Browser Extension (§2 + accepts §1): ⬜
 - Ananth: ⬜
+
+---
+
+## 1.2a · CPT for the testing lane — investigation finding (AUDITABLE)
+
+**Asked by:** Ananth (relayed via Extension agent, 2026-09-09): lift the CPT restriction for our
+pre-commercial testing lane with correct attribution, not by ignoring the license.
+**Investigated by:** Crawler Agent, against AMA's own licensing pages + the CMS/AHCA
+click-through texts, same day.
+
+### Finding 1 — "non-commercial testing" is not a lane the license offers
+
+- AMA's licensing overview states licensing is required for **"use of CPT content to develop,
+  test, maintain and service products"** — development and TESTING are explicitly licensed
+  activities. There is no pre-commercial or evaluation carve-out on the published structure;
+  the AMA's own FAQ directs new-product developers to a licensing application.
+- The click-through licenses on AHCA/CMS pages grant **personal / internal-program use only**
+  and expressly prohibit *"transferring copies of CPT to any party not bound by this
+  agreement, creating any modified or derivative work of CPT, or making any commercial use of
+  CPT."* Ingesting fee-schedule content into a corpus that powers a product under development
+  is development use of a product — **pre-revenue does not make it non-commercial in the
+  AMA's frame.**
+- Therefore: **attribution alone cannot lift the screen.** The correct unlock is an **AMA
+  internal-use ("Private") license** covering development/testing now, moving to/adding a
+  **Distribution license per product** at commercial launch. Executing that agreement is an
+  account/terms action **only Ananth can take** (and the licensing application is the channel
+  AMA specifies).
+
+### Finding 2 — the canonical attribution, captured for when the license exists
+
+> "CPT codes, descriptions and other data only are copyright 1995–2025 American Medical
+> Association. All rights reserved. CPT is a registered trademark of the American Medical
+> Association (AMA)."
+
+Placement under a license: (a) per-document corpus metadata, (b) user-facing surfaces whenever
+CPT-derived content renders (answer citations — Master RAG's layer), (c) FARS/DFARS notice
+where government-program contexts require it.
+
+### Finding 3 — the screen's licensed-mode, built now, dark by default
+
+So nothing is torn out at launch, `cpt_screen` gains a mode switch rather than a bypass:
+
+| Mode | Behaviour | Enabled by |
+|---|---|---|
+| `suppress` (DEFAULT) | today's behaviour: CPT-positive ⇒ not ingested, fail-closed | — |
+| `admit_tag` | CPT-positive ⇒ **admitted**, tagged `source_metadata.licensed_content=["cpt"]` + attribution string attached; screen log still records every tagged item | **both** `CPT_LICENSE_MODE=admit_tag` **and** `CPT_LICENSE_REF=<AMA agreement id/holder>` set — the ref is recorded on every admitted document, so the audit trail names the licence it was admitted under |
+
+The same code path serves testing and launch; only the licence tier behind `CPT_LICENSE_REF`
+changes. **Flipping the mode without a real agreement id is the thing this design makes
+impossible to do silently.**
+
+### Status
+- Investigation: ✅ this section. Mode implementation: ✅ built dark (see web-scraper).
+- **Blocked on Ananth, and only Ananth:** the AMA licensing application / agreement.
+  Until `CPT_LICENSE_REF` holds a real agreement, the screen stays `suppress` — on every lane,
+  user-fetch included.
