@@ -1,0 +1,132 @@
+{
+ "_": "CURATED JUDGEMENT ONLY. Every other field on the page is read out of the code by gen_deep_research_schema.py. Ratings are opinions and have to be argued for; keeping them here means a reader can always tell which is which. Ratings reflect the state on 2026-09-09, after the verification build and before run 7.",
+
+ "runner": {
+  "group": "the loop",
+  "rating": "amber",
+  "how": "The live path. Picks up turns that are due, asks chat, extracts fields, judges them, opens the cited documents, asks the registry whether those documents govern the line, reads the drafter's own reasoning, and decides whether to go round again.",
+  "findings": [
+   ["good", "The only entry point carrying all five guarantees. Everything built on 2026-09-08 lands here."],
+   ["bad", "It is ONE of five ways to run a turn. A request answered through run_v2 is judged without any document ever being opened, and nothing warns anybody."],
+   ["bad", "The document-side gate existed, was tested, and was never called from this file until 2026-09-08 — the docstring of critique() had promised it ran for months."]
+  ]
+ },
+ "extract_critique": {
+  "group": "the judge",
+  "rating": "amber",
+  "how": "Pulls typed fields out of chat's prose, then checks each one: is the quote really in the answer, was the document really cited, is the source authoritative enough for this caller, and does the quote actually support this value.",
+  "findings": [
+   ["good", "Gates are ordered and each one names what it answers, so a refusal says which question failed."],
+   ["good", "An absence is now evidenced by having READ the governing rule rather than by quoting one, which is the only way a true negative can ever pass."],
+   ["bad", "`scope` was extracted and then dropped from the verdict record, so three scoped facts read as one field with three values and the corpus looked self-contradictory."],
+   ["bad", "`_schema_gap` is requested in the prompt and appeared exactly once in the whole repository — in the prompt asking for it. The model complied and nothing read it."]
+  ]
+ },
+ "corroborate": {
+  "group": "the judge",
+  "rating": "amber",
+  "how": "Opens the document a claim cites and decides whether it really says it, by reading the passages most likely to carry it.",
+  "findings": [
+   ["bad", "Returned `absent` — the document does not say it — when passage SELECTION found nothing to read. Seven of eleven document-gate refusals in one run were that, including a claim the rule states verbatim."],
+   ["good", "Now returns `undecidable` with read=0, and `absent` requires that passages were read and refused."]
+  ]
+ },
+ "locate": {
+  "group": "the judge",
+  "rating": "amber",
+  "how": "Finds the line in a document that a claim rests on and cites it by page, paragraph and character offset, instead of handing back a scored excerpt.",
+  "findings": [
+   ["good", "Numbers, codes and short acronyms are tokens at last: 21, 365/6, H2017 and APR-DRG were invisible to the old pattern, which is what refused an eligibility rule the document states."],
+   ["good", "Never snaps a citation on score alone. The top-scoring span for one real claim was the wrong sentence; a reader picks and the snap follows the reader."],
+   ["unproven", "Written 2026-09-09 and not yet exercised in a completed run. Its outcome vocabulary is argued for, not measured."]
+  ]
+ },
+ "recommend": {
+  "group": "the answer",
+  "rating": "green",
+  "how": "Says what a reader should DO with a result — usable, verify first, the evidence conflicts, the rule offers a choice, nobody checked — from signals the other actors already recorded. Costs nothing; the work was done and never summarised.",
+  "findings": [
+   ["good", "No model call. Every signal is already in the record."],
+   ["good", "Tells a LIST from a CONFLICT, and a rule that offers branches from a corpus contradicting itself — three checks in this module had confused those."]
+  ]
+ },
+ "read_thinking": {
+  "group": "the loop",
+  "rating": "green",
+  "how": "Reads the drafter's own reasoning for shapes that recur — it conceded then asserted anyway, it named two populations, it named a rule it never cited, it ran the same search four times — and turns each into the next question.",
+  "findings": [
+   ["good", "Quotes the drafter back to itself, which is harder to wave away than an instruction to try harder."],
+   ["good", "Every reader of the reasoning trace before this was a RENDERER. No actor consumed it."]
+  ]
+ },
+ "thinking": {
+  "group": "provenance",
+  "rating": "green",
+  "how": "Lets every actor record what it saw, what it made of that, and what it decided — kept as three separate fields so a wrong decision can be traced to bad input or bad reasoning.",
+  "findings": [
+   ["good", "The judge now records as much reasoning per question as the drafter does."],
+   ["unproven", "Three actors write traces. Nine of the twelve named actors still record nothing."]
+  ]
+ },
+ "diagnose": {
+  "group": "the loop",
+  "rating": "amber",
+  "how": "Works out WHY a question failed — is the rule missing, is it held but unreadable, did we answer about the wrong service, is our own schema the blocker — and says what would fix it.",
+  "findings": [
+   ["good", "Every branch returns through one place, so a gate added later cannot forget to record its reasoning."],
+   ["bad", "authority_tier called the RIGHT rule the wrong one whenever a request carried no rule reference — nothing was compared, and all five fields of one question were refused on it."],
+   ["unproven", "Instrumented on 2026-09-09 and has not fired once in six runs."]
+  ]
+ },
+ "resolution": {
+  "group": "the answer",
+  "rating": "amber",
+  "how": "Holds what happens after a verdict — the options a caller can choose between, the ruling they made, and whether that closes the question or reopens it.",
+  "findings": [
+   ["good", "A decision is a contract a service can call, not only a button a person can press."],
+   ["bad", "A promise generated from a TERMINAL set rather than written down once let 'stop asking' reopen the question."]
+  ]
+ },
+ "run_v2": {
+  "group": "the loop",
+  "rating": "red",
+  "how": "An older way to run a turn. Still judges answers, and never opens a document, asks the registry, or records reasoning.",
+  "findings": [
+   ["bad", "1 of 5 guarantees. An answer produced here is judged against the ANSWER only — no document is ever opened — and nothing on the result says so."],
+   ["bad", "Five entry points run a turn and only one is complete. This is where a gate with no caller hides."]
+  ]
+ },
+ "run_batch": {
+  "group": "the loop",
+  "rating": "amber",
+  "how": "Runs a set of questions together. Opens documents, but records no reasoning and never asks the registry.",
+  "findings": [
+   ["bad", "2 of 5 guarantees. It called the document gate for months while the live runner did not, which is exactly why nobody noticed the live path had none."]
+  ]
+ },
+ "console": {
+  "group": "the surface",
+  "rating": "amber",
+  "how": "The page a person reads: every question, every round, what each actor did, what it cost and what is waiting on somebody.",
+  "findings": [
+   ["good", "Generated from one source, with assertions, after two variants of the same page drifted apart."],
+   ["bad", "Ten uses of design tokens that do not exist rendered transparent, and a sticky header let rows show through it."]
+  ]
+ },
+ "language": {
+  "group": "the surface",
+  "rating": "green",
+  "how": "One place that decides what every state, actor and refusal is CALLED, so the machine's vocabulary and the reader's are the same words.",
+  "findings": [
+   ["good", "The reader is a front-end user, not an engineer, and the names are chosen for them."]
+  ]
+ },
+ "recorder": {
+  "group": "provenance",
+  "rating": "green",
+  "how": "Writes the ledger — who did what, in which round, with the evidence attached.",
+  "findings": [
+   ["good", "Every event carries an actor name, so the trace reads as a sequence of decisions rather than a log."]
+  ]
+ }
+}
