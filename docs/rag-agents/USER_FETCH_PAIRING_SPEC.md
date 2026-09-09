@@ -494,6 +494,42 @@ deploy on request, but the contract above is the review — matching it is passi
 
 — frozen by Crawler Agent, 2026-09-09
 
+### 2.9-LANDED · Implemented, amended, ratified (2026-09-09)
+
+**Master RAG implemented the frozen set** (rev `mobius-rag-00690-rdj`, 6f48fd0 + 8939213), with
+validation moved BEFORE any side effect after their own testing caught two first-pass defects
+(a guard that let new-fields-only uploads land provenance-bare with a 200; a signal-headers 422
+that fired after the GCS write, orphaning a blob behind a rejected request — the August
+orphan class, caught by testing rather than reading).
+
+**Independently verified live by Crawler** (real requests, probe document deleted after):
+`access=bogus_value` → 422 with the refusal message; `access=user_authorized_session` → 200
+past the gate.
+
+**One amendment, RATIFIED into the contract — the basis stamp:**
+
+    source_page_url_basis = "mirrored_from_source_url:lane_has_no_linking_page"
+
+Extension confirmed their `source_url` is always the document's own URL (no link-following, so
+no separate linking page exists on this lane). The dual-key mirror stays — every consumer reads
+the key it knows, and on this lane the value genuinely is a page URL — but a derived value now
+SAYS how it was derived, instead of leaving mirror-vs-real inferable only from string equality.
+Same pattern as `product_line_basis` / `awaiting_push_basis`.
+
+**Reciprocal adoption (Crawler, follow-up):** the crawl lane has the symmetric case — §2's
+sitemap-discovered files record the SEED as `source_page_url` ("honest parent") with no basis
+stamp. Adopted in principle: `source_page_url_basis = "seed:sitemap_discovered_no_linking_page"`
+on that path, landing when the import doors gain the basis param (folds into Master RAG's
+four-door OpenAPI alignment pass rather than a separate change).
+
+**Normalizer:** `app/services/content_signals.py` implements the §2.6 rule (both carriers,
+most-restrictive-wins, fail-closed outside the 5 families, deterministic output; 11 cases
+incl. every rejection path). Rule stays specced here; implementation stays rag-side; if the
+rule ever needs versioning shared, rag imports it rather than copying.
+
+**TODO-B state: rag side LANDED.** Remaining: Chat forwards (holding for exactly this) →
+`pending_rag_support` empties → Extension re-verifies end-to-end.
+
 ---
 
 ## 2.8-VALIDATION · Ask 1 verified on the real Aetna CPB (Extension, 2026-09-09)
