@@ -251,6 +251,75 @@ works because the declarations are structured.
 
 **Only then** shadow (§3.5), then the A/B (§3).
 
+## 3.7 "Its own agent" — two readings, and only one of them is free
+
+**Ananth, 2026-09-10:** *"this can also now move away from chat to its own agent."*
+
+**That is the natural conclusion of §3.6 and I agree with the direction. But "its own
+agent" has two meanings that cost very different amounts**, and they are easy to conflate:
+
+| reading | what it means | cost |
+|---|---|---|
+| **A · its own OWNER** | a seat that owns tool selection, the catalogue, the declarations, the golden set, the UX, the tests. Code ships as a library chat imports. | **≈ free, and available immediately** |
+| **B · its own SERVICE** | a deployed process chat calls over the network per round | **a network hop on the critical path** |
+
+**Reading A is unambiguously right and should happen now.** Everything §3.6 requires —
+standalone tests, own UX, own fixtures, a catalogue with declarations, a golden set with an
+owner — is *organisational*, and none of it needs a process boundary. It gives the tool
+explosion a home instead of letting it accrete in `react_loop.py`, and it means the
+declarations and the collision test have someone whose job they are.
+
+**Reading B is a real design choice with three costs I have to state**, because I have
+spent this whole program insisting that costs be named:
+
+**1 · A network hop on the per-round critical path, against a saving 2.0 has not yet
+proven.** Selection runs **every round**, not once per turn. A 50–200ms remote call per
+round is set against a reduction in *prompt processing* — and §3.2 already concedes that
+turn-wall latency may not move at all. **The service could plausibly make the thing 2.0
+exists to improve worse**, and we would not know until the A/B, at which point the
+architecture is built.
+
+**2 · An availability dependency, with today's own evidence for how that goes.** §6 already
+specifies fail-open to 1.0's full manifest, which is correct — but an exception is rare and
+a network partition is not. And this fleet has the receipts: `mobius-payor` cold-starts at
+**30s+**, and the *only* thing holding it up is `min: 1` in `fleet.yaml`. A selector service
+would immediately become another **correctness-relevant scaling invariant**, exactly like
+`mobius-phi-classifier`'s `min: 1` (documented 2026-09-10 as a correctness pin, not a cost
+preference). **That is a real, recurring operational cost, not a one-time build cost.**
+
+**3 · The catalogue boundary gets harder, not easier.** §3.6's snapshot is a *test-time*
+artifact today. As a service it becomes a **live cross-process contract**: MCP tools
+register in **chat's** startup, so either the selector must also connect to every MCP
+server (duplicating registration, and now two services can disagree about what exists), or
+chat pushes its catalogue to the selector and **staleness becomes a production failure
+mode** rather than a test concern. Both are worse than a library reading a snapshot.
+
+### Recommendation
+
+**Take reading A now. Defer reading B until a second consumer actually exists.**
+
+Concretely: build it as a **standalone library with its own owner, tests, fixtures and
+UX** — every word of §3.6 — with a **clean interface that a service could later wrap
+without changing a caller**. That captures all of the organisational value and none of the
+latency or availability cost.
+
+**Promote to a service when — and only when — one of these is true:**
+- a **second consumer** exists (the API surface, the appeals workbench, another agent
+  selecting its own tools). One consumer does not justify a hop.
+- **selection needs state chat does not have** — cross-thread learning, per-org
+  performance history, a shared embedding cache warm enough to matter
+- **the selector's release cadence genuinely diverges** from chat's and the coupling
+  becomes the bottleneck
+
+**None of the three is true today**, and the first is the one to watch: the moment the API
+callers of §4 Stage A need selection, reading B becomes correct.
+
+**One thing to decide now even under reading A**, because it is cheap now and expensive
+later: **where the declarations live.** If `tier`/`subscribes`/`requires` live only in
+chat's `SkillSpec`, a future service inherits chat as a dependency for its core data.
+Putting them in the catalogue snapshot's schema from the start — chat *populates* it, the
+selector *owns* it — keeps reading B a wrapping exercise rather than a migration.
+
 ## 4. The selector
 
 Four stages, from schematic §8.1. Each is a pure function of declared inputs.
