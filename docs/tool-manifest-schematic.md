@@ -140,6 +140,51 @@ at manifest line 691, plus `get_rate_benchmarks`, `get_market_size`,
 They arrive through the **MCP auto-discovered section**, not through the deleted static
 block. So the removal held and the tools returned by a different route.
 
+## 3.1 CORRECTED AND SHARPENED, 2026-09-10 — the premise is stale, and the real finding is better
+
+**The 2026-08-04 premise no longer holds** [REPORTED, Chat Master, from the deployed
+environment]. That note's reasoning was *"No MCP URL in dev.env points at whatever
+service is meant to provide these market-analytics tools."* Production now has
+`CHAT_SKILLS_MCP_URL`, `EXTRA_MCP_URLS` and `MOBIUS_MCP_AUTOREGISTER=1` set, and the
+tools arrive via `registry.names_by_source("mcp")`, populated from a live MCP
+`list_tools` response. **A server advertised them. They are registered, not phantom.**
+
+Whether every one *succeeds* on dispatch is still unproven — a server can advertise a
+tool that errors — and Chat Master declined to claim it without calling one. Correct.
+
+**🔴 But the data answers a better question than "do they 404":**
+
+```
+tool.emitted     get_* / search_org* / lookup_npi / search_clinician* / check_provider*   →  0 rows
+tool.dispatched  same                                                                     →  0 rows
+tool.result      same                                                                      →  0 rows
+```
+
+[REPORTED — `turn_spans` across the entire recorded window.]
+
+**Twenty-nine tools — half the catalogue — offered on every single round, emitted zero
+times.**
+
+That is a stronger argument than "broken", because **it requires no bug to be true.**
+If they all dispatch perfectly, nothing about the token bill changes: their cost is
+unconditional and their use is zero. The 58 → 32 reduction and ~6,500 tokens/round holds
+on *never selected* rather than on *defective*.
+
+**And the caveat, which is Chat Master's and is the same shape as my `__unfiltered__`
+correction** — I am recording it as prominently as the finding, because without it the
+finding is an artifact of what we happened to ask:
+
+> *"never emitted in the window" is not "never useful".* These are market/benchmark
+> analytics and the observed window is chat traffic about appeals, rates and policy. A
+> fair test is whether they are selected on a turn they **should** serve — *"what's the
+> market size for behavioral health in Tampa"* — not whether they appear in a window of
+> appeals questions.
+
+**That turn has not been run.** It is one turn, it is a test rather than a fix, and it is
+the difference between *"half the catalogue is dead weight"* and *"half the catalogue was
+never asked for during a week of appeals questions."* **Those are very different
+conclusions and only one of them justifies deleting anything.**
+
 **What I do NOT know, and this is the crux [UNVERIFIED]:**
 - whether they now **dispatch successfully**, i.e. whether the MCP server that publishes
   them is actually reachable and functional from the deployed service

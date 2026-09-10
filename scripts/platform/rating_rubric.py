@@ -56,6 +56,15 @@ badge, so an override is a visible judgement rather than a quiet correction.
 # Thresholds. Stated as constants so they can be argued with rather than
 # rediscovered by reading branches. Calibrated against the live corpus
 # 2026-09-09 — not derived from a standard, and that is worth knowing.
+# THE TELL FOR A SINGLE-VALUED SIGNAL, and it is mechanical enough to apply without
+# judgement (Chat Master, 2026-09-10, after getting it wrong themselves in the same
+# hour): a single-valued FIELD and a single-valued SAMPLE are different things, and the
+# discriminator is **can the code produce a second value at all?**
+#   state_load:blocks_assembled  — CANNOT. The count targets a literal string. Defect.
+#   react_retry_guard blocked_repeat — CAN, and simply has not in 19 calls. Low traffic.
+# Ask it of the code, not of the row count. A distinct-value query alone would have
+# flagged both and taught nothing.
+
 RED_VOLUME  = 8       # open defects on one node: past this, coverage stops excusing it
 LOC_AMBER   = 800     # a module one person can still hold in their head
 LOC_RED     = 2500    # react_loop is 6,200 — not reviewable, not isolable
