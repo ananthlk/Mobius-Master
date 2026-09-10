@@ -1,0 +1,269 @@
+{
+  "source_key": "product_docs",
+  "exported_by": "mobius-c2 (platform seat) on behalf of product-awareness",
+  "exported_at": "2026-09-10T18:16:22.922604+00:00",
+  "exporter_rev": "b86ce54",
+  "caveats": [
+    "asserts is never emitted -- it needs a page-by-page read against shipped behaviour",
+    "registry.json updated_at 2026-09-07; corpus freshness is not verified here",
+    "not the PA seat's own export; supersede when that seat produces one"
+  ],
+  "rows": [
+    {
+      "axis": "feature",
+      "value": "About",
+      "status": "unknown",
+      "rows_present": 1,
+      "rows_sourced": 1,
+      "note": "documented but no deployed service resolved (mapped: None)"
+    },
+    {
+      "axis": "feature",
+      "value": "Answer Cache",
+      "status": "absent",
+      "rows_present": 0,
+      "rows_sourced": 0,
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+    },
+    {
+      "axis": "feature",
+      "value": "Appeals",
+      "status": "absent",
+      "rows_present": 0,
+      "rows_sourced": 0,
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+    },
+    {
+      "axis": "feature",
+      "value": "Architecture",
+      "status": "unknown",
+      "rows_present": 2,
+      "rows_sourced": 2,
+      "note": "documented but no deployed service resolved (mapped: None)"
+    },
+    {
+      "axis": "feature",
+      "value": "Auth",
+      "status": "unknown",
+      "rows_present": 1,
+      "rows_sourced": 1,
+      "note": "documented but no deployed service resolved (mapped: None)"
+    },
+    {
+      "axis": "feature",
+      "value": "Chat",
+      "status": "covered",
+      "rows_present": 1,
+      "rows_sourced": 1,
+      "note": "documented and deployed; asserts-vs-covered needs a human read"
+    },
+    {
+      "axis": "feature",
+      "value": "Credentialing",
+      "status": "covered",
+      "rows_present": 1,
+      "rows_sourced": 1,
+      "note": "documented and deployed; asserts-vs-covered needs a human read"
+    },
+    {
+      "axis": "feature",
+      "value": "Doc Reader",
+      "status": "absent",
+      "rows_present": 0,
+      "rows_sourced": 0,
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+    },
+    {
+      "axis": "feature",
+      "value": "Document Viewer",
+      "status": "unknown",
+      "rows_present": 1,
+      "rows_sourced": 1,
+      "note": "documented but no deployed service resolved (mapped: None)"
+    },
+    {
+      "axis": "feature",
+      "value": "Eval",
+      "status": "unknown",
+      "rows_present": 1,
+      "rows_sourced": 1,
+      "note": "documented but no deployed service resolved (mapped: None)"
+    },
+    {
+      "axis": "feature",
+      "value": "Extension",
+      "status": "covered",
+      "rows_present": 1,
+      "rows_sourced": 1,
+      "note": "documented and deployed; asserts-vs-covered needs a human read"
+    },
+    {
+      "axis": "feature",
+      "value": "Feedback",
+      "status": "absent",
+      "rows_present": 0,
+      "rows_sourced": 0,
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+    },
+    {
+      "axis": "feature",
+      "value": "HIPAA",
+      "status": "unknown",
+      "rows_present": 1,
+      "rows_sourced": 1,
+      "note": "documented but no deployed service resolved (mapped: None)"
+    },
+    {
+      "axis": "feature",
+      "value": "Infra",
+      "status": "unknown",
+      "rows_present": 1,
+      "rows_sourced": 1,
+      "note": "documented but no deployed service resolved (mapped: None)"
+    },
+    {
+      "axis": "feature",
+      "value": "Interact",
+      "status": "absent",
+      "rows_present": 0,
+      "rows_sourced": 0,
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+    },
+    {
+      "axis": "feature",
+      "value": "Lexicon",
+      "status": "covered",
+      "rows_present": 1,
+      "rows_sourced": 1,
+      "note": "documented and deployed; asserts-vs-covered needs a human read"
+    },
+    {
+      "axis": "feature",
+      "value": "Org Intelligence",
+      "status": "absent",
+      "rows_present": 0,
+      "rows_sourced": 0,
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+    },
+    {
+      "axis": "feature",
+      "value": "PHI Classifier",
+      "status": "absent",
+      "rows_present": 0,
+      "rows_sourced": 0,
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+    },
+    {
+      "axis": "feature",
+      "value": "Payor",
+      "status": "absent",
+      "rows_present": 0,
+      "rows_sourced": 0,
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+    },
+    {
+      "axis": "feature",
+      "value": "Product Awareness",
+      "status": "absent",
+      "rows_present": 0,
+      "rows_sourced": 0,
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+    },
+    {
+      "axis": "feature",
+      "value": "RAG",
+      "status": "covered",
+      "rows_present": 1,
+      "rows_sourced": 1,
+      "note": "documented and deployed; asserts-vs-covered needs a human read"
+    },
+    {
+      "axis": "feature",
+      "value": "Releases",
+      "status": "unknown",
+      "rows_present": 1,
+      "rows_sourced": 1,
+      "note": "documented but no deployed service resolved (mapped: None)"
+    },
+    {
+      "axis": "feature",
+      "value": "Response Cards",
+      "status": "unknown",
+      "rows_present": 1,
+      "rows_sourced": 1,
+      "note": "documented but no deployed service resolved (mapped: None)"
+    },
+    {
+      "axis": "feature",
+      "value": "Skills",
+      "status": "unknown",
+      "rows_present": 1,
+      "rows_sourced": 1,
+      "note": "documented but no deployed service resolved (mapped: None)"
+    },
+    {
+      "axis": "feature",
+      "value": "Specs",
+      "status": "absent",
+      "rows_present": 0,
+      "rows_sourced": 0,
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+    },
+    {
+      "axis": "feature",
+      "value": "Story UI",
+      "status": "absent",
+      "rows_present": 0,
+      "rows_sourced": 0,
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+    },
+    {
+      "axis": "feature",
+      "value": "Strategy",
+      "status": "unknown",
+      "rows_present": 1,
+      "rows_sourced": 1,
+      "note": "documented but no deployed service resolved (mapped: None)"
+    },
+    {
+      "axis": "feature",
+      "value": "Task Manager",
+      "status": "absent",
+      "rows_present": 0,
+      "rows_sourced": 0,
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+    },
+    {
+      "axis": "feature",
+      "value": "User",
+      "status": "absent",
+      "rows_present": 0,
+      "rows_sourced": 0,
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+    },
+    {
+      "axis": "feature",
+      "value": "Vault",
+      "status": "unknown",
+      "rows_present": 0,
+      "rows_sourced": 0,
+      "note": "no doc and no deployed service resolved; needs an owner ruling"
+    },
+    {
+      "axis": "feature",
+      "value": "Vibe",
+      "status": "absent",
+      "rows_present": 0,
+      "rows_sourced": 0,
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+    },
+    {
+      "axis": "feature",
+      "value": "Web Scraper",
+      "status": "absent",
+      "rows_present": 0,
+      "rows_sourced": 0,
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+    }
+  ]
+}
