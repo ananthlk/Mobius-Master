@@ -633,7 +633,7 @@
    "module": "app.stages.state_load",
    "group": "stages",
    "path": "app/stages/state_load.py",
-   "loc": 153,
+   "loc": 196,
    "role": "Stage: load state, apply delta from message, build context pack.",
    "role_full": "Stage: load state, apply delta from message, build context pack.",
    "stage": "state_load",

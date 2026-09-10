@@ -1359,7 +1359,10 @@ WHAT IT DOES NOT LOAD, which is the part people assume:
          "into them, because the acquire happens inside the call db_query already times and "
          "adding it would double-count. One live turn turns the floor into a measurement. If "
          "the acquire share proves small, the answer changes and the riskier edit is avoided "
-         "entirely."),
+         "entirely."
+         "DECLINED ON COST by Ananth 2026-09-09: the DB is 0.5-2.3% of turn wall and "
+         "the fix buys ~0.2%. A DECIDED item, not an open defect — reopen if the "
+         "magnitude under contention is ever quantified."),
  ("bad", "OWNER(chat): state_load IS 1.2s AT p50 AND IT IS ALL SEQUENTIAL DB READS — "
          "measured 2026-09-09 from turn_spans, the first finding this node's own "
          "instrumentation produced.\n\n"

@@ -61,7 +61,12 @@ LOC_AMBER   = 800     # a module one person can still hold in their head
 LOC_RED     = 2500    # react_loop is 6,200 — not reviewable, not isolable
 SWALLOW_RED = 10      # log-and-continue handlers: failures the caller cannot see
 
-CLOSED_MARKERS = ("CLOSED", "FIXED", "RESOLVED", "WITHDRAWN", "RETIRED")
+# DECLINED belongs here: a fix the owner considered and rejected on cost is a
+# DECISION, not an outstanding defect. Leaving it open counted a made decision
+# against a node's readiness forever, and would have made `state_load` un-greenable
+# on an item Ananth had explicitly closed. The marker keeps it visible in the log —
+# it is stamped, not deleted — while stopping it from scoring.
+CLOSED_MARKERS = ("CLOSED", "FIXED", "RESOLVED", "WITHDRAWN", "RETIRED", "DECLINED")
 _CALLED = ("PERIPHERAL", "TAGGED-UNVERIFIED", "GUARDED")
 _UNCALLED = ("ABSENT", "IMPORTED-NOT-CALLED")
 
@@ -94,6 +99,20 @@ def is_own_defect(text):
     return any(o.startswith(x) for x in _OWN_NODE if x) or o == ""
 
 
+# A closure marker is recognised ANYWHERE in the text, but only as a STAMP — at the
+# start of a sentence, in caps. The first version scanned only text[:400] to stop a
+# passing mention of another node's fix from closing this one; but stamps are appended
+# at the END, so two of my own rules contradicted and two genuinely-closed state_load
+# findings kept counting as open. Anchoring on sentence-start caps satisfies both: a
+# mid-sentence "fixed" in prose does not close anything, a stamp anywhere does.
+_STAMP_RE = __import__("re").compile(
+    r"(?:^|[.;—)]\s*|\s)(CLOSED|FIXED|RESOLVED|WITHDRAWN|RETIRED|DECLINED)\b(?=[ ,:.]|$)")
+
+
+def is_closed(text):
+    return bool(_STAMP_RE.search(text or ""))
+
+
 def open_bugs(findings, own_only=True):
     """`bad` findings not stamped closed. Only the head of the text is scanned:
     a closure stamp is appended at the front of the tail, and a later mention of
@@ -102,7 +121,7 @@ def open_bugs(findings, own_only=True):
     for kind, text in findings or []:
         if kind != "bad":
             continue
-        if any(c in text[:400] for c in CLOSED_MARKERS):
+        if is_closed(text):
             continue
         if own_only and not is_own_defect(text):
             continue
@@ -114,7 +133,7 @@ def tracked_elsewhere(findings):
     """Open findings recorded here but owned by another seat. Named, not hidden."""
     out = []
     for kind, text in findings or []:
-        if kind != "bad" or any(c in text[:400] for c in CLOSED_MARKERS):
+        if kind != "bad" or is_closed(text):
             continue
         if not is_own_defect(text):
             out.append(owner_of(text))

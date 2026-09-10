@@ -389,7 +389,7 @@
     [
      "functionality",
      "amber",
-     "4 open (+2 tracked for other seats)"
+     "2 open"
     ],
     [
      "testability",
@@ -413,7 +413,7 @@
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "functionality: 4 open (+2 tracked for other seats) \u00b7 testability: coverage unknown \u00b7 error_handling: 2 of 2 handlers swallow \u00b7 observability: 5 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: modularity)",
+   "rating_why": "functionality: 2 open \u00b7 testability: coverage unknown \u00b7 error_handling: 2 of 2 handlers swallow \u00b7 observability: 5 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: modularity)",
    "live_config": [
     {
      "name": "PHI_GATE_URL",
@@ -673,8 +673,8 @@
    "dimensions": [
     [
      "functionality",
-     "red",
-     "8 open defects"
+     "amber",
+     "7 open"
     ],
     [
      "testability",
@@ -698,7 +698,7 @@
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "functionality: 8 open defects \u00b7 error_handling: 27 of 43 handlers log-and-continue  (ok: testability, modularity, observability)",
+   "rating_why": "error_handling: 27 of 43 handlers log-and-continue  (ok: functionality, testability, modularity, observability)",
    "live_config": [],
    "detail": {}
   }
@@ -789,7 +789,7 @@
     [
      "functionality",
      "amber",
-     "3 open"
+     "1 open"
     ],
     [
      "testability",
@@ -813,7 +813,7 @@
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "functionality: 3 open \u00b7 testability: called, guarantee unproven (PERIPHERAL) \u00b7 error_handling: 8 of 10 handlers swallow \u00b7 observability: 1 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: modularity)",
+   "rating_why": "functionality: 1 open \u00b7 testability: called, guarantee unproven (PERIPHERAL) \u00b7 error_handling: 8 of 10 handlers swallow \u00b7 observability: 1 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -929,7 +929,7 @@
     [
      "functionality",
      "amber",
-     "4 open (+2 tracked for other seats)"
+     "2 open"
     ],
     [
      "testability",
@@ -953,7 +953,7 @@
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "functionality: 4 open (+2 tracked for other seats) \u00b7 testability: called, guarantee unproven (PERIPHERAL) \u00b7 error_handling: 2 of 2 handlers swallow \u00b7 observability: 5 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: modularity)",
+   "rating_why": "functionality: 2 open \u00b7 testability: called, guarantee unproven (PERIPHERAL) \u00b7 error_handling: 2 of 2 handlers swallow \u00b7 observability: 5 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: modularity)",
    "live_config": [
     {
      "name": "PHI_CLASSIFIER_URL",
@@ -3572,7 +3572,7 @@
     [
      "functionality",
      "red",
-     "20 open defects (+12 tracked for other seats)"
+     "18 open defects (+5 tracked for other seats)"
     ],
     [
      "testability",
@@ -3596,7 +3596,7 @@
     ]
    ],
    "rating_was_typed": "red",
-   "rating_why": "functionality: 20 open defects (+12 tracked for other seats) \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: testability, error_handling, modularity)",
+   "rating_why": "functionality: 18 open defects (+5 tracked for other seats) \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: testability, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -3842,7 +3842,7 @@
    "module": "app.stages.state_load",
    "group": "stages",
    "path": "app/stages/state_load.py",
-   "loc": 153,
+   "loc": 196,
    "role": "Stage: load state, apply delta from message, build context pack.",
    "role_full": "Stage: load state, apply delta from message, build context pack.",
    "stage": "state_load",
@@ -3859,6 +3859,7 @@
    "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own.",
    "config": [],
    "writes": [
+    "record_ambient",
     "save_state_tracked"
    ],
    "key": "state_load",
@@ -3868,7 +3869,7 @@
    "findings": [
     [
      "bad",
-     "OWNER(chat): ROOT CAUSE OF THE PER-READ OVERHEAD \u2014 EVERY POOLED ACQUIRE RUNS `SELECT 1` AND A COMMIT. Diagnosed by Eval from source, verified by me at db_client.py:334-338 before relaying:\n\n    conn = pool.getconn()\n    with conn.cursor() as _cur:\n        _cur.execute(\"SELECT 1\")     # liveness probe\n    conn.commit()                    # and a commit\n    return conn, True\n\nIn CHAT_DB_MODE=direct \u2014 which is what is LIVE \u2014 every db_query and db_execute does its own acquire -> execute -> release. So each read costs THREE round-trips where one would do, and a turn's 5-10 DB ops become 15-30. The pool amortises the CONNECT; it does not amortise this probe, which runs on every acquire.\n\nThat closes the gap I measured and could not attribute: my direct read via the proxy is 45ms; the service's reads on the same tables are 260-630ms. Three round-trips accounts for the floor, and the VARIABILITY is the getconn contention path \u2014 the PoolError branch sleeps 50ms and retries within a 5s deadline, so a contended acquire adds 50ms increments before the query starts.\n\nCORRECTION, and it is the FOURTH instance this session of the same trap: I relayed 'starves a max=10 pool'. The live value is CHAT_DB_POOL_MAX=20; TEN IS THE SOURCE DEFAULT at db_client.py:227. Eval read the default, I passed it on without checking, Chat Master read the deployed environment. It does not touch the three-round-trips finding but it halves the starvation math, which matters to anyone sizing the pool. Same shape as the governor reading 'off' while deployed true, the integrator 'sequential' while parallel, and enrichment '0%' while 100 \u2014 and it keeps recurring for the reason already logged on this node: 116 of 187 env vars run on invisible code defaults and no surface states the effective value.\n\nTHE FIX, endorsed by Eval, has two halves and the second is the one that bites if omitted: one connection per TURN rather than per query, which removes the per-query getconn and SELECT 1 entirely; and GUARANTEED RELEASE on every exit path including the 20s LLM timeout \u2014 otherwise a turn that times out leaks its connection and starves the pool. That is the same cleanup-on-failure shape as the state_load bug this node just fixed.\n\nHONEST LIMIT, kept from Eval's filing: the SELECT 1 is confirmed from source; the BASE Cloud Run to Cloud SQL round-trip time is unmeasured, so the arithmetic above is a floor and not a full account of 630ms. The fix holds regardless \u2014 three round-trips to one is a real reduction whatever the base RTT turns out to be.\n\nAND THE P2b SPAN WILL SHOW IT: its connection-acquire vs query-execute split is exactly this distinction. The SELECT 1 is acquire-time wearing query-time's clothes \u2014 which is why the counts, which record per-TARGET reads, said n=1 while the wall said otherwise. Chat Master's generalisation, kept in their words: ANY PER-TARGET COUNTER IS BLIND TO WHATEVER HAPPENS BETWEEN DECIDING TO CALL AND THE CALL STARTING.\n\nMEASURED 2026-09-09 ON THE DEPLOYED INSTRUMENT \u2014 MECHANISM CONFIRMED, FIX DECLINED. Chat Master measured; I verified from turn_spans independently.\n\n  acquires == db ops EXACTLY, per turn: 7 acquires for 5 reads + 2 writes; 5 for 5.\n  So the per-query acquire predicted from CHAT_DB_MODE=direct is real.\n  acquire = 75-115ms per turn, 10.7-16.4ms each, 38-71% OF ALL DB TIME.\n\nAND THE SHARE THAT DECIDES IT \u2014 my own numbers, four turns:\n    wall 52,366ms  db 266ms (0.51%)  acquire 111ms (0.21%)\n    wall 47,666ms  db 272ms (0.57%)  acquire  75ms (0.16%)\n    wall 46,297ms  db 347ms (0.75%)  acquire 115ms (0.25%)\n    wall  9,639ms  db 221ms (2.30%)  acquire  93ms (0.97%)\n\nSo eliminating connection acquire ENTIRELY buys roughly 0.2% of turn wall on an agentic turn. The connection-per-turn refactor's second half is guaranteed release on every exit path including the 20s LLM timeout \u2014 the same cleanup-on-failure shape as the state_load bug this node just fixed. THAT RISK FOR 0.2% IS NOT WORTH SPENDING, and Chat Master said so rather than letting a confirmed diagnosis become a work item by momentum. Recorded as a decision, not a deferral.\n\nWHAT REMAINS UNSETTLED, and it is the honest limit: these are WARM turns \u2014 reads at 6-17ms. They do NOT reproduce the 260-630ms I measured earlier, which was cold-pool or contended and consistent with the PoolError 50ms-retry path. So the mechanism is confirmed and its MAGNITUDE UNDER CONTENTION IS UNQUANTIFIED. A per-turn connection would help a cold or contended turn far more than a warm one. n=4 warm turns cannot settle that, and nobody should size the win from these numbers.\n\nMY OWN FIRST READING WAS WRONG: I reported 2 acquires against 15 reads and called the three-round-trips theory into question. That sample straddled the deploy and mixed in old-revision spans carrying no acquire instrument. Chat Master's numbers were right and mine were incomplete.\n\nAND THE NODE'S OWN SHAPE CHANGED: state_load processing ran 80-327ms across those turns \u2014 now LARGER than its DB time including acquire. The 'four sequential slow reads' framing this node started with no longer describes it.\n\nNOT FIXED, DELIBERATELY, and the reasoning is the right one: the arithmetic is a floor built on an unmeasured base RTT, and the second half of the fix is a connection-LIFECYCLE change \u2014 the same cleanup-on-failure shape as the state_load bug. Chat Master built the INSTRUMENT instead (f2db529): db.acquire recorded at all three acquire sites and reported alongside db_read_ms/db_write_ms, never summed into them, because the acquire happens inside the call db_query already times and adding it would double-count. One live turn turns the floor into a measurement. If the acquire share proves small, the answer changes and the riskier edit is avoided entirely."
+     "OWNER(chat): ROOT CAUSE OF THE PER-READ OVERHEAD \u2014 EVERY POOLED ACQUIRE RUNS `SELECT 1` AND A COMMIT. Diagnosed by Eval from source, verified by me at db_client.py:334-338 before relaying:\n\n    conn = pool.getconn()\n    with conn.cursor() as _cur:\n        _cur.execute(\"SELECT 1\")     # liveness probe\n    conn.commit()                    # and a commit\n    return conn, True\n\nIn CHAT_DB_MODE=direct \u2014 which is what is LIVE \u2014 every db_query and db_execute does its own acquire -> execute -> release. So each read costs THREE round-trips where one would do, and a turn's 5-10 DB ops become 15-30. The pool amortises the CONNECT; it does not amortise this probe, which runs on every acquire.\n\nThat closes the gap I measured and could not attribute: my direct read via the proxy is 45ms; the service's reads on the same tables are 260-630ms. Three round-trips accounts for the floor, and the VARIABILITY is the getconn contention path \u2014 the PoolError branch sleeps 50ms and retries within a 5s deadline, so a contended acquire adds 50ms increments before the query starts.\n\nCORRECTION, and it is the FOURTH instance this session of the same trap: I relayed 'starves a max=10 pool'. The live value is CHAT_DB_POOL_MAX=20; TEN IS THE SOURCE DEFAULT at db_client.py:227. Eval read the default, I passed it on without checking, Chat Master read the deployed environment. It does not touch the three-round-trips finding but it halves the starvation math, which matters to anyone sizing the pool. Same shape as the governor reading 'off' while deployed true, the integrator 'sequential' while parallel, and enrichment '0%' while 100 \u2014 and it keeps recurring for the reason already logged on this node: 116 of 187 env vars run on invisible code defaults and no surface states the effective value.\n\nTHE FIX, endorsed by Eval, has two halves and the second is the one that bites if omitted: one connection per TURN rather than per query, which removes the per-query getconn and SELECT 1 entirely; and GUARANTEED RELEASE on every exit path including the 20s LLM timeout \u2014 otherwise a turn that times out leaks its connection and starves the pool. That is the same cleanup-on-failure shape as the state_load bug this node just fixed.\n\nHONEST LIMIT, kept from Eval's filing: the SELECT 1 is confirmed from source; the BASE Cloud Run to Cloud SQL round-trip time is unmeasured, so the arithmetic above is a floor and not a full account of 630ms. The fix holds regardless \u2014 three round-trips to one is a real reduction whatever the base RTT turns out to be.\n\nAND THE P2b SPAN WILL SHOW IT: its connection-acquire vs query-execute split is exactly this distinction. The SELECT 1 is acquire-time wearing query-time's clothes \u2014 which is why the counts, which record per-TARGET reads, said n=1 while the wall said otherwise. Chat Master's generalisation, kept in their words: ANY PER-TARGET COUNTER IS BLIND TO WHATEVER HAPPENS BETWEEN DECIDING TO CALL AND THE CALL STARTING.\n\nMEASURED 2026-09-09 ON THE DEPLOYED INSTRUMENT \u2014 MECHANISM CONFIRMED, FIX DECLINED. Chat Master measured; I verified from turn_spans independently.\n\n  acquires == db ops EXACTLY, per turn: 7 acquires for 5 reads + 2 writes; 5 for 5.\n  So the per-query acquire predicted from CHAT_DB_MODE=direct is real.\n  acquire = 75-115ms per turn, 10.7-16.4ms each, 38-71% OF ALL DB TIME.\n\nAND THE SHARE THAT DECIDES IT \u2014 my own numbers, four turns:\n    wall 52,366ms  db 266ms (0.51%)  acquire 111ms (0.21%)\n    wall 47,666ms  db 272ms (0.57%)  acquire  75ms (0.16%)\n    wall 46,297ms  db 347ms (0.75%)  acquire 115ms (0.25%)\n    wall  9,639ms  db 221ms (2.30%)  acquire  93ms (0.97%)\n\nSo eliminating connection acquire ENTIRELY buys roughly 0.2% of turn wall on an agentic turn. The connection-per-turn refactor's second half is guaranteed release on every exit path including the 20s LLM timeout \u2014 the same cleanup-on-failure shape as the state_load bug this node just fixed. THAT RISK FOR 0.2% IS NOT WORTH SPENDING, and Chat Master said so rather than letting a confirmed diagnosis become a work item by momentum. Recorded as a decision, not a deferral.\n\nWHAT REMAINS UNSETTLED, and it is the honest limit: these are WARM turns \u2014 reads at 6-17ms. They do NOT reproduce the 260-630ms I measured earlier, which was cold-pool or contended and consistent with the PoolError 50ms-retry path. So the mechanism is confirmed and its MAGNITUDE UNDER CONTENTION IS UNQUANTIFIED. A per-turn connection would help a cold or contended turn far more than a warm one. n=4 warm turns cannot settle that, and nobody should size the win from these numbers.\n\nMY OWN FIRST READING WAS WRONG: I reported 2 acquires against 15 reads and called the three-round-trips theory into question. That sample straddled the deploy and mixed in old-revision spans carrying no acquire instrument. Chat Master's numbers were right and mine were incomplete.\n\nAND THE NODE'S OWN SHAPE CHANGED: state_load processing ran 80-327ms across those turns \u2014 now LARGER than its DB time including acquire. The 'four sequential slow reads' framing this node started with no longer describes it.\n\nNOT FIXED, DELIBERATELY, and the reasoning is the right one: the arithmetic is a floor built on an unmeasured base RTT, and the second half of the fix is a connection-LIFECYCLE change \u2014 the same cleanup-on-failure shape as the state_load bug. Chat Master built the INSTRUMENT instead (f2db529): db.acquire recorded at all three acquire sites and reported alongside db_read_ms/db_write_ms, never summed into them, because the acquire happens inside the call db_query already times and adding it would double-count. One live turn turns the floor into a measurement. If the acquire share proves small, the answer changes and the riskier edit is avoided entirely.DECLINED ON COST by Ananth 2026-09-09: the DB is 0.5-2.3% of turn wall and the fix buys ~0.2%. A DECIDED item, not an open defect \u2014 reopen if the magnitude under contention is ever quantified."
     ],
     [
      "bad",
@@ -3938,12 +3939,12 @@
    "signals": {
     "async_no_timeout": 0,
     "bare_except": 0,
-    "except_handlers": 1,
-    "loc": 153,
-    "log_sites": 1,
+    "except_handlers": 3,
+    "loc": 196,
+    "log_sites": 2,
     "missing": false,
     "reraise": 0,
-    "swallow": 0,
+    "swallow": 2,
     "telemetry_sites": 1,
     "todos": 0
    },
@@ -3955,7 +3956,7 @@
     [
      "functionality",
      "amber",
-     "4 open (+1 tracked for other seats)"
+     "2 open (+1 tracked for other seats)"
     ],
     [
      "testability",
@@ -3964,22 +3965,22 @@
     ],
     [
      "error_handling",
-     "green",
-     "1 handlers, none swallow"
+     "amber",
+     "2 of 3 handlers swallow"
     ],
     [
      "modularity",
      "green",
-     "153 lines"
+     "196 lines"
     ],
     [
      "observability",
      "amber",
-     "1 telemetry sites, 1 logs"
+     "1 telemetry sites, 2 logs"
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "functionality: 4 open (+1 tracked for other seats) \u00b7 observability: 1 telemetry sites, 1 logs  (ok: testability, error_handling, modularity)",
+   "rating_why": "functionality: 2 open (+1 tracked for other seats) \u00b7 error_handling: 2 of 3 handlers swallow \u00b7 observability: 1 telemetry sites, 2 logs  (ok: testability, modularity)",
    "live_config": [],
    "detail": {}
   },

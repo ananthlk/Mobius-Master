@@ -354,12 +354,12 @@
  "state_load": {
   "async_no_timeout": 0,
   "bare_except": 0,
-  "except_handlers": 1,
-  "loc": 153,
-  "log_sites": 1,
+  "except_handlers": 3,
+  "loc": 196,
+  "log_sites": 2,
   "missing": false,
   "reraise": 0,
-  "swallow": 0,
+  "swallow": 2,
   "telemetry_sites": 1,
   "todos": 0
  },
