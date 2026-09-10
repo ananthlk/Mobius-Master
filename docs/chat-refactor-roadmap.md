@@ -15,7 +15,7 @@ deliberately not yet asked because P4 has not opened. Per-phase status below is
 hand-maintained in `refactor_roadmap.py`'s `PHASE_STATUS`, because completion is a
 judgement about a gate, not something derivable from the findings file.
 
-**113 bugs · 77 sequenced into 6 phases · 32 explicitly outside · 0 UNSEQUENCED · 27 of the 77 sequenced have NO OWNER**
+**117 bugs · 79 sequenced into 6 phases · 34 explicitly outside · 0 UNSEQUENCED · 27 of the 79 sequenced have NO OWNER**
 
 > The two counts are different questions and the second one used to be invisible.
 > `UNSEQUENCED` was previously printed as "unassigned", which reads as *nobody owns
@@ -28,7 +28,7 @@ judgement about a gate, not something derivable from the findings file.
 
 | Phase | Name | Bugs | Owner | Gate metric | Blocks | Status |
 |---|---|---:|---|---|---|---|
-| **P1** | Delete | 11 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☑ **COMPLETE** 2026-09-08 — ~31,900 lines removed across P1.1/P1a/P1b/P1c/P1d, zero regressions |
+| **P1** | Delete | 13 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☑ **COMPLETE** 2026-09-08 — ~31,900 lines removed across P1.1/P1a/P1b/P1c/P1d, zero regressions |
 | **P2** | Make absent producers detectable | 26 | chat + Eval | every segment timed AND each timed segment's attribution verified against a known-external call — an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☑ **COMPLETE** 2026-09-09 — P2a planner orphans, P2b latency telemetry deployed with spans bound to schema node keys |
 | **P3** | One decision point | 18 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ◐ **IN PROGRESS** — `state_load` closed (StateUnavailable + first contract tag); `tool_manifest` opened 2026-09-09 |
 | **P4** | Split | 16 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
@@ -42,10 +42,10 @@ in `Blocks` have passed their gate.
 
 | Owner | Sequenced bugs |
 |---|---:|
-| chat | 50 |
+| chat | 52 |
 | unassigned-owner | 27 |
 
-## P1 — Delete  ·  11 items
+## P1 — Delete  ·  13 items
 
 **Owner** chat · **ratifier** DB seat, Tech Review
 **Gate** lines removed; handler count down; ZERO invariant movement  
@@ -68,6 +68,8 @@ The cost of leading with it, stated plainly: this phase CANNOT CLAIM A LATENCY W
 | ☐ | `run_pipeline` | chat | THE CLASSIC PATH IS DEAD AND IT IS 1,159 LINES |
 | ☐ | `run_pipeline` | chat | THE CREDENTIALING SURFACE IS 8,994 LINES IN CHAT AND ITS TABLES ARE EMPTY |
 | ☐ | `tool_manifest` | chat | APPEALS AGENT RULED 2026-09-09 — REMOVE THE INVENTED FL MEDICAID DEFAULT |
+| ☐ | `tool_manifest` | chat | THE STRONGEST CANDIDATE YET FOR THE SPORADIC MISS — THE PAYOR KEY IS FREE TEXT FROM THE MODEL, MATCHED EXACTLY |
+| ☐ | `tool_manifest` | chat | `usable` PASSES THE ONE CASE IT WAS BUILT TO CATCH |
 
 ## P2 — Make absent producers detectable  ·  26 items
 
@@ -241,6 +243,8 @@ Each carries a reason. Excluding by silence is the failure mode this guards agai
 | `POST /chat` | correction | a correction to my own text, not work | CORRECTION from the DB seat to my own text: ensure_thread treats two f |
 | `POST /chat` | correction | a correction to my own text, not work | CORRECTION: chat_turns.user_id is nullable TEXT with NO foreign key —  |
 | `PHI gate` | other seat | fleet-power's fleet.yaml; a one-line note, not a chat-internal change | OWNER(fleet-power seat): A HIPAA GATE'S CORRECTNESS DEPENDS ON A SCALI |
+| `tool_manifest` | other seat | appeals-agent self-reported; their code, their fix — chat must stop treating the markers as 'empty' | OWNER(appeals-agent, self-reported): THE GUARD IS FAIL-OPEN ON SCALARS |
+| `tool_manifest` | other seat | appeals contract change offered; chat consumes once shipped | A MISS IS 200-WITH-{} AND 'PAYOR UNKNOWN' IS BYTE-IDENTICAL TO 'CARC N |
 | `PHI gate` | own workstream | feedback-text gate writes no audit row; compliance, not structure | TWO IMPLEMENTATIONS OF THE SAME GATE, and only one is audited |
 | `POST /chat` | own workstream | Tech Review ruled the swallow is not the defect | ensure_thread swallows every DB failure |
 | `POST /chat` | own workstream | entry contract, not chat-internal | The API→worker contract is untyped |

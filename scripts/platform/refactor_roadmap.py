@@ -227,6 +227,8 @@ RULES = [
     ("P2", "model_registry", "THE BANDIT HAS NO SURFACE"),
     ("P2", "tool_manifest", "STAGE 0 COULD NOT NAME THE LAYER"),
     ("P1", "tool_manifest", "APPEALS AGENT RULED 2026-09-09 — REMOVE THE INVENTED FL"),
+    ("P1", "tool_manifest", "THE STRONGEST CANDIDATE YET FOR THE SPORADIC MISS"),
+    ("P1", "tool_manifest", "`usable` PASSES THE ONE CASE IT WAS BUILT TO CATCH"),
     ("P2", "tool_manifest", "THE DISCRIMINATOR CHAT NEEDS IS ALREADY ON THE WIRE"),
     ("P2", "tool_manifest", "A FOURTH LAYER STAGE 0 DID NOT NAME"),
     ("P2", "tool_manifest", "A RECOVERED PARSE FAILURE COSTS A FULL EXTRA LLM ROUND"),
@@ -310,6 +312,8 @@ PRINCIPLES = [
 ]
 
 OUT_OF_PROGRAM = [
+    ("tool_manifest", "THE GUARD IS FAIL-OPEN ON SCALARS", "other seat", "appeals-agent self-reported; their code, their fix — chat must stop treating the markers as 'empty'"),
+    ("tool_manifest", "A MISS IS 200-WITH-{} AND 'PAYOR UNKNOWN'", "other seat", "appeals contract change offered; chat consumes once shipped"),
     ("PHI gate", "A HIPAA GATE'S CORRECTNESS DEPENDS ON A SCALING SETTING", "other seat", "fleet-power's fleet.yaml; a one-line note, not a chat-internal change"),
     ("POST /chat", "CHAT_ENV=prod",       "security posture", "needs Ananth's authorisation + staging; no clean unauthenticated POST sent"),
     ("POST /chat", "HIPAA AUDIT WRITE",   "compliance decision", "fail-open write under a fail-closed gate; posture decision pending"),
