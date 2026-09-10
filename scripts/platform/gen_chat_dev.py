@@ -206,8 +206,19 @@ def main():
     # phi_gate appears twice — as a hop in the chain and as a cross-cutting
     # module. Alias rather than duplicate the prose, so a correction lands once.
     content["phi_gate"] = content["PHI gate"]
-    sig_path = "/private/tmp/claude-502/-Users-ananth-Mobius/7bd378b9-3a8f-4998-a9b3-06f2d630c20f/scratchpad/readiness.json"
-    sigs = json.load(open(sig_path)) if os.path.exists(sig_path) else {}
+    # SIGNALS ARE MEASURED, and their absence is FATAL rather than silent.
+    # This used to read a hardcoded path inside a *session scratchpad* that no
+    # longer existed, with `if os.path.exists(...) else {}` — so every node got
+    # {} and the page rendered "0 except · 0 log-and-continue · 0 emits" for all
+    # 38 nodes as though measured. A swallowed absence presented as data, in the
+    # generator built to find swallowed absences. gen_readiness.py now measures
+    # from source on every refresh, and a missing file stops the build.
+    sig_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            "..", "..", "docs", "chat-readiness.json")
+    if not os.path.exists(sig_path):
+        sys.exit("FATAL: docs/chat-readiness.json missing — run gen_readiness.py. "
+                 "Refusing to render zeroed signals as measurements.")
+    sigs = json.load(open(sig_path))
     sig_alias = {"POST /chat": "chat_api", "PHI gate": "phi_gate", "queue": "queue",
                  "worker": "worker", "run_pipeline": "orchestrator"}
 
@@ -254,7 +265,12 @@ def main():
         _rr_rating, _rr_why = _RUBRIC.rate(
             findings=obj.get("findings") or [],
             coverage=obj.get("coverage"),
-            deleted=bool(obj.get("deleted")))
+            deleted=bool(obj.get("deleted")),
+            signals=obj.get("signals"))
+        obj["dimensions"] = _RUBRIC.dimensions(
+            findings=obj.get("findings") or [],
+            coverage=obj.get("coverage"),
+            signals=obj.get("signals")) if not obj.get("deleted") else []
         _ovr = obj.get("rating_override")
         if _ovr:
             obj["rating_derived"] = _rr_rating

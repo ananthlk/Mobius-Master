@@ -53,7 +53,7 @@
    "direct": 0,
    "reached": 0,
    "tags": [],
-   "rating": "amber"
+   "rating": "red"
   },
   {
    "node": "parsing",
@@ -71,7 +71,7 @@
    "direct": 2,
    "reached": 1,
    "tags": [],
-   "rating": "green"
+   "rating": "red"
   },
   {
    "node": "context",
@@ -80,7 +80,7 @@
    "direct": 46,
    "reached": 44,
    "tags": [],
-   "rating": "amber"
+   "rating": "red"
   },
   {
    "node": "critic",
@@ -107,7 +107,7 @@
    "direct": 1,
    "reached": 1,
    "tags": [],
-   "rating": "amber"
+   "rating": "red"
   },
   {
    "node": "governor",
@@ -116,7 +116,7 @@
    "direct": 1,
    "reached": 1,
    "tags": [],
-   "rating": "amber"
+   "rating": "red"
   },
   {
    "node": "integrate",
@@ -125,7 +125,7 @@
    "direct": 10,
    "reached": 7,
    "tags": [],
-   "rating": "amber"
+   "rating": "red"
   },
   {
    "node": "llm_manager",
@@ -143,7 +143,7 @@
    "direct": 1,
    "reached": 1,
    "tags": [],
-   "rating": "amber"
+   "rating": "red"
   },
   {
    "node": "model_registry",
@@ -152,7 +152,7 @@
    "direct": 11,
    "reached": 9,
    "tags": [],
-   "rating": "amber"
+   "rating": "red"
   },
   {
    "node": "orchestrator",
@@ -161,7 +161,7 @@
    "direct": 3,
    "reached": 1,
    "tags": [],
-   "rating": "amber"
+   "rating": "red"
   },
   {
    "node": "phi_gate",
@@ -188,7 +188,7 @@
    "direct": 39,
    "reached": 20,
    "tags": [],
-   "rating": "amber"
+   "rating": "red"
   },
   {
    "node": "react_retry_guard",
@@ -197,7 +197,7 @@
    "direct": 4,
    "reached": 4,
    "tags": [],
-   "rating": "green"
+   "rating": "red"
   },
   {
    "node": "retrieval_budget",
@@ -206,7 +206,7 @@
    "direct": 1,
    "reached": 1,
    "tags": [],
-   "rating": "green"
+   "rating": "red"
   },
   {
    "node": "round0",
@@ -215,7 +215,7 @@
    "direct": 1,
    "reached": 1,
    "tags": [],
-   "rating": "green"
+   "rating": "amber"
   },
   {
    "node": "tool_manifest",

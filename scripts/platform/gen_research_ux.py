@@ -1,23 +1,36 @@
 #!/usr/bin/env python3
-"""The deep-research UX, generated from the contract it calls.
+"""The deep-research CONTRACT, rendered. Not a second copy of the screen.
 
-Ananth, 2026-09-09: "the ux also in your schema .. WE WILL DRIVE BOTH WITH
-THAT." And then the framework: "request, output, authority, tools, decisions,
-(recommendations), status .. these are good artifacts of things we need."
+Ananth, 2026-09-09: "retire gen_research_ux.py's static three-tab page — do it
+now, and fix the silent empty render."
 
-So the page is organised by those seven, and every one of them — which fields
-are required, the words a refusal uses, which doors exist, which actions are
-offered and what each ends as — is read out of `deep_research/contract`, the
-same declaration the router reads back through `research.contract`.
+WHAT THIS USED TO BE, AND WHY IT HAD TO GO. It rendered the same three doors
+the live page at /research/ask now serves — Ask, My requests, Work — against
+the same published contract. Two renderings of one declaration is the drift
+trap this module spent a day finding instances of, and the served one is the
+one people actually open. The queue and worklist panels, their tabs, their
+scopes and the live-row hero are gone.
 
-THE LIST TRIAGES; THE PAGE DECIDES. An earlier cut put a recommendation, a
-rationale, a wait state and twelve buttons inside a table row — a decision
-surface in forty pixels. A row now carries what we advise and who it is waiting
-on, and everything else lives on the question's own page, where the evidence and
-the conversation have room.
+WHAT IT IS FOR, which the served page genuinely does not do: it shows the SEVEN
+ARTIFACTS INCLUDING THE ONES THAT DO NOT EXIST YET. A working screen shows what
+you can do today; this shows the shape of the framework and where the holes are,
+which is what you want when deciding what to build next. The submit form is
+rendered the same way — an artifact nothing collects appears DISABLED with what
+it would take, rather than being left off, because a form that silently omits
+half the framework teaches a reader the framework is smaller than it is.
 
-Real rows, never lorem. Two of the seven artifacts do not exist yet; the page
-shows the hole rather than omitting the section.
+NO DATABASE, NO ROWS, NO DATA FILE. It reads deep_research/contract and nothing
+else, so it renders identically anywhere and cannot go quietly empty. The old
+version took an optional rows file and, when it was not passed, returned
+`{"requests": []}` in silence — so a page whose own docstring promised "real
+rows, never lorem" rendered zero of them and exited 0. A fallback
+indistinguishable from success, in the generator whose whole claim was real
+data. Removing the row-fed half removes that failure mode at the root rather
+than adding a check for it.
+
+    python3 scripts/platform/gen_research_ux.py [out.html]
+
+The working surface is at /research/ask. This is the map, not the territory.
 """
 import json
 import os
@@ -32,7 +45,6 @@ from deep_research import contract as ct      # noqa: E402
 from deep_research import language as L       # noqa: E402
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else "/tmp/research-ux.html"
-DATA = sys.argv[2] if len(sys.argv) > 2 else None
 
 
 # Which stances a reader can act on, in the resolver's own severity order.
@@ -45,12 +57,6 @@ STANCE_TONE = {"ready": "ok", "thin": "ok", "conditional": "ok",
 WAIT_TONE = {"you": "bad", "nobody": "warn", "nothing": "bad",
              "the machine": "ok"}
 ART_TONE = {"present": "ok", "partial": "warn", "absent": "bad"}
-
-
-def load_rows() -> dict:
-    if DATA and os.path.exists(DATA):
-        return json.load(open(DATA))
-    return {"requests": []}
 
 
 def ask_form(doc) -> str:
@@ -139,66 +145,26 @@ def artifact_sections(doc) -> str:
 
 def main() -> None:
     doc = ct.as_doc()
-    data = load_rows()
-    reqs = data.get("requests") or []
-    tasks = data.get("tasks") or []
-    for r in reqs:
-        st = r.get("stance")
-        r["stance_word"], r["stance_help"] = L.stance(st)
-        r["state_word"] = L.state(r["status"])[0]
-        r["wait_word"] = L.waiting((r.get("eta") or {}).get("waiting_on"))[0]
-    from collections import Counter
-    recs = Counter(r.get("recommended") for r in reqs)
-    acts_by_id = {a["id"]: a for a in doc["actions"]}
-    tally = "".join(
-        f"<span class=t><b>{n}</b> "
-        + esc(acts_by_id.get(k, {}).get("label", "nothing we would advise"))
-        + "</span>" for k, n in recs.most_common())
 
-    rows = "".join(
-        "<tr data-id='" + str(r["id"]) + "' data-invoker='" + esc(r.get("invoker"))
-        + "' data-consumer='" + esc(r.get("consumer")) + "' data-dec='"
-        + str(r.get("dec") or 0) + "'>"
-        f"<td class=n>{r['id']}</td>"
-        f"<td><b>{esc(r['subject_id'])}</b>"
-        f"<span class=q>{esc((r.get('question') or '')[:96])}</span></td>"
-        f"<td><span class='pill {esc(r['status'])}'>{esc(r['state_word'])}</span>"
-        f"<span class='st {STANCE_TONE.get(r.get('stance') or '','')}' "
-        f"title='{esc(r['stance_help'])}'>{esc(r['stance_word'])}</span></td>"
-        f"<td class=advise><span class=rec>"
-        + esc(acts_by_id.get(r.get("recommended"), {}).get("label",
-              "Nothing we would advise")) + "</span>"
-        f"<span class=q>{esc((r.get('why') or '')[:130])}</span></td>"
-        f"<td class=where><span class='wait {esc((r.get('where') or {}).get('tone',''))}'>"
-        f"{esc(r['wait_word'])}</span>"
-        f"<span class=q>{esc((r.get('where') or {}).get('say') or '')}</span></td>"
-        f"<td class=n>{r.get('rounds')}</td></tr>" for r in reqs)
+    # AN EMPTY RENDER IS A FAILURE, NOT A PAGE.
+    #
+    # The version this replaced returned {"requests": []} when its rows file
+    # was absent and rendered a page whose own docstring promised "real rows,
+    # never lorem" — with none, exit 0, nothing said. Removing the rows path
+    # removed that instance; this stops the class. The contract is the only
+    # input left, so if it arrives thin the output is a lie and the generator
+    # says so rather than writing it.
+    thin = [k for k in ("artifacts", "verbs", "surfaces", "fields")
+            if not (doc.get(k) or [])]
+    if thin:
+        sys.exit(f"REFUSING TO RENDER: the contract is missing {thin}. "
+                 f"A page generated from an empty declaration describes a "
+                 f"framework that does not exist. Check deep_research/contract "
+                 f"imports cleanly.")
 
-    worklist_rows = "".join(
-        "<tr data-task='" + str(t["id"]) + "'>"
-        f"<td class=n><b class=worth>{t.get('worth', 0)}</b></td>"
-        f"<td><b>{esc(t['what'])}</b>"
-        f"<span class=q>{esc(t.get('because') or '')}</span></td>"
-        f"<td><span class=pillx>{esc(t.get('owner_role') or 'anyone')}</span>"
-        f"<span class=q>found by: {esc(t.get('basis') or 'declared')}</span></td>"
-        f"<td class=n>{len(t.get('questions') or []) or '—'}</td>"
-        f"<td><span class='wait {'bad' if t.get('outside') else 'ok'}'>"
-        + ("outside" if t.get("outside") else "here") + "</span></td></tr>"
-        for t in tasks)
-
-    # THREE DOORS, AND THE REST ARE SCOPE. Six buttons implied six places; five
-    # of them were one queue with a different WHERE clause. The tabs are named
-    # for what a person came to DO; the folded ones become a choice of WHOSE.
-    tabs = "".join(
-        f"<button class=tab data-tab='{esc(u['id'])}'>"
-        f"<b>{esc(u['tab'])}</b><span>{esc(u['audience'])}</span></button>"
-        for u in doc["surfaces"] if u.get("primary"))
-    folded = [u for u in doc["surfaces"] if not u.get("primary")]
-    scopes = ("<button class='scope on' data-scope='my_requests'>"
-              + esc(next(u["filter_says"] for u in doc["surfaces"]
-                         if u["id"] == "my_requests")) + "</button>"
-              + "".join(f"<button class=scope data-scope='{esc(u['id'])}'>"
-                        f"{esc(u['scope_label'])}</button>" for u in folded))
+    # NO ROWS. The queue and worklist panels these fed are the served page's
+    # job now (/research/ask), and reading live requests into a static file
+    # was the second copy of the same three doors.
 
     vtable = "".join(
         f"<tr><td><code>{esc(v['method'])} {esc(v['route'])}</code></td>"
@@ -209,16 +175,13 @@ def main() -> None:
     from collections import Counter as C2
     astate = C2(a["state"] for a in doc["artifacts"])
 
-    payload = json.dumps({"requests": reqs, "tasks": tasks,
-                          "task_kinds": doc.get("task_kinds") or {},
-                          "actions": acts_by_id,
-                          "artifacts": doc["artifacts"],
+    payload = json.dumps({"artifacts": doc["artifacts"],
                           "surfaces": {s["id"]: s for s in doc["surfaces"]},
-                          "note_uses": doc.get("note_uses") or {},
                           "tools": doc.get("tools") or {},
                           "decisions": doc.get("decisions") or {}})
 
-    html = f"""<title>Deep Research — the four doors</title>
+    html = f"""<meta charset="utf-8">
+<title>Deep Research — the contract</title>
 <link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 :root{{--ground:#faf9fc;--card:#fff;--sunk:#f2f0f7;--ink:#1b1725;--ink2:#4a4459;
@@ -393,59 +356,22 @@ font-family:var(--mono);font-size:11.5px;color:var(--muted);line-height:1.8}}
 [hidden]{{display:none!important}}
 </style>
 <div class=wrap>
-<p class=eyebrow>Deep research</p>
-<h1>Ask a question.<br>See what happened. Do something about it.</h1>
-<p class=lede>Five ways in, one set of rules. Every request carries seven things —
-what you asked, what you want back, what it may rest on, what it may use, what you
-keep deciding, what we advise, and where it stands. Three of those seven do not
-exist yet, and the page says which.</p>
-<p class=src>{len(reqs)} real questions, read live · {astate['present']} artifacts
-present, {astate['partial']} partial, {astate['absent']} absent · contract v1</p>
-
-<div class=hero><b>{recs.get('reopen', 0)} of {len(reqs)}</b> of these should be
-asked again. They are marked finished, but nobody ever opened the document to
-check the answer — most closed before that check existed. Being finished is not
-the same as being right.
-<div class=tally>{tally}</div></div>
-
-<div class=tabs>{tabs}</div>
+<p class=eyebrow>Deep research · the contract</p>
+<h1>What a request carries,<br>and which parts do not exist yet.</h1>
+<p class=lede>Every request carries seven things — what you asked, what you want
+back, what it may rest on, what it may use, what you keep deciding, what we
+advise, and where it stands. This is the map: it shows all seven, including the
+ones nothing collects. The working screen is at
+<a href="{(doc.get('live') or {}).get('ask', '/research/ask')}">{(doc.get('live') or {}).get('ask', '/research/ask')}</a>.</p>
+<p class=src>{astate['present']} artifacts present, {astate['partial']} partial,
+{astate['absent']} absent · read from the published contract, no rows, no
+database · contract v1</p>
 
 <div id=panel_ask class=card>
   <h2 style="margin-bottom:16px">Ask a question</h2>
   {ask_form(doc)}
   <button class=go id=go>Ask it</button>
   <pre id=out hidden></pre>
-</div>
-
-<div id=panel_queue hidden>
-  <div class=scopes>{scopes}</div>
-  <div class=stalled id=stalled hidden></div>
-  <p class=filter id=filt></p>
-  <div class=card style="padding:14px 16px">
-  <table><thead><tr><th>#</th><th>question</th><th>where it stands</th>
-  <th>what we advise</th><th>where it is</th><th>tries</th></tr></thead>
-  <tbody id=tb>{rows}</tbody></table></div>
-  <p class=note><b>The list triages; the page decides.</b> A row says what we
-  advise and who it is waiting on. Open one for the evidence, everything you can
-  do about it, and the conversation.</p>
-</div>
-
-<div id=panel_work hidden>
-  <p class=filter>Work, not questions — most valuable first. What an item is
-  worth is how many questions it unblocks, and it is derived, never typed.</p>
-  <div class=card style="padding:14px 16px">
-  <table><thead><tr><th>worth</th><th>what to do</th><th>who · how we knew</th>
-  <th>closes</th><th>where</th></tr></thead>
-  <tbody id=wl>{worklist_rows}</tbody></table></div>
-  <div id=taskdetail class=card hidden></div>
-  <p class=note><b>How we knew which document</b> — extracted (the answer read
-  it), named (the drafter named it and never cited it), class (one document per
-  payer, which is why four handbook errands are one), or explore. That last is
-  not a failure to fetch; it is research, and it is the machine's own job.</p>
-  <p class=note><b>One item here is worth twenty-three.</b> As twenty-three rows
-  on a question list it looked like twenty-three problems. The bottom row has no
-  question attached at all — work does not have to be about a question, and that
-  is the case this list exists to make expressible.</p>
 </div>
 
 <div id=panel_one hidden>
@@ -509,213 +435,25 @@ document.getElementById('go').addEventListener('click', function(){{
     + '\\n\\n// sent:\\n' + JSON.stringify(body, null, 2);
 }});
 
-// ---- three tabs; the folded surfaces are a scope inside My requests ------
-var SCOPE = 'my_requests';
-
-function applyScope(){{
-  var f = D.surfaces[SCOPE] || {{}};
-  var el = document.getElementById('filt');
-  el.textContent = (f.filter_says || f.scope_label || 'Everything')
-    + '   ·   can call: ' + (f.calls || []).join(', ');
-  el.title = f.filter || 'no filter';
-  document.querySelectorAll('#tb tr').forEach(function(tr){{
-    var show = true, flt = f.filter || '';
-    if(flt.indexOf('invoker') >= 0) show = tr.dataset.invoker === ME;
-    if(flt.indexOf('consumer') >= 0) show = tr.dataset.consumer === ME;
-    if(flt.indexOf('resolution') >= 0) show = tr.dataset.dec !== '0';
-    tr.hidden = !show;
-  }});
-  document.querySelectorAll('.scope').forEach(function(b){{
-    b.classList.toggle('on', b.dataset.scope === SCOPE); }});
-
-  // WHERE IS MY REQUEST — counted over what this scope actually shows, so the
-  // number always describes the rows underneath it.
-  var shown = [...document.querySelectorAll('#tb tr')].filter(function(t){{ return !t.hidden; }});
-  var stuck = shown.filter(function(t){{
-    var q = REQ[t.dataset.id];
-    return q && (q.where || {{}}).tone === 'bad'; }});
-  var b = document.getElementById('stalled');
-  b.hidden = stuck.length === 0;
-  if(stuck.length){{
-    b.innerHTML = '<b>' + stuck.length + ' of ' + shown.length + '</b> have a '
-      + 'round that started and never came back. The status column calls them '
-      + 'Open, which is true and the least useful true thing available.';
-  }}
-}}
-
-function tab(id){{
-  document.querySelectorAll('.tab').forEach(function(b){{
-    b.classList.toggle('on', b.dataset.tab === id); }});
-  document.getElementById('panel_ask').hidden = id !== 'ask';
-  document.getElementById('panel_work').hidden = id !== 'worklist';
-  document.getElementById('panel_queue').hidden = id !== 'my_requests';
-  document.getElementById('panel_one').hidden = true;
-  if(id === 'my_requests') applyScope();
-}}
+// ---- the seven artifacts, as the spine --------------------------------
+//
+// Everything else that used to live here drove the queue and worklist tables:
+// row rendering, scope filters, the stalled banner, the per-request drawer.
+// Those are the served page's job now. What is left is the map — the form's
+// refusals in the contract's own words, and the artifact cards, including the
+// ones nothing collects.
 document.addEventListener('click', function(e){{
-  var t = e.target.closest('.tab');
-  if(t) tab(t.dataset.tab);
-  var sc = e.target.closest('.scope');
-  if(sc){{ SCOPE = sc.dataset.scope; applyScope(); }}
+  var c = e.target.closest('.artcard');
+  if(c) c.classList.toggle('open');
 }});
-
-// ---- the question page --------------------------------------------------
-function li(items){{ return '<ul>' + items.map(function(x){{ return '<li>' + x + '</li>'; }}).join('') + '</ul>'; }}
-function esc(s){{ var d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }}
-
-function fill(r){{
-  document.getElementById('one_title').textContent = '#' + r.id + '  ' + r.subject_id;
-  document.getElementById('one_q').textContent = r.question || '';
-
-  document.getElementById('art_request').innerHTML =
-    '<b>' + esc(r.consumer) + '</b> asked this'
-    + (r.invoker ? '' : ' <span class=no>— anonymously; there is nobody to return it to</span>')
-    + '<br><span class=cur>opened ' + esc(r.d) + ' · ' + r.rounds + ' round(s)</span>';
-
-  var out = [];
-  if(r.schema_keys && r.schema_keys.length)
-    out.push('asked for: ' + r.schema_keys.map(esc).join(', '));
-  else out.push('<span class=no>no schema — a partial answer closes as answered</span>');
-  if(r.fields_kept.length)
-    out.push('kept: ' + li(r.fields_kept.map(function(f){{
-      return '<b>' + esc(f.name) + '</b> = ' + esc(f.value)
-        + (f.scope ? ' <span class=cur>(' + esc(f.scope) + ')</span>' : '')
-        + (f.document ? '<br><span class=cur>' + esc(f.document) + '</span>' : ''); }})));
-  if(r.missing && r.missing.length)
-    out.push('<span class=no>never came: ' + r.missing.map(esc).join(', ') + '</span>');
-  document.getElementById('art_output').innerHTML = out.join('<br>');
-
-  document.getElementById('art_authority').innerHTML =
-    (r.authority ? 'bar: <b>' + esc(r.authority) + '</b>'
-                 : '<span class=no>no bar declared — the default refuses payer policy</span>')
-    + (r.documents && r.documents.length
-        ? '<br>rested on: ' + li(r.documents.map(esc)) : '');
-
-  document.getElementById('art_tools').innerHTML =
-    '<span class=no>nothing was declared, so what this request got depended on which '
-    + 'entry point ran it — and nothing on the result says which.</span>';
-
-  var und = (r.undeclared_decisions || []).length;
-  document.getElementById('art_decisions').innerHTML =
-    '<span class=no>' + und + ' decisions undeclared</span>'
-    + '<br><span class=cur>every one of them defaults to ASK, which is why a person '
-    + 'is interrupted for calls they might have delegated once.</span>';
-
-  var adv = (r.actions || []).filter(function(a){{ return a.id === r.recommended; }})[0];
-  var lead = '';
-  if(adv) lead = '<div class=lead><button class="act adv" data-a="' + esc(adv.id)
-      + '" data-r="' + r.id + '">' + esc(adv.label) + '</button>'
-      + (adv.specific ? '<p class=spec>' + esc(adv.specific) + '</p>' : '')
-      + '<p class=closes>ends as — ' + esc(adv.closes_as) + '</p></div>';
-  var btns = (r.actions || []).filter(function(a){{ return a.id !== r.recommended; }})
-    .map(function(a){{ return '<button class=act data-a="' + esc(a.id) + '" data-r="'
-      + r.id + '" title="' + esc(a.specific || a.does) + '">' + esc(a.label)
-      + '</button>'; }}).join('');
-  document.getElementById('art_recommendations').innerHTML =
-    '<span class=cur>' + esc(r.why) + '</span>' + lead
-    + '<div class=acts>' + btns + '</div><div id=drawer></div>';
-
-  var notes = (r.notes || []).map(function(n){{
-    return '<div class=nitem>' + esc(n.body)
-      + '<span class=cur>→ ' + esc((D.note_uses[n.will] || {{}}).say || n.will)
-      + ' · ' + (n.outcome === 'used' ? 'carried into round ' + n.round
-                 : n.outcome === 'unusable' ? 'could not be used'
-                 : 'waiting on a person') + '</span></div>'; }}).join('');
-  var w = r.where || {{}};
-  var strip = (r.rounds_detail || []).map(function(x){{
-    var tone = x.stalled ? 'bad' : x.clock_lost ? 'warn'
-             : (x.status === 'complete' ? 'ok' : '');
-    var when = x.stalled ? Math.round(x.age_hours) + 'h ago, no answer'
-             : x.clock_lost ? 'finished; when was never recorded'
-             : (x.mins != null ? Math.round(x.mins) + ' min' : '');
-    return '<div class="rnd ' + tone + '"><b>Round ' + x.n + '</b> '
-      + '<span class=cur>' + esc(x.status) + (when ? ' · ' + when : '') + '</span>'
-      + (x.extract_note ? '<br><span class=cur>' + esc(x.extract_note) + '</span>' : '')
-      + (x.feedback_kind ? '<br><span class=cur>waiting on ' + esc(x.feedback_kind)
-         + '</span>' : '')
-      + '</div>'; }}).join('');
-
-  document.getElementById('art_status').innerHTML =
-    '<p class="wheresay ' + esc(w.tone || '') + '">' + esc(w.say || '') + '</p>'
-    + '<div class=rounds>' + strip + '</div>'
-    + '<span class=cur>' + esc((r.eta || {{}}).say || '') + '</span>'
-    + (r.answered_elsewhere_by ? '<br><span class=no>request '
-        + r.answered_elsewhere_by + ' answered the same requirement</span>' : '')
-    + '<div class=noterow><input id=notebox placeholder="Tell it what it was missing — '
-    + 'a document, a section, a year">'
-    + '<button class=act id=notesend data-r="' + r.id + '">Send</button></div>'
-    + '<div class=notelist>' + notes + '</div><pre id=notereply hidden></pre>';
-}}
-
-document.addEventListener('click', function(e){{
-  var wt = e.target.closest('#wl tr');
-  if(wt){{
-    var t = (D.tasks || []).filter(function(x){{ return String(x.id) === wt.dataset.task; }})[0];
-    if(t){{
-      var qs = (t.questions || []);
-      var box = document.getElementById('taskdetail');
-      box.hidden = false;
-      box.innerHTML = '<h2>' + esc(t.what) + '</h2>'
-        + '<p class=says>' + esc((D.task_kinds[t.kind] || {{}}).says || t.kind)
-        + (t.outside ? ' — <b>this happens outside this system; the machine can '
-           + 'never mark it done on its own.</b>' : '') + '</p>'
-        + '<p class=closes>found by ' + esc(t.basis || 'declared')
-        + ' · worth ' + (t.worth || 0) + ' · '
-        + (qs.length ? 'closes ' + qs.length + ' question(s): ' + qs.join(', ')
-                     : 'no question attached — work that stands on its own')
-        + '</p>';
-      box.scrollIntoView({{behavior: 'smooth', block: 'nearest'}});
-    }}
-    return;
-  }}
-  var tr = e.target.closest('#tb tr');
-  if(tr){{
-    fill(REQ[tr.dataset.id]);
-    document.getElementById('panel_queue').hidden = true;
-    document.getElementById('panel_one').hidden = false;
-    window.scrollTo({{top: 0, behavior: 'smooth'}});
-    return;
-  }}
-  if(e.target.id === 'back'){{
-    document.getElementById('panel_one').hidden = true;
-    document.getElementById('panel_queue').hidden = false;
-    return;
-  }}
-  var a = e.target.closest('.act[data-a]');
-  if(a){{
-    var A = D.actions[a.dataset.a] || {{}};
-    var d = document.getElementById('drawer');
-    var extra = (A.needs || []).filter(function(n){{ return n !== 'because'; }});
-    var b = {{action: a.dataset.a, because: 'one sentence a reader will see in a month'}};
-    extra.forEach(function(n){{ b[n] = 'the ' + n; }});
-    d.innerHTML = '<p class=spec><b>' + esc(A.label) + '</b> — ' + esc(A.does) + '</p>'
-      + '<p class=closes>ends as — ' + esc(A.closes_as) + ' · moves it to '
-      + esc(A.moves) + '</p><pre id=dpre></pre>';
-    document.getElementById('dpre').textContent =
-      'POST ' + (A.post_to || '/api/research/request/{{id}}/act').replace('{{id}}', a.dataset.r)
-      + '\\n' + JSON.stringify(b, null, 2);
-    return;
-  }}
-  if(e.target.id === 'notesend'){{
-    var box = document.getElementById('notebox');
-    var body = (box.value || '').trim();
-    var pre = document.getElementById('notereply');
-    pre.hidden = false;
-    if(!body){{ pre.textContent = 'POST /note → 422\\n"there is nothing in the note"'; return; }}
-    pre.textContent = 'POST /api/research/request/' + e.target.dataset.r + '/note\\n'
-      + JSON.stringify({{body: body}}, null, 2)
-      + '\\n\\n// the receipt says what it will do with it, what happens to this'
-      + '\\n// question, and how long that usually takes — and the round later'
-      + '\\n// records whether it was actually used.';
-  }}
-}});
-tab('ask');
 </script>"""
     open(OUT, "w").write(html)
     if not check_script(html):
         sys.exit(1)
     print(f"{len(doc['verbs'])} verbs · {len(doc['surfaces'])} doors · "
-          f"{len(doc['artifacts'])} artifacts · {len(reqs)} requests → {OUT}")
+          f"{len(doc['artifacts'])} artifacts "
+          f"({astate['present']} present, {astate['partial']} partial, "
+          f"{astate['absent']} absent) → {OUT}")
 
 
 if __name__ == "__main__":

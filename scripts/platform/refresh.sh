@@ -21,7 +21,7 @@ OUT="$ROOT/docs/chat-schema"
 DATA="$OUT/chat-dev.json"
 mkdir -p "$OUT"
 
-echo "── 1/6  parse the flow from orchestrator.py  ────────────────────────"
+echo "── 1/7  parse the flow from orchestrator.py  ────────────────────────"
 # THIS STEP WAS MISSING and the page silently drew a deleted branch for hours.
 # gen_chat_submodules.py is what re-parses run_pipeline, so leaving it out of
 # the chain meant the flow (branch_on, classic_path, react_phases) was frozen
@@ -30,10 +30,15 @@ echo "── 1/6  parse the flow from orchestrator.py  ────────�
 # drift this whole file exists to prevent, in the tool meant to prevent it.
 python3 scripts/platform/gen_chat_submodules.py > docs/chat-submodules.json
 
-echo "── 2/6  extract + merge  ────────────────────────────────────────────"
+echo "── 2/7  readiness signals (measured from source)  ───────────────────"
+# MUST run before the merge. The signals it writes used to come from a dead
+# session scratchpad, and the `else {}` fallback rendered zeros as measurements.
+python3 scripts/platform/gen_readiness.py
+
+echo "── 3/7  extract + merge  ────────────────────────────────────────────"
 python3 scripts/platform/gen_chat_dev.py "$DATA"
 
-echo "── 3/6  coverage (Eval Layer 1: reachability)  ──────────────────────"
+echo "── 4/7  coverage (Eval Layer 1: reachability)  ──────────────────────"
 # MUST run BEFORE the page. It used to be step 5/6, i.e. AFTER the page was
 # written — so the page could never show a current coverage state even once
 # it learned to read the file. A generated artifact whose only consumer runs
@@ -41,13 +46,13 @@ echo "── 3/6  coverage (Eval Layer 1: reachability)  ───────�
 # the chain, in the chain that exists to prevent it.
 python3 scripts/platform/gen_coverage.py
 
-echo "── 4/6  page  ───────────────────────────────────────────────────────"
+echo "── 5/7  page  ───────────────────────────────────────────────────────"
 python3 scripts/platform/gen_chat_dev_page.py "$DATA" "$OUT/index.html"
 
-echo "── 5/6  bug log  ────────────────────────────────────────────────────"
+echo "── 6/7  bug log  ────────────────────────────────────────────────────"
 python3 scripts/platform/gen_findings_log.py
 
-echo "── 6/6  roadmap  ────────────────────────────────────────────────────"
+echo "── 7/7  roadmap  ────────────────────────────────────────────────────"
 python3 scripts/platform/gen_roadmap.py
 
 if [ "${1:-}" = "--eval" ]; then

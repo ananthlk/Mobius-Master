@@ -53,7 +53,14 @@ OVERRIDES exist and cost something: set `rating_override=` plus
 badge, so an override is a visible judgement rather than a quiet correction.
 """
 
-RED_VOLUME = 8
+# Thresholds. Stated as constants so they can be argued with rather than
+# rediscovered by reading branches. Calibrated against the live corpus
+# 2026-09-09 — not derived from a standard, and that is worth knowing.
+RED_VOLUME  = 8       # open defects on one node: past this, coverage stops excusing it
+LOC_AMBER   = 800     # a module one person can still hold in their head
+LOC_RED     = 2500    # react_loop is 6,200 — not reviewable, not isolable
+SWALLOW_RED = 10      # log-and-continue handlers: failures the caller cannot see
+
 CLOSED_MARKERS = ("CLOSED", "FIXED", "RESOLVED", "WITHDRAWN", "RETIRED")
 _CALLED = ("PERIPHERAL", "TAGGED-UNVERIFIED", "GUARDED")
 _UNCALLED = ("ABSENT", "IMPORTED-NOT-CALLED")
@@ -72,18 +79,108 @@ def open_bugs(findings):
     return n
 
 
-def rate(*, findings, coverage, deleted=False):
+_ORDER = {"green": 0, "amber": 1, "red": 2}
+
+
+def dimensions(*, findings, coverage, signals):
+    """Score each readiness dimension independently. Returns [(dim, level, why)].
+
+    THE OVERALL RATING IS THE WORST DIMENSION, never an average. A module that
+    is well tested and well factored but swallows every failure is not
+    two-thirds ready — it is unready, for a specific reason a reader can act on.
+    Averaging would let a strong dimension hide a disqualifying one, which is
+    the arithmetic version of the defect this program exists to find.
+    """
+    sg = signals or {}
+    n = open_bugs(findings)
+    cov = coverage or "unknown"
+    d = []
+
+    # 1. FUNCTIONALITY — known open defects against this node.
+    if n >= RED_VOLUME:
+        d.append(("functionality", "red", f"{n} open defects"))
+    elif n:
+        d.append(("functionality", "amber", f"{n} open"))
+    else:
+        d.append(("functionality", "green", "no open defects"))
+
+    # 2. TESTABILITY — Eval's Layer 1, plus the mutation ledger for GUARDED.
+    if cov in ("ABSENT", "IMPORTED-NOT-CALLED"):
+        d.append(("testability", "red", f"no test CALLS it ({cov})"))
+    elif cov == "GUARDED":
+        d.append(("testability", "green", "guarantee mutation-verified"))
+    elif cov in _CALLED:
+        d.append(("testability", "amber", f"called, guarantee unproven ({cov})"))
+    else:
+        d.append(("testability", "amber", "coverage unknown"))
+
+    if sg.get("unmapped"):
+        d.append(("modularity", "amber", "no single module — nothing to measure"))
+        return d
+    if sg.get("missing"):
+        return d
+
+    # 3. ERROR HANDLING — swallows are failures the caller cannot see.
+    sw, bare, hand = sg.get("swallow", 0), sg.get("bare_except", 0), sg.get("except_handlers", 0)
+    if bare:
+        d.append(("error_handling", "red", f"{bare} bare except:"))
+    elif sw >= SWALLOW_RED:
+        d.append(("error_handling", "red", f"{sw} of {hand} handlers log-and-continue"))
+    elif sw:
+        d.append(("error_handling", "amber", f"{sw} of {hand} handlers swallow"))
+    else:
+        d.append(("error_handling", "green",
+                  f"{hand} handlers, none swallow" if hand else "no failure paths"))
+
+    # 4. MODULARITY — size is the one honest proxy available.
+    loc = sg.get("loc", 0)
+    if loc >= LOC_RED:
+        d.append(("modularity", "red", f"{loc} lines — not reviewable in one pass"))
+    elif loc >= LOC_AMBER:
+        d.append(("modularity", "amber", f"{loc} lines"))
+    else:
+        d.append(("modularity", "green", f"{loc} lines"))
+
+    # 5. OBSERVABILITY — log lines and structured telemetry are NOT the same
+    # evidence and are never summed. Logs make a module diagnosable in hindsight
+    # by a human with grep; a span/emit/record makes it OPERABLE — queryable,
+    # alertable, joinable to a turn. A module with neither cannot be reasoned
+    # about at all; one with only logs is the majority case here (24 of 31) and
+    # is honestly amber, not red.
+    tel, log = sg.get("telemetry_sites", 0), sg.get("log_sites", 0)
+    if not tel and not log:
+        d.append(("observability", "red", "no logs and no telemetry — cannot be operated"))
+    elif not tel:
+        d.append(("observability", "amber",
+                  f"{log} log sites, NO structured telemetry — diagnosable, not operable"))
+    elif tel < 3:
+        d.append(("observability", "amber", f"{tel} telemetry sites, {log} logs"))
+    else:
+        d.append(("observability", "green", f"{tel} telemetry sites, {log} logs"))
+
+    # 6. LATENCY — deliberately UNRATED. turn_spans carries per-node p50 but the
+    # join is not built, and Eval's ruling is explicit: wall-time needs a >=5-run
+    # noise floor, p50/p95 never mean. Guessing a level here would be exactly the
+    # "counts without their target" error. Stated as a gap, not scored.
+    if sg.get("async_no_timeout"):
+        d.append(("latency", "red",
+                  f"{sg['async_no_timeout']} outbound calls with no timeout — "
+                  "an un-bounded external wait cannot be attributed"))
+    return d
+
+
+def rate(*, findings, coverage, deleted=False, signals=None):
     """Return (rating, why). `why` is rendered, so it must read as a reason."""
     if deleted:
         return "removed", "node deleted — a rating is a judgement about live code"
-    n = open_bugs(findings)
-    cov = coverage or "unknown"
-    if n and cov in _UNCALLED:
-        return "red", f"{n} open · no test CALLS it ({cov}) — a regression here is silent"
-    if n >= RED_VOLUME:
-        return "red", f"{n} open defects — volume, not coverage"
-    if n:
-        return "amber", f"{n} open · exercised ({cov})"
-    if cov in _CALLED:
-        return "green", f"0 open · exercised ({cov})"
-    return "amber", f"0 open but no test CALLS it ({cov}) — absence of evidence is not health"
+    dims = dimensions(findings=findings, coverage=coverage, signals=signals)
+    if not dims:
+        return "amber", "no evidence available — unrated rather than assumed"
+    worst = max(_ORDER[l] for _, l, _ in dims)
+    level = [k for k, v in _ORDER.items() if v == worst][0]
+    drivers = [f"{d}: {w}" for d, l, w in dims if _ORDER[l] == worst]
+    ok = [d for d, l, _ in dims if _ORDER[l] < worst]
+    why = " · ".join(drivers)
+    if ok:
+        why += f"  (ok: {', '.join(ok)})"
+    return level, why

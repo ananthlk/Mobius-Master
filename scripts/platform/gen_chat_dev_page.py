@@ -107,6 +107,13 @@ header.top .lead{font-size:var(--mobius-text-xs);color:var(--mobius-text-muted);
 .pill{display:inline-block;font-size:var(--mobius-text-xs);letter-spacing:.06em;
  text-transform:uppercase;font-weight:700;padding:0.1rem var(--mobius-space-sm);
  border-radius:var(--mobius-radius-full);margin-left:var(--mobius-space-xs)}
+.dims{display:flex;flex-wrap:wrap;gap:var(--mobius-space-xs);margin:var(--mobius-space-xs) 0 0}
+.dim{font-size:var(--mobius-text-xs);padding:0.1rem 0.4rem;border-radius:var(--mobius-radius-sm);
+ background:var(--mobius-bg-tertiary);border-left:2px solid var(--mobius-text-muted)}
+.dim b{text-transform:uppercase;letter-spacing:.05em;font-size:0.92em}
+.d-red{border-left-color:var(--mobius-error)}
+.d-amber{border-left-color:var(--mobius-warning)}
+.d-green{border-left-color:var(--mobius-success)}
 .p-green{background:var(--mobius-bg-tertiary);color:var(--mobius-success)}
 .p-amber{background:var(--mobius-bg-tertiary);color:var(--mobius-warning)}
 .p-red{background:var(--mobius-bg-tertiary);color:var(--mobius-error)}
@@ -372,8 +379,14 @@ function detail(k){
   // went stale for a day — 13 of 37 ratings were wrong when the rubric was
   // first applied, and none of them looked wrong.
   var eviden = m.rating_why ? ' <span class="depth">'+esc(m.rating_why)+'</span>' : '';
+  // Per-dimension breakdown. The overall rating is the WORST dimension, never an
+  // average — averaging would let a strong dimension hide a disqualifying one.
+  var dimrow = (m.dimensions && m.dimensions.length)
+    ? '<div class="dims">'+m.dimensions.map(function(x){
+        return '<span class="dim d-'+x[1]+'"><b>'+esc(x[0])+'</b> '+esc(x[2])+'</span>';
+      }).join('')+'</div>' : '';
   var ready = m.rating ? '<div class="f"><b>Production readiness '+rate+' '+cov+eviden+
-      ' <span class="depth">read: '+esc(m.depth||'')+'</span></b>'+sigline+findings+'</div>' : '';
+      ' <span class="depth">read: '+esc(m.depth||'')+'</span></b>'+dimrow+sigline+findings+'</div>' : '';
   var howf = m.how ? F('How it works', esc(m.how)) : '';
   // A node whose whole point is "where do I manage this" should hand you the
   // link, not a string to retype.

@@ -24,7 +24,7 @@
     "owner": "chat + Eval",
     "gate": "every segment timed AND each timed segment's attribution verified against a known-external call \u2014 an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
-    "n": 28
+    "n": 30
    },
    {
     "id": "P3",
@@ -260,8 +260,35 @@
     ]
    ],
    "signals": {},
+   "dimensions": [
+    [
+     "functionality",
+     "red",
+     "15 open defects"
+    ],
+    [
+     "testability",
+     "amber",
+     "coverage unknown"
+    ],
+    [
+     "error_handling",
+     "green",
+     "no failure paths"
+    ],
+    [
+     "modularity",
+     "green",
+     "0 lines"
+    ],
+    [
+     "observability",
+     "red",
+     "no logs and no telemetry \u2014 cannot be operated"
+    ]
+   ],
    "rating_was_typed": "red",
-   "rating_why": "15 open defects \u2014 volume, not coverage",
+   "rating_why": "functionality: 15 open defects \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: testability, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -346,9 +373,47 @@
     ]
    ],
    "ux": "No surface of its own. The 422 body carries phi_blocked, identifier_labels and evidence so the UI can explain a block; the audit rows have no reader anywhere.",
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 2,
+    "loc": 106,
+    "log_sites": 5,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 2,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "6 open"
+    ],
+    [
+     "testability",
+     "amber",
+     "coverage unknown"
+    ],
+    [
+     "error_handling",
+     "amber",
+     "2 of 2 handlers swallow"
+    ],
+    [
+     "modularity",
+     "green",
+     "106 lines"
+    ],
+    [
+     "observability",
+     "amber",
+     "5 log sites, NO structured telemetry \u2014 diagnosable, not operable"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "6 open \u00b7 exercised (unknown)",
+   "rating_why": "functionality: 6 open \u00b7 testability: coverage unknown \u00b7 error_handling: 2 of 2 handlers swallow \u00b7 observability: 5 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: modularity)",
    "live_config": [
     {
      "name": "PHI_GATE_URL",
@@ -373,7 +438,7 @@
    "config": [],
    "kind": "hop",
    "how": "A Redis list used as a work queue, and the handoff between the API and the worker.\n\nThe ops, verified: publish does LPUSH onto cfg.redis_request_key; the worker does BRPOP with\na 5-second timeout. LPUSH + BRPOP is correct FIFO \u2014 push left, pop right. ORDERING IS SOUND.\nDurability is not.\n\nBRPOP removes the item atomically with no destination. There is no in-flight list, no ack,\nno visibility timeout, no redelivery. The instant BRPOP returns, Redis has no record the\nitem ever existed. So if the worker dies between popping and publishing, THE TURN IS LOST \u2014\nsilently and unrecoverably. The user sees a request that never returns, and there is no\nserver-side artifact of the loss: no row, no key, no log of an orphan.\n\nThe response side is a per-correlation-id key with a 24-hour TTL, written at two sites. That\nis 288x the live turn deadline of 300s, so a slow turn cannot outlive its response key \u2014 a\nrisk I had suspected and which does not exist. But the asymmetry inverts into a real one:\nTHE RESPONSE HAS A TTL, THE REQUEST LIST HAS NONE. A request never consumed sits in\nmobius:chat:requests indefinitely, with nothing ageing it out and nothing alerting on depth.\n\nget_queue() picks memory or redis behind a QueueAdapter ABC, so the same code runs in tests\nand production. Connection handling retries 12 times with 5s backoff, about a minute, which\ncovers a Redis restart without losing the process.",
-   "rating": "amber",
+   "rating": "red",
    "depth": "code",
    "findings": [
     [
@@ -421,9 +486,47 @@
      "WHAT THIS EXTRACTION CANNOT SEE: whether anything outside mobius-chat writes to or drains mobius:chat:requests, and what the actual queue depth is on the live instance. Both are observable and neither has been checked, so treat this node's durability claims as code-true and runtime-unmeasured."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 0,
+    "loc": 19,
+    "log_sites": 0,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 0,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "4 open"
+    ],
+    [
+     "testability",
+     "amber",
+     "coverage unknown"
+    ],
+    [
+     "error_handling",
+     "green",
+     "no failure paths"
+    ],
+    [
+     "modularity",
+     "green",
+     "19 lines"
+    ],
+    [
+     "observability",
+     "red",
+     "no logs and no telemetry \u2014 cannot be operated"
+    ]
+   ],
    "rating_was_typed": "red",
-   "rating_why": "4 open \u00b7 exercised (unknown)",
+   "rating_why": "observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, testability, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -453,9 +556,47 @@
      "The deadline is implemented with a signal handler, which only works on the main thread of a process. Worth confirming that assumption holds under the deployed server model."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 11,
+    "loc": 405,
+    "log_sites": 7,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 7,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
+   "dimensions": [
+    [
+     "functionality",
+     "green",
+     "no open defects"
+    ],
+    [
+     "testability",
+     "amber",
+     "coverage unknown"
+    ],
+    [
+     "error_handling",
+     "amber",
+     "7 of 11 handlers swallow"
+    ],
+    [
+     "modularity",
+     "green",
+     "405 lines"
+    ],
+    [
+     "observability",
+     "amber",
+     "7 log sites, NO structured telemetry \u2014 diagnosable, not operable"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "0 open but no test CALLS it (unknown) \u2014 absence of evidence is not health",
+   "rating_why": "testability: coverage unknown \u00b7 error_handling: 7 of 11 handlers swallow \u00b7 observability: 7 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: functionality, modularity)",
    "live_config": [
     {
      "name": "MOBIUS_TURN_DEADLINE_S",
@@ -516,9 +657,47 @@
      "OWNER(chat): THE CREDENTIALING SURFACE IS 8,994 LINES IN CHAT AND ITS TABLES ARE EMPTY. Ananth 2026-09-08: credentialing_envelope needs to go, this is not a chat thing, it is legacy we are carrying forward.\n\nTHE ENVELOPE ITSELF IS THE SMALL PART. credentialing_envelope.py is 177 lines with 8 public functions and SEVEN HAVE ZERO CALLERS anywhere in app/ \u2014 roster_uploads_from_active, thread_has_roster_reconciliation_data, message_requests_roster_reconciliation, message_prefers_outside_in_credentialing, envelope_routes_to_reconciliation, classify_org_vs_uploads, build_canonical_credentialing_message. The only live one is resolve_step3_roster_merge_context, imported at credentialing_run_service.py:496. Deleting the seven is a no-impact change; deleting the file is moving one function to its single caller.\n\nTHE SURFACE BEHIND IT IS NOT SMALL. 14 modules whose filename names the subject: roster_credentialing_orchestrator.py 4395, credentialing_run_service.py 1033, api/credentialing.py 688 (13 routes with roster_upload), roster_truth_pg.py 602, credentialing_assertions_pg.py 538, api/roster_upload.py 329, credentialing_runs_pg.py 325, plus 7 more at 1084 \u2014 8,994 lines. Plus 125 scattered references inside SHARED modules: 50 in react_loop.py, 43 in integrate.py, 22 in blueprint.py. Those are the expensive part; they are not removable by deleting a file.\n\nELEVEN OF THIRTEEN TABLES HAVE ZERO ROWS \u2014 credentialing_runs, credentialing_assertion, credentialing_report_runs, _step_outputs, _summaries, _documents, roster_uploads, roster_upload_members, roster_reconciliation_provider, roster_review_session, roster_line_item. The two with data are provider_roster (156 rows, last written 2026-08-12) and roster_events (260, last 2026-07-06).\n\nAND THE DOMAIN HAS ANOTHER OWNER. mobius-skills/provider-roster-credentialing/ is a separate skill service with its own roster_handler, org_discovery and roster routes, referencing provider_roster directly. Chat 4,395-line orchestrator duplicates a module that already exists. That is the strongest form of the point: not a preference that chat should not do this, but that something else already does.\n\nTHE 59 LIVE MENTIONS ARE NOT THE WORKFLOW. 59 turns in 60 days mention roster, credentialing or PML, but they read as ordinary policy questions (What must a practitioner submit to be credentialed by Sunshine Health; AHCA requirements for credentialing a CMHC) and the roster_report skill appears in ZERO of their thinking logs. The credentialing QUESTIONS are plain RAG and touch none of this. Removing the workflow does not remove the ability to answer those 59.\n\nRESOLVED 2026-09-08, and it inverts the conclusion. THERE IS NO PRODUCTION: three GCP projects exist and the only live chat is mobius-chat in mobius-os-dev; mobius-chat-api and -worker in both mobius-staging-mobius and mobiusos-new were last deployed 2026-02-05, seven months ago. So the dev row counts ARE the evidence, not a proxy for evidence elsewhere \u2014 I had imported a dev-vs-prod caveat without checking that the second half of the distinction exists.\n\nAND THE 13 ROUTES DO HAVE CALLERS, which the row counts were hiding. mobius-chat/frontend/static/app.js carries 114 credentialing references, with more in index.html, roster-unified.html, signin.html and pipeline.html. And mobius-skills/provider-roster-credentialing/static/pipeline-chat.js calls credentialing-runs/ \u2014 THE SKILL SERVICE THAT OWNS THE DOMAIN CALLS BACK INTO CHAT'S ROUTES, and it is live at revision 00094. So this is not clean duplication with chat as the redundant copy; the two are entangled.\n\nThe removal therefore takes a frontend surface and a sibling service's dependency with it. It needs the Chat FE seat. Partial signal, offered as a hint and not an audit: two of the element ids app.js binds to (credentialingPreferOutsideIn, credentialingUploadRoster) exist in NO html, so those listeners never attach \u2014 but that is 2 ids checked out of 114 references."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 43,
+    "loc": 1892,
+    "log_sites": 44,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 27,
+    "telemetry_sites": 8,
+    "todos": 0
+   },
+   "dimensions": [
+    [
+     "functionality",
+     "red",
+     "8 open defects"
+    ],
+    [
+     "testability",
+     "amber",
+     "coverage unknown"
+    ],
+    [
+     "error_handling",
+     "red",
+     "27 of 43 handlers log-and-continue"
+    ],
+    [
+     "modularity",
+     "amber",
+     "1892 lines"
+    ],
+    [
+     "observability",
+     "green",
+     "8 telemetry sites, 44 logs"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "8 open defects \u2014 volume, not coverage",
+   "rating_why": "functionality: 8 open defects \u00b7 error_handling: 27 of 43 handlers log-and-continue  (ok: testability, modularity, observability)",
    "live_config": [],
    "detail": {}
   }
@@ -591,11 +770,49 @@
      "OUT OF PROGRAM \u2014 WHY THE 'ema' NEVER GETS RE-GROUNDED. The LLM Agent took my static-literal finding to its cause, and theirs is the deeper one. Verified by me against live data before recording it as fact.\n\nmodel_registry.py:2292-2293 refreshes the ema from model_performance_by_stage `WHERE variant_id = 'default'` \u2014 a filter migration 052 added and labelled a REQUIRED COUPLED CODE CHANGE. But the writer, llm_analytics.build_record(), never populated module_key or variant_id. Migration 051's backfill set existing rows ONCE; nothing in the ongoing write path ever set either column again.\n\nMEASURED: 1,820 of 1,822 llm_calls rows in the last 24h have variant_id NULL. The only two non-NULL rows are the LLM Agent's own verification write, minutes ago. So the refresh query has matched NOTHING for over a month and the roster's hardcoded seed (2500ms flash / 8000ms pro) is never overwritten \u2014 which is exactly why my 'the ema is a static literal' observation was true. Symptom and cause fit together: the value is static because the thing that would replace it selects on a column nobody writes.\n\nCallManager \u2014 the module whose own docstring names it as the intended home for this wiring \u2014 is referenced only in prompt_manager docstrings and its own tests. Built, unit-tested, never connected to the live path. That is the fifth instance on this page of the same class: a write path with no writer, a gate with no caller, an instruction nobody reads back.\n\nBLAST RADIUS BEYOND THE BREAKER: model_winner_by_stage and model_composite_scores (admin dashboards) have been frozen on pre-2026-08-05 data, and the 24h error-rate breaker cannot reflect the last 24h because its row set never advances.\n\nFIXED by the LLM Agent in de43bd2 (pushed, NOT deployed): build_record() now writes module_key=stage and variant_id='default'. I verified the commit is clean \u2014 two files, no P1c deletions swept \u2014 which matters, because it was authored into the same shared working tree as an in-flight refactor phase."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 10,
+    "loc": 469,
+    "log_sites": 1,
+    "missing": false,
+    "reraise": 1,
+    "swallow": 8,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "3 open"
+    ],
+    [
+     "testability",
+     "amber",
+     "called, guarantee unproven (PERIPHERAL)"
+    ],
+    [
+     "error_handling",
+     "amber",
+     "8 of 10 handlers swallow"
+    ],
+    [
+     "modularity",
+     "green",
+     "469 lines"
+    ],
+    [
+     "observability",
+     "amber",
+     "1 log sites, NO structured telemetry \u2014 diagnosable, not operable"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "3 open \u00b7 exercised (PERIPHERAL)",
+   "rating_why": "functionality: 3 open \u00b7 testability: called, guarantee unproven (PERIPHERAL) \u00b7 error_handling: 8 of 10 handlers swallow \u00b7 observability: 1 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -693,11 +910,49 @@
     ]
    ],
    "ux": "No surface of its own. The 422 body carries phi_blocked, identifier_labels and evidence so the UI can explain a block; the audit rows have no reader anywhere.",
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 2,
+    "loc": 106,
+    "log_sites": 5,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 2,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "6 open"
+    ],
+    [
+     "testability",
+     "amber",
+     "called, guarantee unproven (PERIPHERAL)"
+    ],
+    [
+     "error_handling",
+     "amber",
+     "2 of 2 handlers swallow"
+    ],
+    [
+     "modularity",
+     "green",
+     "106 lines"
+    ],
+    [
+     "observability",
+     "amber",
+     "5 log sites, NO structured telemetry \u2014 diagnosable, not operable"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "6 open \u00b7 exercised (PERIPHERAL)",
+   "rating_why": "functionality: 6 open \u00b7 testability: called, guarantee unproven (PERIPHERAL) \u00b7 error_handling: 2 of 2 handlers swallow \u00b7 observability: 5 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: modularity)",
    "live_config": [
     {
      "name": "PHI_CLASSIFIER_URL",
@@ -732,7 +987,7 @@
    ],
    "fan_in": 2,
    "how": "The token adjuster. Task #98, and it exists because RAG was guessing.\n\nRAG's Structure stage used a static per-caller_mode table (chat.default 3000,\nchat.thinking 16000) for how many tokens of retrieved context it could afford, because\nchat never sent a real number. Ananth's correction was that RAG does not have to guess:\nchat knows its own context window, its system prompt, the conversation so far, and how\nmuch it must reserve to generate an answer.\n\n  token_budget_for_retrieval = context_window\n                             - system_prompt_tokens\n                             - conversation_history_tokens\n                             - answer_generation_reserve\n\nconversation_history_tokens is the term that moves \u2014 a thread's first turn and its\ntwentieth differ by thousands of tokens \u2014 so the budget is genuinely per-turn rather than\nper-mode. react_loop computes it at five separate call sites and passes it with the RAG\nrequest.",
-   "rating": "green",
+   "rating": "red",
    "depth": "code",
    "findings": [
     [
@@ -753,11 +1008,49 @@
     ]
    ],
    "ux": "No surface \u2014 the computed number rides in the RAG call payload; visible only in the retrieval trace if you look for token_budget_for_retrieval",
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 0,
+    "loc": 118,
+    "log_sites": 0,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 0,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "green",
+     "no open defects"
+    ],
+    [
+     "testability",
+     "amber",
+     "called, guarantee unproven (PERIPHERAL)"
+    ],
+    [
+     "error_handling",
+     "green",
+     "no failure paths"
+    ],
+    [
+     "modularity",
+     "green",
+     "118 lines"
+    ],
+    [
+     "observability",
+     "red",
+     "no logs and no telemetry \u2014 cannot be operated"
+    ]
+   ],
    "rating_was_typed": "green",
-   "rating_why": "0 open \u00b7 exercised (PERIPHERAL)",
+   "rating_why": "observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, testability, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -815,11 +1108,49 @@
      "Rated RED on the strength of the acquisition gap, not the code. state/jurisdiction.py itself is 137 clean lines with a clear API and no findings against it. The rating is the guarantee, not the construction \u2014 per Technical Review's ruling. Test files: none found for clarification.py."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 1,
+    "loc": 140,
+    "log_sites": 0,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 0,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "ABSENT",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "2 open"
+    ],
+    [
+     "testability",
+     "red",
+     "no test CALLS it (ABSENT)"
+    ],
+    [
+     "error_handling",
+     "green",
+     "1 handlers, none swallow"
+    ],
+    [
+     "modularity",
+     "green",
+     "140 lines"
+    ],
+    [
+     "observability",
+     "red",
+     "no logs and no telemetry \u2014 cannot be operated"
+    ]
+   ],
    "rating_was_typed": "red",
-   "rating_why": "2 open \u00b7 no test CALLS it (ABSENT) \u2014 a regression here is silent",
+   "rating_why": "testability: no test CALLS it (ABSENT) \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -873,6 +1204,7 @@
     ]
    ],
    "signals": {
+    "unmapped": true,
     "loc": 0,
     "tests": [],
     "emits": 0,
@@ -885,6 +1217,7 @@
    },
    "coverage": "REMOVED",
    "coverage_tags": [],
+   "dimensions": [],
    "rating_was_typed": "red",
    "rating_why": "node deleted \u2014 a rating is a judgement about live code",
    "rating_was": "removed",
@@ -973,11 +1306,49 @@
      "This reframes several findings already on this page as one defect rather than several. The governor being unobservable, the curation decision being unreadable, the critic never persisting and the appeals outage lasting 29 days are not four independent gaps in discipline \u2014 they are four instances of a producer shipped without a consumer. Worth saying because fixing them one at a time treats the symptom."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 0,
+    "loc": 1319,
+    "log_sites": 0,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 0,
+    "telemetry_sites": 3,
+    "todos": 0
+   },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "red",
+     "10 open defects"
+    ],
+    [
+     "testability",
+     "amber",
+     "called, guarantee unproven (PERIPHERAL)"
+    ],
+    [
+     "error_handling",
+     "green",
+     "no failure paths"
+    ],
+    [
+     "modularity",
+     "amber",
+     "1319 lines"
+    ],
+    [
+     "observability",
+     "green",
+     "3 telemetry sites, 0 logs"
+    ]
+   ],
    "rating_was_typed": "red",
-   "rating_why": "10 open defects \u2014 volume, not coverage",
+   "rating_why": "functionality: 10 open defects  (ok: testability, error_handling, modularity, observability)",
    "live_config": [],
    "detail": {}
   },
@@ -1030,7 +1401,7 @@
    ],
    "fan_in": 14,
    "how": "THE MODEL BANDIT \u2014 the thing that decides which model serves each call. Ananth,\n2026-09-09: \"it is one of the silent yet effective instruments we have.\" Silent is\nexactly the problem, which is why it earns a node instead of a paragraph inside\nllm_manager.\n\nIt is a real Thompson-sampling bandit over a Beta posterior, not a config table:\n\n  Phase 1  < 10 quality samples    explore on per-model benchmark priors (ema_quality)\n  Phase 2  10-100 samples          blend prior with observed data\n  Phase 3  100+, confidence=locked exploit the best, with 5% drift detection\n  plus     forced exploration      every EXPLORATION_INTERVAL turns the least-sampled\n                                   model gets a slot, so a model can never starve out\n\nHard constraints are applied BEFORE the draw and are technical, not quality judgements:\nphi_detected routes to hipaa_eligible models only; the planner and react_* rounds\nrequire spec_context_k >= MIN_PLANNER_CONTEXT_K; small-context models are confined to\nCHEAP_STAGES; and mode=copilot excludes heavy benchmark_category values so only\nFlash-class tiers compete. ReAct rounds are separate arms \u2014 react_1..react_4 carry\ntheir own caps and their own PG rows, so round 1 and round 4 learn independently.\n\nIT IS DOING REAL WORK, measured over 7 days: 8,104 calls, of which 3,244 were\nhard-pinned and 4,860 \u2014 60% \u2014 were chosen by the bandit.",
-   "rating": "amber",
+   "rating": "red",
    "depth": "code",
    "findings": [
     [
@@ -1059,11 +1430,49 @@
     ]
    ],
    "ux": "No surface. The bandit's choices appear only as ab_variant on an llm_calls row \u2014 there is no page that shows what it is learning or which model it currently prefers.",
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 13,
+    "loc": 2462,
+    "log_sites": 21,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 10,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "3 open"
+    ],
+    [
+     "testability",
+     "amber",
+     "called, guarantee unproven (PERIPHERAL)"
+    ],
+    [
+     "error_handling",
+     "red",
+     "10 of 13 handlers log-and-continue"
+    ],
+    [
+     "modularity",
+     "amber",
+     "2462 lines"
+    ],
+    [
+     "observability",
+     "amber",
+     "21 log sites, NO structured telemetry \u2014 diagnosable, not operable"
+    ]
+   ],
    "rating_was_typed": "red",
-   "rating_why": "3 open \u00b7 exercised (PERIPHERAL)",
+   "rating_why": "error_handling: 10 of 13 handlers log-and-continue  (ok: functionality, testability, modularity, observability)",
    "live_config": [
     {
      "name": "ANTHROPIC_API_KEY",
@@ -1144,11 +1553,49 @@
      "No test file."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 0,
+    "loc": 63,
+    "log_sites": 0,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 0,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "ABSENT",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "1 open"
+    ],
+    [
+     "testability",
+     "red",
+     "no test CALLS it (ABSENT)"
+    ],
+    [
+     "error_handling",
+     "green",
+     "no failure paths"
+    ],
+    [
+     "modularity",
+     "green",
+     "63 lines"
+    ],
+    [
+     "observability",
+     "red",
+     "no logs and no telemetry \u2014 cannot be operated"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "1 open \u00b7 no test CALLS it (ABSENT) \u2014 a regression here is silent",
+   "rating_why": "testability: no test CALLS it (ABSENT) \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -1185,7 +1632,7 @@
    "writes": [],
    "key": "context",
    "how": "The object every stage reads and writes: correlation_id, thread_id, message, state, plan and\nper-stage data. Stages mutate it in place; state moves only through explicit apply_delta\ntransitions rather than patch merging.\n\nIts field docstrings carry real cross-stage contracts. is_retry is the clearest: it is set when\nthe raw message was detected as a bare retry phrase and `message` was OVERWRITTEN with the\nthread's prior question before the planner ran \u2014 and the docstring states that cache-assist\nMUST skip its lookup on a retry turn, because re-serving the cached answer the user is\nexplicitly asking to redo defeats the point.",
-   "rating": "amber",
+   "rating": "red",
    "depth": "code",
    "findings": [
     [
@@ -1213,11 +1660,49 @@
      "No test file of its own."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 0,
+    "loc": 317,
+    "log_sites": 0,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 0,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "2 open"
+    ],
+    [
+     "testability",
+     "amber",
+     "called, guarantee unproven (PERIPHERAL)"
+    ],
+    [
+     "error_handling",
+     "green",
+     "no failure paths"
+    ],
+    [
+     "modularity",
+     "green",
+     "317 lines"
+    ],
+    [
+     "observability",
+     "red",
+     "no logs and no telemetry \u2014 cannot be operated"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "2 open \u00b7 exercised (PERIPHERAL)",
+   "rating_why": "observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, testability, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -1279,11 +1764,49 @@
      "Three swallows on calls crossing a service boundary; a failed ingest that logs and continues looks the same to the conversation as a successful one."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 4,
+    "loc": 331,
+    "log_sites": 4,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 0,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "ABSENT",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "3 open"
+    ],
+    [
+     "testability",
+     "red",
+     "no test CALLS it (ABSENT)"
+    ],
+    [
+     "error_handling",
+     "green",
+     "4 handlers, none swallow"
+    ],
+    [
+     "modularity",
+     "green",
+     "331 lines"
+    ],
+    [
+     "observability",
+     "amber",
+     "4 log sites, NO structured telemetry \u2014 diagnosable, not operable"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "3 open \u00b7 no test CALLS it (ABSENT) \u2014 a regression here is silent",
+   "rating_why": "testability: no test CALLS it (ABSENT)  (ok: functionality, error_handling, modularity, observability)",
    "live_config": [
     {
      "name": "ADMIN_API_KEY",
@@ -1333,7 +1856,7 @@
    "writes": [],
    "key": "message_resolver",
    "how": "Works out what the user means by 'it'. Two problems in one module.\n\nPronoun resolution: 'can you search the web for it?' after a failed query resolves 'it' from the\nprior turn before planning. The trigger is REFERENCE_SIGNALS, a regex alternation of literal\nphrases \u2014 it, that, this one, the same, try again, google it, look it up, what about that, try\na different approach, and a dozen more.\n\nSkill-output awareness: 'how many NPIs have issues with PML?' after a credentialing report is\nanswered from the report already in context rather than sent to RAG or the web.\n\nIt must run BEFORE classify, which preserves the effective_message it sets. Nothing enforces\nthat order.",
-   "rating": "amber",
+   "rating": "red",
    "depth": "code",
    "findings": [
     [
@@ -1349,11 +1872,49 @@
      "The ordering dependency with classify is real and implicit."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 0,
+    "loc": 425,
+    "log_sites": 0,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 0,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "1 open"
+    ],
+    [
+     "testability",
+     "amber",
+     "called, guarantee unproven (PERIPHERAL)"
+    ],
+    [
+     "error_handling",
+     "green",
+     "no failure paths"
+    ],
+    [
+     "modularity",
+     "green",
+     "425 lines"
+    ],
+    [
+     "observability",
+     "red",
+     "no logs and no telemetry \u2014 cannot be operated"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "1 open \u00b7 exercised (PERIPHERAL)",
+   "rating_why": "observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, testability, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -1432,7 +1993,7 @@
    ],
    "key": "orchestrator",
    "how": "See run_pipeline above \u2014 this module is that function plus its helpers.",
-   "rating": "amber",
+   "rating": "red",
    "depth": "code",
    "findings": [
     [
@@ -1448,11 +2009,49 @@
      "The stage sequence is explicit enough that this diagram's flow was parsed directly from it."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 43,
+    "loc": 1892,
+    "log_sites": 44,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 27,
+    "telemetry_sites": 8,
+    "todos": 0
+   },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "2 open"
+    ],
+    [
+     "testability",
+     "amber",
+     "called, guarantee unproven (PERIPHERAL)"
+    ],
+    [
+     "error_handling",
+     "red",
+     "27 of 43 handlers log-and-continue"
+    ],
+    [
+     "modularity",
+     "amber",
+     "1892 lines"
+    ],
+    [
+     "observability",
+     "green",
+     "8 telemetry sites, 44 logs"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "2 open \u00b7 exercised (PERIPHERAL)",
+   "rating_why": "error_handling: 27 of 43 handlers log-and-continue  (ok: functionality, testability, modularity, observability)",
    "live_config": [
     {
      "name": "CACHE_ASSIST_DEFAULT_MAX_AGE_DAYS",
@@ -1532,11 +2131,49 @@
     ]
    ],
    "ux": "The personalization_applied envelope \u2014 the user sees their preferences were honoured. Preferences are AUTHORED in mobius-user, not here.",
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 0,
+    "loc": 131,
+    "log_sites": 0,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 0,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "ABSENT",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "2 open"
+    ],
+    [
+     "testability",
+     "red",
+     "no test CALLS it (ABSENT)"
+    ],
+    [
+     "error_handling",
+     "green",
+     "no failure paths"
+    ],
+    [
+     "modularity",
+     "green",
+     "131 lines"
+    ],
+    [
+     "observability",
+     "red",
+     "no logs and no telemetry \u2014 cannot be operated"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "2 open \u00b7 no test CALLS it (ABSENT) \u2014 a regression here is silent",
+   "rating_why": "testability: no test CALLS it (ABSENT) \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, error_handling, modularity)",
    "live_config": [
     {
      "name": "CHAT_PERSONALIZATION_ENABLED",
@@ -1614,11 +2251,49 @@
      "36 of 966 audited turns failed groundedness (3.7%). 34 shipped with the 'Groundedness notice' warning appended and 8 bought an extra round. So the floor's dominant live outcome is ship-with-warning, not retry \u2014 worth knowing before anyone tunes the prompt on the assumption that it mostly self-corrects."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 6,
+    "loc": 791,
+    "log_sites": 13,
+    "missing": false,
+    "reraise": 2,
+    "swallow": 1,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "3 open"
+    ],
+    [
+     "testability",
+     "amber",
+     "called, guarantee unproven (PERIPHERAL)"
+    ],
+    [
+     "error_handling",
+     "amber",
+     "1 of 6 handlers swallow"
+    ],
+    [
+     "modularity",
+     "green",
+     "791 lines"
+    ],
+    [
+     "observability",
+     "amber",
+     "13 log sites, NO structured telemetry \u2014 diagnosable, not operable"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "3 open \u00b7 exercised (PERIPHERAL)",
+   "rating_why": "functionality: 3 open \u00b7 testability: called, guarantee unproven (PERIPHERAL) \u00b7 error_handling: 1 of 6 handlers swallow \u00b7 observability: 13 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: modularity)",
    "live_config": [
     {
      "name": "MOBIUS_REACT_CRITIC",
@@ -1659,7 +2334,7 @@
    "writes": [],
    "key": "feedback_signal",
    "how": "Decides whether this is the turn where the user gets asked for feedback, computed from their own\ncadence state rather than a fixed interval. The decision is made here and stashed on\nctx.feedback_signal; the planner only chooses whether to surface it via offer_feedback.\n\nGated by FEEDBACK_PERIODIC_ENABLED, default ON. Extracted from react_loop specifically to keep\nthat file under its LOC ratchet \u2014 the extraction programme working as designed.",
-   "rating": "amber",
+   "rating": "red",
    "depth": "code",
    "findings": [
     [
@@ -1675,11 +2350,49 @@
      "No test file."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 0,
+    "loc": 79,
+    "log_sites": 0,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 0,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "1 open"
+    ],
+    [
+     "testability",
+     "amber",
+     "called, guarantee unproven (PERIPHERAL)"
+    ],
+    [
+     "error_handling",
+     "green",
+     "no failure paths"
+    ],
+    [
+     "modularity",
+     "green",
+     "79 lines"
+    ],
+    [
+     "observability",
+     "red",
+     "no logs and no telemetry \u2014 cannot be operated"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "1 open \u00b7 exercised (PERIPHERAL)",
+   "rating_why": "observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, testability, error_handling, modularity)",
    "live_config": [
     {
      "name": "FEEDBACK_PERIODIC_ENABLED",
@@ -1724,7 +2437,7 @@
    "writes": [],
    "key": "governor",
    "how": "The round policy, contract-driven: how many rounds this turn gets, what directive the model\nis given next, and \u2014 since Chat Architecture's 2026-07-30 ruling \u2014 which prompt composition\nis selected, replacing react_agent_role() as the live selector.\n\nIT IS ON. The code default is OFF, but deploy/dev.env sets\nMOBIUS_PRODUCT_PROMISE_ENABLED=true and the deployed service has it true. I previously wrote\nthat it never fires; that was reading the default and calling it behaviour.\n\nThat makes it the live complement to retrieval_budget. retrieval_budget adapts how much\nCONTEXT a turn gets; the governor and its completion-extension gate adapt how many ROUNDS a\nturn gets. Breadth and depth, both per-turn, both adaptive \u2014 and both running.\n\nOne consequence worth knowing: with the flag on, the Product Promise groundedness floor runs\nthe critic INDEPENDENTLY of critic_enabled(). The deployed service sets MOBIUS_REACT_CRITIC=0,\nwhich turns off the optional path only. The mandatory floor still runs.",
-   "rating": "amber",
+   "rating": "red",
    "depth": "code",
    "findings": [
     [
@@ -1776,11 +2489,49 @@
      "Has a test file, and replacing scattered round rules with one contract is the right direction."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 1,
+    "loc": 382,
+    "log_sites": 0,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 1,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "6 open"
+    ],
+    [
+     "testability",
+     "amber",
+     "called, guarantee unproven (PERIPHERAL)"
+    ],
+    [
+     "error_handling",
+     "amber",
+     "1 of 1 handlers swallow"
+    ],
+    [
+     "modularity",
+     "green",
+     "382 lines"
+    ],
+    [
+     "observability",
+     "red",
+     "no logs and no telemetry \u2014 cannot be operated"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "6 open \u00b7 exercised (PERIPHERAL)",
+   "rating_why": "observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, testability, error_handling, modularity)",
    "live_config": [
     {
      "name": "MOBIUS_PRODUCT_PROMISE_ENABLED",
@@ -1827,11 +2578,49 @@
      "The tiers are ordered, documented and bounded, and the one heuristic escape hatch is scoped to a single named question shape rather than being a general guess."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 2,
+    "loc": 167,
+    "log_sites": 2,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 2,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "IMPORTED-NOT-CALLED",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "1 open"
+    ],
+    [
+     "testability",
+     "red",
+     "no test CALLS it (IMPORTED-NOT-CALLED)"
+    ],
+    [
+     "error_handling",
+     "amber",
+     "2 of 2 handlers swallow"
+    ],
+    [
+     "modularity",
+     "green",
+     "167 lines"
+    ],
+    [
+     "observability",
+     "amber",
+     "2 log sites, NO structured telemetry \u2014 diagnosable, not operable"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "1 open \u00b7 no test CALLS it (IMPORTED-NOT-CALLED) \u2014 a regression here is silent",
+   "rating_why": "testability: no test CALLS it (IMPORTED-NOT-CALLED)  (ok: functionality, error_handling, modularity, observability)",
    "live_config": [],
    "detail": {}
   },
@@ -1907,11 +2696,49 @@
     ]
    ],
    "ux": "Prompt Composition Studio \u2014 LIVE at https://mobius-chat-ortabkknqa-uc.a.run.app/admin/prompts (served from frontend/prompts.html via main.py:3160, backed by app/api/admin_prompts.py). Blocks, compositions, versions and monitoring. Note the route is /admin/prompts \u2014 /prompts and /prompts.html both 404.",
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 2,
+    "loc": 1368,
+    "log_sites": 4,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 1,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "4 open"
+    ],
+    [
+     "testability",
+     "amber",
+     "called, guarantee unproven (PERIPHERAL)"
+    ],
+    [
+     "error_handling",
+     "amber",
+     "1 of 2 handlers swallow"
+    ],
+    [
+     "modularity",
+     "amber",
+     "1368 lines"
+    ],
+    [
+     "observability",
+     "amber",
+     "4 log sites, NO structured telemetry \u2014 diagnosable, not operable"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "4 open \u00b7 exercised (PERIPHERAL)",
+   "rating_why": "functionality: 4 open \u00b7 testability: called, guarantee unproven (PERIPHERAL) \u00b7 error_handling: 1 of 2 handlers swallow \u00b7 modularity: 1368 lines \u00b7 observability: 4 log sites, NO structured telemetry \u2014 diagnosable, not operable",
    "live_config": [],
    "detail": {}
   },
@@ -1941,7 +2768,7 @@
    "writes": [],
    "key": "round0",
    "how": "A shortcut that runs before round 1. When the caller supplied verified ground truth in\nsystem_context \u2014 a story presentation node, a skill card with computed metrics \u2014 this\nanswers straight from it and never enters the tool loop. It also handles mid-turn\ntruncation recovery: a 'Continue' after the model was cut off.",
-   "rating": "green",
+   "rating": "amber",
    "depth": "code",
    "findings": [
     [
@@ -1953,11 +2780,49 @@
      "Its short-circuit is marked by preflight_round0_short_circuit_taken at react_loop.py:4223, but that is a logger.info gated on the step taking >= 50ms, not an EmitEnvelope. A fast short-circuit is not recorded, so the rate cannot be measured. Agreed with the Chat seat as one of two worth a real signal."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 1,
+    "loc": 198,
+    "log_sites": 1,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 0,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "green",
+     "no open defects"
+    ],
+    [
+     "testability",
+     "amber",
+     "called, guarantee unproven (PERIPHERAL)"
+    ],
+    [
+     "error_handling",
+     "green",
+     "1 handlers, none swallow"
+    ],
+    [
+     "modularity",
+     "green",
+     "198 lines"
+    ],
+    [
+     "observability",
+     "amber",
+     "1 log sites, NO structured telemetry \u2014 diagnosable, not operable"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "0 open \u00b7 exercised (PERIPHERAL)",
+   "rating_why": "testability: called, guarantee unproven (PERIPHERAL) \u00b7 observability: 1 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: functionality, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -2073,7 +2938,7 @@
    ],
    "key": "react_loop",
    "how": "The engine of the ReAct path: reason about what to do, call a tool, look at what came\nback, go again. It replaces run_plan and the classic sub-question answering, does the core\nsynthesis, and can skip the integrator entirely via ctx.react_bypass_integrate.\n\nIt also emits nearly all of the pipeline's telemetry \u2014 thirteen distinct signals, on behalf\nof itself and of the sub-modules it drives. Every critic signal comes from here, not from\ncritic.py.",
-   "rating": "amber",
+   "rating": "red",
    "depth": "code",
    "findings": [
     [
@@ -2113,11 +2978,49 @@
      "It does have a test file, and the extraction programme is real and ratcheted."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 44,
+    "loc": 6413,
+    "log_sites": 38,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 19,
+    "telemetry_sites": 121,
+    "todos": 0
+   },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "6 open"
+    ],
+    [
+     "testability",
+     "amber",
+     "called, guarantee unproven (PERIPHERAL)"
+    ],
+    [
+     "error_handling",
+     "red",
+     "19 of 44 handlers log-and-continue"
+    ],
+    [
+     "modularity",
+     "red",
+     "6413 lines \u2014 not reviewable in one pass"
+    ],
+    [
+     "observability",
+     "green",
+     "121 telemetry sites, 38 logs"
+    ]
+   ],
    "rating_was_typed": "red",
-   "rating_why": "6 open \u00b7 exercised (PERIPHERAL)",
+   "rating_why": "error_handling: 19 of 44 handlers log-and-continue \u00b7 modularity: 6413 lines \u2014 not reviewable in one pass  (ok: functionality, testability, observability)",
    "live_config": [
     {
      "name": "APPEALS_AGENT_URL",
@@ -2170,7 +3073,7 @@
    "observability_note": "Sets ctx.completion_critic_ran / _satisfied / _gaps, but emits no signal and nothing renders them.",
    "key": "completion_extension_gate",
    "how": "THE dynamic ReAct parameter adjuster \u2014 and the reason it took a message to the Chat seat\nto find it is that it has no module, no class and no name. It is roughly sixty lines\ninline in react_loop's main loop body (react_loop.py:5077-5133), from Task #104 with the\nwall-clock guard added by #107.\n\nWhat it does: when the model says is_complete=true and a draft exists, it runs a cheap\nsecond opinion \u2014 the completion critic, a 400-token fast call with a 1500ms latency\nbudget \u2014 asking whether the answer actually covers the question. If the critic says no,\nthe loop does not finish. It appends a synthetic tool result naming what is still missing\nand a suggested next query, then:\n\n    _pp_extension_rounds_used += 1\n    max_it += 1            # react_loop.py:5120 \u2014 mutates the local ceiling\n    continue\n\nSo the round ceiling is raised for THIS TURN ONLY, in response to observed answer quality.\nThat is the whole adjuster.\n\nSix conditions must all hold: the governor is on, a contract was built, the mode is\nagentic, the turn is not already at ceiling, extension budget remains\n(max_extension_rounds - used > 0), and there is wall-clock left \u2014 elapsed + 25s < the turn\ndeadline, the 25 seconds reserving room to synthesise the final answer.",
-   "rating": "amber",
+   "rating": "red",
    "depth": "code",
    "findings": [
     [
@@ -2200,8 +3103,35 @@
    ],
    "ux": "No surface. ctx.completion_critic_ran / _satisfied / _gaps are set but nothing renders them",
    "signals": {},
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "2 open"
+    ],
+    [
+     "testability",
+     "amber",
+     "coverage unknown"
+    ],
+    [
+     "error_handling",
+     "green",
+     "no failure paths"
+    ],
+    [
+     "modularity",
+     "green",
+     "0 lines"
+    ],
+    [
+     "observability",
+     "red",
+     "no logs and no telemetry \u2014 cannot be operated"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "2 open \u00b7 exercised (unknown)",
+   "rating_why": "observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, testability, error_handling, modularity)",
    "live_config": [
     {
      "name": "MOBIUS_PRODUCT_PROMISE_ENABLED",
@@ -2250,7 +3180,7 @@
    ],
    "key": "react_retry_guard",
    "how": "Stops the loop burning calls re-running a tool that already failed. Written against a pathology\nobserved in production, where the bandit or the model picked the same dead path round after\nround.\n\nThree rules. Same tool plus same inputs plus no new evidence means skip \u2014 a failure is recorded\nwhen a tool raises, returns success=False, or comes back with an ErrorEnvelope, and before the\nnext execution the guard checks whether any NEW tool result has landed since; if not it refuses\nand tells the model to choose differently. Fail-fast at loop end: if every round failed and\nnothing succeeded, it short-circuits the 'escalate honestly' path and emits a typed refusal.\nAnd tool exhaustion: N consecutive failures of one tool with no success between blocks that\ntool for the turn.",
-   "rating": "green",
+   "rating": "red",
    "depth": "code",
    "findings": [
     [
@@ -2266,11 +3196,49 @@
      "A typed refusal beats a hedged answer: the fail-fast path produces something the caller can branch on rather than prose that looks like an answer."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 1,
+    "loc": 345,
+    "log_sites": 0,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 0,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "green",
+     "no open defects"
+    ],
+    [
+     "testability",
+     "amber",
+     "called, guarantee unproven (PERIPHERAL)"
+    ],
+    [
+     "error_handling",
+     "green",
+     "1 handlers, none swallow"
+    ],
+    [
+     "modularity",
+     "green",
+     "345 lines"
+    ],
+    [
+     "observability",
+     "red",
+     "no logs and no telemetry \u2014 cannot be operated"
+    ]
+   ],
    "rating_was_typed": "green",
-   "rating_why": "0 open \u00b7 exercised (PERIPHERAL)",
+   "rating_why": "observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, testability, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -2296,7 +3264,7 @@
    "writes": [],
    "key": "stages",
    "how": "Eleven lines listing the canonical names of the seven classical pipeline stages:\nstate_load, classify, plan, clarify, resolve, integrate, publish. Every non-ReAct emit\nevent and trace entry is keyed on these strings. The ReAct path uses its own stage keys,\nwhich are not in this list.",
-   "rating": "amber",
+   "rating": "red",
    "depth": "code",
    "findings": [
     [
@@ -2304,11 +3272,49 @@
      "Constants in one place instead of string literals scattered through the pipeline."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 0,
+    "loc": 11,
+    "log_sites": 0,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 0,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "ABSENT",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "green",
+     "no open defects"
+    ],
+    [
+     "testability",
+     "red",
+     "no test CALLS it (ABSENT)"
+    ],
+    [
+     "error_handling",
+     "green",
+     "no failure paths"
+    ],
+    [
+     "modularity",
+     "green",
+     "11 lines"
+    ],
+    [
+     "observability",
+     "red",
+     "no logs and no telemetry \u2014 cannot be operated"
+    ]
+   ],
    "rating_was_typed": "green",
-   "rating_why": "0 open but no test CALLS it (ABSENT) \u2014 absence of evidence is not health",
+   "rating_why": "testability: no test CALLS it (ABSENT) \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -2366,6 +3372,14 @@
     [
      "good",
      "GATE GREEN ACROSS ALL FIVE COMMITS, 2026-09-09: regressions 0, newly passing 0, known-failing baseline 14 unchanged; 2579/2598 passed, 5 skipped. Covers 10133ae and 2b0008f. AND ASKING RATHER THAN INFERRING PAID OFF: 10133ae carries three behaviour changes plus TWO CHAT FOUND WHILE IN THERE \u2014 `found` was being set from HTTP success when a miss is 200 {}, and a brief collapse of `success` into `found` WAS CAUGHT BY THE EXISTING SUITE. test_appeals_playbook_zero_result encodes transport-vs-content and failed the moment it broke. Consequence if it had shipped: a legitimate 'no playbook exists' would have recorded as appeals_get_playbook:FAILURE \u2014 corrupting the very funnel being built, with a failure that did not happen. A test written for one distinction defended a different one a month later, which is the argument for encoding distinctions rather than outcomes."
+    ],
+    [
+     "bad",
+     "OWNER(me): THE READINESS SIGNALS WERE READ FROM A DEAD SESSION SCRATCHPAD, AND ZERO WAS RENDERED AS A MEASUREMENT FOR ALL 38 NODES. Found 2026-09-09 while extending the rubric to production readiness on Ananth's instruction. gen_chat_dev.py did: sig_path = '/private/tmp/claude-502/.../scratchpad/readiness.json'; sigs = json.load(open(sig_path)) IF OS.PATH.EXISTS(sig_path) ELSE {}. That directory belonged to a session that had ended. The existence check made the absence SILENT, so every node got {} \u2014 and the page rendered '0 except \u00b7 0 log-and-continue \u00b7 0 emits' for all 38 as though measured. A swallowed absence presented as data, in the generator built to find swallowed absences, on a hardcoded ephemeral path that was GUARANTEED to rot. FIXED: scripts/platform/gen_readiness.py measures from source on every refresh (step 2/7, before the merge), and a missing signals file now sys.exit()s rather than falling back \u2014 'refusing to render zeroed signals as measurements'. First real numbers: 130 swallow handlers, 3 re-raise, 0 bare except, 0 un-timed outbound calls, 211 log sites, 144 telemetry sites, and 24 OF 31 LIVE NODES WITH NO STRUCTURED TELEMETRY AT ALL."
+    ],
+    [
+     "bad",
+     "OWNER(me): MY OWN OBSERVABILITY REGEX MATCHED ONLY logger.info AND NEARLY SHIPPED 19 MANUFACTURED REDS. The first version of gen_readiness.py used r'\\b(emit|record|_rec\\w*|span|logger\\.info|track|counter)\\s*\\(' \u2014 so a module full of logger.warning / logger.error read as ZERO emit sites, and the rubric confidently reported 'emits nothing \u2014 cannot be operated' for NINETEEN nodes including POST /chat (5 logger calls) and state_load (1). Caught by spot-checking ONE node against grep before shipping, not by reading the regex. Same class as the reachability transitive-closure error and the _APPEALS_BLOCK gate-key artefact: a wrong instrument producing CONFIDENT WRONG VERDICTS, which is worse than no instrument because nobody re-derives a number that looks measured. FIXED, and the fix is better than the original intent: log sites and telemetry sites are now counted SEPARATELY AND NEVER SUMMED, because they are different evidence \u2014 a logger line is greppable by a human after the fact, a span is queryable, alertable and joinable to a turn. VALIDATION THAT THE INSTRUMENT IS NOW RIGHT: it independently reproduced a finding established by hand weeks earlier and recorded at the top of docs/chat-refactor-program.md \u2014 'the governor contains zero logger calls'. The measurement agrees with the hand-audit it never saw."
     ],
     [
      "bad",
@@ -2504,11 +3518,49 @@
      "No config and no telemetry: you cannot tell from the trace what manifest the planner was shown on a given turn. The second of the two the Chat seat and I agreed are worth a real signal."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 0,
+    "loc": 737,
+    "log_sites": 0,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 0,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "red",
+     "26 open defects"
+    ],
+    [
+     "testability",
+     "amber",
+     "called, guarantee unproven (PERIPHERAL)"
+    ],
+    [
+     "error_handling",
+     "green",
+     "no failure paths"
+    ],
+    [
+     "modularity",
+     "green",
+     "737 lines"
+    ],
+    [
+     "observability",
+     "red",
+     "no logs and no telemetry \u2014 cannot be operated"
+    ]
+   ],
    "rating_was_typed": "red",
-   "rating_why": "24 open defects \u2014 volume, not coverage",
+   "rating_why": "functionality: 26 open defects \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: testability, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -2543,7 +3595,7 @@
    "writes": [],
    "key": "capabilities",
    "how": "The single source of truth for what each agent path can answer, fed to the parser and planner\nso questions are only decomposed into sub-questions something can actually handle. Each tool\ndeclares can_answer explicitly, so when one fails ReAct has a basis for picking another.",
-   "rating": "green",
+   "rating": "red",
    "depth": "code",
    "findings": [
     [
@@ -2559,11 +3611,49 @@
      "No test file, and four callers depend on its shape."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 0,
+    "loc": 332,
+    "log_sites": 0,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 0,
+    "telemetry_sites": 0,
+    "todos": 0
+   },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "green",
+     "no open defects"
+    ],
+    [
+     "testability",
+     "amber",
+     "called, guarantee unproven (PERIPHERAL)"
+    ],
+    [
+     "error_handling",
+     "green",
+     "no failure paths"
+    ],
+    [
+     "modularity",
+     "green",
+     "332 lines"
+    ],
+    [
+     "observability",
+     "red",
+     "no logs and no telemetry \u2014 cannot be operated"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "0 open \u00b7 exercised (PERIPHERAL)",
+   "rating_why": "observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, testability, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -2603,7 +3693,7 @@
    ],
    "key": "integrate",
    "how": "Not one step \u2014 THREE LLM calls plus a mode switch, which is why it is 1,887 lines.\n\n  Call A  integrator_a \u2014 the first answer. Core synthesis: turns reasoning and tool\n          output into the answer card the user sees.\n  Call B  the critic pass.\n  Call C  the enricher \u2014 produces display_summary, the fuller prose behind the card.\n\nTwo execution modes. MOBIUS_INTEGRATOR_MODE forces parallel or sequential; if unset,\nMOBIUS_INTEGRATOR_PARALLEL_PCT samples. The CODE default is sequential at 0% parallel \u2014 but\nthe deployed service sets MOBIUS_INTEGRATOR_MODE=parallel, so the conservative default is\nnot what runs.\n\nThere are also two paths that skip calls entirely, and the second is subtler than \"skip A\".\n\nThe disambiguation fast-path skips A, B and C outright \u2014 when the turn is a disambiguation\nthere is nothing to synthesise.\n\nDynamic enrichment (Task #76) needs FOUR conditions together: not disambiguation, the\nparallel path, the percentage gate open, and react_loop's own\n_is_sufficient_for_deterministic_pass(ctx). When all four hold, Call A's LLM call is skipped\nand react_draft is structured DETERMINISTICALLY \u2014 regex only, no synthesis. B and C still\nrun, but as fire-and-forget background jobs that patch the persisted card when they land and\nnever block the response. So the user gets a regex-formatted answer immediately and a\ncritiqued, enriched one moments later, in place.\n\nThe deployed service sets MOBIUS_DYNAMIC_ENRICHMENT_PCT=100, so the percentage gate is\nalways open \u2014 but the sufficiency check still decides per turn, so this is not\nunconditional.\n\nIt runs on BOTH pipeline paths. On the ReAct path react_loop does the core synthesis and\nthis handles what follows \u2014 unless ctx.react_bypass_integrate was set, in which case the\nReAct answer is published directly and none of this runs.",
-   "rating": "amber",
+   "rating": "red",
    "depth": "code",
    "findings": [
     [
@@ -2644,11 +3734,49 @@
     ]
    ],
    "ux": "Answer card in the chat bubble; step labels 'Composing your answer' and 'Critique & citations'",
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 29,
+    "loc": 1907,
+    "log_sites": 16,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 19,
+    "telemetry_sites": 3,
+    "todos": 0
+   },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "3 open"
+    ],
+    [
+     "testability",
+     "amber",
+     "called, guarantee unproven (PERIPHERAL)"
+    ],
+    [
+     "error_handling",
+     "red",
+     "19 of 29 handlers log-and-continue"
+    ],
+    [
+     "modularity",
+     "amber",
+     "1907 lines"
+    ],
+    [
+     "observability",
+     "green",
+     "3 telemetry sites, 16 logs"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "3 open \u00b7 exercised (PERIPHERAL)",
+   "rating_why": "error_handling: 19 of 29 handlers log-and-continue  (ok: functionality, testability, modularity, observability)",
    "live_config": [
     {
      "name": "CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL",
@@ -2771,13 +3899,51 @@
      "WHAT THIS CANNOT SEE: whether the data-loss path has ever fired. It leaves no artifact by construction, so its rate is not recoverable \u2014 absence of evidence here is guaranteed, not reassuring. Also unmeasured: whether concurrent turns on one thread occur, and whether any writer outside mobius-chat/app mutates chat_state."
     ]
    ],
-   "signals": {},
+   "signals": {
+    "async_no_timeout": 0,
+    "bare_except": 0,
+    "except_handlers": 1,
+    "loc": 153,
+    "log_sites": 1,
+    "missing": false,
+    "reraise": 0,
+    "swallow": 0,
+    "telemetry_sites": 1,
+    "todos": 0
+   },
    "coverage": "GUARDED",
    "coverage_tags": [
     "state_load:no_silent_reset"
    ],
+   "dimensions": [
+    [
+     "functionality",
+     "amber",
+     "7 open"
+    ],
+    [
+     "testability",
+     "green",
+     "guarantee mutation-verified"
+    ],
+    [
+     "error_handling",
+     "green",
+     "1 handlers, none swallow"
+    ],
+    [
+     "modularity",
+     "green",
+     "153 lines"
+    ],
+    [
+     "observability",
+     "amber",
+     "1 telemetry sites, 1 logs"
+    ]
+   ],
    "rating_was_typed": "amber",
-   "rating_why": "7 open \u00b7 exercised (GUARDED)",
+   "rating_why": "functionality: 7 open \u00b7 observability: 1 telemetry sites, 1 logs  (ok: testability, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -2800,6 +3966,8 @@
    "observability": "n/a",
    "deleted": true,
    "signals": {
+    "missing": true,
+    "path": "app/stages/clarify.py",
     "loc": 0,
     "tests": [],
     "emits": 0,
@@ -2833,6 +4001,7 @@
    ],
    "coverage": "REMOVED",
    "coverage_tags": [],
+   "dimensions": [],
    "rating_was_typed": "green",
    "rating_why": "node deleted \u2014 a rating is a judgement about live code",
    "rating_was": "removed",
@@ -2858,6 +4027,8 @@
    "observability": "n/a",
    "deleted": true,
    "signals": {
+    "missing": true,
+    "path": "app/stages/classify.py",
     "loc": 0,
     "tests": [],
     "emits": 0,
@@ -2887,6 +4058,7 @@
    ],
    "coverage": "REMOVED",
    "coverage_tags": [],
+   "dimensions": [],
    "rating_was_typed": "amber",
    "rating_why": "node deleted \u2014 a rating is a judgement about live code",
    "rating_was": "removed",
@@ -2912,6 +4084,8 @@
    "observability": "n/a",
    "deleted": true,
    "signals": {
+    "missing": true,
+    "path": "app/stages/continuity.py",
     "loc": 0,
     "tests": [],
     "emits": 0,
@@ -2945,6 +4119,7 @@
    ],
    "coverage": "REMOVED",
    "coverage_tags": [],
+   "dimensions": [],
    "rating_was_typed": "red",
    "rating_why": "node deleted \u2014 a rating is a judgement about live code",
    "rating_was": "removed",
@@ -2970,6 +4145,8 @@
    "observability": "n/a",
    "deleted": true,
    "signals": {
+    "missing": true,
+    "path": "app/pipeline/credentialing_envelope.py",
     "loc": 0,
     "tests": [],
     "emits": 0,
@@ -2999,6 +4176,7 @@
    ],
    "coverage": "REMOVED",
    "coverage_tags": [],
+   "dimensions": [],
    "rating_was_typed": "green",
    "rating_why": "node deleted \u2014 a rating is a judgement about live code",
    "rating_was": "removed",
@@ -3024,6 +4202,8 @@
    "observability": "n/a",
    "deleted": true,
    "signals": {
+    "missing": true,
+    "path": "app/stages/plan.py",
     "loc": 0,
     "tests": [],
     "emits": 0,
@@ -3053,6 +4233,7 @@
    ],
    "coverage": "REMOVED",
    "coverage_tags": [],
+   "dimensions": [],
    "rating_was_typed": "amber",
    "rating_why": "node deleted \u2014 a rating is a judgement about live code",
    "rating_was": "removed",
@@ -3078,6 +4259,8 @@
    "observability": "n/a",
    "deleted": true,
    "signals": {
+    "missing": true,
+    "path": "app/stages/resolve.py",
     "loc": 0,
     "tests": [],
     "emits": 0,
@@ -3111,6 +4294,7 @@
    ],
    "coverage": "REMOVED",
    "coverage_tags": [],
+   "dimensions": [],
    "rating_was_typed": "amber",
    "rating_why": "node deleted \u2014 a rating is a judgement about live code",
    "rating_was": "removed",

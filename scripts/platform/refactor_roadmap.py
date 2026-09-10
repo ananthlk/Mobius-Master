@@ -227,6 +227,8 @@ RULES = [
     ("P2", "model_registry", "THE BANDIT HAS NO SURFACE"),
     ("P2", "tool_manifest", "THE COVERAGE ENUM WAS A PRODUCER WITH NO CONSUMER"),
     ("P2", "tool_manifest", "RATINGS WERE NEVER RE-DERIVED, AND NO SIGN-OFF EVER COVERED THEM"),
+    ("P2", "tool_manifest", "THE READINESS SIGNALS WERE READ FROM A DEAD SESSION SCRATCHPAD"),
+    ("P2", "tool_manifest", "MY OWN OBSERVABILITY REGEX MATCHED ONLY logger.info"),
     ("P2", "tool_manifest", "STAGE 0 COULD NOT NAME THE LAYER"),
     ("P1", "tool_manifest", "APPEALS AGENT RULED 2026-09-09 — REMOVE THE INVENTED FL"),
     ("P1", "tool_manifest", "THE STRONGEST CANDIDATE YET FOR THE SPORADIC MISS"),

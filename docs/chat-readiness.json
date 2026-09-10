@@ -1,0 +1,389 @@
+{
+ "PHI gate": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 2,
+  "loc": 106,
+  "log_sites": 5,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 2,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "POST /chat": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 5,
+  "loc": 714,
+  "log_sites": 5,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 4,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "active_context": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 0,
+  "loc": 63,
+  "log_sites": 0,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 0,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "capabilities": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 0,
+  "loc": 332,
+  "log_sites": 0,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 0,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "clarification": {
+  "unmapped": true
+ },
+ "clarify": {
+  "missing": true,
+  "path": "app/stages/clarify.py"
+ },
+ "classify": {
+  "missing": true,
+  "path": "app/stages/classify.py"
+ },
+ "context": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 0,
+  "loc": 317,
+  "log_sites": 0,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 0,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "continuity": {
+  "missing": true,
+  "path": "app/stages/continuity.py"
+ },
+ "credentialing_envelope": {
+  "missing": true,
+  "path": "app/pipeline/credentialing_envelope.py"
+ },
+ "critic": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 6,
+  "loc": 791,
+  "log_sites": 13,
+  "missing": false,
+  "reraise": 2,
+  "swallow": 1,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "curator_tools": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 4,
+  "loc": 331,
+  "log_sites": 4,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 0,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "emit_envelope": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 0,
+  "loc": 1319,
+  "log_sites": 0,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 0,
+  "telemetry_sites": 3,
+  "todos": 0
+ },
+ "feedback_signal": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 0,
+  "loc": 79,
+  "log_sites": 0,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 0,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "governor": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 1,
+  "loc": 382,
+  "log_sites": 0,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 1,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "integrate": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 29,
+  "loc": 1907,
+  "log_sites": 16,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 19,
+  "telemetry_sites": 3,
+  "todos": 0
+ },
+ "jurisdiction": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 1,
+  "loc": 140,
+  "log_sites": 0,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 0,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "llm_manager": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 10,
+  "loc": 469,
+  "log_sites": 1,
+  "missing": false,
+  "reraise": 1,
+  "swallow": 8,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "message_resolver": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 0,
+  "loc": 425,
+  "log_sites": 0,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 0,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "model_registry": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 13,
+  "loc": 2462,
+  "log_sites": 21,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 10,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "orchestrator": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 43,
+  "loc": 1892,
+  "log_sites": 44,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 27,
+  "telemetry_sites": 8,
+  "todos": 0
+ },
+ "parsing": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 2,
+  "loc": 167,
+  "log_sites": 2,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 2,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "personalization": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 0,
+  "loc": 131,
+  "log_sites": 0,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 0,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "phi_gate": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 2,
+  "loc": 106,
+  "log_sites": 5,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 2,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "plan": {
+  "missing": true,
+  "path": "app/stages/plan.py"
+ },
+ "prompts": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 2,
+  "loc": 1368,
+  "log_sites": 4,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 1,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "queue": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 0,
+  "loc": 19,
+  "log_sites": 0,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 0,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "react_loop": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 44,
+  "loc": 6413,
+  "log_sites": 38,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 19,
+  "telemetry_sites": 121,
+  "todos": 0
+ },
+ "react_retry_guard": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 1,
+  "loc": 345,
+  "log_sites": 0,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 0,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "resolve": {
+  "missing": true,
+  "path": "app/stages/resolve.py"
+ },
+ "retrieval_budget": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 0,
+  "loc": 118,
+  "log_sites": 0,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 0,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "round0": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 1,
+  "loc": 198,
+  "log_sites": 1,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 0,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "run_pipeline": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 43,
+  "loc": 1892,
+  "log_sites": 44,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 27,
+  "telemetry_sites": 8,
+  "todos": 0
+ },
+ "stages": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 0,
+  "loc": 11,
+  "log_sites": 0,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 0,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "state_load": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 1,
+  "loc": 153,
+  "log_sites": 1,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 0,
+  "telemetry_sites": 1,
+  "todos": 0
+ },
+ "tool_manifest": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 0,
+  "loc": 737,
+  "log_sites": 0,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 0,
+  "telemetry_sites": 0,
+  "todos": 0
+ },
+ "worker": {
+  "async_no_timeout": 0,
+  "bare_except": 0,
+  "except_handlers": 11,
+  "loc": 405,
+  "log_sites": 7,
+  "missing": false,
+  "reraise": 0,
+  "swallow": 7,
+  "telemetry_sites": 0,
+  "todos": 0
+ }
+}
