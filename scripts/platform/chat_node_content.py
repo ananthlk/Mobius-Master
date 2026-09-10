@@ -1770,6 +1770,25 @@ It runs on BOTH pipeline paths. On the ReAct path react_loop does the core synth
 this handles what follows — unless ctx.react_bypass_integrate was set, in which case the
 ReAct answer is published directly and none of this runs.
 """, findings=[
+ ("bad", "OWNER(chat): THE BADGE CAN SAY 'no sources' WITHOUT EVER LOOKING AT THE "
+          "SOURCES, AND ITS OWN INPUTS ARE NOT RECORDED. _default_source_confidence "
+          "(integrate.py:703) has three paths that return BADGE_NO_SOURCES and TWO OF THEM "
+          "never read all_sources at all: max_layer==5 (:719) and `if not retrieval_signals` "
+          "(:731-732). So a turn holding 2,246 retrieved corpus documents can be badged "
+          "no_sources by a branch that never consults the list it is describing. The MCP "
+          "adapter defect below is one PRODUCER feeding this; this is the consumer, and it "
+          "would mis-badge on an empty signals list even with the adapter fixed. Measured, 30 "
+          "days: of 157 sourced-but-badged-no_sources turns, 145 carry NO MCP source -- they "
+          "carry 2,246 real `document` sources, every one with confidence_label=None. WHICH of "
+          "the two blind paths fires is NOT DETERMINABLE from production, and that is the "
+          "second half of the finding: neither `retrieval_signals` nor `layer_used` is "
+          "persisted on chat_turns (checked -- zero columns matching signal/layer/answer_set), "
+          "so the badge's inputs are unrecoverable after the turn and a wrong badge cannot be "
+          "diagnosed, only reproduced. First fix is to persist both, not to guess. Ruled out "
+          "cheaply, so the next seat doesn't re-spend it: the Tool Manifest seat's hypothesis "
+          "that builtins inherit registry.py:113's `signal='no_sources'` default is WRONG -- "
+          "an AST sweep of every SkillEnvelope(...) construction site in app/ found 0 without "
+          "an explicit signal kwarg. Found 2026-09-10."),
  ("bad", "OWNER(chat): THE SOURCE BADGE IS COMPUTED WRONG ON EVERY MCP TURN, AND THE "
           "MODEL'S OPINION IS WHAT RESCUES IT. mcp_adapter.py:281 is the SUCCESS branch: it "
           "has real text and it builds a populated SourceRef -- and it still sets "
