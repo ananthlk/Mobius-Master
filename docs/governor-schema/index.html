@@ -169,6 +169,25 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:.05re
 <div class="note"><b>Two of the three terms are honest today; one is a posture.</b> Latency and cost are measured and stated. <b>Quality is ordinal only</b> — <i>none &lt; some &lt; best</i> — because accuracy has a pass-rate proxy and <b>recall has no measure at all</b> (§8). Until it does, the quality column ranks the tiers against each other and promises nothing absolute.</div>
 <div class="note"><b>The fast tier's tool-set rule is a constraint, not a preference.</b> A ~13s budget cannot accommodate a tool whose own p50 exceeds it. That makes <code>tier</code> an input to tool selection, which is the Tool Selection seat's Stage A — and the two designs meet there.</div>
 
+<h2>7a · THE SCOPE — emit the attestation, every turn</h2>
+<p class="sub"><b>promise</b> = the standing contract, three tiers, §7. <b>attestation</b> = what one turn emits about it. Different words on purpose — the promise is versioned and changes on a cadence of weeks; the attestation is written 1,119 times a month and is never edited.</p>
+
+<div class="ov"><table>
+<tr><th>field</th><th>value</th><th>why it must be there</th></tr>
+<tr><td><code>promise_version</code></td><td>which promise was in force</td><td>without it "we improved p50" is unfalsifiable — an improvement is indistinguishable from a re-baselining</td></tr>
+<tr><td><code>tier</code></td><td>fast / normal / thinking</td><td>the promise is per-tier; the attestation is meaningless without it</td></tr>
+<tr><td><code>promised_latency_s</code> · <code>delivered_latency_s</code> · <code>met</code></td><td>from §7 · measured · bool</td><td>promised and delivered <b>side by side in one row</b>. A delivered number alone cannot be judged</td></tr>
+<tr><td><code>promised_cost_c</code> · <code>delivered_cost_c</code> · <code>met</code></td><td>from §7 · measured · bool</td><td>same</td></tr>
+<tr><td><code>promised_accuracy</code> · <code>delivered_accuracy</code> · <code>met</code></td><td>from §7 · groundedness floor · bool</td><td>same — <b>but see the gap below</b></td></tr>
+<tr><td><code>promised_recall</code> · <code>delivered_recall</code></td><td><b>null · null</b></td><td><b>emitted as an explicit null, never omitted.</b> A term that is absent from the row is indistinguishable from a term that passed. §8</td></tr>
+</table></div>
+
+<div class="note"><b>The gap this scope exposes immediately: the tier that promises the best quality is the one that does not measure it.</b> §10 — the groundedness floor <b>never runs on <code>agentic</code></b>. So on the thinking tier, <code>delivered_accuracy</code> has nothing to write and <code>delivered_recall</code> has nothing to write, and the attestation for our highest-quality, highest-cost tier carries <b>latency and cost only</b>. That is not a reason to drop the fields. It is the reason to emit them as nulls, so the hole is <b>visible in every row</b> rather than being something a reader has to already know.</div>
+
+<div class="note"><b>Emit on every turn, including the clean ones.</b> Not "log a breach." A row that says <i>all three met, promise v1</i> is the denominator; without it a breach rate has no population and conformance cannot be stated. This is the shape the program has now found twelve times — <b>a producer whose absence looks exactly like a legitimate default</b>. An attestation table that only contains failures is that bug, written deliberately.</div>
+
+<div class="note"><b>Scoring rule, carried from the finding below:</b> <code>delivered_accuracy</code> is scored on the payload — <b>never</b> on <code>signal</code>, never on <code>len(sources)</code>. Both are green by construction on MCP-backed turns.</div>
+
 <h2>8 · What is missing — RECALL, and how we start tracking it</h2>
 <p class="sub">Accuracy has a live proxy. Recall has nothing. Marked here so the gap is tracked rather than assumed away.</p>
 <div class="ov"><table>
@@ -188,7 +207,7 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:.05re
 </table></div>
 <div class="note"><b>Measure 3 is the one that prices the promise.</b> If thinking finds nothing fast missed, the tier is not worth 7× the latency. If it finds a great deal, the fast tier's "no assurance" is doing real work and should be said louder.</div>
 
-<h2>9 · Who can override the promise — the register</h2>
+<h2>9 · Who can override the promise — the register <span class="tag t-no">OUT OF SCOPE — designed, not being built</span></h2>
 <p class="sub">The promise (§7) is the default. It is <b>never edited</b> by any of these — an override selects a different tier, or clamps a term, <b>for one turn or one session</b>. Six actors, and only six. Anything not on this list is a lever move, not an override.</p>
 <div class="ov"><table>
 <tr><th></th><th>actor</th><th>trigger</th><th>direction</th><th>scope</th><th>status</th></tr>
@@ -214,7 +233,7 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:.05re
 
 <div class="note"><b>What is deliberately NOT an override.</b> The governor buying an extra round, the completion critic extending, the planner picking more tools, a model swap by the bandit, per-round depth (§6a) — those are <b>levers</b>. They exist to <i>hit</i> the promise, and they must never be able to change it. If a missed promise can be resolved by editing the promise, the promise is not a contract. <b>Rounds are not the SLA.</b></div>
 
-<h2>9a · The resolver — one module, and its output is a promise</h2>
+<h2>9a · The resolver — one module, and its output is a promise <span class="tag t-no">OUT OF SCOPE — depends on §9</span></h2>
 <p class="sub">The register (§9) is a list of who may speak. This is the module that listens, and the whole design rests on one property.</p>
 
 <div class="ov"><table>
