@@ -868,3 +868,88 @@ alone leaves the tie exactly where lexical matching leaves it.
 4. **Therefore the real fix is round-N, as §11.2 concluded** — offer both, and when the
    first returns `no_sources` twice, try the sibling. Today the loop held the same two
    gaps for three rounds and never did.
+
+---
+
+# 13. MEASURED: three tiers + an absolute floor — and the design holds
+
+**Ananth, 2026-09-10:** *"we have 2 different sections — these domain/specific tools and
+generic tools like corpus_search; few others which are defaults if nothing else."*
+
+**That resolves §12's worst result**, and the experiment says so. Run against the live
+57-tool manifest, no code built.
+
+## 13.1 The tiers
+
+| tier | count | how it is selected | examples |
+|---|---:|---|---|
+| **default** | 2 | **always present.** A floor, not a competitor | `rag`, `recall_evidence` |
+| **specific** | 42 | admitted only on a match clearing a threshold | `appeals_*`, `service_line_*`, `get_*` |
+| **utility** | 14 | not domain-selected — conversation/document helpers | `vibe`, `transform_previous_answer`, `refuse`, `fetch_document` |
+
+**⚠️ The tier assignment above is MY strawman and needs an owner.** I invented a
+"domain" taxonomy in §8.3 and Ananth correctly discarded it; I am not repeating that
+mistake silently. This split is derived from observable behaviour (what answers anything
+vs what needs an entity vs what serves the conversation) and it belongs as a declared
+`SkillSpec` field, not a platform-seat guess. **Treat the tier *mechanism* as measured
+and the tier *membership* as unratified.**
+
+**Why the tier changes the mechanism and not just the score:** a default that *competes*
+can be crowded out; a default that is a *floor* cannot. §12.1's third row —
+*"what is prior authorization"* ranking `transform_previous_answer` first — is a utility
+tool winning a domain contest it should never have entered.
+
+## 13.2 The refinement the experiment forced: a relative threshold is not enough
+
+First attempt admitted specific tools scoring ≥ 35% of the top specific score. On the two
+strong queries it was right. On *"what is prior authorization"* it admitted
+`service_line_requirements` (3.8), `appeals_find_carc` (2.7), `search_orgs` (2.3),
+`service_line_code_lookup` (1.5) — **noise, because the top score itself was weak and
+35% of weak is weaker.**
+
+**A relative threshold cannot tell "several good matches" from "no good matches".** It
+needs an **absolute floor**: if the best specific match does not clear it, admit *nothing*
+specific and serve defaults only.
+
+## 13.3 Results with tiers + floor (BM25, floor = 6.0)
+
+| query | selected | tools | tokens | vs 13,062 |
+|---|---|---:|---:|---:|
+| *how do i appeal a carc 197 denial for sunshine health* | defaults + **all 4 appeals tools** | 6 | ~2,186 | **−84%** |
+| *what's the market size for behavioral health in Tampa* | defaults + `get_msa_map`, `get_rate_benchmarks`, `get_market_size`, `get_service_line_opportunity` | 6 | ~1,634 | **−88%** |
+| *what is prior authorization* | **defaults only** — best specific 3.8 < 6.0 | 2 | ~919 | **−93%** |
+| *what is the filing deadline to submit an appeal to sunshine health* | defaults + **`appeals_get_playbook` FIRST**, then `appeals_lookup_rules` | 4 | ~1,183 | **−91%** |
+
+**Four things this establishes:**
+
+**1 · The generic query now behaves correctly.** *"What is prior authorization"* gets
+`rag` + `recall_evidence` and nothing else — which is the right answer for a question no
+specific tool serves. The floor turned §12's worst result into the cleanest one.
+
+**2 · The fourth row is the payoff, and it was not planted.** On *procedural* phrasing —
+*"filing deadline to submit"* — **`appeals_get_playbook` ranks FIRST**, above the sibling
+that beat it 2.6× on the ambiguous phrasing. BM25 gets it right when the query carries
+process vocabulary, which is exactly the `p:submission.submit` case from §12.2 arriving
+by a different route. **So the collision is not general — it is specific to the ambiguous
+phrasing.**
+
+**3 · And on the ambiguous phrasing, both appeals tools are in the set.** Which per
+§11.2 is the correct outcome, not a failure: *"how do i appeal"* genuinely spans
+what-to-argue and how-to-file, and the design's job is to hand react both with reasons.
+**Ananth's stated output was right and my "the tie is unbroken" framing in §10.1 was the
+wrong test.**
+
+**4 · The token reduction is 84–93% across all four**, on a block that is currently the
+largest single element of the planner prompt.
+
+## 13.4 What is still not settled
+
+- **tier membership** — mine, unratified (§13.1)
+- **the floor value** — 6.0 is fitted to four queries. It is a threshold on an unnormalised
+  BM25 score, so it will not transfer across corpora or query lengths. **A score-shape
+  that needs a magic constant is a smell**; normalising (e.g. score ÷ top-possible, or a
+  z-score over the specific pool) is the version that survives.
+- **`requires` is not in this experiment at all.** §10's eligibility gate would remove
+  `appeals_get_playbook` on a query with no payor — none of these four test that.
+- **the golden set** — four queries chosen by me is not an evaluation. §8.6 question 6
+  stands: who owns it, and how many fixtures before the ranker is trustworthy.
