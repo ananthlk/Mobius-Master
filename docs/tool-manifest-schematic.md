@@ -629,3 +629,86 @@ treatment: **declared-against-vocabulary-version, re-checked, demoted loudly.**
 3. Does `requires` support disjunction (`j:payor.* OR j:regulatory_authority.*`)? The
    appeals ladder escalates to AHCA, so at least one tool spans both.
 4. Do the 26 `get_*` tools dispatch? (§3 — unchanged, and still halves the catalogue.)
+
+---
+
+# 11. 🔴 MEASURED: BM25 OVER THE CURRENT DESCRIPTIONS PICKS THE WRONG TOOL BY 4.6×
+
+**Ananth, 2026-09-10:** *"that's why the balancing with pgvector or bm25 helps."*
+
+The architecture is right — discrete tags for eligibility, similarity for fine ranking.
+**But I tested it against the real text and the similarity layer does not break the tie;
+it amplifies the error.** [MEASURED — BM25, k1=1.5, b=0.75, over the two tool blocks
+extracted from the live `/chat/skills-manifest` render.]
+
+Query: *"how do i appeal a carc 197 denial for sunshine health"*
+
+| tool | BM25 | matched terms |
+|---|---:|---|
+| **`appeals_lookup_rules`** | **5.450** | how×2, do×1, i×1, appeal×5, a×2, carc×7, denial×2, for×3, **sunshine×1, health×1** |
+| `appeals_get_playbook` | **1.184** | how×1, appeal×4, a×1, carc×4, for×1 |
+
+**Query terms appearing ONLY in `appeals_lookup_rules`: `denial`, `do`, `i`, `health`,
+`sunshine`.**
+**Query terms appearing only in `appeals_get_playbook`: none.**
+
+**The reason is §5, quantified.** `appeals_lookup_rules`' description contains the
+example *"rules for CARC 29 timely filing **denial** from **Sunshine Health**"* — so the
+payor name and the word *denial* are literally in the competing tool's text. The prose
+that misleads the model misleads BM25 **for the same reason and by the same mechanism**:
+one entry harvested the other entry's query shape as its own example.
+
+**So "retrieval would pick the wrong tool confidently and faster" is no longer an
+argument I was making — it is a measurement.** 4.6× in the wrong direction.
+
+## 11.1 What this does and does not invalidate
+
+**It does NOT invalidate the design.** Tags for eligibility and similarity for ranking is
+still right. What it establishes is a constraint on the **corpus**:
+
+> **Similarity must not run over the planner prose.** That text is written to persuade a
+> model, contains hand-picked example queries, and is therefore adversarial to lexical
+> retrieval — a tool that lists more example phrasings wins, regardless of fit.
+
+Candidate corpora that are not adversarial, in rough order of cheapness:
+
+1. **the tool's return-field semantics** — `deadline_appeal_days, submission_method,
+   portal_url, fax, mail_address` vs `appeal_argument, triggers_when, requires`. These
+   are *what the tool gives you*, are already declared, and nobody wrote them to win a
+   match.
+2. **Lexicon tags** — discrete, curated, the `p:` axis distinction from §10.2.
+3. **a curated trigger set per tool**, with the §5 collision test asserting no query maps
+   to two tools' triggers. More work, and the only option that catches future collisions
+   at build time.
+
+## 11.2 And the harder truth about this particular query
+
+**On *"how do i appeal a carc 197 denial for sunshine health"*, no lexical signal favours
+the playbook — because the query is genuinely ambiguous.** *"How do I appeal"* can mean
+*what do I argue* (rules) or *how do I file, by when, to where* (playbook). A human
+expert would answer both, or ask.
+
+Which means the honest target for this turn is **not a single correct pick.** It is
+Ananth's own stated output: *"a clear rank ordered set of tools that we think will be
+useful along with the reasoning so that react can confirm based on what it needs to
+do."*
+
+**Both appeals tools should be offered, ranked, with their reasons** — *"substance"* and
+*"process/logistics"* — and react picks or calls both. Judged that way, **today's failure
+is not that the model chose wrongly. It is that the loop called one tool, got
+`no_sources` twice, kept the same two gaps open for three rounds, and never tried the
+sibling that was sitting in the manifest.** That is a Stage-D and round-N failure, not a
+Stage-B ranking failure.
+
+Which relocates the fix and makes §8.1's round-N path the important half of the design,
+not the refinement.
+
+## 11.3 The measurement that now matters most
+
+**Not "which tool ranks first" but "does the eligible set contain both, and does round N
+try the second one when the first returns nothing?"**
+
+Answerable against today's telemetry: on Ananth's turn, `appeals_lookup_rules` returned
+`no_sources` **twice** and the gaps stayed open. Nothing escalated to the sibling. The
+governor saw the gaps; the selector never got the chance to act on them because there is
+no selector.
