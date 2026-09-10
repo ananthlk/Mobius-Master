@@ -77,8 +77,86 @@ The **non-idempotent publish** (rag pkey collision → chat catch-all → `block
 - Feasibility/blast-radius of moving the purge to the decision point. _(pending)_
 
 ### Master RAG (mobius-rag)
-- Can a blocked doc be made un-chunkable, or the cleanup widened safely past `chunks_count == 0`? _(pending)_
-- Idempotency fix status for the publish pkey collision. _(pending)_
+
+**(b) Publish pkey collision — ANSWERED 2026-09-09. It is a RACE, not a logic bug,
+and it is smaller than it looked.**
+
+`rag_published_embeddings.id = chunk_embeddings.id` (publish.py:281 `id=ce.id`) —
+the published row reuses the embedding's key rather than minting one. That is
+deliberate and fine on its own. The publish sequence is:
+
+    line 316   rows.append(row)                        build in memory
+    line 347   DELETE ... WHERE document_id = X        scoped, correct
+    line 349   db.add(row) x N
+    line 350   await db.flush()
+
+So it IS delete-then-insert, correctly scoped, in one transaction. **Sequential
+republish of the same document is already safe.** I expected to find a missing
+delete and did not.
+
+The collision is CONCURRENT publishes of the SAME document. Under READ
+COMMITTED, T1 deletes and inserts uncommitted; T2's delete cannot see T1's
+uncommitted rows, so T2 inserts the same ids and violates the pkey on flush.
+That matches the reported shape exactly: 9x/24h, and triggered by repeatedly
+uploading identical bytes — dedup resolves them to ONE document, so retries
+stack concurrent publishes on a single row set.
+
+Two candidate fixes, and I want the meeting's view rather than picking alone:
+
+  1. `ON CONFLICT (id) DO UPDATE` on the insert. Smallest change; makes publish
+     idempotent by construction. Note `publish_sync.py:352` already does exactly
+     this for the CHAT-side store (`published_rag_metadata`), so the pattern is
+     established in this codebase and the rag-side table is simply the one that
+     never got it.
+  2. A per-document advisory lock around publish. Stronger — it also serialises
+     the read side — but it introduces a lock nobody currently holds, and a
+     stuck publish would then block subsequent ones rather than racing them.
+
+I lean (1) for symmetry with the chat-side store, but (2) is worth ten minutes
+if we think two publishes of one document is itself a bug worth surfacing rather
+than absorbing.
+
+**Why this may shrink the invariant problem:** a publish that dies on the pkey
+leaves the document in a state chat's catch-all labels `blocked_indeterminate`.
+That is very likely the source of at least some observed "blocked" verdicts that
+were never PHI decisions at all. Fixing (b) first may remove a chunk of the
+population before any purge change is designed.
+
+**(a) Un-chunkable vs widened cleanup — POSITION, with the constraint that
+decides it.**
+
+The cleanup guard is `if _chunks_count == 0 and existing_doc.status ==
+"phi_blocked"`. It is guarded on the condition that is false precisely when
+cleanup is needed, which is the defect already recorded above.
+
+I do NOT recommend simply widening it past `chunks_count == 0`. That converts
+the branch into "delete a document that has chunks and may be published", which
+is destructive on a path reached by an ordinary re-upload. Getting that wrong
+removes real corpus.
+
+The better shape, given Chat Master's confirmed ordering (bytes forwarded L1638,
+verdict L1826):
+
+  **rag should not START chunking for bytes whose verdict is still outstanding.**
+
+Today `/upload` enqueues the chunking job at the end of the handler, so by the
+time chat's gate decides, chunking may already be running or done. Making the
+block un-chunkable therefore requires the forwarding side to tell us the verdict
+is pending — a two-phase ingest (`hold` on arrival, `release` or `purge` on
+verdict) rather than a cleanup that races the chunker.
+
+That is a contract change across chat and rag, not a one-line guard, which is
+why I am bringing it as a position rather than a patch. If the meeting prefers
+the smaller move, the honest interim is: keep the guard, and have the purge
+delete chunks too rather than refusing when they exist — but that is still a
+destructive path and it still races.
+
+**Constraint the meeting should know:** whatever we choose, `/upload` writes the
+GCS blob (handler line 196) and the document row carrying the `file_hash` dedup
+key (line 325) BEFORE it calls the classifier (line 422). Any invariant of the
+form "a blocked document leaves no trace" is unachievable at `/upload` without
+either deferring those writes or accepting a purge. There is no ordering of the
+current handler that satisfies it.
 
 ### PHI classifier (mobius-skills)
 - Confirm no block path emits genuine PHI as anything but `gate == "phi"`. _(confirmed 2026-09-09; re-affirm if the tri-state changes)_
