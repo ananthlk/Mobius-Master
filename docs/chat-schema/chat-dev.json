@@ -24,7 +24,7 @@
     "owner": "chat + Eval",
     "gate": "every segment timed AND each timed segment's attribution verified against a known-external call \u2014 an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
-    "n": 24
+    "n": 25
    },
    {
     "id": "P3",
@@ -2249,6 +2249,14 @@
     [
      "watch",
      "SEQUENCED AS P6 (Ananth, 2026-09-09): the tool/capabilities manifest moves to PERSISTENCE with a UX so a tool change needs no deploy; access provisioning becomes its own model rather than riding the subscription table; and the turn RETRIEVES its tools \u2014 Ananth's mechanism: 'a simple even vector search for tool... this will cut short on tokens and make a real good determination and make the latency also faster.' Three effects measured separately: fewer prompt tokens (direct cost, countable today), better selection (P3's funnel is the before-measurement), lower latency (a consequence of the first two, NOT an independent claim). Follows P3 and cannot lead it: retrieval changes WHICH tools are offered, so shipping it while selection is still sporadic makes every miss unattributable \u2014 the exact ambiguity P3 exists to resolve. pgvector; a catalogue this small may not need an index at all \u2014 measure first."
+    ],
+    [
+     "good",
+     "THE THREE STAGE-0 INSTRUMENTS ARE WRITTEN (chat, 2026-09-09), and building them surfaced three defects that would have made the instrument LIE. (1) tool.offered now records tool NAMES, sourced from the composer itself (get_manifest_tool_names) rather than a parallel list that would drift from what the model actually sees. __unfiltered__ is KEPT alongside the names, because 'no filter applied' and 'the filter permitted everything' are different facts about policy and only the sentinel separates them. (2) _allow(name) returning True DOES NOT MEAN THE TOOL WAS RENDERED \u2014 a registry block can come back empty, so a permitted-but-absent tool would have read as 'offered'. Recording is now conditional on non-empty output. (3) _APPEALS_BLOCK IS GATED ON ONE KEY BUT DOCUMENTS FIVE CALLABLE TOOLS (appeals_find_carc, _lookup_rules, _get_playbook, _validate_claim, _assemble_letter). Recording only the gate key would have shown appeals_get_playbook as NEVER OFFERED on the 3 turns the model called it \u2014 the funnel would have reported 'called a tool that was never offered', an artefact of the instrument rather than a fact about the turn. THE UNFILTERED MANIFEST IS 28 TOOLS, NOT 24."
+    ],
+    [
+     "bad",
+     "OWNER(chat): A RECOVERED PARSE FAILURE COSTS A FULL EXTRA LLM ROUND AND LEAVES NOTHING QUERYABLE. Found by Chat Master 2026-09-09 while splitting __none__. There IS a format-correction retry, and when it SUCCEEDS the code only calls emit() \u2014 which goes to the turn's thinking chunks, never to logs or any queryable store. The logger.warning fires ONLY when the retry ALSO fails. So 'zero parse-failure warnings in 24h' was never evidence of zero parse failures: it was evidence of zero UNRECOVERED ones, and the recovered population \u2014 the expensive one, one extra round each \u2014 was invisible by construction. This is why Ananth's json-formatting hypothesis could not be tested, and it is a textbook could-not-check-vs-checked-false: a silent success path that costs money. Now counted as __unparseable_recovered__, distinct from __none__ (planner chose not to act) and __unparseable__ (planner acted, we dropped it)."
     ],
     [
      "bad",
