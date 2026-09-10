@@ -77,7 +77,28 @@ The deployed service serves its own manifest at `GET /chat/skills-manifest` [LIV
 
 [MEASURED: tool signatures counted as lines matching `^[a-z][a-z0-9_]*\(`, split at the
 `── Auto-discovered tools (from MCP) ──` header at manifest line 413.]
-[ESTIMATE for tokens: chars/4. Chat Master's `count_tokens` measurement of the static
+**🔴 MEASURED 2026-09-10 — the production render is 14,271 tokens.** `count_tokens`
+(gemini-2.5-flash) on the full live `/chat/skills-manifest` payload. **My chars/4
+estimate of 13,426 was 5% LOW**, and every token figure I quoted in §§8–15 was the
+estimate. The Tool Selection seat asked for the provenance of the number before
+depending on it, which is the right instinct and is why this is now measured rather
+than assumed.
+
+**Reconciliation of the three figures that have circulated**, so nobody has to re-derive
+it:
+
+| figure | what it is |
+|---|---|
+| **14,271** | `count_tokens`, **full production render** — the number to use |
+| 13,594 | chars/4 of the raw 54,376-byte HTTP body (Tool Selection seat's snapshot) |
+| 13,426 | chars/4 of the 53,705-char page text |
+| 13,062 | chars/4 of the **57 tool blocks only** — excludes 1,456 chars of section headers and framing prose. This is the figure used in §§13–15's reduction percentages. |
+
+The §§13–15 **percentages** are unaffected — they are ratios of block text to block text —
+but the absolute token counts in those tables are chars/4 of blocks and run ~9% below a
+measured full-render figure.
+
+[Original estimate note retained: chars/4. Chat Master's `count_tokens` measurement of the static
 half was 8,137 against a chars/4 estimate of 8,110 — 0.3% apart — so chars/4 is a sound
 approximation here, but these are **not** measured token counts.]
 
