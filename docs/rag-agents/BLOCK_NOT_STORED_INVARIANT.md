@@ -178,3 +178,86 @@ current handler that satisfies it.
 ### Extension (this seat)
 - Re-run the clean-PDF repro against `00030-5p7` + post-deploy `e6b153e`/`185f426`; report whether the sync-indeterminate coin-flip drops and whether "not stored → duplicate" still reproduces. _(pending deploy)_
 - No extension change needed for the invariant itself — the card copy already tells the truth per verdict. _(done)_
+
+---
+
+## Chat Master — answers to (a) and (b), pre-filed 2026-09-09
+
+### (a) Forward-then-gate ordering on the DEPLOYED revision — CONFIRMED
+
+Re-verified against the deployed commit, **not** my working tree, which is
+several commits ahead of production. That distinction matters here: the AST
+evidence quoted above came from the working tree, so on its own it proved
+nothing about what is running.
+
+`mobius-chat-00975-bpc` = commit `9a84923`. Parsed `git show 9a84923:app/main.py`:
+
+```
+_handle_instant_rag_upload : 1462-2052
+_run_hipaa_gate_sync       : 1204-1459
+
+  L1568  POST bytes -> rag /upload            <- forward
+  L1684  _run_phi_classification_async(...)   <- duplicate branch
+  L1715  return _dup_resp                     <- RETURNS
+  L1756  _run_hipaa_gate_sync(...)            <- gate, never reached on that path
+  L1415  purge DELETE                         <- INSIDE the gate (1204-1459)
+```
+
+**Ordering stands on the running revision.** Bytes reach rag 188 lines before
+any verdict; the purge is reachable only from inside the gate function; and the
+409-duplicate branch returns 41 lines before the gate is called.
+
+Line numbers differ from the working-tree figures quoted earlier in this doc
+(1638/1826/1785) because of intervening commits. **The structure is identical.**
+
+### (b) Blast radius of moving the purge to the block decision point
+
+**Small, and smaller than leaving it where it is.**
+
+The purge is one call — `DELETE {rag_url}/documents/{id}` — currently at
+`_run_hipaa_gate_sync`'s step 7, reachable only when that function reaches its
+own blocked branch. Moving it to the block *decision* point means calling it
+wherever `gate_result["blocked"]` becomes true.
+
+There are **four** such points, and they already funnel through a single `if
+gate_result.get("blocked"):` in `_handle_instant_rag_upload`:
+
+| verdict | decided | purges today |
+|---|---|---|
+| `blocked_phi` | inside the gate | yes |
+| `blocked_indeterminate` (real verdict) | inside the gate | yes |
+| `blocked_indeterminate` (catch-all) | outside | **no** |
+| `blocked_publish_failed` | outside | **no** |
+| `blocked_unconfigured` | outside — gate never runs | **no** |
+
+So the change is: hoist the DELETE out of the gate's step 7 into that single
+`if blocked:` block, and make it idempotent-safe (a second DELETE of an
+already-deleted doc must be a no-op, not an error). One call site becomes one
+call site; the difference is which scope it sits in.
+
+**What it does not fix, and must not be mistaken for fixing:**
+
+1. **The duplicate path still bypasses the gate entirely** (L1684→L1715). Purging
+   correctly on block does not help a request that never reaches a block
+   decision. That needs the duplicate branch to consult the prior verdict.
+2. **rag's cleanup branch is guarded on `chunks_count == 0`**, which is false
+   precisely when a blocked doc got chunked — the case that matters. Master
+   RAG's half; a chat-side purge does not remove the need for it.
+3. **A purge is not a substitute for not forwarding.** Bytes still reach rag
+   before any verdict, so there is always a window in which unscreened content
+   exists in the store. Purging closes the window; it does not remove it.
+
+**My recommendation** is (b) plus the duplicate-branch check, and explicitly NOT
+"stop forwarding until after the gate" — the gate reads the extracted text from
+rag's `/pages`, so it cannot run before rag has the document. Forward-then-gate
+is load-bearing, not an accident. The invariant to restore is *"a blocked
+document does not survive the request"*, not *"unscreened bytes never reach
+rag"*, which the current architecture cannot offer.
+
+### One correction to the framing above
+
+The table quoted from me says three verdicts fail to purge. Two of those three —
+`blocked_publish_failed` and `blocked_unconfigured` — **I added today**, in
+`185f426` and `e6b153e`. I improved the attribution of those paths and inherited
+the invariant violation without noticing. Both are held undeployed pending
+Ananth's word, so the fix can land with them rather than after them.
