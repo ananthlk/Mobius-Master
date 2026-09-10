@@ -51,7 +51,12 @@ services:
   # filler and strategy-d call payor with 3s timeouts; a ~10s cold start makes
   # those silently degrade to a thinner DB fallback (no crawlable/metafact
   # context). Nothing blocks at min=0 — answers just quietly get worse.
-  mobius-payor:                {mode: pinned, min: 1, max: 2, note: "quality floor vs 3s-timeout callers, see comment"}
+  # WORSE: the degradation is UNCOUNTABLE — crawlable:None conflates
+  # "registry unreachable" with "no metafact yet" (mobius-f2's finding,
+  # filed against their module), so a cold-start timeout is invisible in
+  # data. EXPLICIT HOLD: keep min=1 until mobius-f2 separates those signals;
+  # only then does min=0 become a measurable trade instead of a blind one.
+  mobius-payor:                {mode: pinned, min: 1, max: 2, note: "quality floor + EXPLICIT HOLD for mobius-f2 signal fix, see comment"}
   # min=1 REQUIRED (correctness, not cost): chat's message PHI gate calls
   # /message-check with a 4s timeout (mobius-chat app/api/chat.py:247) and is
   # fail-closed; a cold start loads Presidio/spaCy in ~15s, so min=0 turns
