@@ -31,6 +31,18 @@ _2026-09-09 · lane coordinator: Extension · full detail in `USER_FETCH_PAIRING
 
 **Attribution correction (RAG):** `persist_allowed` is the **PHI classifier's** proposal, not RAG's (Extension mis-said "your persist_allowed" to RAG — corrected here).
 
+### Review round COMPLETE — all four seats endorse (classifier's sign-off landed 2026-09-10)
+
+The classifier (author of the design) formally endorsed and added three refinements — **none block the decision:**
+
+1. **Scope: NAME-only to start; hold `address` out.** A patient home address is a stronger identifier than a bare name, and the address FPs seen are business-context contact blocks already cleared by deterministic/origin-scope — not an override case. The demonstrated need (Healthy-Start PDF) is name-only. Add `address` later only on a concrete case deterministic can't reach. **→ the initial `overridable` is name-only, no structured ID, no contextual PHI.**
+
+2. **REQUIRED build constraint (classifier owns it): `overridable` must not ride a SKIPPED LLM check.** Their latency optimization skips the LLM when a strong identifier is present — and `name` is strong, so a name-only doc currently skips it. But "no contextual PHI" requires the LLM to have actually RUN ("could-not-check ≠ checked-false"). So for a name-only candidate they suppress the strong-skip, RUN the LLM, and set `overridable=true` only on a POSITIVE no-contextual-PHI result; LLM can't run → `overridable=false` (fail-closed). Safety property of their emit; doesn't change the decision. (Composes with Chat's server-authoritative read: chat reads the gate's LLM-verified `overridable`.)
+
+3. **The audit log is now a COMPLIANCE REQUIREMENT, not just provenance.** Honest residual, stated plainly: **`overridable` DOES admit a bare patient NAME (no other identifier) if the user attests it isn't patient data.** That is the name-only class — bounded and acceptable (lowest-risk identifier; anything harder is never overridable; user-attested) **only IF audited.** The override shifts responsibility to the user; the audit (`task_id, origin, doc-hash, "not_patient_data", user, timestamp`, joined to RAG's `phi_override{classifier_version}`) is what makes that responsibility real and traceable if someone wrongly overrides real PHI. **So the audit log is a gating control, not an enhancement — the override does not ship without it.**
+
+**Honest line for Ananth's decision:** this is not "zero risk." A real patient name with no other identifier *could* be admitted if a user wrongly attests. It is bounded to the lowest-risk identifier, never reaches anything harder, and the required audit makes every such act attributable and reversible. That is the trade the override makes — unblock the provably-not-PHI class, accept a narrow user-attested-name residual under audit.
+
 ---
 
 ## Override feasibility — CONFIRMED by the classifier owner (2026-09-09)
