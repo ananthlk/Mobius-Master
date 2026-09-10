@@ -15,7 +15,7 @@ deliberately not yet asked because P4 has not opened. Per-phase status below is
 hand-maintained in `refactor_roadmap.py`'s `PHASE_STATUS`, because completion is a
 judgement about a gate, not something derivable from the findings file.
 
-**130 bugs · 86 sequenced into 6 phases · 40 explicitly outside · 0 UNSEQUENCED · 26 of the 86 sequenced have NO OWNER**
+**131 bugs · 87 sequenced into 6 phases · 40 explicitly outside · 0 UNSEQUENCED · 26 of the 87 sequenced have NO OWNER**
 
 > The two counts are different questions and the second one used to be invisible.
 > `UNSEQUENCED` was previously printed as "unassigned", which reads as *nobody owns
@@ -30,7 +30,7 @@ judgement about a gate, not something derivable from the findings file.
 |---|---|---:|---|---|---|---|
 | **P1** | Delete | 14 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☑ **COMPLETE** 2026-09-08 — ~31,900 lines removed across P1.1/P1a/P1b/P1c/P1d, zero regressions |
 | **P2** | Make absent producers detectable | 33 | chat + Eval | every segment timed AND each timed segment's attribution verified against a known-external call — an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☑ **COMPLETE** 2026-09-09 — P2a planner orphans, P2b latency telemetry deployed with spans bound to schema node keys |
-| **P3** | One decision point | 19 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ◐ **IN PROGRESS** — `state_load` closed (StateUnavailable + first contract tag); `tool_manifest` opened 2026-09-09 |
+| **P3** | One decision point | 20 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ◐ **IN PROGRESS** — `state_load` closed (StateUnavailable + first contract tag); `tool_manifest` opened 2026-09-09 |
 | **P4** | Split | 16 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
 | **P5** | Config UX | 4 | chat + Prompt Studio | max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped | — | ☐ not started — and correctly so; Prompt Studio has deliberately not been asked to sign yet |
 | **P6** | Tool selection | 0 | chat + Prompt Studio | manifest editable without a deploy; tools offered per turn: ALL -> a retrieved subset; prompt tokens spent on the manifest: measured before, lower after; tool-selection accuracy NOT worse than the P3 baseline; and the retrieval decision is INSPECTABLE — given a situation, the UX shows which tools were selected and why, and a real past turn can be asked the same question | — | ☐ not started — blocked on P3 `tool_manifest` closing; (c) needs P3's Stage 0 funnel as its baseline |
@@ -42,7 +42,7 @@ in `Blocks` have passed their gate.
 
 | Owner | Sequenced bugs |
 |---|---:|
-| chat | 56 |
+| chat | 57 |
 | unassigned-owner | 26 |
 | me | 4 |
 
@@ -125,7 +125,7 @@ GATE AMENDED 2026-09-09, Chat Master's finding, from having executed it rather t
 | ☐ | `tool_manifest` | chat | THE ONLY LIVE CONSUMER OF THE TOOL-RESULT STORE IS THE ONE THAT EMPTIES IT |
 | ☐ | `tool_manifest` | chat | STAGE 0 COULD NOT NAME THE LAYER, AND THE REASON IS THE FINDING — TWO OF THE FOUR FUNNEL STAGES HAVE NO INSTRU |
 
-## P3 — One decision point  ·  19 items
+## P3 — One decision point  ·  20 items
 
 **Owner** chat · **ratifier** Tech Review
 **Gate** modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target  
@@ -150,6 +150,7 @@ GATE AMENDED 2026-09-09, Chat Master's finding, from having executed it rather t
 | ☐ | `run_pipeline` | chat | THE MASTER_OBJECTIVE GAP — filed at Ananth's direction, 2026-09-08, and IT IS A DATED REGRESSION, not a design |
 | ☐ | `state_load` | chat | ROOT CAUSE OF THE PER-READ OVERHEAD — EVERY POOLED ACQUIRE RUNS `SELECT 1` AND A COMMIT |
 | ☐ | `state_load` | chat | state_load IS 1.2s AT p50 AND IT IS ALL SEQUENTIAL DB READS — measured 2026-09-09 from turn_spans, the first f |
+| ☐ | `tool_manifest` | chat | THE LEADING L2 HYPOTHESIS — MANIFEST SIZE DEGRADES SELECTION, AND IT IS CHEAPLY TESTABLE BEFORE ANY RETRIEVAL  |
 | ☐ | `tool_manifest` | chat | THE MODEL NARRATED A TOOL MISS AS A BROKEN TOOL, IN PRODUCTION, VERBATIM |
 | ☐ | `tool_manifest` | chat | TOOL SELECTION IS SPORADIC, AND THE MODEL NARRATES A MISS AS A BROKEN TOOL |
 | ☐ | `tool_manifest` | chat | A TOOL RETURNED A REAL PLAYBOOK AND CHAT REPORTED THERE WAS NONE |

@@ -57,7 +57,7 @@
     "owner": "chat",
     "gate": "modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target",
     "blocks": "P5",
-    "n": 19
+    "n": 20
    },
    {
     "id": "P4",
@@ -4683,6 +4683,10 @@
     ],
     [
      "bad",
+     "OWNER(chat): THE LEADING L2 HYPOTHESIS \u2014 MANIFEST SIZE DEGRADES SELECTION, AND IT IS CHEAPLY TESTABLE BEFORE ANY RETRIEVAL IS BUILT. Ananth, 2026-09-10: 'this is the same issue we have had.. we have way too many tools and react is not able to parse it well.' The post-deploy funnel makes it concrete: appeals_get_playbook was OFFERED and NOT CALLED on a question it answers, while the model called appeals_lookup_rules twice and rag once. And chat found the production manifest offers FIFTY-EIGHT tools, not the 28 a local render shows \u2014 MCP tools register in prod \u2014 so the planner is choosing from roughly twice the catalogue we had measured, on a prompt where the manifest is already 35.8%-or-more of every token it reads. THE EXPERIMENT, and it is the whole point of doing it first: re-run the same query with a REDUCED manifest \u2014 the appeals block plus rag, nothing else \u2014 and see whether appeals_get_playbook gets called. Two outcomes, both decisive. If it IS called, manifest size is the mechanism and P6's retrieval premise is validated on evidence rather than argument, with a measured selection delta as its baseline. If it is STILL NOT called, size is NOT the mechanism and the cause is in the tool's DESCRIPTION or the planner prompt \u2014 which is a different and much cheaper fix, and P6 would have been built against the wrong theory. This costs one turn and it gates a phase, so it runs BEFORE the phase. Related: the manifest's own text never tells the model that appeals_get_playbook is the deadline/submission tool in preference to appeals_lookup_rules \u2014 tool_manifest.py:258-268 says PREFER THIS over rag, and says nothing about preferring it over its own sibling.HYPOTHESIS LARGELY DISPLACED WITHIN THE HOUR \u2014 I READ THE MANIFEST TEXT AND IT INSTRUCTS THE MODEL TO MAKE EXACTLY THIS MISTAKE. tool_manifest.py:250-256, the entry for appeals_lookup_rules, reads: 'USE when: user supplies a CARC number ('CARC 22', 'CARC 29', etc.) and asks HOW TO APPEAL... Use for: 'how do I appeal CARC 22'... 'rules for CARC 29 timely filing denial FROM SUNSHINE HEALTH'.' Ananth's query was 'how do i appeal a carc 197 denial for sunshine health' \u2014 a NEAR-VERBATIM MATCH for that tool's own documented examples, PAYOR INCLUDED. Meanwhile appeals_get_playbook (:258-268) says only 'PREFER THIS OVER RAG' \u2014 over rag, and NOTHING about preferring it over its own sibling. So the model did not fail to parse 58 tools; IT FOLLOWED THE MANIFEST CORRECTLY AND THE MANIFEST IS WRONG. The two appeals tools have overlapping trigger phrasing, one of them claims this exact sentence shape, and nothing disambiguates them. THIS REFRAMES THE NODE: the defect is not selection under load, it is that a hand-written catalogue has no mechanism to keep two sibling entries from claiming the same query \u2014 and no test could have caught it, because the manifest is prose. Ananth's size hypothesis is still worth the one-turn reduced-manifest experiment as a control, but it is no longer the leading explanation. AND IT SHARPENS P6: retrieval over a catalogue whose descriptions overlap would retrieve the WRONG tool CONFIDENTLY and faster \u2014 the descriptions have to be disambiguated before or as part of retrieval, not after."
+    ],
+    [
+     "bad",
      "OWNER(chat): THE MODEL NARRATED A TOOL MISS AS A BROKEN TOOL, IN PRODUCTION, VERBATIM. From the same turn, round 2 reasoning: 'LEARNED: The previous attempt to call appeals_lookup_rules and appeals_get_playbook resulted in an Unknown tool error, despite these tools being explicitly listed as available. This suggests a transient issue or misinterpretation of the tool availability. RESTRATEGIZE: I will proceed by calling these tools again.' NO UNKNOWN-TOOL ERROR OCCURRED \u2014 both calls reported done and 'Rules loaded for CARC 197'. The model invented a tooling failure to explain an empty result, then burned a round retrying the identical call. This is the filed finding confirmed on live traffic, and it is worse than filed: the fabricated diagnosis is PERSISTED IN THE REASONING TRACE, so anyone reading diagnostics later sees 'Unknown tool error' as though it happened.CONFIRMED AGAIN POST-DEPLOY 2026-09-10, now with telemetry proof rather than inference. The answer on Ananth's re-run CITES 'Unknown tool: appeals_lookup_rules' as a snippet. The telemetry says that tool ran TWICE, SUCCESSFULLY, returning no_sources both times. So the citation is a fabricated failure attached to a real answer. WARNING FOR ANY FUTURE READER, and Chat Master asked for this explicitly: DO NOT FILE THIS AS A DISPATCHER DEFECT. They started chasing a bug in _execute_tool on the strength of that citation and the funnel stopped them. The three-state verdict is what settles it \u2014 `success` alone could not have, because the tool did not fail. A fabricated citation is worse than a wrong answer: it survives into the artifact as evidence."
     ],
     [
@@ -4931,6 +4935,12 @@
      "deploy": null
     },
     {
+     "closed": false,
+     "owner": "chat",
+     "own": true,
+     "deploy": null
+    },
+    {
      "closed": true,
      "owner": "me",
      "own": false,
@@ -5151,7 +5161,7 @@
     [
      "functionality",
      "red",
-     "9 open defects (+5 tracked for other seats)"
+     "10 open defects (+5 tracked for other seats)"
     ],
     [
      "testability",
@@ -5175,7 +5185,7 @@
     ]
    ],
    "rating_was_typed": "red",
-   "rating_why": "functionality: 9 open defects (+5 tracked for other seats) \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: testability, error_handling, modularity)",
+   "rating_why": "functionality: 10 open defects (+5 tracked for other seats) \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: testability, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },
