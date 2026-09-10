@@ -214,6 +214,34 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:.05re
 
 <div class="note"><b>What is deliberately NOT an override.</b> The governor buying an extra round, the completion critic extending, the planner picking more tools, a model swap by the bandit, per-round depth (§6a) — those are <b>levers</b>. They exist to <i>hit</i> the promise, and they must never be able to change it. If a missed promise can be resolved by editing the promise, the promise is not a contract. <b>Rounds are not the SLA.</b></div>
 
+<h2>9a · The resolver — one module, and its output is a promise</h2>
+<p class="sub">The register (§9) is a list of who may speak. This is the module that listens, and the whole design rests on one property.</p>
+
+<div class="ov"><table>
+<tr><th>in</th><th>module</th><th>out</th></tr>
+<tr>
+<td><b>the base promise</b> for the tier (§7)<br><span class="sub">+ the turn's signals: message, caller args, tenant policy, thread history, platform health</span></td>
+<td><b><code>resolve_promise()</code></b><br><span class="sub">walks the six actors in precedence order 6&nbsp;&gt;&nbsp;5&nbsp;&gt;&nbsp;2&nbsp;&gt;&nbsp;1&nbsp;&gt;&nbsp;3&nbsp;&gt;&nbsp;4</span></td>
+<td><b>a promise</b><br><span class="sub">same shape — latency, cost, quality — plus <code>promise_version</code>, <code>overridden_by</code>, <code>reason</code></span></td>
+</tr>
+</table></div>
+
+<div class="note"><b>Output type == input type. That is the whole trick.</b> Because the resolver returns a promise and not a decision, <b>nothing downstream needs to know an override happened.</b> The governor, the planner, the extension gate, the integrator hand-off — all of them read a promise and behave identically whether it came from the tier default or from a tenant's standing cap. One code path, not two. An override is not a special case; it is a <b>different promise</b>.</div>
+
+<div class="note"><b>Resolve once, at the top of the turn, then freeze it.</b> Not per round, not per tool call. If the promise can move mid-turn there is no denominator for the breach record — a turn that ran 40s against a 31s promise that quietly became a 95s promise at round three has not been measured, it has been excused. The resolved promise is <b>immutable for the life of the turn</b>. Signals that arrive later (a user's follow-up, mounting frustration) apply to the <b>next</b> turn.</div>
+
+<div class="note"><b>It is a pure function, and that is what makes it testable alone.</b> No DB reads, no clock, no model call — signals in, promise out. Which means every row of §9 is a fixture: <i>tenant caps at 2¢ AND user says "think harder"</i> → asserts the tenant cap wins and <code>overridden_by = tenant</code>. The precedence table stops being prose and becomes a test suite. Same shape as the tool_manifest 2.0 build: <b>independent and self-sufficient first, integrated second.</b></div>
+
+<div class="ov"><table>
+<tr><th>step</th><th>what happens</th><th>writes</th></tr>
+<tr><td><b>1</b></td><td>tier default loaded from the codified promise (§7)</td><td><code>promise_version</code></td></tr>
+<tr><td><b>2</b></td><td><code>resolve_promise()</code> applies the register in precedence order</td><td><code>overridden_by</code>, <code>reason</code> — <b>null when nothing overrode</b>, which is itself the record that the default held</td></tr>
+<tr><td><b>3</b></td><td>the turn runs. Levers move freely — rounds, depth, tools, model — to <b>hit</b> the resolved promise</td><td>existing telemetry</td></tr>
+<tr><td><b>4</b></td><td>delivered latency / cost / quality compared to the resolved promise</td><td><b>the breach record</b> — one row when any term missed</td></tr>
+</table></div>
+
+<div class="note"><b>Step 2 must write even when nothing overrides.</b> A null <code>overridden_by</code> is not an absence — it is the assertion <i>the default was in force and here is which version</i>. Without that row, a breach cannot be attributed to a promise, and "we improved p50" is unfalsifiable: you cannot tell an improvement from a re-baselining. This is the same failure the program has found twelve times — a producer whose absence looks exactly like a legitimate default.</div>
+
 <h2>10 · Quality — the measured floor</h2>
 <div class="ov"><table>
 <tr><th>mode</th><th>turns</th><th>groundedness floor ran</th><th>passed</th><th>pass rate</th><th>budget-exhausted finalize</th></tr>
