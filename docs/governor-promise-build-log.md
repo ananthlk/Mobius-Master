@@ -11,6 +11,55 @@ Spec: `docs/governor-schema/index.html` (serve: `python3 -m http.server 8145 --d
 
 ---
 
+## 2026-09-10 (later still) — Chat Master answers §7; a dead publish terminal
+
+### `[READ]` Eight publish call sites, not ten — my error
+Chat Master, AST-verified, confirmed here independently:
+`_publish_completed` 4 (:889 :909 :988 :1090) · `_publish_failed` 4 (:836 :921
+:996 :1063) · `_publish_clarification_or_refinement` **0**.
+My own table already showed `—` on the clarification row; **the prose count
+contradicted my own table and I published it anyway.** Every other `[READ]` line
+number in the work order checks out, including the early return at :1384-1385.
+
+### `[READ]` `_publish_clarification_or_refinement` is DEAD — 209 lines, zero production callers
+Orphaned by `f2aac16` *"remove use_react, delete the classic path (2,181
+lines)"*. Clarification/refinement was the classic path's terminal; the ReAct
+path has no clarify step (`:817` logs that).
+
+**Two things kept it looking alive:**
+1. `run_pipeline`'s docstring at `:430` still advertises *"clarification,
+   refinement, or completed"* — **the function documents an outcome that can no
+   longer occur.**
+2. **`tests/test_orchestrator.py:279` calls it directly, and passes.** 209 lines
+   of unreachable production code carry green coverage.
+
+`[DESIGN]` **New instance of a known family:** *a test that calls a function
+directly cannot tell you whether the pipeline can reach it.* Green coverage on
+dead code is worse than no coverage — it is what let a whole terminal survive a
+2,181-line refactor unnoticed. Related to
+`feedback_test_file_disables_its_own_gate` but distinct: the test works
+perfectly, it just tests something nothing can reach.
+
+### `[DESIGN]` Accepted from Chat Master — `ctx.publish_outcome` carries the CALL SITE
+The terminals are not distinguished in telemetry, so *"which of the eight
+fired"* is unanswerable from existing data — which is also why nobody can yet
+say whether all eight live sites fire in production. With the site included,
+step 3 can say *failed* **and where**; without it, only *failed*.
+
+### `[OPEN]` Chat builds are on HOLD pending Ananth — step 1 is not started
+Chat Master is holding four specified MCP fixes on the same hold, relayed via
+the Browser Extension seat. **They correctly declined to treat my work order's
+"on Ananth's word" as lifting a build hold** — that phrase authorised the order,
+not the hold. A hold is not a peer's to lift in either direction. **Needs
+Ananth.** Everything above was done without writing code.
+
+### `[OPEN]` Signature mismatch, flagged not resolved
+The reply came from the session titled **Chat Master** but signed **"Payor
+Policy Agent."** Not acted on; raised with them. Cross-wired identity has bitten
+this fleet before (`feedback_fact_store_identity_crosswire`).
+
+---
+
 ## 2026-09-10 (later) — dev spend separated; the cost leg is not blocked
 
 ### `[RULED]` Ananth — `lexicon_triage` and `rag_fact_check` are DEVELOPMENT cost, not per-turn
