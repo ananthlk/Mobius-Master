@@ -11,6 +11,59 @@ Spec: `docs/governor-schema/index.html` (serve: `python3 -m http.server 8145 --d
 
 ---
 
+## 2026-09-10 (latest+2) — the unifying rule, and it is now enforced
+
+### `[DESIGN]` A RULE THAT EXISTS ONLY AS A COMMENT IS NOT A RULE
+This unifies four separate findings from today better than any of them stands
+alone:
+
+| artifact | asserted | enforced |
+|---|---|---|
+| `PROMISE_VERSION` — *"never edit a version''s values in place"* | a comment | **nothing** |
+| `run_pipeline:430` docstring — *"clarification, refinement, or completed"* | an outcome | **impossible** |
+| `test_orchestrator.py:265` — header *"directly-testable"* | coverage | **209 unreachable lines** |
+| *"Builtins win; MCP tool not registered"* | a cause | a **false** cause beside a true event |
+
+**Why this shape persists, and it is the part worth keeping:** each artifact is
+**evidence to the next reader**. A docstring and a green test agreeing a path is
+alive is *stronger testimony than silence* — so the reader who might have
+noticed instead gets confirmation. That is how a whole publish terminal survived
+a 2,181-line refactor.
+
+### `[READ]` Now enforced, verified firsthand — `153174b`
+Three tests, +52 lines:
+- **`test_v1_terms_are_frozen`** — failure message says *add a v2, do not update
+  this expectation*, because updating it **is** the defect.
+- **`test_the_tier_map_is_frozen_too`** — `_TIER_BY_MODE` frozen as well.
+  **Chat''s catch, not mine:** re-pointing `agentic` at `normal` changes the
+  promise as effectively as editing a number. I had only been thinking about the
+  numbers.
+- **`test_every_tier_in_the_map_has_terms`** — a mapped tier with no terms would
+  `KeyError` **at POST, on the user''s request path**, not in a background job.
+
+All three `pytest.skip` once `PROMISE_VERSION` moves past v1 — so the freeze
+**constrains without blocking a legitimate bump.** That is the right shape: a
+guard that cannot be satisfied by editing the guard.
+
+### `[DESIGN]` Chat''s pushback on my error-ledger entry 9 — accepted, and it sharpens it
+I logged "a correct conclusion held for a weak reason is indistinguishable from
+the inside from a wrong one." Their correction: the reason they engaged rather
+than took the exit is that **§7a stated the claim precisely enough to be
+checkable** — *"promised and delivered side by side in one row"* gave them
+something to test their own design against. **A vaguer version would not have
+survived my own offer to withdraw it.**
+
+So the failure mode is real, but the countermeasure needs both halves:
+- **mine:** state the strongest version of the argument *before* offering the out
+- **theirs:** when offered an out, check whether you are taking it because the
+  argument is weak or because **agreement is cheaper**
+
+`[DESIGN]` **The general principle: precision is what survives your own doubt.**
+A claim stated precisely enough to be checked can be rescued by the reader; a
+vague one dies with its author''s confidence.
+
+---
+
 ## 2026-09-10 (latest+1) — the class swept: 16 fields, and one costs a DB write per turn
 
 ### `[MEASURED]` Chat swept all 80 `PipelineContext` fields (`86d34dd`); I verified the expensive one
