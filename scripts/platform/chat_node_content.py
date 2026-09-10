@@ -279,8 +279,15 @@ that is the file it lives in, and lost it from the node whose assessment it reco
          "design, so the 3.6-4.2s phi_classify figure NEVER applied to it: phi_classify "
          "is the bandit LLM stage and fires only on /classify and /redact. NO TIMEOUT "
          "CHANGE IS WARRANTED ON ANY OF THE THREE PATHS. The defect that remains is "
-         "purely the SHAPE — make all three configurable, one name per path, and keep "
-         "the message default at 4."),
+         "purely the SHAPE — make all three configurable, one name per path. FIX SPEC, "
+         "agreed with the phi-classifier seat and recorded so nobody re-derives it: "
+         "message 4s (7x headroom on a measured 561ms p95), upload 45s (8x headroom on "
+         "a measured 5.66s worst case), feedback 4s (no problem raised). EVERY CURRENT "
+         "VALUE IS CORRECT — this is a naming and tunability defect, not a numbers "
+         "defect, and whoever implements it must not take the opportunity to change a "
+         "value. The residual cold-start exposure on the message path is held off by "
+         "min-instances, not by the timeout, and is closed separately in fleet.yaml "
+         "c3688b7."),
  ("bad", "OWNER(fleet-power seat): A HIPAA GATE'S CORRECTNESS DEPENDS ON A SCALING "
          "SETTING, AND THE SETTING'S NOTE ONLY JUSTIFIES ITS COST. The chat message "
          "gate times out at 4s. mobius-phi-classifier loads Presidio/spaCy in roughly "
