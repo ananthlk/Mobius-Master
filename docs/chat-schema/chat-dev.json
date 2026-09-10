@@ -54,7 +54,7 @@
     "id": "P6",
     "name": "Tool selection",
     "owner": "chat + Prompt Studio",
-    "gate": "manifest editable without a deploy; tools offered per turn: ALL -> a retrieved subset; prompt tokens spent on the manifest: measured before, lower after; tool-selection accuracy NOT worse than the P3 baseline",
+    "gate": "manifest editable without a deploy; tools offered per turn: ALL -> a retrieved subset; prompt tokens spent on the manifest: measured before, lower after; tool-selection accuracy NOT worse than the P3 baseline; and the retrieval decision is INSPECTABLE \u2014 given a situation, the UX shows which tools were selected and why, and a real past turn can be asked the same question",
     "blocks": null,
     "n": 0
    }

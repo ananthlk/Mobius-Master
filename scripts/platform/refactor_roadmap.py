@@ -97,7 +97,10 @@ PHASES = [
      "ratifier": "Tech Review + Eval",
      "gate": "manifest editable without a deploy; tools offered per turn: ALL -> a "
              "retrieved subset; prompt tokens spent on the manifest: measured before, "
-             "lower after; tool-selection accuracy NOT worse than the P3 baseline",
+             "lower after; tool-selection accuracy NOT worse than the P3 baseline; "
+             "and the retrieval decision is INSPECTABLE — given a situation, the UX "
+             "shows which tools were selected and why, and a real past turn can be "
+             "asked the same question",
      "blocks": None,
      "why": "SEQUENCED, NOT OUT OF SCOPE — Ananth, 2026-09-09, correcting my draft, "
             "which had parked these as 'enhancements'. They are real work with a real "
@@ -132,7 +135,41 @@ PHASES = [
             "EMBEDDING NOTE: pgvector is the standard; do not introduce a second "
             "vector store for a catalogue of this size. A tool catalogue is small "
             "enough that exact search over the whole set is viable — measure before "
-            "reaching for an index."},
+            "reaching for an index.\n\nTHE RETRIEVAL DECISION IS PART OF THE UX, "
+            "NOT A SEPARATE FEATURE — Ananth, 2026-09-09: 'that should be part of the "
+            "ux build given a situation what tools are selected.' The manifest UX is "
+            "not only an editor; it answers, for a given query, WHICH TOOLS THIS TURN "
+            "GETS AND WHY — the retrieved set, the scores, and what fell below the "
+            "cut. This is a correctness requirement. A retrieval step that silently "
+            "narrows the tool list is A PRODUCER WHOSE DECISION NOTHING RECORDS: when "
+            "the model then says it cannot do something, nobody can tell whether the "
+            "tool was withheld or the model failed to call it — which is exactly the "
+            "ambiguity P3 exists to remove, reintroduced one layer earlier, right "
+            "after we paid to remove it. So the per-turn retrieval decision must be "
+            "PERSISTED, not merely rendered: the UX previews it for a hypothetical "
+            "query, the turn record answers it for a real one. A preview that reads "
+            "live code while the log keeps nothing is a read-back of the wrong "
+            "artifact.\n\nTWO REPRESENTATIONS, NOT ONE — Ananth, 2026-09-09: 'it "
+            "allows a tool to fully represent itself, for selection, and a narrow set "
+            "of short react briefs travel with it.' This is the design, and it is what "
+            "makes the token claim and the accuracy claim compatible instead of in "
+            "tension. A tool gets a SELECTION REPRESENTATION, read only by the "
+            "retriever, matched against but NEVER SPENT AS PROMPT TOKENS — so it can "
+            "be long and complete: when to use it and when not, worked examples, "
+            "failure modes, the phrasings users actually type. And a REACT BRIEF, "
+            "short, which is the only part that travels into the prompt. Today there "
+            "is ONE representation doing both jobs, which is why it is bad at both: "
+            "every word that helps the model choose is paid for on every turn, so the "
+            "description gets trimmed for cost and selection gets worse. 694 lines of "
+            "that compromise. Splitting them removes the tension outright — which is "
+            "also why fewer tokens and better determination are ONE structural change "
+            "with two effects, not two wins to be counted separately. Two "
+            "consequences: the pair must be authored TOGETHER and stay consistent (a "
+            "rich selection text promising what the brief does not describe gets a "
+            "tool retrieved and then not called — P3's funnel with a new cause), so "
+            "the UX edits both side by side; and RETRIEVAL QUALITY BECOMES TESTABLE "
+            "ON ITS OWN, no LLM in the loop — given a query, does the right tool come "
+            "back? Fixture-and-assert, the cheapest test in this program."},
 ]
 
 # (phase, node or None for any, distinctive substring). First match wins.
