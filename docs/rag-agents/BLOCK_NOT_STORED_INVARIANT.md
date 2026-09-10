@@ -382,3 +382,43 @@ writers race the key; the loser hits a pkey collision, which must be handled as
 defer-write and idempotent-admission are the same work — and that same
 idempotency is what resolves `blocked_publish_failed`. Three problems, one fix,
 which is worth Master RAG knowing before scoping it as three.
+
+### Why the blob purge can never be designed away (PHI seat, and this is the stronger form)
+
+The blob's position before the verdict is **not incidental — it is necessary.**
+rag must have the bytes on disk to extract the text it classifies. *You cannot
+verdict a document you have not stored first.*
+
+So the blob provably exists during **every** classification, including every one
+that ends in a block. It is the one write that can never be deferred to
+admission, because admission is decided **from** it.
+
+That converts the conclusion from a fact about today's implementation into a
+permanent property:
+
+- **Defer-write** can move the KEY, because the key is not an input to
+  classification. → structural fix for the duplicate branch.
+- **Purge** is required for blob + row + chunks on every non-`persist_allowed`
+  outcome, **unconditionally and forever**. No ordering change can remove it.
+
+## Corrected net for the 4-way
+
+1. **(a)** Defer key-write to admission if rag can — structural; closes the
+   duplicate branch by making *key exists ⟺ admitted* true by construction.
+2. **(c)** Purge blob + row + chunks at the block decision point whenever
+   `persist_allowed == False` — **always**, because the blob exists by
+   necessity. (a) and (c) are both required and are **not** alternatives;
+   (a) removes the purge burden for the **key only**.
+3. **(b)** `persist_allowed` persisted as a stable per-doc field; the duplicate
+   branch serves `ready` only on a positive admission record, never on the
+   absence of a block flag.
+4. **(d)** `blocked_publish_failed` becomes a save-failure status, not a block;
+   cleaned by rag's rollback, not the gate purge — the document earned
+   admission and the store failed it.
+5. **(e)** Widen rag's `chunks_count == 0` cleanup guard, which is false
+   precisely when the document persisted.
+
+Also: defer-write and idempotent-admission are the same work (concurrent clean
+admissions race the key; the loser's collision must mean "already admitted →
+serve ready"), and that same idempotency resolves (d). **Three problems, one
+fix** — worth knowing before it is scoped as three.
