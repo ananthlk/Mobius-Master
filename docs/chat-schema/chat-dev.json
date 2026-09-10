@@ -43,7 +43,7 @@
     "owner": "chat",
     "gate": "lines removed; handler count down; ZERO invariant movement",
     "blocks": "P2, P4",
-    "n": 21
+    "n": 22
    },
    {
     "id": "P2",
@@ -5393,6 +5393,10 @@
      "CLOSED 2026-09-10 -- THE JOIN IS EXPLAINED, MY ORIGINAL HYPOTHESIS WAS RIGHT, AND I WITHDREW IT WRONGLY. Chat Master read the DEPLOYED IMAGE (Artifact Registry serves manifests and blobs to an access token, so layers pull with curl and open with tarfile -- no docker, no API enablement, no build). That escape was open all day and none of us tried it. REPRODUCED HERE INDEPENDENTLY, both halves. (a) The chat image runs mcp 2.2.0 AND mcp_types 2.2.0 -- I extracted the 213MB layer and listed the dist-info dirs. requirements.txt:113 says mcp>=1.0.0, which PERMITS 2.x; we tested 1.0.0, 1.2.0 and 1.26.0 -- THE VERSIONS WE CHOSE, NOT THE ONE DEPLOYED, and I then told two seats the SDK explanation was 'excluded at every permitted version'. (b) In 2.2.0 CallToolResult moved to a separate mcp_types package and the field was RENAMED: `is_error: Annotated[bool | None, Field(alias='isError')]`. Verified in a scratch venv on mcp==2.2.0: server sends isError=True -> r.is_error True, hasattr(r,'isError') FALSE, getattr(r,'isError',False) FALSE. That is exactly what mcp_manager.py:127 evaluates. So: server flags the error correctly -> client asks for an attribute that no longer exists -> getattr default -> (text, True) -> success branch -> SourceRef citing the error -> the :2792 text guard passes on the wrong literal -> the span records success. Every observation accounted for. SCOPE IS FAR WIDER THAN APPEALS: that getattr is UNCONDITIONALLY FALSE in this revision, independent of tool, server or error, so EVERY MCP CALL IS RECORDED AS A SUCCESS -- all 34 tools. tool.dispatched:success does not carry weak information for MCP tools here, it carries NONE; it is a constant. Appeals is merely where it became visible, because those are the calls that always fail. AND MY OWN AMENDMENT WAS INERT TOO, for a second reason: model_fields_set holds FIELD NAMES, NOT ALIASES -- measured, {'content','is_error'}, so 'isError' in model_fields_set is False and my proposed check would have shipped and changed nothing, exactly like the getattr-default fix it replaced. Two inert fixes proposed in one thread, both caught the same way: by testing against the deployed artefact instead of a local assumption. CORRECTED (1): pin mcp to 2.2.0 -- a range spanning a MAJOR version is the root enabler, since a silent major bump renamed a field the code depends on and nothing failed loudly -- then read result.is_error through the model rather than a getattr default on a name that is an API contract, failing CLOSED if neither name resolves; then _skill_success structured; then registry.py:312 sets success=False. THE LESSON IS THE ONE THAT WOULD HAVE SETTLED IT ON DAY ONE: a version range is not a version, a commit is not an image, and a local venv is not production -- READ THE THING THAT IS RUNNING. This also retires Chat Master's dirty-tree candidate: they extracted mcp_manager.py, mcp_adapter.py, react_loop.py and registry.py from the image and all four are IDENTICAL to 299519c."
     ],
     [
+     "bad",
+     "OWNER(chat + appeals seat): THE TWO ENDS OF ONE WIRE ARE A MAJOR VERSION APART ON THE SAME PROTOCOL LIBRARY, AND NEITHER SIDE IS WRONG ABOUT THE PROTOCOL -- THEY ARE WRONG ABOUT EACH OTHER. Chat Master's final framing, and it is the correct statement of the seam. chat runs mcp 2.2.0, where CallToolResult exposes `is_error` and `isError` is a serialization alias only; the appeals prototype runs mcp 1.30.0, where the attribute IS `isError`. The appeals server sets isError exactly as FastMCP's 1.x contract requires. Chat reads an attribute its own 2.x SDK renamed. BOTH ARE INTERNALLY CORRECT AND THE WIRE IS BROKEN BETWEEN THEM. Both depend on `mcp` with NO UPPER BOUND (chat requirements.txt:113 `mcp>=1.0.0`; appeals Dockerfile `mcp[cli]>=1.0,<2` -- note appeals DID bound the major and chat did not, which is why only chat crossed), so the two ends drifted a major version apart and nothing failed loudly. CONSEQUENCE FOR THE FIX: pin `mcp` on BOTH sides, not just chat's. And it gives the derive-from-what-you-own rule its final form: 'something chat owns' CANNOT INCLUDE A FIELD NAME IN A DEPENDENCY THAT A PEER SERVICE RESOLVES INDEPENDENTLY. Every mechanism chat had for deciding whether a remote tool failed was a value the peer controlled -- the wire flag, the error wording, the server's own isError -- and this adds a fourth that is subtler than the three: THE NAME OF THE FIELD ITSELF. Also the case study for the third standing check (Appeals'): name which side of a seam produced a behaviour before naming what it costs -- this defect was invisible from either end alone, because each end was correct on its own terms. Found 2026-09-10."
+    ],
+    [
      "good",
      "SETTLED BY READING THE APPEALS IMAGE -- the anyio-40 figure Appeals said could not be established from their source IS established, and their deadlock prediction now rests on a measured constant. Applying Chat Master's image-reading technique to mobius-appeals-prototype:pintest-20260908: the image carries anyio 4.15.1, starlette 1.6.0, fastapi 0.141.1, httpx 0.28.1, uvicorn 0.52.4, mcp 1.30.0. I then installed anyio==4.15.1 in a scratch venv: default thread limiter total_tokens == 40. So the 40-vs-80 mismatch against containerConcurrency=80 is REAL IN THE DEPLOYED IMAGE, not assumed from chat's venv, and my own caveat ('a library default read here is not the default running there') is now discharged rather than outstanding. Their Dockerfile still pins nothing but mcp, so the figure is true of THIS image and will move on any rebuild -- their eighth change (a pinned requirements file) remains the one that makes the other seven reproducible. Coherence check that also passes: appeals runs mcp 1.30.0, NOT 2.x, which is why their server sets isError correctly on the wire while chat cannot read it -- the rename bites only the 2.2.0 side. Two services, two SDK majors, one unpinned range each."
     ],
@@ -5497,6 +5501,12 @@
      "owner": "",
      "own": true,
      "deploy": "live"
+    },
+    {
+     "closed": false,
+     "owner": "chat + appeals seat",
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
@@ -5617,7 +5627,7 @@
     [
      "functionality",
      "red",
-     "9 open defects (+1 tracked for other seats)"
+     "10 open defects (+1 tracked for other seats)"
     ],
     [
      "testability",
@@ -5641,7 +5651,7 @@
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "functionality: 9 open defects (+1 tracked for other seats) \u00b7 error_handling: 19 of 29 handlers log-and-continue  (ok: testability, modularity, observability)",
+   "rating_why": "functionality: 10 open defects (+1 tracked for other seats) \u00b7 error_handling: 19 of 29 handlers log-and-continue  (ok: testability, modularity, observability)",
    "live_config": [
     {
      "name": "CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL",
