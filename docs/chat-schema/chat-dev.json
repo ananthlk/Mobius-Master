@@ -32,7 +32,7 @@
     "owner": "chat",
     "gate": "modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target",
     "blocks": "P5",
-    "n": 17
+    "n": 18
    },
    {
     "id": "P4",
@@ -317,6 +317,14 @@
     [
      "good",
      "FIXED (chat, 185f426, 2026-09-09): the wrapper no longer collapses every failure into one verdict. A publish failure now reports 'blocked_publish_failed' and carries the classifier's REAL verdict; fail-closed is untouched \u2014 a publish failure still blocks. Two causes in this area belong to other seats and are routed, not fixed here: rag's non-idempotent publish (9 occurrences/24h, PRE-DATES the chat deploy, so it is not a regression we introduced), and phi_classify tripping circuit breakers at 11.6s against a 3.4s ema. From this deploy on, a classifier timeout is attributable in the log instead of hidden inside a generic indeterminate."
+    ],
+    [
+     "bad",
+     "OWNER(chat): THERE IS NO SUCH THING AS 'THE PHI GATE TIMEOUT'. THREE CALL SITES, THREE DIFFERENT VALUES, ONE OF THEM NOT CONFIGURABLE AT ALL \u2014 and I conflated them when reporting to the phi-classifier seat, which nearly produced a wrong change. (1) UPLOAD gate, app/main.py:1307, POST /classify, timeout=45 HARDCODED. (2) MESSAGE gate, app/api/chat.py:247, POST /message-check, timeout=4.0 HARDCODED \u2014 no env var, cannot be tuned without a deploy, and it sits on the SYNCHRONOUS path before the user sees any acknowledgement. (3) FEEDBACK gate, app/skills/phi_gate.py:30, PHI_GATE_TIMEOUT_SEC default 4 \u2014 the only configurable one, and the least important. A single env var name that governs only the path nobody asked about is worse than none: it reads as the system's timeout knob and is not. FIX: one name per path, all three configurable, and the message gate's value chosen against MESSAGE latency, not document latency \u2014 they are different workloads and a document-sized budget on a message is a UX regression."
+    ],
+    [
+     "watch",
+     "PHI-CLASSIFIER SEAT RULED 2026-09-09 on the fail-open item: REFUSE. An unconfigured classifier means 'cannot screen, therefore refuse', never 'no screening required' \u2014 an unset URL yields NO VERDICT, which is the strongest case to block, not the exception allowed through. Must emit an attributable verdict (action='blocked_unconfigured'), never a silent skip. Chat implements. On latency they ruled 3.6-4.2s is EXPECTED not a regression \u2014 it is the LLM contextual pass on the ingestion critical path, a deliberate P0 choice, with regex+NER sub-second; the 11.6s tail is Vertex tail latency. They recommend 8s and will cut their p50 under ~3s. CAVEAT MINE, and it changes the recommendation: their 5.66s measurement was a 14KB DOCUMENT through the UPLOAD path, whose timeout is already 45s and was never 4s. The 4s they were warned about is the MESSAGE gate on a chat message \u2014 a different and much smaller workload. Their number does not size that budget, and neither does mine."
     ],
     [
      "bad",
@@ -636,6 +644,14 @@
     [
      "good",
      "FIXED (chat, 185f426, 2026-09-09): the wrapper no longer collapses every failure into one verdict. A publish failure now reports 'blocked_publish_failed' and carries the classifier's REAL verdict; fail-closed is untouched \u2014 a publish failure still blocks. Two causes in this area belong to other seats and are routed, not fixed here: rag's non-idempotent publish (9 occurrences/24h, PRE-DATES the chat deploy, so it is not a regression we introduced), and phi_classify tripping circuit breakers at 11.6s against a 3.4s ema. From this deploy on, a classifier timeout is attributable in the log instead of hidden inside a generic indeterminate."
+    ],
+    [
+     "bad",
+     "OWNER(chat): THERE IS NO SUCH THING AS 'THE PHI GATE TIMEOUT'. THREE CALL SITES, THREE DIFFERENT VALUES, ONE OF THEM NOT CONFIGURABLE AT ALL \u2014 and I conflated them when reporting to the phi-classifier seat, which nearly produced a wrong change. (1) UPLOAD gate, app/main.py:1307, POST /classify, timeout=45 HARDCODED. (2) MESSAGE gate, app/api/chat.py:247, POST /message-check, timeout=4.0 HARDCODED \u2014 no env var, cannot be tuned without a deploy, and it sits on the SYNCHRONOUS path before the user sees any acknowledgement. (3) FEEDBACK gate, app/skills/phi_gate.py:30, PHI_GATE_TIMEOUT_SEC default 4 \u2014 the only configurable one, and the least important. A single env var name that governs only the path nobody asked about is worse than none: it reads as the system's timeout knob and is not. FIX: one name per path, all three configurable, and the message gate's value chosen against MESSAGE latency, not document latency \u2014 they are different workloads and a document-sized budget on a message is a UX regression."
+    ],
+    [
+     "watch",
+     "PHI-CLASSIFIER SEAT RULED 2026-09-09 on the fail-open item: REFUSE. An unconfigured classifier means 'cannot screen, therefore refuse', never 'no screening required' \u2014 an unset URL yields NO VERDICT, which is the strongest case to block, not the exception allowed through. Must emit an attributable verdict (action='blocked_unconfigured'), never a silent skip. Chat implements. On latency they ruled 3.6-4.2s is EXPECTED not a regression \u2014 it is the LLM contextual pass on the ingestion critical path, a deliberate P0 choice, with regex+NER sub-second; the 11.6s tail is Vertex tail latency. They recommend 8s and will cut their p50 under ~3s. CAVEAT MINE, and it changes the recommendation: their 5.66s measurement was a 14KB DOCUMENT through the UPLOAD path, whose timeout is already 45s and was never 4s. The 4s they were warned about is the MESSAGE gate on a chat message \u2014 a different and much smaller workload. Their number does not size that budget, and neither does mine."
     ],
     [
      "bad",

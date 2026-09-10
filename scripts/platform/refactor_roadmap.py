@@ -215,6 +215,7 @@ RULES = [
     ("P2", "react_loop", "_rich_evidence IS AN UNRECORDED BRANCH"),
     ("P2", "PHI gate", "'blocked_indeterminate' IS AMBIGUOUS BY CONSTRUCTION"),
     ("P3", "PHI gate", "THE GATE FAILS OPEN ON MISCONFIGURATION"),
+    ("P3", "PHI gate", "THERE IS NO SUCH THING AS 'THE PHI GATE TIMEOUT'"),
     ("P2", "llm_manager", "45% OF llm_calls ROWS CANNOT BE JOINED"),
     ("P1", "run_pipeline", "~25 FRONTEND FETCHES ARE 404ing TODAY"),
     ("P1", "run_pipeline", "DELETING THE CREDENTIALING PLANNER PATH WOULD SILENTLY BREAK"),

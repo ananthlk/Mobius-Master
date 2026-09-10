@@ -15,7 +15,7 @@ deliberately not yet asked because P4 has not opened. Per-phase status below is
 hand-maintained in `refactor_roadmap.py`'s `PHASE_STATUS`, because completion is a
 judgement about a gate, not something derivable from the findings file.
 
-**104 bugs · 69 sequenced into 6 phases · 31 explicitly outside · 0 UNSEQUENCED · 26 of the 69 sequenced have NO OWNER**
+**105 bugs · 70 sequenced into 6 phases · 31 explicitly outside · 0 UNSEQUENCED · 26 of the 70 sequenced have NO OWNER**
 
 > The two counts are different questions and the second one used to be invisible.
 > `UNSEQUENCED` was previously printed as "unassigned", which reads as *nobody owns
@@ -30,7 +30,7 @@ judgement about a gate, not something derivable from the findings file.
 |---|---|---:|---|---|---|---|
 | **P1** | Delete | 10 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☑ **COMPLETE** 2026-09-08 — ~31,900 lines removed across P1.1/P1a/P1b/P1c/P1d, zero regressions |
 | **P2** | Make absent producers detectable | 21 | chat + Eval | every segment timed AND each timed segment's attribution verified against a known-external call — an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☑ **COMPLETE** 2026-09-09 — P2a planner orphans, P2b latency telemetry deployed with spans bound to schema node keys |
-| **P3** | One decision point | 17 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ◐ **IN PROGRESS** — `state_load` closed (StateUnavailable + first contract tag); `tool_manifest` opened 2026-09-09 |
+| **P3** | One decision point | 18 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ◐ **IN PROGRESS** — `state_load` closed (StateUnavailable + first contract tag); `tool_manifest` opened 2026-09-09 |
 | **P4** | Split | 16 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
 | **P5** | Config UX | 5 | chat + Prompt Studio | max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped | — | ☐ not started — and correctly so; Prompt Studio has deliberately not been asked to sign yet |
 | **P6** | Tool selection | 0 | chat + Prompt Studio | manifest editable without a deploy; tools offered per turn: ALL -> a retrieved subset; prompt tokens spent on the manifest: measured before, lower after; tool-selection accuracy NOT worse than the P3 baseline; and the retrieval decision is INSPECTABLE — given a situation, the UX shows which tools were selected and why, and a real past turn can be asked the same question | — | ☐ not started — blocked on P3 `tool_manifest` closing; (c) needs P3's Stage 0 funnel as its baseline |
@@ -42,7 +42,7 @@ in `Blocks` have passed their gate.
 
 | Owner | Sequenced bugs |
 |---|---:|
-| chat | 43 |
+| chat | 44 |
 | unassigned-owner | 26 |
 
 ## P1 — Delete  ·  10 items
@@ -108,7 +108,7 @@ GATE AMENDED 2026-09-09, Chat Master's finding, from having executed it rather t
 | ☐ | `react_loop` | chat | THE CURATION DECISION IS NEVER PERSISTED, which makes evidence_review untestable after the fact |
 | ☐ | `state_load` | chat | state_version is WRITE-ONLY — inserted, incremented, never read or compared anywhere in app/ |
 
-## P3 — One decision point  ·  17 items
+## P3 — One decision point  ·  18 items
 
 **Owner** chat · **ratifier** Tech Review
 **Gate** modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target  
@@ -118,6 +118,7 @@ GATE AMENDED 2026-09-09, Chat Master's finding, from having executed it rather t
 
 | ☐ | Node | Owner | Finding |
 |---|---|---|---|
+| ☐ | `PHI gate` | chat | THERE IS NO SUCH THING AS 'THE PHI GATE TIMEOUT' |
 | ☐ | `PHI gate` | — | OWNER(phi-classifier seat): THE GATE FAILS OPEN ON MISCONFIGURATION |
 | ☐ | `clarification` | chat | THE ONLY LIVE CLARIFY IS WRITTEN BY ANOTHER MODULE AND FILTERED BY KEYWORDS |
 | ☐ | `completion_extension_gate` | — | The most interesting control loop in the product is an un-named `max_it += 1` inside an if-block in a 6,113-li |
