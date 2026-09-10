@@ -15,7 +15,7 @@ deliberately not yet asked because P4 has not opened. Per-phase status below is
 hand-maintained in `refactor_roadmap.py`'s `PHASE_STATUS`, because completion is a
 judgement about a gate, not something derivable from the findings file.
 
-**111 bugs · 75 sequenced into 6 phases · 32 explicitly outside · 0 UNSEQUENCED · 27 of the 75 sequenced have NO OWNER**
+**112 bugs · 75 sequenced into 6 phases · 33 explicitly outside · 0 UNSEQUENCED · 27 of the 75 sequenced have NO OWNER**
 
 > The two counts are different questions and the second one used to be invisible.
 > `UNSEQUENCED` was previously printed as "unassigned", which reads as *nobody owns
@@ -239,6 +239,7 @@ Each carries a reason. Excluding by silence is the failure mode this guards agai
 | `POST /chat` | correction | a correction to my own text, not work | CORRECTION from the DB seat to my own text: ensure_thread treats two f |
 | `POST /chat` | correction | a correction to my own text, not work | CORRECTION: chat_turns.user_id is nullable TEXT with NO foreign key —  |
 | `PHI gate` | other seat | fleet-power's fleet.yaml; a one-line note, not a chat-internal change | OWNER(fleet-power seat): A HIPAA GATE'S CORRECTNESS DEPENDS ON A SCALI |
+| `tool_manifest` | other seat | appeals-agent ruling requested; domain judgement, not chat plumbing — chat implements once ruled | OWNER(appeals-agent, ruling requested): CHAT INVENTS AN APPEAL DEADLIN |
 | `PHI gate` | own workstream | feedback-text gate writes no audit row; compliance, not structure | TWO IMPLEMENTATIONS OF THE SAME GATE, and only one is audited |
 | `POST /chat` | own workstream | Tech Review ruled the swallow is not the defect | ensure_thread swallows every DB failure |
 | `POST /chat` | own workstream | entry contract, not chat-internal | The API→worker contract is untyped |

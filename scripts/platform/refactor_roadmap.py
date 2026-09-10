@@ -308,6 +308,7 @@ PRINCIPLES = [
 ]
 
 OUT_OF_PROGRAM = [
+    ("tool_manifest", "CHAT INVENTS AN APPEAL DEADLINE", "other seat", "appeals-agent ruling requested; domain judgement, not chat plumbing — chat implements once ruled"),
     ("PHI gate", "A HIPAA GATE'S CORRECTNESS DEPENDS ON A SCALING SETTING", "other seat", "fleet-power's fleet.yaml; a one-line note, not a chat-internal change"),
     ("POST /chat", "CHAT_ENV=prod",       "security posture", "needs Ananth's authorisation + staging; no clean unauthenticated POST sent"),
     ("POST /chat", "HIPAA AUDIT WRITE",   "compliance decision", "fail-open write under a fail-closed gate; posture decision pending"),

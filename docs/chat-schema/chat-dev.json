@@ -59,7 +59,7 @@
     "n": 1
    }
   ],
-  "outside": 32
+  "outside": 33
  },
  "missing_content": [],
  "live_env_service": "mobius-chat (us-central1)",
@@ -2257,6 +2257,10 @@
     [
      "bad",
      "OWNER(chat): A RECOVERED PARSE FAILURE COSTS A FULL EXTRA LLM ROUND AND LEAVES NOTHING QUERYABLE. Found by Chat Master 2026-09-09 while splitting __none__. There IS a format-correction retry, and when it SUCCEEDS the code only calls emit() \u2014 which goes to the turn's thinking chunks, never to logs or any queryable store. The logger.warning fires ONLY when the retry ALSO fails. So 'zero parse-failure warnings in 24h' was never evidence of zero parse failures: it was evidence of zero UNRECOVERED ones, and the recovered population \u2014 the expensive one, one extra round each \u2014 was invisible by construction. This is why Ananth's json-formatting hypothesis could not be tested, and it is a textbook could-not-check-vs-checked-false: a silent success path that costs money. Now counted as __unparseable_recovered__, distinct from __none__ (planner chose not to act) and __unparseable__ (planner acted, we dropped it)."
+    ],
+    [
+     "bad",
+     "OWNER(appeals-agent, ruling requested): CHAT INVENTS AN APPEAL DEADLINE WHEN THE APPEALS SERVICE FINDS NOTHING, AND NOBODY WHO OWNS THE DOMAIN APPROVED THE NUMBER. On the not-found path react_loop.py:3178/3181 synthesises pb = {'message': 'No playbook for <payor>. Default FL Medicaid: 60 days, certified mail.'}. Two problems, and the second is the serious one. (1) It makes a miss indistinguishable from a hit downstream \u2014 a well-formed non-empty payload either way, which is why turn 143309c1 cannot be adjudicated. (2) A WRONG APPEAL DEADLINE IS A REAL-WORLD HARM: a provider who files on day 55 against a plan whose real window is 30 days has lost the appeal. Chat is generating a specific, actionable, jurisdiction-flavoured number ('60 days, certified mail') for payors it has no playbook for, and the number was chosen in chat's own code rather than by the appeals domain. Raised to the appeals agent 2026-09-09 for a RULING, not a fix: should a not-found return nothing and let the answer say so? Filed as theirs because the judgement is domain, not plumbing; the change, if ruled, is chat's."
     ],
     [
      "bad",
