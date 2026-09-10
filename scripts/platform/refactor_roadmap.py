@@ -226,6 +226,8 @@ RULES = [
     ("P2", "model_registry", "THE CIRCUIT BREAKER DID NOT PULL A PROVIDER"),
     ("P2", "model_registry", "THE BANDIT HAS NO SURFACE"),
     ("P2", "tool_manifest", "STAGE 0 COULD NOT NAME THE LAYER"),
+    ("P1", "tool_manifest", "APPEALS AGENT RULED 2026-09-09 — REMOVE THE INVENTED FL"),
+    ("P2", "tool_manifest", "THE DISCRIMINATOR CHAT NEEDS IS ALREADY ON THE WIRE"),
     ("P2", "tool_manifest", "A FOURTH LAYER STAGE 0 DID NOT NAME"),
     ("P2", "tool_manifest", "A RECOVERED PARSE FAILURE COSTS A FULL EXTRA LLM ROUND"),
     ("P6", "tool_manifest", "P6 BASELINE, MEASURED EXACTLY"),
@@ -308,7 +310,6 @@ PRINCIPLES = [
 ]
 
 OUT_OF_PROGRAM = [
-    ("tool_manifest", "CHAT INVENTS AN APPEAL DEADLINE", "other seat", "appeals-agent ruling requested; domain judgement, not chat plumbing — chat implements once ruled"),
     ("PHI gate", "A HIPAA GATE'S CORRECTNESS DEPENDS ON A SCALING SETTING", "other seat", "fleet-power's fleet.yaml; a one-line note, not a chat-internal change"),
     ("POST /chat", "CHAT_ENV=prod",       "security posture", "needs Ananth's authorisation + staging; no clean unauthenticated POST sent"),
     ("POST /chat", "HIPAA AUDIT WRITE",   "compliance decision", "fail-open write under a fail-closed gate; posture decision pending"),
