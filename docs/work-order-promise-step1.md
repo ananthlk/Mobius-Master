@@ -243,6 +243,32 @@ export PGPASSWORD=$(gcloud secrets versions access latest --secret=db-password)
 PSQL="psql -h 127.0.0.1 -p 5433 -U postgres -d mobius_chat"
 ```
 
+**AMENDMENT, 2026-09-10 — every query below must exclude retained verification
+rows.** Add to each `WHERE`:
+
+```sql
+AND (notes IS NULL OR notes NOT LIKE 'VERIFY-ROW%')
+```
+
+Five marked rows are retained in dev on purpose, written through the production
+path, so the shape and column set are inspectable without a deploy. **They break
+P2's `turns == rows` equality**, which is the strongest check here — measured:
+
+```
+P2 without the exclusion :  turns 1 | rows_all  5   <- reads as a failure
+P2 with the exclusion    :  turns 1 | rows_real 0   <- correct: nothing deployed
+```
+
+**Chat's recommendation, adopted over both alternatives I offered** (delete the
+rows at demonstration time, or keep the table illustrative): *"I'd rather amend
+the query than rely on deleting rows at the right moment; deletion is a step
+someone can forget, the predicate isn't."* Right — and it is the same principle
+as the freeze tests: **prefer a control that cannot be skipped over a procedure
+someone has to remember.**
+
+`turns 1 | rows_real 0` is already the correct reading while undeployed, which
+means P2 is discriminating properly before it has been asked to.
+
 **P1 — one row per turn, all four outcomes present:**
 ```sql
 SELECT outcome, count(*) FROM turn_attestations

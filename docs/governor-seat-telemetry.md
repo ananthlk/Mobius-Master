@@ -63,6 +63,18 @@ doing exactly what §7a forbids.
 
 | 10 | rendered five attestation rows in §7e reading as evidence | **the table has 0 rows**; four of the five never existed, and the fifth was deleted. Constructed from reported values + schema | **Ananth** — *"i want to see the actual row written"* | published fabricated-looking evidence on the spec page |
 
+| 11 | wrote the countermeasure to entry 10 as *"`READ FROM <source> AT <time>` or `ILLUSTRATIVE` — there is no third category"* | **there is.** A row genuinely written by the production path and genuinely read back, whose *values* are chosen inputs, is **both** | **Chat Master**, refusing to let me publish a read-time and call it settled | would have republished the same class of error with a stronger-looking label |
+
+**Entry 11 is entry 10''s own fix being wrong, one turn later** — which is the
+same "one level down" shape as entries 7-8, now applied to a countermeasure
+rather than a spec. **A binary rule felt safer than the thing it replaced, and
+that feeling is what made it worse:** a read-time on constructed numbers looks
+*more* settled than an unlabelled table.
+
+`[DESIGN]` **Corrected rule — provenance has two axes:** where the **row** came
+from (read / constructed) and where its **values** came from (measured /
+chosen). The dangerous quadrant is a real row full of chosen numbers.
+
 **Entry 10 is the worst one so far and belongs at the top of this file.** I have
 spent this track insisting that a demonstration is not a summary, that a green
 suite is not a written row, and that `signal` must not be scored because it is
