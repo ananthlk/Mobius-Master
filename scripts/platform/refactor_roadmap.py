@@ -312,6 +312,7 @@ PRINCIPLES = [
 ]
 
 OUT_OF_PROGRAM = [
+    ("tool_manifest", "TWO SCRIPTS ARE NAMED LIKE TESTS AND ONE OF THEM ABORTS", "other seat", "mobius-payor tests/; not a chat change — routed to the payor seat with the real cause"),
     ("tool_manifest", "'51% OF THE CORPUS' WAS ONE TEMPLATE REPEATED 72 TIMES", "other seat", "appeals-agent self-reported; their corpus, their re-key — retracts three of my own filings"),
     ("tool_manifest", "THE _GENERIC BLOCKLIST MAKES PASS 2 UNREACHABLE", "other seat", "payor seat's matcher in mobius-payor registry_admin.py; not a chat change"),
     ("tool_manifest", "DISPLAY NAME IS DERIVED FROM THE SLUG BY TITLE-CASING", "other seat", "mine, in mobius-rag payer_context.py — not a chat change"),
