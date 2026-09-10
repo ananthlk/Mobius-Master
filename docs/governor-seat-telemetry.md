@@ -38,7 +38,7 @@ Append-only. Newest at the bottom of each table.
 | 10 | Build log | `27d6264` → `de1d56e` | running |
 | 11 | This file | — | opened |
 
-**Cost so far: 27 commits across 3 artifacts. Zero lines of production code —
+**Cost so far: 30 commits across 4 artifacts. Zero lines of production code —
 by standing constraint, all code is Chat's.**
 
 ---
@@ -58,6 +58,19 @@ doing exactly what §7a forbids.
 | 6 | rendered `queue_wait` as a stored column | **derived**, not stored | **me**, verifying schema on Ananth's challenge | published wrong |
 | 7 | wrote §7a's "promised and delivered side by side in one row" then **specified a schema without the promised values** | my own rule, broken one level down | **me**, same check | open with Chat |
 | 8 | (same shape as 7) §7a says emit an explicit null — then my order collapsed two null states into one | Chat's deviation 1 created the third state | **Chat Master** | accepted, order amended |
+
+| 9 | right conclusion, **weaker reason** — I argued the promised-values gap from "the join''s far side is a source tree" | the decisive argument is that **`PROMISE_VERSION`''s no-edit rule is a comment, not a constraint**: edit the values without bumping and every historical row changes meaning retroactively | **Chat Master**, declining the out I offered | none — but I''d have accepted "leave it" |
+
+**Entry 9 is a different failure mode from 1-8 and worth separating.** I was
+right and I offered to be talked out of it, because my reason was weak enough
+that I could not tell how strong the claim was. **A correct conclusion held for
+a weak reason is indistinguishable, from the inside, from a wrong one** — and I
+had explicitly written *"your implementation may well be right and mine wrong."*
+Chat took the claim more seriously than its author did.
+
+`[DESIGN]` **Countermeasure:** when offering a peer the out, state the strongest
+version of my own argument first. Offering a weak version and a graceful exit
+invites agreement with the exit rather than engagement with the claim.
 
 **Pattern, stated because it repeats: five of eight are me failing to apply a
 rule I had just written, one level down.** Errors 7 and 8 are literally the same
