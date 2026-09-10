@@ -224,3 +224,160 @@ For Chat Master, as the person who knows the dispatch side:
 - per-tool trigger-phrase overlap map across all 57 entries
 - the `allowed`-narrowing path end to end
 - what a reader of the planner prompt actually sees, in order
+
+---
+
+# 8. PROPOSED MODEL — deterministic per-turn tool selection
+
+**Ananth's design, 2026-09-10. Written up as a schematic, not a plan. No code.**
+
+> *"every user loaded /api caller — we can shortlist the tools they have access to, this
+> is our list.. then a user query comes in.. we have to say this query can be in many
+> domains, which domains make sense.. we can do a simple vector match or bm25 match or
+> hybrid to get this.. then we pick the top x domains and their tools.. this is what we
+> need to build.. the UX should be the place to test it.. in the next turn the governor
+> knows the gaps (which is trailing by 1 round as react has not closed after that
+> round's execution).. so we should see what happens — this is clearly deterministically
+> doable"*
+
+## 8.1 The pipeline
+
+```
+  ┌─ STAGE A ── AUTHORITY ─────────────── deterministic, cacheable, no query ──┐
+  │  caller identity (user / API key / service)                               │
+  │    ∩ supports_modes[chat_mode]                                            │
+  │    ∩ visible_to_planner                                                   │
+  │    ∩ user_tool_subscriptions  (enable / block per user)                   │
+  │  ─────────────────────────────────────────────────────────────────────────│
+  │  = THE CALLER'S LIST      "what this caller may ever use"                 │
+  └───────────────────────────────────────────────────────────────────────────┘
+                                     │
+                  query ────────────►│
+                                     ▼
+  ┌─ STAGE B ── DOMAIN MATCH ────────────────── vector / BM25 / hybrid ───────┐
+  │  score(query, domain) for each domain the caller's list covers            │
+  │  → rank domains, take top-K                                              │
+  │  emit: domain, score, matched terms          ← THE REASON, not just rank  │
+  └───────────────────────────────────────────────────────────────────────────┘
+                                     ▼
+  ┌─ STAGE C ── TOOL EXPANSION + RANK ────────────────────────────────────────┐
+  │  tools of the selected domains ∩ caller's list                           │
+  │  rank within: trigger match · health · past success · cost · retryability │
+  │  emit: ranked tools, each with its reason                                │
+  └───────────────────────────────────────────────────────────────────────────┘
+                                     ▼
+  ┌─ STAGE D ── THE MANIFEST REACT ACTUALLY SEES ─────────────────────────────┐
+  │  rank-ordered, reasons attached, ~top-N only                             │
+  │  react CONFIRMS against what it needs — it does not search a catalogue   │
+  └───────────────────────────────────────────────────────────────────────────┘
+
+  ROUND N>0 — same pipeline, three extra inputs into Stage B/C:
+      open gaps (governor)   ·   tools already tried   ·   what they returned
+```
+
+**Why this is testable and the current manifest is not:** every stage is a pure function
+of declared inputs. Stage A is set arithmetic. Stage B is a scored retrieval over a
+fixed corpus with a pinned embedding. Stage C is a sort. **No model in the loop**, so a
+fixture — *query → expected ranked tools* — either passes or fails.
+
+## 8.2 What exists, what doesn't
+
+| stage | exists today | gap |
+|---|---|---|
+| **A** authority | `supports_modes`, `visible_to_planner`, `user_tool_subscriptions`, `_resolve_allowed_tools` (`orchestrator.py:95`) | it narrows **rendering**, and is a *subscription* model, not an *authorization* model |
+| **B** domain match | `SkillSpec.category` — 8 values, already drives the tool-settings UI | **no scoring at all.** Nothing matches a query to a domain. No domain description text to match *against* |
+| **C** rank | — | **nothing.** No health, no past-success, no cost, no retryability field |
+| **D** ranked output | — | **nothing.** The manifest is unordered prose, identical every turn |
+| **round N** | governor computes gaps; `tool.result` telemetry landed 2026-09-10 | no history yet; the selector has never seen a gap |
+
+## 8.3 🔴 The finding that shapes the design: domains are wildly uneven
+
+[MEASURED — 57 tools from the live manifest, classified by name prefix.]
+
+| domain | tools | share |
+|---|---:|---:|
+| **analytics** (`get_*`, `search_orgs`, …) | **26** | **45%** |
+| service_line | 7 | 12% |
+| corpus/search | 6 | 10% |
+| appeals | 5 | 8% |
+| provider/npi | 4 | 7% |
+| utility/other | 4 | 7% |
+| healthcare | 2 | 3% |
+| documents | 2 | 3% |
+| web | 1 | 1% |
+
+**One domain is 45% of the catalogue.** So "pick the top 3 domains and their tools"
+narrows almost nothing whenever analytics is one of them — you have selected 26 tools
+and ~6,500 tokens. **Stage B alone is not sufficient**; Stage C's within-domain ranking
+is doing the real work, not the optional polish.
+
+Three consequences:
+
+**(a) `analytics` must be split** into sub-domains (market · org · rate · service-mix)
+or Stage B's top-K is meaningless for half the catalogue.
+
+**(b) The cheapest possible win is not the ranker — it is §3.** Those 26 analytics tools
+are exactly the `get_*` set a code comment says were deleted for always 404-ing.
+**If they do not dispatch, deleting them takes the catalogue 57 → 31 and cuts ~6,500
+tokens per round, before a line of selector code is written.** One dispatch attempt
+answers it.
+
+**(c) Domain sizes must be a monitored property.** A domain that grows to 26 entries
+silently defeats the mechanism that was supposed to narrow it.
+
+## 8.4 Design constraints I would hold
+
+**1 · Authority is a FILTER, never a rank input.** Stage A produces a set; Stage B and C
+may only reorder within it. If authority becomes a score component, a high-relevance
+tool can outrank its own permission boundary. Same reason the PHI gate is fail-closed
+rather than weighted.
+
+**2 · Determinism requires a pinned embedding and a golden set.** A deterministic ranker
+with no ground truth is *reproducibly* wrong. And an embedding-model change silently
+re-ranks everything, so the model version is part of the contract — same decay problem
+as the mutation ledger, and it wants the same treatment.
+
+**3 · Match against structured triggers, not the planner prose.** The current
+descriptions are written to persuade a model, and two of them already claim the same
+query (§5). Retrieving over that text inherits the collision. Structured trigger phrases
+make the overlap a **build-time test failure** — which is the thing prose can never give
+us, and the real prize.
+
+**4 · Emit the reason, and persist it.** Stage D's reasons let react confirm rather than
+re-derive — and a selection nobody records is a producer with no consumer, which is what
+`tool.offered` already was when it recorded `__unfiltered__` instead of the names.
+
+**5 · The governor's gap state is stale by one round, by construction.** Ananth's own
+point, and it must be stated rather than discovered: at round N the gaps were computed
+from round N−1's results, so the selector is always reasoning from the previous round's
+picture. That is not a bug and cannot be fixed by ordering — it means gap-closure must
+never be read as *current*, and a selector that assumes freshness will re-offer a tool
+whose result has already landed.
+
+## 8.5 The UX is the test surface — what it has to show
+
+Ananth: *"the UX should be the place to test it."* For that to be true it must show, for
+a typed query:
+
+- **Stage A** — the caller's list, and what authority excluded
+- **Stage B** — every domain with its score, including the ones that lost
+- **Stage C** — the ranked tools with each reason
+- **Stage D** — the manifest react would actually receive, and its token count
+- and for a **real past turn**: what was selected, what react then called, and whether
+  the two agreed
+
+**That last row is the one that makes it an instrument rather than a demo.** Everything
+above it is a preview of a hypothetical; only the last row can tell you the selector was
+right.
+
+## 8.6 Open questions before any of this is built
+
+1. **Do the 26 analytics tools dispatch?** (§3 — halves the problem either way.)
+2. What text does Stage B match against — and who writes it?
+3. Sub-domain split for analytics: what are the axes?
+4. Where do health / past-success / cost / retryability live — `SkillSpec` fields, or a
+   separate table fed by `tool.result`?
+5. Top-K and top-N: what are they, and are they fixed or budget-derived from the
+   remaining prompt space?
+6. Who owns the golden set, and how many fixtures before the ranker is trustworthy?
+   (The CARC 197 turn is fixture #1: expect `appeals_get_playbook` ranked first.)
