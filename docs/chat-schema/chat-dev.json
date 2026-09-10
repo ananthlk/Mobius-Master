@@ -4774,6 +4774,14 @@
      "PATTERN, appeals seat 2026-09-09 \u2014 AN ARTEFACT WHOSE IDENTITY IS WRONG RATHER THAN WHOSE PATH IS MISSING. Distinct from the three artefact-without-a-path instances collected tonight, and worse in one respect: a template stored in the payor column READS AS DATA EVERYWHERE IT IS CONSUMED. It gets counted in coverage, quoted in status, and generates work for other teams \u2014 it nearly bought a Lexicon key from me and an identity ruling from the payor seat for something that is not a payor. Nothing is broken and nothing is missing; the row is simply not the kind of thing its column says it is. The tell is ZERO VARIATION across many rows: 72 rows with one signature is a template, and no real corpus is that uniform."
     ],
     [
+     "watch",
+     "PATTERN \u2014 THE INSTRUCTION FORBIDS IT AND THE WORKED EXAMPLE SUPPLIES THE MATERIAL. Appeals seat, 2026-09-10, third instance of the fabricated-deadline sweep and a DIFFERENT SPECIES from the first two. api/prompts.py carries RULE 5: \"ONLY REAL VALUES. Every number, form name, URL, fax, portal and rung name you write must appear verbatim in PAYOR FACTS. Never carry a number over from another payor, never round, never infer 'typically 90 days'. A fabricated deadline is the worst possible output.\" FORTY LINES LATER, worked examples labelled \"this is the bar \u2014 match this register exactly\" contain: \"Sunshine Health's documented filing limit is 180 days from DOS (90 days for appeals) \u2014 per the Provider Manual.\" So the instruction forbids fabrication and THE DEMONSTRATION HANDS OVER CONCRETE NUMBERS PLUS A SOURCE ATTRIBUTION READY TO COPY. A model told to match a register reproduces its CONTENT when its own facts block is empty \u2014 which is the state of 100% of that corpus (0 of 339 values sourced). And they are Sunshine's real numbers, so carrying them is exactly the \"never carry a number over from another payor\" the example makes easy.\n\nTESTED AND NOT LEAKED, with bounds stated by them rather than by me: 51 generated guidance statements across CARCs 29, 22, 50, 197, 16 and 4 \u2014 ZERO day-values asserted. RULE 5 held. They filed it as a LATENT structural risk and said plainly it is 51 of roughly 846 statements, six CARCs, one sample: evidence, not proof. They chose to hand over a clean negative with its limits rather than a third scalp.\n\nWHY IT IS A PATTERN AND NOT AN INSTANCE: this is the SAME SHAPE as the tool_manifest collision. appeals_lookup_rules' description forbids nothing but its EXAMPLE QUERIES captured the playbook tool's use case verbatim, and BM25 then ranked the wrong tool first by 4.6x. In both cases the prose's RULE was fine and its EXEMPLAR did the damage. THE TELL: the example is more SPECIFIC than the rule, and specificity is what gets copied. Applies to every prompt and every tool description in the fleet.\n\nTHEY ARE FIXING IT ANYWAY \u2014 replacing the concrete numbers with a slot marker so the register survives and the material does not \u2014 on the grounds that the structure is one prompt edit away from failing and the thing holding it is a rule the model CHOOSES to follow rather than something enforced. That reasoning is the right one.\n\nFOURTH, same family, REPORTED not verified by me: app.py:2582 in their template scaffold asserts submission: \"certified_mail\" on the Provider Claim Dispute rung with no source. The DEADLINE was nulled during P0-0; the CHANNEL was not. Lower stakes, same class."
+    ],
+    [
+     "good",
+     "MY CLOSING QUESTION ANSWERED, AND THE GUARDED ENDPOINT IS CLEAN. Appeals verified /playbook-guarded has no synthesised not-found path, two ways: code (\"pb = await get_playbook(...); if not pb: return {}\") and LIVE \u2014 GET /playbook-guarded/Sunshine%20Health/24?audience=provider returns HTTP 200 and TWO BYTES. Nothing to strip. Which sharpens the earlier finding on a second axis: the guarded route was already correct on a miss while the MCP route was inventing a deadline, so the two doors differed in what they FABRICATE as well as in what they FILTER."
+    ],
+    [
      "bad",
      "OWNER(appeals-agent, self-reported): THE MCP ROUTE READS THE UNGUARDED /playbook/ ENDPOINT WHILE CHAT READS /playbook-guarded \u2014 ONE DOOR ROUND THE PARTY FILTER. Self-reported 2026-09-10. I checked how far it reaches and CHAT IS NOT EXPOSED, verified rather than inferred: appeals_get_playbook renders in the STATIC section of the live manifest (before the MCP header at line 413), react_loop.py:3191 has a hard-coded router-owned handler that runs before any registry dispatch, and it calls /playbook-guarded/...?audience=provider at :3273 and :3285 with a comment at :3263 reading 'audience=\"provider\" is NOT optional and must not be dropped'. ALL FIVE appeals_* tools have hard-coded handlers, so none routes through the MCP server. BUT THE MCP SERVER IS REGISTERED IN PRODUCTION (EXTRA_MCP_URLS = mobius-appeals-prototype, MOBIUS_MCP_AUTOREGISTER=1), so the unguarded route is live and reachable by any consumer without chat's handler. CHAT IS PROTECTED BY AN ACCIDENT OF IMPLEMENTATION, NOT BY DESIGN: remove that handler and let the tool fall through to the registry, and the party filter silently disappears. Theirs to fix, and more urgent than 'relevant to you only'."
     ],
@@ -5042,6 +5050,18 @@
      "closed": true,
      "owner": "payor seat / whoever owns intake",
      "own": false,
+     "deploy": null
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true,
+     "deploy": null
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true,
      "deploy": null
     },
     {
