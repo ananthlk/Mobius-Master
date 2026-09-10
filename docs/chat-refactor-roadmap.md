@@ -15,7 +15,7 @@ deliberately not yet asked because P4 has not opened. Per-phase status below is
 hand-maintained in `refactor_roadmap.py`'s `PHASE_STATUS`, because completion is a
 judgement about a gate, not something derivable from the findings file.
 
-**107 bugs · 72 sequenced into 6 phases · 31 explicitly outside · 0 UNSEQUENCED · 26 of the 72 sequenced have NO OWNER**
+**108 bugs · 73 sequenced into 6 phases · 31 explicitly outside · 0 UNSEQUENCED · 27 of the 73 sequenced have NO OWNER**
 
 > The two counts are different questions and the second one used to be invisible.
 > `UNSEQUENCED` was previously printed as "unassigned", which reads as *nobody owns
@@ -33,7 +33,7 @@ judgement about a gate, not something derivable from the findings file.
 | **P3** | One decision point | 18 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ◐ **IN PROGRESS** — `state_load` closed (StateUnavailable + first contract tag); `tool_manifest` opened 2026-09-09 |
 | **P4** | Split | 16 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
 | **P5** | Config UX | 5 | chat + Prompt Studio | max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped | — | ☐ not started — and correctly so; Prompt Studio has deliberately not been asked to sign yet |
-| **P6** | Tool selection | 0 | chat + Prompt Studio | manifest editable without a deploy; tools offered per turn: ALL -> a retrieved subset; prompt tokens spent on the manifest: measured before, lower after; tool-selection accuracy NOT worse than the P3 baseline; and the retrieval decision is INSPECTABLE — given a situation, the UX shows which tools were selected and why, and a real past turn can be asked the same question | — | ☐ not started — blocked on P3 `tool_manifest` closing; (c) needs P3's Stage 0 funnel as its baseline |
+| **P6** | Tool selection | 1 | chat + Prompt Studio | manifest editable without a deploy; tools offered per turn: ALL -> a retrieved subset; prompt tokens spent on the manifest: measured before, lower after; tool-selection accuracy NOT worse than the P3 baseline; and the retrieval decision is INSPECTABLE — given a situation, the UX shows which tools were selected and why, and a real past turn can be asked the same question | — | ☐ not started — blocked on P3 `tool_manifest` closing; (c) needs P3's Stage 0 funnel as its baseline |
 
 Phase order is a blocking order: a phase does not open until the phases naming it
 in `Blocks` have passed their gate.
@@ -43,7 +43,7 @@ in `Blocks` have passed their gate.
 | Owner | Sequenced bugs |
 |---|---:|
 | chat | 46 |
-| unassigned-owner | 26 |
+| unassigned-owner | 27 |
 
 ## P1 — Delete  ·  10 items
 
@@ -186,7 +186,7 @@ confidence_bar is EXCLUDED ENTIRELY, which is stronger than the bound I asked fo
 | ☐ | `tool_manifest` | chat | MOVE THE MANIFEST OUT OF CODE — Ananth's point, and the cost is measurable |
 | ☐ | `tool_manifest` | chat | CONTEXT-SPECIFIC TOOL SELECTION IS BUILT AND UNUSED |
 
-## P6 — Tool selection  ·  0 items
+## P6 — Tool selection  ·  1 items
 
 **Owner** chat + Prompt Studio · **ratifier** Tech Review + Eval
 **Gate** manifest editable without a deploy; tools offered per turn: ALL -> a retrieved subset; prompt tokens spent on the manifest: measured before, lower after; tool-selection accuracy NOT worse than the P3 baseline; and the retrieval decision is INSPECTABLE — given a situation, the UX shows which tools were selected and why, and a real past turn can be asked the same question  
@@ -209,8 +209,13 @@ TWO REPRESENTATIONS, NOT ONE — Ananth, 2026-09-09: 'it allows a tool to fully 
 
 THE SECOND-ORDER EFFECT IS THE REAL PRIZE (Ananth: 'this will allow for better options'). Today a tool's cost is paid by EVERY turn, including every turn that will never use it — so each new tool taxes the whole system and the rational design is FEW, BROAD tools. That is a constraint imposed by the prompt budget, not by the problem. Retrieval inverts it: once a tool costs ~nothing on turns that do not retrieve it, MANY NARROW, SPECIFIC, WELL-DESCRIBED TOOLS BEAT A FEW GENERAL ONES. A tool serving 3% of turns is not worth its prompt weight today and is obviously worth building after. The token saving is a one-time win; the change in what is WORTH BUILDING compounds — and it makes the catalogue somewhere product knowledge accumulates instead of somewhere additions cost. CAVEAT, so this is not read as a licence to proliferate: more tools means more ways for retrieval to be wrong, and a wrong retrieval is INVISIBLE TO THE MODEL — it cannot call what it was never offered. Which is why the inspector and the persisted per-turn decision are gate items, not nice-to-haves. The economics only improve while selection stays honest and checkable.
 
+BASELINE, MEASURED 2026-09-09 BEFORE ANY CHANGE: the catalogue is 8,137 tokens per render and renders ONCE PER REACT ROUND, so ~16,681 tokens per turn at 2.05 rounds. Over 12h that is 1,285,646 of 3,594,875 prompt tokens = 35.8% of everything the planner reads, and up to two thirds of the leanest turns' context. That is the gate's before-number and it was taken with Gemini's own count_tokens, not chars/4 — an estimate held up as a baseline is the same defect one step earlier.
+
+DESIGN CONSTRAINT THAT FOLLOWS, Chat Master 2026-09-09 and it is the sharpest thing said about this phase: today's L1 instrument ALREADY has the defect P6 would reproduce. tool.offered records '__unfiltered__' — the fact that no filter ran, not what was on offer. IF P6 LANDS A RETRIEVER AND RECORDS ONLY 'RETRIEVAL RAN', IT REPRODUCES TODAY'S BLIND SPOT AT A LAYER WHERE THE CONSEQUENCE IS WORSE, because a wrong retrieval is invisible to the model — it cannot call what it was never offered, and it will narrate the absence exactly as it does today. So the persisted record must be THE TOOLS IT SELECTED AND THE ONES IT RANKED AND DROPPED, never the fact of selection.
+
 | ☐ | Node | Owner | Finding |
 |---|---|---|---|
+| ☐ | `tool_manifest` | — | P6 BASELINE, MEASURED EXACTLY, 2026-09-09: THE TOOL CATALOGUE IS 35.8% OF EVERYTHING THE PLANNER READS |
 
 ## Outside the program
 

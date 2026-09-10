@@ -1999,6 +1999,26 @@ It is mid-migration and says so: five tools are now registry-owned, their descri
 living on SkillSpec.description and rendered through registry.manifest_text(), so adding a
 skill is one file and no edit here. The rest are still described inline.
 """, findings=[
+ ("bad", "P6 BASELINE, MEASURED EXACTLY, 2026-09-09: THE TOOL CATALOGUE IS 35.8% OF "
+         "EVERYTHING THE PLANNER READS. 8,137 tokens per render, from Gemini's own "
+         "count_tokens rather than chars/4 (chars/4 gave 8,110 — within 0.3%, and the "
+         "measured figure is the one P6 is held against; an ESTIMATE held up as a "
+         "baseline is the same defect one step earlier). It renders once per ReAct "
+         "ROUND, not per turn — it sits in the system prompt via "
+         "_react_reasoning_system <- build_reasoning_context, which the spans show "
+         "running every round. At 2.05 rounds/turn that is ~16,681 manifest tokens PER "
+         "TURN. Over 12h: 158 react calls, 3,594,875 prompt tokens, 1,285,646 of them "
+         "manifest = 35.8%. Per stage: react_1 41.8% of avg prompt (63.9% of its "
+         "smallest), react_2 29.7%, react_3 31.6% — so on the leanest turns roughly "
+         "TWO THIRDS of the planner's context is the tool catalogue. This is the size "
+         "of the tax that makes the two-representations design necessary rather than "
+         "merely tidy: at 35.8% of prompt, every word that improves selection is "
+         "immediately expensive, so the incentive runs AGAINST writing a description "
+         "good enough to choose on. RECORDED AS A BASELINE, NOT AS EVIDENCE FOR A "
+         "LAYER — Chat Master was explicit that it does not move Stage 0's verdict, "
+         "and it must not be read as support for a layer nobody has named. Window "
+         "stated rather than smoothed: token figures are 12h of llm_calls, the funnel "
+         "was ~10.75h of turn_spans."),
  ("watch", "SEQUENCED AS P6 (Ananth, 2026-09-09): the tool/capabilities manifest moves "
            "to PERSISTENCE with a UX so a tool change needs no deploy; access "
            "provisioning becomes its own model rather than riding the subscription "

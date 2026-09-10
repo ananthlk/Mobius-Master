@@ -186,7 +186,23 @@ PHASES = [
             "MODEL — it cannot call what it was never offered. Which is why the "
             "inspector and the persisted per-turn decision are gate items, not "
             "nice-to-haves. The economics only improve while selection stays honest "
-            "and checkable."},
+            "and checkable.\n\nBASELINE, MEASURED 2026-09-09 BEFORE ANY CHANGE: "
+            "the catalogue is 8,137 tokens per render and renders ONCE PER REACT "
+            "ROUND, so ~16,681 tokens per turn at 2.05 rounds. Over 12h that is "
+            "1,285,646 of 3,594,875 prompt tokens = 35.8% of everything the planner "
+            "reads, and up to two thirds of the leanest turns' context. That is the "
+            "gate's before-number and it was taken with Gemini's own count_tokens, not "
+            "chars/4 — an estimate held up as a baseline is the same defect one step "
+            "earlier.\n\nDESIGN CONSTRAINT THAT FOLLOWS, Chat Master 2026-09-09 and "
+            "it is the sharpest thing said about this phase: today's L1 instrument "
+            "ALREADY has the defect P6 would reproduce. tool.offered records "
+            "'__unfiltered__' — the fact that no filter ran, not what was on offer. IF "
+            "P6 LANDS A RETRIEVER AND RECORDS ONLY 'RETRIEVAL RAN', IT REPRODUCES "
+            "TODAY'S BLIND SPOT AT A LAYER WHERE THE CONSEQUENCE IS WORSE, because a "
+            "wrong retrieval is invisible to the model — it cannot call what it was "
+            "never offered, and it will narrate the absence exactly as it does today. "
+            "So the persisted record must be THE TOOLS IT SELECTED AND THE ONES IT "
+            "RANKED AND DROPPED, never the fact of selection."},
 ]
 
 # (phase, node or None for any, distinctive substring). First match wins.
@@ -210,6 +226,7 @@ RULES = [
     ("P2", "model_registry", "THE CIRCUIT BREAKER DID NOT PULL A PROVIDER"),
     ("P2", "model_registry", "THE BANDIT HAS NO SURFACE"),
     ("P2", "tool_manifest", "STAGE 0 COULD NOT NAME THE LAYER"),
+    ("P6", "tool_manifest", "P6 BASELINE, MEASURED EXACTLY"),
     ("P2", "tool_manifest", "THE ONLY LIVE CONSUMER OF THE TOOL-RESULT STORE"),
     ("P3", "tool_manifest", "TOOL SELECTION IS SPORADIC, AND THE MODEL NARRATES"),
     ("P3", "state_load", "ROOT CAUSE OF THE PER-READ OVERHEAD"),
