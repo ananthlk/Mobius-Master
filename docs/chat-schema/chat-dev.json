@@ -42,7 +42,7 @@
     "owner": "chat",
     "gate": "lines removed; handler count down; ZERO invariant movement",
     "blocks": "P2, P4",
-    "n": 15
+    "n": 16
    },
    {
     "id": "P2",
@@ -5385,6 +5385,10 @@
    "findings": [
     [
      "bad",
+     "OWNER(chat): AN HONEST EMPTY ARRIVES DRESSED AS EVIDENCE, AND THIS CREATES A FIX-ORDERING HAZARD BETWEEN TWO SEATS. The self-citing SourceRef at mcp_adapter.py:274 is text[:300] of the tool's OWN output under document_name=f'MCP: {tool_name}' -- the answer citing itself, always exactly 1 on success. Found by the Governor seat while reviewing my remedy; I had told two seats to score on len(sources) and that advice was wrong. Three consequences, in increasing order of how easy they are to miss. (a) Anything scoring groundedness or quality off len(sources) reads 100% on every MCP turn -- green by construction. (b) react_retry_guard CANNOT FIRE on MCP tools: _is_zero_result (react_retry_guard.py:286) requires success=True + signal no_sources + an EMPTY sources list, and this envelope sets signal='no_sources' AND attaches a source in the same object nine lines apart. It declares 'no sources' and then supplies the one thing that stops the no-sources classifier from firing -- the signal field was already telling the truth and is simply not reachable. So tool-exhaustion never trips; 16 identical appeals_lookup_rules failures across 16 turns is what that looks like. I FILED THE OPPOSITE EARLIER ('retry guard is NOT affected, its len(sources) check saves it') -- that bound was exactly backwards: the check does not save the guard, it defeats it. (c) THE ORDERING HAZARD, raised by Appeals: their fix removes the fabricated FL-Medicaid playbook default so a not-found returns an honest empty. Through the MCP door that honest empty is still TRUTHY TEXT ('{\"found\": false}'), so `if success and text` holds and it is wrapped as a SourceRef citing itself. Net effect if their fix lands first: the ANSWER becomes honest and the CITATION still makes it look sourced -- a truthful non-fact arriving as evidence, which reads as a VERIFIED ABSENCE rather than a gap. That is harder to spot than the fabrication it replaces. So the two changes are coupled and the SourceRef must go first or together; Appeals' fix is necessary and NOT sufficient. Contrast the hardened door, which fails correctly: react_loop's _no_src() sets success=False, signal=NO_SOURCES, sources=[] and the guard trips. Same tool, opposite failure semantics -- the fourth axis of 'the guarantee is conditional on which door you came through', after what it filters, what it fabricates on a miss, and whether it is reachable at all. Found 2026-09-10."
+    ],
+    [
+     "bad",
      "OWNER(chat): THREE APPEALS TOOLS ARE DISPATCHED TO A SERVER THAT DOES NOT HAVE THEM, AND THE ERROR IS CITED AS A SOURCE. Discovery is multi-server: register_mcp_skills (mcp_adapter.py:465-474) merges tools from CHAT_SKILLS_MCP_URL with tools from every EXTRA_MCP_URLS entry via `discovered = discovered + extra_tools` -- but _spec_from_mcp_tool builds the SkillSpec from name/description/inputSchema only, so THE ORIGIN URL IS DROPPED. Dispatch is single-server: the one call site is `call_mcp_tool(tool_name, _inputs)` (mcp_adapter.py:223) and _get_mcp_url() (mcp_manager.py:56) takes no tool name -- it returns the constant MCP_SERVER_URL. So a tool discovered from the appeals prototype is called against the roster/credentialing server. Verified against the DEPLOYED env (CHAT_SKILLS_MCP_URL=roster/credentialing/mcp, EXTRA_MCP_URLS=mobius-appeals-prototype): the primary advertises 29 tools, appeals_lookup_rules / appeals_get_playbook / appeals_find_carc are ALL ABSENT from it, get_market_size IS present, and a live call_tool('appeals_lookup_rules', {carc:197}) returns exactly 'Unknown tool: appeals_lookup_rules' with isError=True. Live and recent: 21 source rows carrying that error text as a CITED SOURCE -- 16 appeals_lookup_rules, 4 appeals_get_playbook, 1 appeals_find_carc -- 13 on 2026-09-09 and 8 on 2026-09-10, none before, across 16 turns. That is 21 of 39 MCP source rows in 30 days (54%). ONE LINK IS NOT CLOSED AND I AM NOT ASSERTING IT: the only producer of a 'MCP: <tool>' source is mcp_adapter.py:274, which is the SUCCESS branch, yet mcp_manager.py:127 DOES check isError and returns (text, False) -- and that check has been in the tree since 0b3505f (2026-02-22), so it is in the deployed image (299519c8ce). How success became True on an isError=True response is therefore UNEXPLAINED, and I have now KILLED MY OWN BEST HYPOTHESIS for it. I assumed the deployed image predated the isError check. It does not, and the proof is a timestamp: three of the 21 rows land at 14:12:02, 14:14:00 and 14:35:49 on 2026-09-10, AFTER revision mobius-chat-00977-8bl went live at 14:09:05 running image 299519c8ce -- and `git show 299519c8ce:app/services/mcp_manager.py` contains the isError check at :127, while `git show 299519c8ce:app/skills/mcp_adapter.py` contains the success-branch SourceRef at :274 and signal=no_sources at :280. Identical to HEAD. So this is happening in the CURRENT image, and every failure path in _call_mcp_tool_async returns success=False (checked all five: isError, ImportError, retriable-exhausted, session-error-exhausted, generic). Also ruled out: the appeals REST path (react_loop.py:3076) has a different shape entirely and names no sources, and mcp_adapter.py:274 is the ONLY producer of a 'MCP: <tool>' document_name in the entire repo. The routing defect and the cited-error symptom are each confirmed independently; the join needs one log line on what call_mcp_tool actually returns, which is chat's to add, not mine to infer. Appeals confirmed the origin side: their server advertises all 5 tools over a full MCP handshake and has NO log of these 16 turns, so the call never reached them. Their revision timeline corroborates the onset -- appeals-prototype deployed 2026-09-08 after a gap since 08-11, and the errors start 09-09: the tools became nameable in the merged manifest and immediately misrouted. Appeals also notes the 5 tools ARE hardened at react_loop.py:3073 (unconditional set membership, no fall-through), so react_loop cannot be the caller -- their candidate is app/services/tool_agent.py, which has ZERO appeals interception (two prose hits in prompt strings) and dispatches straight to the registry at :902-915. I verified that much; it does not by itself explain success=True, since that path also lands on call_mcp_tool. SUPERSEDES MY OWN EARLIER ROOT CAUSE for the CARC 197 offered-and-never-called failure, which I attributed to the manifest's sibling example text; a tool that cannot be reached is the better explanation and the example-text finding should be re-tested, not assumed. Found 2026-09-10."
     ],
     [
@@ -5453,6 +5457,12 @@
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
    "findings_status": [
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true,
+     "deploy": null
+    },
     {
      "closed": true,
      "owner": "chat",
@@ -5536,7 +5546,7 @@
     [
      "functionality",
      "amber",
-     "5 open"
+     "6 open"
     ],
     [
      "testability",
