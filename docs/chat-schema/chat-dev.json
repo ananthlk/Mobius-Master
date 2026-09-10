@@ -438,7 +438,7 @@
    "config": [],
    "kind": "hop",
    "how": "A Redis list used as a work queue, and the handoff between the API and the worker.\n\nThe ops, verified: publish does LPUSH onto cfg.redis_request_key; the worker does BRPOP with\na 5-second timeout. LPUSH + BRPOP is correct FIFO \u2014 push left, pop right. ORDERING IS SOUND.\nDurability is not.\n\nBRPOP removes the item atomically with no destination. There is no in-flight list, no ack,\nno visibility timeout, no redelivery. The instant BRPOP returns, Redis has no record the\nitem ever existed. So if the worker dies between popping and publishing, THE TURN IS LOST \u2014\nsilently and unrecoverably. The user sees a request that never returns, and there is no\nserver-side artifact of the loss: no row, no key, no log of an orphan.\n\nThe response side is a per-correlation-id key with a 24-hour TTL, written at two sites. That\nis 288x the live turn deadline of 300s, so a slow turn cannot outlive its response key \u2014 a\nrisk I had suspected and which does not exist. But the asymmetry inverts into a real one:\nTHE RESPONSE HAS A TTL, THE REQUEST LIST HAS NONE. A request never consumed sits in\nmobius:chat:requests indefinitely, with nothing ageing it out and nothing alerting on depth.\n\nget_queue() picks memory or redis behind a QueueAdapter ABC, so the same code runs in tests\nand production. Connection handling retries 12 times with 5s backoff, about a minute, which\ncovers a Redis restart without losing the process.",
-   "rating": "red",
+   "rating": "amber",
    "depth": "code",
    "findings": [
     [
@@ -489,12 +489,13 @@
    "signals": {
     "async_no_timeout": 0,
     "bare_except": 0,
-    "except_handlers": 0,
-    "loc": 19,
-    "log_sites": 0,
+    "except_handlers": 9,
+    "files": 5,
+    "loc": 372,
+    "log_sites": 12,
     "missing": false,
-    "reraise": 0,
-    "swallow": 0,
+    "reraise": 2,
+    "swallow": 6,
     "telemetry_sites": 0,
     "todos": 0
    },
@@ -511,22 +512,22 @@
     ],
     [
      "error_handling",
-     "green",
-     "no failure paths"
+     "amber",
+     "6 of 9 handlers swallow"
     ],
     [
      "modularity",
      "green",
-     "19 lines"
+     "372 lines"
     ],
     [
      "observability",
-     "red",
-     "no logs and no telemetry \u2014 cannot be operated"
+     "amber",
+     "12 log sites, NO structured telemetry \u2014 diagnosable, not operable"
     ]
    ],
    "rating_was_typed": "red",
-   "rating_why": "observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, testability, error_handling, modularity)",
+   "rating_why": "functionality: 4 open \u00b7 testability: coverage unknown \u00b7 error_handling: 6 of 9 handlers swallow \u00b7 observability: 12 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -2629,7 +2630,7 @@
    "module": "app.pipeline.react.prompts",
    "group": "pipeline/react",
    "path": "app/pipeline/react/prompts.py",
-   "loc": 1368,
+   "loc": 1380,
    "role": "ReAct prompt + reasoning-context helpers (Phase 1i pass 1).",
    "role_full": "ReAct prompt + reasoning-context helpers (Phase 1i pass 1).\n\nExtracted from react_loop.py to isolate the text-generation surface\nfrom the tool-dispatch surface. Everything in this module is either:\n\n  - A mode-label / max-rounds constant the planner reads to decide how\n    much leeway to give the reasoner.\n  - A prompt template builder (``_react_reasoning_system``).\n  - The per-round reasoning context builder\n    (``build_reasoning_context``) that feeds the planner.\n  - One LLM call wrapper ``_call_llm_json`` used by run_react to emit\n    and collect the decision JSON.\n\nThe Phase 1i split (202",
    "stage": null,
@@ -2699,11 +2700,11 @@
    "signals": {
     "async_no_timeout": 0,
     "bare_except": 0,
-    "except_handlers": 2,
-    "loc": 1368,
-    "log_sites": 4,
+    "except_handlers": 3,
+    "loc": 1380,
+    "log_sites": 5,
     "missing": false,
-    "reraise": 0,
+    "reraise": 1,
     "swallow": 1,
     "telemetry_sites": 0,
     "todos": 0
@@ -2724,21 +2725,21 @@
     [
      "error_handling",
      "amber",
-     "1 of 2 handlers swallow"
+     "1 of 3 handlers swallow"
     ],
     [
      "modularity",
      "amber",
-     "1368 lines"
+     "1380 lines"
     ],
     [
      "observability",
      "amber",
-     "4 log sites, NO structured telemetry \u2014 diagnosable, not operable"
+     "5 log sites, NO structured telemetry \u2014 diagnosable, not operable"
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "functionality: 4 open \u00b7 testability: called, guarantee unproven (PERIPHERAL) \u00b7 error_handling: 1 of 2 handlers swallow \u00b7 modularity: 1368 lines \u00b7 observability: 4 log sites, NO structured telemetry \u2014 diagnosable, not operable",
+   "rating_why": "functionality: 4 open \u00b7 testability: called, guarantee unproven (PERIPHERAL) \u00b7 error_handling: 1 of 3 handlers swallow \u00b7 modularity: 1380 lines \u00b7 observability: 5 log sites, NO structured telemetry \u2014 diagnosable, not operable",
    "live_config": [],
    "detail": {}
   },

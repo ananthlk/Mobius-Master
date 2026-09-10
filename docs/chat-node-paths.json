@@ -24,7 +24,7 @@
  "phi_gate": "app/skills/phi_gate.py",
  "plan": "app/stages/plan.py",
  "prompts": "app/pipeline/react/prompts.py",
- "queue": "app/queue/__init__.py",
+ "queue": "app/queue",
  "react_loop": "app/pipeline/react_loop.py",
  "react_retry_guard": "app/pipeline/react_retry_guard.py",
  "resolve": "app/stages/resolve.py",

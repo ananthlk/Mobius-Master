@@ -555,7 +555,7 @@
    "module": "app.pipeline.react.prompts",
    "group": "pipeline/react",
    "path": "app/pipeline/react/prompts.py",
-   "loc": 1368,
+   "loc": 1380,
    "role": "ReAct prompt + reasoning-context helpers (Phase 1i pass 1).",
    "role_full": "ReAct prompt + reasoning-context helpers (Phase 1i pass 1).\n\nExtracted from react_loop.py to isolate the text-generation surface\nfrom the tool-dispatch surface. Everything in this module is either:\n\n  - A mode-label / max-rounds constant the planner reads to decide how\n    much leeway to give the reasoner.\n  - A prompt template builder (``_react_reasoning_system``).\n  - The per-round reasoning context builder\n    (``build_reasoning_context``) that feeds the planner.\n  - One LLM call wrapper ``_call_llm_json`` used by run_react to emit\n    and collect the decision JSON.\n\nThe Phase 1i split (202",
    "stage": null,

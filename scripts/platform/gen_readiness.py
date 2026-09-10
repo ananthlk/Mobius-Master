@@ -64,7 +64,34 @@ _TODO = re.compile(r"#\s*(TODO|FIXME|XXX|HACK)\b")
 _OUTBOUND = re.compile(r"\b(httpx\.(Client|AsyncClient)|urlopen|requests\.(get|post))\s*\(")
 
 
-def measure(relpath: str) -> dict:
+def measure(relpath) -> dict:
+    """relpath is a file, a DIRECTORY, or a list of either.
+
+    A node is not always one file. `queue` was mapped to app/queue/__init__.py —
+    a 19-line factory that re-exports — so it measured 0 telemetry while the real
+    implementation next door (redis_queue.py, 195 lines) has 11 sites. It landed
+    on the telemetry-gap list on the strength of the wrong file. Caught by opening
+    the file before dispatching work off the list.
+    """
+    if isinstance(relpath, list):
+        parts = [measure(r) for r in relpath]
+        parts = [q for q in parts if not q.get("missing")]
+        if not parts:
+            return {"missing": True, "path": relpath}
+        agg = {"loc": 0, "except_handlers": 0, "swallow": 0, "bare_except": 0,
+               "reraise": 0, "log_sites": 0, "telemetry_sites": 0, "todos": 0,
+               "async_no_timeout": 0, "missing": False}
+        for q in parts:
+            for k in agg:
+                if k != "missing":
+                    agg[k] += q.get(k, 0)
+        agg["files"] = len(parts)
+        return agg
+    if os.path.isdir(os.path.join(CHAT, relpath)):
+        import glob
+        return measure(sorted(
+            os.path.relpath(f, CHAT)
+            for f in glob.glob(os.path.join(CHAT, relpath, "*.py"))))
     p = os.path.join(CHAT, relpath)
     if not os.path.exists(p):
         # DELETED is not the same as UNMAPPED is not the same as ZERO. Collapsing
