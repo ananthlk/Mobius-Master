@@ -11,6 +11,51 @@ Spec: `docs/governor-schema/index.html` (serve: `python3 -m http.server 8145 --d
 
 ---
 
+## 2026-09-10 (post-deploy) — a withdrawn finding, and one real anomaly left standing
+
+### `[DESIGN]` WITHDRAWN — "mode is inverted as a difficulty proxy"
+Sent by Chat, cited by me one message earlier, **withdrawn by both.** Joined to
+`chat_turns` at 20:21:49Z: **11 of 16 rows are one question — "what is a CARC
+code?" — across all three tiers**; 4 distinct questions in the sample. Chat
+generated it themselves to exercise the tiers.
+
+The comparison **held the question constant and varied only the tier.** The
+apparent inversion is arithmetic: identical work ⇒ similar delivered time ⇒
+percent-of-promise is driven by the **denominator**. Thinking showed 8.7%
+because 95 was the largest number in the column.
+
+`[DESIGN]` **Third provenance axis, and my two-axis rule missed it entirely:**
+where the row came from · where its values came from · **what varied and what
+was held constant.** Both existing checks passed cleanly here — real rows, real
+read-time, genuine measurements — and the conclusion was still unsupported.
+Chat''s sharper form: **a sample you constructed yourself is the most dangerous
+input of all, because the provenance checks pass on it perfectly.** Filed to
+memory.
+
+**Self-generated traffic is evidence the plumbing works. It is never evidence
+about behaviour.** Both of us used it as the second.
+
+**Dropping `agentic` from the critic gate stands** — on the original argument
+(mode is a tier; a tier is a promise envelope; difficulty is a forecast), which
+never needed the data.
+
+### `[MEASURED]` 🔴 STILL OPEN — 3.7× on the warm path, same request
+```
+deploy smoke probe · fast · 7.80s   (worker 7.78, queue 0.023)  19:53:58Z
+deploy smoke probe · fast · 28.60s  (worker 28.58, queue 0.028) 20:02:29Z
+```
+**Warm both times** — the queue wait is ~25ms in each. So this is **28.58s of
+real worker time on an identical probe 8.5 minutes later.** Not cold start, not
+queueing, not difficulty. It is also the **only promise breach in the sample**
+(`fast`, 13s promised).
+
+`[OPEN]` A genuine anomaly, and the one thing from today''s deployed data that
+survives scrutiny. Raised by Chat as its own item. **Its cause is unknown and
+should not be guessed** — the last two explanations offered for these rows were
+both wrong.
+
+---
+
 ## 2026-09-10 (deployed) — step 1 LIVE; the queue wait is BIMODAL, not a distribution
 
 Serving `mobius-chat-00982`. Chat verified by **pulling the image layer and
