@@ -198,7 +198,14 @@ comprehensive test.**
 
 ---
 
-## 3.2 🟢 ANSWERED, 2026-09-10 — the turn was run. They are selected, and they work.
+## 3.2 ANSWERED, 2026-09-10 — the turn was run. They are SELECTED and DISPATCH, and they return NOTHING.
+
+**Headline corrected 2026-09-10 (Platform seat).** It previously read *"They are selected,
+and they work"* — which **its own table below contradicts.** Every probed query returned
+`no_sources`. The new Tool Selection seat read the old headline, reasonably concluded the
+market tools work, and was about to design against that. **Selected ≠ dispatched ≠
+returns data**, and collapsing the three is the shape this whole document exists to
+prevent.
 
 [REPORTED — Payor Policy Agent. Live probe against dev rev `00977-8bl`, digest
 `sha256:ca0695e4…9327a`, commit `299519c`. Spans read back from `turn_spans`.]
