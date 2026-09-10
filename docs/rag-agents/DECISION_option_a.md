@@ -30,7 +30,28 @@ overridable = gate=="phi"
 - **This sample qualifies, unambiguously** — `identifier_labels=['Name']` only, no structured identifier, no contextual PHI. A safe override **would** clear this exact doc.
 - **The safety line (for Ananth):** `overridable` NEVER includes a real SSN/DOB/MRN/any structured identifier, a Presidio-strong name in clinical context, or an LLM patient-detection. Any of those → not overridable → hard block stays, no override offered. The override is scoped to exactly the low-confidence, name/address-only, no-hard-identifier class this doc exemplifies.
 
-**Status:** classifier confirms the safe design is real and will ship `overridable` on `/classify` **on Ananth's word**. Not built yet. Remaining wiring once green-lit: chat honors `overridable` in the `/chat/upload` admit; extension offers the override affordance on a blocked+overridable card (e.g. "This looks like a false flag — add anyway", logged/attested). Decision owner: Ananth; enforcement: chat; UX: extension.
+### Two overrides — DIFFERENT, do not conflate (classifier owner, 2026-09-09)
+
+The `overridable` flag is the discriminator between two distinct user claims with distinct outcomes:
+
+| | **False-positive override** (this design) | **Genuine-PHI attestation-admit** (Ask-2) |
+|---|---|---|
+| User's claim | "the detector is WRONG — no patient data here" | "there IS PHI and I'm authorized for it here" |
+| Precondition | `overridable==true` | signed **BAA** (Key-1) + per-site authorization log |
+| Ingests as | **CLEAN — no PHI tag** | **PHI-tagged** |
+| BAA needed? | **NO** (there's no PHI to govern) | **YES** |
+| Attestation | lightweight: "I confirm this is not patient data" (logged for provenance) | full per-site attestation |
+| Who | anyone (correcting a detector error) | authorized user under BAA |
+
+**Why this matters for the call:** the false-positive override is the **LIGHT** one — it **unblocks clean payer docs TODAY with NO BAA dependency**, because by definition no PHI is present. Do not read this decision as "needs a BAA to ship" — that's the *other* path. `overridable==true` → false-positive path (ingest clean, no BAA); `overridable==false` with real identifiers → attestation path (BAA-gated) or stays hard-blocked.
+
+**Extension card logic — a THIRD lane, not a merge:**
+- `gate==phi & !overridable` → plain PHI card (no override; or the BAA attestation if/when Key-1 lands)
+- `gate==phi & overridable` → **"This looks like a false flag — add anyway"** → ingests **CLEAN**
+- `indeterminate` / `publish_failed` → their own soft "try again" cards
+- (`unconfigured` → admin card)
+
+**Status:** classifier confirms the safe design is real and will ship `overridable` on `/classify` **on Ananth's word**. Not built yet. Remaining wiring once green-lit: chat honors `overridable` in the `/chat/upload` admit (ingest clean, no PHI tag); extension adds the false-flag lane to the block card with the lightweight "not patient data" attestation log. Decision owner: Ananth; enforcement: chat; UX: extension. **No BAA on the critical path for this override.**
 
 ---
 
