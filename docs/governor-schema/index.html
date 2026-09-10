@@ -108,26 +108,29 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:.05re
 <tr><td><b>B · spend</b><br>every round</td><td>progress against the SLA</td><td>continue · buy a round · consolidate · finalize — and <b>which term is at risk</b></td></tr>
 <tr><td><b>C · hand off</b><br>once, at the end</td><td>what was actually achieved</td><td>tell the integrator <b>which terms were met and which were not</b>, so the answer can say so</td></tr>
 </table></div>
-<div class="note"><b>This is what makes Phase C matter.</b> If the SLA is three terms, the hand-off is three answers: recall met, accuracy met, latency exceeded. An answer that ran short on accuracy should say so — which is exactly what the CARC&nbsp;197 turn failed to do when it stated a 90-day deadline its own disclaimer called unsupported.<h2>6 · The codified promise — measured, 2026-08-11 → 2026-09-10, n=1,120 turns</h2>
-<p class="sub">From <code>chat_turns.duration_ms</code> joined to <code>react_trace</code> for mode and reasoning depth, and to <code>llm_calls</code> for cost. This is the baseline to improve on, not a target.</p>
+<div class="note"><b>This is what makes Phase C matter.</b> If the SLA is three terms, the hand-off is three answers: recall met, accuracy met, latency exceeded. An answer that ran short on accuracy should say so — which is exactly what the CARC&nbsp;197 turn failed to do when it stated a 90-day deadline its own disclaimer called unsupported.<h2>6 · The codified promise — measured, 2026-08-11 → 2026-09-10, n=1,119 turns</h2>
+<p class="sub">Mode <b>is</b> the tier: <code>quick</code>=fast · <code>copilot</code>=normal · <code>agentic</code>=thinking. From <code>chat_turns.duration_ms</code> joined to <code>react_trace</code> and <code>llm_calls</code>. This is the baseline to improve on, not a target.</p>
 <div class="ov"><table>
-<tr><th>mode</th><th>depth</th><th>n</th><th>p10</th><th>p25</th><th>p50</th><th>p75</th><th>p90</th><th>rounds</th><th>tok p50</th><th>tok p90</th><th>$ p50</th><th>llm calls</th></tr>
-<tr><td>quick</td><td>fast</td><td>122</td><td>7.4</td><td>8.6</td><td><b>14.4</b></td><td>24.3</td><td>31.8</td><td>1.1</td><td>24,940</td><td>44,667</td><td>0.0102</td><td>5.6</td></tr>
-<tr><td>copilot</td><td>fast</td><td>374</td><td>16.1</td><td>21.8</td><td><b>31.5</b></td><td>47.6</td><td>56.5</td><td>2.5</td><td>73,726</td><td>125,273</td><td>0.0304</td><td>7.5</td></tr>
-<tr><td>copilot</td><td>thinking</td><td>93</td><td>20.2</td><td>24.6</td><td><b>31.3</b></td><td>43.2</td><td>50.9</td><td>2.4</td><td>81,889</td><td>128,904</td><td>0.0272</td><td>7.6</td></tr>
-<tr><td>agentic</td><td>fast</td><td>472</td><td>24.4</td><td>40.3</td><td><b>91.8</b></td><td>153.5</td><td>211.3</td><td>5.1</td><td>134,418</td><td>533,700</td><td>0.0473</td><td>11.7</td></tr>
-<tr><td>agentic</td><td>thinking</td><td>55</td><td>58.8</td><td>85.0</td><td><b>126.9</b></td><td>197.9</td><td>274.8</td><td>6.7</td><td>207,366</td><td>659,406</td><td>0.1098</td><td>13.4</td></tr>
-<tr><td>quick</td><td>thinking</td><td>3</td><td>24.8</td><td>26.7</td><td>29.8</td><td>33.6</td><td>35.9</td><td>1.7</td><td>106,926</td><td>109,449</td><td>0.0285</td><td>6.7</td></tr>
+<tr><th>tier</th><th>mode</th><th>n</th><th>p10</th><th>p25</th><th>p50</th><th>p75</th><th>p90</th><th>rounds</th><th>tok p50</th><th>tok p90</th><th>$ p50</th><th>$ p90</th></tr>
+<tr><td><b>fast</b></td><td>quick</td><td>125</td><td>7.4</td><td>8.7</td><td><b>14.6</b></td><td>24.4</td><td>33.9</td><td>1.1</td><td>24,952</td><td>47,396</td><td>0.0104</td><td>0.0233</td></tr>
+<tr><td><b>normal</b></td><td>copilot</td><td>467</td><td>16.6</td><td>22.1</td><td><b>31.3</b></td><td>46.5</td><td>56.1</td><td>2.4</td><td>76,582</td><td>126,266</td><td>0.0303</td><td>0.0558</td></tr>
+<tr><td><b>thinking</b></td><td>agentic</td><td>527</td><td>24.5</td><td>43.6</td><td><b>95.5</b></td><td>157.7</td><td>218.5</td><td>5.3</td><td>145,141</td><td>555,171</td><td>0.0538</td><td>0.3810</td></tr>
 </table></div>
-<p class="legend" style="margin-top:.5rem">latency in seconds · tokens per turn, all LLM calls summed · $ per turn · rounds = mean</p>
+<p class="legend" style="margin-top:.5rem">latency seconds · tokens per turn, all LLM calls summed · dollars per turn · rounds = mean</p>
 
-<div class="note"><b>There is no <code>normal</code> depth in production.</b> <code>_DEPTH_RANK</code> defines fast / normal / thinking; only <b>fast</b> and <b>thinking</b> ever appear across 1,120 turns. The middle rung is declared and unreachable.</div>
+<div class="note"><b>The tiers separate cleanly on latency and cost, which is the good news.</b> p50 <b>14.6 → 31.3 → 95.5s</b> and $ p50 <b>0.0104 → 0.0303 → 0.0538</b>. The dial works: each tier is roughly 2–3× the one below on both terms. <b>This is a promise that can be stated.</b></div>
 
-<div class="note"><b>In copilot, thinking is not slower than fast — it is marginally faster.</b> p50 31.3s vs 31.5s, p90 50.9s vs 56.5s, on the same 2.4–2.5 rounds. Depth costs 11% more tokens and buys no measurable extra work. <b>The dial does nothing in copilot.</b> In agentic it plainly does: 126.9s vs 91.8s and 2.3× the cost.</div>
+<div class="note"><b>The thinking tier's tail is the one that cannot be promised.</b> p90 <b>218.5s</b> against a 300s ceiling, and $ p90 <b>0.3810</b> — <b>7× its own p50</b> and <b>36×</b> quick's p90. The mean is affordable and the tail is not, so a cost term stated at p50 would be met while the p90 turns are what actually shows up on the bill.</div>
 
-<div class="note"><b>The latency promise no mode can keep is agentic.</b> Its p90 is <b>211s (fast)</b> and <b>275s (thinking)</b> against a 300s hard ceiling — so the ceiling binds on roughly a tenth of agentic turns, and <code>soft_target_s = 120s</code> is already past p50. The governor is consolidating on more than half of agentic turns before the round budget matters.</div>
-
-<div class="note"><b>Cost has an order-of-magnitude spread and no term to bound it.</b> agentic/thinking p90 is <b>659,406 tokens</b> against quick/fast p50 of 24,940 — <b>26×</b>. And <code>$0.1098</code> vs <code>$0.0102</code> per turn at p50, <b>10.8×</b>. Nothing in the contract caps either.</div>
+<h2>6a · Inside each tier — the per-round depth dial</h2>
+<p class="sub"><code>reasoning_depth</code> is a <b>separate</b> per-round escalation chosen inside a mode, not the tier itself.</p>
+<div class="ov"><table>
+<tr><th>tier / mode</th><th>rounds at <code>fast</code></th><th>at <code>thinking</code></th><th>at <code>normal</code></th></tr>
+<tr><td>fast / quick</td><td>136 — <b>96.5%</b></td><td>5 — 3.5%</td><td><span class="tag t-no">0</span></td></tr>
+<tr><td>normal / copilot</td><td>923 — <b>80.5%</b></td><td>220 — 19.2%</td><td><span class="tag t-no">0</span></td></tr>
+<tr><td>thinking / agentic</td><td>2,405 — <b>86.7%</b></td><td>368 — 13.3%</td><td><span class="tag t-no">0</span></td></tr>
+</table></div>
+<div class="note"><b>The thinking tier executes 87% of its rounds at <code>fast</code> depth.</b> The tier name describes the budget, not the work. And <b><code>normal</code> never appears as a round depth in 4,060 rounds</b> — <code>_DEPTH_RANK</code> defines fast/normal/thinking and the middle rung of the inner dial is unreachable, so a round is either cheap or expensive with nothing between.</div>
 
 <h2>7 · Quality — the term we cannot yet state</h2>
 <div class="ov"><table>
