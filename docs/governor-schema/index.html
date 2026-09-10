@@ -280,6 +280,67 @@ h3{font-size:.82rem;margin:1.8rem 0 .5rem;letter-spacing:.04em;text-transform:up
 
 <div class="note"><b>Why step 2 needs step 1 and not the reverse.</b> The governor today compares <code>elapsed_s</code> against <code>soft_target_s</code> — a <b>budget it was handed</b>, with no link to anything promised to anyone. Once the turn carries a promise, the same comparison becomes <i>"am I on track for what was promised?"</i> and the levers acquire a target. <b>That is the whole point of doing the boundary first:</b> levers pointed at an invented number are the state we are already in.</div>
 
+<h2>7e · THE EMIT — what actually appears, shown</h2>
+<p class="sub">Read from <code>app/pipeline/react/promise.py</code> as built (<code>e227165</code>). Not a mock-up — these are the fields the code writes. Values are from Chat''s verified dev write.</p>
+
+<h3>E — the log line (Cloud Logging)</h3>
+<p class="sub">The human-readable part is deliberately thin. <b>Everything that matters is in <code>jsonPayload</code></b>, because a number inside a message string is not an emit — nothing can read it back.</p>
+<pre style="overflow-x:auto;padding:.9rem 1rem;border:1px solid var(--line);border-radius:6px;background:var(--card,rgba(127,127,127,.06));font-size:.72rem;line-height:1.55"><b>[promise] attestation cid=d50c4353 outcome=completed tier=thinking</b>
+
+jsonPayload: {
+  "event"               : "turn_attestation",
+  "correlation_id"      : "d50c4353-1032-4af8-85cd-fea3052693f7",
+  "promise_version"     : "v1",
+  "tier"                : "thinking",
+  "outcome"             : "completed",
+  "posted_at"           : "2026-09-10T22:14:03.118000+00:00",
+  "published_at"        : "2026-09-10T22:14:15.618000+00:00",
+  "delivered_latency_s" : 12.50,        <span class="sub">← POST → PUBLISH. the promise clock</span>
+  "worker_latency_s"    : 8.00,         <span class="sub">← the old duration_ms</span>
+  <b>"queue_wait_s"        : 4.50</b>,         <span class="sub">← <b>never measured before</b></span>
+  "notes"               : null
+}</pre>
+<div class="note"><b>The emit is deliberately separate from the persist.</b> From the code''s own comment: <i>"if the DB write fails, the structured record must still reach Cloud Logging, and vice versa. Wiring them together would let one failure hide the other."</i> Two independent surfaces, two independent failure modes — which is the entire lesson of the write path that produced zero rows behind a green suite.</div>
+
+<h3>P — the row</h3>
+<pre style="overflow-x:auto;padding:.9rem 1rem;border:1px solid var(--line);border-radius:6px;background:var(--card,rgba(127,127,127,.06));font-size:.72rem;line-height:1.55">correlation_id  version  tier      outcome        delivered  worker  queue_wait  cost  quality  notes
+d50c4353…       v1       thinking  completed          12.50    8.00        4.50  NULL  NULL     NULL
+9f21b7ac…       v1       —         completed           9.80    6.10        3.70  NULL  NULL     "task mode: no section-7 tier"
+5c08e4d1…       —        —         completed          14.20   11.05        3.15  NULL  NULL     "pre-deploy enqueue: no promise"
+a71b3390…       v1       normal    <b>failed</b>             31.90   28.40        3.50  NULL  NULL     NULL
+e6042f8b…       v1       fast      <b>empty_payload</b>       6.40    4.90        1.50  NULL  NULL     NULL</pre>
+
+<div class="ov"><table>
+<tr><th>what to read in it</th><th>why</th></tr>
+<tr><td><b>Rows 2 and 3 are different</b> — one has <code>v1</code>, the other has nothing</td><td><b>"promised nothing, and here is why"</b> vs <b>"no promise travelled at all."</b> Collapsing these into one null would hide the exact gap step 1 exists to expose</td></tr>
+<tr><td><b><code>failed</code> and <code>empty_payload</code> have rows</b></td><td>the whole reason the close sits in <code>run_pipeline</code>''s outermost <code>finally</code> and not in the publish functions. <b>A turn that broke is the most valuable attestation there is</b></td></tr>
+<tr><td><code>cost</code> and <code>quality</code> are <b>NULL, not 0.0</b></td><td>step 3''s backlog, visible in every row. <b>A <code>0.0</code> here would be a step-1 failure, not a cheap turn</b></td></tr>
+<tr><td>a <code>clarification</code> row would be <b>alarming</b></td><td>that outcome is unreachable at both ends. One appearing means a flag writer <b>and</b> a caller were revived</td></tr>
+</table></div>
+
+<h3>W — the payload at POST</h3>
+<pre style="overflow-x:auto;padding:.9rem 1rem;border:1px solid var(--line);border-radius:6px;background:var(--card,rgba(127,127,127,.06));font-size:.72rem;line-height:1.55">"promise": {
+  "version"   : "v1",
+  "tier"      : "thinking",
+  "posted_at" : "2026-09-10T22:14:03.118000+00:00",
+  "latency_s" : 95.5,      <span class="sub">← promised, from §7</span>
+  "cost_c"    : 81.0,      <span class="sub">← the 15× exploration bound</span>
+  "quality"   : "best"
+}</pre>
+<div class="note"><b><code>posted_at</code> is wall-clock UTC, and that is the whole trick.</b> <code>t0_start</code> is a <code>perf_counter()</code> — monotonic and <b>process-local</b>. POST runs in the API process, the turn in the worker; those two cannot be subtracted. The wall clock is what makes <code>queue_wait_s</code> computable at all.</div>
+
+<h3>What YOU see on screen — almost nothing</h3>
+<div class="ov"><table>
+<tr><th>moment</th><th>on screen</th></tr>
+<tr><td><b>before</b></td><td><i>"usually about 95 seconds"</i> — the promise, set as an expectation up front</td></tr>
+<tr><td><b>during</b>, running long</td><td><i>"taking longer than usual"</i> — said first, before you notice</td></tr>
+<tr><td><b>after</b>, promise kept</td><td><b>nothing</b></td></tr>
+<tr><td><b>after</b>, promise broken</td><td><i>"this ran long — worth re-asking in thinking mode?"</i> — only if actionable, phrased as an offer</td></tr>
+</table></div>
+<div class="note"><b>The attestation is not a screen feature.</b> Its job is to make the promise falsifiable; the user-facing lines above are a <i>consequence</i> of having it, not the reason to write it. <b>Cost never appears on screen</b> — it is a system term, and at a 15× exploration bound it would be actively misleading read as a price. <b>Silence is the report.</b> A badge on every answer saying the SLA was met is noise that trains you to ignore the one time it was not.</div>
+
+<div class="note"><b>Caveat, stated rather than assumed.</b> <span class="tag t-part">READ, NOT YET OBSERVED</span> <code>configure_logging()</code> at <code>main.py:172</code> removes every root handler and installs the JSON formatter, and the deployed container runs one process (<code>CMD uvicorn app.main:app</code>) that serves HTTP <b>and</b> consumes queued turns — so the structured emit should win. But <b>a worker run standalone</b> (<code>python -m app.worker</code>) never calls <code>configure_logging</code> and would render this line as <b>plain text with every structured field dropped</b>. The <b>E</b> demonstration settles it: one <code>gcloud logging read</code> either returns <code>jsonPayload</code> fields or it does not.</div>
+
 <h2>8 · What is missing — RECALL, and how we start tracking it</h2>
 <p class="sub">Accuracy has a live proxy. Recall has nothing. Marked here so the gap is tracked rather than assumed away.</p>
 <div class="ov"><table>
