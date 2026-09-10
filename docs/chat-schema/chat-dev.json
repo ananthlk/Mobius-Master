@@ -59,7 +59,7 @@
     "n": 1
    }
   ],
-  "outside": 36
+  "outside": 37
  },
  "missing_content": [],
  "live_env_service": "mobius-chat (us-central1)",
@@ -2278,6 +2278,14 @@
     [
      "bad",
      "OWNER(chat): `usable` PASSES THE ONE CASE IT WAS BUILT TO CATCH. Appeals measured it against live data: FL Medicaid x 29 returns {deadline_appeal_days: null, submission_method: 'portal', portal_url: '', fax: '', mail_address: ''}. Chat's guard is usable = found and (days is not None or bool(method)) -> False or True -> TRUE. So the '?d deadline' shape \u2014 72 OF 141 ROWS, 51% OF THE CORPUS, all FL Medicaid \u2014 is admitted as usable, and chat proceeds to answer a DEADLINE question from a playbook that has no deadline. The predicate is a single boolean over a union of fields; it needs to be PER-FIELD, checked against the field the QUESTION needs. A deadline question requires deadline_appeal_days; a submission question requires submission_method. Neither implies the other and OR-ing them was the error."
+    ],
+    [
+     "bad",
+     "OWNER(appeals-agent, self-reported): '51% OF THE CORPUS' WAS ONE TEMPLATE REPEATED 72 TIMES, AND I REPEATED THE NUMBER ALL EVENING. Appeals inspected all 72 'FL Medicaid' rows 2026-09-09: ONE distinct appeal_levels signature across all 72; every payor-specific scalar blank (deadline_appeal_days None, portal_url '', fax '', mail_address ''). So it is a TEMPLATE, not 72 sourced records, and it carries no payor identity at all. THE DECISIVE EVIDENCE THAT IT IS ALSO NOT THE AGENCY: ladder level 5 is 'AHCA Complaint / CMS \u2014 File with FL AHCA or CMS. Last resort.' YOU CANNOT ESCALATE TO THE AGENCY IF YOU ARE THE AGENCY \u2014 and level 4, 'Provider Claim Dispute \u2014 contractual right', presupposes a contract with a PLAN. So 'FL Medicaid' is neither AHCA nor fee-for-service Medicaid: it is a generic managed-care-plan appeal template stored under a payor-shaped name. CONSEQUENCES, three of them retractions of my own filings: (1) the FL Medicaid IDENTITY RULING I asked the payor seat for is WITHDRAWN \u2014 it is not a payor, so there is nothing to canonicalise, and point 3 rules out the AHCA mapping on the template's own evidence; (2) the Lexicon coverage debt shrinks \u2014 florida_medicaid should NOT become a key, and appeals' real payor list is SUNSHINE HEALTH, SINGULAR; (3) every '72 of 141 rows / 51% of the corpus' statement in this log, mine included, described one template as though it were 72 records with a sourcing gap. The honest statement is ONE REAL PAYOR AND ONE DEFAULT. Appeals' fix, theirs: re-key those rows to the actual MCOs or mark them as the template they are."
+    ],
+    [
+     "watch",
+     "PATTERN, appeals seat 2026-09-09 \u2014 AN ARTEFACT WHOSE IDENTITY IS WRONG RATHER THAN WHOSE PATH IS MISSING. Distinct from the three artefact-without-a-path instances collected tonight, and worse in one respect: a template stored in the payor column READS AS DATA EVERYWHERE IT IS CONSUMED. It gets counted in coverage, quoted in status, and generates work for other teams \u2014 it nearly bought a Lexicon key from me and an identity ruling from the payor seat for something that is not a payor. Nothing is broken and nothing is missing; the row is simply not the kind of thing its column says it is. The tell is ZERO VARIATION across many rows: 72 rows with one signature is a template, and no real corpus is that uniform."
     ],
     [
      "bad",
