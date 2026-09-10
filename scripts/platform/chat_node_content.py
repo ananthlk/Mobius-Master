@@ -2211,7 +2211,8 @@ skill is one file and no edit here. The rest are still described inline.
          "If the gap should be more useful than a blank, render the adapter's REASON "
          "CODE (unsourced = a real gap the user should act on; resolver_unavailable = "
          "transient, retry) — RENDER THE REASON, NEVER A NUMBER."
-         "FIXED (chat 10133ae) and LIVE in 00976-btd — verified: react_loop.py carries 'NO INVENTED DEFAULT' where the substitution was."),
+         "FIXED (chat 10133ae) and LIVE in 00976-btd — verified: react_loop.py carries 'NO INVENTED DEFAULT' where the substitution was."
+         "CORRECTED 2026-09-10 — IT WAS TWO COPIES, NOT ONE, AND THE APPEALS SEAT SELF-REPORTED THEIRS. They told me to route it as a chat fix, then found the same invention in their own tool: mobius-skills/appeals-agent/api/mcp_server.py, the not-found path of appeals_get_playbook — 'No playbook found for {payor}. Use standard FL Medicaid appeal process: 42 CFR 438.408. Default deadline: 60 days from denial notice date. Submit via certified mail...'. VERIFIED IN GIT that chat's string was DIFFERENT TEXT — 'No playbook for {payor}. Default FL Medicaid: 60 days, certified mail.' — so this is TWO INDEPENDENT INVENTIONS OF THE SAME WRONG NUMBER, not one bug reported twice. Chat's is removed (10133ae) and live; theirs is live and being fixed. Their ruling was INCOMPLETE, NOT WRONG: the four reasons they gave applied to chat's copy and chat acted on them, and that the reasons also condemned their own code makes the argument stronger. Re-filed as BOTH seats'. And they self-reported it unprompted while writing a document about something else."),
  ("good", "GATE GREEN ACROSS ALL FIVE COMMITS, 2026-09-09: regressions 0, newly "
           "passing 0, known-failing baseline 14 unchanged; 2579/2598 passed, 5 "
           "skipped. Covers 10133ae and 2b0008f. AND ASKING RATHER THAN INFERRING PAID "
@@ -2830,6 +2831,8 @@ skill is one file and no edit here. The rest are still described inline.
            "thing its column says it is. The tell is ZERO VARIATION across many rows: "
            "72 rows with one signature is a template, and no real corpus is that "
            "uniform."),
+ ("bad", "OWNER(appeals-agent, self-reported): THE MCP ROUTE READS THE UNGUARDED "
+         "/playbook/ ENDPOINT WHILE CHAT READS /playbook-guarded — ONE DOOR ROUND THE PARTY FILTER. Self-reported 2026-09-10. I checked how far it reaches and CHAT IS NOT EXPOSED, verified rather than inferred: appeals_get_playbook renders in the STATIC section of the live manifest (before the MCP header at line 413), react_loop.py:3191 has a hard-coded router-owned handler that runs before any registry dispatch, and it calls /playbook-guarded/...?audience=provider at :3273 and :3285 with a comment at :3263 reading 'audience=\"provider\" is NOT optional and must not be dropped'. ALL FIVE appeals_* tools have hard-coded handlers, so none routes through the MCP server. BUT THE MCP SERVER IS REGISTERED IN PRODUCTION (EXTRA_MCP_URLS = mobius-appeals-prototype, MOBIUS_MCP_AUTOREGISTER=1), so the unguarded route is live and reachable by any consumer without chat's handler. CHAT IS PROTECTED BY AN ACCIDENT OF IMPLEMENTATION, NOT BY DESIGN: remove that handler and let the tool fall through to the registry, and the party filter silently disappears. Theirs to fix, and more urgent than 'relevant to you only'."),
  ("bad", "OWNER(appeals-agent, self-reported): THE GUARD IS FAIL-OPEN ON SCALARS AND "
          "ITS DOCSTRING SAYS THE OPPOSITE. Found by the appeals seat 2026-09-09 by "
          "TESTING their own endpoint at my request rather than describing it — and "

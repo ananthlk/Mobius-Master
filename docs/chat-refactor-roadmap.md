@@ -15,7 +15,7 @@ deliberately not yet asked because P4 has not opened. Per-phase status below is
 hand-maintained in `refactor_roadmap.py`'s `PHASE_STATUS`, because completion is a
 judgement about a gate, not something derivable from the findings file.
 
-**132 bugs · 88 sequenced into 6 phases · 40 explicitly outside · 0 UNSEQUENCED · 27 of the 88 sequenced have NO OWNER**
+**133 bugs · 88 sequenced into 6 phases · 41 explicitly outside · 0 UNSEQUENCED · 27 of the 88 sequenced have NO OWNER**
 
 > The two counts are different questions and the second one used to be invisible.
 > `UNSEQUENCED` was previously printed as "unassigned", which reads as *nobody owns
@@ -259,6 +259,7 @@ Each carries a reason. Excluding by silence is the failure mode this guards agai
 | `tool_manifest` | other seat | mobius-payor docstring + mobius-rag wiring; mine and the payor seat's, not chat's | OWNER(me + payor seat): THE ENDPOINT AT THE CENTRE OF THIS WHOLE INVES |
 | `tool_manifest` | other seat | roster seat's one-line fix in mobius-skills org_handler.py:1015; payor notifying directly | OWNER(roster seat): PAYOR'S canonical:null CHANGE BREAKS display_name  |
 | `tool_manifest` | other seat | mobius-payor tests/; not a chat change — routed to the payor seat with the real cause | OWNER(payor seat / whoever owns intake): TWO SCRIPTS ARE NAMED LIKE TE |
+| `tool_manifest` | other seat | appeals-agent's mcp_server.py; chat verified not exposed, but the unguarded route is live for other consumers | OWNER(appeals-agent, self-reported): THE MCP ROUTE READS THE UNGUARDED |
 | `tool_manifest` | other seat | appeals-agent self-reported; their code, their fix — chat must stop treating the markers as 'empty' | OWNER(appeals-agent, self-reported): THE GUARD IS FAIL-OPEN ON SCALARS |
 | `tool_manifest` | other seat | appeals contract change offered; chat consumes once shipped | A MISS IS 200-WITH-{} AND 'PAYOR UNKNOWN' IS BYTE-IDENTICAL TO 'CARC N |
 | `PHI gate` | own workstream | feedback-text gate writes no audit row; compliance, not structure | TWO IMPLEMENTATIONS OF THE SAME GATE, and only one is audited |

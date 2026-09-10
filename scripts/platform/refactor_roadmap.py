@@ -324,6 +324,7 @@ PRINCIPLES = [
 ]
 
 OUT_OF_PROGRAM = [
+    ("tool_manifest", "THE MCP ROUTE READS THE UNGUARDED", "other seat", "appeals-agent's mcp_server.py; chat verified not exposed, but the unguarded route is live for other consumers"),
     # Declined on cost by Ananth, 2026-09-09: the DB is 0.5-2.3% of turn wall and the
     # fix buys ~0.2%. A DECLINED FIX IS A DECISION, NOT AN OPEN DEFECT — leaving it
     # open counted a made decision against state_load's readiness forever.
