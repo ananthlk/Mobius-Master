@@ -1,11 +1,12 @@
 {
  "generated_by": "scripts/platform/gen_coverage.py",
  "layer": "1 \u2014 reachability (Eval's Q5 ruling); Layer 2 tags are collected, and GUARDED requires Eval's audit of the tag",
- "tests_scanned": 177,
+ "tests_scanned": 178,
  "counts": {
   "ABSENT": 5,
   "IMPORTED-NOT-CALLED": 1,
-  "PERIPHERAL": 19,
+  "PERIPHERAL": 18,
+  "TAGGED-UNVERIFIED": 1,
   "REMOVED": 7
  },
  "nodes": [
@@ -218,11 +219,13 @@
   },
   {
    "node": "state_load",
-   "state": "PERIPHERAL",
+   "state": "TAGGED-UNVERIFIED",
    "module": "app.stages.state_load",
    "direct": 1,
    "reached": 1,
-   "tags": [],
+   "tags": [
+    "state_load:no_silent_reset"
+   ],
    "rating": "red"
   },
   {
@@ -291,5 +294,9 @@
    "tags": []
   }
  ],
- "tags_found": {}
+ "tags_found": {
+  "state_load:no_silent_reset": [
+   "test_state_load_state_integrity.py"
+  ]
+ }
 }

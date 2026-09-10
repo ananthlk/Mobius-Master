@@ -23,6 +23,25 @@ requires Eval's verification of the tag, so a tag alone renders as
 TAGGED-UNVERIFIED until they sign it — a tag nobody audited is exactly the
 "reports connected while nothing flows" shape this program keeps finding.
 
+TAGGING RULE, set on the first tag and binding on every one after
+(Chat Master, 2026-09-09, adopted):
+
+  A tag is valid only if the tagged test has been DEMONSTRATED to fail with
+  the guarantee removed. Not "asserts the guarantee" as a reading judgement —
+  mutate the guarantee out of app/, run the tagged tests, and keep only the
+  ones that go red.
+
+This is not pedantry; it was earned on the first use. Four tests were tagged
+for state_load:no_silent_reset. Under mutation THREE failed and the FOURTH
+PASSED WITH THE GUARANTEE DELETED — test_tracked_write_is_suppressed_after_a_
+failed_read snapshotted `before` AFTER the turn ran, so with the guarantee
+gone it captured the already-damaged row and its final assert then held for
+an unrelated reason (a compare-and-set miss). The test READS correctly. Only
+mutation finds it. Without this rule Layer 2 becomes a second producer without
+a consumer: a machine-checkable marker whose machine-checkable content is
+"someone thought this was relevant", believed MORE than an untagged test
+precisely because it carries a tag.
+
 FIRST IMPLEMENTATION WAS WRONG AND IS RECORDED HERE. I built reachability as
 a TRANSITIVE import closure — a test importing the orchestrator "reaches"
 every module the orchestrator imports. That returned 24 of 24 nodes reached,
