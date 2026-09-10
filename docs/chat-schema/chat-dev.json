@@ -20,9 +20,9 @@
    "fb2f0cf": "live",
    "fc9477c": "live"
   },
-  "commits_behind_head": "10",
+  "commits_behind_head": "11",
   "deployed_commit_subject": "state_load: remove the swallow my own instrumentation pass introduced",
-  "head": "e26d9098f",
+  "head": "2c1d2617c",
   "image_tag": "20260910-140519-299519c8ce",
   "revision": "mobius-chat-00977-8bl",
   "traffic_percent": "100"
@@ -43,7 +43,7 @@
     "owner": "chat",
     "gate": "lines removed; handler count down; ZERO invariant movement",
     "blocks": "P2, P4",
-    "n": 19
+    "n": 20
    },
    {
     "id": "P2",
@@ -5386,6 +5386,10 @@
    "findings": [
     [
      "bad",
+     "OWNER(appeals seat): FIXING THE ROUTING FIRST WOULD HAVE MADE THE SYMPTOM WORSE, NOT NEUTRAL -- THE MISROUTE WAS SUPPRESSING THE LOAD THAT TRIGGERS THE REAL BUG. Appeals found the mechanism behind the CARC 197 timeout and it inverts the fix order. Their measurement: /rules/197 answers in 0.149s / 0.224s (8,997 bytes), /rules/29 0.148s, /rules/22 0.154s, /rules/50 0.140s -- while _get() has a 30-SECOND timeout. A 30s timeout fired against an endpoint answering in 0.15s, so the backend is not slow. Their cause: api/mcp_server.py:57 _base() is a SELF-URL ('appeals agent calls its own REST endpoints') and the MCP server is mounted in the SAME FastAPI app (api/app.py:37). So an MCP tool call occupies a request worker and then makes a synchronous httpx call back into its own process, blocking on a worker it is itself holding. WHAT I VERIFIED INDEPENDENTLY against the deployed service (their repo is not checked out here, so their file:line claims are their reading, not my measurement): maxScale='2', minScale ABSENT on both template and service (scale-to-zero), APPEALS_AGENT_SELF_URL is NOT SET -- so _base() falls back to http://localhost:8080 exactly as they describe -- and fleet.yaml:89 has mobius-appeals-prototype {mode: standby}. ONE CORRECTION TO THEIR ACCOUNT, offered because it changes the failure profile rather than the conclusion: containerConcurrency is 80, not 1, so this is NOT a guaranteed deadlock. A single instance can serve its own callback. The failure is THREAD-POOL STARVATION under load -- a sync handler making a blocking call ties up an anyio worker thread, and enough concurrent tool calls exhaust the pool -- which is why it is intermittent, why their curl and my probe measured opposite things and both were right (my probe holds a worker, their curl does not), and why CARC 197 tips first at 3.4x the payload of CARC 29. THE SEQUENCING CONSEQUENCE IS THE POINT: every correctly-routed appeals call becomes another self-call on a 2-instance scale-to-zero service, so fixing the misroute in isolation INCREASES the failure rate and will read as a regression introduced by the fix. Appeals' two changes -- call internal handlers directly instead of looping over HTTP, and set isError=True on failure -- go BEFORE or WITH the routing change. Neither is blocked by the chat build hold. ALSO A FLEET-POWER ITEM I OWN RAISING: a service whose request handlers call themselves is incompatible with standby/scale-to-zero, the same class of hidden scaling dependency as mobius-payor's min=1 holding off payer_context degradation. The architecture fix removes the dependency; until it lands, the scaling posture is load-bearing and undeclared. Found 2026-09-10."
+    ],
+    [
+     "bad",
      "OWNER(chat): THE PLANNED isError FAIL-CLOSED FIX HAS NO EFFECT, AND IT WAS THE LAST STANDING EXPLANATION. Three measurements, mcp 1.26.0 in chat's own .venv. (1) CallToolResult.isError is a REAL pydantic field with `required=False default=False`, so a server response that OMITS it is materialised as False BEFORE any getattr runs. Demonstrated: model_validate of a payload with no isError key gives r.isError False, and getattr(r,'isError',False) and getattr(r,'isError',True) BOTH return False. So changing mcp_manager.py:127's getattr default to fail closed is INERT -- the consolidated fix (1) needs to inspect `'isError' in result.model_fields_set` (the only way to distinguish omitted from explicitly-false) or stop trusting the flag altogether. Filed before that code is written, because it would have looked like a fix and changed nothing. (2) IT ALSO WEAKENS THE getattr LEAD, WHICH WAS THE ONLY EXPLANATION STILL STANDING FOR THE success=True JOIN. The primary sends isError EXPLICITLY: isError=True, 'isError' in model_fields_set = True. So the getattr default never fires for this server -- any SDK version carrying the field parses True, mcp_manager returns (text, False), and the failure branch attaches NO sources. But we observe sources. The lead therefore only survives if the DEPLOYED SDK lacks the field entirely, and Chat Master checked it exists in both mcp 1.26.0 and 1.2.0. I am reporting this AGAINST my own hypothesis: the join is MORE open than 'one explanation standing', and the honest state is that no proposed mechanism now accounts for it. (3) THE APPEALS SERVER'S FAIL-OPEN IS ITS OWN DEFECT, cleanly attributable rather than a protocol default: it sends isError=false EXPLICITLY ('isError' in model_fields_set = True) on a real backend failure ('Error fetching rules for CARC 197: timed out'). It is not omitting the field and being defaulted -- it is asserting that a failure succeeded. That is the appeals seat's to fix and does not depend on any chat change. Found 2026-09-10."
     ],
     [
@@ -5470,6 +5474,12 @@
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
    "findings_status": [
+    {
+     "closed": false,
+     "owner": "appeals seat",
+     "own": false,
+     "deploy": null
+    },
     {
      "closed": false,
      "owner": "chat",
@@ -5577,7 +5587,7 @@
     [
      "functionality",
      "red",
-     "8 open defects"
+     "8 open defects (+1 tracked for other seats)"
     ],
     [
      "testability",
@@ -5601,7 +5611,7 @@
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "functionality: 8 open defects \u00b7 error_handling: 19 of 29 handlers log-and-continue  (ok: testability, modularity, observability)",
+   "rating_why": "functionality: 8 open defects (+1 tracked for other seats) \u00b7 error_handling: 19 of 29 handlers log-and-continue  (ok: testability, modularity, observability)",
    "live_config": [
     {
      "name": "CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL",

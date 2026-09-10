@@ -18,9 +18,9 @@
   "fb2f0cf": "live",
   "fc9477c": "live"
  },
- "commits_behind_head": "10",
+ "commits_behind_head": "11",
  "deployed_commit_subject": "state_load: remove the swallow my own instrumentation pass introduced",
- "head": "e26d9098f",
+ "head": "2c1d2617c",
  "image_tag": "20260910-140519-299519c8ce",
  "revision": "mobius-chat-00977-8bl",
  "traffic_percent": "100"
