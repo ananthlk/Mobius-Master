@@ -20,9 +20,9 @@
    "fb2f0cf": "live",
    "fc9477c": "live"
   },
-  "commits_behind_head": "19",
+  "commits_behind_head": "20",
   "deployed_commit_subject": "state_load: remove the swallow my own instrumentation pass introduced",
-  "head": "f30426fed",
+  "head": "54aa86c2c",
   "image_tag": "20260910-140519-299519c8ce",
   "revision": "mobius-chat-00977-8bl",
   "traffic_percent": "100"
@@ -51,7 +51,7 @@
     "owner": "chat + Eval",
     "gate": "every segment timed AND each timed segment's attribution verified against a known-external call \u2014 an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
-    "n": 36
+    "n": 37
    },
    {
     "id": "P3",
@@ -5394,6 +5394,10 @@
     ],
     [
      "bad",
+     "OWNER(platform, method): THE DISQUALIFYING FACT WAS FOUR CHARACTERS TO THE LEFT -- A SELF-LABELLED PRINT ASSERTED THE OPPOSITE OF ITS OWN MEASURED VALUE. Chat Master's, and it is a sharper failure mode than the fourth check as we wrote it. Their verification script printed `omitted: r2.is_error = False (None, not False)`. THE MEASURED VALUE WAS False; THE PARENTHETICAL WAS A HARDCODED LABEL THEY HAD TYPED, asserting the opposite. They read the annotation instead of the output, carried it into their doc and into a report, and did so in the message AFTER endorsing the check about resolving disqualifying facts before concluding. So the refutation was not sitting unread in old notes -- it was on the same line as the value. THE GENERALISATION, which is the part to keep: a self-labelled print is a TRAP, because THE LABEL IS WRITTEN BEFORE THE VALUE IS KNOWN and is never re-examined afterwards. The check therefore has to apply to your own FRESH OUTPUT, not only to remembered incidents. RELEVANT TO MY OWN METHOD AND NOT ONLY THEIRS: every probe I ran today printed values next to hand-typed annotations -- `getattr(r,'isError',False) = False  <- mcp_manager.py:127 evaluates this`, `<- MY proposed fix`, `<- the only discriminator`. Mine annotated the MEANING of a value rather than restating the value, which is why none of them inverted; but the distinction is a habit, not a safeguard, and one slip from `<- what this evaluates` to `<- which is None` reproduces their defect exactly. The safe form is to print the value and let it speak, or to compute the label from the value rather than typing it alongside. Found 2026-09-10."
+    ],
+    [
+     "bad",
      "OWNER(chat): HOW STEP 2 OF THE FIX MUST ACTUALLY BE WRITTEN -- Chat Master found the durable read and I verified it, then found their supporting claim about omission is wrong in a way that would produce a subtly broken fix. VERIFIED ON THE DEPLOYED 2.2.0: model_dump(by_alias=True)['isError'] returns True when the server sent True. That reads the field by its WIRE name -- the one the MCP spec fixes -- rather than by whatever the SDK currently spells it in Python, so it is correct on 2.2.0 AND on 1.x, i.e. right before the bump, right after it, and right THROUGH it. That is the principle the McpError negative exposed: .error.code survived because it is the JSON-RPC shape and cannot move without a protocol change, while isError moved because it was only a spelling. DEPEND ON THE WIRE CONTRACT, WHICH IS VERSIONED DELIBERATELY AND LOUDLY; NEVER ON A BINDING, WHICH IS VERSIONED SILENTLY. It also gives the derive-from-what-you-own rule the mechanism it lacked: chat cannot own a peer's flag, but it CAN own which NAME it reads that flag by, and the durable choice is the protocol's, not the library's. BUT THE OMISSION HALF DOES NOT WORK AS PROPOSED. Chat Master reported that on 2.x the field defaults to None, so omission is distinguishable from an explicit false, and that a fail-closed-on-omission rule is therefore expressible on 2.x but not 1.x. MEASURED, AND IT IS FALSE: on 2.2.0 `is_error` is `alias='isError' default=False required=False` -- the SAME default as 1.x -- so an omitted flag materialises as False on both, and model_dump(by_alias=True) ALWAYS CONTAINS THE KEY (the default is populated into the dump), which means the dump cannot detect omission AT ALL. Three payloads measured on 2.2.0: sent True, sent false, and omitted give dump values True / False / False with 'isError' present in the dump every time. THE ONLY DISCRIMINATOR FOR OMISSION REMAINS model_fields_set -- and that holds the PYTHON FIELD NAME, not the alias, so it is `'is_error' in model_fields_set` on 2.x and `'isError' in model_fields_set` on 1.x. So the two halves of step 2 pull in opposite directions: THE VALUE must be read by the wire name to survive renames, while STATED-NESS can only be read by the Python name, which is the exact fragility we are removing. Writing step 2 as 'read the protocol field and fail closed when it is not stated' therefore cannot be done through one call, and a fix that used model_dump alone would silently treat every omission as a success -- the current bug, preserved. Workable form: take the VALUE from model_dump(by_alias=True), and for stated-ness either test BOTH spellings in model_fields_set or stop relying on the flag for that question and treat error-shaped content as failure independently. Pinning is what makes the choice knowable either way -- which is Chat Master's conclusion, reached for a different reason than the one they gave. Found 2026-09-10."
     ],
     [
@@ -5509,6 +5513,12 @@
      "owner": "",
      "own": true,
      "deploy": "live"
+    },
+    {
+     "closed": false,
+     "owner": "platform, method",
+     "own": false,
+     "deploy": null
     },
     {
      "closed": false,
@@ -5647,7 +5657,7 @@
     [
      "functionality",
      "red",
-     "10 open defects (+1 tracked for other seats)"
+     "10 open defects (+2 tracked for other seats)"
     ],
     [
      "testability",
@@ -5671,7 +5681,7 @@
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "functionality: 10 open defects (+1 tracked for other seats) \u00b7 error_handling: 19 of 29 handlers log-and-continue  (ok: testability, modularity, observability)",
+   "rating_why": "functionality: 10 open defects (+2 tracked for other seats) \u00b7 error_handling: 19 of 29 handlers log-and-continue  (ok: testability, modularity, observability)",
    "live_config": [
     {
      "name": "CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL",
