@@ -226,6 +226,7 @@ RULES = [
     ("P2", "model_registry", "THE CIRCUIT BREAKER DID NOT PULL A PROVIDER"),
     ("P2", "model_registry", "THE BANDIT HAS NO SURFACE"),
     ("P2", "tool_manifest", "STAGE 0 COULD NOT NAME THE LAYER"),
+    ("P2", "tool_manifest", "A FOURTH LAYER STAGE 0 DID NOT NAME"),
     ("P6", "tool_manifest", "P6 BASELINE, MEASURED EXACTLY"),
     ("P2", "tool_manifest", "THE ONLY LIVE CONSUMER OF THE TOOL-RESULT STORE"),
     ("P3", "tool_manifest", "TOOL SELECTION IS SPORADIC, AND THE MODEL NARRATES"),
