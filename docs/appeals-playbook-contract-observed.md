@@ -202,7 +202,17 @@ This is worse than mangling a name: mangling fails loudly as a miss, this **succ
 confidently at the wrong granularity** — the exact product_line/state collapse the fact-store
 key was designed to prevent, arriving with `resolved: true` attached.
 
-### 🔴 New finding B — the `_GENERIC` blocklist has a blind spot over our entire pilot geography
+### ⚠️ Finding B — CORRECTED: coverage, not the matcher
+
+*Superseded 2026-09-09. The discriminating test (`florida community care` → `resolved:true,
+via:lexicon`) proves a florida-first key clears **pass 1**, blocklist never consulted. So
+`florida blue` → unresolved means the KEY IS ABSENT — a Lexicon coverage gap, not a matcher
+defect. My original evidence showed a miss and attributed it to the mechanism I had just read.
+The blocklist remains a latent defect for brand-token-only inputs (`?value=blue` → unresolved
+while `molina` and `sunshine` resolve), but it is lower priority, and its stated rationale is
+already handled by pass 1. Original text below, kept for the record.*
+
+### ~~New finding B — the `_GENERIC` blocklist has a blind spot over our entire pilot geography~~
 
 Pass 2 skips brand tokens in `{florida, community, health, healthcare, care, national, blue}`.
 The intent is sound (stop *"florida community care"* claiming *"Molina Healthcare of Florida"*),
@@ -234,3 +244,53 @@ Preconditions before wiring: (1) tier-2 derivation replaced by a lookup, (2) FL 
 identity ruled on, (3) payor seat ratifies runtime use — an ingest-time resolver that is
 occasionally wrong is a data-quality issue; a runtime one on a filing-critical path serves a
 wrong payor's deadline.
+
+
+---
+
+## 8. §7 CORRECTION — Finding A is in TIER 1 too, and it is BY DESIGN
+
+**2026-09-09.** §7 told consumers to trust `via: "registry"`. **That is wrong.**
+
+```
+?value=aetna better health of florida
+  → {"canonical":"Aetna", "resolved":true, "via":"registry"}
+```
+
+`_resolve_payor` (`mobius-payor/app/skills.py:167`) performs the same residual-free substring
+match, over `{key, key.replace("_"," "), key.split("_")[0]}`, keeping the longest **match** and
+never checking what the input had left over. Its docstring states the intent plainly:
+
+> *"Every variant of a brand ("Aetna Better Health of Florida", "Aetna Florida", "Aetna")
+> contains the j-tag key ('aetna'), so we match the payor whose j-tag key appears in the query."*
+
+So Aetna Better Health of Florida — a Florida Medicaid MCO with its own appeal chain — resolves
+to the national Aetna brand, via the tier we were treating as authoritative.
+
+**`via` distinguishes DERIVED from LOOKED-UP. It does not distinguish EXACT from GENERALISED**,
+and for a filing-critical path the second is the one that matters.
+
+### This is not a bug — it is a semantic mismatch
+
+The generalisation is **correct for the endpoint's actual consumer**. Ingest and publish need
+every Aetna variant collapsed onto one canonical payor to stamp a corpus. A residual check would
+break RAG's publish path to serve a consumer that is not using it yet.
+
+| | Question the endpoint answers |
+|---|---|
+| ingest/publish (today's consumer) | *which brand family is this document about?* |
+| appeals (proposed consumer) | *which contracting entity adjudicated this claim?* |
+
+Different questions. Only one can be right per endpoint.
+
+### Revised ask — a mode, not a fix
+
+1. A **strict** resolution that refuses `resolved:true` when the match leaves a meaningful
+   residual, and **returns the residual**. Flag, parameter or sibling endpoint — payor seat's call.
+2. Default behaviour unchanged, so ingest is untouched.
+
+### Revised preconditions before appeals wires this
+
+1. ~~tier-2 derivation replaced by a lookup~~ → **a strict/residual mode exists**
+2. FL Medicaid identity ruled on
+3. Payor seat ratifies runtime use of an ingest-scoped endpoint
