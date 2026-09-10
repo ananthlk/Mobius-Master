@@ -2126,7 +2126,8 @@ skill is one file and no edit here. The rest are still described inline.
          "LAYER — Chat Master was explicit that it does not move Stage 0's verdict, "
          "and it must not be read as support for a layer nobody has named. Window "
          "stated rather than smoothed: token figures are 12h of llm_calls, the funnel "
-         "was ~10.75h of turn_spans."),
+         "was ~10.75h of turn_spans."
+         "CORRECTED 2026-09-10 — 8,137 TOKENS AND 35.8% ARE A FLOOR, NOT THE FIGURE. Chat found that the manifest offered FIFTY-EIGHT tools on a production turn, not the 28 their local render measured: MCP tools register in prod and a local render cannot see them. So the baseline was taken against a smaller manifest than production actually sends, and the real share is HIGHER. Do not restate 35.8% as the number — it must be re-measured in situ. Recording this rather than quietly adjusting it, because the measurement was cited as exact (count_tokens, not chars/4) and its precision was never the weak part — its SCOPE was."),
  ("watch", "SEQUENCED AS P6 (Ananth, 2026-09-09): the tool/capabilities manifest moves "
            "to PERSISTENCE with a UX so a tool change needs no deploy; access "
            "provisioning becomes its own model rather than riding the subscription "
@@ -2266,7 +2267,8 @@ skill is one file and no edit here. The rest are still described inline.
          "empty result, then burned a round retrying the identical call. This is the "
          "filed finding confirmed on live traffic, and it is worse than filed: the "
          "fabricated diagnosis is PERSISTED IN THE REASONING TRACE, so anyone reading "
-         "diagnostics later sees 'Unknown tool error' as though it happened."),
+         "diagnostics later sees 'Unknown tool error' as though it happened."
+         "CONFIRMED AGAIN POST-DEPLOY 2026-09-10, now with telemetry proof rather than inference. The answer on Ananth's re-run CITES 'Unknown tool: appeals_lookup_rules' as a snippet. The telemetry says that tool ran TWICE, SUCCESSFULLY, returning no_sources both times. So the citation is a fabricated failure attached to a real answer. WARNING FOR ANY FUTURE READER, and Chat Master asked for this explicitly: DO NOT FILE THIS AS A DISPATCHER DEFECT. They started chasing a bug in _execute_tool on the strength of that citation and the funnel stopped them. The three-state verdict is what settles it — `success` alone could not have, because the tool did not fail. A fabricated citation is worse than a wrong answer: it survives into the artifact as evidence."),
  ("bad", "OWNER(chat): THE RETRY GUARD DID NOT FIRE ON FOUR DUPLICATE CALLS. Same "
          "turn: 'Checking playbook for Sunshine Health' emitted TWICE, 'Looking up "
          "CARC 197 rules' emitted TWICE, and appeals_lookup_rules was called in round "
@@ -2946,7 +2948,8 @@ skill is one file and no edit here. The rest are still described inline.
          "genuinely did not fire; what was fabricated was the CAUSE, not the failure. His "
          "'sporadic' is the better description and it points at selection, not at the "
          "service."
-         "RESOLVED 2026-09-10 — the cause was named and fixed: carc_group precedence at react_loop.py:3201, not the manifest. Ananth's framing was right about the symptom and its sporadic character; the mechanism was argument precedence."),
+         "RESOLVED 2026-09-10 — the cause was named and fixed: carc_group precedence at react_loop.py:3201, not the manifest. Ananth's framing was right about the symptom and its sporadic character; the mechanism was argument precedence."
+         "REOPENED 2026-09-10 — MY CLOSURE WAS PREMATURE AND I AM WITHDRAWING IT. I stamped this RESOLVED on the strength of the carc_group precedence fix. Chat then deployed (00977-8bl, digest-verified) and RE-RAN ANANTH'S EXACT TURN: it still fails, and the precedence fix WAS NEVER EXERCISED. The funnel, now that the three counts exist: tool.offered appeals_get_playbook 1 — OFFERED; tool.emitted appeals_get_playbook — NEVER CALLED; the model called appeals_lookup_rules twice and rag once instead. So the drop is at L2 (offered, not called), one layer EARLIER than the argument I fixed. The precedence bug is real and the fix is right; it is not the cause of this turn. I closed a finding on a mechanism I had verified in isolation without checking it was the mechanism ACTUALLY FIRING — which is the same error as inferring a live consumer from a docstring, committed on my own log."),
  ("bad", "OWNER(chat): A TOOL RETURNED A REAL PLAYBOOK AND CHAT REPORTED THERE WAS NONE. "
          "Found by Ananth testing live, 2026-09-09, cid 0985d25a and bb898cf5. Logged for the "
          "tool node, NOT fixed — his ruling.\n\n"
@@ -2987,7 +2990,8 @@ skill is one file and no edit here. The rest are still described inline.
          "Node moved GREEN -> RED. A control surface that silently reports 'no data' when the "
          "data exists is not green, however clean the migration around it is — rating the "
          "guarantee, not the construction."
-         "RESOLVED 2026-09-10 by the same precedence fix — reproduced against live appeals (Sunshine Health x 197 returns id 55, PRECERT, 90 days) and closed at the argument, which also restores the playbook card since :3496 gates section_hint on `usable`."),
+         "RESOLVED 2026-09-10 by the same precedence fix — reproduced against live appeals (Sunshine Health x 197 returns id 55, PRECERT, 90 days) and closed at the argument, which also restores the playbook card since :3496 gates section_hint on `usable`."
+         "REOPENED 2026-09-10 with the item above — the playbook was never REQUESTED on this turn, so 'the tool returned it and chat reported none' is not what happened here. Restated: THE TOOL HOLDING THE ANSWER WAS OFFERED AND THE MODEL DID NOT CALL IT."),
  ("bad", "OWNER(chat): SPORADIC TOOL SELECTION — FOLDED INTO THE TOOLS REFACTOR, with the "
          "three candidate layers named. Ananth 2026-09-09: 'we will have to touch the module "
          "anyway... i think the retries or json formatting or something is wrong.. not clear "
