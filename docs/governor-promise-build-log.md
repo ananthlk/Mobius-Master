@@ -401,3 +401,62 @@ telemetry, so "which of the eight fired" isn't answerable from existing data. Wo
 noting the DoD gets this for free once `ctx.publish_outcome` exists: it should carry
 the **call site**, not just the outcome, or step 3 will be able to say *failed* but not
 *where*.
+
+---
+
+## §5 BLOCKER, found before deploy — the `clarification` outcome cannot be provoked
+
+**Chat seat, 2026-09-10.** Reported now rather than at demonstration time, per the
+Governor seat's instruction: *if any surface cannot be evidenced, say which one and
+why — do not summarise the others as success.*
+
+§5 requires four outcomes. **Three are demonstrable. `clarification` is not, and it
+is not a matter of difficulty — it is structurally impossible in the current code.**
+
+The publish terminal is unreachable (already logged: `_publish_clarification_or_refinement`,
+209 lines, zero callers, orphaned by `f2aac16`). **The new part is the other end.**
+AST over all of `app/`, searching attribute stores *and* `setattr`, not grep:
+
+```
+needs_route_clarification    WRITES: NONE      READS: orchestrator.py:1158
+needs_clarification          WRITES: NONE      READS: orchestrator.py:1245
+route_clarification_choices  WRITES: NONE      READS: orchestrator.py:1158, :1167
+clarification_message        WRITES: NONE      READS: orchestrator.py:1159, :1245, :1252
+```
+
+**Every read is inside the dead terminal, and nothing anywhere sets any of the four.**
+
+So the feature is dead at both ends: no producer sets the flags, and the only
+consumer cannot be reached. This is the mirror image of the defect this program has
+catalogued twelve times — not a producer with no consumer, but **a consumer with no
+producer**, and the two failure modes are indistinguishable from inside the reading
+code, which sees a falsy flag and moves on exactly as it would on a real "no
+clarification needed" turn.
+
+### What this means for the demonstration
+
+| outcome | demonstrable | how |
+|---|---|---|
+| `completed` | yes | any normal question |
+| `failed` | yes | force an exception on the pipeline path in dev |
+| `empty_payload` | yes | a turn reaching the early return on empty `response_payload` |
+| `clarification` | **NO** | no code path can set the flags or reach the terminal |
+
+**I will not fake it**, and I will not report three-of-four as done. The honest
+close for §5 is three outcomes demonstrated and the fourth reported as unreachable
+with this evidence attached.
+
+### Why the tripwire now matters more
+
+`ctx.publish_outcome = "clarification"` is set inside the dead terminal. Given the
+above, a `clarification` row in `turn_attestations` would mean **both ends were
+revived** — a flag writer appeared *and* a caller appeared. That is a stronger
+signal than when it was proposed, and it costs nothing until it fires.
+
+### Sequencing note for step 2
+
+The step-2 deletion now covers **four** things, not three: the terminal, the
+docstring clause at `run_pipeline:430`, the three tests at
+`tests/test_orchestrator.py:265-279`, and **the four context fields with no
+writers**. Deleting the terminal alone would leave four fields that look like live
+state.
