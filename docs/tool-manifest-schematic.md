@@ -953,3 +953,95 @@ largest single element of the planner prompt.
   `appeals_get_playbook` on a query with no payor — none of these four test that.
 - **the golden set** — four queries chosen by me is not an evaluation. §8.6 question 6
   stands: who owns it, and how many fixtures before the ranker is trustworthy.
+
+---
+
+# 14. MEASURED: vector similarity added — and it beats BM25 on exactly the queries BM25 loses
+
+**Ananth, 2026-09-10:** *"lets pick a vector score on similarity also.. a tool has its
+description and bullet points of its requirements and capabilities.. can we not do a
+vector match.. so we have a tag match.. and then we can also assign a similarity match..
+is this not possible."*
+
+**Yes, and I ran it.** Real embeddings, not a simulation: **`text-embedding-004` on
+Vertex, 768-dim — the same model the Lexicon uses** [LIVE]. All 57 live tool blocks
+embedded, four queries embedded, cosine similarity computed.
+
+## 14.1 Vector vs BM25, side by side
+
+| query | vector top-3 | BM25 top-3 |
+|---|---|---|
+| *how do i appeal a carc 197 denial for sunshine health* | lookup_rules **.734** · find_carc .669 · **playbook .608 (#3)** | lookup_rules 1.00 · find_carc .55 · assemble_letter .41 → **playbook #4** |
+| *filing deadline to submit an appeal to sunshine health* | lookup_rules .674 · **playbook .599 (#2)** · find_carc .550 | **playbook 1.00 (#1)** · lookup_rules .83 · rag .60 |
+| *what argument should i use to appeal carc 197* | find_carc .609 · lookup_rules .608 · **playbook .557 (#3)** | lookup_rules 1.00 · find_carc .66 · **playbook .55 (#3)** |
+| *what is prior authorization* | **service_line_requirements .541 · rag .494** | **transform_previous_answer 1.00** · search_uploaded_document .99 · rag .98 |
+
+**Three results, and the second is the one that matters:**
+
+**1 · Vector improves the ambiguous query.** The playbook moves **#4 → #3**. Better, still
+not first — because the collision is semantic as well as lexical: the two tools genuinely
+are about the same subject.
+
+**2 · 🔴 BM25 BEATS VECTOR on the procedural query.** On *"filing deadline to submit"*
+BM25 ranks the playbook **#1** and vector ranks it **#2**, behind the sibling. That is the
+opposite of what you would expect — and it is the strongest argument for hybrid in this
+whole document. The terms *deadline*, *submit*, *filing* are **exact lexical signals**
+that BM25 rewards and an embedding partially dissolves into a general "appeals" topic.
+**Embeddings blur precisely the distinction we need; term matching preserves it.**
+
+**3 · Vector fixes the generic query, decisively.** *"What is prior authorization"* —
+BM25 ranks `transform_previous_answer` **#1** (nonsense, a utility tool winning a domain
+contest). Vector ranks `service_line_requirements` #1 and `rag` #2, which is sensible.
+**So vector solves §13's problem without needing the utility tier as a hack** — though
+the tier is still right for other reasons.
+
+**And a shape difference worth knowing:** vector scores are compressed (0.45–0.73 across
+all 57), so an absolute cosine threshold has far less room than §13's BM25 floor. The
+appeals family clusters at 0.49–0.73 — narrow. **Whatever gating we use cannot be a
+single constant on a raw cosine.**
+
+## 14.2 Hybrid — reciprocal rank fusion, k=60
+
+| query | RRF top-3 | playbook lands |
+|---|---|---|
+| *how do i appeal a carc 197…* | lookup_rules · find_carc · **playbook** | **#3** |
+| *filing deadline to submit…* | lookup_rules · **playbook** · find_carc | **#2** |
+| *what argument should i use…* | find_carc · lookup_rules · **playbook** | **#3** |
+| *what is prior authorization* | service_line_requirements · rag · find_carc | n/a |
+
+**RRF puts the right tool in the top 3 on every appeals query, and keeps the generic query
+sane.** It does not make the playbook #1 on the ambiguous phrasing — and per §11.2 and
+§13.3 it should not have to: *"how do i appeal"* spans both tools, and the design's
+output is a ranked **set** with reasons.
+
+**What RRF buys, stated precisely:** not a better #1, but **robustness across query
+shapes.** Each method has a failure mode the other does not share — BM25 is fooled by
+harvested example text and by short queries; vector blurs exact procedural terms. Fusing
+by *rank* rather than score also sidesteps §13.4's magic-constant problem: no threshold
+on an unnormalised scale.
+
+## 14.3 So the answer to *"is this not possible"* is yes, with three signals not two
+
+| signal | strength | failure mode |
+|---|---|---|
+| **tag match** (Lexicon `d:`/`p:`/`j:`) | entity and domain — `j:payor.sunshine_health` resolves exactly; `requires` becomes mechanical | silent on implied intent — **no `p:` tag fires on *"how do i appeal"*** (§12.2) |
+| **BM25** over tool text | exact procedural terms — *deadline/submit/filing* → playbook #1 | harvested example phrasings (§11); nonsense on short generic queries |
+| **vector** (`text-embedding-004`) | short generic queries; topical similarity when wording differs | blurs the exact terms that discriminate siblings; compressed score range |
+
+**None of the three is sufficient. Each covers a gap the other two leave.** That is a
+better argument for hybrid than "hybrid is usually better", and it is measured on this
+corpus rather than assumed.
+
+## 14.4 Still not settled
+
+- **the corpus each signal reads.** §11's constraint stands: BM25 over the *planner prose*
+  is adversarial. These measurements use that prose because it is what exists — **the
+  numbers above are a floor on what a purpose-written corpus would achieve**, not a
+  ceiling.
+- **weights.** RRF k=60 is the textbook default, untuned. Anything tuned on four queries
+  is fitted, not learned.
+- **cost.** One query embedding per turn (~10ms, cheap) plus 57 stored tool vectors
+  (embed once, re-embed on description change) — but *that* is a drift dependency: a
+  tool whose description changes without re-embedding ranks on stale meaning, silently.
+  Same decay shape as §10.3.
+- **the golden set.** Four queries I chose. Unchanged and still the real prerequisite.
