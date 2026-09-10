@@ -35,16 +35,16 @@ echo "── 2/8  readiness signals (measured from source)  ──────�
 # session scratchpad, and the `else {}` fallback rendered zeros as measurements.
 python3 scripts/platform/gen_readiness.py
 
-echo "── 3/8  extract + merge  ────────────────────────────────────────────"
-python3 scripts/platform/gen_chat_dev.py "$DATA"
-
-echo "── 4/8  coverage (Eval Layer 1: reachability)  ──────────────────────"
+echo "── 3/8  coverage (Eval Layer 1: reachability)  ──────────────────────"
 # MUST run BEFORE the page. It used to be step 5/6, i.e. AFTER the page was
 # written — so the page could never show a current coverage state even once
 # it learned to read the file. A generated artifact whose only consumer runs
 # before it: the same ordering defect that let gen_chat_submodules sit outside
 # the chain, in the chain that exists to prevent it.
 python3 scripts/platform/gen_coverage.py
+
+echo "── 4/8  extract + merge  ────────────────────────────────────────────"
+python3 scripts/platform/gen_chat_dev.py "$DATA"
 
 echo "── 5/8  page  ───────────────────────────────────────────────────────"
 python3 scripts/platform/gen_chat_dev_page.py "$DATA" "$OUT/index.html"

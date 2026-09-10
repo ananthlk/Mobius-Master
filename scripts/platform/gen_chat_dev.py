@@ -248,7 +248,13 @@ def main():
             if c.get("ux"):
                 obj["ux"] = c["ux"]
         obj["signals"] = sigs.get(sig_alias.get(key, key), {})
-            # Eval's Layer-1 coverage state, merged so the PAGE can show it. The enum
+            # ORDERING, TWICE WRONG NOW. gen_coverage.py first ran at step 5/6, AFTER the
+    # page. I moved it before the PAGE — and missed that the MERGE (this file) is
+    # what actually reads it, so chat-dev.json kept carrying the PREVIOUS run's
+    # coverage. Result: state_load's dimension read TAGGED-UNVERIFIED while
+    # docs/chat-coverage.json said GUARDED, and I nearly reported the wrong answer
+    # to "is state_load green". Coverage is now step 3/8, before this merge.
+    # Eval's Layer-1 coverage state, merged so the PAGE can show it. The enum
         # existed in docs/chat-coverage.json for a day with no reader — the page
         # never rendered it, so "is this node guarded?" was answerable only by
         # opening a JSON file by hand. Producer without a consumer, in the tool
