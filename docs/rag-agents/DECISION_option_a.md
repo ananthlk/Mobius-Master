@@ -10,6 +10,29 @@ _2026-09-09 · lane coordinator: Extension · full detail in `USER_FETCH_PAIRING
 
 ---
 
+## ⇒ COORDINATOR SYNTHESIS (Extension, after all seat reviews · 2026-09-10)
+
+**All four seats ENDORSE the `overridable` instrument.** No seat objected to the design; every flag is about *sequencing and composition*, not the instrument. The one-gate-owned-field approach, the false-positive/attestation split, and "no BAA on this path" are agreed by construction.
+
+**But three seats independently surfaced one decision-critical coupling:** the override, framed as **"add anyway = re-upload the same bytes,"** is **broken on today's storage** and would ship as a button that returns 200 and changes nothing —
+- **RAG:** the re-upload hits `/upload`'s `file_hash` dedup (line 121) before any override notion → silent "duplicate."
+- **Chat:** an override is `gate==phi & !hipaa_mode_allowed → persist_allowed==False → purged` — the override admits and the purge deletes it.
+- **Chat (deeper):** `persist_allowed` is computed by the classifier *at classify time*, before the human override exists — so it can never be the final word on an override lane.
+
+**Converged resolution (what to green-light):**
+1. **Build the override as RELEASE, not resubmit** — "Unblock this document; it's not patient data" applied to the *existing blocked row*, not a re-upload. Removes the dedup/purge coupling entirely, lands the marker on the row that was flagged. (RAG's alternative; Extension adopts it as the UX.) Cost: a new **release/unblock endpoint** (chat+rag).
+2. **Effective persist decision at the admit point** (Chat): treat the classifier's `persist_allowed` as the gate's *recommendation*; chat computes `effective = gate_recommendation OR validated_override`; purge + dedup key on the effective value.
+3. **Server-authoritative overridable** (Chat): the client sends only the user's override *intent*; the gate's `overridable==true` is read server-side and is the sole authority (client-asserted overridable = self-authorizing = the Ask-2 shape we rejected). Override branch resolves to `published`, **not** `published_private` — the intended asymmetry (no PHI to restrict); state it in code.
+4. **Mark it for reversibility** (RAG): persist `phi_override{overridable, identifier_labels, attestation, by, at, classifier_version}` in `source_metadata`, keyed to the extension's attestation log by `task_id`+doc-hash. `classifier_version` is the one that matters. Stays `source_type=user_fetch` — do **not** mint a new mode.
+
+**So the decision has two coupled parts, not one:**
+- **(A) Green-light the `overridable` false-positive override as an instrument** — unanimously endorsed, no BAA, clears exactly the Healthy-Start class. This is a clean yes.
+- **(B) It is NOT independently shippable onto today's storage.** It rides on the **block-not-stored** fix — either sequence the invariant first, or (preferred by all) build the **release design**, which removes the dependency by never re-uploading. This folds the override INTO tomorrow's block-not-stored 4-way rather than being a separate ship.
+
+**Attribution correction (RAG):** `persist_allowed` is the **PHI classifier's** proposal, not RAG's (Extension mis-said "your persist_allowed" to RAG — corrected here).
+
+---
+
 ## Override feasibility — CONFIRMED by the classifier owner (2026-09-09)
 
 The classifier ran the real PDF with unmasked spans. Result makes this **decision-ready**:
