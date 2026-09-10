@@ -757,3 +757,114 @@ Answerable against today's telemetry: on Ananth's turn, `appeals_lookup_rules` r
 `no_sources` **twice** and the gaps stayed open. Nothing escalated to the sibling. The
 governor saw the gaps; the selector never got the chance to act on them because there is
 no selector.
+
+---
+
+# 12. MEASURED: "if we cannot determine top 5 by lexical match, why do we expect react to"
+
+**Ananth, 2026-09-10.** Two experiments, both run against the **live** production
+manifest and the **live** Lexicon. No code built.
+
+## 12.1 BM25 over all 57 tool blocks — the right tool is #4, and that is the finding
+
+Query: *"how do i appeal a carc 197 denial for sunshine health"*
+
+| rank | tool | BM25 | block len |
+|---:|---|---:|---:|
+| 1 | `appeals_lookup_rules` | **25.97** | 74 |
+| 2 | `appeals_find_carc` | 14.29 | 65 |
+| 3 | `appeals_assemble_letter` | 10.76 | 472 |
+| **4** | **`appeals_get_playbook`** ← the tool with the answer | **10.01** | 85 |
+| 5 | `rag` | 8.77 | 425 |
+
+[MEASURED — BM25 k1=1.5 b=0.75 over 57 blocks extracted from the live
+`/chat/skills-manifest`. 56 of 57 score non-zero.]
+
+**So the honest answer to your question has two halves, and they point opposite ways:**
+
+**Lexical match cannot SELECT.** It puts the wrong tool first, by 2.6×, for the reason
+in §11 — `appeals_lookup_rules`' own example text contains *"denial"* and *"Sunshine
+Health"*.
+
+**Lexical match CAN SHORTLIST, and well.** 57 → 5 with the right tool inside, and **4 of
+the 5 are the appeals family.** That is not a weak result; that is the job.
+
+**Which reframes "why do we expect react to":** we should not. Today react picks from
+**57** entries, ~13,062 tokens, on a prompt where the manifest is already the largest
+single block. A shortlist makes it a **5-way choice among siblings, four of them in the
+right domain.** Those are different tasks. **Expecting a model to pick 1-of-57 and
+expecting it to pick 1-of-5-already-relevant are not the same ask** — and the second one
+is the one your design actually creates.
+
+**The token payoff, three queries:**
+
+| query | top-5 tools | top-5 tokens | vs full 13,062 |
+|---|---|---:|---:|
+| appeal CARC 197 sunshine | 4 appeals + rag | ~1,971 | **−85%** |
+| market size behavioral health Tampa | `get_msa_map`, `get_rate_benchmarks`, `get_market_size`, `get_service_line_opportunity`, `lookup_npi` | ~926 | **−93%** |
+| what is prior authorization | `transform_previous_answer`, `search_uploaded_document`, `rag`, … | ~1,799 | **−87%** |
+
+**Note the second row: the market query DOES surface the market tools.** Which is
+evidence for Chat Master's caveat in §3.1 — those 29 are not unreachable, they were
+never *asked for* in an appeals-heavy window.
+
+**And note the third row, which is the weakest result:** *"what is prior authorization"*
+ranks `transform_previous_answer` first and never surfaces a UM/prior-auth tool.
+Lexical match on a short generic query is poor, and this is where the tag axis has to
+carry it.
+
+## 12.2 Tag match against the LIVE Lexicon — and the `p:` axis I proposed does NOT fire
+
+The Lexicon is live and queryable at `GET /policy/lexicon` [LIVE]:
+**5,570 tags — `d:` 4,843 · `j:` 472 · `p:` 255**, `lexicon_version v1.0.0`, revision 3480.
+
+**Its own metadata confirms the axis semantics I had inferred** — this is the source of
+truth, not my reading:
+> *"p-tags = procedural intent (what can be done with the statement)"*
+> *"d-tags = domain/topic (provider manual sections: claims, pharmacy, …)"*
+
+Matching the real queries against the real tag phrases, word-boundary anchored:
+
+| query | tags matched | `p:` axis |
+|---|---|---|
+| *"how do i appeal a carc 197 denial for sunshine health"* | `d:claims.denial`, `d:disputes.appeal`, `j:payor.sunshine_health` | **NONE** |
+| *"what is the filing deadline to submit an appeal to sunshine health"* | `d:claims.timely_filing`, `d:disputes.appeal`, `j:payor.sunshine_health`, **`p:submission.submit`** | ✅ |
+| *"what argument should i use to appeal carc 197"* | `d:disputes.appeal` | **NONE** |
+
+[MEASURED. Caveat: this is *my* matcher — word-boundary phrase and code matching over
+the published tag specs — **not** production's tagger, which may use embeddings and
+score tiers. Treat the *presence* of hits as sound and the exact set as indicative.]
+
+**🔴 The result kills my §10.2 proposal as stated.** I argued the `p:` axis would break
+the playbook-vs-rules tie. **On Ananth's actual query no `p:` tag fires at all** — and it
+does not fire on the *what-argument* phrasing either. The axis only engages when the user
+uses procedural vocabulary (*"filing deadline"*, *"submit"*). So:
+
+- `p:` **is** the right discriminator when it resolves — `p:submission.submit` is exactly
+  *how-to-file*, and would rank the playbook over the rules tool
+- but it resolves on **explicit** process language, and *"how do i appeal"* is not that,
+  even though a human reads it as procedural
+
+**Three tags on the real query — `d:claims.denial`, `d:disputes.appeal`,
+`j:payor.sunshine_health` — and both appeals tools would match all three.** Tag matching
+alone leaves the tie exactly where lexical matching leaves it.
+
+## 12.3 What the two experiments together actually establish
+
+1. **Shortlisting works; selection does not.** Both methods narrow 57 → 5 with the right
+   tool inside. Neither ranks it first. **Your design's output — a ranked set with
+   reasons for react to confirm — is the right shape, and "pick the one correct tool" is
+   the wrong target.**
+2. **The two methods fail differently, which is why hybrid helps** — but not as a
+   tie-breaker. Lexical is strong on specific, term-rich queries and poor on short
+   generic ones (*"what is prior authorization"*). Tags are strong on entity and domain
+   (`j:payor.*` resolved cleanly) and silent on implied intent. **Hybrid buys coverage,
+   not discrimination.**
+3. **Nothing available today separates the two appeals tools on that query** — not BM25,
+   not tags. The discriminating fact (*payor-scoped vs CARC-scoped*, *process vs
+   substance*) exists in neither corpus. It has to be **declared**, which is §10's
+   `subscribes`/`requires`, and §10's own limit stands: on a query supplying both a payor
+   and a CARC, both tools remain eligible and correctly so.
+4. **Therefore the real fix is round-N, as §11.2 concluded** — offer both, and when the
+   first returns `no_sources` twice, try the sibling. Today the loop held the same two
+   gaps for three rounds and never did.
