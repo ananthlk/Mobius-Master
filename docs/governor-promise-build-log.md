@@ -11,6 +11,58 @@ Spec: `docs/governor-schema/index.html` (serve: `python3 -m http.server 8145 --d
 
 ---
 
+## 2026-09-10 (latest) — A CONSUMER WITH NO PRODUCER: the mirror of the systemic finding
+
+### `[MEASURED]` `clarification` is unreachable at BOTH ends — verified independently
+Chat found it (`545e16f`); I re-ran my own AST over attribute stores **and**
+`setattr` across all of `app/` rather than accept it:
+
+```
+needs_route_clarification    WRITES: NONE   READS: orchestrator.py:1158
+needs_clarification          WRITES: NONE   READS: orchestrator.py:1245
+route_clarification_choices  WRITES: NONE   READS: orchestrator.py:1158, :1167
+clarification_message        WRITES: NONE   READS: orchestrator.py:1159, :1245, :1252
+```
+
+**Nothing sets any of the four. Every read is inside the dead terminal.**
+
+### `[DESIGN]` This is the MIRROR of the twelve, and it deserves its own name
+Twelve findings so far are **a producer with no consumer**. This is **a consumer
+with no producer** — and it is harder to see, for a specific reason:
+
+`context.py:175-183` declares all four fields with **falsy defaults** (`False`,
+`None`, `field(default_factory=list)`). So the reading code sees a falsy flag and
+proceeds **exactly as it would on a genuine no-clarification turn**. There is no
+error, no anomaly, no moment where behaviour diverges. **The absent producer is
+indistinguishable from a legitimate negative** — which is the same root cause as
+`feedback_could_not_check_vs_checked_false`, arriving from the opposite
+direction.
+
+**The tell for this shape:** a field that is read but never assigned, whose
+default is falsy. A grep finds the reads and the *declaration* and looks
+satisfied. **A declaration is not a write** — only an AST over assignment
+targets separates them.
+
+### `[DESIGN]` §5 closes as THREE of four, stated as three of four
+`completed`, `failed`, `empty_payload` demonstrable. `clarification` reported
+**unreachable with evidence attached**. Chat declined to fake a row and declined
+to round three-of-four up to done — which is what §5 was rewritten for, applied
+without being asked twice.
+
+### `[DESIGN]` The tripwire is now worth more than when I asked for it
+With **both** ends dead, a `clarification` row in `turn_attestations` means a
+flag writer appeared **and** a caller appeared. It is no longer a smoke detector
+for one revival; it is an assertion about two.
+
+### `[DESIGN]` Step-2 deletion grows from three items to four
+Terminal · docstring clause at `:430` · the three tests at `:265-279` · **and the
+four `PipelineContext` fields with no writers**. **Item 4 is why this survived:**
+deleting the terminal alone leaves four fields that still read as live state —
+declared, typed, defaulted, referenced nowhere that runs — and the next person
+to find them would reasonably wire something to them.
+
+---
+
 ## 2026-09-10 (late) — THE WRITE PATH NEVER WORKED, and 21 green tests said it did
 
 ### `[MEASURED]` The single most important finding of this build

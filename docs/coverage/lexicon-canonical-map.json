@@ -1,0 +1,258 @@
+{
+ "generated": "2026-09-10",
+ "axes": {
+  "payor": {
+   "mapped": [
+    [
+     "Sunshine Health",
+     "payor.sunshine_health",
+     "covered"
+    ],
+    [
+     "Aetna",
+     "payor.aetna",
+     "covered"
+    ],
+    [
+     "Molina Healthcare of Florida",
+     "payor.molina_healthcare",
+     "asserts"
+    ],
+    [
+     "Bbhcflorida",
+     "payor.bbhc",
+     "not_applicable"
+    ],
+    [
+     "Payor.simply_healthcare",
+     "payor.simply_healthcare",
+     "asserts"
+    ],
+    [
+     "Health",
+     "payor.altrua_healthshare",
+     "not_applicable"
+    ],
+    [
+     "Simply Healthcare",
+     "payor.simply_healthcare",
+     "asserts"
+    ],
+    [
+     "Cfbhn",
+     "payor.cfbhn",
+     "asserts"
+    ],
+    [
+     "Ambetter",
+     "payor.ambetter",
+     "asserts"
+    ],
+    [
+     "Humana",
+     "payor.humana",
+     "asserts"
+    ],
+    [
+     "BBHC",
+     "payor.bbhc",
+     "absent"
+    ],
+    [
+     "CFCHS",
+     "payor.cfchs",
+     "absent"
+    ],
+    [
+     "LSF Health Systems",
+     "payor.lsf_health_systems",
+     "absent"
+    ],
+    [
+     "NWF Health Network",
+     "payor.nwf_health_network",
+     "absent"
+    ],
+    [
+     "SEFBHN",
+     "payor.sefbhn",
+     "absent"
+    ],
+    [
+     "SFBHN",
+     "payor.sfbhn",
+     "absent"
+    ],
+    [
+     "CFBHN",
+     "payor.cfbhn",
+     "absent"
+    ]
+   ],
+   "real_unmapped_ADD": [
+    [
+     "WellCare",
+     "asserts"
+    ],
+    [
+     "Edit.cms",
+     "asserts"
+    ],
+    [
+     "United Healthcare",
+     "asserts"
+    ],
+    [
+     "AHCA",
+     "covered"
+    ],
+    [
+     "Medpac",
+     "asserts"
+    ]
+   ],
+   "strays_excluded_count": 171
+  },
+  "service_line": {
+   "matched_1to1": 31,
+   "missing": []
+  },
+  "feature_to_product": {
+   "exists": [
+    [
+     "Appeals",
+     "product.appeals"
+    ],
+    [
+     "Chat",
+     "product.chat"
+    ],
+    [
+     "Credentialing",
+     "product.roster"
+    ],
+    [
+     "Eval",
+     "product.rag"
+    ],
+    [
+     "Feedback",
+     "product.feedback"
+    ],
+    [
+     "Payor",
+     "product.rag"
+    ],
+    [
+     "RAG",
+     "product.rag"
+    ],
+    [
+     "Vault",
+     "product.vault"
+    ]
+   ],
+   "need_create": [
+    [
+     "About",
+     "product.about"
+    ],
+    [
+     "Answer Cache",
+     "product.answer_cache"
+    ],
+    [
+     "Architecture",
+     "product.architecture"
+    ],
+    [
+     "Auth",
+     "product.auth"
+    ],
+    [
+     "Doc Reader",
+     "product.doc_reader"
+    ],
+    [
+     "Document Viewer",
+     "product.document_viewer"
+    ],
+    [
+     "Extension",
+     "product.extension"
+    ],
+    [
+     "HIPAA",
+     "product.hipaa"
+    ],
+    [
+     "Infra",
+     "product.infra"
+    ],
+    [
+     "Interact",
+     "product.interact"
+    ],
+    [
+     "Lexicon",
+     "product.lexicon"
+    ],
+    [
+     "Org Intelligence",
+     "product.org_intelligence"
+    ],
+    [
+     "PHI Classifier",
+     "product.phi_classifier"
+    ],
+    [
+     "Product Awareness",
+     "product.product_awareness"
+    ],
+    [
+     "Releases",
+     "product.releases"
+    ],
+    [
+     "Response Cards",
+     "product.response_cards"
+    ],
+    [
+     "Skills",
+     "product.skills"
+    ],
+    [
+     "Specs",
+     "product.specs"
+    ],
+    [
+     "Story UI",
+     "product.story_ui"
+    ],
+    [
+     "Strategy",
+     "product.strategy"
+    ],
+    [
+     "Task Manager",
+     "product.task_manager"
+    ],
+    [
+     "User",
+     "product.user"
+    ],
+    [
+     "Vibe",
+     "product.vibe"
+    ],
+    [
+     "Web Scraper",
+     "product.web_scraper"
+    ]
+   ]
+  },
+  "code": "NOT j: \u2014 resolves via Registry code->line binding (120 values)",
+  "requirement_type": "NOT j: \u2014 d:/p: axis (10 values)",
+  "payor_document_type": "composite j:payor x j:doc_type (36 values)"
+ }
+}

@@ -1,0 +1,287 @@
+{
+ "artifact": "payor-alias-validation",
+ "generated": "2026-09-10",
+ "validator": "payer-canonical?mode=strict",
+ "rows": [
+  {
+   "alias": "AHCA",
+   "slug": "ahca",
+   "origin": "display_forms",
+   "match": "exact",
+   "residual": []
+  },
+  {
+   "alias": "ahca.myflorida.com",
+   "slug": "ahca",
+   "origin": "host_forms",
+   "match": "family",
+   "residual": [
+    "myflorida",
+    "com"
+   ]
+  },
+  {
+   "alias": "flrules.elaws.us",
+   "slug": "ahca",
+   "origin": "host_forms",
+   "match": "family",
+   "residual": []
+  },
+  {
+   "alias": "flrules.org",
+   "slug": "ahca",
+   "origin": "host_forms",
+   "match": "family",
+   "residual": []
+  },
+  {
+   "alias": "flsenate.gov",
+   "slug": "ahca",
+   "origin": "host_forms",
+   "match": "family",
+   "residual": []
+  },
+  {
+   "alias": "Sunshine Health",
+   "slug": "sunshine_health",
+   "origin": "display_forms",
+   "match": "exact",
+   "residual": []
+  },
+  {
+   "alias": "sunshine_health.local",
+   "slug": "sunshine_health",
+   "origin": "host_forms",
+   "match": "family",
+   "residual": [
+    "local"
+   ]
+  },
+  {
+   "alias": "sunshinehealth.com",
+   "slug": "sunshine_health",
+   "origin": "host_forms",
+   "match": "family",
+   "residual": [
+    "sunshinehealth",
+    "com"
+   ]
+  },
+  {
+   "alias": "www.sunshinehealth.com",
+   "slug": "sunshine_health",
+   "origin": "host_forms",
+   "match": "family",
+   "residual": [
+    "www",
+    "sunshinehealth",
+    "com"
+   ]
+  },
+  {
+   "alias": "Aetna",
+   "slug": "aetna",
+   "origin": "display_forms",
+   "match": "exact",
+   "residual": []
+  },
+  {
+   "alias": "aetnabetterhealth.com",
+   "slug": "aetna",
+   "origin": "host_forms",
+   "match": "family",
+   "residual": [
+    "aetnabetterhealth",
+    "com"
+   ]
+  },
+  {
+   "alias": "BBHC",
+   "slug": "bbhc",
+   "origin": "display_forms",
+   "match": "exact",
+   "residual": []
+  },
+  {
+   "alias": "bbhcflorida.com",
+   "slug": "bbhc",
+   "origin": "host_forms",
+   "match": "family",
+   "residual": [
+    "bbhcflorida",
+    "com"
+   ]
+  },
+  {
+   "alias": "CFBHN",
+   "slug": "cfbhn",
+   "origin": "display_forms",
+   "match": "exact",
+   "residual": []
+  },
+  {
+   "alias": "cfbhn.org",
+   "slug": "cfbhn",
+   "origin": "host_forms",
+   "match": "family",
+   "residual": [
+    "org"
+   ]
+  },
+  {
+   "alias": "CFCHS",
+   "slug": "cfchs",
+   "origin": "display_forms",
+   "match": "exact",
+   "residual": []
+  },
+  {
+   "alias": "cfchs.org",
+   "slug": "cfchs",
+   "origin": "host_forms",
+   "match": "family",
+   "residual": [
+    "org"
+   ]
+  },
+  {
+   "alias": "LSF Health Systems",
+   "slug": "lsf_health_systems",
+   "origin": "display_forms",
+   "match": "exact",
+   "residual": []
+  },
+  {
+   "alias": "lsfhealthsystems.org",
+   "slug": "lsf_health_systems",
+   "origin": "host_forms",
+   "match": "family",
+   "residual": [
+    "lsfhealthsystems",
+    "org"
+   ]
+  },
+  {
+   "alias": "NWF Health Network",
+   "slug": "nwf_health_network",
+   "origin": "display_forms",
+   "match": "exact",
+   "residual": []
+  },
+  {
+   "alias": "nwfhealth.org",
+   "slug": "nwf_health_network",
+   "origin": "host_forms",
+   "match": "family",
+   "residual": [
+    "nwfhealth",
+    "org"
+   ]
+  },
+  {
+   "alias": "SEFBHN",
+   "slug": "sefbhn",
+   "origin": "display_forms",
+   "match": "exact",
+   "residual": []
+  },
+  {
+   "alias": "sefbhn.org",
+   "slug": "sefbhn",
+   "origin": "host_forms",
+   "match": "family",
+   "residual": [
+    "org"
+   ]
+  },
+  {
+   "alias": "SFBHN",
+   "slug": "sfbhn",
+   "origin": "display_forms",
+   "match": "exact",
+   "residual": []
+  },
+  {
+   "alias": "sfbhn.org",
+   "slug": "sfbhn",
+   "origin": "host_forms",
+   "match": "family",
+   "residual": [
+    "org"
+   ]
+  },
+  {
+   "alias": "Humana",
+   "slug": "humana",
+   "origin": "display_forms",
+   "match": "exact",
+   "residual": []
+  },
+  {
+   "alias": "WellCare",
+   "slug": "wellcare",
+   "origin": "display_forms",
+   "match": "family",
+   "residual": []
+  },
+  {
+   "alias": "Simply Healthcare",
+   "slug": "simply_healthcare",
+   "origin": "display_forms",
+   "match": "exact",
+   "residual": []
+  },
+  {
+   "alias": "Payor.simply_healthcare",
+   "slug": "simply_healthcare",
+   "origin": "display_forms",
+   "match": "family",
+   "residual": [
+    "payor"
+   ]
+  },
+  {
+   "alias": "Molina Healthcare of Florida",
+   "slug": "molina_healthcare",
+   "origin": "display_forms",
+   "match": "family",
+   "residual": [
+    "florida"
+   ]
+  },
+  {
+   "alias": "United Healthcare",
+   "slug": "unitedhealthcare",
+   "origin": "display_forms",
+   "match": "family",
+   "residual": [
+    "united",
+    "healthcare"
+   ]
+  },
+  {
+   "alias": "Uhcprovider",
+   "slug": "unitedhealthcare",
+   "origin": "display_forms",
+   "match": "family",
+   "residual": []
+  },
+  {
+   "alias": "Ambetter",
+   "slug": "ambetter",
+   "origin": "display_forms",
+   "match": "exact",
+   "residual": []
+  },
+  {
+   "alias": "ambetterhealth.com",
+   "slug": "ambetter",
+   "origin": "display_forms",
+   "match": "family",
+   "residual": [
+    "ambetterhealth",
+    "com"
+   ]
+  }
+ ]
+}
