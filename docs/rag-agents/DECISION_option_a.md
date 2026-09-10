@@ -10,6 +10,30 @@ _2026-09-09 · lane coordinator: Extension · full detail in `USER_FETCH_PAIRING
 
 ---
 
+## Override feasibility — CONFIRMED by the classifier owner (2026-09-09)
+
+The classifier ran the real PDF with unmasked spans. Result makes this **decision-ready**:
+
+- **Every name hit is score 0.45** (the weakest cap-sequence heuristic), on ~20 **medical/program proper-noun bigrams** — "Healthy Start" (15×), "Risk Screening Instrument", "Immune Globulin", "Perinatal Hepatitis", "Human Immunodeficiency Virus"… — **not people**.
+- **ZERO structured findings:** no SSN, DOB, MRN, account, phone, email, IP. No clinical patient-context, no corroboration, no digits. The whole doc is Title-Case clinical terminology the heuristic reads as PERSON names.
+- **Why deterministic vocab is exhausted for this class:** clearing it by vocabulary means enumerating all of medical terminology, unbounded — and a real surname can *be* a medical word. The heuristic cannot tell "Healthy Start" from "Sarah Johnson" by vocab. **So the safe override is the instrument, not more vocab.**
+
+**The safe instrument — `overridable: bool` on `/classify`** (one gate-owned field, same shape as `persist_allowed`). Robust definition (does NOT depend on fragile per-detector scores):
+
+```
+overridable = gate=="phi"
+              AND the only flagging categories are name/address (the ambiguous proper-noun class)
+              AND NO strong structured identifier anywhere (ssn/dob/mrn/account/phone/email/ip/…)
+              AND NO LLM contextual-PHI
+```
+
+- **This sample qualifies, unambiguously** — `identifier_labels=['Name']` only, no structured identifier, no contextual PHI. A safe override **would** clear this exact doc.
+- **The safety line (for Ananth):** `overridable` NEVER includes a real SSN/DOB/MRN/any structured identifier, a Presidio-strong name in clinical context, or an LLM patient-detection. Any of those → not overridable → hard block stays, no override offered. The override is scoped to exactly the low-confidence, name/address-only, no-hard-identifier class this doc exemplifies.
+
+**Status:** classifier confirms the safe design is real and will ship `overridable` on `/classify` **on Ananth's word**. Not built yet. Remaining wiring once green-lit: chat honors `overridable` in the `/chat/upload` admit; extension offers the override affordance on a blocked+overridable card (e.g. "This looks like a false flag — add anyway", logged/attested). Decision owner: Ananth; enforcement: chat; UX: extension.
+
+---
+
 ## (Prior record — the "no override" state as of earlier 2026-09-09, now superseded by the reopen above)
 
 > An earlier draft framed an "Option A" LLM/override for Ananth to approve. Ananth ruled against THAT specific form (user-trumps + LLM-clear), and the classifier owner agreed those were the wrong tools. The reopen above is a DIFFERENT instrument (confidence-tiered deterministic), argued by a concrete case the deterministic precision can't reach.
