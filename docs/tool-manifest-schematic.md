@@ -93,7 +93,30 @@ the figure.** It was measured against the static half. The real manifest is ~1.6
 [MEASURED, ESTIMATE]. I have already corrected the finding; the honest position is that
 the true share is unknown until someone runs `count_tokens` on the production render.
 
-**(c) A prompt-cost decision cannot be made from the code.** Any judgement about
+**(c) A LOCAL RENDER SEES 28 OF 58, AND SUCCEEDS.** [REPORTED + independently
+consistent] Chat Master's framing, sharper than mine: `get_manifest_tool_names(None)`
+on a dev machine returns a plausible 28-item list and no error, because MCP tools
+register at FastAPI startup against services a laptop cannot reach. **The local render
+does not fail — it silently returns half the catalogue.** Any conclusion drawn from
+source or from a dev render is missing 51% of the object and has no way to know it.
+That is the exact failure mode this document exists to avoid, and it would have been
+invisible.
+
+**Two independent measurements agree.** I counted 57 tool signatures in the live
+`/chat/skills-manifest` render; Chat Master counted 58 entries from `turn_spans`
+`kind='tool.offered'` on the deployed revision — 57 tools plus the `__unfiltered__`
+sentinel, which is not a tool. Their catalogue is at
+`mobius-chat/docs/tool-catalogue-production-observed.md` (`c5088c3`) and records what
+production *offered*, not what source says it would. They labelled its own two limits:
+it is one window, not an existence proof; and the static-vs-MCP split is inferred from
+source, the only claim in it not established by observation.
+
+**26 of the 29 MCP entries are one coherent market/benchmark block from one service** —
+`get_market_size`, `get_churn_benchmark`, `get_org_leakage`, `get_msa_map` and the rest
+— **offered on every turn, including turns about appeal deadlines** [REPORTED,
+consistent with my own count of 26 in §8.3].
+
+**(d) A prompt-cost decision cannot be made from the code.** Any judgement about
 "the manifest is too big" that reads only this file is reasoning about 51% of the object.
 
 ---
