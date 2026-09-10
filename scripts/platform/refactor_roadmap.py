@@ -306,6 +306,7 @@ PRINCIPLES = [
 ]
 
 OUT_OF_PROGRAM = [
+    ("PHI gate", "A HIPAA GATE'S CORRECTNESS DEPENDS ON A SCALING SETTING", "other seat", "fleet-power's fleet.yaml; a one-line note, not a chat-internal change"),
     ("POST /chat", "CHAT_ENV=prod",       "security posture", "needs Ananth's authorisation + staging; no clean unauthenticated POST sent"),
     ("POST /chat", "HIPAA AUDIT WRITE",   "compliance decision", "fail-open write under a fail-closed gate; posture decision pending"),
     ("PHI gate",   "AUDIT WRITE IS FAIL-OPEN", "compliance decision", "same item, second node"),
