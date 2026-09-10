@@ -11,6 +11,93 @@ Spec: `docs/governor-schema/index.html` (serve: `python3 -m http.server 8145 --d
 
 ---
 
+## 2026-09-10 (deployed) — step 1 LIVE; the queue wait is BIMODAL, not a distribution
+
+Serving `mobius-chat-00982`. Chat verified by **pulling the image layer and
+diffing** — `promise.py` and `065_*.sql` byte-identical to HEAD. Not the tag,
+not the deploy script''s success line. Ananth authorised in their session; they
+asked him rather than acting on my relay, consistent with refusing the last one.
+
+### `[MEASURED]` queue_wait — verified independently by the Governor seat at 20:05:21Z
+```
+n=16  uniq=16  min 0.0041s  p50 0.0234s  p90 3.6732s  max 3.9397s  negatives 0
+```
+**It is two regimes, not a distribution:**
+
+| regime | rows | mean |
+|---|---|---|
+| warm | **13** | **0.023s** |
+| slow | **3** | **3.762s** |
+
+`[DESIGN]` **A p50 here would have been actively wrong.** It reports the queue
+wait as negligible — 23ms — and is wrong about roughly **1 turn in 5**. Nothing
+sits between 0.03s and 3.6s: this is warm dispatch versus cold start/scale-up,
+and **a percentile summarising two regimes describes neither.** Chat''s framing
+and it is correct: restate against the regimes, not a percentile.
+
+**Answer to the §7 restatement question, stated conditionally.** At the median
+the promise clock and the worker clock agree to ~23ms, so **§7''s 14.6 / 31.3 /
+95.5 are not materially understated at the median.** On the slow regime the
+promise as the user experiences it is ~3.7s worse than the worker measured.
+`[OPEN]` **n=16 is far too few to restate a promise on** — and the turns behind
+it were exercise traffic, not representative questions (thinking delivered a
+worst case of **8.3s against a 95s promise**, which no real agentic turn does).
+**No restatement until real traffic accumulates.**
+
+### `[MEASURED]` First live promise breach — on the tier with the tightest promise
+| tier | n | kept | worst |
+|---|---|---|---|
+| fast | 6 | **5** | **28.6s** vs 13s promised |
+| normal | 6 | 6 | 20.7s |
+| thinking | 3 | 3 | 8.3s |
+
+**`fast` promised 13s and delivered 28.6s — `kept=false`.** The first recorded
+miss, and the attestation caught it on its first day. **This is the mechanism
+working**, not a regression: the promise was always being missed, and until
+today nothing could say so.
+
+### `[MEASURED]` §5 — W and E evidenced, P is ONE of three, stated as one of three
+- **W** — evidenced. `jsonPayload.event="promise_opened"`, the real published dict.
+- **E** — **evidenced. My READ-NOT-OBSERVED question resolves: structured wins.**
+  `correlation_id` on 3/3.
+- **P** — **`completed` only (16 rows).** `failed` and `empty_payload` **not**
+  demonstrated: they need a forced fault in dev, and Chat declined to hack one
+  into production code to manufacture a row. `clarification` unreachable,
+  evidence filed. **One of three reachable outcomes.**
+- **P2 — PASSES: turns 14 | rows_real 14 | duplicates 0.** The `finally` fires
+  exactly once across every exit those 14 turns took. **The strongest check in
+  the DoD, and the one that most needed real traffic.**
+- **P3 — PASSES: `queue_wait >= 0` on all 16.** The two-process clock is sound.
+- **P4 — PASSES:** cost 0, quality 0, version 0, posted 0.
+
+### `[MEASURED]` 🔴 PLATFORM FINDING, far beyond step 1
+Getting `correlation_id` into the emit took **three attempts**, and the first two
+failures are not about the attestation at all:
+
+1. **The worker never set the logging ContextVar.** The API gets it from HTTP
+   middleware; **the worker does not.** So **every worker log line of every turn
+   has been uncorrelated in Cloud Logging** — not just the attestation. All the
+   turn work happens in the worker.
+2. **ContextVars do not cross thread boundaries** — the turn runs in a separate
+   thread off the signal path, so setting it in `process_one` was not enough.
+3. Chat''s own: `reset_request_context` at the top of the `finally`, emit at the
+   bottom — cleared before emitting.
+
+`[OPEN]` **Item 1 is a fleet-wide observability gap that predates this work and
+belongs to whoever owns chat telemetry.** Every `jsonPayload.correlation_id`
+query against worker logs has been returning null the entire time. **To be
+relayed, not fixed here.**
+
+### `[RULED]` Ananth — surface it on the existing envelope, invent nothing
+*"if you write to tent emit envelop table it should pick it up. dont invent
+something new."* `turn_completed` now carries the promise:
+`✓ Turn completed in 2 round(s), 19106ms · promised 31s · delivered 19.7s · kept`.
+**The row stays the system of record; the envelope is the readable half.** A turn
+with no promise emits the envelope **byte-identical to before** — the addition
+cannot change existing output.
+
+---
+
 ## 2026-09-10 (latest+2) — the unifying rule, and it is now enforced
 
 ### `[DESIGN]` A RULE THAT EXISTS ONLY AS A COMMENT IS NOT A RULE
