@@ -11,6 +11,71 @@ Spec: `docs/governor-schema/index.html` (serve: `python3 -m http.server 8145 --d
 
 ---
 
+## 2026-09-10 (latest+1) — the class swept: 16 fields, and one costs a DB write per turn
+
+### `[MEASURED]` Chat swept all 80 `PipelineContext` fields (`86d34dd`); I verified the expensive one
+**Read but never written — 8**, every one falsy-defaulted:
+`needs_route_clarification` · `needs_clarification` · `route_clarification_choices` ·
+`clarification_message` · `refinement_suggestions` · `missing_slots` ·
+`failed_query` · **`refined_query` (17 reads)**.
+**Declared but neither read nor written — 8 more:** `active_skill`, `blueprint`,
+`cache_influence`, `classification`, `credentialing_options`,
+`pending_rag_grade_calls`, `refinement_message`, `should_refine`.
+
+### `[DESIGN]` They handed me a false positive in their own detector — and it fixes my rule
+`thinking_chunks` came up dead and **is not**: it is mutated in place, and
+`ctx.thinking_chunks.append(...)` is an attribute **Load** plus a method call,
+never a Store. **An assignment-target sweep alone reports every in-place-mutated
+container as dead.** The tell needs a second half: for container fields also
+check `.append/.extend/.update/[k]=`. Memory rule amended. Volunteering a false
+positive rather than a clean number is the reason the number is worth having.
+
+### `[MEASURED]` `refined_query` is inert on the LIVE path — and I found a second one
+Verified independently: **`PipelineContext.refined_query` has zero writers, zero
+mutations, 17 reads**, and every read is `ctx.refined_query or ctx.message` —
+so **every one of them is unconditionally `ctx.message`**. Refinement is not
+failing; it is inert, and at each site it reads like a deliberate fallback.
+
+**My sweep surfaced what looked like a write, and it is a SECOND FIELD OF THE
+SAME NAME.** `app/state/model.py:22,43,56` declares `ChatState.refined_query`,
+hydrated by `refined_query=d.get("refined_query")` and serialised back out. That
+one is fully wired — so **the persisted state model looks alive**. But the only
+value ever fed into it is `ctx.refined_query` (`orchestrator.py:1233, 1337,
+1575`), which is always `None`. Grep confirms no other producer writes a
+non-null value.
+
+**It is a closed loop of nulls: `None` → persisted `None` → hydrated `None`.**
+`[DESIGN]` **Two fields sharing a name, one wired and one inert, is why nobody
+noticed** — every check of the *state* side comes back healthy, and the dead half
+is one indirection away. Add to the tell: **when a field looks alive, confirm the
+live reads and the live writes are the same object.**
+
+### `[MEASURED]` The cost — a real DB write per turn on the live terminal
+`orchestrator.py:1575`, inside `_publish_completed` (the **live** terminal):
+```python
+merged = {**(ctx.merged_state or {}), "refined_query": ctx.refined_query}
+save_state_tracked(ctx, merged)
+```
+**Every completed turn does a second `chat_state` write whose only added payload
+is a constant `None`.** `:1233` and `:1337` are inside the dead terminal and
+never run. And `storage/threads.py:750` **documents this second write** as the
+reason a compare-and-set went stale — *"state_load persists the delta, then the
+orchestrator persists refined_query at the end. Each write advances
+state_version."* That defect was fixed today by passing the version differently;
+**the write causing it exists only to persist a field that is always null.**
+
+So step 2's deletion is not cosmetic: **it removes a DB write from every turn**
+and the second-write hazard behind an already-fixed bug.
+
+### `[OPEN]` Bounded claim — deletion is the owner's call
+Chat explicitly does **not** claim all 16 should go: `PipelineContext` is not
+theirs, and some of the 8 untouched fields may be a contract with a caller
+outside `app/` or a deliberate future wiring point. The established claim is
+narrow: **these 16 have no writer in `app/`, and the 8 falsy-default readers
+cannot distinguish an absent producer from a legitimate negative.**
+
+---
+
 ## 2026-09-10 (latest) — A CONSUMER WITH NO PRODUCER: the mirror of the systemic finding
 
 ### `[MEASURED]` `clarification` is unreachable at BOTH ends — verified independently
