@@ -174,3 +174,63 @@ boolean (§3D). Read `_suppressed` / `_party_suppressed` rather than inferring f
 Verify the caller isn't snake_casing payor names (§2).
 
 Live coverage number at any time: `GET /admin/facts/evidence-audit`.
+
+---
+
+## 7. Payor-name resolution — `payer-canonical` is NOT safe for a filing-critical path yet
+
+**Added 2026-09-09** after Platform seat proposed resolving payor names via the Lexicon.
+Source read at `mobius-payor/app/routers/registry_admin.py`, behaviour confirmed live.
+
+**Confirmed:** `_canonicalize_one` tier 2 does `canonical=key.replace("_"," ").title()`
+(`_hit()`), so **every `via: "lexicon"` name is a synthesised string, not a record**. Tier 1
+reads `SELECT DISTINCT payor, j_tag FROM payor_readiness_asset` — a *readiness* table — and
+`_resolve_payor` (`app/skills.py:167`) anchors on the same table, so tier 1 is doubly bound to
+it. Docstring scopes the endpoint to *"ingest/publish."*
+
+### 🔴 New finding A — the derivation DROPS SCOPE QUALIFIERS and reports success
+
+```
+?value=Molina Healthcare of Florida
+  → {"canonical":"Molina Healthcare","j_tag":"j:payor.molina_healthcare",
+     "resolved":true,"via":"lexicon"}
+```
+
+"of Florida" is **silently dropped**, and it returns `resolved: true`. A Florida Medicaid MCO
+(42 CFR 438, state contract, its own appeal chain) is canonicalised to the national brand.
+This is worse than mangling a name: mangling fails loudly as a miss, this **succeeds
+confidently at the wrong granularity** — the exact product_line/state collapse the fact-store
+key was designed to prevent, arriving with `resolved: true` attached.
+
+### 🔴 New finding B — the `_GENERIC` blocklist has a blind spot over our entire pilot geography
+
+Pass 2 skips brand tokens in `{florida, community, health, healthcare, care, national, blue}`.
+The intent is sound (stop *"florida community care"* claiming *"Molina Healthcare of Florida"*),
+but any payor key whose **first token** is one of those is unreachable via pass 2 — including
+`florida_medicaid` and `florida_blue`. Florida Blue is a major real payor whose brand token is
+literally blocked. Confirmed: `?value=florida medicaid` → `resolved: false`.
+
+Our pilot is entirely Florida.
+
+### Identity question, sharpened
+
+`?value=AHCA` → `{"canonical":"AHCA","j_tag":"j:payor.ahca","via":"registry"}` — AHCA **is** a
+canonical payor. `FL Medicaid` is not. Someone will be tempted to map one to the other. AHCA is
+the *agency*; FL Medicaid is the *program*; the MCOs beneath it are separate payors with their
+own appeal chains. Mapping them would serve the state agency's process for a plan denial.
+**Payor seat to rule on identity — not a synonym row.**
+
+### Appeals' position
+
+Do **not** wire this into `/playbook-guarded` yet. When we do:
+
+| `via` | Meaning | Appeals treatment |
+|---|---|---|
+| `registry` | a looked-up record | proceed |
+| `lexicon` | a **derived string**, may have dropped qualifiers | surface to the user for confirmation; **never key another lookup on it** |
+| unresolved | — | honest gap, distinct reason code |
+
+Preconditions before wiring: (1) tier-2 derivation replaced by a lookup, (2) FL Medicaid
+identity ruled on, (3) payor seat ratifies runtime use — an ingest-time resolver that is
+occasionally wrong is a data-quality issue; a runtime one on a filing-critical path serves a
+wrong payor's deadline.
