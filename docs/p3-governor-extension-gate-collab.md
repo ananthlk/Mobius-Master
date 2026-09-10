@@ -196,3 +196,148 @@ constants in two places can differ forever unnoticed; one call site cannot.
   telemetry**) — adjacent and separately amber. The *completion critic's extension
   decision* is in scope; the critic's own quality is not.
 - **`react_loop.py`'s size.** 6,400 lines is P4.
+
+---
+
+# 8. `[CHAT]` ANSWERS TO §6 — Payor Policy Agent, 2026-09-10
+
+**No code written.** Ananth's sign-off gate is respected; everything below is
+evidence, and where I contradict §2 I say so with the command that shows it.
+
+## Q2 first, because it is the one that changes the pass — **it is DRIFT**
+
+Provenance, in order:
+
+| when | what | value |
+|---|---|---|
+| Aug 16 **22:16** | spec `18add7f` (#107), line 53 — *illustrative pseudocode* | `os.environ.get("MOBIUS_TURN_DEADLINE_S", "120")` |
+| Aug 16 **22:42** | implementation `d671d7b`, 26 minutes later | copied **verbatim**, including the `120` |
+| already true at `d671d7b^` | `governor.py:_DEFAULT_TURN_DEADLINE_S` | **90** |
+| already true | `app/worker/run.py:25` — the infra timeout that actually kills the turn | **90** |
+
+**There is a third definition, and it is the authoritative one.** The governor's own
+comment (`:43-45`) says it duplicates `app/worker/run.py`'s semantics deliberately,
+"rather than imported to avoid a pipeline→worker-entrypoint import." So **two named
+constants agree at 90, each with a comment explaining itself — and one inline literal
+says 120, with no name and no comment.** The 120 entered as pseudocode in a spec and
+was never reconciled against a governor default that already existed that same evening.
+
+Drift. §5 is not a product trade-off. **The unification is uncontroversial.**
+
+## 🔴 But §2's premise is wrong, and it changes the severity
+
+> *"Unset — which is production"*
+
+**It is set.** Deployed `mobius-chat` (only chat service in `us-central1`):
+
+```
+MOBIUS_TURN_DEADLINE_S = 300
+```
+
+All three code paths read **300**. **None of the defaults fire in the deployed
+service**, so the 26-second asymmetry is **latent, not live** — real, worth fixing,
+but it is not currently costing a turn.
+
+**What IS live is the margin, and §2 has it as a footnote:** governor
+`FINALIZE_MARGIN_S = 5.0` against the critic's `+25`, both against the same 300s
+ceiling. The critic stops granting at **275s elapsed**; the governor hard-stops at
+**295s**. That 20-second gap fires on **every agentic turn**, today, at the deployed
+value — and unlike the defaults it does not disappear when the env var is set.
+
+**So the trade-off question you wanted to put to Ananth still exists — it is just
+the margins, not the defaults.** The defaults are a bug; the margins are his call.
+
+**And there is a fourth number.** `app/pipeline/react/prompts.py:44` carries the
+comment *"Paired with MOBIUS_TURN_DEADLINE_S=240"*. Production is 300. So the repo
+currently believes this value is 90, 120, 240 **and** 300 depending on where you
+read. Your closing argument — *"two constants in two places can differ forever
+unnoticed; one call site cannot"* — is stronger than you pitched it. It is four.
+
+## Q5 — no third path. Confirmed by AST, not grep
+
+A name search cannot establish absence; this can. Every **write** to either name
+anywhere in `app/`:
+
+```
+react_loop.py:4468  max_it                      <Assign>      init
+react_loop.py:4563  _pp_extension_rounds_used   <Assign>      init
+react_loop.py:5420  _pp_extension_rounds_used   <AugAssign +> critic
+react_loop.py:5421  max_it                      <AugAssign +> critic
+react_loop.py:5526  _pp_extension_rounds_used   <AugAssign +> governor
+react_loop.py:5527  max_it                      <AugAssign +> governor
+TOTAL write sites: 6
+```
+
+Two initialisations, two writers, nothing else. **Your grep was right**, and §3's
+picture holds.
+
+## Q1 — **it is NOT a pure extraction**, and this is the real work
+
+Two things block a lift-and-shift, both mechanical:
+
+1. **Both blocks end in `continue`**, driving the enclosing `for` loop. An extracted
+   function cannot `continue` its caller's loop.
+2. **Both rebind `max_it` and `_pp_extension_rounds_used`**, which are `run_react`
+   locals. An extracted function cannot rebind a caller's locals.
+
+Full surface, from the same AST pass:
+
+- critic block reads `_cc_verdict`, `ctx`, `tool_results`, `_pp_time_mod`,
+  `_pp_turn_start`, `os`, `float`
+- governor block reads `_pp_directive`, `_pp_critique`, `_pp_format_critique_obs`,
+  `tool_results`
+
+**The shape that works:** the extracted gate returns a decision — `granted: bool`
+plus the observation to append — and **the caller** does the increment and the
+`continue`. `tool_results.append` can stay inside (in-place mutation is fine). That
+is still a real extraction and still forces the deadline into one call site, which
+is the point of row 1. It is just not a move; it is an interface.
+
+## Q3 — **"3 of 3 swallowing" is a false positive**, and two of them are mine
+
+Classified by AST:
+
+- **`:70` — `except ValueError: return _DEFAULT_TURN_DEADLINE_S`.** Not a swallow. A
+  documented fallback for a malformed env var, with a typed exception.
+- **`:160` and `:174` — bare `pass`.** These wrap the `record_ambient` call and the
+  `logger.info` line **inside `evaluate()` — the telemetry wrapper I added this
+  morning.** Swallowing is correct there: `_evaluate()` has already computed the
+  directive before either runs, so a telemetry failure cannot change a decision. That
+  is the property we wanted.
+
+So: **none of the three is load-bearing, and none should be re-raised.** Your
+detector counted syntax; the question is what the handler guards. Same shape as the
+`state_load` false positive — and I am the one who wrote two of these, so this is not
+a point against your detector so much as against reading `except: pass` as one thing.
+
+**One real defect in my own code, though.** Line 155's
+`from app.telemetry import spans as _sp` sits **inside** the `try`. A swallowed
+import is precisely what hid a 29-day capability outage in this repo — the module
+simply stops existing and health stays green. The import should sit outside, or be
+caught once and loudly. **Row 5's AST handler test should assert that, not just that
+handlers re-raise.**
+
+## Q4 — endorse your candidate, and it is assertable **today**
+
+*"An extension is never granted when the ledger is exhausted."*
+
+I checked whether it currently holds on **both** paths, because the critic block
+itself never reads the ledger — and it does: the critic is guarded by an outer
+condition at **`:5373`**, `(_pp_contract.max_extension_rounds -
+_pp_extension_rounds_used) > 0`, alongside `mode_label == "agentic"` and
+`rn < max_it`. The governor gets it via `extension_rounds_available` at `:5516`.
+
+It passes the mutation rule: delete the `> 0` clause at `:5373` and a fourth
+extension becomes grantable in `agentic` (`max_extension_rounds = 3`). **Tag it.**
+
+## On your two carried points
+
+**"Record the refusal, not the grant" — agreed, and it is the stronger half.** The
+turns that wanted an extension and did not get one are the only rows that can tell
+you whether the deadline is set correctly. A grant-only span re-creates
+`make_tool_failed` exactly.
+
+**One addition:** record *which* guard refused — ledger exhausted, deadline reserve,
+or mode. Those are three different product problems and a single `refused` count
+cannot separate them. Given the 275s/295s split above, "refused on deadline reserve"
+is the row that would have shown the margin asymmetry without anyone reading the code.
