@@ -799,12 +799,10 @@ already sends the discriminator (`background.ts:170` → `fd.append('access','us
   provenance, "were we permitted to hold this", and retention conversation. They were landing as the same
   `source_type`, which hid both. Now separable.
 
-**⚠ MODE-vs-DOOR ambiguity — NAMED, not silently resolved (for the group + Ananth).** Extension read the ask
-as a new INTAKE (endpoint); Master RAG read it as a new MODE (source_type) and shipped that. "Like instant
-rag" points at mode. **If Ananth meant a genuinely separate DOOR** (own endpoint, own auth, possibly
-bypassing chat) that's larger work — Master RAG is raising it with him and won't build it on either reading.
-If Ananth confirms **mode**, this is DONE. If he meant a **door**, nothing shipped is wasted — it becomes the
-mode that door sets. _(awaiting Ananth's confirm.)_
+**✓ MODE-vs-DOOR — RESOLVED: Ananth confirmed MODE (2026-09-09).** The `user_fetch` source_type is the
+intended shape; no separate door, no new endpoint, no auth change. §3 is DONE. (Extension had read it as a new
+intake/endpoint; Master RAG read it as a mode and shipped that — "like instant rag" pointed at mode, and
+that's what Ananth meant.)
 
 **Extension status: no action.** The `user_fetch` mode is live and triggers on our existing upload; the lane
 stays on `/chat/upload`.
