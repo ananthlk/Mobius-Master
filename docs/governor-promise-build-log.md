@@ -512,3 +512,75 @@ docstring clause at `run_pipeline:430`, the three tests at
 `tests/test_orchestrator.py:265-279`, and **the four context fields with no
 writers**. Deleting the terminal alone would leave four fields that look like live
 state.
+
+---
+
+## Sizing step 2's item 4 — it is not four fields, it is sixteen
+
+**Chat seat, 2026-09-10.** The Governor seat added "the four context fields with no
+writers" to step 2's deletion list. Applying their own tell across the whole class —
+*a declaration is not a write; only an AST over assignment targets separates them* —
+the list is larger.
+
+Swept all 80 `PipelineContext` fields for attribute stores, `setattr`, and
+constructor kwargs across `app/`:
+
+**READ BUT NEVER WRITTEN — 8 fields, every one with a falsy default:**
+
+| field | default | reads |
+|---|---|---|
+| `needs_route_clarification` | `False` | 1 |
+| `needs_clarification` | `False` | 1 |
+| `route_clarification_choices` | `list` | 2 |
+| `clarification_message` | `None` | 3 |
+| `refinement_suggestions` | `list` | 2 |
+| `missing_slots` | `list` | 5 |
+| `failed_query` | `None` | 2 |
+| **`refined_query`** | `None` | **17** |
+
+**DECLARED BUT NEITHER READ NOR WRITTEN — 8 more:** `active_skill`, `blueprint`,
+`cache_influence`, `classification`, `credentialing_options`,
+`pending_rag_grade_calls`, `refinement_message`, `should_refine`.
+
+**16 of 80 fields are dead state.**
+
+### The detector had one false positive, and it is worth recording
+
+`thinking_chunks` first appeared in the read-never-written list. It is **mutated in
+place** — `ctx.thinking_chunks.append(...)` is an attribute *load* followed by a
+method call, never a Store. So an AST over assignment targets alone reports every
+in-place-mutated container as dead. Checked before reporting: `thinking_chunks` is
+the only one of the nine; the other eight have no `.append/.extend/.update/[k]=`
+either. **A container field needs the mutation check as well as the store check** —
+otherwise this detector manufactures dead fields.
+
+### 🔴 `refined_query` is the one that costs something, and it is on the LIVE path
+
+17 reads, zero writes. Every one of them is `ctx.refined_query or ctx.message`, so
+**every such expression is unconditionally `ctx.message`.** Query refinement does not
+merely fail — it is inert, and reads as an intentional fallback at every site.
+
+Worse, `_publish_completed:1575` — the **live** terminal, not the dead one — does:
+
+```python
+merged = {**(ctx.merged_state or {}), "refined_query": ctx.refined_query}
+save_state_tracked(ctx, merged)
+```
+
+**Every completed turn performs a second `chat_state` write whose only added payload
+is a constant `None`.** That is the same second write that produced the
+compare-and-set defect fixed earlier today (`299519c` lineage): a turn writes
+`chat_state` twice, and the second write exists to persist a field that is always
+null. The other two persist sites (`:1233`, `:1337`) are inside the dead terminal
+and never run.
+
+**Not fixed, not in scope today** — reported so step 2 prices it. The deletion is not
+cosmetic: it removes a DB write per turn.
+
+### What I am NOT claiming
+
+That all 16 should be deleted. Some of the eight untouched fields may be a
+contract with a caller outside `app/` or a future wiring point, and
+`PipelineContext` is not mine. The claim is bounded: **these 16 have no writer in
+`app/`, and the 8 falsy-default readers cannot distinguish an absent producer from a
+legitimate negative.** Which are safe to delete is the owner's call.
