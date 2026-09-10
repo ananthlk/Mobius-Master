@@ -6,8 +6,9 @@ _2026-09-09 · lane coordinator: Extension · full detail in `USER_FETCH_PAIRING
 
 ## The problem (real, proven) — and the precise today/next split
 The fetch‑to‑RAG lane is **built and DB‑verified end‑to‑end**. The PHI classifier **false‑flags real payer web pages**; the precision work is landing in stages:
-- **TODAY (classifier rev `00026-w8t`, live):** reference‑author names + Title‑Case headings + web‑nav chrome are FIXED → **reference/heading‑heavy POLICY docs (the PDF class) ingest.** But the corporate **CONTACT BLOCK** (Address/Email/Phone/ZIP) + the MRN‑shaped ID still fire → **a real payer HOMEPAGE does NOT ingest yet.**
-- **NEXT (deterministic contact‑block + MRN fix, building — not shipped):** closes Email/Phone/ZIP/MRN/Address → payer homepages ingest.
+- **TODAY (classifier rev `00027-m2t`, live):** reference names + headings + nav chrome + the **MRN bug** (fired on "Documentation"/"data") + the **address‑token bug** ("Availity"/"HEDIS") all FIXED. Molina homepage went **222 → 97 false flags**. Policy PDFs ingest well.
+- **RESIDUAL (97):** the payer's OWN name ("Molina" — a real patient surname too, so not globally clearable), its corporate contact block (email/phone/address/zip), and ~28 copyright/schedule dates — plus some nav names a follow‑up vocab pass still clears.
+- **NEXT (CHOSEN + building):** an **origin‑scoped payer allowlist** closes payer‑name + contact‑block together (on molinahealthcare.com, "Molina" + its own contacts are the site owner's → suppressed for that origin only, recall‑safe); a separate date‑context fix clears the dates. Then payer homepages ingest.
 
 Live proof: Ananth ran the real extension on Molina's *public* FL Medicaid provider homepage → **222 flagged spans, 100% false positive, zero patient data** (nav menus, state lists, section headings, the payer's own corporate contact block, training dates). Two are outright detector bugs: `medical_record_number` firing on the words "Documentation"/"data", `address` firing on "Availity"/"HEDIS".
 
@@ -31,5 +32,5 @@ Any genuinely‑ambiguous residual after deterministic precision stays blocked �
 - **BAA** → admitting *genuine* PHI via the two‑key toggle.
 - **AMA CPT licence** → CPT‑bearing docs.
 
-## The only thing that would come back to Ananth later
-A *deterministic* (no‑LLM) override for the truly‑ambiguous residual, **if** the precision work leaves enough real payer content still blocked to matter — and only then. Not now.
+## The last‑mile call — MADE (Ananth, 2026‑09‑09)
+Ananth chose the **origin‑scoped payer allowlist** (deterministic; DISTINCT from the LLM approach he declined). It closes payer‑name + contact‑block in one move, recall‑safe. Extension already supplies the origin (authentic `source_url`); the only plumbing left is chat forwarding it to `/classify`. Plus a false‑positive **learning‑loop / regression corpus** (Molina + CPB batches) so these FPs can't regress. No further decision pending on the false‑positive path — it's building.
