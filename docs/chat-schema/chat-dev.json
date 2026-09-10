@@ -20,9 +20,9 @@
    "fb2f0cf": "live",
    "fc9477c": "live"
   },
-  "commits_behind_head": "6",
+  "commits_behind_head": "7",
   "deployed_commit_subject": "state_load: remove the swallow my own instrumentation pass introduced",
-  "head": "ecf1e6625",
+  "head": "e1c41a3d5",
   "image_tag": "20260910-140519-299519c8ce",
   "revision": "mobius-chat-00977-8bl",
   "traffic_percent": "100"
@@ -43,7 +43,7 @@
     "owner": "chat",
     "gate": "lines removed; handler count down; ZERO invariant movement",
     "blocks": "P2, P4",
-    "n": 16
+    "n": 17
    },
    {
     "id": "P2",
@@ -5386,6 +5386,10 @@
    "findings": [
     [
      "bad",
+     "OWNER(chat): THE LAST LINE OF DEFENCE STRING-MATCHES AN ERROR MESSAGE IT DOES NOT OWN, AND TWO FAIL-OPENS POINT THE SAME WAY. Found by Appeals; verified here in one line. react_loop.py:2792 is `_skill_success = env.success and bool(env.text and not env.text.startswith(\"Unknown skill\"))`, and its own comment at :2791 says it is 'belt-and-suspenders ... for skills that don't yet set success but still return an empty or Unknown skill text on failure'. The actual error text is 'Unknown tool: appeals_lookup_rules'. startswith('Unknown skill') -> False. The guard written specifically to catch a failure that did not set success does not match the string it is looking at. THE OFF-BY-ONE-WORD FRAMING UNDERSTATES IT, and the real shape is worse: registry.py:313 emits `Unknown skill: {name!r}.` -- so the guard matches CHAT'S OWN literal exactly and always did. What it cannot match is a REMOTE SERVER'S wording, and 'Unknown tool: <name>' is produced by the roster/credentialing MCP server, not by chat (chat's own 'Unknown tool' at react_loop.py:3619 sets success=False and sources=[], so it never reaches this guard). So this is not a typo -- it is a guard whose contract is a string owned by another system. Renaming skill -> tool would fix these 21 rows and leave the guard armed only against two exact spellings, defeated by the next server that words its error differently. Together with `getattr(result, \"isError\", False)` failing open at mcp_manager.py:127, there is a complete path to success=True with NO BUG ANYWHERE: (1) deployed SDK renames or drops isError, getattr default reads no-error, success=True; (2) the text guard that exists to catch exactly that tests the wrong literal and passes; (3) _skill_success is True and propagates through the result dict, the span (tool.dispatched -> appeals_lookup_rules:success) and the funnel. TWO DEFAULTS, EACH INDIVIDUALLY DEFENSIBLE, BOTH POINTING AT SUCCESS -- which is why three seats looked for one bug and none of us found it. Consequence for the fix order: pinning mcp addresses (1) and LEAVES (2) ARMED for the next differently-worded error, so the guard needs to stop matching strings and read a structured outcome instead. Stated as a reading, not a measurement, on the isError half: the deployed image cannot be instrumented under the current build hold, and Appeals cannot test it because these calls never reach their server. The 2792 half IS measured -- the startswith result above is deterministic. Found 2026-09-10."
+    ],
+    [
+     "bad",
      "OWNER(chat): AN HONEST EMPTY ARRIVES DRESSED AS EVIDENCE, AND THIS CREATES A FIX-ORDERING HAZARD BETWEEN TWO SEATS. The self-citing SourceRef at mcp_adapter.py:274 is text[:300] of the tool's OWN output under document_name=f'MCP: {tool_name}' -- the answer citing itself, always exactly 1 on success. Found by the Governor seat while reviewing my remedy; I had told two seats to score on len(sources) and that advice was wrong. Three consequences, in increasing order of how easy they are to miss. (a) Anything scoring groundedness or quality off len(sources) reads 100% on every MCP turn -- green by construction. (b) react_retry_guard CANNOT FIRE on MCP tools: _is_zero_result (react_retry_guard.py:286) requires success=True + signal no_sources + an EMPTY sources list, and this envelope sets signal='no_sources' AND attaches a source in the same object nine lines apart. It declares 'no sources' and then supplies the one thing that stops the no-sources classifier from firing -- the signal field was already telling the truth and is simply not reachable. So tool-exhaustion never trips; 16 identical appeals_lookup_rules failures across 16 turns is what that looks like. I FILED THE OPPOSITE EARLIER ('retry guard is NOT affected, its len(sources) check saves it') -- that bound was exactly backwards: the check does not save the guard, it defeats it. (c) THE ORDERING HAZARD, raised by Appeals: their fix removes the fabricated FL-Medicaid playbook default so a not-found returns an honest empty. Through the MCP door that honest empty is still TRUTHY TEXT ('{\"found\": false}'), so `if success and text` holds and it is wrapped as a SourceRef citing itself. Net effect if their fix lands first: the ANSWER becomes honest and the CITATION still makes it look sourced -- a truthful non-fact arriving as evidence, which reads as a VERIFIED ABSENCE rather than a gap. That is harder to spot than the fabrication it replaces. So the two changes are coupled and the SourceRef must go first or together; Appeals' fix is necessary and NOT sufficient. Contrast the hardened door, which fails correctly: react_loop's _no_src() sets success=False, signal=NO_SOURCES, sources=[] and the guard trips. Same tool, opposite failure semantics -- the fourth axis of 'the guarantee is conditional on which door you came through', after what it filters, what it fabricates on a miss, and whether it is reachable at all. Found 2026-09-10."
     ],
     [
@@ -5458,6 +5462,12 @@
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
    "findings_status": [
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true,
+     "deploy": null
+    },
     {
      "closed": false,
      "owner": "chat",
@@ -5547,7 +5557,7 @@
     [
      "functionality",
      "amber",
-     "6 open"
+     "7 open"
     ],
     [
      "testability",
