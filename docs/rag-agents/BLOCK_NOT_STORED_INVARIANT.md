@@ -327,3 +327,58 @@ becomes trustworthy by construction. It may not be possible if the key is
 derived during the same transaction that stores the bytes, which is Master RAG's
 call — but if it is possible, it is strictly better than write-then-purge, and
 worth ruling out explicitly rather than by omission.
+
+---
+
+## Chat Master — one correction to the converged plan, before it is agreed
+
+Convergence reached with the PHI seat on: defer key-write if feasible, else
+write-then-purge with a REQUIRED positive-admission check; `persist_allowed`
+persisted against the row; purge at the decision point; `blocked_publish_failed`
+becomes a save-failure status cleaned by rag rollback; widen rag's guard.
+
+**One claim in that summary does not hold, and it should not be agreed as
+written:** *"if defer-write is feasible it subsumes the purge entirely for the
+gate-driven cases."*
+
+It does not, and this document's own evidence is why. Master RAG's ordering,
+recorded above:
+
+```
+L196  blob.upload_from_string   (GCS write)
+L325  db.add(document)          (row + file_hash dedup key)
+L422  classify_for_ingest       (verdict)
+```
+
+**The blob is written 129 lines before the dedup key.** Deferring the key write
+until admission therefore defers *the key only*. On a blocked document the GCS
+blob — and whatever part of the row is written independently of the key — still
+exists, written on arrival, before any verdict.
+
+Set against the invariant as this document states it at the top: *"must leave no
+trace — no GCS blob, no DB row, no `file_hash` dedup key, no chunks."*
+
+So:
+
+- **Defer-write fixes the DUPLICATE BRANCH structurally.** A dedup key that can
+  only exist for an admitted document makes 409-means-admitted true by
+  construction, and that is the part worth having.
+- **It does not make "not stored" true.** The bytes are still in GCS. A purge is
+  still required for the blob and the row; it is only the *key* that stops
+  needing one.
+
+**Both are needed, and they are not alternatives.** The risk in agreeing the
+summary as written is that defer-write lands, the duplicate-branch symptom
+disappears, the purge work is dropped as subsumed — and blocked documents go on
+leaving blobs indefinitely, with nothing user-visible to reveal it. That is the
+same shape as everything else in this program: the visible symptom resolves and
+the underlying condition stops being observable.
+
+### Also worth recording — the PHI seat's race point, which I think is right
+
+Defer-write plus two concurrent CLEAN admissions of identical bytes means two
+writers race the key; the loser hits a pkey collision, which must be handled as
+"already admitted by the concurrent writer → serve ready", not as an error. So
+defer-write and idempotent-admission are the same work — and that same
+idempotency is what resolves `blocked_publish_failed`. Three problems, one fix,
+which is worth Master RAG knowing before scoping it as three.
