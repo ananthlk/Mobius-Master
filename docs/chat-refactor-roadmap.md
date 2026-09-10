@@ -15,7 +15,7 @@ deliberately not yet asked because P4 has not opened. Per-phase status below is
 hand-maintained in `refactor_roadmap.py`'s `PHASE_STATUS`, because completion is a
 judgement about a gate, not something derivable from the findings file.
 
-**124 bugs · 80 sequenced into 6 phases · 40 explicitly outside · 0 UNSEQUENCED · 27 of the 80 sequenced have NO OWNER**
+**125 bugs · 81 sequenced into 6 phases · 40 explicitly outside · 0 UNSEQUENCED · 27 of the 81 sequenced have NO OWNER**
 
 > The two counts are different questions and the second one used to be invisible.
 > `UNSEQUENCED` was previously printed as "unassigned", which reads as *nobody owns
@@ -29,7 +29,7 @@ judgement about a gate, not something derivable from the findings file.
 | Phase | Name | Bugs | Owner | Gate metric | Blocks | Status |
 |---|---|---:|---|---|---|---|
 | **P1** | Delete | 13 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☑ **COMPLETE** 2026-09-08 — ~31,900 lines removed across P1.1/P1a/P1b/P1c/P1d, zero regressions |
-| **P2** | Make absent producers detectable | 27 | chat + Eval | every segment timed AND each timed segment's attribution verified against a known-external call — an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☑ **COMPLETE** 2026-09-09 — P2a planner orphans, P2b latency telemetry deployed with spans bound to schema node keys |
+| **P2** | Make absent producers detectable | 28 | chat + Eval | every segment timed AND each timed segment's attribution verified against a known-external call — an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☑ **COMPLETE** 2026-09-09 — P2a planner orphans, P2b latency telemetry deployed with spans bound to schema node keys |
 | **P3** | One decision point | 18 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ◐ **IN PROGRESS** — `state_load` closed (StateUnavailable + first contract tag); `tool_manifest` opened 2026-09-09 |
 | **P4** | Split | 16 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
 | **P5** | Config UX | 5 | chat + Prompt Studio | max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped | — | ☐ not started — and correctly so; Prompt Studio has deliberately not been asked to sign yet |
@@ -44,7 +44,7 @@ in `Blocks` have passed their gate.
 |---|---:|
 | chat | 52 |
 | unassigned-owner | 27 |
-| me | 1 |
+| me | 2 |
 
 ## P1 — Delete  ·  13 items
 
@@ -72,7 +72,7 @@ The cost of leading with it, stated plainly: this phase CANNOT CLAIM A LATENCY W
 | ☐ | `tool_manifest` | chat | THE STRONGEST CANDIDATE YET FOR THE SPORADIC MISS — THE PAYOR KEY IS FREE TEXT FROM THE MODEL, MATCHED EXACTLY |
 | ☐ | `tool_manifest` | chat | `usable` PASSES THE ONE CASE IT WAS BUILT TO CATCH |
 
-## P2 — Make absent producers detectable  ·  27 items
+## P2 — Make absent producers detectable  ·  28 items
 
 **Owner** chat + Eval
 **Gate** every segment timed AND each timed segment's attribution verified against a known-external call — an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join  
@@ -112,6 +112,7 @@ GATE AMENDED 2026-09-09, Chat Master's finding, from having executed it rather t
 | ☐ | `react_loop` | chat | THE CURATION DECISION IS NEVER PERSISTED, which makes evidence_review untestable after the fact |
 | ☐ | `state_load` | chat | state_version is WRITE-ONLY — inserted, incremented, never read or compared anywhere in app/ |
 | ☐ | `tool_manifest` | chat | A RECOVERED PARSE FAILURE COSTS A FULL EXTRA LLM ROUND AND LEAVES NOTHING QUERYABLE |
+| ☐ | `tool_manifest` | me | RATINGS WERE NEVER RE-DERIVED, AND NO SIGN-OFF EVER COVERED THEM |
 | ☐ | `tool_manifest` | me | THE COVERAGE ENUM WAS A PRODUCER WITH NO CONSUMER, IN THE TOOL BUILT TO FIND PRODUCERS WITH NO CONSUMERS — and |
 | ☐ | `tool_manifest` | chat | THE DISCRIMINATOR CHAT NEEDS IS ALREADY ON THE WIRE AND CHAT READS NEITHER FIELD |
 | ☐ | `tool_manifest` | chat | A FOURTH LAYER STAGE 0 DID NOT NAME — THE TOOL RETURNS A WELL-FORMED ENVELOPE WRAPPING NOTHING, AND IT HAS HAP |

@@ -367,7 +367,10 @@ function detail(k){
       'a node cannot mark itself GUARDED.">test: '+esc(m.coverage)+'</span>'+
       ((m.coverage_tags && m.coverage_tags.length)
         ? ' <span class="depth">'+esc(m.coverage_tags.join(', '))+'</span>' : '') : '';
-  var ready = m.rating ? '<div class="f"><b>Production readiness '+rate+' '+cov+
+  var nbug = (m.findings||[]).filter(function(f){return f[0]==='bad';}).length;
+  var eviden = m.rating ? ' <span class="depth">'+(m.rated? 'rated '+esc(m.rated)+' · ':'')+
+      nbug+' open</span>' : '';
+  var ready = m.rating ? '<div class="f"><b>Production readiness '+rate+' '+cov+eviden+
       ' <span class="depth">read: '+esc(m.depth||'')+'</span></b>'+sigline+findings+'</div>' : '';
   var howf = m.how ? F('How it works', esc(m.how)) : '';
   // A node whose whole point is "where do I manage this" should hand you the

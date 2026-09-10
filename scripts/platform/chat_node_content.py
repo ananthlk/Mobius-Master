@@ -354,7 +354,8 @@ that is the file it lives in, and lost it from the node whose assessment it reco
          "audit-write failure, publish failure all block). Routed to the phi-classifier "
          "seat as a POLICY call, not error handling: does an unconfigured classifier "
          "mean 'no screening required' or 'cannot screen, therefore refuse'? Found by "
-         "Chat Master, 2026-09-09, while fixing the verdict-ambiguity item."),
+         "Chat Master, 2026-09-09, while fixing the verdict-ambiguity item."
+         "CLOSED 2026-09-09, chat e6b153e — VERIFIED IN CODE, not on report: app/main.py:1926 now emits action_taken='blocked_unconfigured' and :1910 carries a comment stating it is DELIBERATELY DISTINCT from indeterminate and publish_failed. The phi-classifier seat's ruling implemented as ruled: cannot screen, therefore refuse, with an attributable verdict rather than a silent skip. NOT YET DEPLOYED — live revision mobius-chat-00975-bpc predates it."),
  ("bad", "OWNER(chat): 'blocked_indeterminate' IS AMBIGUOUS BY CONSTRUCTION — the upload gate "
          "emits the same verdict for at least three unrelated causes, and the emitted row "
          "cannot tell them apart. app/main.py:1332 is the real classifier verdict "
@@ -372,7 +373,8 @@ that is the file it lives in, and lost it from the node whose assessment it reco
          "counted. FIX: carry a distinct failure_class on the wrapper's path (gate_timeout / "
          "publish_error / audit_error / classifier_indeterminate) and persist it. Fresh "
          "instance of the producer-without-a-consumer class: the field that would make the "
-         "row assertable was never produced."),
+         "row assertable was never produced."
+         "FULLY CLOSED 2026-09-09: 185f426 split publish failures out, e6b153e added blocked_unconfigured. The three causes that used to share one verdict now each carry their own. NOT YET DEPLOYED."),
 ]),
 
 "queue": dict(rating="red", depth="code", how="""
@@ -1178,7 +1180,7 @@ request.
 
 # ── The 25 pipeline sub-modules ─────────────────────────────────────────────
 SUB = {
-"state_load": dict(rating="red", depth="code", how="""
+"state_load": dict(rating="amber", rated="2026-09-09", depth="code", how="""
 Runs on every turn, before the path is chosen. It is not one load — it assembles NINE BLOCKS
 from four different sources, and a route decides how many of them reach the model.
 
@@ -2163,6 +2165,39 @@ skill is one file and no edit here. The rest are still described inline.
           "corrupting the very funnel being built, with a failure that did not happen. "
           "A test written for one distinction defended a different one a month later, "
           "which is the argument for encoding distinctions rather than outcomes."),
+ ("bad", "OWNER(me): RATINGS WERE NEVER RE-DERIVED, AND NO SIGN-OFF EVER COVERED "
+         "THEM. Ananth, 2026-09-09: 'why is state_load still red' — and then, on being "
+         "told the rating was hand-written and stale, 'isnt that what the signoff were "
+         "for'. He is right, and the answer is a real gap in the governance rather "
+         "than an excuse. THE MECHANISM: all 37 ratings (22 amber, 10 red, 5 green) "
+         "were typed once at d7075fe on 2026-09-08 and NEVER TOUCHED AGAIN — "
+         "state_load's `red` predates its own P3 pass, the StateUnavailable fix, the "
+         "first contract tag, and Eval's GUARDED audit. There is also NO RUBRIC "
+         "anywhere: nothing states what red/amber/green mean, so no one could have "
+         "re-derived them even deliberately. WHY THE SIGN-OFFS DID NOT CATCH IT, "
+         "precisely: the six seats ratified THE PLAN — that bugs were correctly "
+         "attributed, the P1-P5 order, the gate's invariants, the corpus design. "
+         "NOBODY WAS EVER ASKED TO SIGN 'state_load IS RED'. Per-node production "
+         "readiness sat outside every row of the table. AND THE DEEPER SHAPE: A "
+         "SIGN-OFF IS A ONE-TIME RATIFICATION OF A PLAN; A RATING IS A RECURRING "
+         "JUDGEMENT ABOUT CURRENT STATE. A one-time gate cannot keep a recurring "
+         "judgement fresh, and we built ceremony for the plan while leaving the "
+         "headline badge on every node ungoverned. That is the same class as "
+         "everything else in this log — a value that reads as current and is frozen — "
+         "committed by me, in the instrument I use to report status to Ananth. FIXED "
+         "TWO WAYS: ratings now carry a `rated` date, and the page shows the "
+         "open-bug count and coverage state BESIDE the rating, so a badge that "
+         "disagrees with its own evidence is visible rather than merely wrong."),
+ ("good", "state_load RE-RATED red -> AMBER, 2026-09-09, with the reasoning stated so "
+          "the next person can disagree with it: the correctness defect is CLOSED "
+          "(get_state raises StateUnavailable rather than returning None on a failed "
+          "read) and Eval has independently AUDITED THE TAG GUARDED by running the "
+          "mutations themselves. So `red` is no longer defensible. But three items "
+          "remain open — state_version is write-only, the per-acquire SELECT 1 + "
+          "commit (fix declined on cost), and 1.2s at p50 all sequential DB reads, "
+          "which is the slowest node measured — so `green` would be a lie in the other "
+          "direction. AMBER is the honest reading: no known correctness defect, real "
+          "performance debt, guarantee enforced by a mutation-verified test."),
  ("bad", "OWNER(me): THE COVERAGE ENUM WAS A PRODUCER WITH NO CONSUMER, IN THE TOOL "
          "BUILT TO FIND PRODUCERS WITH NO CONSUMERS — and it took Ananth asking 'did "
          "you update your schema, i want to make sure that captures everything "
@@ -2247,7 +2282,8 @@ skill is one file and no edit here. The rest are still described inline.
          "display-name match, so the resolution moves server-side and chat stops "
          "guessing. CHAT MUST NOT BUILD A PAYOR-NAME NORMALISER — a service with no "
          "payor data making a payor judgement is the same class of mistake as chat "
-         "inventing an FL Medicaid deadline."),
+         "inventing an FL Medicaid deadline."
+         "URL ENCODING CLOSED 2026-09-09, chat 10133ae — verified, quote() now applied at the call site."),
  ("bad", "OWNER(me, rag): DISPLAY NAME IS DERIVED FROM THE SLUG BY TITLE-CASING, AND "
          "THAT IS A LATENT BUG IN MY OWN MODULE. payer_context.py:134 does "
          "display_name = slug.replace('_', ' ').title(). 'sunshine_health' -> "
@@ -2373,7 +2409,8 @@ skill is one file and no edit here. The rest are still described inline.
          "boolean over a union of fields; it needs to be PER-FIELD, checked against "
          "the field the QUESTION needs. A deadline question requires "
          "deadline_appeal_days; a submission question requires submission_method. "
-         "Neither implies the other and OR-ing them was the error."),
+         "Neither implies the other and OR-ing them was the error."
+         "CLOSED 2026-09-09, chat 10133ae — the OR-ed guard is per-field, AND chat found two more while in there: `found` was being set from HTTP success when a miss is 200 {}, and a brief collapse of `success` into `found` was CAUGHT BY THE EXISTING SUITE (test_appeals_playbook_zero_result), which would otherwise have recorded a legitimate 'no playbook exists' as a tool FAILURE. NOT YET DEPLOYED."),
  ("bad", "OWNER(appeals-agent, self-reported): '51% OF THE CORPUS' WAS ONE "
          "TEMPLATE REPEATED 72 TIMES, AND I REPEATED THE NUMBER ALL EVENING. Appeals "
          "inspected all 72 'FL Medicaid' rows 2026-09-09: ONE distinct appeal_levels "
@@ -2684,7 +2721,8 @@ skill is one file and no edit here. The rest are still described inline.
          "counter. FIX IS SMALL AND IS THE NEXT CHANGE: per-tool names when unfiltered; "
          "split __none__ into __none__ vs __unparseable__; record dispatch EMPTINESS "
          "beside its success flag. Each is one count at a site already recording a "
-         "neighbouring count."),
+         "neighbouring count."
+         "INSTRUMENTS BUILT 2026-09-09, chat b3942f3 + 2b0008f — verified in code: __unparseable__ / __unparseable_recovered__ split, tool_result_is_empty() as a module-level predicate the test imports, three-state tool verdict. NOT YET DEPLOYED, so tool.arg rows remain 0 and the funnel is still unmeasured on live traffic."),
  ("good", "THE EMIT->DISPATCH BOUNDARY IS CLEAN AND IS NOW ELIMINATED AS A CAUSE: 86 "
           "tool emissions, 86 dispatches, ZERO loss (76 success / 10 failure). 'The "
           "model asked and the executor never ran it' is off the table. Together with "

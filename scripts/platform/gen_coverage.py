@@ -153,6 +153,33 @@ for dirpath, _, files in os.walk(os.path.join(CHAT, "app")):
 # ── walk the tests ───────────────────────────────────────────────────────
 reached = collections.defaultdict(set)   # app module -> {test files}
 direct  = collections.defaultdict(set)   # app module -> {test files importing it directly}
+_LEDGER = []
+try:
+    _lp = ROOT / "docs" / "chat-mutation-ledger.json" if "ROOT" in dir() else None
+except Exception:
+    _lp = None
+if _lp is None:
+    import pathlib as _pl
+    _lp = _pl.Path(__file__).resolve().parents[2] / "docs" / "chat-mutation-ledger.json"
+try:
+    _LEDGER = json.loads(_lp.read_text()).get("entries", []) if _lp.exists() else []
+except Exception:
+    _LEDGER = []
+
+
+def _ledger_current(entry):
+    """True when the entry's files have not moved past its verified_at commit."""
+    import subprocess, pathlib
+    repo = pathlib.Path(__file__).resolve().parents[2] / entry.get("repo", "mobius-chat")
+    try:
+        r = subprocess.run(["git", "-C", str(repo), "diff", "--name-only",
+                            entry["verified_at"] + "..HEAD", "--", *entry["files"]],
+                           capture_output=True, text=True, timeout=20)
+        return r.returncode == 0 and not r.stdout.strip()
+    except Exception:
+        return False
+
+
 tags    = collections.defaultdict(set)   # contract id -> {test files}
 tdir = os.path.join(CHAT, "tests")
 n_tests = 0
@@ -194,6 +221,17 @@ for s in d["submodules"] + d["cross_cutting"]:
         state = "PERIPHERAL"
     else:
         state = "TAGGED-UNVERIFIED"   # GUARDED only after Eval audits the tag
+        # Eval's Q2 ruling, 2026-09-09: GUARDED requires MACHINE-READABLE mutation
+        # evidence, and that evidence DECAYS. An entry proves the tagged tests went
+        # red under a mutation removing the guarantee, AND names the commit it was
+        # verified at; if the files have moved since, the verdict demotes rather
+        # than persisting. Without this the ledger would be the next thing asserted
+        # in a transcript and believed forever.
+        for _e in _LEDGER:
+            if _e.get("tag") in ntags and _e.get("verdict") == "GUARDED":
+                if _ledger_current(_e):
+                    state = "GUARDED"
+                break
     nodes.append({"node": key, "state": state, "module": mod,
                   "direct": len(dt), "reached": len(rt), "tags": ntags,
                   "rating": s.get("rating")})

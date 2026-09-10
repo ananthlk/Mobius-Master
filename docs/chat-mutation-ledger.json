@@ -1,0 +1,24 @@
+{
+  "_what": "Eval's mutation ledger. A contract tag renders GUARDED only when an entry here proves the tagged tests went RED under a mutation that removed the guarantee, AND the recorded commit still matches the current state of the files the entry names. Eval's Q2 ruling, 2026-09-09: mutation evidence DECAYS — a test red under mutation today can pass tomorrow when app/ or the test changes, so GUARDED is re-verified, never stamped once.",
+  "_rule": "generator: if verified_at != current commit touching `files`, demote to TAGGED-UNVERIFIED.",
+  "entries": [
+    {
+      "tag": "state_load:no_silent_reset",
+      "verdict": "GUARDED",
+      "auditor": "Eval",
+      "audited": "2026-09-09",
+      "verified_at": "c468880",
+      "repo": "mobius-chat",
+      "files": ["app/storage/threads.py", "tests/test_state_load_state_integrity.py"],
+      "mutations": [
+        {"facet": "failed read == no-row",
+         "transform": "app/storage/threads.py: get_state L606 and get_state_with_version L632 error-raise sites -> return None, None",
+         "tests_went_red": ["99", "124", "202"]},
+        {"facet": "undecodable row looks new",
+         "transform": "app/storage/threads.py: decode-raise sites L616, L638 -> return None, None",
+         "tests_went_red": ["134"]}
+      ],
+      "note": "Eval ran the mutations themselves, reverting each — not on chat's word and not by reading. First ledger entry; these two transforms are the first fixtures when the mutation harness moves into the generator/CI."
+    }
+  ]
+}
