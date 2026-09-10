@@ -1,47 +1,31 @@
-# Decision — Option A: make fetch‑to‑RAG usable on real payer content
+# Fetch‑to‑RAG on real payer content — status & the fix path (NOT a pending override decision)
 
-**One decision, two coupled parts. Owner of the ask: Extension (lane coordinator).**
-_2026-09-09 · full detail in `USER_FETCH_PAIRING_SPEC.md` §2.8 / §2.9_
+_2026-09-09 · lane coordinator: Extension · full detail in `USER_FETCH_PAIRING_SPEC.md` §2.8/§2.9 · evidence in `molina_false_positive_evidence.md`_
 
-> ## ⛔ OUTCOME — WITHDRAWN for now (Ananth's directive, relayed via PHI/compliance seat 2026‑09‑09; Extension to confirm in‑session)
-> **"No user override trumps for now"** — and the LLM‑clear approach **rejected outright** on its own merits: running a doc through the LLM to decide whether to admit it is *itself* processing/ingesting the doc, and the LLM isn't certain anyway. So Option A is **withdrawn, not awaiting‑decision** — there is no caller field to build; the design is parked on the shelf, build‑ready if Ananth ever green‑lights an override path. The gate stays **fail‑closed / hard‑block**. This holds BOTH overrides: the false‑positive override (Option A below) **and** the genuine‑PHI attestation‑admit (Ask 2, already parked behind the BAA).
-> - **What this changes:** the deterministic precision fixes already shipped **stand** (references, Title‑Case headings, web‑nav chrome — those doc classes now ingest). What **still blocks**: docs whose remaining flags are a medical‑TITLE fragment or a corporate‑footer address/contact block (i.e. most real payer homepages). No override to clear those until Ananth green‑lights an override path (and the chat‑side admit infra / BAA exist).
-> - **The override design is specced and build‑ready** (confidence‑tiered, deterministic, no LLM) — parked, not abandoned; the classifier pings when/if it's green‑lit.
-> - The rest of this brief is retained as the record of what the decision was and why.
+> **Read this first:** an earlier draft framed an "Option A" LLM/override for Ananth to approve. **Ananth already ruled against that**, and the classifier owner agrees it's the wrong tool. This page is now the accurate record. **No decision is required here** — the fix is a build already underway.
 
----
+## The problem (real, proven)
+The fetch‑to‑RAG lane is **built and DB‑verified end‑to‑end**, but the PHI classifier **false‑flags real payer web pages**, so the lane is **inert on real content today**. Live proof: Ananth ran the real extension on Molina's *public* FL Medicaid provider homepage → **222 flagged spans, 100% false positive, zero patient data** (nav menus, state lists, section headings, the payer's own corporate contact block, training dates). Two are outright detector bugs: `medical_record_number` firing on the words "Documentation"/"data", `address` firing on "Availity"/"HEDIS".
 
----
+## What Ananth ruled (settled, not open)
+- **No user‑override‑trumps** for now — no user‑override‑ingests path ships.
+- **No LLM‑clear** — running a doc through the LLM to *decide* whether to admit it is itself processing/ingesting it, and the LLM isn't certain anyway. Rejected on its merits.
+- Therefore the gate stays **fail‑closed / hard‑block**. This holds *both* the false‑positive override and the genuine‑PHI attestation‑admit (Ask 2, separately parked behind the BAA).
 
-## The situation (3 lines)
-- The browser‑extension "Add this document to Mobius" lane is **built and verified end‑to‑end** — capture → consent → PHI gate → provenance → corpus, confirmed from the DB.
-- But the PHI classifier **false‑flags essentially every real payer web page.** Live proof: Ananth ran it on Molina's *public* FL Medicaid provider homepage → blocked on **7 categories** (Name, Address, Email, Phone, ZIP, Date, MRN) — all the site's own nav headings + corporate contact block, **zero patient data**.
-- So the lane is **inert on real content** until this is fixed. This is the line between "demos" and "usable."
+## The fix — deterministic precision (in progress, no decision needed)
+The classifier owner is fixing the false positives the constraint‑consistent way Ananth asked for — **better precision / confidence, no LLM, no override, no policy change, global‑safe, no chat passthrough**:
+- **name** (nav/headings/state‑lists/UI labels) → extend structural + org‑token suppression.
+- **corporate contact block** (address/email/phone/zip clustered by an allowlisted payer name = the payer's own footer) → deterministic contact‑cluster suppression, with recall guards (only org‑adjacent clusters, never clinical context).
+- **MRN/date bugs** → regex‑precision tightening (words like "Documentation" and copyright dates are not identifiers).
+- **Recall floor unchanged:** suppress *only* tokens structurally impossible as patient PHI in context; any clinically‑contexted or clustered patient‑identifier hit still hard‑blocks.
+- **Rollout:** a rev or two like `00026-w8t`, straight to dev, each verified against the real Molina text (surviving‑count reported) before it's called done.
 
-## The decision — bundled, one call
-1. **Approve the caller‑scoped recall carve‑out** (Option A, below). It's a scoped exception to the fleet "names always flag" policy, so it needs your explicit nod.
-2. **Name who writes chat's PHI‑adjacent code** while Chat Master is parked off PHI. Three items all need it and are otherwise blocked: (a) Option A's one‑field caller passthrough (chat gate → `/classify`); (b) the Ask‑2 two‑key admit path; (c) the HTML→text digit‑boundary fix (phantom SSN/MRN). One owner unblocks all three.
+## What stays blocked (accepted, fail‑closed)
+Any genuinely‑ambiguous residual after deterministic precision stays blocked — no override to clear it — until/unless Ananth later green‑lights an override path (the confidence‑tiered *deterministic, no‑LLM* design is on the shelf, build‑ready). And genuine PHI still needs the **BAA**.
 
-## What Option A is
-`/classify` takes a **caller** hint. For `caller = browser-extension:user-fetch`, **low‑confidence, uncorroborated, heuristic‑only** findings (Name, Address, Email, Phone, ZIP, Date, MRN) become **LLM‑overridable** — the LLM pass that already runs clears them when it confirms the page is public provider/nav/contact content with no patient PHI. **Global default unchanged** (any other caller: names always flag).
-
-## Why it's safe — the recall floor is preserved
-Even on this caller, these **still hard‑block** (never overridable): Presidio‑detected names, clinical‑context names, all regex identifiers, real `XXX‑XX‑XXXX` SSNs, and the LLM's own patient‑detection. A real patient document mis‑routed to this lane still blocks on any of them; only a public page's own furniture gets cleared. No per‑document medical dictionary — it scales to every payer site.
-
-## What "yes" unblocks (and who does it)
-- **Classifier owner:** ready to build the caller‑scoped arbitration **the moment the caller field arrives** (their side is done pending it).
-- **Chat‑side (the named owner):** one‑field caller passthrough — small.
-- Same owner then also clears (b) Ask‑2 admit and (c) the extraction fix on their own tracks.
-- **Extension:** nothing further — we already send the fields; verified.
-
-## What "no / defer" means
-The lane stays **demo‑only**: it cannot ingest real payer policy pages, because they all carry contact blocks and nav that trip the gate. The plumbing sits complete but unused.
-
-## NOT this decision (separate gates, don't conflate)
-- **BAA** → admitting *genuine* PHI via the two‑key toggle. Option A is for *false positives on public content*, not real PHI.
+## Not this at all (separate, unchanged)
+- **BAA** → admitting *genuine* PHI via the two‑key toggle.
 - **AMA CPT licence** → CPT‑bearing docs.
-Both are additional gates; **Option A is the one that makes the feature work on ordinary public payer content**, which is the dominant case.
 
----
-
-**Ask:** ☐ Approve Option A carve‑out ☐ Name the chat‑PHI owner → _______________  ·  Ananth / date: ________
+## The only thing that would come back to Ananth later
+A *deterministic* (no‑LLM) override for the truly‑ambiguous residual, **if** the precision work leaves enough real payer content still blocked to matter — and only then. Not now.
