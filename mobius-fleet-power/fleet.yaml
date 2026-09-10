@@ -21,7 +21,13 @@ modes:
 
 services:
   # --- RAG core ---
-  mobius-rag:                  {mode: pinned, min: 1, max: 1, note: "min=max=1 guardrail (connection-leak ceiling); downsized 4c/8Gi -> 2c/4Gi Sep 7 (p95 cpu<10%, p99 mem<19%)"}
+  # min=max=1 REQUIRED (correctness): eval/calibration runner and nightly
+  # orchestrator state live IN-PROCESS on the single instance (deploy script
+  # §3 comments; the 13/110 mid-eval stall was a scale-down kill). max>1
+  # routes status polls to the wrong instance; min=0 kills background
+  # extraction/eval mid-run and loses its status. Also the connection-leak
+  # ceiling. Lift only when extraction moves to its own worker.
+  mobius-rag:                  {mode: pinned, min: 1, max: 1, note: "min=max=1 correctness invariant, see comment; 2c/4Gi since Sep 7"}
   # Poll-loop workers at min=0 BY CHOICE (Sep 8, dev cost): nothing polls the
   # queue while parked, so enqueued docs (incl. instant-RAG uploads) WAIT until
   # the nightly pipeline boosts at 10pm or someone runs:
@@ -34,14 +40,18 @@ services:
   mobius-answer-cache:         {mode: active, max: 2}
 
   # --- Chat / user-facing ---
-  mobius-chat:                 {mode: pinned, min: 1, max: 20, note: "warm instance for first-token latency; downsized 2c/2Gi -> 1c/1Gi Sep 7 (p95 cpu<13%, p99 mem<19%)"}
+  mobius-chat:                 {mode: pinned, min: 1, max: 20, note: "LATENCY ONLY (safe at 0 — state lives in shared DB/Redis): warm instance for first-token; 1c/1Gi since Sep 7"}
   mobius-os-backend:           {mode: active}
   mobius-user:                 {mode: active}
   mobius-interact:             {mode: standby}
   mobius-story-ui:             {mode: standby, max: 5}
 
   # --- Payor / facts ---
-  mobius-payor:                {mode: pinned, min: 1, max: 2, note: "existing min=1 kept; drop to active if latency doesn't matter"}
+  # min=1 is a QUALITY floor (fail-soft, not fail-closed): rag's payer_context
+  # filler and strategy-d call payor with 3s timeouts; a ~10s cold start makes
+  # those silently degrade to a thinner DB fallback (no crawlable/metafact
+  # context). Nothing blocks at min=0 — answers just quietly get worse.
+  mobius-payor:                {mode: pinned, min: 1, max: 2, note: "quality floor vs 3s-timeout callers, see comment"}
   # min=1 REQUIRED (correctness, not cost): chat's message PHI gate calls
   # /message-check with a 4s timeout (mobius-chat app/api/chat.py:247) and is
   # fail-closed; a cold start loads Presidio/spaCy in ~15s, so min=0 turns
