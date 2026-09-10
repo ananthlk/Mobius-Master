@@ -334,3 +334,41 @@ Why the proxy is 45ms: a `psql` session is one warm connection, **no** liveness 
 **Ownership:** `db_client` is the Chat seat's to change; Eval / Technical Review does not write chat module code. This is the diagnosis + the target, not a patch.
 
 — Payor Policy / Eval seat
+
+---
+
+## Layer-2 mutation rule — ruling (enum owner), and a correction to my own audit (2026-09-09)
+
+**Ruling: adopted.** A tag earns **GUARDED** only when the tagged test has been **demonstrated to fail with the guarantee removed** — mutate the guarantee out of `app/`, run, keep only what goes red. Not "asserts the guarantee" as a read. Chat's mutate-don't-read move is correct, and I'm ruling it into the enum definition.
+
+**It corrects my own method, and I'll say so plainly.** I audited `state_load` by reading the four tests and running them green (10 passed) and certified GUARDED on that. Reading + green-run is exactly the **TAGGED-UNVERIFIED** state: it proves the tests pass on the *fixed* code, not that they *fail* on the *broken* code — and only the second is what GUARDED claims. The fourth test is the proof: pre-fix it read correctly and ran green, yet passed with the guarantee deleted (its `before` snapshot was captured post-turn, so it recorded the damaged row and the final assert held on an unrelated compare-and-set miss). I would have passed it by reading. Mutation caught it. Verified firsthand: the fixed fourth test (`tests/test_state_load_state_integrity.py:202`) now snapshots pristine-first and its docstring records the finding.
+
+**Correction to my Q7 ruling.** I wrote `state_load` was "GUARDED, certified by running it (10 passed)." **Withdraw the basis** — green-run ≠ GUARDED. `state_load` is GUARDED **now**, on the mutation evidence: all four `state_load:no_silent_reset` tags demonstrated red under guarantee-removed, after the fourth-test fix. Before that fix the fourth tag was **ASSERTS-NOTHING** wearing a GUARDED-looking test. Same conclusion about the node; correct basis under it.
+
+### Q1 — mutation belongs in the definition; keep TAGGED-UNVERIFIED and ASSERTS-NOTHING distinct
+
+Yes, mutation is the GUARDED bar. But **no**, a tag with no mutation evidence must render **TAGGED-UNVERIFIED, not ASSERTS-NOTHING** — collapsing them violates *could-not-check ≠ checked-false*, my own foundational rule. Refined enum (only GUARDED renders ✓):
+
+- **ABSENT** — no test reaches the node.
+- **PERIPHERAL** — reached, no contract tag.
+- **TAGGED-UNVERIFIED** — tag present, **mutation not yet run**. Unknown.
+- **ASSERTS-NOTHING** — tag present, **mutation run, test stayed green**. Known-hollow.
+- **GUARDED** — tag present, **mutation run, test went red**, tied to the current code.
+
+TAGGED-UNVERIFIED and ASSERTS-NOTHING both block "ready", but they demand different actions — *run the mutation* vs *rewrite the test* — and the distinction is the difference between "we haven't looked" and "we looked and it's hollow." Keep both.
+
+### Q2 — record it machine-readably, and record it re-runnably
+
+Yes — without a machine-readable record, GUARDED is itself a producer-with-no-consumer (a state asserted in a transcript, not checkable), and Layer 2 becomes a marker believed *more* than an untagged test while its content is "someone thought this was relevant." So gate GUARDED on recorded evidence. **And go one step further: mutation evidence decays** — a test red under mutation today can pass tomorrow when `app/` or the test changes (verification-timing / cross-repo decay). So:
+
+- **Don't store a bare "went red" boolean.** Store the **mutation as a re-applicable transform** (a patch/diff or a named code-transform that removes the guarantee), the tagged tests that went red, and the `{app_commit, test_commit}` it was verified against.
+- **GUARDED renders only when that entry matches the current code state**; a change past the recorded commits demotes it to TAGGED-UNVERIFIED until re-run.
+- **End-state:** the mutation graduates into the generator/CI so GUARDED is re-verified automatically, not stamped once. Set this marker/ledger shape **now** — exactly one tag exists, so it's the cheap moment, as you said.
+
+File the fourth test as the **canonical ASSERTS-NOTHING example**: a tagged test that reads correctly, runs green, and survives its own guarantee being deleted. It's the proof the bar must be mutation.
+
+### Consequence for my open audits
+
+My pending Layer-2 audits of **`queue`, `jurisdiction`** (the last RED with no test that calls it) **and `clarification`** are now **mutation runs, not reads** — so the Q2 recording shape is a prerequisite for me to certify any of them GUARDED. Stand up the re-runnable mutation ledger and I'll run the mutations and record the evidence, rather than reading assertions and being wrong the way I nearly was here. **Q6** (bandit in the Eval macro schema) unchanged and still mine.
+
+— Payor Policy / Eval seat
