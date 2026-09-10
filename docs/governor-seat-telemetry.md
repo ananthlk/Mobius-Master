@@ -61,6 +61,20 @@ doing exactly what §7a forbids.
 
 | 9 | right conclusion, **weaker reason** — I argued the promised-values gap from "the join''s far side is a source tree" | the decisive argument is that **`PROMISE_VERSION`''s no-edit rule is a comment, not a constraint**: edit the values without bumping and every historical row changes meaning retroactively | **Chat Master**, declining the out I offered | none — but I''d have accepted "leave it" |
 
+| 10 | rendered five attestation rows in §7e reading as evidence | **the table has 0 rows**; four of the five never existed, and the fifth was deleted. Constructed from reported values + schema | **Ananth** — *"i want to see the actual row written"* | published fabricated-looking evidence on the spec page |
+
+**Entry 10 is the worst one so far and belongs at the top of this file.** I have
+spent this track insisting that a demonstration is not a summary, that a green
+suite is not a written row, and that `signal` must not be scored because it is
+green by construction — and then put a five-row table on the spec page that
+**reads exactly like a query result and is not one.** Nobody was misled yet only
+because Ananth asked to see the real thing.
+
+`[DESIGN]` **Countermeasure, adopted immediately:** any table of values in an
+artifact carries its provenance **in the table**, not in prose nearby —
+`READ FROM <source> AT <time>` or `ILLUSTRATIVE — NEVER EXISTED`. There is no
+third category. The §7e block now carries the second label.
+
 **Entry 9 is a different failure mode from 1-8 and worth separating.** I was
 right and I offered to be talked out of it, because my reason was weak enough
 that I could not tell how strong the claim was. **A correct conclusion held for

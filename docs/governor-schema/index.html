@@ -303,6 +303,9 @@ jsonPayload: {
 <div class="note"><b>The emit is deliberately separate from the persist.</b> From the code''s own comment: <i>"if the DB write fails, the structured record must still reach Cloud Logging, and vice versa. Wiring them together would let one failure hide the other."</i> Two independent surfaces, two independent failure modes — which is the entire lesson of the write path that produced zero rows behind a green suite.</div>
 
 <h3>P — the row</h3>
+<div class="note"><b>⚠ ILLUSTRATIVE — these five rows have never existed.</b> <span class="tag t-no">NOT READ FROM THE TABLE</span> <code>turn_attestations</code> in dev held <b>0 rows</b> when checked at <b>2026-09-10 19:08:46Z</b>. Chat wrote and read back real rows during verification and then <b>deleted them so they could not pollute the §5 counts</b> — correctly. The shapes below are constructed from their reported values plus the schema; only the <code>thinking</code>/<code>completed</code> row corresponds to a write that actually happened, and even that one is no longer there.
+<br><br><b>This label exists because the page briefly did the thing this whole design polices:</b> a table of numbers that reads as evidence and is not. <b>Real rows replace this at §5 demonstration time</b>, read from the table and marked as such.</div>
+
 <pre style="overflow-x:auto;padding:.9rem 1rem;border:1px solid var(--line);border-radius:6px;background:var(--card,rgba(127,127,127,.06));font-size:.72rem;line-height:1.55">correlation_id  version  tier      outcome        promised  delivered  worker   cost  quality  notes
 d50c4353…       v1       thinking  completed         95.00      61.00   57.10   NULL  NULL     NULL
 9f21b7ac…       v1       —         completed          NULL       9.80    6.10   NULL  NULL     "task mode: no section-7 tier"
