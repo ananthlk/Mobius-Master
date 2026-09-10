@@ -1,5 +1,5 @@
 {
-  "_what": "Eval's mutation ledger. A contract tag renders GUARDED only when an entry here proves the tagged tests went RED under a mutation that removed the guarantee, AND the recorded commit still matches the current state of the files the entry names. Eval's Q2 ruling, 2026-09-09: mutation evidence DECAYS — a test red under mutation today can pass tomorrow when app/ or the test changes, so GUARDED is re-verified, never stamped once.",
+  "_what": "Eval's mutation ledger. A contract tag renders GUARDED only when an entry here proves the tagged tests went RED under a mutation that removed the guarantee, AND the recorded commit still matches the current state of the files the entry names. Eval's Q2 ruling, 2026-09-09: mutation evidence DECAYS \u2014 a test red under mutation today can pass tomorrow when app/ or the test changes, so GUARDED is re-verified, never stamped once.",
   "_rule": "generator: if verified_at != current commit touching `files`, demote to TAGGED-UNVERIFIED.",
   "entries": [
     {
@@ -7,18 +7,32 @@
       "verdict": "GUARDED",
       "auditor": "Eval",
       "audited": "2026-09-09",
-      "verified_at": "c468880",
+      "verified_at": "299519c",
       "repo": "mobius-chat",
-      "files": ["app/storage/threads.py", "tests/test_state_load_state_integrity.py"],
-      "mutations": [
-        {"facet": "failed read == no-row",
-         "transform": "app/storage/threads.py: get_state L606 and get_state_with_version L632 error-raise sites -> return None, None",
-         "tests_went_red": ["99", "124", "202"]},
-        {"facet": "undecodable row looks new",
-         "transform": "app/storage/threads.py: decode-raise sites L616, L638 -> return None, None",
-         "tests_went_red": ["134"]}
+      "files": [
+        "app/storage/threads.py",
+        "tests/test_state_load_state_integrity.py"
       ],
-      "note": "Eval ran the mutations themselves, reverting each — not on chat's word and not by reading. First ledger entry; these two transforms are the first fixtures when the mutation harness moves into the generator/CI."
+      "mutations": [
+        {
+          "facet": "failed read == no-row",
+          "transform": "app/storage/threads.py: get_state L606 and get_state_with_version L632 error-raise sites -> return None, None",
+          "tests_went_red": [
+            "test_failed_read_does_not_overwrite_stored_state",
+            "test_error_and_absence_are_distinguishable",
+            "test_tracked_write_is_suppressed_after_a_failed_read"
+          ]
+        },
+        {
+          "facet": "undecodable row looks new",
+          "transform": "app/storage/threads.py: decode-raise sites L616, L638 -> return None, None",
+          "tests_went_red": [
+            "test_undecodable_row_raises_rather_than_looking_new"
+          ]
+        }
+      ],
+      "note": "Eval ran the mutations themselves, reverting each \u2014 not on chat's word and not by reading. First ledger entry; these two transforms are the first fixtures when the mutation harness moves into the generator/CI. RE-AUDITED 2026-09-10 at 299519c: chat's state_load latency parallelisation moved the test file past c468880, the decay rule fired and auto-demoted to TAGGED-UNVERIFIED. Both mutations re-run \u2014 read-error facet -> 3 tags red, decode facet -> 1 tag red, source byte-restored. CONCURRENCY CHECK (per Platform ask): get_state_with_version is deliberately kept SEQUENTIAL before the ThreadPoolExecutor (state_load.py:101-102, fb2f0cf) so StateUnavailable still suppresses every write in the turn \u2014 the parallelisation does NOT change the failure semantics; verified empirically, tests red exactly as before. tests_went_red switched from line numbers to test NAMES \u2014 line numbers drift faster than the decay rule catches.",
+      "reverified": "2026-09-10"
     }
   ]
 }
