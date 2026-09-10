@@ -1117,3 +1117,91 @@ corpus rather than assumed.
   tool whose description changes without re-embedding ranks on stale meaning, silently.
   Same decay shape as §10.3.
 - **the golden set.** Four queries I chose. Unchanged and still the real prerequisite.
+
+---
+
+# 15. MEASURED: cleaned descriptions — 72% smaller, and the procedural query becomes unanimous
+
+**Ananth, 2026-09-10:** *"this is the single biggest accelerant that we can build — our
+number of tools is going to explode as we build service lines, appeals analytics, payor
+fact store etc.. this is what will make it manageable.. now lets clean up the manifest
+descriptions and run this.. don't have to say prioritize this over the other etc.. this
+was too complicated. we just describe the tool and best use.. this will make it simpler."*
+
+**Tested before changing anything.** I wrote candidate descriptions for the five appeals
+tools under his rule — *describe the tool and its best use, nothing else* — and re-ran all
+three signals against the live 57-tool corpus with only those five blocks swapped.
+
+**What was removed:** the `⚠ APPEALS TOOLS — HIGHEST PRIORITY` header, the TRIGGER WORDS
+table, the *"NOT rag, NOT product_help_search"* negations, the *"PREFER THIS over rag"*
+line — and, critically, **the example queries that harvested each other's phrasing**
+(*"how do I appeal CARC 22"*, *"rules for CARC 29 timely filing denial from Sunshine
+Health"*). §11 measured those examples as the cause of the 4.6× mis-rank.
+
+## 15.1 Size
+
+**Appeals block: 5,448 → 1,548 chars (~1,362 → ~387 tokens). 72% smaller**, for five
+tools, with no capability lost — only the cross-tool instructions and the harvested
+examples.
+
+## 15.2 Ranking, before vs after (RRF over vector + BM25)
+
+| query | BEFORE | AFTER |
+|---|---|---|
+| *how do i appeal a carc 197 denial for sunshine health* | playbook **#3** (vec #3, bm25 #4) | playbook **#3** (vec #3, bm25 #3) |
+| *filing deadline to submit an appeal to sunshine health* | playbook **#2** (vec #2, bm25 #1) | **playbook #1 — unanimous (vec #1, bm25 #1)** |
+| *what argument should i use to appeal carc 197* | playbook #3 | playbook #2 |
+| *what is prior authorization* | defaults-ish, sane | unchanged, sane |
+
+**🔴 The headline is the second row, and it is not the one I expected.** Before cleaning,
+vector ranked the playbook **#2** on the procedural query — behind the sibling. After
+cleaning it ranks **#1**, agreeing with BM25.
+
+**So the harvested example text was corrupting the vector signal too, not only BM25.**
+§11 established that the examples fooled lexical matching. This shows they also shifted
+the *embedding* — the sibling's block contained *"timely filing"*, *"denial"* and
+*"Sunshine Health"*, which pulled its vector toward procedural-payor questions it does
+not answer. **Removing prose written to steer a model improved a signal that has nothing
+to do with steering.** That is a stronger result than the size saving.
+
+**Row 1 is unchanged at #3, and per §11.2 that is correct** — *"how do i appeal"* spans
+what-to-argue and how-to-file, and the ranked set contains both tools.
+
+**Row 3 is a small regression in discrimination**, stated rather than buried: the playbook
+rises #3 → #2 on *"what argument should i use"*, where it should sit lower. `lookup_rules`
+holds #1 so the outcome is still right, but the cleaned playbook description is now
+slightly *too* attractive to appeal-shaped queries. That is a wording iteration, not a
+design problem — and it is exactly what a golden set would catch automatically.
+
+## 15.3 Why this is the accelerant Ananth says it is
+
+His argument, and the measurements support it: **tool count is about to grow** — service
+lines, appeals analytics, payor fact store. Today's failure mode scales badly in three
+compounding ways:
+
+1. **prompt cost is linear in tool count** and unconditional — 57 tools, ~13,062 tokens,
+   on every round of every turn (§2)
+2. **collision probability grows superlinearly** — every new tool can collide with every
+   existing one, and prose has no mechanism to detect it (§5)
+3. **cross-tool priority language grows quadratically** — *"prefer this over X"* has to be
+   restated in every entry as X multiplies, which is why the appeals block reached 5,448
+   characters for five tools
+
+**Cleaning removes the third entirely and makes the second detectable**, because
+*"describe the tool and its best use"* is a per-tool statement that does not reference
+other tools. **A description that never mentions a sibling cannot go stale when the
+sibling changes** — and that is the property that survives twenty more tools.
+
+## 15.4 What this does not settle
+
+- **the five descriptions are MINE.** They are candidates, measured, unratified. They
+  belong to whoever owns the appeals tools' semantics — not the platform seat.
+- **only the appeals family was rewritten.** The other 52 blocks still carry the old
+  style; `service_line_*` in particular has eight entries that will have the same
+  collision shape.
+- **§14.4's caveat is now partly discharged and partly sharper.** These numbers are no
+  longer over purely adversarial prose for the appeals family — but the corpus is still
+  the *planner prose*, and the right corpus question (return-field semantics? tags?
+  curated triggers?) is untouched.
+- **row 3's regression** needs a golden set to catch, which is still §8.6 question 6 and
+  still unowned.
