@@ -5216,12 +5216,16 @@
    "depth": "code",
    "findings": [
     [
+     "good",
+     "TWICE IN ONE NODE THE INSTRUMENTATION CARRIED THE DEFECT IT WAS REMOVING \u2014 AND CHAT CAUGHT BOTH, IN THEIR OWN WORK. (1) They wrapped record_ambient in `except Exception: pass`, and record_ambient ALREADY guarantees it never raises AND logs its own failures \u2014 so the wrapper could only ever have hidden that warning. Removed, not softened (299519c). (2) _take substitutes a default for None, so a MISSING table rendered as 'empty' \u2014 the exact absent-vs-empty collapse the new telemetry exists to report, reproduced inside the report. Their own test caught it and the block state now reads the raw result. This is the third instance in two days after the governor's log line inside `except Exception: pass`, which would have raised NameError into that handler forever while the node counted as instrumented. THE GENERALISATION, and it is chat's: an instrumentation pass is written by someone thinking about the happy path of the thing they are adding, which is precisely the mindset that produced the defect being instrumented. Their AST test \u2014 walk every ExceptHandler in the module and require it to re-raise, log, or return the error to a caller that does \u2014 SHOULD RUN ON THE OTHER 22 NODES, and I am carrying that as a requirement rather than a suggestion. Also correctly annotated: the remaining broad handler in state_load is NOT a swallow \u2014 it returns the exception, _take logs it, and the block renders read_failed rather than empty, so the next audit does not miscount it."
+    ],
+    [
      "bad",
      "OWNER(chat): ROOT CAUSE OF THE PER-READ OVERHEAD \u2014 EVERY POOLED ACQUIRE RUNS `SELECT 1` AND A COMMIT. Diagnosed by Eval from source, verified by me at db_client.py:334-338 before relaying:\n\n    conn = pool.getconn()\n    with conn.cursor() as _cur:\n        _cur.execute(\"SELECT 1\")     # liveness probe\n    conn.commit()                    # and a commit\n    return conn, True\n\nIn CHAT_DB_MODE=direct \u2014 which is what is LIVE \u2014 every db_query and db_execute does its own acquire -> execute -> release. So each read costs THREE round-trips where one would do, and a turn's 5-10 DB ops become 15-30. The pool amortises the CONNECT; it does not amortise this probe, which runs on every acquire.\n\nThat closes the gap I measured and could not attribute: my direct read via the proxy is 45ms; the service's reads on the same tables are 260-630ms. Three round-trips accounts for the floor, and the VARIABILITY is the getconn contention path \u2014 the PoolError branch sleeps 50ms and retries within a 5s deadline, so a contended acquire adds 50ms increments before the query starts.\n\nCORRECTION, and it is the FOURTH instance this session of the same trap: I relayed 'starves a max=10 pool'. The live value is CHAT_DB_POOL_MAX=20; TEN IS THE SOURCE DEFAULT at db_client.py:227. Eval read the default, I passed it on without checking, Chat Master read the deployed environment. It does not touch the three-round-trips finding but it halves the starvation math, which matters to anyone sizing the pool. Same shape as the governor reading 'off' while deployed true, the integrator 'sequential' while parallel, and enrichment '0%' while 100 \u2014 and it keeps recurring for the reason already logged on this node: 116 of 187 env vars run on invisible code defaults and no surface states the effective value.\n\nTHE FIX, endorsed by Eval, has two halves and the second is the one that bites if omitted: one connection per TURN rather than per query, which removes the per-query getconn and SELECT 1 entirely; and GUARANTEED RELEASE on every exit path including the 20s LLM timeout \u2014 otherwise a turn that times out leaks its connection and starves the pool. That is the same cleanup-on-failure shape as the state_load bug this node just fixed.\n\nHONEST LIMIT, kept from Eval's filing: the SELECT 1 is confirmed from source; the BASE Cloud Run to Cloud SQL round-trip time is unmeasured, so the arithmetic above is a floor and not a full account of 630ms. The fix holds regardless \u2014 three round-trips to one is a real reduction whatever the base RTT turns out to be.\n\nAND THE P2b SPAN WILL SHOW IT: its connection-acquire vs query-execute split is exactly this distinction. The SELECT 1 is acquire-time wearing query-time's clothes \u2014 which is why the counts, which record per-TARGET reads, said n=1 while the wall said otherwise. Chat Master's generalisation, kept in their words: ANY PER-TARGET COUNTER IS BLIND TO WHATEVER HAPPENS BETWEEN DECIDING TO CALL AND THE CALL STARTING.\n\nMEASURED 2026-09-09 ON THE DEPLOYED INSTRUMENT \u2014 MECHANISM CONFIRMED, FIX DECLINED. Chat Master measured; I verified from turn_spans independently.\n\n  acquires == db ops EXACTLY, per turn: 7 acquires for 5 reads + 2 writes; 5 for 5.\n  So the per-query acquire predicted from CHAT_DB_MODE=direct is real.\n  acquire = 75-115ms per turn, 10.7-16.4ms each, 38-71% OF ALL DB TIME.\n\nAND THE SHARE THAT DECIDES IT \u2014 my own numbers, four turns:\n    wall 52,366ms  db 266ms (0.51%)  acquire 111ms (0.21%)\n    wall 47,666ms  db 272ms (0.57%)  acquire  75ms (0.16%)\n    wall 46,297ms  db 347ms (0.75%)  acquire 115ms (0.25%)\n    wall  9,639ms  db 221ms (2.30%)  acquire  93ms (0.97%)\n\nSo eliminating connection acquire ENTIRELY buys roughly 0.2% of turn wall on an agentic turn. The connection-per-turn refactor's second half is guaranteed release on every exit path including the 20s LLM timeout \u2014 the same cleanup-on-failure shape as the state_load bug this node just fixed. THAT RISK FOR 0.2% IS NOT WORTH SPENDING, and Chat Master said so rather than letting a confirmed diagnosis become a work item by momentum. Recorded as a decision, not a deferral.\n\nWHAT REMAINS UNSETTLED, and it is the honest limit: these are WARM turns \u2014 reads at 6-17ms. They do NOT reproduce the 260-630ms I measured earlier, which was cold-pool or contended and consistent with the PoolError 50ms-retry path. So the mechanism is confirmed and its MAGNITUDE UNDER CONTENTION IS UNQUANTIFIED. A per-turn connection would help a cold or contended turn far more than a warm one. n=4 warm turns cannot settle that, and nobody should size the win from these numbers.\n\nMY OWN FIRST READING WAS WRONG: I reported 2 acquires against 15 reads and called the three-round-trips theory into question. That sample straddled the deploy and mixed in old-revision spans carrying no acquire instrument. Chat Master's numbers were right and mine were incomplete.\n\nAND THE NODE'S OWN SHAPE CHANGED: state_load processing ran 80-327ms across those turns \u2014 now LARGER than its DB time including acquire. The 'four sequential slow reads' framing this node started with no longer describes it.\n\nNOT FIXED, DELIBERATELY, and the reasoning is the right one: the arithmetic is a floor built on an unmeasured base RTT, and the second half of the fix is a connection-LIFECYCLE change \u2014 the same cleanup-on-failure shape as the state_load bug. Chat Master built the INSTRUMENT instead (f2db529): db.acquire recorded at all three acquire sites and reported alongside db_read_ms/db_write_ms, never summed into them, because the acquire happens inside the call db_query already times and adding it would double-count. One live turn turns the floor into a measurement. If the acquire share proves small, the answer changes and the riskier edit is avoided entirely.DECLINED ON COST by Ananth 2026-09-09: the DB is 0.5-2.3% of turn wall and the fix buys ~0.2%. A DECIDED item, not an open defect \u2014 reopen if the magnitude under contention is ever quantified."
     ],
     [
      "bad",
-     "OWNER(chat): state_load IS 1.2s AT p50 AND IT IS ALL SEQUENTIAL DB READS \u2014 measured 2026-09-09 from turn_spans, the first finding this node's own instrumentation produced.\n\n  p50 1,229ms \u00b7 p95 2,192ms \u00b7 max 3,337ms across 107 spans\n  57 OF 107 SPANS EXCEED ONE SECOND, and it is not the smoke test alone \u2014 a source=real span sits at 2,333ms.\n\nThe counts break it down completely, and this is exactly the discrimination Eval specified when they insisted a count carry its TARGET. Worst span:\n    chat_state           n=1    369ms\n    chat_turn_messages   n=1    909ms\n    chat_turns           n=1  1,452ms\n    chat_threads         n=1    605ms\n\nEVERY n IS 1. So this is NOT a loop \u2014 the bug class the instrument was built to hunt \u2014 it is FOUR SEQUENTIAL ROUND-TRIPS, each slow on its own. A bare duration would have said 'state_load is slow'; count+target says 'four reads, none repeated, all slow', which is a different fix entirely: parallelise or collapse the reads, do not go looking for a loop.\n\nIt also corrects the attribution doc, which reported state_load at 345ms processing + 140ms db on one turn. That turn was not representative: across 107 spans the median is 1.2s and the work is essentially all DB. Chat Master had already retracted a state_load claim for smoke-test cid reuse; this is the opposite direction \u2014 the module is slower than the single sampled turn suggested, not faster.\n\nIN SCOPE FOR THIS NODE'S PASS as the latency half of production readiness."
+     "OWNER(chat): state_load IS 1.2s AT p50 AND IT IS ALL SEQUENTIAL DB READS \u2014 measured 2026-09-09 from turn_spans, the first finding this node's own instrumentation produced.\n\n  p50 1,229ms \u00b7 p95 2,192ms \u00b7 max 3,337ms across 107 spans\n  57 OF 107 SPANS EXCEED ONE SECOND, and it is not the smoke test alone \u2014 a source=real span sits at 2,333ms.\n\nThe counts break it down completely, and this is exactly the discrimination Eval specified when they insisted a count carry its TARGET. Worst span:\n    chat_state           n=1    369ms\n    chat_turn_messages   n=1    909ms\n    chat_turns           n=1  1,452ms\n    chat_threads         n=1    605ms\n\nEVERY n IS 1. So this is NOT a loop \u2014 the bug class the instrument was built to hunt \u2014 it is FOUR SEQUENTIAL ROUND-TRIPS, each slow on its own. A bare duration would have said 'state_load is slow'; count+target says 'four reads, none repeated, all slow', which is a different fix entirely: parallelise or collapse the reads, do not go looking for a loop.\n\nIt also corrects the attribution doc, which reported state_load at 345ms processing + 140ms db on one turn. That turn was not representative: across 107 spans the median is 1.2s and the work is essentially all DB. Chat Master had already retracted a state_load claim for smoke-test cid reuse; this is the opposite direction \u2014 the module is slower than the single sampled turn suggested, not faster.\n\nIN SCOPE FOR THIS NODE'S PASS as the latency half of production readiness.FIXED (chat fb2f0cf, 2026-09-10) \u2014 VERIFIED IN CODE, awaiting deploy for the after-measurement. BEFORE, measured over n=211 turns from turn_spans (2026-09-09 14:43Z to 2026-09-10 11:59Z): p50 1592.3ms, p95 5600.1ms, min 230.2, max 21374.2, with DB reads about 1,796ms/turn across four tables \u2014 so THE READS ARE THE NODE, not a component of it. Four of the five reads take nothing but thread_id and none consumes another's result; those now run concurrently, proven in test by wall-clock (4 reads x 60ms complete in under 200ms). ONE READ STAYS SEQUENTIAL ON PURPOSE and the reason is the interesting part: get_state_with_version gates every write in the turn, because StateUnavailable must suppress them. That is not a DATA dependency, it is a FAILURE-SEMANTICS one \u2014 and chat's judgement, which I agree with, is that it should be obvious in the code rather than buried inside a fan-out. The acquire overhead was NOT folded in; it stays declined."
     ],
     [
      "bad",
@@ -5237,7 +5241,7 @@
     ],
     [
      "bad",
-     "OWNER(chat): state_version is WRITE-ONLY \u2014 inserted, incremented, never read or compared anywhere in app/. So it cannot detect the above, AND read-modify-write through get_state/save_state_full is unguarded: two concurrent turns on one thread are a lost update.NOTE ON READING THIS NODE (2026-09-10): the page used to render SEVEN red triangles here while the derived badge said 2 open, because the finding list styled every `bad` entry identically regardless of a closure stamp or another seat's OWNER. Ananth caught it \u2014 'i see so many bugs / reds in the state_load, is that accurate in the schema'. It was not. A rating computed from evidence and a list that ignores the same evidence is worse than either alone, because the reader trusts the one they can see. Closed findings are now kept and marked (they are the history) but rendered as done, other seats' items carry an owner chip, open items sort first, and a summary line states the split."
+     "OWNER(chat): state_version is WRITE-ONLY \u2014 inserted, incremented, never read or compared anywhere in app/. So it cannot detect the above, AND read-modify-write through get_state/save_state_full is unguarded: two concurrent turns on one thread are a lost update.NOTE ON READING THIS NODE (2026-09-10): the page used to render SEVEN red triangles here while the derived badge said 2 open, because the finding list styled every `bad` entry identically regardless of a closure stamp or another seat's OWNER. Ananth caught it \u2014 'i see so many bugs / reds in the state_load, is that accurate in the schema'. It was not. A rating computed from evidence and a list that ignores the same evidence is worse than either alone, because the reader trusts the one they can see. Closed findings are now kept and marked (they are the history) but rendered as done, other seats' items carry an owner chip, open items sort first, and a summary line states the split.CLOSED \u2014 it stopped being write-only at chat c8fc7c8, before this pass. VERIFIED IN CODE: threads.py:680 does UPDATE ... WHERE thread_id = :tid AND state_version = :ev, i.e. a live compare-and-set, read by get_state_with_version with two tests. Closed by earlier work, not by the green push \u2014 worth recording as such rather than claimed as progress."
     ],
     [
      "bad",
@@ -5302,13 +5306,8 @@
    ],
    "findings_status": [
     {
-     "closed": true,
-     "owner": "chat",
-     "own": true
-    },
-    {
      "closed": false,
-     "owner": "chat",
+     "owner": "",
      "own": true
     },
     {
@@ -5327,7 +5326,17 @@
      "own": true
     },
     {
-     "closed": false,
+     "closed": true,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": true,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": true,
      "owner": "chat",
      "own": true
     },
@@ -5390,8 +5399,8 @@
    "dimensions": [
     [
      "functionality",
-     "amber",
-     "2 open (+1 tracked for other seats)"
+     "green",
+     "no open defects owned here (1 tracked for other seats)"
     ],
     [
      "testability",
@@ -5415,7 +5424,7 @@
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "functionality: 2 open (+1 tracked for other seats) \u00b7 testability: called, guarantee unproven (TAGGED-UNVERIFIED) \u00b7 error_handling: 1 of 2 handlers swallow \u00b7 observability: 1 telemetry sites, 2 logs  (ok: modularity)",
+   "rating_why": "testability: called, guarantee unproven (TAGGED-UNVERIFIED) \u00b7 error_handling: 1 of 2 handlers swallow \u00b7 observability: 1 telemetry sites, 2 logs  (ok: functionality, modularity)",
    "live_config": [],
    "detail": {}
   },

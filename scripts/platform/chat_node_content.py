@@ -1280,6 +1280,27 @@ WHAT IT DOES NOT LOAD, which is the part people assume:
     from versioned blocks in Postgres via MOBIUS_PROMPT_SOURCE=composition.
   * PHI. Checked at the API boundary, before the queue.
 """, findings=[
+ ("good", "TWICE IN ONE NODE THE INSTRUMENTATION CARRIED THE DEFECT IT WAS "
+          "REMOVING — AND CHAT CAUGHT BOTH, IN THEIR OWN WORK. (1) They wrapped "
+          "record_ambient in `except Exception: pass`, and record_ambient ALREADY "
+          "guarantees it never raises AND logs its own failures — so the wrapper could "
+          "only ever have hidden that warning. Removed, not softened (299519c). (2) "
+          "_take substitutes a default for None, so a MISSING table rendered as "
+          "'empty' — the exact absent-vs-empty collapse the new telemetry exists to "
+          "report, reproduced inside the report. Their own test caught it and the "
+          "block state now reads the raw result. This is the third instance in two "
+          "days after the governor's log line inside `except Exception: pass`, which "
+          "would have raised NameError into that handler forever while the node "
+          "counted as instrumented. THE GENERALISATION, and it is chat's: an "
+          "instrumentation pass is written by someone thinking about the happy path of "
+          "the thing they are adding, which is precisely the mindset that produced the "
+          "defect being instrumented. Their AST test — walk every ExceptHandler in the "
+          "module and require it to re-raise, log, or return the error to a caller that "
+          "does — SHOULD RUN ON THE OTHER 22 NODES, and I am carrying that as a "
+          "requirement rather than a suggestion. Also correctly annotated: the "
+          "remaining broad handler in state_load is NOT a swallow — it returns the "
+          "exception, _take logs it, and the block renders read_failed rather than "
+          "empty, so the next audit does not miscount it."),
  ("bad", "OWNER(chat): ROOT CAUSE OF THE PER-READ OVERHEAD — EVERY POOLED ACQUIRE RUNS "
          "`SELECT 1` AND A COMMIT. Diagnosed by Eval from source, verified by me at "
          "db_client.py:334-338 before relaying:\n\n"
@@ -1386,7 +1407,8 @@ WHAT IT DOES NOT LOAD, which is the part people assume:
          "already retracted a state_load claim for smoke-test cid reuse; this is the "
          "opposite direction — the module is slower than the single sampled turn suggested, "
          "not faster.\n\n"
-         "IN SCOPE FOR THIS NODE'S PASS as the latency half of production readiness."),
+         "IN SCOPE FOR THIS NODE'S PASS as the latency half of production readiness."
+         "FIXED (chat fb2f0cf, 2026-09-10) — VERIFIED IN CODE, awaiting deploy for the after-measurement. BEFORE, measured over n=211 turns from turn_spans (2026-09-09 14:43Z to 2026-09-10 11:59Z): p50 1592.3ms, p95 5600.1ms, min 230.2, max 21374.2, with DB reads about 1,796ms/turn across four tables — so THE READS ARE THE NODE, not a component of it. Four of the five reads take nothing but thread_id and none consumes another's result; those now run concurrently, proven in test by wall-clock (4 reads x 60ms complete in under 200ms). ONE READ STAYS SEQUENTIAL ON PURPOSE and the reason is the interesting part: get_state_with_version gates every write in the turn, because StateUnavailable must suppress them. That is not a DATA dependency, it is a FAILURE-SEMANTICS one — and chat's judgement, which I agree with, is that it should be obvious in the code rather than buried inside a fan-out. The acquire overhead was NOT folded in; it stays declined."),
  ("bad", "OWNER(chat): A TRANSIENT READ FAILURE DESTROYS ACCUMULATED THREAD STATE. get_state returns None "
          "for a DB error and None for no-row — identical, and its docstring says only 'or None "
          "if no row', never mentioning the error case. state_load does `raw = get_state(...) "
@@ -1417,7 +1439,8 @@ WHAT IT DOES NOT LOAD, which is the part people assume:
          "alone, because the reader trusts the one they can see. Closed findings are now "
          "kept and marked (they are the history) but rendered as done, other seats' "
          "items carry an owner chip, open items sort first, and a summary line states "
-         "the split."),
+         "the split."
+         "CLOSED — it stopped being write-only at chat c8fc7c8, before this pass. VERIFIED IN CODE: threads.py:680 does UPDATE ... WHERE thread_id = :tid AND state_version = :ev, i.e. a live compare-and-set, read by get_state_with_version with two tests. Closed by earlier work, not by the green push — worth recording as such rather than claimed as progress."),
  ("bad", "OWNER(db-seat): CROSS-NODE, invisible to any code read: mobius_chat has NO query guards. "
          "statement_timeout = 0 and no idle-in-transaction guard. mobius_rag carries "
          "idle_in_transaction_session_timeout = 120s and is the ONLY per-database override on "
