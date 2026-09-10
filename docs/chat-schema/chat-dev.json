@@ -43,7 +43,7 @@
     "owner": "chat",
     "gate": "lines removed; handler count down; ZERO invariant movement",
     "blocks": "P2, P4",
-    "n": 22
+    "n": 23
    },
    {
     "id": "P2",
@@ -5394,6 +5394,10 @@
     ],
     [
      "bad",
+     "OWNER(chat): CHAT IS IN THE EXACT STATE THAT ALREADY CAUSED A 29-DAY SILENT OUTAGE ON THIS FLEET, AND I HAD THAT PRECEDENT WRITTEN DOWN ALL DAY. Appeals answered the pinning question: YES, they added `<2` on 2026-09-08, commit 06e46d5, whose message is `pin mcp below 2.x -- the MCP surface had been silently gone for 29 days`. Before it, b582d7f (2026-07-06) carried the unbounded `mcp[cli]>=1.0` -- which is exactly the 08-11 source I read from the bucket. My read was not contradicting them; IT WAS THE PREVIOUS STATE, AND IT WAS THE BROKEN ONE. THE ONSET IS REFRAMED, and the new version is better than the one I filed twice: I had been reporting `appeals deployed 09-08, errors start 09-09`. The strong version is that an unbounded mcp resolved to 2.x, the appeals MCP server stopped working ENTIRELY, and nothing noticed for 29 days -- health green, no alert, no error rate, because AN ABSENT CAPABILITY PRODUCES NO FAILURES. The 09-08 commit did not ADD their tools to the merged manifest, it RESTORED them. So the errors beginning 09-09 are not new behaviour, they are the FIRST OBSERVATION of behaviour that could not occur while the surface was down -- whatever was wrong with dispatch was probably wrong the whole time and had nothing to route. THE PRECEDENT, stated without narrative because it needs none: chat runs mcp 2.2.0 from an unbounded range TODAY, which is the exact condition that silently removed a capability from another service on this fleet for a month. That is documented precedent, not attribution, and it is stronger than the pinning asymmetry I withdrew. It also means the isError rename is only the VISIBLE half of chat's 2.x exposure; the 29-day case says the invisible half is worse, because a major bump can remove a capability outright with every health signal still green. AND THE PART THAT IS MINE: I already had this incident in my own notes -- same service, same cause (mcp 2.x renaming `mcp.server.fastmcp`), same 29 days, same green health -- together with the instruction I wrote for it: `when sweeping for a dependency break, grep for the IMPORT, not the requirements file -- services with inline pip install in a Dockerfile and no requirements.txt are invisible to a requirements sweep`. Today's root cause is mcp 2.x renaming a symbol, in a service with an unbounded range, and I spent the day reasoning from requirements.txt and locally-chosen versions. I held the answer and the method the whole time and did not connect them. Found 2026-09-10."
+    ],
+    [
+     "bad",
      "OWNER(chat + appeals seat): THE TWO ENDS OF ONE WIRE ARE A MAJOR VERSION APART ON THE SAME PROTOCOL LIBRARY, AND NEITHER SIDE IS WRONG ABOUT THE PROTOCOL -- THEY ARE WRONG ABOUT EACH OTHER. Chat Master's final framing, and it is the correct statement of the seam. chat runs mcp 2.2.0, where CallToolResult exposes `is_error` and `isError` is a serialization alias only; the appeals prototype runs mcp 1.30.0, where the attribute IS `isError`. The appeals server sets isError exactly as FastMCP's 1.x contract requires. Chat reads an attribute its own 2.x SDK renamed. BOTH ARE INTERNALLY CORRECT AND THE WIRE IS BROKEN BETWEEN THEM. Both depend on `mcp` with NO UPPER BOUND. THE ASYMMETRY I CLAIMED HERE IS NOW WITHDRAWN, and it is my error twice over. I said appeals bounded the major (`mcp[cli]>=1.0,<2`) while chat did not (`mcp>=1.0.0`), so only chat crossed, and that chat should have copied appeals. Chat Master flagged that I had relayed the appeals half as established when it was the appeals seat's read of a repo not checked out here, and they could not confirm it from the image (Cloud Run source deploy leaves NO Dockerfile, requirements.txt or pyproject.toml in any layer). I then went and got the actual build source from gs://run-sources-mobius-os-dev-us-central1/services/mobius-appeals-prototype/ and READ THE DOCKERFILE: it says `pip install --no-cache-dir fastapi uvicorn pyyaml httpx asyncpg \"mcp[cli]>=1.0\"` -- NO UPPER BOUND. So as of that source, both services were unbounded and the asymmetry did not exist. TWO CAVEATS THAT KEEP THIS HONEST RATHER THAN A COUNTER-CLAIM: the newest retained source is 2026-08-11T20:51Z and the deployed image is tagged pintest-20260908, so THAT SOURCE IS NOT THE BUILD THAT PRODUCED THE RUNNING IMAGE (no September source exists in the bucket -- checked, zero objects) and the `<2` may well have been added between the two. Indeed the tag reads like `pin test`, which would corroborate the appeals seat rather than contradict them, and appeals landing on mcp 1.30.0 (newest 1.x) rather than 2.x is what a `<2` bound produces. WHAT IS ESTABLISHED: chat is unbounded (read directly); appeals was unbounded on 08-11 (read directly); appeals' current bound is UNVERIFIED and consistent with the installed 1.30.0. WHAT IS NOT: that appeals had a standing practice chat should have copied. If the bound was added on 09-08 it is days old, not a habit, and my 'chat should have copied appeals' framing was a narrative built on a relayed claim. The fix does not depend on any of it -- PIN BOTH SIDES -- but a one-sided attribution of blame did depend on it. So the two ends drifted a major version apart and nothing failed loudly. CONSEQUENCE FOR THE FIX: pin `mcp` on BOTH sides, not just chat's. And it gives the derive-from-what-you-own rule its final form: 'something chat owns' CANNOT INCLUDE A FIELD NAME IN A DEPENDENCY THAT A PEER SERVICE RESOLVES INDEPENDENTLY. Every mechanism chat had for deciding whether a remote tool failed was a value the peer controlled -- the wire flag, the error wording, the server's own isError -- and this adds a fourth that is subtler than the three: THE NAME OF THE FIELD ITSELF. Also the case study for the third standing check (Appeals'): name which side of a seam produced a behaviour before naming what it costs -- this defect was invisible from either end alone, because each end was correct on its own terms. Found 2026-09-10."
     ],
     [
@@ -5501,6 +5505,12 @@
      "owner": "",
      "own": true,
      "deploy": "live"
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
@@ -5627,7 +5637,7 @@
     [
      "functionality",
      "red",
-     "8 open defects (+1 tracked for other seats)"
+     "9 open defects (+1 tracked for other seats)"
     ],
     [
      "testability",
@@ -5651,7 +5661,7 @@
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "functionality: 8 open defects (+1 tracked for other seats) \u00b7 error_handling: 19 of 29 handlers log-and-continue  (ok: testability, modularity, observability)",
+   "rating_why": "functionality: 9 open defects (+1 tracked for other seats) \u00b7 error_handling: 19 of 29 handlers log-and-continue  (ok: testability, modularity, observability)",
    "live_config": [
     {
      "name": "CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL",
