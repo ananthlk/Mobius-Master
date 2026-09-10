@@ -303,12 +303,12 @@ jsonPayload: {
 <div class="note"><b>The emit is deliberately separate from the persist.</b> From the code''s own comment: <i>"if the DB write fails, the structured record must still reach Cloud Logging, and vice versa. Wiring them together would let one failure hide the other."</i> Two independent surfaces, two independent failure modes — which is the entire lesson of the write path that produced zero rows behind a green suite.</div>
 
 <h3>P — the row</h3>
-<pre style="overflow-x:auto;padding:.9rem 1rem;border:1px solid var(--line);border-radius:6px;background:var(--card,rgba(127,127,127,.06));font-size:.72rem;line-height:1.55">correlation_id  version  tier      outcome        delivered  worker   cost  quality  notes
-d50c4353…       v1       thinking  completed          12.50    8.00   NULL  NULL     NULL
-9f21b7ac…       v1       —         completed           9.80    6.10   NULL  NULL     "task mode: no section-7 tier"
-5c08e4d1…       —        —         completed          14.20   11.05   NULL  NULL     "pre-deploy enqueue: no promise"
-a71b3390…       v1       normal    <b>failed</b>             31.90   28.40   NULL  NULL     NULL
-e6042f8b…       v1       fast      <b>empty_payload</b>       6.40    4.90   NULL  NULL     NULL</pre>
+<pre style="overflow-x:auto;padding:.9rem 1rem;border:1px solid var(--line);border-radius:6px;background:var(--card,rgba(127,127,127,.06));font-size:.72rem;line-height:1.55">correlation_id  version  tier      outcome        promised  delivered  worker   cost  quality  notes
+d50c4353…       v1       thinking  completed         95.00      61.00   57.10   NULL  NULL     NULL
+9f21b7ac…       v1       —         completed          NULL       9.80    6.10   NULL  NULL     "task mode: no section-7 tier"
+5c08e4d1…       —        —         completed          NULL      14.20   11.05   NULL  NULL     "pre-deploy enqueue: no promise"
+a71b3390…       v1       normal    <b>failed</b>            31.00      31.90   28.40   NULL  NULL     NULL
+e6042f8b…       v1       fast      <b>empty_payload</b>      13.00       6.40    4.90   NULL  NULL     NULL</pre>
 
 <div class="ov"><table>
 <tr><th>what to read in it</th><th>why</th></tr>
@@ -320,9 +320,9 @@ e6042f8b…       v1       fast      <b>empty_payload</b>       6.40    4.90   N
 
 <div class="note"><b>Schema verified against dev, 2026-09-10 — and it exposes two gaps, one of them mine.</b> <span class="tag t-part">VERIFIED</span> 12 columns, PK on <code>correlation_id</code>, <b>0 rows</b> (Chat''s test rows removed as reported — confirmed, not taken).
 <br><br><b>1. <code>queue_wait</code> is NOT stored — it is derived.</b> An earlier version of this table showed it as a column. It is computed in the emit''s <code>jsonPayload</code> and by query as <code>delivered_latency_s − worker_latency_s</code>. Corrected above. Derived is the right call — a stored difference of two stored numbers can drift out of agreement with them.
-<br><br><b>2. The PROMISED values are not in the row — and that contradicts §7a''s own rule.</b> The table stores <code>tier</code> and <code>promise_version</code>, not <code>promised_latency_s</code> / <code>promised_cost_c</code> / <code>promised_quality</code>. §7a says <i>"promised and delivered <b>side by side in one row</b> — a delivered number alone cannot be judged."</i> What is stored is a <b>reference</b> to the promise, not the promise.
-<br><br>That is defensible — <code>(v1, thinking)</code> pins it exactly, and duplicating the promise on 1,100 rows a month is denormalisation. <b>But the values live in code, not in a table</b>, so resolving <code>v1 + thinking → 95.5s</code> means reading source at the right commit. <b>Raised with Chat as a question, not a change order.</b> The cheap fix if it matters: a small <code>promise_versions</code> table so the join has a far side that outlives the source tree.
-<br><br><b>3. <code>forecast_latency_s</code> is absent, correctly.</b> The forecast is step 2 — it needs the planner. When it lands it is a <b>new column and a new <code>promise_version</code></b>, not a backfill.</div>
+<br><br><b>2. RESOLVED — the promise is now stored inline</b> (<code>63b9212</code>, verified against dev: <code>promised_latency_s</code>, <code>promised_cost_c</code>, <code>promised_quality</code> present). The row had stored <code>tier</code> + <code>promise_version</code> — a <b>reference</b> to the promise, not the promise, contradicting §7a''s <i>"promised and delivered side by side in one row."</i>
+<br><br><b>The decisive argument came from Chat and is stronger than mine.</b> I argued the join''s far side is a source tree. Their point goes further: <code>PROMISE_VERSION</code>''s rule <i>"never edit a version''s values in place"</i> is <b>a comment, not a constraint</b>. Edit <code>_TERMS["thinking"]</code> without bumping the version and <b>every historical row silently changes meaning, retroactively, with nothing able to detect it.</b> So <code>(version, tier)</code> was not a reference to a promise — it was a reference to <b>a file someone can edit</b>.
+<br><br>They also declined the <code>promise_versions</code> table I offered: still a join, one more thing to keep in sync. <b>Three inline columns at ~1,100 rows a month; denormalisation is the cheaper failure.</b> Done while the table had <b>0 rows and was undeployed</b> — the only moment it cost neither a backfill nor a second migration.<br><br><b>3. <code>forecast_latency_s</code> is absent, correctly.</b> The forecast is step 2 — it needs the planner. When it lands it is a <b>new column and a new <code>promise_version</code></b>, not a backfill.</div>
 
 <h3>W — the payload at POST</h3>
 <pre style="overflow-x:auto;padding:.9rem 1rem;border:1px solid var(--line);border-radius:6px;background:var(--card,rgba(127,127,127,.06));font-size:.72rem;line-height:1.55">"promise": {
