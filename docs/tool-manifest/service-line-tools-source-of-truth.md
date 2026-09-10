@@ -39,18 +39,28 @@ wrote as a placeholder, not text read from a rule. They read like findings:
 > *"Place-of-service set for this line is stated in its coverage policy; not yet
 > extracted."*
 
-A model receiving that gets a grammatical, confident sentence and **cannot tell
-it from a sourced fact**. `sourced` is on the row and a caller that ignores it
-will report our own to-do list as Florida Medicaid policy. Lines where **every**
-requirement is a placeholder:
+**FIXED 2026-09-10, after this page was first written.** The tool no longer returns
+the placeholder in `statement`: an unsourced row carries `statement: null`,
+`not_extracted: true`, and the old wording under `placeholder`. And `status` returns
+`unknown` rather than `found` when nothing is sourced — it had been returning `found`
+on four placeholders for `state_mental_health`, in the field the envelope tells
+callers to branch on.
+
+**A demotion for `asserts` is therefore no longer warranted on these lines; the
+honest coverage state is now `absent`.**
+
+The original finding, kept because it is why the fix exists: a model receiving the
+placeholder got a grammatical, confident sentence and **could not tell it from a
+sourced fact**. Lines where **every** requirement is a placeholder:
 
 ```
 evaluation_management  fqhc_encounter  specialized_therapeutic
 state_mental_health  therapeutic_group_care
 ```
 
-For those keys the honest ranking is: this tool will answer, and its answer
-asserts nothing.
+For those keys the tool now returns `status: unknown` with null statements. It still
+answers — the requirement types are real and the absence is the finding — but it no
+longer supplies wording that can be mistaken for a rule.
 
 ### "No codes" does not mean "no data"
 
@@ -343,9 +353,12 @@ Two further limits on the sourced ones:
 about either returns nothing, always.
 
 ### Failure modes
-The important one is not an error. It is a fluent placeholder returned with
-`sourced: false`, which a caller that does not read that field will present as
-policy.
+`status: unknown` on a line with no sourced requirements — an admission. The correct
+response is not to retry but to treat the requirement as unanswered.
+
+The old failure mode, fixed 2026-09-10 and recorded because any surface compiled
+before that date still describes it: a fluent placeholder returned in `statement`
+with `sourced: false`, which a caller not reading that field presented as policy.
 
 ---
 
