@@ -78,6 +78,8 @@ _TOMBSTONE_PATHS = {
 }
 
 
+import rating_rubric as _RUBRIC
+
 _COVERAGE = {}
 try:
     import json as _j, pathlib as _pl
@@ -240,10 +242,30 @@ def main():
         # never rendered it, so "is this node guarded?" was answerable only by
         # opening a JSON file by hand. Producer without a consumer, in the tool
         # built to find producers without consumers.
+        # RATING IS DERIVED, NOT TYPED (rating_rubric.py). Hand-typed ratings went
+        # stale for a day: state_load read `red` after its defect was fixed, a tag
+        # was written and Eval had audited it GUARDED. Computed here on every
+        # refresh so staleness is structurally impossible; only the rubric can be
+        # wrong now, and the rubric is in one arguable place.
         _cov = _COVERAGE.get(key)
         if _cov:
             obj["coverage"] = _cov["state"]
             obj["coverage_tags"] = _cov.get("tags") or []
+        _rr_rating, _rr_why = _RUBRIC.rate(
+            findings=obj.get("findings") or [],
+            coverage=obj.get("coverage"),
+            deleted=bool(obj.get("deleted")))
+        _ovr = obj.get("rating_override")
+        if _ovr:
+            obj["rating_derived"] = _rr_rating
+            obj["rating"] = _ovr
+            obj["rating_why"] = "OVERRIDE: " + (obj.get("rating_override_reason") or
+                                                "no reason given") + \
+                                f" (rubric said {_rr_rating})"
+        else:
+            obj["rating_was_typed"] = obj.get("rating")
+            obj["rating"] = _rr_rating
+            obj["rating_why"] = _rr_why
         if obj.get("deleted"):
             # A RATING IS A JUDGEMENT ABOUT LIVE CODE. Leaving green/amber/red on a
             # module that no longer exists is worse than leaving the description:

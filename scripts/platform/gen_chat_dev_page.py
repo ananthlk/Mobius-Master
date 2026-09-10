@@ -368,8 +368,10 @@ function detail(k){
       ((m.coverage_tags && m.coverage_tags.length)
         ? ' <span class="depth">'+esc(m.coverage_tags.join(', '))+'</span>' : '') : '';
   var nbug = (m.findings||[]).filter(function(f){return f[0]==='bad';}).length;
-  var eviden = m.rating ? ' <span class="depth">'+(m.rated? 'rated '+esc(m.rated)+' · ':'')+
-      nbug+' open</span>' : '';
+  // The rating's REASON renders beside it. A badge without its basis is what
+  // went stale for a day — 13 of 37 ratings were wrong when the rubric was
+  // first applied, and none of them looked wrong.
+  var eviden = m.rating_why ? ' <span class="depth">'+esc(m.rating_why)+'</span>' : '';
   var ready = m.rating ? '<div class="f"><b>Production readiness '+rate+' '+cov+eviden+
       ' <span class="depth">read: '+esc(m.depth||'')+'</span></b>'+sigline+findings+'</div>' : '';
   var howf = m.how ? F('How it works', esc(m.how)) : '';

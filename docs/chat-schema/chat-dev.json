@@ -117,7 +117,7 @@
     "modules": [
      "round0"
     ],
-    "cite": 4262,
+    "cite": 4271,
     "note": "Short-circuits the loop when the caller already did the work."
    },
    {
@@ -128,7 +128,7 @@
      "capabilities",
      "parsing"
     ],
-    "cite": 4338,
+    "cite": 4347,
     "note": "Builds the planner prompt and parses the decision back out."
    },
    {
@@ -137,7 +137,7 @@
      "react_retry_guard",
      "curator_tools"
     ],
-    "cite": 5902,
+    "cite": 5911,
     "note": "Dispatches tools, and refuses a repeat of a call that already failed."
    },
    {
@@ -148,7 +148,7 @@
      "feedback_signal",
      "completion_extension_gate"
     ],
-    "cite": 5534,
+    "cite": 5543,
     "note": "Audits the draft against sources and decides whether to go round again."
    }
   ],
@@ -260,6 +260,8 @@
     ]
    ],
    "signals": {},
+   "rating_was_typed": "red",
+   "rating_why": "15 open defects \u2014 volume, not coverage",
    "live_config": [],
    "detail": {}
   },
@@ -345,6 +347,8 @@
    ],
    "ux": "No surface of its own. The 422 body carries phi_blocked, identifier_labels and evidence so the UI can explain a block; the audit rows have no reader anywhere.",
    "signals": {},
+   "rating_was_typed": "amber",
+   "rating_why": "6 open \u00b7 exercised (unknown)",
    "live_config": [
     {
      "name": "PHI_GATE_URL",
@@ -369,7 +373,7 @@
    "config": [],
    "kind": "hop",
    "how": "A Redis list used as a work queue, and the handoff between the API and the worker.\n\nThe ops, verified: publish does LPUSH onto cfg.redis_request_key; the worker does BRPOP with\na 5-second timeout. LPUSH + BRPOP is correct FIFO \u2014 push left, pop right. ORDERING IS SOUND.\nDurability is not.\n\nBRPOP removes the item atomically with no destination. There is no in-flight list, no ack,\nno visibility timeout, no redelivery. The instant BRPOP returns, Redis has no record the\nitem ever existed. So if the worker dies between popping and publishing, THE TURN IS LOST \u2014\nsilently and unrecoverably. The user sees a request that never returns, and there is no\nserver-side artifact of the loss: no row, no key, no log of an orphan.\n\nThe response side is a per-correlation-id key with a 24-hour TTL, written at two sites. That\nis 288x the live turn deadline of 300s, so a slow turn cannot outlive its response key \u2014 a\nrisk I had suspected and which does not exist. But the asymmetry inverts into a real one:\nTHE RESPONSE HAS A TTL, THE REQUEST LIST HAS NONE. A request never consumed sits in\nmobius:chat:requests indefinitely, with nothing ageing it out and nothing alerting on depth.\n\nget_queue() picks memory or redis behind a QueueAdapter ABC, so the same code runs in tests\nand production. Connection handling retries 12 times with 5s backoff, about a minute, which\ncovers a Redis restart without losing the process.",
-   "rating": "red",
+   "rating": "amber",
    "depth": "code",
    "findings": [
     [
@@ -418,6 +422,8 @@
     ]
    ],
    "signals": {},
+   "rating_was_typed": "red",
+   "rating_why": "4 open \u00b7 exercised (unknown)",
    "live_config": [],
    "detail": {}
   },
@@ -448,6 +454,8 @@
     ]
    ],
    "signals": {},
+   "rating_was_typed": "amber",
+   "rating_why": "0 open but no test CALLS it (unknown) \u2014 absence of evidence is not health",
    "live_config": [
     {
      "name": "MOBIUS_TURN_DEADLINE_S",
@@ -464,7 +472,7 @@
    "config": [],
    "kind": "pipeline",
    "how": "The orchestrator's single entry point, and everything the schema below draws happens\ninside this one call. It loads state, decides between the ReAct and classic paths, runs\nthe chosen one, then integrates and publishes. It also owns the early exits \u2014 when the\nturn needs clarification or refinement it publishes and returns without finishing.",
-   "rating": "amber",
+   "rating": "red",
    "depth": "code",
    "findings": [
     [
@@ -509,6 +517,8 @@
     ]
    ],
    "signals": {},
+   "rating_was_typed": "amber",
+   "rating_why": "8 open defects \u2014 volume, not coverage",
    "live_config": [],
    "detail": {}
   }
@@ -584,6 +594,8 @@
    "signals": {},
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "rating_was_typed": "amber",
+   "rating_why": "3 open \u00b7 exercised (PERIPHERAL)",
    "live_config": [],
    "detail": {}
   },
@@ -684,6 +696,8 @@
    "signals": {},
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "rating_was_typed": "amber",
+   "rating_why": "6 open \u00b7 exercised (PERIPHERAL)",
    "live_config": [
     {
      "name": "PHI_CLASSIFIER_URL",
@@ -742,6 +756,8 @@
    "signals": {},
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "rating_was_typed": "green",
+   "rating_why": "0 open \u00b7 exercised (PERIPHERAL)",
    "live_config": [],
    "detail": {}
   },
@@ -802,6 +818,8 @@
    "signals": {},
    "coverage": "ABSENT",
    "coverage_tags": [],
+   "rating_was_typed": "red",
+   "rating_why": "2 open \u00b7 no test CALLS it (ABSENT) \u2014 a regression here is silent",
    "live_config": [],
    "detail": {}
   },
@@ -867,7 +885,9 @@
    },
    "coverage": "REMOVED",
    "coverage_tags": [],
-   "rating_was": "red",
+   "rating_was_typed": "red",
+   "rating_why": "node deleted \u2014 a rating is a judgement about live code",
+   "rating_was": "removed",
    "live_config": [],
    "detail": {}
   },
@@ -956,6 +976,8 @@
    "signals": {},
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "rating_was_typed": "red",
+   "rating_why": "10 open defects \u2014 volume, not coverage",
    "live_config": [],
    "detail": {}
   },
@@ -1008,7 +1030,7 @@
    ],
    "fan_in": 14,
    "how": "THE MODEL BANDIT \u2014 the thing that decides which model serves each call. Ananth,\n2026-09-09: \"it is one of the silent yet effective instruments we have.\" Silent is\nexactly the problem, which is why it earns a node instead of a paragraph inside\nllm_manager.\n\nIt is a real Thompson-sampling bandit over a Beta posterior, not a config table:\n\n  Phase 1  < 10 quality samples    explore on per-model benchmark priors (ema_quality)\n  Phase 2  10-100 samples          blend prior with observed data\n  Phase 3  100+, confidence=locked exploit the best, with 5% drift detection\n  plus     forced exploration      every EXPLORATION_INTERVAL turns the least-sampled\n                                   model gets a slot, so a model can never starve out\n\nHard constraints are applied BEFORE the draw and are technical, not quality judgements:\nphi_detected routes to hipaa_eligible models only; the planner and react_* rounds\nrequire spec_context_k >= MIN_PLANNER_CONTEXT_K; small-context models are confined to\nCHEAP_STAGES; and mode=copilot excludes heavy benchmark_category values so only\nFlash-class tiers compete. ReAct rounds are separate arms \u2014 react_1..react_4 carry\ntheir own caps and their own PG rows, so round 1 and round 4 learn independently.\n\nIT IS DOING REAL WORK, measured over 7 days: 8,104 calls, of which 3,244 were\nhard-pinned and 4,860 \u2014 60% \u2014 were chosen by the bandit.",
-   "rating": "red",
+   "rating": "amber",
    "depth": "code",
    "findings": [
     [
@@ -1040,6 +1062,8 @@
    "signals": {},
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "rating_was_typed": "red",
+   "rating_why": "3 open \u00b7 exercised (PERIPHERAL)",
    "live_config": [
     {
      "name": "ANTHROPIC_API_KEY",
@@ -1104,7 +1128,7 @@
    "writes": [],
    "key": "active_context",
    "how": "Remembers which tool the conversation is currently inside, so a follow-up lands in the right\nplace instead of starting over. Replaced an older active_skill notion with something generic\nto any tool.\n\nTwo functions, and the first is the one that matters: persist_active_context(ctx, turn_record)\nADDS active_context and failed_query to the turn record before it is saved. load_active_context\nreads them back out of merged_state or the last turns.\n\nSo this 60-line module is a WRITER INTO chat_turns \u2014 which makes it exactly the node the DB\nseat's forward note pointed at when they said the unmodelled-key failure would recur through\nwhichever node writes turns.",
-   "rating": "amber",
+   "rating": "red",
    "depth": "code",
    "findings": [
     [
@@ -1123,6 +1147,8 @@
    "signals": {},
    "coverage": "ABSENT",
    "coverage_tags": [],
+   "rating_was_typed": "amber",
+   "rating_why": "1 open \u00b7 no test CALLS it (ABSENT) \u2014 a regression here is silent",
    "live_config": [],
    "detail": {}
   },
@@ -1190,6 +1216,8 @@
    "signals": {},
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "rating_was_typed": "amber",
+   "rating_why": "2 open \u00b7 exercised (PERIPHERAL)",
    "live_config": [],
    "detail": {}
   },
@@ -1223,7 +1251,7 @@
    "writes": [],
    "key": "curator_tools",
    "how": "Two tools that let the assistant work on the corpus mid-conversation, called from\nreact_loop._execute_tool. lookup_authoritative_sources queries RAG's /sources/search to\nenumerate URLs Mobius has seen for a payer, state and topic \u2014 both ingested and not. ingest_url\nPOSTs to /documents/import-from-html (or import-from-gcs for uploaded PDFs) to pull one URL\nthrough chunking, embedding, lexicon and publish.\n\nBoth are HTTP rather than direct DB, deliberately and with the reasoning written down:\n/sources/search runs on RAG so the same shape works whether chat shares a Postgres or talks to\na future split-out curator service, and ingest_url has side effects that belong in RAG's\nprocess rather than being triggered across the wire by SQL.",
-   "rating": "amber",
+   "rating": "red",
    "depth": "code",
    "findings": [
     [
@@ -1254,6 +1282,8 @@
    "signals": {},
    "coverage": "ABSENT",
    "coverage_tags": [],
+   "rating_was_typed": "amber",
+   "rating_why": "3 open \u00b7 no test CALLS it (ABSENT) \u2014 a regression here is silent",
    "live_config": [
     {
      "name": "ADMIN_API_KEY",
@@ -1322,6 +1352,8 @@
    "signals": {},
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "rating_was_typed": "amber",
+   "rating_why": "1 open \u00b7 exercised (PERIPHERAL)",
    "live_config": [],
    "detail": {}
   },
@@ -1419,6 +1451,8 @@
    "signals": {},
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "rating_was_typed": "amber",
+   "rating_why": "2 open \u00b7 exercised (PERIPHERAL)",
    "live_config": [
     {
      "name": "CACHE_ASSIST_DEFAULT_MAX_AGE_DAYS",
@@ -1465,7 +1499,7 @@
    "writes": [],
    "key": "personalization",
    "how": "Chat's side of a contract owned by another module: Mobius-user/CONSUMER_RECIPE_PROFILE.md.\n\nWHERE COMMUNICATION PREFERENCES LIVE. In profile.communication, three fields with closed\nvocabularies:\n\n  tone                  professional | friendly | concise\n  ai_experience_level   beginner | regular | expert\n  greeting_enabled      boolean\n\nSiblings in the same profile: autonomy{routine_tasks, sensitive_tasks} each automatic |\nconfirm_first | manual; preferred_name; tasks; timezone; version; generated_at; and\nrendered_prompt.\n\nHOW THEY REACH THE MODEL \u2014 and this is the part that is not obvious. They do NOT reach it as\nfields. mobius-user pre-renders them into rendered_prompt, a 4-6 line paragraph of about 150\ntokens, and THAT is what chat splices. The structured communication block is read in exactly\none place in the entire service \u2014 personalization.py:114-123 \u2014 and only to build the\npersonalization_applied envelope. It never steers behaviour.\n\nWhat steers is the rendered prose, spliced at six call sites covering the planner/ReAct\nreasoning prompt, the critic, the integrator (both sequential and parallel responders) and\nthe post-run adjudicator. So a preference shapes tool choice, the quality bar, the voice and\nthe grade \u2014 but only in whatever words mobius-user chose.\n\nThe profile arrives per-turn in the POST payload. It is never persisted in chat's thread\nstate, so it is caller input, not conversation state.",
-   "rating": "amber",
+   "rating": "red",
    "depth": "code",
    "findings": [
     [
@@ -1501,6 +1535,8 @@
    "signals": {},
    "coverage": "ABSENT",
    "coverage_tags": [],
+   "rating_was_typed": "amber",
+   "rating_why": "2 open \u00b7 no test CALLS it (ABSENT) \u2014 a regression here is silent",
    "live_config": [
     {
      "name": "CHAT_PERSONALIZATION_ENABLED",
@@ -1581,6 +1617,8 @@
    "signals": {},
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "rating_was_typed": "amber",
+   "rating_why": "3 open \u00b7 exercised (PERIPHERAL)",
    "live_config": [
     {
      "name": "MOBIUS_REACT_CRITIC",
@@ -1640,6 +1678,8 @@
    "signals": {},
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "rating_was_typed": "amber",
+   "rating_why": "1 open \u00b7 exercised (PERIPHERAL)",
    "live_config": [
     {
      "name": "FEEDBACK_PERIODIC_ENABLED",
@@ -1739,6 +1779,8 @@
    "signals": {},
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "rating_was_typed": "amber",
+   "rating_why": "6 open \u00b7 exercised (PERIPHERAL)",
    "live_config": [
     {
      "name": "MOBIUS_PRODUCT_PROMISE_ENABLED",
@@ -1773,7 +1815,7 @@
    "writes": [],
    "key": "parsing",
    "how": "Recovers a structured decision from the reasoning model's free text. Each round is supposed to\nemit {thought, tool, inputs, is_complete}; real output arrives in code fences, with trailing\ncommas, with unescaped newlines, or buried in markdown prose. This is where the tolerance\nlives, and it is explicit about how much.\n\nFOUR TIERS, in order: strip a triple-backtick json fence; json.loads verbatim;\njson_repair.loads for common LLM hiccups; extract the first balanced {...} block and re-run the\nprevious two on it. If all four miss the ReAct loop stops \u2014 except for one narrow class, 'NPIs\nfor <org>', which keeps a heuristic fallback so a mangled planner response still routes to\nlookup_npi rather than becoming a blank refusal.\n\nIt deliberately imports nothing from react_loop, which is what makes it testable in isolation.",
-   "rating": "amber",
+   "rating": "red",
    "depth": "code",
    "findings": [
     [
@@ -1788,6 +1830,8 @@
    "signals": {},
    "coverage": "IMPORTED-NOT-CALLED",
    "coverage_tags": [],
+   "rating_was_typed": "amber",
+   "rating_why": "1 open \u00b7 no test CALLS it (IMPORTED-NOT-CALLED) \u2014 a regression here is silent",
    "live_config": [],
    "detail": {}
   },
@@ -1866,6 +1910,8 @@
    "signals": {},
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "rating_was_typed": "amber",
+   "rating_why": "4 open \u00b7 exercised (PERIPHERAL)",
    "live_config": [],
    "detail": {}
   },
@@ -1895,7 +1941,7 @@
    "writes": [],
    "key": "round0",
    "how": "A shortcut that runs before round 1. When the caller supplied verified ground truth in\nsystem_context \u2014 a story presentation node, a skill card with computed metrics \u2014 this\nanswers straight from it and never enters the tool loop. It also handles mid-turn\ntruncation recovery: a 'Continue' after the model was cut off.",
-   "rating": "amber",
+   "rating": "green",
    "depth": "code",
    "findings": [
     [
@@ -1910,6 +1956,8 @@
    "signals": {},
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "rating_was_typed": "amber",
+   "rating_why": "0 open \u00b7 exercised (PERIPHERAL)",
    "live_config": [],
    "detail": {}
   },
@@ -1918,7 +1966,7 @@
    "module": "app.pipeline.react_loop",
    "group": "pipeline",
    "path": "app/pipeline/react_loop.py",
-   "loc": 6404,
+   "loc": 6413,
    "role": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.",
    "role_full": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.\n\nReplaces (when enabled): run_plan() + _answer_for_subquestion() + run_integrate().\n\nKeeps: answer_non_patient(), answer_tool(), answer_reasoning(),\n       emitter system, badge system, jurisdiction system.\n\nEmission map (thinking chunks sent to UI via emitter=on_thinking):\n  Pre-loop:\n    [if pronoun enriched] \"\u21ba Understood: <resolved message>\"\n    [if follow-up to active context] \"\u25cc Answering from the report we just generated\u2026\"\n    [jurisdiction] emit_jurisdiction_context: \"\u2713 Confirmed: \u2026\" | \"? Payer not identified\u2026\" | etc.\n    \"I'm breaking down",
    "stage": null,
@@ -2025,7 +2073,7 @@
    ],
    "key": "react_loop",
    "how": "The engine of the ReAct path: reason about what to do, call a tool, look at what came\nback, go again. It replaces run_plan and the classic sub-question answering, does the core\nsynthesis, and can skip the integrator entirely via ctx.react_bypass_integrate.\n\nIt also emits nearly all of the pipeline's telemetry \u2014 thirteen distinct signals, on behalf\nof itself and of the sub-modules it drives. Every critic signal comes from here, not from\ncritic.py.",
-   "rating": "red",
+   "rating": "amber",
    "depth": "code",
    "findings": [
     [
@@ -2068,6 +2116,8 @@
    "signals": {},
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "rating_was_typed": "red",
+   "rating_why": "6 open \u00b7 exercised (PERIPHERAL)",
    "live_config": [
     {
      "name": "APPEALS_AGENT_URL",
@@ -2150,6 +2200,8 @@
    ],
    "ux": "No surface. ctx.completion_critic_ran / _satisfied / _gaps are set but nothing renders them",
    "signals": {},
+   "rating_was_typed": "amber",
+   "rating_why": "2 open \u00b7 exercised (unknown)",
    "live_config": [
     {
      "name": "MOBIUS_PRODUCT_PROMISE_ENABLED",
@@ -2217,6 +2269,8 @@
    "signals": {},
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "rating_was_typed": "green",
+   "rating_why": "0 open \u00b7 exercised (PERIPHERAL)",
    "live_config": [],
    "detail": {}
   },
@@ -2242,7 +2296,7 @@
    "writes": [],
    "key": "stages",
    "how": "Eleven lines listing the canonical names of the seven classical pipeline stages:\nstate_load, classify, plan, clarify, resolve, integrate, publish. Every non-ReAct emit\nevent and trace entry is keyed on these strings. The ReAct path uses its own stage keys,\nwhich are not in this list.",
-   "rating": "green",
+   "rating": "amber",
    "depth": "code",
    "findings": [
     [
@@ -2253,6 +2307,8 @@
    "signals": {},
    "coverage": "ABSENT",
    "coverage_tags": [],
+   "rating_was_typed": "green",
+   "rating_why": "0 open but no test CALLS it (ABSENT) \u2014 absence of evidence is not health",
    "live_config": [],
    "detail": {}
   },
@@ -2313,7 +2369,7 @@
     ],
     [
      "bad",
-     "OWNER(me): RATINGS WERE NEVER RE-DERIVED, AND NO SIGN-OFF EVER COVERED THEM. Ananth, 2026-09-09: 'why is state_load still red' \u2014 and then, on being told the rating was hand-written and stale, 'isnt that what the signoff were for'. He is right, and the answer is a real gap in the governance rather than an excuse. THE MECHANISM: all 37 ratings (22 amber, 10 red, 5 green) were typed once at d7075fe on 2026-09-08 and NEVER TOUCHED AGAIN \u2014 state_load's `red` predates its own P3 pass, the StateUnavailable fix, the first contract tag, and Eval's GUARDED audit. There is also NO RUBRIC anywhere: nothing states what red/amber/green mean, so no one could have re-derived them even deliberately. WHY THE SIGN-OFFS DID NOT CATCH IT, precisely: the six seats ratified THE PLAN \u2014 that bugs were correctly attributed, the P1-P5 order, the gate's invariants, the corpus design. NOBODY WAS EVER ASKED TO SIGN 'state_load IS RED'. Per-node production readiness sat outside every row of the table. AND THE DEEPER SHAPE: A SIGN-OFF IS A ONE-TIME RATIFICATION OF A PLAN; A RATING IS A RECURRING JUDGEMENT ABOUT CURRENT STATE. A one-time gate cannot keep a recurring judgement fresh, and we built ceremony for the plan while leaving the headline badge on every node ungoverned. That is the same class as everything else in this log \u2014 a value that reads as current and is frozen \u2014 committed by me, in the instrument I use to report status to Ananth. FIXED TWO WAYS: ratings now carry a `rated` date, and the page shows the open-bug count and coverage state BESIDE the rating, so a badge that disagrees with its own evidence is visible rather than merely wrong."
+     "OWNER(me): RATINGS WERE NEVER RE-DERIVED, AND NO SIGN-OFF EVER COVERED THEM. Ananth, 2026-09-09: 'why is state_load still red' \u2014 and then, on being told the rating was hand-written and stale, 'isnt that what the signoff were for'. He is right, and the answer is a real gap in the governance rather than an excuse. THE MECHANISM: all 37 ratings (22 amber, 10 red, 5 green) were typed once at d7075fe on 2026-09-08 and NEVER TOUCHED AGAIN \u2014 state_load's `red` predates its own P3 pass, the StateUnavailable fix, the first contract tag, and Eval's GUARDED audit. There is also NO RUBRIC anywhere: nothing states what red/amber/green mean, so no one could have re-derived them even deliberately. WHY THE SIGN-OFFS DID NOT CATCH IT, precisely: the six seats ratified THE PLAN \u2014 that bugs were correctly attributed, the P1-P5 order, the gate's invariants, the corpus design. NOBODY WAS EVER ASKED TO SIGN 'state_load IS RED'. Per-node production readiness sat outside every row of the table. AND THE DEEPER SHAPE: A SIGN-OFF IS A ONE-TIME RATIFICATION OF A PLAN; A RATING IS A RECURRING JUDGEMENT ABOUT CURRENT STATE. A one-time gate cannot keep a recurring judgement fresh, and we built ceremony for the plan while leaving the headline badge on every node ungoverned. That is the same class as everything else in this log \u2014 a value that reads as current and is frozen \u2014 committed by me, in the instrument I use to report status to Ananth. FIXED TWO WAYS: ratings now carry a `rated` date, and the page shows the open-bug count and coverage state BESIDE the rating, so a badge that disagrees with its own evidence is visible rather than merely wrong. STRUCTURALLY CLOSED 2026-09-09 on Ananth's instruction to write the rubric and re-rate all 37: ratings are now DERIVED on every refresh by scripts/platform/rating_rubric.py, so a stale rating is no longer possible \u2014 only a wrong RUBRIC is, and the rubric sits in one arguable place with its criteria written out. THIRTEEN OF THE THIRTY-SEVEN WERE WRONG, and none of them looked wrong: 3 red -> amber (defects real but the module IS exercised), 5 amber -> red (defects in modules NO TEST CALLS, where a regression is silent \u2014 jurisdiction, curator_tools, personalization, active_context, parsing), 1 amber -> red on volume (run_pipeline, 8 open), 1 green -> amber (stages: zero open bugs but ABSENT coverage \u2014 'no known defects and nothing tests it' is GREEN BY CONSTRUCTION, the exact shape that hid tool_failed), and 3 stale badges on DELETED nodes finally reading `removed`. Every rating now renders its REASON beside it. THE RUBRIC'S STATED LIMITATION, in the file rather than hidden: it does not weigh severity \u2014 a data-integrity defect and a naming nit both count 1 \u2014 because severity is not machine-readable in this log. So `red` means 'many open defects, or silent ones', NOT 'the worst module'. Overrides exist and cost something: rating_override plus rating_override_reason, with the reason rendered, so an override is a visible judgement rather than a quiet correction."
     ],
     [
      "good",
@@ -2451,6 +2507,8 @@
    "signals": {},
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "rating_was_typed": "red",
+   "rating_why": "24 open defects \u2014 volume, not coverage",
    "live_config": [],
    "detail": {}
   },
@@ -2485,7 +2543,7 @@
    "writes": [],
    "key": "capabilities",
    "how": "The single source of truth for what each agent path can answer, fed to the parser and planner\nso questions are only decomposed into sub-questions something can actually handle. Each tool\ndeclares can_answer explicitly, so when one fails ReAct has a basis for picking another.",
-   "rating": "amber",
+   "rating": "green",
    "depth": "code",
    "findings": [
     [
@@ -2504,6 +2562,8 @@
    "signals": {},
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "rating_was_typed": "amber",
+   "rating_why": "0 open \u00b7 exercised (PERIPHERAL)",
    "live_config": [],
    "detail": {}
   },
@@ -2587,6 +2647,8 @@
    "signals": {},
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "rating_was_typed": "amber",
+   "rating_why": "3 open \u00b7 exercised (PERIPHERAL)",
    "live_config": [
     {
      "name": "CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL",
@@ -2714,6 +2776,8 @@
    "coverage_tags": [
     "state_load:no_silent_reset"
    ],
+   "rating_was_typed": "amber",
+   "rating_why": "7 open \u00b7 exercised (GUARDED)",
    "live_config": [],
    "detail": {}
   },
@@ -2769,7 +2833,9 @@
    ],
    "coverage": "REMOVED",
    "coverage_tags": [],
-   "rating_was": "green",
+   "rating_was_typed": "green",
+   "rating_why": "node deleted \u2014 a rating is a judgement about live code",
+   "rating_was": "removed",
    "live_config": [],
    "detail": {}
   },
@@ -2821,7 +2887,9 @@
    ],
    "coverage": "REMOVED",
    "coverage_tags": [],
-   "rating_was": "amber",
+   "rating_was_typed": "amber",
+   "rating_why": "node deleted \u2014 a rating is a judgement about live code",
+   "rating_was": "removed",
    "live_config": [],
    "detail": {}
   },
@@ -2877,7 +2945,9 @@
    ],
    "coverage": "REMOVED",
    "coverage_tags": [],
-   "rating_was": "red",
+   "rating_was_typed": "red",
+   "rating_why": "node deleted \u2014 a rating is a judgement about live code",
+   "rating_was": "removed",
    "live_config": [],
    "detail": {}
   },
@@ -2929,7 +2999,9 @@
    ],
    "coverage": "REMOVED",
    "coverage_tags": [],
-   "rating_was": "green",
+   "rating_was_typed": "green",
+   "rating_why": "node deleted \u2014 a rating is a judgement about live code",
+   "rating_was": "removed",
    "live_config": [],
    "detail": {}
   },
@@ -2981,7 +3053,9 @@
    ],
    "coverage": "REMOVED",
    "coverage_tags": [],
-   "rating_was": "amber",
+   "rating_was_typed": "amber",
+   "rating_why": "node deleted \u2014 a rating is a judgement about live code",
+   "rating_was": "removed",
    "live_config": [],
    "detail": {}
   },
@@ -3037,7 +3111,9 @@
    ],
    "coverage": "REMOVED",
    "coverage_tags": [],
-   "rating_was": "amber",
+   "rating_was_typed": "amber",
+   "rating_why": "node deleted \u2014 a rating is a judgement about live code",
+   "rating_was": "removed",
    "live_config": [],
    "detail": {}
   }

@@ -17,7 +17,7 @@
    "direct": 0,
    "reached": 0,
    "tags": [],
-   "rating": "amber"
+   "rating": "red"
   },
   {
    "node": "curator_tools",
@@ -26,7 +26,7 @@
    "direct": 0,
    "reached": 0,
    "tags": [],
-   "rating": "amber"
+   "rating": "red"
   },
   {
    "node": "jurisdiction",
@@ -44,7 +44,7 @@
    "direct": 0,
    "reached": 0,
    "tags": [],
-   "rating": "amber"
+   "rating": "red"
   },
   {
    "node": "stages",
@@ -53,7 +53,7 @@
    "direct": 0,
    "reached": 0,
    "tags": [],
-   "rating": "green"
+   "rating": "amber"
   },
   {
    "node": "parsing",
@@ -62,7 +62,7 @@
    "direct": 1,
    "reached": 0,
    "tags": [],
-   "rating": "amber"
+   "rating": "red"
   },
   {
    "node": "capabilities",
@@ -71,7 +71,7 @@
    "direct": 2,
    "reached": 1,
    "tags": [],
-   "rating": "amber"
+   "rating": "green"
   },
   {
    "node": "context",
@@ -152,7 +152,7 @@
    "direct": 11,
    "reached": 9,
    "tags": [],
-   "rating": "red"
+   "rating": "amber"
   },
   {
    "node": "orchestrator",
@@ -188,7 +188,7 @@
    "direct": 39,
    "reached": 20,
    "tags": [],
-   "rating": "red"
+   "rating": "amber"
   },
   {
    "node": "react_retry_guard",
@@ -215,7 +215,7 @@
    "direct": 1,
    "reached": 1,
    "tags": [],
-   "rating": "amber"
+   "rating": "green"
   },
   {
    "node": "tool_manifest",
