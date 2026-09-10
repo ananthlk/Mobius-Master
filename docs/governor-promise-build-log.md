@@ -11,6 +11,53 @@ Spec: `docs/governor-schema/index.html` (serve: `python3 -m http.server 8145 --d
 
 ---
 
+## 2026-09-10 (later) — dev spend separated; the cost leg is not blocked
+
+### `[RULED]` Ananth — `lexicon_triage` and `rag_fact_check` are DEVELOPMENT cost, not per-turn
+And: *"we should have visibility into every per turn cost."*
+
+### `[MEASURED]` Re-run with dev separated — turn-path cost is 97.0% attributed
+| slice | 30d $ | attributed | verdict |
+|---|---|---|---|
+| turn path (`react_*`, `integrator_*`, `critique`, `thread_summary`, `adjudicator`) | $96.76 | 94.5% of calls | healthy |
+| **development / offline** (`rag_eval_adjudicate`, `lexicon_triage`, `rag_fact_check`) | **$81.46** | 3.1% | correctly unattributed — **not a gap** |
+| **turn path, zero attribution** (`parser`, `phi_classify`) | **$2.95** | **0.0%** | **the actual defect** |
+| unclassified (`rag_extraction`, `rag_critique`, `rag_strategy_*`, `deep_research_*`, `payor_fact_reverify`) | $1.32 | 0.5% | `[OPEN]` needs a ruling |
+
+Cost-weighted over the turn path: **$96.70 of $99.72 = 97.0%**.
+
+**This corrects my own correction.** I reported 53.7% and called the cost leg
+BLOCKED. That figure counted development spend as missing turn cost. The first
+number (99.6%) was too generous, the second (53.7%) too harsh; **97.0% is the
+one that answers the question asked.** Pattern worth keeping: *when a
+denominator is wrong, the fix is to name the population, not to re-measure
+harder.*
+
+### `[MEASURED]` 45% of LLM spend is development, and nothing in the data says so
+`llm_calls` has **no environment, origin or tenant column** — the only
+discriminators are `is_ab_call`, `ab_variant`, `quality_source`. The dev/prod
+split exists solely as knowledge about which module names are offline.
+
+**Do not classify spend by regex over module names.** That is the same mistake
+as inventing a domain taxonomy from name prefixes, already made once in this
+program and corrected by Ananth. `[DESIGN]` **A module should declare its cost
+class** (`turn` / `development` / `background`), and the attestation reads the
+declaration.
+
+### `[MEASURED]` `parser` and `phi_classify` — the real gap, and one of them sits at POST
+`parser` 2,147 calls / $2.85 and `phi_classify` 1,867 calls / $0.10, both at
+**0% `correlation_id`**, both on essentially every turn. Small in dollars, but
+they are the exact counterexample to "visibility into every per-turn cost."
+`phi_classify` runs **at POST** — inside segment 1 of the promise clock (§7c) —
+so it is in the promised window while being invisible to it.
+
+### `[DESIGN]` The cost leg ships with a named residual, it does not wait
+`delivered_cost_c` emits a turn-path total plus an explicit **`excludes`** list.
+A stated residual is safe; an unstated one is the failure. The rule it enforces:
+never silently include development spend, never silently omit turn spend.
+
+---
+
 ## 2026-09-10 — readiness check for the promise handler
 
 ### `[MEASURED]` Only 53.7% of LLM cost is attributable to a turn — BLOCKER for the cost leg
