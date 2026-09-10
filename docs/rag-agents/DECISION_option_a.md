@@ -1,8 +1,18 @@
-# Fetch‑to‑RAG on real payer content — status & the fix path (NOT a pending override decision)
+# Fetch‑to‑RAG on real payer content — status, the fix path, and the REOPENED override question
 
-_2026-09-09 · lane coordinator: Extension · full detail in `USER_FETCH_PAIRING_SPEC.md` §2.8/§2.9 · evidence in `molina_false_positive_evidence.md`_
+_2026-09-09 · lane coordinator: Extension · full detail in `USER_FETCH_PAIRING_SPEC.md` §2.8/§2.9 · evidence in `molina_false_positive_evidence.md` + `regression_samples/`_
 
-> **Read this first:** an earlier draft framed an "Option A" LLM/override for Ananth to approve. **Ananth already ruled against that**, and the classifier owner agrees it's the wrong tool. This page is now the accurate record. **No decision is required here** — the fix is a build already underway.
+> **⚠ REOPENED 2026-09-09 (Ananth):** an override is back on the table. Trigger: a real, clean, public Molina provider-policy PDF (`regression_samples/molina_healthy_start_provider_reqs.pdf`) hard-blocks `gate:phi ['Name']` — a phantom Name (NER reading "Healthy Start"/proper-noun bigrams as people) on a doc with ZERO patient data. **`source_origin` does NOT clear it** (verified: survives removing Molina + Healthy Start + passing the origin), so deterministic origin-scoping can't reach this class. Ananth: _"that's why we have to have an override."_ The earlier "no override" ruling (§2.8) stands as the record of what was decided THEN; this section is the record of it being reopened NOW.
+>
+> **What "override" must mean here (to stay safe):** the shelf design — a **confidence-tiered, DETERMINISTIC (no-LLM) override** for the LOW-confidence heuristic-only class (Name/Address/Phone/etc. with no digits, no clinical patient-context, no corroboration), and **NEVER** for high-confidence PHI (Presidio-strong, clinical context, real SSN, LLM patient-detection). NOT a blanket user-trumps-everything, and DISTINCT from the genuine-PHI attestation admit (BAA/two-key, still separate). The override keys on **one gate-owned confidence field** (same shape as the classifier's `persist_allowed` proposal).
+>
+> **Open before Ananth re-decides:** (1) does the classifier emit / can it emit a per-detection confidence tier? (2) does this Healthy-Start sample land in the low-confidence overridable class? — both asked of the classifier owner 2026-09-09. (3) who owns the admit composition (extension signals → chat `/chat/upload` enforces). This is PHI-compliance-shaped → likely belongs with the block-not-stored 4-way, same seats.
+
+---
+
+## (Prior record — the "no override" state as of earlier 2026-09-09, now superseded by the reopen above)
+
+> An earlier draft framed an "Option A" LLM/override for Ananth to approve. Ananth ruled against THAT specific form (user-trumps + LLM-clear), and the classifier owner agreed those were the wrong tools. The reopen above is a DIFFERENT instrument (confidence-tiered deterministic), argued by a concrete case the deterministic precision can't reach.
 
 ## The problem (real, proven) — and the precise today/next split
 The fetch‑to‑RAG lane is **built and DB‑verified end‑to‑end**. The PHI classifier **false‑flags real payer web pages**; the precision work is landing in stages:
