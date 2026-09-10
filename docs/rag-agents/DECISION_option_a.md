@@ -57,6 +57,26 @@ The classifier owner accepts safe-by-attestation+audit **as the posture** — th
 
 ---
 
+## ⇒⇒ THIRD LANE — DEV/BUILD OVERRIDE (Ananth, 2026-09-10) — environment+role, NOT a PHI claim
+
+Ananth: _"we are in dev, not production — how do we build this if we can't let it go through? Maybe there's a dev and prod override too; we have a build-level authority for engineers."_ Correct, and it's a **distinct axis** from Overrides 1/2:
+
+- **Override 1** = a claim about the content ("no PHI").
+- **Override 2** = a claim about the org ("we hold a BAA").
+- **Dev/build override** = a claim about the **environment + the actor** ("this is a non-production environment and I am an authorized engineer building/testing the pipeline"). It asserts nothing about whether the content is PHI — it force-proceeds **past every gate, including `hard_floor`**, so the block AND pass paths can be exercised end-to-end.
+
+**What makes it safe is not attestation — it's two hard, structural properties:**
+1. **Impossible to invoke in production.** The environment is a **server-side deploy fact**, not a user claim. Prod simply does not offer the lane; there is no request a client can send that turns it on in prod. (Same posture as `overridable` being gate-asserted, not client-asserted — the authority is the environment, read server-side.)
+2. **Data isolation — the load-bearing condition.** A dev-overridden document must land in a **dev/test corpus that production never reads**. If dev and prod share a store, a dev override poisons prod, and the whole thing is unsafe. So this lane is only as safe as the isolation beneath it. **This is the one fact that must be verified, not assumed** (asked of Chat/RAG).
+
+**And the expectation that keeps it clean:** dev should use **synthetic** test data, never real PHI. The dev override exists so synthetic fixtures that *trip* the classifier (a realistic fake chart, a test intake form) can be pushed through in dev — not so real patient data can be. Real PHI in dev is a data-handling violation independent of this lane; the lane must not become the reason it happens.
+
+**How it composes with the tiers:** in **prod**, `hard_floor` holds (real-clinical-record → Override 2/BAA or blocked) — the classifier's compliance condition is a *production* guarantee. In **dev**, the build override is the engineer escape hatch past it, into the isolated dev corpus. So Ananth's "how do we build it" is answered without weakening the prod floor: the floor is real in prod, the dev override is how you develop against it.
+
+**Open — routed to the seats:** (a) **Chat/RAG:** are the dev and prod RAG corpora actually isolated (separate store/index/org), such that a dev-overridden doc can never surface in a prod retrieval? This is the safety pivot. (b) **Platform/Org:** what is the "build-level engineer authority" — a deploy role, an env flag, an allow-listed identity? (c) does the dev override still RUN the classifier (emit the verdict for testing) and just proceed regardless — yes, so both paths are testable. New/adjacent seats: Platform (env+role), and the isolation answer gates whether this ships as designed.
+
+---
+
 ## ⇒ COORDINATOR SYNTHESIS (Extension, after all seat reviews · 2026-09-10)
 
 **All four seats ENDORSE the `overridable` instrument.** No seat objected to the design; every flag is about *sequencing and composition*, not the instrument. The one-gate-owned-field approach, the false-positive/attestation split, and "no BAA on this path" are agreed by construction.
