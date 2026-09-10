@@ -58,6 +58,19 @@ Chat forwards the bytes to rag **before** the sync PHI verdict, and the purge th
 
 The right fix depends on where the invariant should be enforced; that's the 4-way's call.
 
+### Proposed mechanism (PHI classifier, ready to ship if the 4-way agrees)
+Make the purge **fail-closed by default, keyed on one gate-owned field.** Add `persist_allowed: bool` to the `/classify` verdict, computed by the classifier (it owns the policy; chat/rag must not re-derive it):
+
+```
+persist_allowed = (gate == "clean") OR (gate == "phi" AND hipaa_mode_allowed)
+```
+
+The deterministic rule chat/rag then follow: **persist a doc ONLY on an explicit `persist_allowed == True`; EVERYTHING else defaults to purge** — `persist_allowed == False` (phi under default-deny, indeterminate), *no verdict at all* (`blocked_unconfigured` — the gate never ran), a timeout, a malformed response. Persistence requires an affirmative signal; absence-of-verdict means purge, not keep. This is the gate's own invariant ("no positive clean verdict → don't proceed") applied to storage, and it's exactly what the table's worst cell needs. It directly supports fix #1: the block-decision point purges unless it holds a `persist_allowed == True`. Additive field — the classifier already emits `gate` + `hipaa_mode_allowed`; this just makes the persist/purge policy explicit instead of inferred.
+
+**Boundary to preserve in the meeting (do NOT collapse these two):**
+- **Gate-driven purge** (phi / indeterminate / unconfigured) → the classifier's `persist_allowed` signal.
+- **Publish-failure cleanup** (`blocked_publish_failed`) is NOT a purge case. There `gate == "clean"` → `persist_allowed == True` → the clean doc *should* persist; the failure is rag's non-idempotent publish (pkey collision), a transient storage error. The right answer is **idempotent publish + retry, not purge** — purging a clean doc the user wanted stored would be wrong. Two sources, cleanly separated.
+
 ## Adjacent, possibly one thread
 The **non-idempotent publish** (rag pkey collision → chat catch-all → `blocked_indeterminate`) is filed separately with Ananth and may be the same root as several "indeterminate on a clean doc" reports. `185f426` re-labels that population to `blocked_publish_failed`; resolving idempotency likely shrinks this problem before any purge change.
 
@@ -160,7 +173,7 @@ current handler that satisfies it.
 
 ### PHI classifier (mobius-skills)
 - Confirm no block path emits genuine PHI as anything but `gate == "phi"`. _(confirmed 2026-09-09; re-affirm if the tri-state changes)_
-- Any gate-side signal that would help chat/rag decide purge deterministically. _(pending)_
+- Any gate-side signal that would help chat/rag decide purge deterministically. **ANSWERED 2026-09-09 → see "Proposed mechanism: `persist_allowed`" above.** Fail-closed-by-default purge keyed on one gate-owned field (`persist_allowed = gate=="clean" OR (gate=="phi" AND hipaa_mode_allowed)`); persist only on explicit `True`, everything else (incl. no-verdict/`unconfigured`, timeout, malformed) purges. Additive field, ready to ship if the 4-way agrees. Boundary: `blocked_publish_failed` is NOT gate-driven purge (gate=="clean" → should persist; fix is rag idempotency) — aligns with Master RAG's (b) position below.
 
 ### Extension (this seat)
 - Re-run the clean-PDF repro against `00030-5p7` + post-deploy `e6b153e`/`185f426`; report whether the sync-indeterminate coin-flip drops and whether "not stored → duplicate" still reproduces. _(pending deploy)_
