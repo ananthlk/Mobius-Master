@@ -25,6 +25,11 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:.05re
 .note{background:var(--bg2);border-left:3px solid var(--red);padding:.7rem .9rem;border-radius:0 6px 6px 0;margin:1rem 0;font-size:12.5px}
 .note b{color:var(--red)}
 .ov{overflow-x:auto}
+.up{color:#0a7d3c;font-weight:700;white-space:nowrap}
+.dn{color:#a8410a;font-weight:700;white-space:nowrap}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .up{color:#4ade80}:root:not([data-theme="light"]) .dn{color:#fb923c}}
+:root[data-theme="dark"] .up{color:#4ade80}
+:root[data-theme="dark"] .dn{color:#fb923c}
 </style>
 <div class="wrap">
 <h1>Governor — the SLA</h1>
@@ -183,15 +188,31 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:.05re
 </table></div>
 <div class="note"><b>Measure 3 is the one that prices the promise.</b> If thinking finds nothing fast missed, the tier is not worth 7× the latency. If it finds a great deal, the fast tier's "no assurance" is doing real work and should be said louder.</div>
 
-<h2>9 · The two override paths — marked, not built</h2>
-<p class="sub">Only two ways the tier changes. Everything else stays a system default.</p>
+<h2>9 · Who can override the promise — the register</h2>
+<p class="sub">The promise (§7) is the default. It is <b>never edited</b> by any of these — an override selects a different tier, or clamps a term, <b>for one turn or one session</b>. Six actors, and only six. Anything not on this list is a lever move, not an override.</p>
 <div class="ov"><table>
-<tr><th></th><th>path</th><th>trigger</th><th>effect</th><th>status</th></tr>
-<tr><td><b>1</b></td><td><b>Caller declares</b></td><td>the user or the API caller states its own requirement — "think harder", "quick answer", an explicit latency ceiling or cost cap</td><td>sets the tier directly. <b>Never widened by the system</b>, only narrowed by a hard limit</td><td><span class="tag t-part">mode exists; <code>extract_query_intent_floor</code> reads "think" intent from the message</span></td></tr>
-<tr><td><b>2</b></td><td><b>Auto-escalate on persistence</b></td><td>the user is <b>still on the same question or thread</b> — repeat asks, a long-lived thread, a re-phrase of an unanswered question</td><td>escalate the tier. The cheap tier has demonstrably failed, so keep paying</td><td><span class="tag t-no">nothing detects this</span></td></tr>
+<tr><th></th><th>actor</th><th>trigger</th><th>direction</th><th>scope</th><th>status</th></tr>
+
+<tr><td><b>1</b></td><td><b>The user, in the conversation</b></td><td>says it in the message — "think harder", "quick answer", "take your time", or picks the mode in the UI</td><td><span class="up">widen ↑</span> or <span class="dn">narrow ↓</span></td><td>this turn</td><td><span class="tag t-part">mode exists; <code>extract_query_intent_floor</code> reads "think" intent from the message text</span></td></tr>
+
+<tr><td><b>2</b></td><td><b>The API caller, with values</b></td><td>the calling service states its own numbers, not a tier — <code>max_latency_s</code>, <code>max_cost_cents</code>, <code>min_quality</code></td><td><span class="up">widen ↑</span> or <span class="dn">narrow ↓</span></td><td>this call</td><td><span class="tag t-no">no caller term on the SLA object (§3)</span></td></tr>
+
+<tr><td><b>3</b></td><td><b>The observed user — frustrated</b></td><td>still on the same question: repeat ask, re-phrase, long-lived thread, an explicit "no, I meant…"</td><td><span class="up">widen ↑</span> only</td><td>this thread, decaying</td><td><span class="tag t-no">nothing detects persistence</span></td></tr>
+
+<tr><td><b>4</b></td><td><b>The observed user — satisfied</b></td><td>accepted the answer and moved on; no re-ask, no escalation, thread closes</td><td><span class="dn">narrow ↓</span> only</td><td>this thread</td><td><span class="tag t-no">not measured; CSAT is per-turn, not per-thread</span></td></tr>
+
+<tr><td><b>5</b></td><td><b>Tenant / admin policy</b></td><td>an org buys a standing floor or cap for all its users — "never spend more than 2¢", "always agentic for clinical questions"</td><td><span class="up">widen ↑</span> or <span class="dn">narrow ↓</span></td><td>standing, all turns for that org</td><td><span class="tag t-no">no per-tenant promise binding</span></td></tr>
+
+<tr><td><b>6</b></td><td><b>The platform, under back-pressure</b></td><td>the system cannot keep the promise — degraded upstream, credit exhaustion, queue depth, an outage in a tier's model</td><td><span class="dn">narrow ↓</span> only</td><td>global, temporary</td><td><span class="tag t-no">degrades silently today; no promise-breach record</span></td></tr>
 </table></div>
-<div class="note"><b>Path 2 is the interesting one and it inverts the usual logic.</b> Normally repetition looks like cost to avoid; here it is <b>evidence the promise was not kept</b>. A user re-asking is the strongest available signal that the tier was wrong — stronger than any internal check, because it is the user's own verdict. <b>Recall failure is exactly what makes someone ask again</b>, which means path 2 is also a free recall signal (§8 measure 1's cousin) and worth instrumenting before it is worth acting on.</div>
-<div class="note"><b>Not built. Marked only.</b> Both paths need the SLA to be a real object with a caller term first (§3), and path 2 needs a persistence signal that does not exist. Recorded so the design is not re-derived.</div>
+
+<div class="note"><b>Precedence, when two fire at once.</b> <b>6 &gt; 5 &gt; 2 &gt; 1 &gt; 3 &gt; 4.</b> The rule behind the order: <b>a narrowing always beats a widening</b>, and a <b>declared</b> value beats an <b>observed</b> one. The platform can always refuse to spend what it does not have; a tenant's cap binds its own users; an explicit caller value beats a user's adjective ("think harder" is not a number); and anything the system merely <i>inferred</i> about a user's mood loses to anything the user or caller actually <i>said</i>.</div>
+
+<div class="note"><b>3 and 4 are the same instrument pointed both ways, and they are not symmetric.</b> A re-ask is <b>evidence the promise was not kept</b> — the strongest available, because it is the user's own verdict, and recall failure is exactly what makes someone ask again. Silence is <b>much weaker evidence</b> that it was: a user who gave up looks identical to a user who was satisfied. So <b>4 must never fire on absence alone</b> — it needs a positive signal (thumbs-up, a follow-on that builds on the answer, an explicit accept). Escalate on evidence; de-escalate only on proof.</div>
+
+<div class="note"><b>6 is the one that is live and invisible.</b> 1–5 are unbuilt but honest — they do nothing. 6 already happens: when a model is credit-exhausted or an upstream degrades, the turn silently comes back worse and the promise is broken with no record. This is the <b>producer-without-a-consumer</b> shape again — the breach is real, nothing reads it. <b>First thing to build on this list is not an override at all: it is a breach record</b>, one row per turn where the delivered latency/cost/quality missed the promise version in force. Without it, no override can ever be shown to have helped.</div>
+
+<div class="note"><b>What is deliberately NOT an override.</b> The governor buying an extra round, the completion critic extending, the planner picking more tools, a model swap by the bandit, per-round depth (§6a) — those are <b>levers</b>. They exist to <i>hit</i> the promise, and they must never be able to change it. If a missed promise can be resolved by editing the promise, the promise is not a contract. <b>Rounds are not the SLA.</b></div>
 
 <h2>10 · Quality — the measured floor</h2>
 <div class="ov"><table>
