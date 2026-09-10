@@ -759,25 +759,46 @@ the false-positive override (Option A) AND the genuine-PHI attestation-admit (As
 
 ---
 
-## §3 · Dedicated EXTENSION INTAKE — new lane (OPEN, Master RAG building; captured 2026-09-09)
+## §3 · EXTENSION INTAKE — a new MODE, not a new endpoint (SHIPPED, Master RAG; 2026-09-09)
 
-Ananth asked Master RAG to create a **dedicated intake means for docs coming from the extension**, distinct
-from the generic `/chat/upload` path the fetch-to-RAG lane rides today. Captured here as the tracked seam;
-contract to be filled in from Master RAG's answer.
+Ananth: _"when we have something come from extension we need to create a new entry MODE for it like instant
+rag but different."_ Master RAG read "entry mode / like instant rag" as a **source_type mode on the same
+door** (instant RAG itself is not an endpoint — it's `/upload` with an `agent_scope`) and built the same
+shape one step over. **SHIPPED + verified live: commit `0ea62ca`, rev `mobius-rag-00693-9qp`.**
 
-**Why it matters to the extension:** the swap is a single constant — `INGEST_TARGET` in
-`mobius-os/extension/src/services/ingest.ts` (already commented as a provisional SEAM pending Sourcing/Master
-RAG sign-off). One change point when the new intake is named.
+**Nothing changes on the extension side — `INGEST_TARGET` stays on `/chat/upload`.** Confirmed the extension
+already sends the discriminator (`background.ts:170` → `fd.append('access','user_authorized_session')`).
 
-**Open questions (asked of Master RAG 2026-09-09):**
-1. Endpoint/entry — new rag endpoint vs. `/upload` + an extension source-type marker? URL/verb.
-2. Contract — does it accept today's fields as-is (file, `source_url`, `access="user_authorized_session"`,
-   `task_id`/`source_run_id`, `fetched_at`, `signal_headers`, origin-only `source_origin`), rename any, or
-   require new ones (e.g. explicit `source="browser_extension"` / caller tag)?
-3. Path — still Extension → `/chat/upload` → rag (chat owns the PHI-gate admit), or a **direct** Extension →
-   rag intake? A direct path changes WHO runs the gate — must reconcile with §BLOCK_NOT_STORED_INVARIANT
-   (the gate/purge ordering) before it ships.
-4. Status — shipped/dev/planned + rev.
+1. **Endpoint — UNCHANGED.** `POST /upload`. No `/extension-intake`, no direct door.
+2. **Contract — UNCHANGED.** Nothing renamed/added/newly-required. `access="user_authorized_session"` **IS
+   the discriminator** — its presence selects the mode; it's closed-map validated (unknown value → 422, not
+   a default), so a caller can't spoof a source string. That's why Master RAG did NOT add a
+   `source="browser_extension"` tag: a caller-asserted source is the exact anti-spoof problem already settled
+   on the classify caller. `source_origin` (chat-side `e6b153e`) rides through into `source_metadata` as-is
+   (tell Master RAG the allowed values if we want it close-mapped).
+3. **Path — UNCHANGED, deliberately.** Extension → `/chat/upload` → rag `/upload`; chat still owns the PHI
+   gate admit. Master RAG explicitly pushed back on a direct Extension→rag path — it would move the gate to a
+   service that doesn't run it, worse given §BLOCK_NOT_STORED_INVARIANT (blob+row+dedup written before any
+   verdict; routing around chat = no verdict at all).
+4. **Verified precedence:** `access=user_authorized_session` + `agent_scope=chat` → `source_type=user_fetch`
+   (NOT `instant_rag`), `caller=browser-extension:user-fetch`. **`access` outranks `agent_scope`** —
+   browser-session provenance is the more specific fact. Probe rows cleaned with read-back.
 
-**Extension commitment:** on receiving endpoint + contract, wire `INGEST_TARGET` and re-verify the true
-end-to-end. Until then the lane stays on `/chat/upload`. _(awaiting Master RAG)_
+**What changed server-side (rag):**
+- `INGEST_SOURCES` gains `{key:"user_fetch", label:"Extension fetch", status:"live", what:"fetched by the
+  browser extension in the user's own session"}`.
+- `source_type = "user_fetch" if access else instant_rag/upload as before`.
+- **Rationale (the whole point):** a doc fetched inside the user's authenticated session with per-capture
+  consent is a materially different act from a file dragged into a chat window — different consent model,
+  provenance, "were we permitted to hold this", and retention conversation. They were landing as the same
+  `source_type`, which hid both. Now separable.
+
+**⚠ MODE-vs-DOOR ambiguity — NAMED, not silently resolved (for the group + Ananth).** Extension read the ask
+as a new INTAKE (endpoint); Master RAG read it as a new MODE (source_type) and shipped that. "Like instant
+rag" points at mode. **If Ananth meant a genuinely separate DOOR** (own endpoint, own auth, possibly
+bypassing chat) that's larger work — Master RAG is raising it with him and won't build it on either reading.
+If Ananth confirms **mode**, this is DONE. If he meant a **door**, nothing shipped is wasted — it becomes the
+mode that door sets. _(awaiting Ananth's confirm.)_
+
+**Extension status: no action.** The `user_fetch` mode is live and triggers on our existing upload; the lane
+stays on `/chat/upload`.
