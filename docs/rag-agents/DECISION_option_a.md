@@ -75,6 +75,26 @@ Ananth: _"we are in dev, not production — how do we build this if we can't let
 
 **Open — routed to the seats:** (a) **Chat/RAG:** are the dev and prod RAG corpora actually isolated (separate store/index/org), such that a dev-overridden doc can never surface in a prod retrieval? This is the safety pivot. (b) **Platform/Org:** what is the "build-level engineer authority" — a deploy role, an env flag, an allow-listed identity? (c) does the dev override still RUN the classifier (emit the verdict for testing) and just proceed regardless — yes, so both paths are testable. New/adjacent seats: Platform (env+role), and the isolation answer gates whether this ships as designed.
 
+#### RAG's VERIFIED answer + two calls (2026-09-10)
+
+**Isolation: YES, verified from the deployed services — three separate GCP projects, DBs, and buckets:**
+- dev `mobius-os-dev` · db `mobius-platform-dev-db` · bucket `mobius-rag-uploads-dev`
+- staging `mobius-staging-mobius` · db `mobius-platform-staging-db` · bucket `…-staging`
+- prod `mobiusos-new` · db `mobius-platform-db` · bucket `mobius-rag-uploads-mobiusos`
+
+Separate projects → separate Cloud SQL → separate GCS, each with its own rag+workers. A dev doc **cannot** surface in prod retrieval (prod holds no connection string to dev). **Safe by construction on the prod-retrieval axis.** _Tripwire (not a defect):_ dev also attaches an instance literally named `mobius-platform-db` (prod's name, different project) — grepping for the prod instance name will hit dev; genuinely different machines, isolation holds.
+
+**Call 1 — BOTH isolation AND a marker (RAG pushes back on "isolation ⇒ no marker," and is right).** Isolation is real but **single-layer**, and there is **no env/tenant/org column** in the `documents` schema today — isolation lives entirely in the deployment boundary; nothing in a row knows which environment produced it. Plausible failure modes (dev backup restored into prod, a prod service pointed at a dev connection string in an incident, a future "promote dev corpus" job) all move data that cannot answer "how did I get here." So carry a cheap marker, same shape as `phi_override`:
+```
+ingest_override: { kind: "dev_build_force" | "false_positive",
+                   gate_verdict, identifier_labels, forced_by, at,
+                   environment: "dev",        # stamped at ingest, not inferred
+                   classifier_version }
+```
+`environment` stamped at ingest is the piece that makes a retrieval-time guard **possible later without a migration**, and lets the corpus answer "which rows got here by force" after an incident. RAG persists it; doesn't compute it. **Extension: agree, adopt it** — and key it to the extension attestation log by `task_id`+doc-hash like `phi_override`.
+
+**Call 2 — THE ONE FOR ANANTH (+ PHI classifier), which RAG flagged rather than assumed:** the dev override force-proceeds **past the real-clinical-record `hard_floor`** → **genuine PHI can be ingested into dev.** Isolation protects prod *retrieval*; it does **not** make dev an appropriate place to *hold* real patient data — dev's bucket and DB are real storage with whatever access controls they happen to have. So **"synthetic test data only" must be a STATED CONDITION of the lane, not assumed from "it's only dev."** Open decision: (i) is the lane synthetic-data-only by policy, enforced by the audit marker + dev access controls; or (ii) is real PHI in dev acceptable under some control; or (iii) does the dev override itself need a residual guard so it can't hold a *real* chart even in dev? **Ananth + PHI classifier own this; it must not go unasked because everyone assumed it was only dev.**
+
 ---
 
 ## ⇒ COORDINATOR SYNTHESIS (Extension, after all seat reviews · 2026-09-10)
