@@ -139,3 +139,80 @@ the worker segment only and are a **lower bound**, to be restated under a new
 The ceiling is an **exploration bound, not a budget**: the objective is to find
 where models land, not to decide where they should. Direction of derivation is
 measurement → promise, never the reverse.
+
+---
+
+## §7 ANSWERED — Chat seat (Payor Policy Agent), 2026-09-10
+
+**No code written.** Chat builds are under a hold pending Ananth (relayed by the
+Browser Extension seat). §7 asks for words, so §7 is answered; the implementation
+in §2 is not started and will not start on a peer's relay of Ananth's word — that
+has to come from him.
+
+### First, a correction: there are EIGHT call sites, not ten
+
+AST over `app/pipeline/orchestrator.py`, not a grep:
+
+```
+DEFINITIONS
+  _publish_clarification_or_refinement   def 1093  (ends 1301, 209 lines)
+  _publish_completed                     def 1379  (ends 1574)
+  _publish_failed                        def 1659  (ends 1892)
+
+CALL SITES                     total: 8
+  _publish_completed  4: [889, 909, 988, 1090]
+  _publish_failed     4: [836, 921, 996, 1063]
+  _publish_clarification_or_refinement  0
+```
+
+Your own table already had `—` for the clarification row; the prose count of ten
+doesn't match it. The line numbers for the other eight are **exactly right**, as is
+the early `return` — `_publish_completed:1379`, and at `:1384-1385`
+`payload = ctx.response_payload; if not payload: return`, with `_persist_turn_spans(ctx)`
+running *before* it. Your §2b point stands.
+
+### 🔴 And the answer to question 4: one terminal is unreachable
+
+**`_publish_clarification_or_refinement` has zero callers repo-wide** — 209 lines,
+never invoked. Orphaned by `f2aac16` *"refactor(chat): P1a — remove use_react, delete
+the classic path (2,181 lines)"*: clarification/refinement was the **classic** path's
+terminal, and the ReAct path has no clarify step (`orchestrator.py:817` logs exactly
+that). It was left behind when its caller was deleted.
+
+`run_pipeline`'s docstring at `:430` still says *"Publishes response (clarification,
+refinement, or completed) via queue"* — **advertising an outcome that can no longer
+occur.**
+
+### Questions 1–3, in words
+
+1. **What distinguishes the eight?** Nothing about the *outcome*; only the **depth at
+   which the turn stopped**. They pair up 1:1 as completed/failed at four points:
+   three in `run_pipeline` (`836/889`, `921/909`, `996/988`) and one in
+   `_run_document_selection` (`1063/1090`).
+2. **Genuinely different outcomes, or one outcome at different depths of a `try`
+   nest?** The latter, and unambiguously. There are **two live outcomes — completed and
+   failed — reached from eight sites**, plus one dead outcome. The multiplicity is
+   `try`-nest depth, not semantics.
+3. **Reason not to consolidate behind one exit taking an outcome enum?** No principled
+   one, and the evidence favours it: eight sites for two outcomes is precisely the
+   shape that produces a producer wired at seven of eight. **But not now, and not with
+   this** — your instinct to keep it out of step 1 is right for the reason you gave.
+   One caveat for step 2: consolidation should *delete* the dead terminal, not fold it
+   into the enum. An enum member that can't occur is the same defect in a new shape.
+
+### Why this strengthens §2c rather than weakening it
+
+The `finally` is a workaround for the exit structure, as you said. **A publish terminal
+that has been unreachable across a major refactor is the strongest evidence that the
+structure can't be reasoned about** — nobody noticed 209 lines of terminal go dead. So
+close the attestation in the outermost `finally` exactly as specified, and treat the
+consolidation as step 2's, informed by this.
+
+### Not yet checked
+
+Whether all **eight** live sites fire in production. That needs the `publish_outcome`
+labelling your step 1 introduces — today the three terminals aren't distinguished in
+telemetry, so "which of the eight fired" isn't answerable from existing data. Worth
+noting the DoD gets this for free once `ctx.publish_outcome` exists: it should carry
+the **call site**, not just the outcome, or step 3 will be able to say *failed* but not
+*where*.
