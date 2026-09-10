@@ -20,9 +20,9 @@
    "fb2f0cf": "live",
    "fc9477c": "live"
   },
-  "commits_behind_head": "8",
+  "commits_behind_head": "10",
   "deployed_commit_subject": "state_load: remove the swallow my own instrumentation pass introduced",
-  "head": "9f1b4601c",
+  "head": "e26d9098f",
   "image_tag": "20260910-140519-299519c8ce",
   "revision": "mobius-chat-00977-8bl",
   "traffic_percent": "100"
@@ -43,7 +43,7 @@
     "owner": "chat",
     "gate": "lines removed; handler count down; ZERO invariant movement",
     "blocks": "P2, P4",
-    "n": 18
+    "n": 19
    },
    {
     "id": "P2",
@@ -5386,6 +5386,10 @@
    "findings": [
     [
      "bad",
+     "OWNER(chat): THE PLANNED isError FAIL-CLOSED FIX HAS NO EFFECT, AND IT WAS THE LAST STANDING EXPLANATION. Three measurements, mcp 1.26.0 in chat's own .venv. (1) CallToolResult.isError is a REAL pydantic field with `required=False default=False`, so a server response that OMITS it is materialised as False BEFORE any getattr runs. Demonstrated: model_validate of a payload with no isError key gives r.isError False, and getattr(r,'isError',False) and getattr(r,'isError',True) BOTH return False. So changing mcp_manager.py:127's getattr default to fail closed is INERT -- the consolidated fix (1) needs to inspect `'isError' in result.model_fields_set` (the only way to distinguish omitted from explicitly-false) or stop trusting the flag altogether. Filed before that code is written, because it would have looked like a fix and changed nothing. (2) IT ALSO WEAKENS THE getattr LEAD, WHICH WAS THE ONLY EXPLANATION STILL STANDING FOR THE success=True JOIN. The primary sends isError EXPLICITLY: isError=True, 'isError' in model_fields_set = True. So the getattr default never fires for this server -- any SDK version carrying the field parses True, mcp_manager returns (text, False), and the failure branch attaches NO sources. But we observe sources. The lead therefore only survives if the DEPLOYED SDK lacks the field entirely, and Chat Master checked it exists in both mcp 1.26.0 and 1.2.0. I am reporting this AGAINST my own hypothesis: the join is MORE open than 'one explanation standing', and the honest state is that no proposed mechanism now accounts for it. (3) THE APPEALS SERVER'S FAIL-OPEN IS ITS OWN DEFECT, cleanly attributable rather than a protocol default: it sends isError=false EXPLICITLY ('isError' in model_fields_set = True) on a real backend failure ('Error fetching rules for CARC 197: timed out'). It is not omitting the field and being defaulted -- it is asserting that a failure succeeded. That is the appeals seat's to fix and does not depend on any chat change. Found 2026-09-10."
+    ],
+    [
+     "bad",
      "OWNER(appeals seat + chat): THE ROUTING FIX WOULD NOT HAVE FIXED THE SYMPTOM -- THE DESTINATION SERVER FAILS OPEN TOO. Found by Chat Master with probe_mcp_tool.py; reproduced here independently. The appeals prototype advertises all 5 appeals tools, and call_tool('appeals_lookup_rules', {carc:197}) returns isError FALSE -- attribute PRESENT, value False -- on a REAL backend failure, with text '[appeals_lookup_rules] Error fetching rules for CARC 197: timed out'. So call_mcp_tool returns (error_text, True), the mcp_adapter SUCCESS branch fires, and the timeout is wrapped as a SourceRef named 'MCP: appeals_lookup_rules' citing itself. Send the appeals calls to the RIGHT server and the identical pathology reappears with a different error string. This retires my own recommended fix ORDER, not just a detail of it: I argued isError-fail-closed first on the grounds that it makes the mystery reproducible. The real reason is stronger and does not depend on the mystery at all -- a server we route to in production demonstrably does not set the flag, so fail-closed is a correctness requirement independent of the join. Note also that this is a THIRD fail-open, and it is on the OTHER side of the wire: the first two (getattr isError default at mcp_manager.py:127, and the 'Unknown skill' string guard at react_loop.py:2792) are chat's; this one is the server's. A client-side fail-closed check is the only thing that catches it, because the server's own flag is the thing that is wrong. ALSO A LIVE PRODUCT DEFECT IN ITS OWN RIGHT, unrelated to the misroute: the appeals CARC 197 rules backend is TIMING OUT RIGHT NOW. CARC 197 is the exact case that opened this whole investigation, and a timing-out backend is a better explanation for that turn than either of the two causes I previously asserted (the manifest's sibling example text, then the misroute). I am NOT declaring it the root cause -- that would be the third time I have named one on this turn -- it is a third candidate and the appeals seat owns confirming it. What is measured: the timeout is real and current, and Appeals' own evidence that /rules/197 returns 5 rules was taken at a different time, so both can be true. Found 2026-09-10."
     ],
     [
@@ -5466,6 +5470,12 @@
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
    "findings_status": [
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true,
+     "deploy": null
+    },
     {
      "closed": true,
      "owner": "appeals seat + chat",
@@ -5566,8 +5576,8 @@
    "dimensions": [
     [
      "functionality",
-     "amber",
-     "7 open"
+     "red",
+     "8 open defects"
     ],
     [
      "testability",
@@ -5591,7 +5601,7 @@
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "error_handling: 19 of 29 handlers log-and-continue  (ok: functionality, testability, modularity, observability)",
+   "rating_why": "functionality: 8 open defects \u00b7 error_handling: 19 of 29 handlers log-and-continue  (ok: testability, modularity, observability)",
    "live_config": [
     {
      "name": "CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL",
