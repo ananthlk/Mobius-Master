@@ -188,6 +188,10 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:.05re
 
 <div class="note"><b>Scoring rule, carried from the finding below:</b> <code>delivered_accuracy</code> is scored on the payload — <b>never</b> on <code>signal</code>, never on <code>len(sources)</code>. Both are green by construction on MCP-backed turns.</div>
 
+<div class="note"><b>What must NOT enter the attestation — the deletion rule.</b> No lever. Not <code>rounds_used</code>, not <code>extension_rounds</code>, not depth, not model, not tool count. Those belong in existing telemetry and they are how we <i>hit</i> the promise. The moment a lever appears in the same row as a promised term, someone will eventually resolve a missed promise by tuning the lever's target — and <b>a promise that can be edited to match what was delivered is not a contract</b>. Levers are diagnosable by joining on <code>turn_id</code>; they do not need to live here. <b>Rounds are not the SLA.</b></div>
+
+<div class="note"><b>Open, before any code — <code>delivered_cost_c</code> provenance.</b> <span class="tag t-no">UNVERIFIED</span> It is not yet established that per-turn cost is readable <i>at</i> turn end rather than only as a sum over <code>llm_calls</code> rows after the fact. If it is a post-hoc sum, the attestation cannot be written inside the turn and must be written by a settling step once the turn's calls have landed. That is acceptable — but it changes <b>where the emit sits</b>, and a row written before its cost is known would carry a null that reads identically to the recall null while meaning something entirely different. To be measured, not assumed.</div>
+
 <h2>8 · What is missing — RECALL, and how we start tracking it</h2>
 <p class="sub">Accuracy has a live proxy. Recall has nothing. Marked here so the gap is tracked rather than assumed away.</p>
 <div class="ov"><table>
@@ -275,3 +279,11 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:.05re
 <div class="note"><b>The mapping error, precisely.</b> <code>confidence_bar</code> (low / medium / high) is the closest thing to a quality term, and it is a threshold on the planner's <i>self-report</i>, gated by a groundedness check. It promises neither recall nor accuracy — it promises that a model said it was confident and a check did not object.</div>
 
 </div>
+<h2>11 · Open — owed by Ananth, blocking code</h2>
+<p class="sub">Design is complete to the edge of these two. Neither is a technical question; both are product rulings.</p>
+<div class="ov"><table>
+<tr><th></th><th>question</th><th>why it cannot be defaulted</th></tr>
+<tr><td><b>1</b></td><td><b>Can a quality signal buy rounds after the budget authority has consolidated?</b></td><td>Consolidation is the point where spend stops being negotiable. Allowing quality to reopen it makes the cost term advisory; forbidding it means a turn can knowingly finalize an answer it has just been told is weak. <b>Both are defensible and they are opposite promises.</b></td></tr>
+<tr><td><b>2</b></td><td><b>Should <code>hard_ceiling_s</code> be per-mode?</b></td><td>It is <b>300s for every mode</b> today, while the promise says fast is ~13s and thinking is ~95s. One ceiling across a 7× spread means the ceiling binds nothing on fast and is the only real limit on thinking — so the same number is doing two different jobs.</td></tr>
+</table></div>
+<div class="note"><b>No code until both are ruled.</b> Standing constraint: every code change goes through Chat or a sub-agent, tested in dev, then committed and deployed one at a time.</div>
