@@ -24,7 +24,7 @@
     "owner": "chat + Eval",
     "gate": "every segment timed AND each timed segment's attribution verified against a known-external call \u2014 an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
-    "n": 33
+    "n": 34
    },
    {
     "id": "P3",
@@ -974,14 +974,16 @@
    "id": "retrieval_budget",
    "path": "app/services/retrieval_budget.py",
    "kind": "cross-cutting",
-   "loc": 118,
+   "loc": 136,
    "role": "Chat's real, request-level context-window math for",
    "role_full": "Chat's real, request-level context-window math for\n``token_budget_for_retrieval`` -- Task #98 (2026-08-15, Chat Master/Ananth).\n\nRAG's Structure stage (mobius-rag/app/services/retriever/shape/structure.py)\nhas always guessed the retrieval token budget from a static per-caller_mode\ntable (chat.default=3000, chat.thinking=16000, ...) because chat never sent\na real value. Ananth's direct correction: \"RAG does not have to guess\" --\nchat knows its own context window, system prompt, conversation history, and\nanswer-generation reserve; it should compute the real number and pass it.\nRAG's own docstring frames the formula as::\n\n    token_budget_for_retrieval = context_window\n                         ",
    "api": [
     "compute_token_budget_for_retrieval()"
    ],
    "config": [],
-   "writes": [],
+   "writes": [
+    "record_decision"
+   ],
    "callers": [
     "app.pipeline.react_loop",
     "app.telemetry.spans"
@@ -1013,7 +1015,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 0,
-    "loc": 118,
+    "loc": 136,
     "log_sites": 0,
     "missing": false,
     "reraise": 0,
@@ -1042,7 +1044,7 @@
     [
      "modularity",
      "green",
-     "118 lines"
+     "136 lines"
     ],
     [
      "observability",
@@ -1517,7 +1519,7 @@
    "module": "app.pipeline.active_context",
    "group": "pipeline",
    "path": "app/pipeline/active_context.py",
-   "loc": 63,
+   "loc": 87,
    "role": "Active context persistence.",
    "role_full": "Active context persistence.\nReplaces active_skill \u2014 generic for any tool.",
    "stage": null,
@@ -1535,7 +1537,9 @@
    "observability": "mediated",
    "observability_note": "Emits nothing. Observable only through app.pipeline.react_loop \u2014 its behaviour has no telemetry identity of its own.",
    "config": [],
-   "writes": [],
+   "writes": [
+    "record_decision"
+   ],
    "key": "active_context",
    "how": "Remembers which tool the conversation is currently inside, so a follow-up lands in the right\nplace instead of starting over. Replaced an older active_skill notion with something generic\nto any tool.\n\nTwo functions, and the first is the one that matters: persist_active_context(ctx, turn_record)\nADDS active_context and failed_query to the turn record before it is saved. load_active_context\nreads them back out of merged_state or the last turns.\n\nSo this 60-line module is a WRITER INTO chat_turns \u2014 which makes it exactly the node the DB\nseat's forward note pointed at when they said the unmodelled-key failure would recur through\nwhichever node writes turns.",
    "rating": "red",
@@ -1558,7 +1562,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 0,
-    "loc": 63,
+    "loc": 87,
     "log_sites": 0,
     "missing": false,
     "reraise": 0,
@@ -1566,7 +1570,7 @@
     "telemetry_sites": 0,
     "todos": 0
    },
-   "coverage": "ABSENT",
+   "coverage": "PERIPHERAL",
    "coverage_tags": [],
    "dimensions": [
     [
@@ -1576,8 +1580,8 @@
     ],
     [
      "testability",
-     "red",
-     "no test CALLS it (ABSENT)"
+     "amber",
+     "called, guarantee unproven (PERIPHERAL)"
     ],
     [
      "error_handling",
@@ -1587,7 +1591,7 @@
     [
      "modularity",
      "green",
-     "63 lines"
+     "87 lines"
     ],
     [
      "observability",
@@ -1596,7 +1600,7 @@
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "testability: no test CALLS it (ABSENT) \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, error_handling, modularity)",
+   "rating_why": "observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, testability, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -2070,7 +2074,7 @@
    "module": "app.pipeline.personalization",
    "group": "pipeline",
    "path": "app/pipeline/personalization.py",
-   "loc": 131,
+   "loc": 146,
    "role": "User-profile splicing helpers.",
    "role_full": "User-profile splicing helpers.\n\nMobius-user/CONSUMER_RECIPE_PROFILE.md is the contract. This module\nimplements the chat-side consumer:\n\n  * ``splice_user_profile(base, profile)`` \u2014 Pattern A from the recipe.\n    Drop ``profile.rendered_prompt`` between a base system prompt and\n    whatever follows. No-op when the user hasn't onboarded.\n  * ``autonomy_for(profile, sensitive)`` \u2014 Pattern B. Read-only access\n    to ``profile.autonomy.{routine,sensitive}_tasks`` for tool-execution\n    gating (confirm-first vs auto). Defaults to ``confirm_first`` when\n    profile is missing \u2014 safest fallback.\n  * `",
    "stage": null,
@@ -2096,7 +2100,9 @@
    "config": [
     "CHAT_PERSONALIZATION_ENABLED"
    ],
-   "writes": [],
+   "writes": [
+    "record_decision"
+   ],
    "key": "personalization",
    "how": "Chat's side of a contract owned by another module: Mobius-user/CONSUMER_RECIPE_PROFILE.md.\n\nWHERE COMMUNICATION PREFERENCES LIVE. In profile.communication, three fields with closed\nvocabularies:\n\n  tone                  professional | friendly | concise\n  ai_experience_level   beginner | regular | expert\n  greeting_enabled      boolean\n\nSiblings in the same profile: autonomy{routine_tasks, sensitive_tasks} each automatic |\nconfirm_first | manual; preferred_name; tasks; timezone; version; generated_at; and\nrendered_prompt.\n\nHOW THEY REACH THE MODEL \u2014 and this is the part that is not obvious. They do NOT reach it as\nfields. mobius-user pre-renders them into rendered_prompt, a 4-6 line paragraph of about 150\ntokens, and THAT is what chat splices. The structured communication block is read in exactly\none place in the entire service \u2014 personalization.py:114-123 \u2014 and only to build the\npersonalization_applied envelope. It never steers behaviour.\n\nWhat steers is the rendered prose, spliced at six call sites covering the planner/ReAct\nreasoning prompt, the critic, the integrator (both sequential and parallel responders) and\nthe post-run adjudicator. So a preference shapes tool choice, the quality bar, the voice and\nthe grade \u2014 but only in whatever words mobius-user chose.\n\nThe profile arrives per-turn in the POST payload. It is never persisted in chat's thread\nstate, so it is caller input, not conversation state.",
    "rating": "red",
@@ -2136,7 +2142,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 0,
-    "loc": 131,
+    "loc": 146,
     "log_sites": 0,
     "missing": false,
     "reraise": 0,
@@ -2165,7 +2171,7 @@
     [
      "modularity",
      "green",
-     "131 lines"
+     "146 lines"
     ],
     [
      "observability",
@@ -2312,7 +2318,7 @@
    "module": "app.pipeline.react.feedback_signal",
    "group": "pipeline/react",
    "path": "app/pipeline/react/feedback_signal.py",
-   "loc": 79,
+   "loc": 83,
    "role": "Periodic product-feedback cadence signal for a ReAct turn.",
    "role_full": "Periodic product-feedback cadence signal for a ReAct turn.\n\nExtracted from react_loop.py so that file stays under its LOC ratchet\n(tests/test_react_split_phase_1i). See docs/feedback-agent-spec.md \u00a74B/\u00a76:\nthe *decision* (which ask, if any) is computed here from per-user cadence state;\nthe planner only chooses whether to surface it via ``offer_feedback``.",
    "stage": null,
@@ -2332,7 +2338,9 @@
    "config": [
     "FEEDBACK_PERIODIC_ENABLED"
    ],
-   "writes": [],
+   "writes": [
+    "record_decision"
+   ],
    "key": "feedback_signal",
    "how": "Decides whether this is the turn where the user gets asked for feedback, computed from their own\ncadence state rather than a fixed interval. The decision is made here and stashed on\nctx.feedback_signal; the planner only chooses whether to surface it via offer_feedback.\n\nGated by FEEDBACK_PERIODIC_ENABLED, default ON. Extracted from react_loop specifically to keep\nthat file under its LOC ratchet \u2014 the extraction programme working as designed.",
    "rating": "red",
@@ -2355,7 +2363,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 0,
-    "loc": 79,
+    "loc": 83,
     "log_sites": 0,
     "missing": false,
     "reraise": 0,
@@ -2384,7 +2392,7 @@
     [
      "modularity",
      "green",
-     "79 lines"
+     "83 lines"
     ],
     [
      "observability",
@@ -3152,7 +3160,7 @@
    "module": "app.pipeline.react_retry_guard",
    "group": "pipeline",
    "path": "app/pipeline/react_retry_guard.py",
-   "loc": 345,
+   "loc": 369,
    "role": "Smart-retry guard for the ReAct loop (Phase 0.7).",
    "role_full": "Smart-retry guard for the ReAct loop (Phase 0.7).\n\nPrevents the pathology observed in production where the bandit or the LLM\ndecision picks the *same* tool with the *same* inputs across rounds after it\nalready failed, burning LLM calls on a known-dead path.\n\nRules\n-----\n1. **Same tool + same inputs + no new evidence \u2192 skip.** A \"failed attempt\"\n   is recorded when a tool execution either raises, returns ``success=False``,\n   or returns a result attached to an :class:`ErrorEnvelope`. Before the next\n   tool execution, if the (tool, inputs_signature) pair matches a prior\n   failure, we check whe",
    "stage": null,
@@ -3179,11 +3187,12 @@
    "observability_note": "Emits its own signals; visible in chat_turns.thinking_log under its own name.",
    "config": [],
    "writes": [
+    "record_decision",
     "record_result"
    ],
    "key": "react_retry_guard",
    "how": "Stops the loop burning calls re-running a tool that already failed. Written against a pathology\nobserved in production, where the bandit or the model picked the same dead path round after\nround.\n\nThree rules. Same tool plus same inputs plus no new evidence means skip \u2014 a failure is recorded\nwhen a tool raises, returns success=False, or comes back with an ErrorEnvelope, and before the\nnext execution the guard checks whether any NEW tool result has landed since; if not it refuses\nand tells the model to choose differently. Fail-fast at loop end: if every round failed and\nnothing succeeded, it short-circuits the 'escalate honestly' path and emits a typed refusal.\nAnd tool exhaustion: N consecutive failures of one tool with no success between blocks that\ntool for the turn.",
-   "rating": "red",
+   "rating": "amber",
    "depth": "code",
    "findings": [
     [
@@ -3203,12 +3212,12 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 1,
-    "loc": 345,
+    "loc": 369,
     "log_sites": 0,
     "missing": false,
     "reraise": 0,
     "swallow": 0,
-    "telemetry_sites": 0,
+    "telemetry_sites": 4,
     "todos": 0
    },
    "coverage": "PERIPHERAL",
@@ -3232,16 +3241,16 @@
     [
      "modularity",
      "green",
-     "345 lines"
+     "369 lines"
     ],
     [
      "observability",
-     "red",
-     "no logs and no telemetry \u2014 cannot be operated"
+     "green",
+     "4 telemetry sites, 0 logs"
     ]
    ],
    "rating_was_typed": "green",
-   "rating_why": "observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, testability, error_handling, modularity)",
+   "rating_why": "testability: called, guarantee unproven (PERIPHERAL)  (ok: functionality, error_handling, modularity, observability)",
    "live_config": [],
    "detail": {}
   },
@@ -3375,6 +3384,10 @@
     [
      "good",
      "GATE GREEN ACROSS ALL FIVE COMMITS, 2026-09-09: regressions 0, newly passing 0, known-failing baseline 14 unchanged; 2579/2598 passed, 5 skipped. Covers 10133ae and 2b0008f. AND ASKING RATHER THAN INFERRING PAID OFF: 10133ae carries three behaviour changes plus TWO CHAT FOUND WHILE IN THERE \u2014 `found` was being set from HTTP success when a miss is 200 {}, and a brief collapse of `success` into `found` WAS CAUGHT BY THE EXISTING SUITE. test_appeals_playbook_zero_result encodes transport-vs-content and failed the moment it broke. Consequence if it had shipped: a legitimate 'no playbook exists' would have recorded as appeals_get_playbook:FAILURE \u2014 corrupting the very funnel being built, with a failure that did not happen. A test written for one distinction defended a different one a month later, which is the argument for encoding distinctions rather than outcomes."
+    ],
+    [
+     "bad",
+     "OWNER(chat): expires_after_turns HAS NO WRITER, NO COMPARISON, AND ITS DECREMENT CAN NEVER RUN. Found by Chat Master in the P2 telemetry pass 2026-09-10; I verified it and it is worse than reported. They found it decremented and never enforced. The full picture: the ONLY assignments in app/ are the decrements themselves (active_context.py:53, :64); the only other mention anywhere is a DOCSTRING at context.py:212 describing it as a field of tool output. So NOTHING EVER SETS IT. Both reads are ctx.get('expires_after_turns', 0), which returns 0, so the `if ttl > 0` guard is false and THE DECREMENT NEVER EVEN EXECUTES. A TTL that is never written, never counted down, and never compared \u2014 the context simply never expires, and the countdown that looks like it manages that is inert in all three directions. CONSEQUENCE FOR THEIR OWN NEW TELEMETRY, and it is immediate: expired_but_served=(ttl <= 0) will be TRUE ON EVERY ROW, because ttl is always 0. That is their own is_fallback finding \u2014 a field that can only hold one value passes 'producer exists', 'consumer exists' and 'query returns rows' while carrying no information \u2014 reproduced in the field they added hours after warning me about it. The fix is to record the RAW ttl and whether the key was PRESENT AT ALL, so 'no writer' is distinguishable from 'expired'. Their decision not to make it expire without a ruling is right: enforcing it changes what the model sees on later turns."
     ],
     [
      "bad",
@@ -3559,7 +3572,7 @@
     [
      "functionality",
      "red",
-     "31 open defects"
+     "32 open defects"
     ],
     [
      "testability",
@@ -3583,7 +3596,7 @@
     ]
    ],
    "rating_was_typed": "red",
-   "rating_why": "functionality: 31 open defects \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: testability, error_handling, modularity)",
+   "rating_why": "functionality: 32 open defects \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: testability, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },

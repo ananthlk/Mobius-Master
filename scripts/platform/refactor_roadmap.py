@@ -228,6 +228,7 @@ RULES = [
     ("P2", "tool_manifest", "THE COVERAGE ENUM WAS A PRODUCER WITH NO CONSUMER"),
     ("P2", "tool_manifest", "RATINGS WERE NEVER RE-DERIVED, AND NO SIGN-OFF EVER COVERED THEM"),
     ("P1", "tool_manifest", "FOUND IT — carc_group SILENTLY OVERRIDES A CORRECT CARC CODE"),
+    ("P2", None, "expires_after_turns HAS NO WRITER, NO COMPARISON"),
     ("P3", "tool_manifest", "THE MODEL NARRATED A TOOL MISS AS A BROKEN TOOL, IN PRODUCTION"),
     ("P2", "tool_manifest", "THE RETRY GUARD DID NOT FIRE ON FOUR DUPLICATE CALLS"),
     ("P2", "tool_manifest", "THREE ROUNDS OF 'no chunks marked relevant"),
