@@ -756,3 +756,28 @@ the false-positive override (Option A) AND the genuine-PHI attestation-admit (As
   build. A confidence-tiered DETERMINISTIC (no-LLM) override design stays on the shelf, build-ready if
   green-lit. Decision brief: `DECISION_option_a.md` (outcome: WITHDRAWN for now).
 - phantom ssn/MRN = chat HTML→text extraction-boundary fix, unaffected by this ruling.
+
+---
+
+## §3 · Dedicated EXTENSION INTAKE — new lane (OPEN, Master RAG building; captured 2026-09-09)
+
+Ananth asked Master RAG to create a **dedicated intake means for docs coming from the extension**, distinct
+from the generic `/chat/upload` path the fetch-to-RAG lane rides today. Captured here as the tracked seam;
+contract to be filled in from Master RAG's answer.
+
+**Why it matters to the extension:** the swap is a single constant — `INGEST_TARGET` in
+`mobius-os/extension/src/services/ingest.ts` (already commented as a provisional SEAM pending Sourcing/Master
+RAG sign-off). One change point when the new intake is named.
+
+**Open questions (asked of Master RAG 2026-09-09):**
+1. Endpoint/entry — new rag endpoint vs. `/upload` + an extension source-type marker? URL/verb.
+2. Contract — does it accept today's fields as-is (file, `source_url`, `access="user_authorized_session"`,
+   `task_id`/`source_run_id`, `fetched_at`, `signal_headers`, origin-only `source_origin`), rename any, or
+   require new ones (e.g. explicit `source="browser_extension"` / caller tag)?
+3. Path — still Extension → `/chat/upload` → rag (chat owns the PHI-gate admit), or a **direct** Extension →
+   rag intake? A direct path changes WHO runs the gate — must reconcile with §BLOCK_NOT_STORED_INVARIANT
+   (the gate/purge ordering) before it ships.
+4. Status — shipped/dev/planned + rev.
+
+**Extension commitment:** on receiving endpoint + contract, wire `INGEST_TARGET` and re-verify the true
+end-to-end. Until then the lane stays on `/chat/upload`. _(awaiting Master RAG)_
