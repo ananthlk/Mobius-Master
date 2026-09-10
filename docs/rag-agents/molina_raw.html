@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>Florida Providers Home</title>
+    <link rel='shortcut icon' href='/_Content/Images/favicon_ico.png' />
+    <link rel='apple-touch-icon' href='/_Content/Images/favicon_ico.png' />
+    
+    
+    
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="title" content="Florida Providers Home">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta property="og:title" content="Florida Providers Home">
+    <meta property="og:description" content="">
+    <meta property="og:type" content="article">
+    <meta name="og:url" content="https://www.molinahealthcare.com/providers/fl/medicaid/home">
+    <meta name="twitter:title" content="Florida Providers Home">
+    <meta name="twitter:description" content="">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/_Content/Css/bootstrap.min.css">
+
+    
+
+    <link href="/_Content/Css/ProviderLayoutCSS.css" rel="stylesheet" />
+
+
+    
+    <script type="text/javascript" id="_cls_detector"  
+            src="https://cdn.gbqofs.com/molinahealth/molina-public/p/detector-dom.min.js"></script>
+
+
+    <!-- jQuery library -->
+    
+    <script src="/_Content/Js/PWSLibraryJS.min.js"></script>
+
+    
+
+    <script src="/_Content/Js/ProviderMainJS.min.js"></script>
+
+   
+    <script src="/_Content/Js/purify.min.js"></script>
+    <script src="/purify.min.js" type="text/javascript"></script>
+
+        <!-- The below scripts should be added into the head element -->
+<script src="/_Content/Js/User1st.js"></script>
+
+    
+        <script>
+        // Initialize the engage variable
+                        var engage = undefined;
+                        // Create and inject the
+
+                        var s = document.createElement("script");
+                        s.type = "text/javascript";
+                        s.async = true;
+                        s.src = 'https://d1mj578wat5n4o.cloudfront.net/sitecore-engage-v.1.4.1.min.js';
+                        var x = document.querySelector("script");
+                        x.parentNode.insertBefore(s, x);
+                        // Initialize the Engage SDK
+                        s.addEventListener("load", async () =>
+                        {
+                            var settings = {
+                                clientKey: 'mhil6ethg50dixw8j04qc11r8pge8uu0',
+                                targetURL: 'https://api-engage-us.sitecorecloud.io',
+                                pointOfSale: 'molinahealthcare.com',
+                                cookieDomain: window.location.host.replace(/(www\.)?\:([0-9])+/, ''),
+                                cookieExpiryDays: 365,
+                                forceServerCookieMode: false,
+                                includeUTMParameters: true,
+                                webPersonalization: true /* boolean or object. See Settings object for all options. Default: false */
+
+                            };
+                        engage = await window.Engage.init(settings);
+                        // Send a VIEW event
+                        // ...
+                        // VIEW event object
+                        var event = {
+                                channel: "WEB",
+                                //page: "HOME-PAGE"
+                                page: "Medicaid"
+                            };
+
+                // Send VIEW event
+                engage.pageView(event);
+
+                //console.log("bid:", engage.getBrowserId());
+                        });
+
+        $(document).ready(function(){
+            $('.cdp-form').on("hide.bs.modal",function(){
+                const eventData = {
+                        "channel": "WEB",
+                        "pointOfSale": Engage.settings.pointOfSale,
+                    };
+            window.engage.event("ContactUsFormClosed", eventData);
+            });
+
+            $('.contact-us-btncdp').on('click', function (event) {
+                event.preventDefault();
+                var ContactUsUrl = '';
+                if ($("[data-sc-field-name='txtContactUsUrl']").length > 0) {
+                    ContactUsUrl = $("[data-sc-field-name='txtContactUsUrl']").val();
+                }
+
+                if (ContactUsUrl != '') {
+                    window.open(ContactUsUrl,'_blank');
+                }
+            });
+
+        });
+
+        function getCookie(cookieName) {
+              let cookie = {};
+              document.cookie.split(';').forEach(function(el) {
+                let [key,value] = el.split('=');
+                cookie[key.trim()] = value;
+              })
+              return cookie[cookieName];
+            }
+
+            function sendInteractionToPersonalize(eventId, state) {
+                const eventData = {
+                    "channel": "WEB",
+                    "pointOfSale": Engage.settings.pointOfSale,
+                };
+
+                if (state != undefined && state != '' && state != null) {
+                    const extensionData = {
+                        "statecode": state
+                    }
+                    window.engage.event(eventId, eventData, extensionData);
+                } else {
+                    window.engage.event(eventId, eventData);
+                }
+
+            }
+
+         function openCDPForm() {
+            $('.cdp-form').modal('toggle');
+            $('.cdp-form').removeClass('d-none');
+            }
+
+
+
+        </script>
+
+
+
+</head>
+
+<body>
+    <div id="cookieConsentContainer" class="cookieConsentContainer">
+    <div class="cookieTitle"></div>
+    <div class="cookieDesc">
+        We use cookies on our website. Cookies are used to improve the use of our website and analytic purposes. By using our website, you consent to our use of cookies in accordance with our Privacy Policy.  <a href="/members/common/en-US/terms_privacy.aspx" target="_blank" rel="noopener noreferrer" >Read More</a>
+        <a href="javascript:void(0)" class="cookieButton" onclick="purecookieDismiss();" >I agree</a>
+    </div>
+</div>
+
+    <div class="pagelayout">
+        <header class="container">
+            <div class="row">
+
+                
+
+
+
+            </div>
+            <div class="row">
+                
+
+
+<div class="container">
+    <div class="row">
+        <div class="globalToolbox">
+            <div class="pageWrapper1 clearfix">
+                <div class="provider-tool ">
+
+                            <a href="/members/fl/en-us/pages/home" class="membersBtn">  For Molina Members</a>
+                                                <a href="/members/common/en-us/abtmolina/home" class="membersBtn">  About Molina</a>
+
+
+                </div>
+                <div class="stateSelector">
+                    <label for="dd-country">
+                        Showing Information For Florida
+                    </label>
+                </div>
+                <div class="stateddlSelector">
+                    <select id="dd-country" data-size="5" onchange="OnStateSelectEvent(this.value);">
+                                                <option value="az">Arizona</option>
+                                                <option value="ca">California</option>
+                                                <option selected value="fl">Florida</option>
+                                                <option value="id">Idaho</option>
+                                                <option value="il">Illinois</option>
+                                                <option value="ia">Iowa</option>
+                                                <option value="ky">Kentucky</option>
+                                                <option value="mi">Michigan</option>
+                                                <option value="ms">Mississippi</option>
+                                                <option value="ne">Nebraska</option>
+                                                <option value="nv">Nevada</option>
+                                                <option value="nm">New Mexico</option>
+                                                <option value="ny">New York</option>
+                                                <option value="oh">Ohio</option>
+                                                <option value="sc">South Carolina</option>
+                                                <option value="tx">Texas</option>
+                                                <option value="ut">Utah</option>
+                                                <option value="va">Virginia</option>
+                                                <option value="wa">Washington</option>
+                                                <option value="wi">Wisconsin</option>
+                    </select>
+                </div>
+                <div class="languageSelector">
+                    <select id="dd-language" class="selectpicker" data-size="5" onchange="OnLanguageSelectEvent(this.value);">
+
+                                            <option selected value="medicaid"> Medicaid </option>
+                                            <option value="marketplace"> Marketplace </option>
+                        
+
+                    </select>
+                </div>
+
+                <div class="typeTool">
+                    <p> Type Size</p>
+                    <a href="#" class="decreaseType" title="Font Decrease">TypeSize Decrease</a>
+                    <a href="#" class="increaseType" title="Font Increase">TypeSize Increase</a>
+                </div>
+
+
+
+            </div>
+        </div>
+    </div><!--row-->
+</div><!---container-->
+
+<input type="hidden" id="selStateCodeHdn" value="fl" />
+<input type="hidden" id="selLangCodeHdn" value="medicaid" />
+
+
+
+<div class="provider-header">
+    <div class="row">
+        
+        <div class="logo col-sm-3 col-lg-2 col-md-3">
+            <h1>Molinalogo<a href="/providers/fl/medicaid/home.aspx" target=""><img src="/-/media/Project/Molina/PublicWebsites/molinaLogo-notag.png?la=en&amp;h=54&amp;w=180&amp;hash=7CB7AF66B769A4DF55DE06DCFD8DC466" alt="Molina Healthcare logo" /></a></h1>
+
+        </div>
+            <div class="pr-nav-main-new col-sm-5 col-lg-5 col-xs-12">
+                            <div class="nav">
+                                <ul class="persistent-links">
+                                        <li><a href="https://www.availity.com/molinahealthcare" class="" target="_blank" rel="noopener noreferrer" >Availity Essentials Portal</a></li>
+                                        <li>&nbsp; | &nbsp;</li>
+                                        <li><a href="https://molina.sapphirethreesixtyfive.com//?ci=fl-medicaid&amp;locale=en_us" class="" target="_blank" rel="noopener noreferrer" >Provider Online Directory</a></li>
+                                        <li>&nbsp; | &nbsp;</li>
+                                </ul>
+                            </div>
+
+            </div>
+
+        <div class="search-main col-sm-4 col-lg-3">
+            <div class="search">
+                <div class="input-group">
+                    <label for="searchInputText" hidden="">Search</label>
+                    <input id="searchInputText" type="text" class="form-control" placeholder="Search">
+                    <div id="searchsubmit" class="input-group-append"><input type="submit" class="button" value="Go"></div>
+                </div>
+
+            </div>
+
+
+            
+
+        </div>
+
+    
+
+
+    <div class="col-sm-2 col-lg-2 col-md-2" id="signin">
+        <div class="signin">
+            <div class="click-nav">
+                <button type="button" class="clicker" title=""><style>
+    .signin-dropdown{display:none;visibility:hidden;}
+    .clicker span{display:none;visibility:hidden;}
+    .fcc-btn{
+    color:white;
+    }
+</style>
+<div class="SignIn-anchor">
+<a rel="noopener noreferrer" target="_blank" class="fcc-btn" style="text-decoration: none; color:white;" href="https://www.availity.com/molinahealthcare/">Login or Register</a>
+</div><span></span></button>
+                <ul class="signin-dropdown" role="menu">
+
+                    <li><a href="" target="" class="Medicaidpopup"></a></li>
+                    <li><a href="" target="" class="Medicaidpopup"></a></li>
+                </ul>
+
+            </div>
+                <a id="registerURL" target="" class="register Medicaidpopup" style="" href=""></a>
+
+        </div>
+    </div>
+
+                <div class="persistent-links-wrapper" style="padding:10px!important;">
+                    <ul class="persistent-links">
+                            <li><a href="http://www.vsp.com" class="state-specific-links" target="_blank" rel="noopener noreferrer" >Vision Service Provider</a></li>
+                            <li>&nbsp; | &nbsp;</li>
+                            <li><a href="https://www.molinaapps.com/default.asp?stoploop=1" class="state-specific-links" target="_blank" rel="noopener noreferrer" > Facility Review</a></li>
+                            <li>&nbsp; | &nbsp;</li>
+                    </ul>
+                </div>
+
+</div>
+</div>
+
+<div id="provider-navigation">
+    <div class="container">
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top provider">
+
+
+            <a class="navbar-brand d-block d-sm-none" href="">
+
+                    <img src="/_Content/Images/molinaLogo-notag.png" width="100" height="auto" alt="Molina Logo" />
+
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="providerNav navbar-nav mr-auto">
+                    
+                                    <li class="nav-item  selected ">
+                                        <a href="/providers/fl/medicaid/home.aspx" class="nav-link" id="Home-nav"> Home</a>
+                                    </li>
+                                    <li class="nav-item   dropdown">
+                                        <a href="#" class="nav-link dropdown-toggle" id="Manual-nav" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Manual</a>
+
+                                            <span class="arrow"></span>
+                                            <ul class="submenu dropdown-menu" aria-labelledby="Manual-nav">
+
+                                                
+                                                        <li class="nostylesubchild dropdown-item">
+                                                            <a href="/providers/fl/medicaid/manual/medical.aspx" target="_self">
+                                                                Provider Manual and Orientation
+                                                            </a>
+                                                        </li>
+
+
+                                            </ul>
+                                    </li>
+                                    <li class="nav-item   dropdown">
+                                        <a href="#" class="nav-link dropdown-toggle" id="Forms-nav" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Forms</a>
+
+                                            <span class="arrow"></span>
+                                            <ul class="submenu dropdown-menu" aria-labelledby="Forms-nav">
+
+                                                
+                                                        <li class="nostylesubchild dropdown-item">
+                                                            <a href="/providers/fl/medicaid/forms/fuf.aspx" target="_self">
+                                                                Frequently Used Forms
+                                                            </a>
+                                                        </li>
+
+
+                                            </ul>
+                                    </li>
+                                    <li class="nav-item   dropdown">
+                                        <a href="#" class="nav-link dropdown-toggle" id="Policies-nav" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Policies</a>
+
+                                            <span class="arrow"></span>
+                                            <ul class="submenu dropdown-menu" aria-labelledby="Policies-nav">
+
+                                                
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/policies/member_rights.aspx" target="_self">
+                                                                Member Rights &amp; Responsibilities
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/policies/provider_rights.aspx" target="_self">
+                                                                Provider Responsibilities
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/policies/credential.aspx" target="_self">
+                                                                Provider Credentialing Rights
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/policies/fraud.aspx" target="_self">
+                                                                Florida Fraud and Abuse
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/policies/patient.aspx" target="_self">
+                                                                Patient Safety
+                                                            </a>
+                                                        </li>
+                                                        <li class="nostylesubchild dropdown-item">
+                                                            <a href="/providers/fl/medicaid/policies/complaint.aspx" target="_self">
+                                                                Complaint System
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/policies/payment.aspx" target="_self">
+                                                                Molina Healthcare Billing and Reimbursement Policies
+                                                            </a>
+                                                        </li>
+
+
+                                            </ul>
+                                    </li>
+                                    <li class="nav-item   dropdown">
+                                        <a href="#" class="nav-link dropdown-toggle" id="HIPAA-nav" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> HIPAA</a>
+
+                                            <span class="arrow"></span>
+                                            <ul class="submenu dropdown-menu" aria-labelledby="HIPAA-nav">
+
+                                                
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/common/medicaid/hipaa/home.aspx" target="_self">
+                                                                HIPAA Resource Center
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/common/medicaid/hipaa/tcs.aspx" target="_self">
+                                                                HIPAA Transactions
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/common/medicaid/hipaa/codesets.aspx" target="_self">
+                                                                HIPAA Code Sets
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/common/medicaid/hipaa/npi.aspx" target="_self">
+                                                                Unique Identifiers
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/common/medicaid/hipaa/privacy.aspx" target="_self">
+                                                                Privacy of Health Info
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/common/medicaid/hipaa/security.aspx" target="_self">
+                                                                HIPAA Security
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/common/medicaid/hipaa/contact.aspx" target="_self">
+                                                                Contact HIPAA
+                                                            </a>
+                                                        </li>
+
+
+                                            </ul>
+                                    </li>
+                                    <li class="nav-item sixth   dropdown">
+                                        <a href="#" class="nav-link dropdown-toggle" id="EDI ERA/EFT-nav" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> EDI ERA/EFT</a>
+
+                                            <span class="arrow"></span>
+                                            <ul class="submenu dropdown-menu" aria-labelledby="EDI ERA/EFT-nav">
+
+                                                
+                                                        <li class="nostylesubchild dropdown-item">
+                                                            <a href="/providers/common/medicaid/ediera/edi/benefits.aspx" target="">
+                                                                EDI
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/common/medicaid/ediera/edi/chinfo.aspx" target="_self">
+                                                                Clearinghouse Information
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/common/medicaid/ediera/edi/faq.aspx" target="_self">
+                                                                Frequently Asked Questions
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/common/medicaid/ediera/edi/guidanceinfo.aspx" target="_self">
+                                                                Companion Guide
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/common/medicaid/ediera/edi/contact.aspx" target="_self">
+                                                                Contact Us
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/common/medicaid/ediera/edi/edi_websites.aspx" target="_self">
+                                                                EDI Web Site Links
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/common/medicaid/ediera/edi/state_websites.aspx" target="_self">
+                                                                State/Commonwealth Links
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/common/medicaid/ediera/edi/editrans.aspx" target="_self">
+                                                                Submitting EDI Transactions
+                                                            </a>
+                                                        </li>
+                                                        <li class="nostylesubchild dropdown-item">
+                                                            <a href="/providers/common/medicaid/ediera/era/benefits.aspx" target="">
+                                                                ERA/EFT
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/common/medicaid/ediera/era/enrollERAEFT.aspx" target="_self">
+                                                                Enrollment Information for ERA/EFT
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/common/medicaid/ediera/era/faq.aspx" target="_self">
+                                                                Frequently Asked Questions
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/common/medicaid/ediera/era/contact.aspx" target="_self">
+                                                                Contact Us
+                                                            </a>
+                                                        </li>
+
+
+                                            </ul>
+                                    </li>
+                                    <li class="nav-item   dropdown">
+                                        <a href="#" class="nav-link dropdown-toggle" id="Drug List-nav" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Drug List</a>
+
+                                            <span class="arrow"></span>
+                                            <ul class="submenu dropdown-menu" aria-labelledby="Drug List-nav">
+
+                                                
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/drug/formulary.aspx" target="_self">
+                                                                Drug Formulary
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/drug/authorization.aspx" target="_self">
+                                                                Prior Authorization Request Procedure
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/drug/hemophilia.aspx" target="_self">
+                                                                Hemophilia
+                                                            </a>
+                                                        </li>
+
+
+                                            </ul>
+                                    </li>
+                                    <li class="nav-item sixth   dropdown">
+                                        <a href="#" class="nav-link dropdown-toggle" id="Health Resources-nav" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Health Resources</a>
+
+                                            <span class="arrow"></span>
+                                            <ul class="submenu dropdown-menu" aria-labelledby="Health Resources-nav">
+
+                                                
+                                                        <li class="nostylesubchild dropdown-item">
+                                                            <a href="/providers/fl/medicaid/resource/qualityimp.aspx" target="_self">
+                                                                Quality Improvement
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/resource/quality_hedis.aspx" target="_self">
+                                                                HEDIS
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/resource/quality_cahps.aspx" target="_self">
+                                                                CAHPS
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/resource/medical.aspx" target="_self">
+                                                                Medical Record Documentation
+                                                            </a>
+                                                        </li>
+                                                        <li class="nostylesubchild dropdown-item">
+                                                            <a href="/providers/fl/medicaid/resource/guide_clinical.aspx" target="_self">
+                                                                Clinical Practice Guidelines
+                                                            </a>
+                                                        </li>
+                                                        <li class="nostylesubchild dropdown-item">
+                                                            <a href="/providers/fl/medicaid/resource/guide_prevent.aspx" target="_self">
+                                                                Preventive Health Guidelines
+                                                            </a>
+                                                        </li>
+                                                        <li class="nostylesubchild dropdown-item">
+                                                            <a href="/providers/fl/medicaid/resource/utilized_mgt.aspx" target="_self">
+                                                                Utilization Management
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/resource/case_mgt.aspx" target="_self">
+                                                                Case Management
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/resource/coordination_mgt.aspx" target="_self">
+                                                                Coordination of Care
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/resource/dis_mgt.aspx" target="_self">
+                                                                Disease Management
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/resource/service.aspx" target="_self">
+                                                                24 Hour Nurse Advice Line
+                                                            </a>
+                                                        </li>
+                                                        <li class="nostylesubchild dropdown-item">
+                                                            <a href="/providers/common/medicaid/bh_toolkit/bh_toolkit.aspx" target="_self">
+                                                                Behavioral Health Toolkit
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/SubstanceAbuseToolkit.aspx" target="_self">
+                                                                Substance Abuse Toolkit
+                                                            </a>
+                                                        </li>
+                                                        <li class="nostylesubchild dropdown-item">
+                                                            <a href="/providers/common/medicaid/hipaa/Opioid-Safety-Guidelines.aspx" target="_self">
+                                                                Opioid Safety Provider Education Resources
+                                                            </a>
+                                                        </li>
+
+
+                                            </ul>
+                                    </li>
+                                    <li class="nav-item   dropdown">
+                                        <a href="#" class="nav-link dropdown-toggle" id="Communications-nav" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Communications</a>
+
+                                            <span class="arrow"></span>
+                                            <ul class="submenu dropdown-menu" aria-labelledby="Communications-nav">
+
+                                                
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/comm/Medicaid-Renewals.aspx" target="_self">
+                                                                Medicaid Renewals
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/comm/newsletters.aspx" target="_self">
+                                                                Provider Newsletters
+                                                            </a>
+                                                        </li>
+                                                        <li class="nostylesubchild dropdown-item">
+                                                            <a href="/providers/fl/medicaid/comm/training.aspx" target="_self">
+                                                                Resources and Training
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/comm/YouMattertoMolina.aspx" target="_self">
+                                                                You Matter to Molina
+                                                            </a>
+                                                        </li>
+
+
+                                            </ul>
+                                    </li>
+                                    <li class="nav-item   dropdown">
+                                        <a href="#" class="nav-link dropdown-toggle" id="Contact Us-nav" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Contact Us</a>
+
+                                            <span class="arrow"></span>
+                                            <ul class="submenu dropdown-menu" aria-labelledby="Contact Us-nav">
+
+                                                
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/contacts/contact_info.aspx" target="_self">
+                                                                Contact Us
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="http://molinahealthcare.com/providers/fl/medicaid/comm/Join-Our-Network" target="">
+                                                                Join Our Network
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/contacts/service_area.aspx" target="_self">
+                                                                Service Area
+                                                            </a>
+                                                        </li>
+                                                        <li class="dropdown-item">
+                                                            <a href="/providers/fl/medicaid/contacts/site_review.aspx" target="_self">
+                                                                Facility Site Review
+                                                            </a>
+                                                        </li>
+
+
+                                            </ul>
+                                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</div>
+<script src="/Assets/common/js/hcaptcha.js"></script>
+
+
+
+
+<div id="captcha-pub-key" data-captchakey="03a24890-555c-42da-adea-e6f8ce1c7e8e"></div>
+
+<div class="captcha-wrapper">
+    <script src="https://js.hcaptcha.com/1/api.js?render=explicit&hl=" async defer></script>
+    <div id="captcha_element" data-sitekey="03a24890-555c-42da-adea-e6f8ce1c7e8e"></div>
+    <div class="h-captcha" id="captcha-container" data-sitekey="03a24890-555c-42da-adea-e6f8ce1c7e8e" data-size="invisible"></div>
+
+</div>
+
+
+
+
+<div class="container homeBanner">
+    <div class="contrlbutton">
+        <a title="Pause" class="pausebtn" href="javascript:void(0)">Play/Pause</a>
+    </div>
+    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+        <ol class="carousel-indicators">
+                        <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                        <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+                        <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+                        <li data-target="#carouselExampleIndicators" data-slide-to="3"></li>
+                        <li data-target="#carouselExampleIndicators" data-slide-to="4"></li>
+        </ol>
+        
+<div class="carousel-inner">
+                            <div class="carousel-item">
+                                <img src="/-/media/Molina/PublicWebsite/Images/NV/MHNV-Provider-Fax-Notice.png?la=en&amp;h=314&amp;w=1024&amp;hash=3846B247BC6F614F2BF97F3B5790AFB7" alt="person using laptop computer" />
+                                <div class="carousel-caption">
+                                    <h5 class="marketplacemobile" style="font-size: 33px; line-height: 33px; color: black;"><strong>Molina has discontinued fax submissions of prior authorizations.</strong></h5>
+<br />
+<h2 class="marketplacemobile" style="font-size: 20px; line-height: 22px; color: black;">Please submit all requests for prior authorizations and appeals through Availity. If you have any questions, please contact Provider Relations at  <a href="mailto:mflproviderservicesmanagement@molinahealthcare.com">mflproviderservicesmanagement@molinahealthcare.com</a>.</h2>
+
+                                                                                                                                            </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="/-/media/Molina/PublicWebsite/Images/FL-Medicaid-images/CMS-banner.png?la=en&amp;h=318&amp;w=1024&amp;hash=172A6FE3E8FACD660E5F0038CB5B4C73" alt="provider giving patient a shot" />
+                                <div class="carousel-caption">
+                                    
+<br /><br /><br /><br /><br /><br /><br /><br />
+<table>
+    <tbody>
+        <tr>
+            <td style="border-right:20px;"><a class="button-green heroBtn caption-learn-more" href="https://www.molinahealthcare.com/members/CMS" title="">Member</a> </td>
+            <td></td>
+            <td style="border-right:20px;"><a class="button-green heroBtn caption-learn-more" href="http://molinahealthcare.com/providers/cms">Provider</a></td>
+        </tr>
+    </tbody>
+</table>                                                                                                                                            </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="/-/media/Molina/PublicWebsite/Images/providers/ms/provider-pws-banner.jpg?la=en&amp;h=314&amp;w=1024&amp;hash=3B8157D51B985698DDAFFC9FE51F6FAD" alt="provider giving patient a shot" />
+                                <div class="carousel-caption">
+                                    <h2 class="marketplacemobile" style="font-size:26px;line-height:22px;color:white;">
+<span style="color: #ffffff;">Join Molina for a live, </span></h2>
+<h2 class="marketplacemobile" style="font-size:26px;line-height:22px;color:white;"><span style="color: #ffffff;">informative training session </span></h2>
+<br />
+                                                                                                             <a href="" target="_blank" class="caption-learn-more">Scroll down for upcoming trainings</a>                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="/-/media/Molina/PublicWebsite/Images/Psych-Hub-Banner-Molina-v3-03.png?la=en&amp;h=315&amp;w=1025&amp;hash=5759BDD40048BB79FBB14C49FFD8CBDD" alt="" />
+                                <div class="carousel-caption">
+                                    <div class="images">
+<h2 style="color:#1F00B9 !important;">Learn More About Mental Health</h2><p>&nbsp;</p>
+<p style="font-size: 1.4em; color: black !important;"><b>EXPLORE EVIDENCE-BASED EDUCATION OPPORTUNITIES FROM PSYCH HUB.</b></p>
+
+
+<p>&nbsp;</p>
+
+
+</div>
+
+
+                                                                                                             <a href="https://resources.psychhub.com/molina" target="_blank" class="caption-learn-more">Click here</a>                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="/-/media/Molina/PublicWebsite/Images/providers/common/23164---Provider-Portal-Sunset-Carousel-Banner.jpg?la=en&amp;h=314&amp;w=1024&amp;hash=FDBD614C9348BC78DC7CF072B82C6947" alt="" />
+                                <div class="carousel-caption">
+                                    <h2 class="marketplacemobile" style="font-size:38px;line-height:38px;color:black;"><strong>Now is the time:</strong></h2>
+<br />
+<h2 class="marketplacemobile" style="font-size:20px;line-height:20px;color:black;">Availity Essentials is now the official secure Provider Portal for Molina providers. Register now on Availity to ensure uninterrupted access to all portal tools and functions.</h2>
+
+                                                                                                             <a href="https://www.availity.com/molinahealthcare" target="_blank" class="caption-learn-more">REGISTER HERE</a>                                </div>
+                            </div>
+                </div>
+
+        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true" title="Previous"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true" title="Next"></span>
+            <span class="sr-only">Next</span>
+        </a>
+        <div calss="play_pause_button">
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+<div id="state-plan-popup-config" style="display:none;">
+    {"stateLanguageMapping":{"az":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"}],"ca":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"},{"text":"Pусский","value":"ru-US"},{"text":"Tiếng Việt","value":"vi-US"},{"text":"中文","value":"zh-US"},{"text":"Hmoob","value":"hm-US"},{"text":"العربية","value":"ar-US"}],"ct":[{"text":"English","value":"en-US"}],"fl":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"}],"ga":[{"text":"English","value":"en-US"}],"id":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"}],"il":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"}],"ia":[{"text":"English","value":"en-US"}],"ky":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"}],"ma":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"}],"mi":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"}],"ms":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"}],"ne":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"}],"nv":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"}],"nm":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"}],"ny":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"}],"oh":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"}],"sc":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"}],"tx":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"}],"ut":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"}],"va":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"}],"wa":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"}],"wi":[{"text":"English","value":"en-US"},{"text":"Español","value":"es-US"}]},"showPlanPopUp":false,"stateOrPlanRedirectURl":"/api/Sitecore/PWS/RedirectOtherState","stateUpdateUrl":"/api/Sitecore/PWS/FindADoctorRedirect"}
+</div>
+<script src="/_Content/Js/StatelangMapping.js"></script>
+
+
+<div class="modal state-select-modal" id="state-select-modal" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="ssm-close-btn" data-dismiss="modal"></div>
+                <h2>Choose a Molina Healthcare State</h2>
+                <p class="ssm-sub-title">Please select one of the states in which Molina Healthcare provides services.</p>
+                <div class="ssm-content">
+                    <div>
+                        <h4 class="ssm-state-dd-ttl">Select Your State</h4>
+                        <select class="ssm-state-dd">
+                                <option value="az">Arizona</option>
+                                <option value="ca">California</option>
+                                <option value="ct">Connecticut</option>
+                                <option value="fl">Florida</option>
+                                <option value="ga">Georgia</option>
+                                <option value="id">Idaho</option>
+                                <option value="il">Illinois</option>
+                                <option value="ia">Iowa</option>
+                                <option value="ky">Kentucky</option>
+                                <option value="ma">Massachusetts</option>
+                                <option value="mi">Michigan</option>
+                                <option value="ms">Mississippi</option>
+                                <option value="ne">Nebraska</option>
+                                <option value="nv">Nevada</option>
+                                <option value="nm">New Mexico</option>
+                                <option value="ny">New York</option>
+                                <option value="oh">Ohio</option>
+                                <option value="sc">South Carolina</option>
+                                <option value="tx">Texas</option>
+                                <option value="ut">Utah</option>
+                                <option value="va">Virginia</option>
+                                <option value="wa">Washington</option>
+                                <option value="wi">Wisconsin</option>
+
+                        </select>
+                    </div>
+                    <div>
+                        <h4 class="ssm-lang-dd-ttl">Select Your Language</h4>
+                        <div class="ssm-lang-dd-cntr"></div>
+                    </div>
+                </div>
+                <button class="ssm-submit">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+            </div>
+        </header>
+        <div class="mainContent" role="main">
+            <div class="container provider-two-column">
+                <div class="row">
+                    <div class="col-md-12 provider-column-left">
+                        
+    <div class="alert container">
+
+        <p>We are aware of a POA (Present on Admission) indicator issue with our clearinghouse, SSI Group, impacting inpatient claims. Remediation is actively underway, and claims are being reprocessed. Please do not resubmit affected claims, as all will be addressed. We appreciate your patience while we resolve this issue.</p>
+
+    </div>
+
+
+
+<script src='https://PEGAPALookup.molinahealthcare.com/prweb/PRAuth/PRGuest?pzuiactionzzz=CXtpbn1GNWQxUnlhVGMwMmR1TTUxeURmdWlKdTNZYkZ2QkJEdDIrWk5saEc2a1ByNy8rbHBLSWlPWGFTcGF0a2hmbDJ1*'></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var strAPIurl = 'https://PEGAPALookup.molinahealthcare.com/prweb/PRRestService/EnvAPI/v1/Availability';
+        var strScripturl='https://PEGAPALookup.molinahealthcare.com/prweb/PRAuth/PRGuest';
+
+		if ( strScripturl != '' )
+		{
+			$('#PegaContainer').attr('data-pega-url',strScripturl);
+		}
+
+        $('#Author').on("click", function () {
+            if (strAPIurl != '' && strScripturl !='' ) {
+                $.ajax({
+                url: 'https://PEGAPALookup.molinahealthcare.com/prweb/PRRestService/EnvAPI/v1/Availability',
+                type: 'GET',
+                complete: function (data) {
+                    if (data.status == 200) {
+                        console.log('UM-Pega API Call sucess. status code is:' + data.status);
+                        $('#UMPega-Error').collapse('hide');
+                        $('#UMPega').collapse('show')
+                        $('#UMPega').collapse('toggle');
+                    }
+                    else {
+                        console.log('UM-Pega API Call failure. status code is:' + data.status);
+                        $('#UMPega').collapse('hide');
+                        $('#UMPega-Error').collapse('show');
+                        $('#UMPega-Error').collapse('toggle');
+                    }
+                }
+            });
+            }
+            else {
+                        $('#UMPega').collapse('hide');
+                        $('#UMPega-Error').collapse('show');
+                        $('#UMPega-Error').collapse('toggle');
+
+            }
+
+        });
+    });
+</script>
+<div style="padding: 10px;color: #ffffff;margin-top: 5px;background-color: #01A3B2;">
+    <div style="padding-top: 10px; padding-bottom: 10px;text-align: center;">
+        <h4 class="text-white">Need a Prior Authorization?</h4>
+ <button id="Author" type="button" class="btn btn-sm border border-dark rounded" data-toggle="collapse" style="color:#01A3B2;background:white;"><a href="https://www.molinahealthcare.com/providers/fl/medicaid/palookup" target="_blank" style="color:#01A3B2;background:white;">Code LookUp Tool </a></button> 
+    </div>
+</div>
+<script src="/Assets/common/js/hcaptcha.js"></script>
+
+
+<div id="coronaModal" class="modal fade modal-pr" style="display: none;" aria-hidden="true">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+</div>
+<div class="modal-body">
+<div id="tx_notify_popup_div">
+<div class="tx_notify_box">
+<h3>Important update for providers!</h3>
+<p>Molina has discontinued fax submissions of prior authorizations. Please submit all requests for prior authorizations and appeals through Availity. If you have any questions, contact Provider Relations at <a href="mailto:mflproviderservicesmanagement@molinahealthcare.com">mflproviderservicesmanagement@molinahealthcare.com</a>.
+<br />
+<br />
+</p>
+<p>
+</p>
+</div>
+</div>
+</div>
+<div class="modal-body">
+<div id="tx_notify_popup_div">
+<div class="tx_notify_box">
+<h2></h2>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<style>
+    #coronaModal .modal-content{
+    height:auto!important;
+    }
+    .modal-pr{
+    padding-right:10px!important;
+    }
+    .modal-content {
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0 auto;
+    }
+    .modal-content {
+    height:420px !important;
+    }
+    @media (min-width: 300px) and (max-width: 500px) {
+    .modal-content {
+    padding: 10px;
+    border-radius: 0;
+    width: 100% !important;
+    height: auto !important;
+    }
+    }
+</style>
+
+<div id="captcha-pub-key" data-captchakey="03a24890-555c-42da-adea-e6f8ce1c7e8e"></div>
+
+<div class="captcha-wrapper">
+    <script src="https://js.hcaptcha.com/1/api.js?render=explicit&hl=" async defer></script>
+    <div id="captcha_element" data-sitekey="03a24890-555c-42da-adea-e6f8ce1c7e8e"></div>
+    <div class="h-captcha" id="captcha-container" data-sitekey="03a24890-555c-42da-adea-e6f8ce1c7e8e" data-size="invisible"></div>
+
+</div>
+
+
+
+                    </div>
+                    <div class="col-md-8 provider-column-left">
+                        
+<div class="provider-welcome-note">
+<h2 style="background: #009EA0;">Welcome, Florida Healthcare Providers</h2>
+<div>
+<p><strong>New Behavioral Analysis Services information is now available</strong>:&nbsp;<a href="/-/media/Molina/PublicWebsite/PDF/Providers/fl/medicaid/08-07-26-MHFL-Comprehensive-BA-QRG-508.ashx">2026 Quick Reference Guide</a>&nbsp;(Updated August 2026)</p>
+<p>As our partner, assisting you is one of our highest priorities. We look forward to supporting your efforts to provide quality care. If you have questions, call Provider Services at <a href="tel: (855) 322-4076">(855) 322-4076</a>&nbsp;or register below for one of our upcoming events.</p>
+<p>CMS Plan has additional trainings scheduled through the end of the year and resources available. <a href="https://www.molinahealthcare.com/providers/fl/medicaid/CMS.aspx">Visit our CMS Plan page</a>&nbsp;for more information.</p>
+<p style="margin: 12pt 0in 12pt 40px; text-align: left;"><strong><span style="font-size: 16px;"><span style="white-space: pre;">		      </span>Upcoming CMS Plan Provider Trainings&nbsp;</span></strong></p>
+<a rel="noopener noreferrer" href="https://www.molinahealthcare.com/-/media/Molina/PublicWebsite/PDF/Providers/fl/medicaid/Provider-Orientation-Updated-Aug-2023.pdf" target="_blank" id="PRV FL orientation presentation"></a>
+</div>
+<table border="1" cellpadding="5" style="color: #3d3d3d; background-color: #ffffff; height: 217.667px; width: 80%; left: 295px; top: 212.237px; margin-left: 40px;" align="center">
+    <tbody style="text-align: left;">
+        <tr>
+            <td style="width: 220px; text-align: center;">
+            <p><span style="background-color: #ffffff; text-align: center; color: #000000;">8/19/26 - General CMS Plan &amp; Provider Onboarding</span></p>
+            </td>
+            <td style="width: 84px; text-align: center;">&nbsp;<a rel="noopener noreferrer" href="https://events.teams.microsoft.com/event/712d1be5-3588-415c-aac1-cb5e8247e5b9@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c" target="_blank">Register</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">8/20/26 - Behavioral Health / BNet Training</td>
+            <td style="width: 84px; text-align: center;">&nbsp;<a href="https://events.teams.microsoft.com/event/26cd13a0-37cd-42b4-8372-9a3d4013365b@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">Register</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">8/24/26 - Behavior Analysis (BA) Provider Training</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/57463594-f815-41bf-a5dd-b96e2221443d@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">Register</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">8/24/26 - Home Health (HH) Provider Training</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/b3f440cd-b212-447a-b7ca-c2f9219bff58@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">Register&nbsp;</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">&nbsp;8/27/26 - Hospital Training</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/ab249c1b-7fb7-45d5-a9e2-8742a96f37d5@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">Register</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">&nbsp;8/31/26 -&nbsp;Provider Insights &amp; Updates Session</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/61ebc972-3916-4d57-adf5-9202819d808a@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">Register&nbsp;</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">9/1/26 - Therapies Training&nbsp;</td>
+            <td style="width: 84px; text-align: center;">&nbsp;<a href="https://events.teams.microsoft.com/event/d09136c8-d857-4a3e-9c5f-06b438572a2f@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">Register</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">&nbsp;9/2/26 -&nbsp;General CMS Plan &amp; Provider Onboarding</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/1ec4507b-0731-4f75-9a61-962d6b21d2d9@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">Register</a>&nbsp;</td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">&nbsp;9/2/26 - PPEC Training</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/04951b8c-e3b0-43ae-86eb-a97f433e4b72@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">&nbsp;Register</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">9/3/26 - PDN/FHHA (Private Duty Nursing) Training</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/35a47a05-c594-4416-83d1-1452906f0777@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">&nbsp;Register</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">9/8/26 - Pediatric Physician / Specialist Training&nbsp;</td>
+            <td style="width: 84px; text-align: center;">&nbsp;<a href="https://events.teams.microsoft.com/event/77c5de9d-9907-40a9-a45a-84d645d37755@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">Register</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">9/9/26 -&nbsp;PIC: Team for Kids (PIC:TFK) / Hospice Training&nbsp;</td>
+            <td style="width: 84px; text-align: center;">&nbsp;<a href="https://events.teams.microsoft.com/event/a57f3c71-0a2b-4346-83bf-bdeaf27f466e@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">Register</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">&nbsp;9/10/26 -&nbsp;Early Intervention Services (EIS) Training</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/cb6df01d-9167-406f-bfde-d82e88cd64b6@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">&nbsp;Register</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">&nbsp;9/14/26 - PPEC Training</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/571a54f1-0826-49d4-bbf4-3d3aa3775080@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">Register</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">9/15/26 -&nbsp;General CMS Plan &amp; Provider Onboarding&nbsp;</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/a2db21e7-3e4c-4e1e-8ed1-47a8c998178d@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">Register&nbsp;</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">&nbsp;9/16/26 - Hospital Training</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/fad46f78-7d12-44e8-b4cf-729f827d8815@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">Register</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">&nbsp;9/17/26 -&nbsp;Behavioral Health / BNet Training</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/b0184e70-e505-4eec-a3a6-6b83bf45314a@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">Register</a>&nbsp;</td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">9/21/26 - PIC: Team for Kids (PIC:TFK) / Hospice Training</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/4ec32d68-baf8-4d4f-83ef-fc9bde0c6a5c@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">&nbsp;Register</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">9/22/26 -&nbsp;Behavior Analysis (BA) Provider Training&nbsp;</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/c5da6506-832d-49ba-a873-165e7a06bf07@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">&nbsp;Register</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">9/23/26 - Therapies Training&nbsp;</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/99f1c6b8-a150-4faa-a6d0-3f5a08b457cc@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">Register</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">&nbsp;9/24/26 -&nbsp;Home Health (HH) Provider Training</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/a6879772-dbf7-4a4c-900e-01dfae435b3e@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">&nbsp;Register</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">&nbsp;9/28/26 -&nbsp;Early Intervention Services (EIS) Training</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/adb47060-591d-405e-aed6-c6f41dccca0e@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">&nbsp;Register</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">&nbsp;9/28/26 -&nbsp;Pediatric Physician / Specialist Training</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/cfdd9ae6-1e74-4377-8048-fda845c3ef19@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">Register&nbsp;</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">9/29/26 - General CMS Plan &amp; Provider Onboarding&nbsp;</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/8d8e3841-656b-419d-ac6f-2667e3f5216e@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">&nbsp;Register</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">9/29/26 - PDN/FHHA (Private Duty Nursing) Training&nbsp;</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/c72a624c-a7b7-4380-ad9e-d29516ded543@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">Register&nbsp;</a></td>
+        </tr>
+        <tr>
+            <td style="width: 220px; text-align: center;">&nbsp;9/30/26 -&nbsp;Provider Insights &amp; Updates Session</td>
+            <td style="width: 84px; text-align: center;"><a href="https://events.teams.microsoft.com/event/9505a98a-4acd-4a82-974a-c1b6bfa99190@5e625f8d-0b53-4f56-9e46-19fa14bb2e5c">Register&nbsp;</a></td>
+        </tr>
+    </tbody>
+</table>
+</div>
+<div class="provider-welcome-note">
+<h2 style="background: #E2F5F6; color:#373535;">Join Our Network</h2>
+<p style="margin-left: 20px; margin-right: 20px;"> Thank you for your interest in joining Molina Healthcare of Florida's provider network. Currently, we provide coverage to Medicaid and Marketplace members in the State of Florida. We are also honored to have been selected to serve the forthcoming Children's Medical Services Program. Contracted providers are an essential part of delivering quality care to our members, and we value our partnerships with our providers.
+To begin the process of joining our provider network, please <a href="https://www.molinahealthcare.com/providers/fl/medicaid/comm/Join-Our-Network.aspx">click here.</a></p>
+</div><div class="provider-service-portal">
+<h3>Laboratory Services</h3>
+<div>
+<p style="background: white; margin: 0in;"><span style="color: #636466;">Molina&rsquo;s providers&rsquo; of laboratory services are Quest Diagnostics and&nbsp;</span><span>Labcorp</span><span style="color: #004a31;"><br />
+<br />
+</span></p>
+<p style="background: white; margin: 0in;"><span style="color: #595959;">Quest Diagnostics&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LabCorp</span></p>
+<p style="background: white; margin: 0in;"><span style="color: #595959;">866-MYQUEST (866-697-8378)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 800-845-6167</span></p>
+<p style="background: white; margin: 0in;"><span style="text-decoration: underline; color: #0563c1;"><a rel="noopener noreferrer" rel="noopener noreferrer" href="http://www.questdiagnostics.com/" target="_blank" data-toggle="modal" data-target="#siteLeavingAlert" aria-label="To make this website accessible to screen reader, Press combination of alt and 1 keys. To stop getting this message, press the combination of alt and 2 keys"><span style="color: #5a5d03;">www.questdiagnostics.com</span></a></span><span style="color: black;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="text-decoration: underline; color: #0563c1;"><a rel="noopener noreferrer" rel="noopener noreferrer" href="http://www.labcorp.com/" target="_blank" data-toggle="modal" data-target="#siteLeavingAlert" aria-label="To make this website accessible to screen reader, Press combination of alt and 1 keys. To stop getting this message, press the combination of alt and 2 keys"><span style="color: #5a5d03;">www.labcorp.com</span></a></span></p>
+<p style="background: white; margin: 0in;"><span style="color: #3d3d3d;">&nbsp;</span></p>
+<p><strong><span style="font-size: 16px; color: #636466;"> </span></strong><span style="font-size: 16px; color: #636466;">Molina allows only<a href="/-/media/Molina/PublicWebsite/PDF/Providers/fl/medicaid/11-11-24-MHFL-Claims-In-Office-Labs-508.ashx"> specific laboratory tests</a> in the physician&rsquo;s office. All other medically necessary laboratory testing must be directed to Quest by the ordering physician.&nbsp;</span><span style="font-size: 16px;"><span style="color: #004a31;"><br />
+<br />
+This list includes most tests currently performed in the office by our network providers, and tests generally considered essential (&ldquo;stat&rdquo;) for immediate diagnosis and treatment. Claims for tests performed in the physician office, but not on Molina&rsquo;s list of allowed in-office laboratory tests will be denied.<br />
+<br />
+For more information about In-Network Laboratory Providers, please&nbsp;<a rel="noopener noreferrer" rel="noopener noreferrer" href="https://molina.sapphirethreesixtyfive.com/?ci=fl-medicaid" target="_blank" aria-label="To make this website accessible to screen reader, Press combination of alt and 1 keys. To stop getting this message, press the combination of alt and 2 keys"><span style="color: #5a5d03;">consult the Molina Provider Directory&nbsp;</span></a></span>on our website.</span><span style="font-size: 16px; color: #004a31;"><br />
+<br />
+For testing available through In-Network Laboratory Providers, or for a list of In-Network Laboratory Provider patient services centers, please reach out to the In-Network Laboratory Provider.</span></p>
+</div>
+</div><div class="provider-service-portal">
+<h3>Electronic Medical Records Access</h3>
+<div>
+<p>Molina Healthcare strives to improve HEDIS scores year-round through the collection and reporting of data. To achieve high HEDIS scores, the collection of medical records must occur multiple times throughout the year. Molina is interested in strengthening our relationship with provider groups by utilizing EMR Remote Access method to efficiently retrieve the necessary records to meet HEDIS requirements. </p>
+<p>Benefits from EMR Remote Access:</p>
+<ul style="padding-left: 15px; margin-left: 40px;">
+    <li>Reduction in time and office resources</li>
+    <li>Removing the need for multiple outreaches from our team to yours</li>
+    <li>Mitigating COVID-19 risks associated with going on-site</li>
+</ul>
+<p>In order to fulfill our state and federal accreditation requirements regarding HEDIS and Risk Adjustment quality reporting, it is necessary for Molina to collect medical record data year-round. </p>
+<p>By providing Molina Remote Access to HEDIS data, Molina can simplify the record collection process for the office staff. EMR access ensures Molina receives the required records in a timely manner to properly obtain HEDIS and contract compliance for the selected members.</p>
+<p>We are striving for a collaborative relationship; therefore, your Intervention specialist is readily available to offer any help. You can also reach out to a HEDIS Specialist at: <a href="mailto:RegionDHEDIS@MolinaHealthCare.Com" title="Email to HEDIS Specialist">RegionDHEDIS@MolinaHealthCare.Com</a>.</p>
+</div>
+</div><div class="provider-service-portal">
+<h3 style="text-align: center;"> </h3>
+</div><div class="provider-service-portal">
+			<h3>Claims Denied for Missing Documentation</h3>
+			<div>
+	<p>Claims denied for missing or additional documentation requirements such as consent forms, invoices, Explanation of Benefits from primary carrier, or itemized bills are not considered claim disputes. In order to process your claim appropriately and promptly, these documents, along with a copy of the claim, must be received within federal and state timely filing requirements and/or your Provider Services Agreement. Please mail the documentation with the copy of the claim to:</p>
+Molina Healthcare of FL<br />P.O. BOX 22812<br />Long Beach, CA 90801<br /><p>Please Note: As of January 15, 2020, disputes received for denial reasons stated above will be rejected.</p>
+			</div>
+		</div>
+
+
+<div class="provider-service-portal">
+<h3>&nbsp;
+</h3>
+</div>
+                    </div>
+                    <div class="col-md-4 provider-column-right">
+                        
+<div class="wrapper-box">
+<p>Visit&nbsp;<a rel="noopener noreferrer" href="https://www.molinahealthcare.com/providers/fl/medicaid/contacts/contact_info.aspx" target="_blank"><strong>'<span style="text-decoration: underline;">Contact Us</span>'</strong></a>&nbsp;to find your&nbsp;regional network and engagement representatives.</p>
+&nbsp;
+<p>It is important that your provider directory demographics are accurate. Please visit our&nbsp;<a rel="noopener noreferrer" href="https://molina.sapphirethreesixtyfive.com//?ci=fl-molina" class="externalLink" target="_blank"><strong><span style="text-decoration: underline;">Provider Directory</span></strong></a>&nbsp;to validate your information and notify us of any updates.&nbsp;<a rel="noopener noreferrer" href="mailto:mflproviderservicesmanagement@molinahealthcare.com?subject=Provider%20Directory%20Change" target="_blank"><strong><span style="text-decoration: underline;">Notify Molina Healthcare via email</span></strong></a>&nbsp;at least 30 days in advance when you have changes in:</p>
+<ul>
+    <li>Office location,<br />
+    &nbsp;&nbsp; hours, phone, fax, or email</li>
+    <li>Addition or termination of a<br />
+    &nbsp;&nbsp; provider</li>
+    <li>Tax ID and/or NPI</li>
+    <li>Open or close your practice to new<br />
+    &nbsp;&nbsp; patients (PCPs only)</li>
+</ul>
+<p>&nbsp;</p>
+</div><div class="wrapper-box">
+<p><strong>Quick Links</strong></p>
+<p style="color: #3d3d3d; margin-bottom: 10px;"><span><a rel="noopener noreferrer" href="https://www.availity.com/molinahealthcare/" target="_blank">Availity Portal Login</a></span></p>
+<p style="color: #3d3d3d; margin-bottom: 10px;"><span><a rel="noopener noreferrer" href="https://ahca.myflorida.com/medicaid/rules/rule-59g-4.002-provider-reimbursement-schedules-and-billing-codes" target="_blank" id="billing codes">AHCA Provider Reimbursement Schedules and Billing Codes</a></span></p>
+<p style="color: #3d3d3d; margin-bottom: 10px;"><span><a href="/-/media/Molina/PublicWebsite/PDF/Providers/common/Florida/healthy-start-services-lm.pdf">Healthy Start Provider Requirements&nbsp;</a></span><span style="color: #131313;"></span></p>
+<p style="color: #3d3d3d; margin-bottom: 10px;"><a rel="noopener noreferrer" href="https://www.molinahealthcare.com/providers/fl/medicaid/contacts/contact_info.aspx" target="_blank" id="Florida Provider Network Managers Statewide">Florida Provider Network Managers Statewide</a></p>
+&nbsp;</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer class="container">
+            
+
+<div class="modal" id="MedicareAlert">
+<div class="modal-dialog">
+<div class="modal-content">
+<!-- Modal body -->
+<div class="modal-body">
+<span class="alert_icon"></span>
+<h3>You are leaving the Molina Medicare product webpages and going to Molina&rsquo;s non-Medicare web pages. Click Ok to continue.</h3>
+<div class="confirmation-box">
+<a rel="noopener noreferrer" rel="noopener noreferrer" class="get-ex-link" target="_self">ok</a>
+<a data-dismiss="modal">cancel</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="modal" id="LeavingAlertPsy">
+<div class="modal-dialog" style="
+    width: 426px!important;">
+<div class="modal-content" style="
+    width: 419px!important;">
+<!-- Modal body -->
+<div class="modal-body">
+<span class="alert_icon"></span>
+<h3 style="font-size: 13px!important;line-height: 16px;!important;">You are leaving the Molina Healthcare website. Are you sure?
+Remember to take this cohort code with you to access PsychHub: sGDcuXXmQXZEGsu</h3>
+<div class="confirmation-box">
+<a rel="noopener noreferrer" class="get-ex-link" target="_blank">ok</a>
+<a data-dismiss="modal">cancel</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+
+<div class="row">
+    <div class="col-md-2 col-6">
+
+        
+        <h3> <a href="/members/fl/en-us/hp/home.aspx" target="_self" data-toggle="" data-target="" id="BecomeaMember">Become a Member</a></h3>
+                        <ul class="footer-child">
+            <li><a href="/members/fl/en-us/hp/medicaid/medicaid.aspx" class=" " target="_self">Medicaid</a></li>
+            <li><a href="/members/fl/en-us/mem/cms.aspx" class=" " target="_self">Children&#39;s Medical Services (CMS)</a></li>
+            <li><a href="https://www.molinamarketplace.com/marketplace/fl/en-us/" class=" " target="">Health Insurance Marketplace</a></li>
+        </ul>
+    </div>
+    <div class="col-md-2 col-6">
+
+        
+        <h3> <a href="/members/fl/en-us/mem/home.aspx" target="_self" data-toggle="" data-target="" id="Members">Members</a></h3>
+                        <ul class="footer-child">
+            <li><a href="/members/fl/en-us/mem/medicaid/medicaid.aspx" class=" " target="_self">Medicaid</a></li>
+            <li><a href="/members/fl/en-us/mem/cms.aspx" class=" " target="_self">Children&#39;s Medical Services (CMS)</a></li>
+            <li><a href="https://www.molinamarketplace.com/marketplace/fl/en-us/Members" class=" " target="">Health Insurance Marketplace</a></li>
+            <li><a href="/members/fl/en-us/mem/hipaa/home.aspx" class=" " target="_self">HIPAA Privacy Notice</a></li>
+            <li><a href="https://member.molinahealthcare.com/" class=" " target="">My Molina Portal</a></li>
+            <li><a href="http://www.molinahelpfinder.com/" class=" " target="_blank">Molina Help Finder</a></li>
+        </ul>
+    </div>
+    <div class="col-md-2 col-6">
+
+        
+        <h3> <a href="/members/fl/en-us/health-care-professionals/home.aspx" target="_self" data-toggle="" data-target="" id="HealthCareProfessionals">Health Care Professionals</a></h3>
+                        <ul class="footer-child">
+            <li><a href="http://molinahealthcare.com/providers/fl/medicaid/comm/Join-Our-Network" class=" " target="">Join Our Network</a></li>
+            <li><a href="/providers/fl/medicaid/home.aspx" class=" " target="">Medicaid</a></li>
+            <li><a href="https://www.molinamarketplace.com/marketplace/fl/en-us/Providers" class=" " target="">Marketplace</a></li>
+            <li><a href="https://provider.molinahealthcare.com/" class=" " target="">Provider Portal</a></li>
+            <li class=""><a href="/members/fl/en-us/health-care-professionals/home.aspx" class=" " target="">Prior Auth LookUp Tool</a></li>
+            <li><a href="/members/fl/en-us/health-care-professionals/MolinaClinicalPolicy.aspx" class=" " target="_self">Services</a></li>
+        </ul>
+    </div>
+    <div class="col-md-2 col-6">
+
+        
+        <h3> <a href="https://molina.sapphirethreesixtyfive.com/?ci=fl-molina" target="_self" data-toggle="modal" data-target="#state-select-modal-find-doctor" id="FindaDoctororPharmacy">Find a Doctor or Pharmacy</a></h3>
+                        <ul class="footer-child">
+        </ul>
+    </div>
+    <div class="col-md-2 col-6">
+
+        
+                <h3> <a href="https://www.molinahelpfinder.com/" target="_blank">Molina Help Finder</a></h3>
+                <ul class="footer-child">
+        </ul>
+    </div>
+    <div class="col-md-2 col-6">
+
+        
+                <h3> <a href="/members/common/en-us/brokers/home.aspx" target="_self">Brokers</a></h3>
+                <ul class="footer-child">
+            <li class=""><a href="https://www.molinamarketplace.com/marketplace/brokers/en-us/" class=" " target="">Molina Healthcare Medical Insurance Marketplace</a></li>
+            <li><a href="/members/common/en-us/brokers/medicare" class=" " target="">Medicare Brokers</a></li>
+            <li><a href="/members/common/en-us/sitecore/content/MolinaHealthcare/members/wi/Community/Community-Partners.aspx" class=" " target="_self">Community Partners</a></li>
+        </ul>
+    </div>
+    <div class="col-md-2 col-6">
+
+        
+                <h3> <a href="/members/common/en-us/abtmolina/home.aspx" target="_self">About Molina</a></h3>
+                <ul class="footer-child">
+            <li><a href="/members/common/en-us/abtmolina/compinfo/compinfo.aspx" class=" " target="_self">Company Information</a></li>
+            <li class=""><a href="/members/common/en-us/abtmolina/compinfo/aboutus.aspx" class=" " target="_self">About Us</a></li>
+            <li><a href="/members/common/en-us/abtmolina/compinfo/newsmed/newsmed.aspx" class=" " target="_self">Molina News</a></li>
+            <li><a href="https://investors.molinahealthcare.com/" class=" " target="">Investor Information</a></li>
+            <li><a href="/members/common/en-us/abtmolina/whymolina/yourcomm/fl/yourcomm.aspx" class=" ">In Your Community</a></li>
+            <li><a href="/members/common/en-us/abtmolina/compinfo/quality/quality.aspx" class=" " target="_self">Commitment to Quality</a></li>
+            <li class=""><a href="javascript:redirectTOContactUSNow();" class=" " target="">Contact Us</a></li>
+            <li><a href="/blog/pages/home.aspx?state=Florida" class=" " target="">Molina Blog</a></li>
+            <li><a href="/members/common/en-us/healthy/home.aspx" class=" " target="_self">Staying Healthy</a></li>
+            <li><a href="javascript:openFeedbackPopup();" class=" " target="">Website Feedback</a></li>
+            <li><a href="https://careers.molinahealthcare.com/" class=" " target="">Careers</a></li>
+            <li class=""><a href="https://passwordreset.microsoftonline.com/?whr=molinahealthcare.com" class=" " target="">Employee Password Reset</a></li>
+            <li><a href="https://molinahealthcare.alertline.com/gcs/welcome" class=" " target="">Report Fraud</a></li>
+            <li><a href="/members/common/en-us/abtmolina/data-sharing.aspx" class=" " target="_self">What is data sharing?</a></li>
+            <li><a href="https://www.molinahealthcare.com/~/media/Molina/PublicWebsite/PDF/members/common/en-us/Molina_Healthcare_Affiliated_Health_Plans_List_as_of_January_30_2026-508.pdf" class=" " target="">Molina Healthcare Affiliated Health Plans</a></li>
+        </ul>
+    </div>
+    <div class="footer-social-icons">
+<a class="fb-big social-icon-big" target="_blank" title="Facebook" rel="noopener noreferrer" href="https://www.facebook.com/MolinaHealthFL">Facebook</a><a class="twitter-big social-icon-big" target="_blank" title="Twitter" rel="noopener noreferrer" href="https://www.twitter.com/molinahealth">Twitter</a><a class="instagram-big social-icon-big" target="_blank" title="Instagram" rel="noopener noreferrer" href="https://instagram.com/molinahealth/">Instagram</a><a class="linkedin-big social-icon-big" target="_blank" title="LinkedIn" rel="noopener noreferrer" href="https://www.linkedin.com/company/molina-healthcare">LinkedIn</a>    </div>
+
+    <div class="col-md-12 footer-copyrights">
+        <ul>
+
+            <br>
+            <li>&#169;2025 Molina Healthcare, Inc. All rights reserved.</li>
+            <li><a href="/members/common/en-US/terms_privacy.aspx"> Molina - Terms of Use &amp; Website Privacy</a></li>
+            <li>|</li>
+
+            <li><a href="/providers/common/sitemap.aspx">Sitemap</a></li>
+
+            <li>last updated:  05/28/2026</li>
+        </ul>
+    </div>
+</div>
+
+<div class="modal" id="MedicareAlert">
+<div class="modal-dialog">
+<div class="modal-content">
+<!-- Modal body -->
+<div class="modal-body">
+<span class="alert_icon"></span>
+<h3>You are leaving the Molina Medicare product webpages and going to Molina&rsquo;s non-Medicare web pages. Click Ok to continue.</h3>
+<div class="confirmation-box">
+<a rel="noopener noreferrer" rel="noopener noreferrer" class="get-ex-link" target="_self">ok</a>
+<a data-dismiss="modal">cancel</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<div class="modal" id="internalAlert">
+<div class="modal-dialog">
+<div class="modal-content">
+<!-- Modal body -->
+<div class="modal-body">
+<span class="alert_icon"></span>
+<h3>This link will take you away from the Dual Options section of MolinaHealthcare.com</h3>
+<div class="confirmation-box">
+<a rel="noopener noreferrer" class="get-ex-link" target="_self">ok</a>
+<a data-dismiss="modal">cancel</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal" id="siteLeavingAlert">
+<div class="modal-dialog">
+<div class="modal-content">
+<!-- Modal body -->
+<div class="modal-body">
+<span class="alert_icon"></span>
+    <h3>You are leaving the Molina Healthcare website.  Are you sure?</h3>
+<div class="confirmation-box">
+<a rel="noopener noreferrer" rel="noopener noreferrer" class="get-ex-link" target="_blank">ok</a>
+<a data-dismiss="modal">cancel</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<input type="hidden" id="selStateCodeHdnFooterNav" value="fl" footer-loading-time="57" />
+
+<div class="modal FeedbackPopUp">
+    <form action="/formbuilder?fxb.FormItemId=31fec8a8-6796-4973-ad94-b4f071394041&amp;fxb.HtmlPrefix=fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6" data-ajax="true" data-ajax-method="Post" data-ajax-mode="replace-with" data-ajax-success="$.validator.unobtrusive.parse(&#39;#fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_31fec8a8-6796-4973-ad94-b4f071394041&#39;);$.fxbFormTracker.parse(&#39;#fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_31fec8a8-6796-4973-ad94-b4f071394041&#39;);" data-ajax-update="#fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_31fec8a8-6796-4973-ad94-b4f071394041" data-sc-fxb="31fec8a8-6796-4973-ad94-b4f071394041" enctype="multipart/form-data" id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_31fec8a8-6796-4973-ad94-b4f071394041" method="post"><input id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_FormSessionId" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.FormSessionId" type="hidden" value="5a7cf284-b895-41ce-ade0-2bd3cddf4e72" /><input name="__RequestVerificationToken" type="hidden" value="abumaQuTVCEOCYnfTiuRrFBgJxAexSfJlR7_nAdGw95Rmww5MSa6P6Cui3MAMtDNns3yAC02Z3NrYUioQmr_kUN8hPhZcb8KAdtMCYbbxlM1" /><input id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_FormItemId" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.FormItemId" type="hidden" value="31fec8a8-6796-4973-ad94-b4f071394041" /><input id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_PageItemId" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.PageItemId" type="hidden" value="6cab95d9-7059-4214-b0b7-2c0f1352d236" />
+<div data-sc-field-key="340044190F3F4903B92748D2DC6A550C" class="websiteFeedback">
+    <div data-sc-field-key="F17C95AA1F934B1F866AB60632D1958F" class="modal-dialog">
+    <div data-sc-field-key="A5C5052BBEE34DE499D469BA8A52276F" class="modal-content">
+    <div data-sc-field-key="5E15F3CF9FCC46BFA7CE7E343871CD99" class="modal-header">
+    
+
+<input value="close" type="submit" class="close" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.904a58e4-9e0a-4627-9112-d008a14193e2" data-sc-field-key="68A06074546740BD93E528AF95A4B3A7" />
+<input id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_NavigationButtons" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.NavigationButtons" type="hidden" value="904a58e4-9e0a-4627-9112-d008a14193e2" />
+<input id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_904a58e4-9e0a-4627-9112-d008a14193e2" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.904a58e4-9e0a-4627-9112-d008a14193e2" type="hidden" value="0" /><h2 data-sc-field-key="A9275B39DEAD4CE7A4A9E9326538CD48" class="modal-title">Tell Us what You Think..</h2>
+</div>
+<div data-sc-field-key="A5086A1709764E6584B700EA560B28B0" class="modal-body">
+    <p data-sc-field-key="2D2CF22F0FD14CBAA894F4AAC772D4FC" class="surveysubhead">We appreciate your feedback about our website.</p><div data-sc-field-key="B4C9DAB4153A4ACA940BCCAEA23148A7" class="rate-this-page rs-rate-this">
+    <h3 data-sc-field-key="8C8F74801E024F339EAC9406C122FB56" class="ratethis">Rate This Page</h3><div data-sc-field-key="6A2471A05CEB4C34A8561A9843145D58" class="Information">
+    <span data-sc-field-key="4B2FDBA070D04EB7B2097F257FF72F86" class="asterik">*</span><h4 data-sc-field-key="71FCF8826F9348FA95C205272CF0EDDB" class=" informationheading">Information</h4><div data-sc-field-key="CD1B06C4B48C4D28926B1796D3B759FC" class="surveybadimg">
+    
+</div>
+<input id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_Fields_Index_38411806-0037-4eac-8192-2e687b216dd7" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields.Index" type="hidden" value="38411806-0037-4eac-8192-2e687b216dd7" /><input id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_Fields_38411806-0037-4eac-8192-2e687b216dd7__ItemId" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[38411806-0037-4eac-8192-2e687b216dd7].ItemId" type="hidden" value="38411806-0037-4eac-8192-2e687b216dd7" /><label class=""></label>
+    <label>
+        <input type="radio" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[38411806-0037-4eac-8192-2e687b216dd7].Value" value="Vary Bad" data-sc-tracking="True" data-sc-field-name="Information" data-sc-field-key="F3C250B2777E464CBE44B8DC96F8E4B8" data-val-required=" is required." data-val="true"/>Very Bad
+    </label>
+    <label>
+        <input type="radio" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[38411806-0037-4eac-8192-2e687b216dd7].Value" value="Bad" data-sc-tracking="True" data-sc-field-name="Information" data-sc-field-key="F3C250B2777E464CBE44B8DC96F8E4B8" />Bad
+    </label>
+    <label>
+        <input type="radio" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[38411806-0037-4eac-8192-2e687b216dd7].Value" value="Okay" data-sc-tracking="True" data-sc-field-name="Information" data-sc-field-key="F3C250B2777E464CBE44B8DC96F8E4B8" />Okay
+    </label>
+    <label>
+        <input type="radio" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[38411806-0037-4eac-8192-2e687b216dd7].Value" value="Good" data-sc-tracking="True" data-sc-field-name="Information" data-sc-field-key="F3C250B2777E464CBE44B8DC96F8E4B8" />Good
+    </label>
+    <label>
+        <input type="radio" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[38411806-0037-4eac-8192-2e687b216dd7].Value" value="Great" data-sc-tracking="True" data-sc-field-name="Information" data-sc-field-key="F3C250B2777E464CBE44B8DC96F8E4B8" />Great
+    </label>
+<span class="field-validation-valid" data-valmsg-for="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[38411806-0037-4eac-8192-2e687b216dd7].Value" data-valmsg-replace="true"></span><div data-sc-field-key="180CD8392C144C21A48F100BA71BFE65" class="surveygoodimg">
+    
+</div>
+
+</div>
+<div data-sc-field-key="B9314DB22F634CEBB1E8C98E27FC7AE1" class="Easeofuse">
+    <span data-sc-field-key="93902466C55C48769E8BCEA7DE093E82" class="asterik">*</span><h4 data-sc-field-key="7A2AA39F87DD4410A39AE00CB8A4C2AC" class="informationheading">Ease of Use</h4><div data-sc-field-key="4ACB18F1920645FB97579618858ED828" class="surveybadimg">
+    
+</div>
+<input id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_Fields_Index_db561f35-d0cd-4988-84c3-f62990f8f300" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields.Index" type="hidden" value="db561f35-d0cd-4988-84c3-f62990f8f300" /><input id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_Fields_db561f35-d0cd-4988-84c3-f62990f8f300__ItemId" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[db561f35-d0cd-4988-84c3-f62990f8f300].ItemId" type="hidden" value="db561f35-d0cd-4988-84c3-f62990f8f300" /><label class=""></label>
+    <label>
+        <input type="radio" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[db561f35-d0cd-4988-84c3-f62990f8f300].Value" value="Vary Bad" data-sc-tracking="True" data-sc-field-name="Ease Of Use" data-sc-field-key="7C5663DC19504E18A71D4B4E5FA176C6" data-val-required=" is required." data-val="true"/>Very Bad
+    </label>
+    <label>
+        <input type="radio" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[db561f35-d0cd-4988-84c3-f62990f8f300].Value" value="Bad" data-sc-tracking="True" data-sc-field-name="Ease Of Use" data-sc-field-key="7C5663DC19504E18A71D4B4E5FA176C6" />Bad
+    </label>
+    <label>
+        <input type="radio" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[db561f35-d0cd-4988-84c3-f62990f8f300].Value" value="Okay" data-sc-tracking="True" data-sc-field-name="Ease Of Use" data-sc-field-key="7C5663DC19504E18A71D4B4E5FA176C6" />Okay
+    </label>
+    <label>
+        <input type="radio" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[db561f35-d0cd-4988-84c3-f62990f8f300].Value" value="Good" data-sc-tracking="True" data-sc-field-name="Ease Of Use" data-sc-field-key="7C5663DC19504E18A71D4B4E5FA176C6" />Good
+    </label>
+    <label>
+        <input type="radio" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[db561f35-d0cd-4988-84c3-f62990f8f300].Value" value="Great" data-sc-tracking="True" data-sc-field-name="Ease Of Use" data-sc-field-key="7C5663DC19504E18A71D4B4E5FA176C6" />Great
+    </label>
+<span class="field-validation-valid" data-valmsg-for="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[db561f35-d0cd-4988-84c3-f62990f8f300].Value" data-valmsg-replace="true"></span><div data-sc-field-key="084E807A8C8547E0A62415ABCFB4DA47" class="surveygoodimg">
+    
+</div>
+
+</div>
+<div data-sc-field-key="BE675300173940B099CE862D90AFA980" class="Satisfaction">
+    <span data-sc-field-key="00753946A7F74C5080CCAF60BA32669B" class="asterik">*</span><h4 data-sc-field-key="1D6500BB73DC496EBA1468008B55CC16" class="informationheading">Overall Satisfaction with this Website</h4><div data-sc-field-key="8B3177E942784550AF62C45C6D392D95" class="surveybadimg">
+    
+</div>
+<input id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_Fields_Index_088af240-d38a-4ade-a07e-39fd6b3de013" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields.Index" type="hidden" value="088af240-d38a-4ade-a07e-39fd6b3de013" /><input id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_Fields_088af240-d38a-4ade-a07e-39fd6b3de013__ItemId" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[088af240-d38a-4ade-a07e-39fd6b3de013].ItemId" type="hidden" value="088af240-d38a-4ade-a07e-39fd6b3de013" /><label class=""></label>
+    <label>
+        <input type="radio" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[088af240-d38a-4ade-a07e-39fd6b3de013].Value" value="Vary Bad" data-sc-tracking="True" data-sc-field-name="Overall Satisfaction" data-sc-field-key="39C6103CE3264DCB8CA1DC3D2543EA8E" data-val-required=" is required." data-val="true"/>Very Bad
+    </label>
+    <label>
+        <input type="radio" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[088af240-d38a-4ade-a07e-39fd6b3de013].Value" value="Bad" data-sc-tracking="True" data-sc-field-name="Overall Satisfaction" data-sc-field-key="39C6103CE3264DCB8CA1DC3D2543EA8E" />Bad
+    </label>
+    <label>
+        <input type="radio" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[088af240-d38a-4ade-a07e-39fd6b3de013].Value" value="Okay" data-sc-tracking="True" data-sc-field-name="Overall Satisfaction" data-sc-field-key="39C6103CE3264DCB8CA1DC3D2543EA8E" />Okay
+    </label>
+    <label>
+        <input type="radio" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[088af240-d38a-4ade-a07e-39fd6b3de013].Value" value="Good" data-sc-tracking="True" data-sc-field-name="Overall Satisfaction" data-sc-field-key="39C6103CE3264DCB8CA1DC3D2543EA8E" />Good
+    </label>
+    <label>
+        <input type="radio" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[088af240-d38a-4ade-a07e-39fd6b3de013].Value" value="Great" data-sc-tracking="True" data-sc-field-name="Overall Satisfaction" data-sc-field-key="39C6103CE3264DCB8CA1DC3D2543EA8E" />Great
+    </label>
+<span class="field-validation-valid" data-valmsg-for="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[088af240-d38a-4ade-a07e-39fd6b3de013].Value" data-valmsg-replace="true"></span><div data-sc-field-key="305D6DF7A4A44BA0B83C3852A656F43F" class="surveygoodimg">
+    
+</div>
+
+</div>
+
+</div>
+<div data-sc-field-key="D766CABA9DCB4D97A81A81274357DADD" class="feedback-questions">
+    <h3 data-sc-field-key="800B10E89FC44388BE4ECEF66E19E0AD" class="questionheading">Questions</h3><div data-sc-field-key="C11090875B6042D3A76FF13EE4AB7AD0" class="formcontrol">
+    <label data-sc-field-key="FCD59267219C4785B1D05756D42C2009" class="asterik">*</label><input id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_Fields_Index_de3bda61-d99e-45a0-b484-d4db3c121ad3" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields.Index" type="hidden" value="de3bda61-d99e-45a0-b484-d4db3c121ad3" /><input id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_Fields_de3bda61-d99e-45a0-b484-d4db3c121ad3__ItemId" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[de3bda61-d99e-45a0-b484-d4db3c121ad3].ItemId" type="hidden" value="de3bda61-d99e-45a0-b484-d4db3c121ad3" /><label for="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_Fields_de3bda61-d99e-45a0-b484-d4db3c121ad3__Value" class="reasnText">1. What is the reason for your first Visit</label>
+<select id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_Fields_de3bda61-d99e-45a0-b484-d4db3c121ad3__Value" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[de3bda61-d99e-45a0-b484-d4db3c121ad3].Value" class="VisitReasonlist" data-sc-tracking="True" data-sc-field-name="VisitReasonlist" data-sc-field-key="C5CA790C0B1A48B5B1620F233AEF4F0C" data-val-required="1. What is the reason for your first Visit is required." data-val="true">
+        <option value="Please choose one">Please choose one</option>
+        <option value="Login to a secure website (i.e. myMolina)">Login to a secure website (i.e. myMolina)</option>
+        <option value="Find a doctor/hospital/other provider">Find a doctor/hospital/other provider</option>
+        <option value="Learn about Molina products/services">Learn about Molina products/services</option>
+        <option value="Learn about career opportunities @ Molina">Learn about career opportunities @ Molina</option>
+        <option value="Other">Other</option>
+</select>
+<span class="field-validation-valid" data-valmsg-for="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[de3bda61-d99e-45a0-b484-d4db3c121ad3].Value" data-valmsg-replace="true"></span>
+</div>
+<div data-sc-field-key="F50520A5C8A947279D6C0FA80B57A9F5" class="formcontrol">
+    <span data-sc-field-key="018E99ABE13947D28C5C4106F5EFFC44" class="asterik">*</span><input id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_Fields_Index_eaa14ed5-3e0a-45af-9120-ab0b56ab56c9" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields.Index" type="hidden" value="eaa14ed5-3e0a-45af-9120-ab0b56ab56c9" /><input id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_Fields_eaa14ed5-3e0a-45af-9120-ab0b56ab56c9__ItemId" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[eaa14ed5-3e0a-45af-9120-ab0b56ab56c9].ItemId" type="hidden" value="eaa14ed5-3e0a-45af-9120-ab0b56ab56c9" /><label for="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_Fields_eaa14ed5-3e0a-45af-9120-ab0b56ab56c9__Value" class="areYouText">2. Are you a:</label>
+<select id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_Fields_eaa14ed5-3e0a-45af-9120-ab0b56ab56c9__Value" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[eaa14ed5-3e0a-45af-9120-ab0b56ab56c9].Value" class="IAmlist" data-sc-tracking="True" data-sc-field-name="IAmlist" data-sc-field-key="40BBB6F7BBBA416FBEBE784054A1D7CE" data-val-required="2. Are you a: is required." data-val="true">
+        <option value="Please choose one">Please choose one</option>
+        <option value="Molina member">Molina member</option>
+        <option value="Possible future member">Possible future member</option>
+        <option value="Health Care Professional">Health Care Professional</option>
+        <option value="Community based organization">Community based organization</option>
+</select>
+<span class="field-validation-valid" data-valmsg-for="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[eaa14ed5-3e0a-45af-9120-ab0b56ab56c9].Value" data-valmsg-replace="true"></span>
+</div>
+
+</div>
+<div data-sc-field-key="F84EFE56E3BA4A099CBFE763E2ACFCD6" class="dvCaptcha FeedBackPopUpReCaptcha">
+    <input id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_Fields_Index_1fba5966-194a-4419-bc35-a0dd18bf2777" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields.Index" type="hidden" value="1fba5966-194a-4419-bc35-a0dd18bf2777" /><input id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_Fields_1fba5966-194a-4419-bc35-a0dd18bf2777__ItemId" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.Fields[1fba5966-194a-4419-bc35-a0dd18bf2777].ItemId" type="hidden" value="1fba5966-194a-4419-bc35-a0dd18bf2777" />
+<script src="/Assets/common/js/hcaptcha.js"></script>
+<div class="captcha-cntr">
+
+
+    <div id="captcha-pub-key" data-captchakey="03a24890-555c-42da-adea-e6f8ce1c7e8e"></div>
+
+    <div class="captcha-wrapper">
+        <script src="https://js.hcaptcha.com/1/api.js?render=explicit&hl=" async defer></script>
+        <div id="captcha_element" data-sitekey="03a24890-555c-42da-adea-e6f8ce1c7e8e"></div>
+        <div class="h-captcha" id="captcha-container" data-sitekey="03a24890-555c-42da-adea-e6f8ce1c7e8e" data-size="invisible"></div>
+
+    </div>
+</div>
+
+</div>
+
+
+<input value="Submit" type="submit" class="FeedbackPopupSubmit" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.545eac1d-8716-41f3-b582-5caa3929e2fa" data-sc-field-key="25B5B0E4FF9043769D7A9BA29E2694DB" />
+<input id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_NavigationButtons" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.NavigationButtons" type="hidden" value="545eac1d-8716-41f3-b582-5caa3929e2fa" />
+<input id="fxb_460dba41-5ac6-465b-9913-9094f1ae4ec6_545eac1d-8716-41f3-b582-5caa3929e2fa" name="fxb.460dba41-5ac6-465b-9913-9094f1ae4ec6.545eac1d-8716-41f3-b582-5caa3929e2fa" type="hidden" value="0" /><div data-sc-field-key="71A158FE51A34795B778EA1A48F27007" class="">
+    <span data-sc-field-key="lblMandatoryField" class="errortitlebar">Please enter all the mandatory fields for the form to be submitted</span><span data-sc-field-key="captchaValid" class="errortitlebar">Please select captcha</span>
+</div>
+<span>For questions or comments about your coverage, or for more information, please <a href="/members/common/en-US/abtmolina/compinfo/contactus.aspx">Contact Us.</a></span>
+<p data-sc-field-key="A525DE0DB187468C9B735092A2B9B4FC" class="display-success-msg">Thanks for your feedback.</p><p data-sc-field-key="4713251238334C60A5BF96C7F99DD424" class="display-failure-msg">Unable to take your feedback now, Please try again later.</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+        <script type="text/javascript">
+            (function($) {
+                var $formEl = $("form[data-sc-fxb='31fec8a8-6796-4973-ad94-b4f071394041']");
+                if ($formEl.length && typeof $formEl.init_fxbConditions === 'function') {
+                    var options = {};
+                    $formEl.init_fxbConditions(options);
+                }
+            })(jQuery)
+        </script>
+</form>
+
+</div>
+
+        </footer>
+    </div>
+    
+</body>
+</html>
