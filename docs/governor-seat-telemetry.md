@@ -65,6 +65,18 @@ doing exactly what §7a forbids.
 
 | 11 | wrote the countermeasure to entry 10 as *"`READ FROM <source> AT <time>` or `ILLUSTRATIVE` — there is no third category"* | **there is.** A row genuinely written by the production path and genuinely read back, whose *values* are chosen inputs, is **both** | **Chat Master**, refusing to let me publish a read-time and call it settled | would have republished the same class of error with a stronger-looking label |
 
+| 12 | cited the deployed rows as evidence that mode is a weak difficulty proxy — and nearly let "mode is **inverted**" into the spec | **11 of 16 rows are the same question across all three tiers.** The comparison held the question constant and varied only the tier; the pattern is the denominator, not difficulty | **me**, checking the traffic behind a table I had already accepted | a correct conclusion was one message from resting on a false citation |
+
+**Entry 12 is entry 10 at a higher altitude, and that is what makes it worth
+keeping.** Entry 10 was a fabricated table. This was a **real table, real rows,
+a real read-time — and a conclusion the data could not carry.** Every provenance
+label I had invented would have passed it.
+
+`[DESIGN]` **Third provenance question, missing from my own two-axis rule:**
+where did the row come from · where did its values come from · **what varied and
+what was held constant?** A comparison table needs the third or it is a shape
+with no experiment behind it.
+
 **Entry 11 is entry 10''s own fix being wrong, one turn later** — which is the
 same "one level down" shape as entries 7-8, now applied to a countermeasure
 rather than a spec. **A binary rule felt safer than the thing it replaced, and

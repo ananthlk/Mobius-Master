@@ -42,11 +42,34 @@ Today: `_pp_enabled AND agentic AND rn < max_it AND ledger > 0`. `[READ]`
 
 **Drop `agentic`.** Mode is a *tier*, and it is standing in for *expected
 difficulty*. **A hard question on `normal` needs the critic more than an easy
-one on `agentic`** — and today's data says so: on the deployed rows, `thinking`
-delivered a worst case of **8.3s against a 95s promise**. Those turns were
-trivial and would have run a critic anyway. Difficulty is a **forecast**, which
-is exactly what step 2 introduces — so replace the mode test with the forecast,
-not with another proxy.
+one on `agentic`.** Difficulty is a **forecast**, which is exactly what step 2
+introduces — so replace the mode test with the forecast, not another proxy.
+
+> **CORRECTION, same day.** An earlier version of this paragraph cited the
+> deployed rows — *"thinking delivered a worst case of 8.3s against a 95s
+> promise, so those turns were trivial."* **That citation is withdrawn.** Joined
+> to `chat_turns` at 20:21:49Z, **11 of the 16 rows are the same question —
+> "what is a CARC code?" — sent across all three tiers**, out of four distinct
+> questions in the whole sample. The comparison **holds the question constant
+> and varies only the tier**, so it measures nothing about difficulty.
+>
+> It also fully explains the shape that looked like inversion, and the
+> explanation is arithmetic: same question ⇒ similar delivered time ⇒
+> *worst-as-%-of-promise* is dominated by the **denominator**. Thinking shows
+> 8.7% because 95 is the largest number in the column.
+>
+> **The argument above never needed that data and stands without it.** Recorded
+> rather than deleted, because a good conclusion resting on a bad citation is
+> the same failure as a wrong one — it just survives longer.
+>
+> Nor is the `fast` breach a difficulty result: both `28.6s` and `7.8s` rows are
+> `deploy smoke probe`, and the 28.6s one has `queue_wait = 0.028s` — **warm
+> dispatch, 28.6s of real worker time on an identical probe eight minutes
+> later.** That is a genuine open question, and a different one.
+>
+> `[OPEN]` **What would settle the difficulty question:** one tier across
+> *different* questions, or real traffic. Sixteen rows of one question settles
+> nothing.
 
 **Keep `rn < max_it`, and understand why it is the sound part.** It is a crude
 proxy for the real gate:
