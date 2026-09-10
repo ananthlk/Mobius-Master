@@ -174,27 +174,113 @@ mean, in the style of `060_turn_spans.sql`.
 
 ---
 
-## 5. Definition of done
+## 5. Definition of done — DEMONSTRATED, not asserted
 
-1. A turn enqueued after deploy has `promise` in its queue payload.
-2. `ctx.promise` is populated in the worker; a payload without the key yields
-   `None` and the turn still runs.
-3. **Exactly one** `turn_attestations` row per turn — verified across all four
-   outcomes: **completed, clarification, failed, and empty-payload**. The last
-   two are the ones that prove the `finally` placement; a test that only covers
-   the happy path does not close this item.
-4. `delivered_latency_s` is POST→PUBLISH, and is **larger than** `worker_latency_s`
-   on the same turn. If it is not, the wiring is wrong — that difference is the
-   queue wait and it cannot be negative.
-5. Rerunning migrations on a booted DB is a no-op.
-6. `delivered_cost_c` and `delivered_quality` are **null with a reason**, not
-   absent, not zero, not guessed.
+**Ananth, 2026-09-10: step 1 is done when we have SEEN that everything is
+written, persisted and emitted.** A green test suite does not close this item.
+Unit tests can pass against a mocked writer while nothing reaches the database;
+that is the exact shape this program keeps finding. **Run real turns in dev and
+show the artifacts.**
 
-**Report back:** the observed `delivered_latency_s − worker_latency_s` spread
-over the first day. That number is segments 1+2 of §7c — the queue wait — and it
-determines whether §7's promise figures need restating under a new
-`promise_version`. **It is the first thing this build makes visible that nothing
-has ever measured.**
+Three surfaces must each be evidenced separately (§7b):
+
+| # | surface | means | evidence required |
+|---|---|---|---|
+| **W** | **written** | the promise is in the queue payload at POST | the payload dict, with its `promise` key, for a real request |
+| **P** | **persisted** | the attestation row is in Postgres | `psql` output — the actual row |
+| **E** | **emitted** | the structured log line is in Cloud Logging | `gcloud logging read` output — the actual entry |
+
+### The runs
+
+Exercise **all four outcomes**. The last two are the point — they are what prove
+the `finally` placement, and a happy-path-only demonstration does not close this.
+
+| outcome | how to provoke it | expected |
+|---|---|---|
+| `completed` | any normal question | full row |
+| `clarification` | a query that trips route clarification (`ctx.needs_route_clarification`) | full row, `outcome=clarification` |
+| `failed` | force an exception on the pipeline path in dev | **full row** — a failed turn still closes its promise |
+| empty payload | a turn hitting the early `return` at `orchestrator.py:1385` | **full row**, `outcome` set, not missing |
+
+### The queries — run these, paste the raw output
+
+```bash
+# proxy must be up on 5433
+export PGPASSWORD=$(gcloud secrets versions access latest --secret=db-password)
+PSQL="psql -h 127.0.0.1 -p 5433 -U postgres -d mobius_chat"
+```
+
+**P1 — one row per turn, all four outcomes present:**
+```sql
+SELECT outcome, count(*) FROM turn_attestations
+WHERE published_at > now() - interval '2 hours' GROUP BY 1 ORDER BY 1;
+```
+
+**P2 — exactly one row per turn, no duplicates and no misses.** This is the one
+that catches a `finally` that fires twice, or a terminal that returns before it:
+```sql
+SELECT
+  (SELECT count(*) FROM chat_turns WHERE created_at > now() - interval '2 hours') AS turns,
+  (SELECT count(*) FROM turn_attestations WHERE published_at > now() - interval '2 hours') AS rows,
+  (SELECT count(*) FROM turn_attestations WHERE published_at > now() - interval '2 hours'
+     GROUP BY correlation_id HAVING count(*) > 1 LIMIT 1) AS any_duplicate;
+```
+`turns` and `rows` must match. `any_duplicate` must be empty.
+
+**P3 — the promise clock is wider than the worker clock:**
+```sql
+SELECT correlation_id, tier, promise_version, outcome,
+       round(delivered_latency_s::numeric, 2)  AS post_to_publish,
+       round(worker_latency_s::numeric, 2)     AS worker_only,
+       round((delivered_latency_s - worker_latency_s)::numeric, 2) AS queue_wait
+FROM turn_attestations
+WHERE published_at > now() - interval '2 hours'
+ORDER BY published_at DESC LIMIT 20;
+```
+**`queue_wait` must be >= 0 on every row.** A negative value means the two clocks
+were mixed (§3) and the wiring is wrong — do not explain it away.
+
+**P4 — the nulls are the intended ones, and nothing arrived as a zero or a guess:**
+```sql
+SELECT count(*) FILTER (WHERE delivered_cost_c IS NOT NULL)    AS cost_should_be_0,
+       count(*) FILTER (WHERE delivered_quality IS NOT NULL)   AS quality_should_be_0,
+       count(*) FILTER (WHERE promise_version IS NULL)         AS version_should_be_0,
+       count(*) FILTER (WHERE posted_at IS NULL)               AS posted_should_be_0
+FROM turn_attestations WHERE published_at > now() - interval '2 hours';
+```
+All four must be **0**. A `delivered_cost_c` of `0.0` is a step-1 failure, not a
+cheap turn.
+
+**E — the emit reached Cloud Logging:**
+```bash
+gcloud logging read \
+  'resource.labels.service_name="mobius-chat" AND jsonPayload.event="turn_attestation"' \
+  --limit 5 --freshness=2h --format=json
+```
+Must return entries with the same `correlation_id` values as P3, as structured
+`jsonPayload` fields — **not a formatted message string**. A log line that
+carries the numbers only inside human-readable text is not an emit; nothing can
+read it back.
+
+**W — the payload:** paste the `promise` dict as it was published for one real
+request (a debug log at `post_chat`, or read it off the queue). It must contain
+`version`, `tier`, `posted_at`, and the three promised terms.
+
+### Also required
+
+- **Migration idempotency, demonstrated:** boot twice against a DB that already
+  has the table, and show the second boot is clean.
+- **The pre-deploy case:** one turn whose payload has **no** `promise` key —
+  enqueued before deploy, or hand-crafted. It must run normally and produce a
+  row with a null promise, **not** a synthesised one and **not** a crash.
+- **The report-back number:** the observed `queue_wait` spread (min / p50 / p90 /
+  max) across the day. This is segments 1+2 of §7c and **nothing has ever
+  measured it**. It determines whether §7's latency figures get restated under a
+  new `promise_version`.
+
+**If any surface cannot be evidenced, say which one and why — do not summarise
+the others as success.** A partial demonstration reported as done is worse than
+an honest blocker, because it ends the checking.
 
 ---
 
