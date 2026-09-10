@@ -74,3 +74,61 @@ The override is **coupled to block-not-stored** and ships with it:
 4. **Org:** BAA state for Override 2.
 
 Isolation is **verified** (dev/staging/prod = separate GCP projects/DBs/buckets; prod holds no dev connection string). The `environment`-stamped marker adds the second layer + makes a retrieval guard possible later without a migration.
+
+---
+
+## Chat seat — §3 admit row confirmed, with three flags
+
+**The §3 Chat row matches how I would build it.** Server-side authority, effective
+persist at admit, `published` not `published_private` with the asymmetry stated
+in code, Override 1 never clearing `hard_floor`. No changes requested to that row.
+
+Three things I would want settled before the build, all inside my enforcement.
+
+### 1 · Override 1's justification changed and its outcome did not
+
+As reviewed, Override 1's claim was *"the detector is WRONG — no patient data
+here"*, and "no PHI to govern, therefore no BAA" held **by construction**:
+`overridable` certified name/address-only with **zero structured identifiers**.
+
+§2 now has Override 1 clearing **`light` AND `heavy_attest`**, on the claim *"no
+PHI — it's an example/synthetic"*. If `heavy_attest` can carry structured
+identifiers, the no-BAA justification stops being structural and becomes **the
+user's word** — while the outcome stays identical: `published`, clean, no PHI
+tag, no BAA.
+
+Both tiers reaching the same outcome is defensible. Reaching it on two different
+kinds of guarantee, without that being visible in the emitted verdict, is the
+part I would not want to discover later. **Request:** the persisted marker
+records the tier that was cleared, so "admitted because provably not PHI" and
+"admitted because a human said it was synthetic" are distinguishable forever
+after. Same rule as `blocked_indeterminate` vs `blocked_publish_failed` — one
+value must not stand for two situations.
+
+### 2 · For `heavy_attest` the audit IS the control, so admit must fail closed on it
+
+A synthetic-data claim is **unfalsifiable at admit time**. Nothing can check it;
+only the audit makes it attributable afterwards. The contract already says the
+audit is a compliance requirement rather than provenance — which means, for this
+tier, **the audit is the only control that exists.**
+
+So the ordering matters and is not stated: **if the audit write fails, the admit
+must fail.** Not "log and continue". A failure between admit and audit leaves an
+unattributable admission of possibly-real PHI, which is the exact state the
+audit exists to make impossible. I will build it that way unless PHI rules
+otherwise — flagging because it is a rule, not an implementation detail.
+
+### 3 · Override 3 reads the environment — which way does it fail?
+
+"Impossible in prod" rests on a server-side env + role check. We closed a
+fail-open of exactly this shape hours ago: `PHI_CLASSIFIER_URL` unset meant the
+gate was skipped and the document published unscreened.
+
+An env check answering "am I in dev?" must **fail closed — absent, empty or
+unrecognised means PROD**, and Override 3 is unavailable. Not "not dev, so
+presumably dev". Cheap to state now; expensive to discover from a misconfigured
+deploy that quietly enabled a `hard_floor` bypass.
+
+**Otherwise confirmed. Not starting the build until Ananth clears it directly —
+this is PHI enforcement and it is coupled to the block-not-stored spine, so it
+is his call and not a relay's.**
