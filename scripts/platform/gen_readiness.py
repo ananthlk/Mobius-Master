@@ -71,6 +71,25 @@ _TODO = re.compile(r"#\s*(TODO|FIXME|XXX|HACK)\b")
 _OUTBOUND = re.compile(r"\b(httpx\.(Client|AsyncClient)|urlopen|requests\.(get|post))\s*\(")
 
 
+# STATED LIMIT OF THIS DETECTOR, after its fifth false positive (Chat Master,
+# 2026-09-10, adjudicating governor.py's three handlers): IT COUNTS SYNTAX; THE
+# QUESTION IS WHAT THE HANDLER GUARDS. `except ValueError: return _DEFAULT` is a typed
+# fallback, not a swallow. `except Exception: pass` around a telemetry call that runs
+# AFTER the decision is already produced is correct, not a swallow. Neither is
+# distinguishable from a real swallow by shape alone.
+#
+# So `swallow` is a FLAG, not a verdict, and the rubric must not treat it as one.
+# The check that IS mechanically decidable — and which caught a real defect this one
+# missed — is: NO IMPORT INSIDE A SWALLOWING TRY. A swallowed import is how a
+# capability disappeared for 29 days in this repo while health stayed green.
+
+
+def _import_in_try(node) -> bool:
+    """True when a handler's protected block imports — a swallowed import hides an
+    outage. Decidable by shape, unlike 'is this swallow correct'."""
+    return False  # placeholder: needs the Try node, not the handler; see row 8
+
+
 def _hands_up(node) -> bool:
     """True when the handler RETURNS a value referencing the exception it caught."""
     name = node.name

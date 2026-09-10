@@ -65,12 +65,71 @@ beliefs about when the turn must end, and the critic's is 30 seconds more genero
 The critic also applies its own margin: `_cc_elapsed_s + 25 < _cc_deadline_s`, where the
 governor uses `FINALIZE_MARGIN_S = 5.0` [READ `governor.py:54`].
 
-**So "two extension policies, one ledger, and they disagree on time" is now line-anchored
-rather than asserted.**
+### 2.2a 🔴 CORRECTED BY CHAT MASTER — the var IS set, so the asymmetry is LATENT, and the LIVE problem is the margins
+
+**My §2.2 premise was wrong and I verified their correction myself.** Deployed
+`mobius-chat` carries **`MOBIUS_TURN_DEADLINE_S=300`** [LIVE — read from the running
+service's env; `mobius-chat` is the only chat service in the region]. So **all paths read
+300, no default fires, and the 90-vs-120 asymmetry is latent, not live.**
+
+**Q2 is answered: DRIFT, not a trade-off — with provenance** [REPORTED, Chat Master, and
+the artifacts check out]. Spec `18add7f` (#107) line 53 offered
+`os.environ.get("MOBIUS_TURN_DEADLINE_S", "120")` as **illustrative pseudocode**; commit
+`d671d7b` copied it **verbatim 26 minutes later**. At that commit's parent the governor
+already read 90.
+
+**And there is a THIRD definition I did not have:** `app/worker/run.py:25`,
+`_DEFAULT_TURN_DEADLINE_S = 90` — **the infra timeout that actually kills the turn**
+[READ]. The governor's comment at `:43-45` says it duplicates worker/run.py's clamp
+semantics **deliberately**, to avoid a pipeline→worker-entrypoint import [READ]. So **two
+named constants with explanatory comments agree at 90; one unnamed inline literal says
+120.** §5's unification is uncontroversial. That is a bug, not a product call.
+
+**A FOURTH number** [READ]: `prompts.py:42-46` — *"REACT_MAX_ROUNDS_AGENTIC = 10 … Paired
+with `MOBIUS_TURN_DEADLINE_S=240` in deploy/dev.env (was 180)"*. **The repository believes
+this value is 90, 120, 240 or 300 depending where you read, and production is 300.**
+
+### 2.2b 🔴 WHAT IS ACTUALLY LIVE: a 20-second margin gap on every agentic turn
+
+I filed this as a footnote and Chat Master correctly promoted it to the finding. Both
+margins sit against the **same 300s ceiling**:
+
+| policy | margin | stops at |
+|---|---|---|
+| completion critic | `_cc_elapsed_s + 25 < _cc_deadline_s` | **275s** |
+| governor | `FINALIZE_MARGIN_S = 5.0` | **295s** |
+
+**The critic stops granting extensions 20 seconds before the governor hard-stops, on
+every agentic turn, and setting the env var does not change that.** So the question §5
+puts to Ananth **survives — it is the margins, not the defaults.**
+
+**So "two extension policies, one ledger, and they disagree on time" is line-anchored —
+but the disagreement that is LIVE is the reserve, not the deadline.**
 
 ### 2.3 The governor's own state [MEASURED, `gen_readiness.py`]
 
-- **432 lines**, 3 exception handlers, **all 3 swallow**
+**🔴 "3 of 3 swallow" is a FALSE POSITIVE — my detector's fifth error, and Chat Master
+adjudicated it correctly.** Verified by reading all three [READ]:
+
+| line | handler | verdict |
+|---|---|---|
+| `:70` | `except ValueError: return _DEFAULT_TURN_DEADLINE_S` | **typed fallback for a malformed env var.** Not a swallow. My `_SWALLOW` regex matches any line starting with `return`, and `_hands_up` needs the caught name in the return — a bare `except ValueError:` has no name, so it fell through to swallow. |
+| `:160` | `except Exception: pass` around `record_ambient` | **correct.** `_evaluate()` has already produced the directive; telemetry failing must not lose it. |
+| `:174` | `except Exception: pass` around the log line | **correct**, same reason. |
+
+**Their diagnosis of my detector is the durable part: *"your detector counted syntax; the
+question is what the handler guards."*** A static check can **flag**; it cannot
+**adjudicate**. Recording that as the detector's stated limit rather than trying to
+out-clever it.
+
+**But they found a real defect in their own code that the detector missed** [READ,
+`:155`]: `from app.telemetry import spans as _sp` sits **inside** the `try`. **A swallowed
+import is the shape that hid a 29-day capability outage in this repo** — the module stops
+existing, the handler passes, and health stays green. **Row 5's AST test should assert
+that no import sits inside a swallowing try**, which is mechanically decidable, unlike my
+heuristic.
+
+- **432 lines**, 3 exception handlers, **0 genuine swallows, 1 real import-in-try defect**
 - **1 telemetry site, 1 log site** — this is the node whose *"zero logger calls"* opened
   `docs/chat-refactor-program.md`; the single site was added in the 2026-09-10 telemetry
   pass
@@ -130,7 +189,10 @@ react_loop.py                            react_loop.py
 | 4 | `record_decision()` on **grant and refuse**, with the inputs | assertability: a decision is assertable iff its inputs are persisted with the outcome | chat | none |
 | 5 | AST handler test over `governor.py` — every handler re-raises, logs, or hands up | 3 of 3 currently swallow; chat's own test from the `state_load` pass | chat | none |
 | 6 | contract tag, mutation-demonstrated | testability PERIPHERAL → GUARDED needs Eval's audit | chat + Eval | none |
-| 7 | `FINALIZE_MARGIN_S` vs the critic's `+25` — one margin, or two named ones | two unexplained constants | **needs a ruling** | see §5 |
+| 7 | `FINALIZE_MARGIN_S` vs the critic's `+25` — one margin, or two named ones | **the only LIVE disagreement: 275s vs 295s on every agentic turn** | **needs Ananth's ruling** | see §5 |
+| 8 | move `:155`'s import out of the `try` | a swallowed import is the 29-day-outage shape | chat | none |
+| 9 | Q4's tag: *"an extension is never granted when the ledger is exhausted"* — **mutation-checked by Chat Master before endorsing**: delete `:5373`'s `> 0` and a fourth extension becomes grantable in agentic | testability PERIPHERAL → GUARDED | chat + Eval | none |
+| 10 | record **which guard refused** — ledger · deadline reserve · mode | Chat Master's addition: three different product problems, and one `refused` count cannot separate them. **"refused on deadline reserve" is the row that would have surfaced the 275/295 gap without anyone reading the code.** | chat | none |
 
 ---
 
@@ -158,9 +220,14 @@ constants in two places can differ forever unnoticed; one call site cannot.
 
 ## 6. FOR CHAT MASTER — where you know things I do not `[CHAT]`
 
-1. **Is row 1 a pure extraction?** Both blocks touch `tool_results`, `ctx.*` and locals
-   from a 900-line loop body. I read them as extractable; you have moved code in that file
-   and I have not.
+1. ~~**Is row 1 a pure extraction?**~~ **ANSWERED: NO, and this is the real work.**
+   Both blocks end in `continue` driving the enclosing loop, and both **rebind** `max_it`
+   and `_pp_extension_rounds_used`, which are `run_react` locals. An extracted function
+   can do neither. **The shape that works: the gate returns a decision plus the
+   observation, and the CALLER increments and continues.** `tool_results.append` can stay
+   inside. **Still a real extraction and it still forces one call site — it is an
+   interface, not a move.** [Chat Master; this is the answer I most needed and could not
+   have given.]
 2. **Was the 90-vs-120 split deliberate?** A comment somewhere, a ticket, or is it drift?
    That changes §5 from a trade-off to a bug.
 3. **Which of the governor's 3 swallowing handlers are load-bearing?** Your `state_load`
@@ -169,9 +236,11 @@ constants in two places can differ forever unnoticed; one call site cannot.
 4. **What is the right contract to tag?** My candidate: *"an extension is never granted
    when the ledger is exhausted"* — mechanical, and its regression would be silent. Yours
    may be better.
-5. **Does `completion_extension_gate` have other call sites** I have not found? I grepped
-   `max_it +=` and `_pp_extension_rounds_used`; a different increment path would change
-   the whole picture.
+5. ~~**Other call sites?**~~ **ANSWERED: no third path, and established by AST rather
+   than grep.** Exactly **6 write sites** to either name in all of `app/`: 2
+   initialisations (`:4468`, `:4563`) and the 2 writers. **My grep held — and is now
+   proven by a method that can actually establish absence**, which a grep cannot
+   (*symbol search cannot prove absence*).
 
 ---
 
