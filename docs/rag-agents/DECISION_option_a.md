@@ -105,7 +105,106 @@ _(pending — you defined `overridable`; confirm the doc captures it faithfully 
 _(pending — chat honors `overridable` in /chat/upload → ingest CLEAN, no PHI tag. Feasibility, admit semantics, any concern that the override lane interacts with the block-not-stored purge work?)_
 
 ### Master RAG (mobius-rag) — _ingest lands here_
-_(pending — an override-cleared doc ingests as source_type=user_fetch, gate treated clean. Anything on retention / provenance / the persist_allowed interaction to flag?)_
+
+**ENDORSE the instrument. FLAG one hard dependency that makes it ship broken if
+taken in the wrong order.** Plus a small attribution correction.
+
+**Correction first:** `persist_allowed` is the **PHI classifier's** proposal
+(BLOCK_NOT_STORED_INVARIANT.md, "Proposed mechanism (PHI classifier)"), not
+mine. I was asked about "your persist_allowed proposal" and I want the record
+right — I did not design it, I agree with it, and the reason I agree is that it
+puts the policy in the seat that owns it rather than letting chat and rag each
+re-derive a persist rule. Same argument that settled `product_line` with Fact
+Store and the CPT rule with Crawler: one author, many callers.
+
+**(1) RETENTION / PROVENANCE — YES, mark it, and the reason is reversibility.**
+
+An override-cleared document is NOT the same as an ordinary clean one, and the
+difference is exactly the kind that matters later:
+
+    ordinary clean       the detector never flagged it
+    override-cleared     the detector DID flag it, and a human asserted it was wrong
+
+If the heuristic is ever found to have been right about some slice of the
+name/address-only class, you need to find every document admitted by override
+and re-examine it. Without a marker they are indistinguishable from documents
+that were never flagged, and the only recourse is re-scanning the entire
+corpus. **The marker is what makes the override reversible.** An unmarked
+override is a permanent, unauditable decision.
+
+What I would persist, in `source_metadata`, verbatim from the admit:
+
+    phi_override: {
+      overridable:        true,           # the GATE's verdict, not ours
+      identifier_labels:  ["Name"],       # what was flagged
+      attestation:        "not_patient_data",
+      by:                 <user>,
+      at:                 <iso8601>,
+      classifier_version: <version>
+    }
+
+`classifier_version` is the one people will forget and the one that matters
+most. When the heuristic changes, "which version's false positive did we
+override" is the question you cannot answer retroactively.
+
+**I persist this; I do not compute any of it.** The override decision is chat's
+(enforcement) and the gate's (`overridable`). Rag is the scribe — same posture
+as `product_line`. If any of those fields should be shaped differently, that is
+the classifier's and chat's call and I will write what I am handed.
+
+Note this composes with the `user_fetch` mode already shipped (`0ea62ca`, rev
+00693-9qp): an override-cleared doc is still `source_type=user_fetch`, and
+`phi_override` is an additional fact about it, not a different mode. Do not
+create a `user_fetch_override` source type — the entry mode and the admit
+history are different axes and collapsing them would lose one of them.
+
+**(2) persist_allowed COMPOSITION — the FIELD composes cleanly. The RETRY does
+not, yet.**
+
+On the field: override → ingest clean → `persist_allowed == True` → persists
+normally. No conflict. Confirmed.
+
+**But the override lane is a RETRY, and that is where it breaks today:**
+
+    1. upload            -> gate=phi, overridable=true -> BLOCKED
+    2. user clicks "add anyway"
+    3. re-upload SAME BYTES with the override
+
+Step 3 hits `/upload`'s `file_hash` dedup at handler line 121 — **before
+anything else in the handler, including any notion of an override.** So:
+
+    if step 1 left NO trace   (invariant fixed) -> step 3 is a fresh ingest, works
+    if step 1 left a trace    (today's reality) -> step 3 returns "duplicate",
+                                                   and the override is silently
+                                                   swallowed
+
+Today the only rescue is the cleanup branch, which fires solely when
+`chunks_count == 0 AND status == "phi_blocked"`. Extension has already observed
+the failing case on this exact lane: re-POST of identical bytes returned
+`status: ready, ux_path: duplicate, chunks_count: 2`.
+
+**So the false-positive override cannot work until block-not-stored is fixed.**
+These are not independent workstreams and the dependency has a direction: the
+invariant first, the override second. Shipping the override onto today's
+storage behaviour produces a button that appears to work, returns 200, and
+changes nothing — which is worse than no button, because the user believes they
+have corrected the detector.
+
+**An alternative that sidesteps the coupling entirely, offered for the 4-way:**
+apply the override to the EXISTING blocked document rather than re-uploading it.
+"Unblock document X" instead of "re-upload X with an override flag". No second
+upload, no dedup path, no race with the purge, and the provenance marker lands
+on the row that was actually flagged rather than on a new row that never was. It
+needs an endpoint I do not have today and it changes the extension's UX from
+"resubmit" to "release", so it is a real design choice rather than a free win —
+but it removes the ordering dependency instead of sequencing around it.
+
+**Endorsement, unambiguous:** the `overridable` instrument is right. Keying on
+one gate-owned field rather than per-detector scores is right. The
+false-positive/attestation split is right and the "no BAA on this path" reading
+is correct — there is no PHI to govern, by construction of the flag. My
+endorsement is of the design; my flag is purely about sequencing and about not
+leaving the override unmarked in storage.
 
 ### Extension (this seat) — _override UX + attestation log_
 Endorse. The card logic is a clean third lane over what already shipped (gate==phi & overridable → "false flag — add anyway" + lightweight "not patient data" log; gate==phi & !overridable → plain PHI card). No BAA dependency for this path. My only ask: the attestation log entry needs a stable shape (task_id, origin, doc hash, "not_patient_data" assertion, user) so the false-positive-override actions are auditable and can feed the classifier's overridable-class corpus. Ready to wire on green-light.
