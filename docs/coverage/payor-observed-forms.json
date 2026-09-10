@@ -1,0 +1,176 @@
+{
+ "artifact": "payor-observed-forms",
+ "exported_by": "payor-fact-store",
+ "exported_at": "2026-09-10",
+ "note": "MEASURED surface forms only, per canonical slug. kinds: display (documents.payer), caller (ingest ledger as callers sent it), host (ingest-observed + registry-verified domains). Family/exact tagging is Lexicon's validated pass via payer-canonical?mode=strict.",
+ "slugs": {
+  "ahca": {
+   "canonical": "AHCA",
+   "display_forms": [
+    "AHCA"
+   ],
+   "caller_forms": [
+    "AHCA"
+   ],
+   "host_forms": [
+    "ahca.myflorida.com",
+    "flrules.elaws.us",
+    "flrules.org",
+    "flsenate.gov"
+   ]
+  },
+  "sunshine_health": {
+   "canonical": "Sunshine Health",
+   "display_forms": [
+    "Sunshine Health"
+   ],
+   "caller_forms": [
+    "Sunshine Health"
+   ],
+   "host_forms": [
+    "sunshine_health.local",
+    "sunshinehealth.com",
+    "www.sunshinehealth.com"
+   ]
+  },
+  "aetna": {
+   "canonical": "Aetna",
+   "display_forms": [
+    "Aetna"
+   ],
+   "caller_forms": [
+    "Aetna"
+   ],
+   "host_forms": [
+    "aetnabetterhealth.com"
+   ]
+  },
+  "bbhc": {
+   "canonical": "BBHC",
+   "display_forms": [
+    "BBHC"
+   ],
+   "caller_forms": [],
+   "host_forms": [
+    "bbhcflorida.com"
+   ]
+  },
+  "cfbhn": {
+   "canonical": "CFBHN",
+   "display_forms": [
+    "CFBHN"
+   ],
+   "caller_forms": [],
+   "host_forms": [
+    "cfbhn.org"
+   ]
+  },
+  "cfchs": {
+   "canonical": "CFCHS",
+   "display_forms": [
+    "CFCHS"
+   ],
+   "caller_forms": [],
+   "host_forms": [
+    "cfchs.org"
+   ]
+  },
+  "lsf_health_systems": {
+   "canonical": "LSF Health Systems",
+   "display_forms": [
+    "LSF Health Systems"
+   ],
+   "caller_forms": [],
+   "host_forms": [
+    "lsfhealthsystems.org"
+   ]
+  },
+  "nwf_health_network": {
+   "canonical": "NWF Health Network",
+   "display_forms": [
+    "NWF Health Network"
+   ],
+   "caller_forms": [],
+   "host_forms": [
+    "nwfhealth.org"
+   ]
+  },
+  "sefbhn": {
+   "canonical": "SEFBHN",
+   "display_forms": [
+    "SEFBHN"
+   ],
+   "caller_forms": [],
+   "host_forms": [
+    "sefbhn.org"
+   ]
+  },
+  "sfbhn": {
+   "canonical": "SFBHN",
+   "display_forms": [
+    "SFBHN"
+   ],
+   "caller_forms": [],
+   "host_forms": [
+    "sfbhn.org"
+   ]
+  },
+  "humana": {
+   "canonical": "Humana",
+   "display_forms": [
+    "Humana"
+   ],
+   "caller_forms": [],
+   "host_forms": [],
+   "tracked": false
+  },
+  "wellcare": {
+   "canonical": "WellCare",
+   "display_forms": [
+    "WellCare"
+   ],
+   "caller_forms": [],
+   "host_forms": [],
+   "tracked": false
+  },
+  "simply_healthcare": {
+   "canonical": "Simply Healthcare",
+   "display_forms": [
+    "Simply Healthcare",
+    "Payor.simply_healthcare"
+   ],
+   "caller_forms": [],
+   "host_forms": [],
+   "tracked": false
+  },
+  "molina_healthcare": {
+   "canonical": "Molina Healthcare of Florida",
+   "display_forms": [
+    "Molina Healthcare of Florida"
+   ],
+   "caller_forms": [],
+   "host_forms": [],
+   "tracked": false
+  },
+  "unitedhealthcare": {
+   "canonical": "United Healthcare",
+   "display_forms": [
+    "United Healthcare",
+    "Uhcprovider"
+   ],
+   "caller_forms": [],
+   "host_forms": [],
+   "tracked": false
+  },
+  "ambetter": {
+   "canonical": "Ambetter",
+   "display_forms": [
+    "Ambetter",
+    "ambetterhealth.com"
+   ],
+   "caller_forms": [],
+   "host_forms": [],
+   "tracked": false
+  }
+ }
+}
