@@ -192,6 +192,12 @@ Consequences, all of which must be in the design rather than discovered:
    rather than against 28 tools.
 4. **A snapshot makes the A/B honest**: both arms are then provably reasoning about the
    same catalogue.
+5. **When the native export lands, check it against the prose parse — and treat any
+   disagreement as a finding, not a merge conflict.** Tool Selection seat, 2026-09-10.
+   Two independent derivations of the same catalogue already agree (57 tools, 28 + 29,
+   pinned to `00977-8bl`); if a registry-native export and a parse of
+   `/chat/skills-manifest` ever disagree on the tool set, **one of the two paths is lying
+   about what production offers**, and that is worth more than whichever number wins.
 
 ### The UX — its own surface, and what it must show
 
