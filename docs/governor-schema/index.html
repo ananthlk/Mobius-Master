@@ -204,6 +204,38 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:.05re
 
 
 
+<h2>7b · How the attestation is presented — three surfaces, three audiences</h2>
+<p class="sub">One record, written once. Three readers who need completely different things from it. Getting this wrong in either direction is costly: a user shown the system's view learns nothing and loses trust; a system given the user's view cannot compute conformance.</p>
+
+<div class="ov"><table>
+<tr><th>surface</th><th>audience</th><th>carries</th><th>when</th><th>authority</th></tr>
+<tr><td><b>the row</b><br><code>turn_attestations</code></td><td>the system, and us</td><td>all terms, promised and delivered, plus <code>promise_version</code> and settle state</td><td>at settle, after the turn's calls land</td><td><b>source of truth.</b> Conformance is computed from here and nowhere else</td></tr>
+<tr><td><b>the line</b><br>structured log</td><td>whoever is debugging one turn</td><td>the same fields, flat, keyed by <code>correlation_id</code></td><td>at settle</td><td><b>debug only.</b> Never aggregate a conformance number out of logs</td></tr>
+<tr><td><b>the signal</b><br>counter / histogram per tier per term</td><td>alerting</td><td>breach rate, delivered distribution</td><td>at settle</td><td>derived. Alerts on trend, never the record</td></tr>
+</table></div>
+
+<div class="note"><b>Why the row and the line are not the same thing, even though they carry the same fields.</b> Logs are sampled, rotated, and lossy; a conformance rate computed from them silently reports on whatever survived retention. The row is the population. <b>Keep both</b> — the line is what makes a single weird turn diagnosable at 2am without a query — but never let the line become the source.</div>
+
+<h3>What the USER sees — and the answer is almost always nothing</h3>
+
+<div class="ov"><table>
+<tr><th>moment</th><th>show</th><th>why</th></tr>
+<tr><td><b>before</b> the turn</td><td><b>the promise</b> — "usually about 30 seconds"</td><td>this is the surface that actually helps. An expectation set <b>up front</b> converts a wait into a wait-of-known-length</td></tr>
+<tr><td><b>during</b>, when the promise is being exceeded</td><td>a single honest line — "taking longer than usual"</td><td>the user already knows. Saying it first is the difference between a system that is slow and a system that is broken</td></tr>
+<tr><td><b>after</b>, promise kept</td><td><b>nothing at all</b></td><td><b>silence is the report.</b> A badge saying "met our SLA" on every answer is noise that trains the user to ignore the one time it matters</td></tr>
+<tr><td><b>after</b>, promise broken</td><td>only if <b>actionable</b>, and phrased as an offer, not an apology</td><td>"this ran long — worth re-asking in thinking mode?" gives the user a move. "We exceeded our latency SLA" gives them nothing</td></tr>
+</table></div>
+
+<div class="note"><b>Never show the user cost.</b> Cost is a system term. It is also, right now, an <b>exploration bound deliberately set 15× above measured</b> (§7) — a number that would be actively misleading to a reader who took it as a price. The user's two terms are <b>latency</b> (which they experience) and <b>quality</b> (which they are affected by). Cost is ours.</div>
+
+<div class="note"><b>The attestation is not a user feature, and should not be built as one.</b> Its job is to make the promise falsifiable. The user-facing pieces above are a <i>consequence</i> of having it — a way to be honest about a bad turn — not the reason to write it. If the presentation work starts driving the record's shape, the record will end up carrying what looks good rather than what is true.</div>
+
+<h3>The two failure modes to design against</h3>
+
+<div class="note"><b>1. The emit sits on the success path.</b> <b>A turn that timed out at 200s, errored, or was abandoned is the single most valuable attestation there is</b> — and it is exactly the one that goes missing when the write lives at the end of the happy path. It must be written in a <code>finally</code>, with an outcome field (<code>completed</code> / <code>errored</code> / <code>abandoned</code> / <code>unsettled</code>). This is precisely the shape found in <code>mcp_adapter.py</code> today, where the success branch carries <code>signal="no_sources"</code> beside a populated <code>sources</code> list — <b>the path that runs and the path that reports diverged.</b></div>
+
+<div class="note"><b>2. Nobody reads it.</b> The cost bound (§7) is 15× wide <i>specifically so the distribution can be observed</i>. If no one takes that reading, the bound is not an instrument, it is an unmonitored blank cheque — and the attestation becomes the thirteenth producer-without-a-consumer in this program. <b>The report is therefore part of the build, not a follow-on:</b> conformance by tier by promise version, over a window, with the delivered distribution beside the promised number. <b>If the report is not in scope, the attestation is not worth writing.</b></div>
+
 <h2>8 · What is missing — RECALL, and how we start tracking it</h2>
 <p class="sub">Accuracy has a live proxy. Recall has nothing. Marked here so the gap is tracked rather than assumed away.</p>
 <div class="ov"><table>
