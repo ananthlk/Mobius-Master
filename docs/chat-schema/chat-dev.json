@@ -49,7 +49,7 @@
     "owner": "chat + Eval",
     "gate": "every segment timed AND each timed segment's attribution verified against a known-external call \u2014 an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
-    "n": 34
+    "n": 35
    },
    {
     "id": "P3",
@@ -5384,6 +5384,14 @@
    "findings": [
     [
      "bad",
+     "OWNER(chat): THE SOURCE BADGE IS COMPUTED WRONG ON EVERY MCP TURN, AND THE MODEL'S OPINION IS WHAT RESCUES IT. mcp_adapter.py:281 is the SUCCESS branch: it has real text and it builds a populated SourceRef -- and it still sets signal='no_sources', the identical literal its own failure branch sets at :288. It is the registry default (registry.py:113) that was never overridden on the success path, so no MCP tool can ever declare that it found something. integrate.py:733 then reads that signal FIRST in the badge precedence chain, so one no_sources poisons the badge for the whole turn -- including turns where corpus search returned real documents alongside. Measured, 30 days: 206 turns badged no_sources, of which 157 CARRIED SOURCES; samples include a turn whose first source is literally 'MCP: get_market_size', and turns carrying 27 and 15 real PDF sources. Of the 27 turns carrying an MCP source, all 27 compute to no_sources, but only 12 are BADGED it -- the other 15 escape because integrate.py:1539 lets the model's source_confidence_override replace the computed badge unconditionally. So the deterministic computation is wrong 100% of the time here and the user sees a wrong badge 44% of the time, decided by whether the LLM happened to volunteer an override. Two scope bounds, both checked: react_retry_guard is NOT affected -- _is_zero_result (react_retry_guard.py:332-340) also requires an empty sources list, and these envelopes carry one, so tool-exhaustion does not misfire. And the MCP adapter does NOT explain the other 145 sourced-but-badged-no_sources turns; those carry no MCP source and have a separate, still-unidentified cause. Found 2026-09-10 while checking whether the market/analytics tools were real capability."
+    ],
+    [
+     "good",
+     "THE MARKET/ANALYTICS TOOLS ARE REAL CAPABILITY, NOT A PROMISE AHEAD OF THE PRODUCT. This was an open product-truth question: 26 market/analytics tools are selected, dispatch successfully, and return no_sources every time, and the working hypothesis was 'the plumbing is real and the data is not'. That hypothesis is WRONG, and the reason it looked true is the badge defect above. Verified end to end 2026-09-10 against the deployed roster/credentialing service: /market-size returns 2024 FL Medicaid rollups (334 COMMUNITY_BH orgs, $402.4M, 1.386M benes, 5.13M claims, decomposed intake/high-acuity/ongoing); /rate-benchmarks returns per-HCPCS p25/p50/p75 payment-per-claim and revenue-per-bene; /market-panel-size returns monthly panel-size indices by provider type; /market-map returns 188KB of geo-located orgs with revenue, claims and benes. The chain behind them is real too: MCP tool get_market_size (provider_skill/mcp/server.py:263) -> fetch_market_size (utilization_benchmarks.py:3837) -> BigQuery org_profile_v2. Two caveats kept: my first probes 404'd because these endpoints are POST, not GET -- a method mismatch is not an absent capability, and I nearly filed it as one; and /org-rate-gap and /org-radar returned empty for the org slug and name I guessed, which is unresolved entity resolution on my probe, not demonstrated absence of data."
+    ],
+    [
+     "bad",
      "OWNER(chat): 13% OF TURNS NEVER REACH THE INTEGRATOR, AND THE USER CAN TELL. Measured over 2,740 live turns / 60 days by whether the integrator's own 'Composing answer' emit appears in thinking_log: 2,357 ran it, 383 did not.\n\n  refuse (PHI / clinical guidance)  217\n  clarify (needs clarification)      83\n  task mode                           5\n  unexplained by any known bypass    83\n\nAll four publish ctx.final_message as raw markdown straight from react_loop \u2014 no answer card, no citations, no critique, no enrichment. That is exactly Ananth's report of sometimes getting a message that reads like it came from react and sometimes not: it did. The bypass is set at three sites in react_loop (1222 refuse, 1767 clarify, 2426 still-indexing) and honoured by two early returns in orchestrator.py (870 task, 894 bypass), each building its own assistant_envelope inline with empty ui_blocks, empty sources and empty next_steps.\n\nTHE 83 UNEXPLAINED ARE A SEPARATE ITEM. They match none of the three bypass markers and are not task mode. Cause not established \u2014 do not fold them into the same finding until someone looks.\n\nThe bypasses are individually defensible (a refusal genuinely has no card to build) but the CONSEQUENCE is not scoped to formatting: on those 383 turns nothing runs the critic, nothing runs the enricher, nothing emits the diagnostics, and the evidence ledger assembled during the loop is discarded unread."
     ],
     [
@@ -5450,6 +5458,18 @@
     },
     {
      "closed": false,
+     "owner": "chat",
+     "own": true,
+     "deploy": null
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true,
+     "deploy": null
+    },
+    {
+     "closed": false,
      "owner": "",
      "own": true,
      "deploy": null
@@ -5495,7 +5515,7 @@
     [
      "functionality",
      "amber",
-     "3 open"
+     "4 open"
     ],
     [
      "testability",
