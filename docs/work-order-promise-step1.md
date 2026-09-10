@@ -198,6 +198,46 @@ has ever measured.**
 
 ---
 
+## 7. QUESTION FOR CHAT — why are there ten publish call sites?
+
+**Ananth is asking this directly, and it is not rhetorical.**
+
+`orchestrator.py` has **three publish terminals reached from ten call sites**:
+
+| terminal | call sites |
+|---|---|
+| `_publish_completed` (:1379) | :889, :909, :988, :1090 |
+| `_publish_failed` (:1659) | :836, :921, :996, :1063 |
+| `_publish_clarification_or_refinement` (:1093) | — |
+
+Plus an early `return` at :1385 when `ctx.response_payload` is empty.
+
+**The question:** is this ten *distinct outcomes* the pipeline genuinely has, or
+is it one outcome reached ten ways because the exit path was never consolidated?
+
+**Why it matters beyond tidiness.** Ten exits is ten places for a future
+telemetry, persistence or contract change to be added in nine of them. That is
+the shape this program keeps finding — a producer wired at most of its sites and
+silently absent at the rest. The `finally` in §2c is a **workaround for this
+structure, not a fix**: it guarantees the attestation closes once regardless of
+which exit fired, but it does not make the exits comprehensible.
+
+**What we want back from Chat, in words, not code:**
+1. What distinguishes each of the ten? Name them.
+2. Which are genuinely different outcomes vs. the same outcome at different
+   depths of a `try` nest?
+3. Is there a reason not to consolidate them behind one exit that takes an
+   outcome enum?
+4. **Do all ten actually fire in production, or are some unreachable?** A
+   `_publish_*` call site that never runs is a different problem from a
+   redundant one, and only Chat can say which.
+
+**This is a question, not a work item.** Do not refactor the exits as part of
+step 1 — the answer shapes step 2, and consolidating exits while wiring a new
+`finally` through them is two risky changes in one deploy. Answer first.
+
+---
+
 ## 6. Standing constraints
 
 - Dev first. Tested in dev, then commit, then deploy, then next item.
