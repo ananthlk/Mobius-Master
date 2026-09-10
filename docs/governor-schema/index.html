@@ -144,7 +144,7 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:.05re
 <tr>
  <td><b>FAST</b><br><span class="tag">quick</span></td>
  <td><b>~13s</b><br><span class="legend">p50 14.6 · p90 33.9</span></td>
- <td><b>~5¢</b><br><span class="legend">5× headroom · measured p50 $0.0104</span></td>
+ <td><b>~16¢</b><br><span class="legend">15× headroom · measured p50 $0.0104</span></td>
  <td><b>no assurance</b> on recall or accuracy — the groundedness floor never runs</td>
  <td>simple look-ups. A known entity, a single fact, a definition</td>
  <td><b>narrow, and only tools that can return inside the budget.</b> A tool that cannot answer in ~13s does not belong in a fast turn</td>
@@ -152,7 +152,7 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:.05re
 <tr>
  <td><b>NORMAL</b><br><span class="tag">copilot</span></td>
  <td><b>~31s</b><br><span class="legend">p50 31.3 · p90 56.1</span></td>
- <td><b>~15¢</b><br><span class="legend">5× headroom · measured p50 $0.0303</span></td>
+ <td><b>~45¢</b><br><span class="legend">15× headroom · measured p50 $0.0303</span></td>
  <td><b>some assurance on all three.</b> Groundedness floor runs; 96.1% pass</td>
  <td>the default. Most real questions</td>
  <td>broader</td>
@@ -160,13 +160,13 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:.05re
 <tr>
  <td><b>THINKING</b><br><span class="tag">agentic</span></td>
  <td><b>~95s</b><br><span class="legend">p50 95.5 · p90 218.5</span></td>
- <td><b>~27¢</b><br><span class="legend">5× headroom · measured p50 $0.0538 · p90 $0.38</span></td>
+ <td><b>~81¢</b><br><span class="legend">15× headroom · measured p50 $0.0538 · p90 $0.38</span></td>
  <td><b>best available quality and recall</b> — and the longest wait. 98.1% groundedness pass</td>
  <td>multi-hop, cross-source, anything filing-critical</td>
  <td>widest</td>
 </tr>
 </table></div>
-<div class="note"><b>The cost term carries 5× headroom, deliberately — Ananth, 2026-09-10.</b> Promised <b>5¢ / 15¢ / 27¢</b> against measured p50s of 1.04¢ / 3.03¢ / 5.38¢. <span class="sub">Set at 3× earlier the same day and raised to 5× within the hour — <b>the multiplier is a dial being tuned, not a derived figure</b>, which is exactly why it is stated as headroom over a preserved measurement rather than written in as the cost.</span> <b>This is a stated ceiling, not a measurement</b>, and the legend keeps the measured figure beside it so the two are never confused. The reason is admission: a cost promise set at today's p50 <b>silently excludes every model more expensive than the ones we happen to run now</b> — the promise would quietly become a model whitelist, enforced by a number nobody revisits. The headroom keeps the door open as the roster grows. <b>Check the tail before trusting it:</b> thinking already reaches <b>$0.38 at p90</b> — <b>above the 27¢ ceiling</b> — so this is a <b>p50 commitment and the tail will breach it</b>. That is acceptable only because the attestation (§7a) records every breach; a headroom nobody measures is a guess, one that is measured becomes evidence for where the real ceiling belongs. <b>When the roster settles, the headroom should shrink</b> — it is a temporary allowance, and leaving it in place indefinitely turns a contract into a blank cheque.</div>
+<div class="note"><b>The cost term carries 15× headroom, deliberately — Ananth, 2026-09-10.</b> Promised <b>16¢ / 45¢ / 81¢</b> against measured p50s of 1.04¢ / 3.03¢ / 5.38¢. <span class="sub">Set at 3× that day, then 5×, then 15× within the hour — <b>the multiplier is a dial being tuned, not a derived figure</b>, which is exactly why it is stated as headroom over a preserved measurement rather than written in as the cost. The measured p50s do not move when the dial does.</span> <b>This is a stated ceiling, not a measurement</b>, and the legend keeps the measured figure beside it so the two are never confused. The reason is admission: a cost promise set at today's p50 <b>silently excludes every model more expensive than the ones we happen to run now</b> — the promise would quietly become a model whitelist, enforced by a number nobody revisits. The headroom keeps the door open as the roster grows. At 15× the tail now fits: thinking's <b>$0.38 p90</b> sits well under the 81¢ ceiling, so the promise binds on <b>neither p50 nor p90</b> today.<br><br><b>The cost that this buys — say it plainly.</b> At 15×, the cost term <b>no longer separates the tiers</b>: fast is promised <b>16</b>¢, which is <b>3× what thinking actually costs</b> (5.38¢). A caller reading the promise cannot use cost to tell the tiers apart, and nothing in the system will refuse a turn on cost grounds. <b>That is the deliberate trade</b> — admission of new models over discrimination between tiers — and it holds only while the roster is expanding. The moment the roster settles, <b>this is the first number to bring back down</b>, or the cost leg of the promise is decorative. <b>The attestation still records delivered cost every turn</b> (§7a), so the evidence for where the real ceilings belong accumulates regardless of where the dial sits. <b>When the roster settles, the headroom should shrink</b> — it is a temporary allowance, and leaving it in place indefinitely turns a contract into a blank cheque.</div>
 
 <div class="note"><b>Cost is BLENDED, and the blend is the normal case.</b> <span class="tag t-part">MEASURED 30d</span> A turn is <b>not one model</b>: median <b>8.6 LLM calls</b> across <b>2.1 distinct models</b>, and only <b>306 of 1,496 turns (20%) use a single model</b> — 1,190 blend two or more, up to ten. So the promise's cost term is the <b>sum over the turn</b>, never a model's price. <b>Do not attribute a turn's cost to <code>chat_turns.model_used</code></b> — that is one label on a blended turn, and grouping blended cost by it produces a per-model cost table that is arithmetically wrong. <span class="sub">Recorded because this page did exactly that once.</span></div>
 
