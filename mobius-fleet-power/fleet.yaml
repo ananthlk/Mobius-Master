@@ -42,7 +42,12 @@ services:
 
   # --- Payor / facts ---
   mobius-payor:                {mode: pinned, min: 1, max: 2, note: "existing min=1 kept; drop to active if latency doesn't matter"}
-  mobius-phi-classifier:       {mode: pinned, min: 1, max: 10, note: "HIPAA gate; throttled CPU so idle min is cheap"}
+  # min=1 REQUIRED (correctness, not cost): chat's message PHI gate calls
+  # /message-check with a 4s timeout (mobius-chat app/api/chat.py:247) and is
+  # fail-closed; a cold start loads Presidio/spaCy in ~15s, so min=0 turns
+  # every cold start into a FALSE-BLOCK of a legitimate user message. Idle
+  # min being cheap (~$39/mo at the idle SKU) is the secondary point.
+  mobius-phi-classifier:       {mode: pinned, min: 1, max: 10, note: "HIPAA gate — min=1 is a correctness invariant, see comment"}
   mobius-healthcare:           {mode: standby}
 
   # --- Workers / agents ---
