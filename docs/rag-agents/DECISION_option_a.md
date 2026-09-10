@@ -10,6 +10,33 @@ _2026-09-09 · lane coordinator: Extension · full detail in `USER_FETCH_PAIRING
 
 ---
 
+## ⇒⇒ MODEL REVISED (Ananth, 2026-09-10) — TWO overrides + org-level BAA. This supersedes the `overridable`-as-hard-gate framing below.
+
+Ananth sharpened the model. Two overrides, distinguished by **what the human asserts about PHI**, plus BAA moved to where it actually lives (the org, not the user).
+
+| | **Override 1 — "there is NO PHI"** | **Override 2 — "there IS PHI, admit it anyway"** |
+|---|---|---|
+| Human's claim | "I reviewed it; the flag is wrong / this is an **example or synthetic** — no real patient data" | "I reviewed it; there **is** real PHI and I want it ingested" |
+| Ingests as | **CLEAN** (no PHI tag) | **PHI-tagged** |
+| Gate | human review + attestation + **mandatory audit** | **org-level BAA** (`hipaa_mode_allowed` / Key-1), owned by the **Org agent** |
+| Applies to | **any flag, including high-confidence** — because examples/synthetic data trip even strong detectors (a fake SSN in a sample form) | real-PHI blocks |
+| No BAA? | irrelevant — no PHI to govern | **HARD STOP — suppressed** |
+
+**Two changes from the seat design below — read these, because the seat reviews predate them:**
+
+1. **Override 1 is BROADER than `overridable`.** The seats scoped the false-positive override to a narrow, low-confidence `name/address-only` class and made high-confidence detections **non-overridable by construction**. Ananth's Override 1 works on **any** flag, including high-confidence, because the motivating case is **examples / synthetic data** (a realistic-looking fake SSN in a sample form is high-confidence-flagged but is genuinely not PHI). So `overridable` is **no longer a hard gate**; it becomes an **attestation-weight signal**:
+   - low-confidence flag (Healthy-Start class) → light "not patient data" confirm;
+   - high-confidence flag (looks like a real SSN) → heavier explicit attestation ("I confirm this is synthetic / an example / not a real patient") + mandatory audit, and reasonably a second confirm.
+   Same override; friction scales with risk. Examples get through; casually waving past a real identifier takes a deliberate, logged act.
+
+2. **BAA is ORG-level, not a user thing.** Whether the org holds a BAA is an org fact (`hipaa_mode_allowed`), owned by the **Org agent**. It gates **only** Override 2. Real PHI + someone wants it in + **no BAA → suppress (hard stop)**. Real PHI + BAA → PHI-tagged admit.
+
+**Honest risk posture (deliberate, Ananth's call — flagged for the classifier/compliance owner to confirm):** this moves Override 1 from **safe-by-construction** (the seats' hard floor: SSN/DOB/MRN/clinical never overridable) to **safe-by-attestation-plus-audit**. A real identifier *could* be admitted if someone wrongly attests "it's just an example," caught only after the fact by the audit log. That is the trade Override 1 makes to allow examples/synthetic data through. **The classifier owner designed the hard floor for a reason — this broadening needs their explicit sign-off at the 4-way (now 5-way), not silent adoption.** The audit log — already a compliance REQUIREMENT — is the load-bearing control here, more than before.
+
+**Everything else in the seat reviews still holds** — the storage mechanics are unchanged by this: the bounded **HOLD** for a doc pending override, **release-not-resubmit**, **effective-persist-at-admit**, the **`phi_override` provenance marker** (with `classifier_version`), server-authoritative signals, and the mandatory audit. What changed is Override 1's **scope** (any flag, via attestation-weight) and BAA's **home** (org, via the Org agent). New seat: **Org agent** (BAA state).
+
+---
+
 ## ⇒ COORDINATOR SYNTHESIS (Extension, after all seat reviews · 2026-09-10)
 
 **All four seats ENDORSE the `overridable` instrument.** No seat objected to the design; every flag is about *sequencing and composition*, not the instrument. The one-gate-owned-field approach, the false-positive/attestation split, and "no BAA on this path" are agreed by construction.
@@ -364,3 +391,18 @@ then. No special case.
 in the same pass as the block-not-stored work. These two designs are landing in
 the same week and touch the same decision point; agreed separately they will
 conflict on their first overridden document.
+
+---
+
+## Seat review — Org agent (BAA / org-level HIPAA state) — ADDED 2026-09-10
+
+_Looped in by Ananth: BAA is an org fact, not a user toggle, and it gates Override 2 (real-PHI admit) only._
+
+**Your half:** own the org-level BAA / `hipaa_mode_allowed` (Key-1) state that Override 2 keys on. Questions for your review:
+1. Where does org BAA status live and who sets it (org-setup flow, an admin surface)? Is `hipaa_mode_allowed` already the right field, or does BAA need its own explicit org attribute + effective-date/expiry?
+2. The rule to confirm: **real PHI + user wants to admit + org has NO BAA → hard stop / suppress**; **+ BAA → PHI-tagged admit**. Does that match how you'd model org BAA, and is there a per-workspace/per-site granularity (org-wide vs. specific site) we should carry?
+3. Override 1 (no-PHI / example) needs **no** BAA — confirm nothing on your side gates the clean-ingest path.
+
+Add your opinion here and reply to Extension (coordinator).
+
+_(pending — Org agent)_
