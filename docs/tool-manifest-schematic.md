@@ -381,3 +381,123 @@ right.
    remaining prompt space?
 6. Who owns the golden set, and how many fixtures before the ranker is trustworthy?
    (The CARC 197 turn is fixture #1: expect `appeals_get_playbook` ranked first.)
+
+---
+
+# 9. CORRECTION TO §8 — match against the LEXICON, not invented domains
+
+**Ananth, 2026-09-10:** *"analytics is the wrong domain.. we should try and match it with
+lexicon.. because that is the easiest way"* … *"we can match the query against the
+lexicon and we can match the tools against the lexicon."*
+
+**He is right and §8.3's domain table was my own invention.** I classified 57 tools by
+name prefix — `get_*` → "analytics", `appeals_*` → "appeals" — and then reasoned about
+the distribution as if it meant something. It does not. It is a taxonomy I made up an
+hour ago from string matching, with no owner, no definition, and no existence anywhere
+in the system. **Treat §8.3's domain labels as discarded.** The 45%-in-one-bucket
+observation survives only as *"the catalogue is lopsided under any grouping"*, which is
+weaker than I stated it.
+
+## 9.1 Why the Lexicon is the right substrate
+
+The Lexicon is a **curated, embedded, already-live tag vocabulary** on three axes
+[READ, `mobius-rag`]:
+
+| axis | meaning | examples observed in code |
+|---|---|---|
+| **d:** | domain / document-type | `d:claims`, `d:appeals_and_disputes`, `d:benefits`, `d:credentialing`, `d:utilization_management`, `d:eligibility`, `d:billing_codes` |
+| **p:** | process | `p:prior_authorization`, `p:process`, `p:utilization_management` |
+| **j:** | jurisdiction / party | `j:payor.<slug>`, `j:regulatory_authority.<slug>`, `j:service_line.<slug>` |
+
+It is embedded in pgvector (`vector(768)`, `text-embedding-004`) and **already used
+query-side in production retrieval** — `corpus_search.py` reads `chunk_d/p/j_tags` off
+`rag_published_embeddings`, and `payer_context.extract_payer_slug` pulls `j:payor.*`
+out of a query's tag matches.
+
+**Five reasons this beats invented domains:**
+
+1. **It answers §8.6's open question #2 — "what text does Stage B match against, and who
+   writes it?"** Nobody has to author domain descriptions. The vocabulary exists, is
+   curated, and has an owner.
+2. **Both sides project into the same space.** Query → tags is already built. Tool → tags
+   is a declaration. The match is then set overlap plus similarity in one shared
+   vocabulary, not cosine distance between a question and a paragraph of marketing prose.
+3. **The reason becomes human-checkable.** *"Query matched `d:appeals_and_disputes` +
+   `j:payor.sunshine_health`; these three tools declare those tags"* is auditable by a
+   person. A similarity score is not. That matters more here than anywhere, because the
+   whole point of this node is to be trustworthy.
+4. **It reuses a live, tuned instrument** rather than standing up a second retrieval
+   path — and per the pgvector standard, there is no second vector store to introduce.
+5. **It sidesteps the overlap trap.** §5's collision exists because two tools' *prose*
+   claims the same query. Tags are discrete: two tools declaring `d:appeals_and_disputes`
+   are *visibly* siblings, and the tie-break becomes an explicit rule rather than an
+   accident of wording.
+
+## 9.2 What Stage B becomes
+
+```
+  query ──► lexicon tag match  (vector / BM25 / hybrid — already live query-side)
+              │
+              ├─ d: tags  ──┐
+              ├─ p: tags  ──┼──► tag set, each with a score
+              └─ j: tags  ──┘
+                            │
+  tools ──► declared tags ──┤   ← THE ONE THING THAT DOES NOT EXIST YET
+                            ▼
+              overlap + score ──► ranked tools, reason = the shared tags
+```
+
+**The single missing piece is the tool side.** Each tool needs to declare its Lexicon
+tags — a `lexicon_tags` field on `SkillSpec`, which already spans builtins *and* MCP
+tools (`source="mcp"`), so the whole 57 can carry them.
+
+CARC 197 as the worked example [ILLUSTRATIVE — not yet measured]:
+
+| | tags |
+|---|---|
+| query *"how do i appeal a carc 197 denial for sunshine health"* | `d:appeals_and_disputes`, `j:payor.sunshine_health`, plausibly `d:claims` |
+| `appeals_get_playbook` | `d:appeals_and_disputes` + **`j:payor.*` required** |
+| `appeals_lookup_rules` | `d:appeals_and_disputes`, **no payor axis** |
+
+**The `j:` axis is what discriminates them, and it is exactly what the prose failed to
+express.** The playbook tool is payor-scoped; the rules tool is CARC-scoped. A human
+reading the two descriptions could not tell — I could not, and the model could not. A
+tag declaring *this tool needs a payor* makes it mechanical.
+
+**Whether that is what actually happens is UNVERIFIED** and is the first fixture: run
+the real query through live query-side tagging and see which tags come back. That is a
+measurement I can take without building anything, and it should come before the design
+is settled.
+
+## 9.3 What this changes in §8
+
+- **Stage B** — "domain match" becomes **Lexicon tag match**; the domain taxonomy is
+  deleted rather than fixed.
+- **§8.3's analytics-is-45% table** — discarded as a made-up grouping. The real question
+  is how the 57 distribute across `d:`/`p:`/`j:`, which is **[UNMEASURED]** and needs
+  the tool-side tags to exist first.
+- **§8.6 question #2** — answered: the Lexicon, owned by Curation/RAG.
+- **§8.6 question #3** ("sub-domain split for analytics") — **void.** There is no
+  analytics domain.
+- **§8.4 constraint 2 stands and gets sharper:** the pinned-embedding requirement now
+  means the Lexicon's own embedding version is part of the selector's contract, and
+  Lexicon curation changes re-rank tools. That is a real coupling and it wants the same
+  decay treatment as the mutation ledger.
+- **§8.4 constraint 3 is largely satisfied by this** — tags *are* the structured triggers
+  I was arguing for, and they already exist.
+
+**New risk, mine to own:** Lexicon coverage is imperfect — `florida_blue` and
+`florida_medicaid` are absent as `j:payor.*` keys [MEASURED 2026-09-09]. A selector that
+depends on tags inherits every coverage gap in my vocabulary, and a query whose tags do
+not resolve gets a *silently* worse tool set. That needs a stated fallback and a
+countable "no tags matched" signal, or it becomes the next could-not-check-vs-checked-false.
+
+## 9.4 The cheapest next measurement
+
+Before any of this is built, and answerable today:
+
+1. **Run the CARC 197 query through live query-side Lexicon tagging.** What tags come
+   back? If `j:payor.sunshine_health` and `d:appeals_and_disputes` both resolve, the
+   substrate works and §9.2's example is real rather than illustrative.
+2. **§3 still stands** — do the 26 `get_*` tools dispatch? Independent of all of this,
+   and it halves the catalogue either way.
