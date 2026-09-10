@@ -1,154 +1,114 @@
 <meta charset="utf-8">
-<title>Governor — Product Promise schema</title>
+<title>Governor — the SLA</title>
 <style>
-:root{
- --bg:#faf9f7; --bg2:#f2efea; --bg3:#e8e3db; --ink:#1c1a17; --mut:#6f675d;
- --line:#d6cfc4; --vio:#7c3aed; --grn:#2f7d5d; --amb:#b07a15; --red:#b03a2e;
- --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
- --bg:#16151a; --bg2:#1e1d24; --bg3:#272631; --ink:#eae7e1; --mut:#9c948a;
- --line:#38363f; --grn:#5fbf90; --amb:#e0a83c; --red:#e0705f; --vio:#a97cf5;}}
-:root[data-theme=dark]{--bg:#16151a;--bg2:#1e1d24;--bg3:#272631;--ink:#eae7e1;
- --mut:#9c948a;--line:#38363f;--grn:#5fbf90;--amb:#e0a83c;--red:#e0705f;--vio:#a97cf5;}
-body{background:var(--bg);color:var(--ink);font:14px/1.55 ui-sans-serif,system-ui,sans-serif;
- margin:0;padding:2rem 1.5rem 5rem}
-.wrap{max-width:1120px;margin:0 auto}
-h1{font-size:1.5rem;margin:0 0 .2rem;letter-spacing:-.01em}
-h2{font-size:1.02rem;margin:2.4rem 0 .7rem;padding-bottom:.3rem;border-bottom:1px solid var(--line);
+:root{--bg:#faf9f7;--bg2:#f2efea;--bg3:#e8e3db;--ink:#1c1a17;--mut:#6f675d;--line:#d6cfc4;
+ --vio:#7c3aed;--grn:#2f7d5d;--amb:#b07a15;--red:#b03a2e;--mono:ui-monospace,SFMono-Regular,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#16151a;--bg2:#1e1d24;
+ --bg3:#272631;--ink:#eae7e1;--mut:#9c948a;--line:#38363f;--grn:#5fbf90;--amb:#e0a83c;--red:#e0705f;--vio:#a97cf5}}
+:root[data-theme=dark]{--bg:#16151a;--bg2:#1e1d24;--bg3:#272631;--ink:#eae7e1;--mut:#9c948a;
+ --line:#38363f;--grn:#5fbf90;--amb:#e0a83c;--red:#e0705f;--vio:#a97cf5}
+body{background:var(--bg);color:var(--ink);font:14px/1.55 ui-sans-serif,system-ui,sans-serif;margin:0;padding:2rem 1.5rem 5rem}
+.wrap{max-width:1060px;margin:0 auto}
+h1{font-size:1.5rem;margin:0 0 .25rem;letter-spacing:-.01em}
+h2{font-size:1rem;margin:2.5rem 0 .6rem;padding-bottom:.3rem;border-bottom:1px solid var(--line);
  text-transform:uppercase;letter-spacing:.07em;color:var(--mut)}
-.sub{color:var(--mut);margin:0 0 .3rem}
-.q{font-style:italic;color:var(--mut);border-left:2px solid var(--vio);padding-left:.7rem;margin:.8rem 0 1.4rem}
+.sub{color:var(--mut);margin:0 0 .2rem}
+.q{font-style:italic;color:var(--mut);border-left:2px solid var(--vio);padding-left:.7rem;margin:.9rem 0 1.5rem}
 svg{width:100%;height:auto;display:block;background:var(--bg2);border:1px solid var(--line);border-radius:8px}
-table{border-collapse:collapse;width:100%;font-size:12.5px;margin:.5rem 0 0}
-th,td{text-align:left;padding:.42rem .6rem;border-bottom:1px solid var(--line);vertical-align:top}
+table{border-collapse:collapse;width:100%;font-size:12.5px;margin:.4rem 0 0}
+th,td{text-align:left;padding:.45rem .6rem;border-bottom:1px solid var(--line);vertical-align:top}
 th{color:var(--mut);text-transform:uppercase;font-size:10.5px;letter-spacing:.06em;font-weight:600}
 code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:.05rem .3rem;border-radius:3px}
 .tag{display:inline-block;font-family:var(--mono);font-size:10px;text-transform:uppercase;
  letter-spacing:.05em;padding:.05rem .34rem;border-radius:3px;background:var(--bg3);white-space:nowrap}
-.t-ok{color:var(--grn)} .t-part{color:var(--amb)} .t-no{color:var(--red)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem;margin-top:.6rem}
-.card{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:.9rem 1rem}
-.card h3{margin:0 0 .45rem;font-size:.92rem;letter-spacing:.01em}
-.card p{margin:.3rem 0;color:var(--mut);font-size:12.5px}
-.legend{font-size:11.5px;color:var(--mut);margin:.5rem 0 0}
-.legend span{margin-right:1rem}
-.note{background:var(--bg2);border-left:3px solid var(--red);padding:.7rem .9rem;border-radius:0 6px 6px 0;
- margin:.9rem 0;font-size:12.5px}
+.t-ok{color:var(--grn)}.t-part{color:var(--amb)}.t-no{color:var(--red)}
+.note{background:var(--bg2);border-left:3px solid var(--red);padding:.7rem .9rem;border-radius:0 6px 6px 0;margin:1rem 0;font-size:12.5px}
 .note b{color:var(--red)}
 .ov{overflow-x:auto}
 </style>
 <div class="wrap">
-<h1>Governor — Product Promise schema</h1>
-<p class="sub">SLA in → best answer within it → tell the integrator what it got. Every element marked for whether it exists today.</p>
-<p class="q">"we start with a SLA (who is calling, user, mode etc).. and the role of this agent is to get the best possible answer to meet the sla" — Ananth, 2026-09-10</p>
-<p class="legend"><span class="tag t-ok">exists</span><span class="tag t-part">exists, unnamed / scattered</span><span class="tag t-no">missing / inert</span></p>
+<h1>Governor — the SLA</h1>
+<p class="sub">The promise is quality, latency and cost. Rounds are how we try to keep it.</p>
+<p class="q">"SLA IS NOT ABOUT NUMBER OF ROUNDS THATS WRONG. THE SLA IS THE PROMISE OF QUALITY (recall and accuracy), LATENCY AND COST" — Ananth, 2026-09-10</p>
 
-<h2>1 · Flow</h2>
-<svg viewBox="0 0 1100 700" xmlns="http://www.w3.org/2000/svg" font-family="ui-sans-serif,system-ui,sans-serif">
+<h2>1 · The three terms</h2>
+<svg viewBox="0 0 1060 430" xmlns="http://www.w3.org/2000/svg" font-family="ui-sans-serif,system-ui,sans-serif">
 <defs><marker id="a" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
 <polygon points="0 0, 9 3.5, 0 7" fill="currentColor"/></marker></defs>
-<g color="var(--mut)" stroke="currentColor" stroke-width="1.4" fill="none" marker-end="url(#a)">
-<path d="M550 116 L550 148"/><path d="M550 268 L550 300"/><path d="M550 512 L550 544"/><path d="M550 640 L550 666"/>
-</g>
-<!-- SLA -->
-<rect x="150" y="18" width="800" height="98" rx="7" fill="var(--bg3)" stroke="var(--line)"/>
-<text x="170" y="40" font-size="12" font-weight="700" fill="var(--ink)" letter-spacing="1">SLA</text>
-<text x="170" y="62" font-size="12.5" fill="var(--red)">caller identity — user / API key / service</text>
-<text x="640" y="62" font-size="11" fill="var(--red)" font-family="var(--mono)">NOT AN INPUT TODAY</text>
-<text x="170" y="80" font-size="12.5" fill="var(--ink)">mode — quick · copilot · agentic · task</text>
-<text x="170" y="98" font-size="12.5" fill="var(--ink)">query intent · infra ceiling <tspan font-family="var(--mono)" font-size="11">MOBIUS_TURN_DEADLINE_S=300s</tspan></text>
-<!-- PHASE A -->
-<rect x="150" y="148" width="800" height="120" rx="7" fill="var(--bg2)" stroke="var(--amb)" stroke-width="1.6"/>
-<text x="170" y="170" font-size="12" font-weight="700" fill="var(--amb)" letter-spacing="1">PHASE A · SCOPE — once, before round 1</text>
-<text x="170" y="192" font-size="12.5" fill="var(--ink)">build contract: rounds · extensions · confidence bar · soft_target_s · hard_ceiling_s</text>
-<text x="170" y="211" font-size="12.5" fill="var(--ink)">resolve depth: intent floor → reasoning depth → latency budget</text>
-<text x="170" y="230" font-size="12.5" fill="var(--ink)">scope the planner: what it may call, how deep, how long</text>
-<text x="170" y="255" font-size="11" font-family="var(--mono)" fill="var(--mut)">default_contract_for_mode · extract_query_intent_floor · resolve_reasoning_depth · latency_budget_ms</text>
-<!-- PHASE B -->
-<rect x="150" y="300" width="800" height="212" rx="7" fill="var(--bg2)" stroke="var(--grn)" stroke-width="1.6"/>
-<text x="170" y="322" font-size="12" font-weight="700" fill="var(--grn)" letter-spacing="1">PHASE B · SPEND — every round</text>
-<rect x="172" y="336" width="300" height="60" rx="5" fill="var(--bg3)" stroke="var(--line)"/>
-<text x="186" y="356" font-size="11.5" fill="var(--ink)">RoundState → evaluate()</text>
-<text x="186" y="374" font-size="10.5" font-family="var(--mono)" fill="var(--mut)">pure · no I/O · first match wins</text>
-<text x="186" y="389" font-size="10.5" font-family="var(--mono)" fill="var(--mut)">→ (directive, reason)</text>
-<g font-size="11.5" fill="var(--ink)">
-<text x="500" y="352">finalize — budget exhausted, ship what we have</text>
-<text x="500" y="370">complete — bar met, ship</text>
-<text x="500" y="388">extend — quality gap + budget left</text>
-<text x="500" y="406">consolidate — time low, no more tool calls</text>
-<text x="500" y="424">search — keep gathering</text>
-</g>
-<rect x="172" y="418" width="300" height="78" rx="5" fill="var(--bg3)" stroke="var(--red)" stroke-dasharray="4 3"/>
-<text x="186" y="437" font-size="11.5" font-weight="700" fill="var(--red)">quality signals ASK — MISSING</text>
-<text x="186" y="454" font-size="10.5" font-family="var(--mono)" fill="var(--mut)">groundedness ┐</text>
-<text x="186" y="469" font-size="10.5" font-family="var(--mono)" fill="var(--mut)">critic       ┼→ request_extension()</text>
-<text x="186" y="484" font-size="10.5" font-family="var(--mono)" fill="var(--mut)">future       ┘   granted | refused(guard)</text>
-<text x="500" y="452" font-size="11.5" fill="var(--red)">today: 2 writers increment the ledger directly</text>
-<text x="500" y="470" font-size="11.5" fill="var(--red)">and contradict each other for 155s per agentic turn</text>
-<text x="500" y="490" font-size="10.5" font-family="var(--mono)" fill="var(--mut)">react_loop:5420 · react_loop:5526</text>
-<!-- PHASE C -->
-<rect x="150" y="544" width="800" height="96" rx="7" fill="var(--bg2)" stroke="var(--red)" stroke-width="1.6" stroke-dasharray="5 4"/>
-<text x="170" y="566" font-size="12" font-weight="700" fill="var(--red)" letter-spacing="1">PHASE C · HAND OFF — once, at the end · DOES NOT EXIST</text>
-<text x="170" y="588" font-size="12.5" fill="var(--ink)">did we meet the bar or ship short, and why · what is unverified and must be said</text>
-<text x="170" y="607" font-size="12.5" fill="var(--ink)">what was cut for time · tone + reasoning_visibility from the SLA</text>
-<text x="170" y="630" font-size="11" font-family="var(--mono)" fill="var(--mut)">today: ctx.product_promise_directive → read once → make_react_trace → a human string</text>
-<!-- integrator -->
-<rect x="380" y="666" width="340" height="30" rx="5" fill="var(--bg3)" stroke="var(--line)"/>
-<text x="550" y="686" font-size="12" text-anchor="middle" fill="var(--ink)">integrate → answer</text>
+<!-- SLA box -->
+<rect x="30" y="20" width="420" height="200" rx="8" fill="var(--bg3)" stroke="var(--vio)" stroke-width="1.8"/>
+<text x="50" y="46" font-size="12.5" font-weight="700" fill="var(--vio)" letter-spacing="1.2">THE SLA — THE PROMISE</text>
+<text x="50" y="76" font-size="13" font-weight="700" fill="var(--ink)">QUALITY</text>
+<text x="50" y="95" font-size="12" fill="var(--mut)">recall — did we find what exists</text>
+<text x="50" y="112" font-size="12" fill="var(--mut)">accuracy — is what we said supported</text>
+<text x="50" y="142" font-size="13" font-weight="700" fill="var(--ink)">LATENCY</text>
+<text x="50" y="161" font-size="12" fill="var(--mut)">how long the caller waits</text>
+<text x="50" y="191" font-size="13" font-weight="700" fill="var(--ink)">COST</text>
+<text x="50" y="208" font-size="12" fill="var(--mut)">tokens · tool calls · dollars per turn</text>
+<!-- arrow -->
+<g color="var(--mut)" stroke="currentColor" stroke-width="1.5" fill="none" marker-end="url(#a)">
+<path d="M450 120 L520 120"/></g>
+<text x="485" y="112" font-size="10.5" text-anchor="middle" fill="var(--mut)" font-family="var(--mono)">meets</text>
+<!-- levers -->
+<rect x="520" y="20" width="510" height="200" rx="8" fill="var(--bg2)" stroke="var(--line)"/>
+<text x="540" y="46" font-size="12.5" font-weight="700" fill="var(--mut)" letter-spacing="1.2">THE LEVERS — HOW, NOT WHAT</text>
+<text x="540" y="76" font-size="12" fill="var(--ink)">rounds · extensions</text>
+<text x="540" y="95" font-size="12" fill="var(--ink)">reasoning depth · model choice</text>
+<text x="540" y="114" font-size="12" fill="var(--ink)">how many tools are offered</text>
+<text x="540" y="133" font-size="12" fill="var(--ink)">when to consolidate · when to finalize</text>
+<text x="540" y="152" font-size="12" fill="var(--ink)">whether to run the critic / groundedness floor</text>
+<text x="540" y="186" font-size="11.5" fill="var(--red)">Today's contract is entirely this column,</text>
+<text x="540" y="204" font-size="11.5" fill="var(--red)">and it is labelled the promise.</text>
+<!-- sources -->
+<rect x="30" y="252" width="1000" height="152" rx="8" fill="var(--bg2)" stroke="var(--line)"/>
+<text x="50" y="278" font-size="12.5" font-weight="700" fill="var(--mut)" letter-spacing="1.2">WHERE EACH TERM COMES FROM</text>
+<text x="50" y="306" font-size="12" font-weight="700" fill="var(--ink)">1 · declared by the caller</text>
+<text x="50" y="324" font-size="11.5" fill="var(--mut)">an API caller states its latency ceiling and cost cap</text>
+<text x="380" y="306" font-size="12" font-weight="700" fill="var(--ink)">2 · declared by the user</text>
+<text x="380" y="324" font-size="11.5" fill="var(--mut)">"think harder" · "quick answer" · mode</text>
+<text x="700" y="306" font-size="12" font-weight="700" fill="var(--ink)">3 · system default</text>
+<text x="700" y="324" font-size="11.5" fill="var(--mut)">by circumstance, when neither declared</text>
+<text x="50" y="358" font-size="11.5" fill="var(--ink)">Precedence: caller &gt; user &gt; default. A declared term is never widened by the system —</text>
+<text x="50" y="376" font-size="11.5" fill="var(--ink)">only narrowed, and only by a hard limit (infra deadline, compliance gate).</text>
+<text x="50" y="394" font-size="11" font-family="var(--mono)" fill="var(--red)">TODAY: none of the three sources exists. Mode is the only input, and mode is not a term.</text>
 </svg>
 
-<h2>2 · The SLA object — <code>ProductPromiseContract</code></h2>
+<h2>2 · Defining each term</h2>
 <div class="ov"><table>
-<tr><th>field</th><th>quick</th><th>copilot</th><th>agentic</th><th>task</th><th>status</th></tr>
-<tr><td><code>max_rounds</code></td><td>2</td><td>3</td><td>10</td><td>3</td><td><span class="tag t-ok">binds</span></td></tr>
-<tr><td><code>max_extension_rounds</code></td><td>0</td><td>1</td><td>3</td><td>0</td><td><span class="tag t-part">no derivation — §4</span></td></tr>
-<tr><td><code>confidence_bar</code></td><td>low</td><td>medium</td><td>high</td><td>medium</td><td><span class="tag t-ok">binds</span></td></tr>
-<tr><td><code>soft_target_s</code></td><td>6</td><td>12</td><td>120</td><td>15</td><td><span class="tag t-ok">binds — and gates <code>extend</code></span></td></tr>
-<tr><td><code>hard_ceiling_s</code></td><td>300</td><td>300</td><td>300</td><td>300</td><td><span class="tag t-no">same for all modes</span></td></tr>
-<tr><td><code>tone</code></td><td colspan="4">—</td><td><span class="tag t-no">zero readers</span></td></tr>
-<tr><td><code>reasoning_visibility</code></td><td colspan="4">medium</td><td><span class="tag t-no">zero readers</span></td></tr>
-<tr><td>caller identity</td><td colspan="4">—</td><td><span class="tag t-no">not a field</span></td></tr>
+<tr><th>term</th><th>what it promises</th><th>measured by</th><th>today</th></tr>
+<tr><td><b>recall</b></td><td>we considered the evidence that exists</td><td>against a bank: fraction of known-relevant sources retrieved</td><td><span class="tag t-no">no term, no measure</span></td></tr>
+<tr><td><b>accuracy</b></td><td>every claim we made is supported</td><td>groundedness — claims traceable to retrieved evidence</td><td><span class="tag t-part">groundedness floor exists as a pass/fail gate, not a promised level</span></td></tr>
+<tr><td><b>latency</b></td><td>an answer within N seconds</td><td>turn wall clock, p50 and p95</td><td><span class="tag t-part"><code>soft_target_s</code> / <code>hard_ceiling_s</code> — a budget, not a promise, and the ceiling is 300s for every mode</span></td></tr>
+<tr><td><b>cost</b></td><td>no more than N tokens / dollars per turn</td><td>prompt + completion tokens, tool calls, provider spend</td><td><span class="tag t-no">no term at all</span></td></tr>
 </table></div>
-<div class="note"><b>hard_ceiling_s is 300 for every mode</b>, because <code>default_contract_for_mode()</code> sets it to the full infra deadline. That is why <code>scale_ceiling_for_intent()</code> has no effect — its own docstring says so. A deep-intent query cannot buy wall-clock, and a <code>quick</code> turn and an <code>agentic</code> turn share a hard stop.</div>
+<div class="note"><b>The mapping error, precisely.</b> <code>confidence_bar</code> (low / medium / high) is the closest thing to a quality term, and it is a threshold on the planner's <i>self-report</i>, gated by a groundedness check. It promises neither recall nor accuracy — it promises that a model said it was confident and a check did not object.</div>
 
-<h2>3 · Precedence — <code>evaluate()</code>, first match wins</h2>
+<h2>3 · Sources and precedence</h2>
 <div class="ov"><table>
-<tr><th>#</th><th>condition</th><th>directive</th></tr>
-<tr><td>1</td><td><code>elapsed_s >= hard_ceiling_s − FINALIZE_MARGIN_S</code> (295s) <b>or</b> no rounds and no extensions left</td><td>finalize</td></tr>
-<tr><td>2</td><td><code>proposes_complete</code> · critic not flagged · (bar low <b>or</b> groundedness passed)</td><td>complete</td></tr>
-<tr><td>3</td><td><code>groundedness_passed is False</code> · extensions left · <code>elapsed_s &lt; soft_target_s</code> (120s)</td><td>extend</td></tr>
-<tr><td>4</td><td><code>groundedness_passed is False</code> · no extensions left</td><td>finalize</td></tr>
-<tr><td>5</td><td><code>elapsed_s >= soft_target_s</code> (120s)</td><td>consolidate</td></tr>
-<tr><td>6</td><td>rounds exhausted · extensions left · <code>elapsed_s &lt; soft_target_s</code> · confidence not high</td><td>extend</td></tr>
-<tr><td>7</td><td>otherwise</td><td>search</td></tr>
+<tr><th>source</th><th>can set</th><th>example</th><th>today</th></tr>
+<tr><td><b>caller</b> — API key, service, integration</td><td>latency ceiling · cost cap · minimum accuracy</td><td>a batch job accepts 120s and wants maximum recall; a widget needs 3s</td><td><span class="tag t-no">caller identity is not an input</span></td></tr>
+<tr><td><b>user</b> — in the request</td><td>latency vs quality preference</td><td>"think harder" · "quick answer" · picking agentic</td><td><span class="tag t-part">mode, and <code>extract_query_intent_floor</code> reads "think" intent from the message</span></td></tr>
+<tr><td><b>system default</b> — by circumstance</td><td>all three, when nothing is declared</td><td>see §4</td><td><span class="tag t-part">per-mode defaults only</span></td></tr>
 </table></div>
-<div class="note"><b>Rows 3 and 6 gate <code>extend</code> on 120s. The critic's inline path gates on 275s.</b> Between them the governor says <code>consolidate</code> while the critic funds more gathering — 155 seconds, every agentic turn.</div>
+<p class="sub" style="margin-top:.6rem"><b>Precedence: caller &gt; user &gt; default.</b> A declared term is never widened by the system — only <b>narrowed</b>, and only by a hard limit: the infra deadline, or a compliance gate.</p>
 
-<h2>4 · Extension budget — the record that replaces 0 / 1 / 3</h2>
-<p class="sub">One row per <b>request</b>, granted or refused. Refusals are not optional: a curve built only on grants is conditioned on the budget it is setting.</p>
+<h2>4 · Circumstances that should set a default</h2>
 <div class="ov"><table>
-<tr><th>field</th><th>type</th><th>why it is in the schema</th><th>available today</th></tr>
-<tr><td><code>ordinal</code></td><td>int</td><td>the curve is conditioned on it — 1st vs 3rd are different questions</td><td><span class="tag t-part">derivable, governor only</span></td></tr>
-<tr><td><code>trigger</code></td><td>groundedness · coverage</td><td>separate curves; pooling them hides both</td><td><span class="tag t-no">no</span></td></tr>
-<tr><td><code>granted</code></td><td>bool</td><td>numerator</td><td><span class="tag t-part">grants only</span></td></tr>
-<tr><td><code>refused_guard</code></td><td>ledger · deadline_reserve · consolidated · mode</td><td>which of four product problems it was</td><td><span class="tag t-no">no</span></td></tr>
-<tr><td><code>elapsed_s</code></td><td>float</td><td>answers whether <b>time or count</b> is the binding constraint</td><td><span class="tag t-ok">yes</span></td></tr>
-<tr><td><code>closed_next_round</code></td><td>bool</td><td>did the triggering condition clear — the whole point</td><td><span class="tag t-no">no</span></td></tr>
-<tr><td><code>mode</code></td><td>str</td><td>the budget is per-mode, so the curve must be</td><td><span class="tag t-ok">yes</span></td></tr>
+<tr><th>circumstance</th><th>which term it moves</th><th>direction</th><th>today</th></tr>
+<tr><td>mode — quick / copilot / agentic / task</td><td>all three</td><td>the primary dial</td><td><span class="tag t-ok">exists</span></td></tr>
+<tr><td>first turn vs continuation</td><td>latency</td><td>continuations carry context, so less retrieval is needed</td><td><span class="tag t-no">no</span></td></tr>
+<tr><td>query intent — deep vs lookup</td><td>quality up, latency up</td><td><code>extract_query_intent_floor</code></td><td><span class="tag t-part">reads it; the ceiling it would raise is already maxed</span></td></tr>
+<tr><td>filing-critical subject — deadlines, PHI, appeals</td><td><b>accuracy floor raised</b></td><td>a wrong appeal deadline is unrecoverable</td><td><span class="tag t-no">no</span></td></tr>
+<tr><td>caller is an integration, not a human</td><td>latency tightened, cost capped</td><td>nobody is watching a spinner</td><td><span class="tag t-no">no</span></td></tr>
+<tr><td>retry of a failed turn</td><td>cost capped</td><td>do not pay twice for the same answer</td><td><span class="tag t-no">no</span></td></tr>
 </table></div>
-<p class="sub" style="margin-top:.7rem"><code>close_rate(N) = closed_after_N / granted_N</code>, over turns that <b>reached</b> N. Budget = largest N clearing a stated bar. The bar is a product choice.</p>
 
-<h2>5 · What each phase owns</h2>
-<div class="grid">
-<div class="card"><h3>Phase A — scope <span class="tag t-part">scattered</span></h3>
-<p>Already in <code>governor.py</code>: contract construction, intent floor, depth resolution, latency budget. Called from <code>react_loop</code> and <code>prompts</code>.</p>
-<p><b>Change:</b> name it, add caller identity, bring the planner's opening scope in.</p></div>
-<div class="card"><h3>Phase B — spend <span class="tag t-ok">works</span></h3>
-<p><code>evaluate()</code> is pure and correct. The defect is around it, not in it.</p>
-<p><b>Change:</b> one writer. Quality signals call <code>request_extension()</code> and are told <i>which guard</i> refused.</p></div>
-<div class="card"><h3>Phase C — hand off <span class="tag t-no">missing</span></h3>
-<p>The verdict is written to <code>ctx</code>, read once, and becomes a diagnostics string. The integrator never sees it.</p>
-<p><b>Change:</b> a structured hand-off. <code>tone</code> and <code>reasoning_visibility</code> already exist for it.</p></div>
-</div>
+<h2>5 · What the governor does with it</h2>
+<div class="ov"><table>
+<tr><th>phase</th><th>reads</th><th>decides</th></tr>
+<tr><td><b>A · scope</b><br>once, before round 1</td><td>the SLA</td><td>the levers: rounds, extensions, depth, model, how many tools, whether the floors run</td></tr>
+<tr><td><b>B · spend</b><br>every round</td><td>progress against the SLA</td><td>continue · buy a round · consolidate · finalize — and <b>which term is at risk</b></td></tr>
+<tr><td><b>C · hand off</b><br>once, at the end</td><td>what was actually achieved</td><td>tell the integrator <b>which terms were met and which were not</b>, so the answer can say so</td></tr>
+</table></div>
+<div class="note"><b>This is what makes Phase C matter.</b> If the SLA is three terms, the hand-off is three answers: recall met, accuracy met, latency exceeded. An answer that ran short on accuracy should say so — which is exactly what the CARC&nbsp;197 turn failed to do when it stated a 90-day deadline its own disclaimer called unsupported.</div>
 </div>
