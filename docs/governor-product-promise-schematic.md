@@ -165,3 +165,139 @@ and aggregates nowhere.
 - **not P5's config UX** — this is what makes that UX have something coherent to edit
 - **not the tool selector** — that seat owns *which tools*; the governor owns *how much
   budget and to what standard*. They meet at Phase A, and both start from the caller.
+
+---
+
+# 8. Deriving the extension budget from real data, instead of 0 / 1 / 3
+
+**Ananth, 2026-09-10:** *"we should use real data to make determinations for part b — on
+how many extensions, as against this made up 2 or 3 etc. lets get into the logic of doing
+that too."*
+
+**The current numbers have no derivation.** `_MODE_DEFAULTS` [READ, `governor.py:89-94`]
+declares `quick 0 · copilot 1 · agentic 3` with a comment citing a spec section, not a
+measurement. **They are a starting guess that has never been checked against outcomes.**
+
+## 8.1 The question the data has to answer
+
+Not *"how many extensions feel right"* but:
+
+> **Does the Nth extension change the outcome often enough to be worth a round?**
+
+An extension costs one round — LLM calls, tool calls, wall-clock. It earns its keep only
+if it **closes the gap that triggered it**. So the budget is where the **marginal value of
+the next extension** falls below its cost. Same shape as RAG's recall@k curve: you buy
+depth until the curve flattens.
+
+**Both triggers state their own success condition, which is what makes this measurable:**
+
+| trigger | granted because | **closed** if, next round |
+|---|---|---|
+| groundedness floor | `groundedness_passed is False` | groundedness passes |
+| completion critic | `_cc_verdict.satisfied is False`, with `uncovered` gaps | those gaps no longer uncovered |
+
+**Neither is a judgement call.** The turn already computes both verdicts.
+
+## 8.2 What is already queryable — more than I expected
+
+`react_trace` persists **as JSON inside `chat_turns.thinking_log`** [READ,
+`emit_envelope.py:11,41,164`], and its `rounds` array carries **one dict per round**:
+
+```json
+{"round": 2, "directive": "consolidate", "reason": "...",
+ "agent_role": "synthesize", "composition_id": 26, "elapsed_s": 70.9}
+```
+
+So **available today, no new instrumentation:**
+- the **extension ordinal** — count `directive == "extend"` in order within a turn
+- **`elapsed_s` at the moment of each extension**
+- `rounds_used` / `max_rounds`, `final_directive`, `groundedness_passed` (turn-level)
+
+**Two questions can therefore be answered this week, from data already on disk.**
+
+## 8.3 🔴 But half the extensions are invisible, and it is the two-writer problem again
+
+**The critic's extension at `react_loop.py:5420` is not a `governor.evaluate()` call**, so
+**it produces no per-round `directive`** [READ]. Only the governor's extensions appear as
+`directive == "extend"` in the trace.
+
+**So `rounds[].directive == "extend"` undercounts extensions by exactly the critic's
+share, and there is no way to tell from the trace how large that share is.** The
+architectural defect and the measurement gap are the same defect: **two writers, one of
+which does not report.**
+
+**Which means the ordering is forced, and that is useful rather than annoying:** unify the
+writers first (§3's `request_extension()`), and the data needed to set the budget starts
+existing as a side effect. **The refactor is the instrumentation.**
+
+## 8.4 What must be recorded, per extension request
+
+Small, specific, and it is the same list §4 row 10 already proposed:
+
+| field | why |
+|---|---|
+| `ordinal` | 1st / 2nd / 3rd — the whole curve is conditioned on this |
+| `trigger` | `groundedness` · `coverage` · future | different curves; do not pool them |
+| `granted` / `refused` | and **which guard refused**: ledger · deadline reserve · consolidated · mode |
+| `elapsed_s` at request | answers §8.6 — whether count or time is the real constraint |
+| `outcome_next_round` | did the triggering condition clear? **the numerator** |
+| `mode` | the budget is per-mode, so the curve must be too |
+
+**`refused` is not optional.** A curve built only on granted extensions is conditioned on
+the budget it is trying to set — the classic circularity. **The refusals are what tell you
+whether a bigger budget would have helped.**
+
+## 8.5 The decision rule
+
+For each mode, for each ordinal N, over turns that **reached** N:
+
+```
+close_rate(N) = closed_after_extension_N / granted_extension_N
+```
+
+**Set the budget at the largest N where `close_rate(N)` clears a stated bar.** The bar is
+a product choice, not a statistical one — *"an extension must close the gap at least X% of
+the time to be worth ~R seconds"* — and it is Ananth's to set, once the curve exists.
+
+**Three traps, named because each would produce a confident wrong number:**
+
+**1 · Survivorship.** Turns reaching extension 3 are the hard ones. **`close_rate(3)`
+must be computed over turns that reached 3, never over all turns**, or the denominator
+flatters the tail.
+
+**2 · The curve is not monotonic and should not be assumed to be.** A second extension may
+help *more* than the first if the first bought the evidence the second needed. **Report
+the raw rates; do not fit a decay.**
+
+**3 · Refused-but-would-have-closed is unobservable**, so the curve can only tell you
+where to *stop*, never where to *start*. **Widening the budget requires an experiment**
+(temporarily raise it in one arm), which is exactly the A/B machinery the tool-selection
+spec already describes.
+
+## 8.6 The question I would answer first, because it may make the budget moot
+
+**Is the count even the binding constraint?**
+
+Today the governor will not extend once `elapsed_s >= soft_target_s` — **120s for
+agentic** [READ, `governor.py:196,206`]. So if most extension requests arrive after 120s,
+**a budget of 3 is fiction: time binds first and the count never runs out.**
+
+**This is answerable right now from `rounds[].elapsed_s` in `thinking_log`** — the
+distribution of elapsed at each `extend`, against the 120s line. **No new instrumentation,
+no ruling needed.**
+
+**If time binds first, the honest fix is `soft_target_s`, not `max_extension_rounds`** —
+and every conversation about "2 or 3" was about the wrong number.
+
+## 8.7 Sequencing
+
+1. **measure the elapsed distribution at extension time** — existing data, answers §8.6
+2. **unify the writers** (§3) — makes extensions countable at all
+3. **record the six fields** (§8.4) — small, and follows from 2
+4. **build the curves per mode and ordinal** — a week of traffic, and dev traffic is thin
+   (217 `state_load` turns / 11h), so this is days not hours
+5. **Ananth sets the bar**; the budget follows from the curve
+6. **widen only by experiment**, never by argument (§8.5 trap 3)
+
+**Steps 1 and 2 are worth doing regardless of the budget question**, which is the argument
+for doing them first.
