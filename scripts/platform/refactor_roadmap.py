@@ -236,6 +236,7 @@ RULES = [
     ("P2", "state_load", "blocks_assembled IS SINGLE-VALUED"),
     ("P2", "integrate", "THE SOURCE BADGE IS COMPUTED WRONG ON EVERY MCP TURN"),
     ("P2", "integrate", "THE BADGE CAN SAY 'no sources' WITHOUT EVER LOOKING AT THE SOURCES"),
+    ("P1", "integrate", "THREE APPEALS TOOLS ARE DISPATCHED TO A SERVER THAT DOES NOT HAVE THEM"),
     ("P2", "tool_manifest", "A FIELD THAT CAN ONLY HOLD ONE VALUE IS A PRODUCER WITH A CONSUMER"),
     ("P2", "tool_manifest", "THE READINESS SIGNALS WERE READ FROM A DEAD SESSION SCRATCHPAD"),
     ("P2", "tool_manifest", "MY OWN OBSERVABILITY REGEX MATCHED ONLY logger.info"),
