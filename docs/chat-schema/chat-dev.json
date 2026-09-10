@@ -20,9 +20,9 @@
    "fb2f0cf": "live",
    "fc9477c": "live"
   },
-  "commits_behind_head": "18",
+  "commits_behind_head": "19",
   "deployed_commit_subject": "state_load: remove the swallow my own instrumentation pass introduced",
-  "head": "5fbe05a63",
+  "head": "f30426fed",
   "image_tag": "20260910-140519-299519c8ce",
   "revision": "mobius-chat-00977-8bl",
   "traffic_percent": "100"
@@ -43,7 +43,7 @@
     "owner": "chat",
     "gate": "lines removed; handler count down; ZERO invariant movement",
     "blocks": "P2, P4",
-    "n": 23
+    "n": 24
    },
    {
     "id": "P2",
@@ -5394,6 +5394,10 @@
     ],
     [
      "bad",
+     "OWNER(chat): HOW STEP 2 OF THE FIX MUST ACTUALLY BE WRITTEN -- Chat Master found the durable read and I verified it, then found their supporting claim about omission is wrong in a way that would produce a subtly broken fix. VERIFIED ON THE DEPLOYED 2.2.0: model_dump(by_alias=True)['isError'] returns True when the server sent True. That reads the field by its WIRE name -- the one the MCP spec fixes -- rather than by whatever the SDK currently spells it in Python, so it is correct on 2.2.0 AND on 1.x, i.e. right before the bump, right after it, and right THROUGH it. That is the principle the McpError negative exposed: .error.code survived because it is the JSON-RPC shape and cannot move without a protocol change, while isError moved because it was only a spelling. DEPEND ON THE WIRE CONTRACT, WHICH IS VERSIONED DELIBERATELY AND LOUDLY; NEVER ON A BINDING, WHICH IS VERSIONED SILENTLY. It also gives the derive-from-what-you-own rule the mechanism it lacked: chat cannot own a peer's flag, but it CAN own which NAME it reads that flag by, and the durable choice is the protocol's, not the library's. BUT THE OMISSION HALF DOES NOT WORK AS PROPOSED. Chat Master reported that on 2.x the field defaults to None, so omission is distinguishable from an explicit false, and that a fail-closed-on-omission rule is therefore expressible on 2.x but not 1.x. MEASURED, AND IT IS FALSE: on 2.2.0 `is_error` is `alias='isError' default=False required=False` -- the SAME default as 1.x -- so an omitted flag materialises as False on both, and model_dump(by_alias=True) ALWAYS CONTAINS THE KEY (the default is populated into the dump), which means the dump cannot detect omission AT ALL. Three payloads measured on 2.2.0: sent True, sent false, and omitted give dump values True / False / False with 'isError' present in the dump every time. THE ONLY DISCRIMINATOR FOR OMISSION REMAINS model_fields_set -- and that holds the PYTHON FIELD NAME, not the alias, so it is `'is_error' in model_fields_set` on 2.x and `'isError' in model_fields_set` on 1.x. So the two halves of step 2 pull in opposite directions: THE VALUE must be read by the wire name to survive renames, while STATED-NESS can only be read by the Python name, which is the exact fragility we are removing. Writing step 2 as 'read the protocol field and fail closed when it is not stated' therefore cannot be done through one call, and a fix that used model_dump alone would silently treat every omission as a success -- the current bug, preserved. Workable form: take the VALUE from model_dump(by_alias=True), and for stated-ness either test BOTH spellings in model_fields_set or stop relying on the flag for that question and treat error-shaped content as failure independently. Pinning is what makes the choice knowable either way -- which is Chat Master's conclusion, reached for a different reason than the one they gave. Found 2026-09-10."
+    ],
+    [
+     "bad",
      "OWNER(chat): CHAT IS IN THE EXACT STATE THAT ALREADY CAUSED A 29-DAY SILENT OUTAGE ON THIS FLEET, AND I HAD THAT PRECEDENT WRITTEN DOWN ALL DAY. Appeals answered the pinning question: YES, they added `<2` on 2026-09-08, commit 06e46d5, whose message is `pin mcp below 2.x -- the MCP surface had been silently gone for 29 days`. Before it, b582d7f (2026-07-06) carried the unbounded `mcp[cli]>=1.0` -- which is exactly the 08-11 source I read from the bucket. My read was not contradicting them; IT WAS THE PREVIOUS STATE, AND IT WAS THE BROKEN ONE. THE ONSET IS REFRAMED, and the new version is better than the one I filed twice: I had been reporting `appeals deployed 09-08, errors start 09-09`. The strong version is that an unbounded mcp resolved to 2.x, the appeals MCP server stopped working ENTIRELY, and nothing noticed for 29 days -- health green, no alert, no error rate, because AN ABSENT CAPABILITY PRODUCES NO FAILURES. The 09-08 commit did not ADD their tools to the merged manifest, it RESTORED them. So the errors beginning 09-09 are not new behaviour, they are the FIRST OBSERVATION of behaviour that could not occur while the surface was down -- whatever was wrong with dispatch was probably wrong the whole time and had nothing to route. THE PRECEDENT, stated without narrative because it needs none: chat runs mcp 2.2.0 from an unbounded range TODAY, which is the exact condition that silently removed a capability from another service on this fleet for a month. That is documented precedent, not attribution, and it is stronger than the pinning asymmetry I withdrew. It also means the isError rename is only the VISIBLE half of chat's 2.x exposure; the 29-day case says the invisible half is worse, because a major bump can remove a capability outright with every health signal still green. MEASURED AND MY SECOND CLAUSE WAS WRONG -- chat has NO invisible-half exposure, and the reason makes the pinning argument stronger. Chat Master tested chat's mcp import sites against the deployed 2.2.0 and I reproduced it: chat imports exactly two symbols, mcp.client.session.ClientSession and mcp.client.streamable_http.streamable_http_client, at six sites, and BOTH RESOLVE CLEANLY under 2.2.0. Chat never imports mcp.server.fastmcp -- chat is a CLIENT, not a server -- so there is no absent capability waiting. THE CONTRAST IS THE REAL FINDING: a server-side 2.x break is LOUD (ModuleNotFoundError, and 2.x's own message names the rename, links the migration guide and suggests pinning mcp<2 -- I saw it in the traceback), while chat's client-side break is SILENT (renamed field, back-compat alias, getattr default). So the appeals outage COULD ONLY HAVE BEEN MISSED BY SWALLOWING IT -- the SDK practically shouts -- and it still cost 29 days; chat's break cannot be caught that way BECAUSE IT NEVER RAISES. No exception, no warning, no failed import, just a wrong answer on every call indefinitely. Appeals' outage needed a try/except to stay hidden; CHAT'S HIDES ITSELF. The argument is therefore not that chat might lose a capability as appeals did -- it is that the same unbounded range on the same library already produced a month-long invisible failure in a sibling service, and the form it took in chat is the one that cannot announce itself at all. A NEGATIVE FINDING FROM THE SAME SWEEP, worth recording because it distinguishes two things that look alike: mcp 2.2.0 ALSO renamed McpError to MCPError, and mcp_manager.py names McpError at :36 and :47 -- but only in comments. _is_session_error is DUCK-TYPED on structure (getattr(exc,'error').code) rather than on the class, and MCPError in 2.2.0 still exposes .error as ErrorData with .code and .message, so the check STILL FIRES -- verified by constructing MCPError(-32600, ...) on 2.2.0 and running chat's own predicate against it: True. That is the distinction to carry: duck-typing on STRUCTURE that is part of the wire contract survived the rename, while reading an attribute by NAME did not. The docstring reference to `mcp.shared.exceptions.McpError` is now a stale name (doc-only, no behaviour). AND THE PART THAT IS MINE: I already had this incident in my own notes -- same service, same cause (mcp 2.x renaming `mcp.server.fastmcp`), same 29 days, same green health -- together with the instruction I wrote for it: `when sweeping for a dependency break, grep for the IMPORT, not the requirements file -- services with inline pip install in a Dockerfile and no requirements.txt are invisible to a requirements sweep`. Today's root cause is mcp 2.x renaming a symbol, in a service with an unbounded range, and I spent the day reasoning from requirements.txt and locally-chosen versions. I held the answer and the method the whole time and did not connect them. Found 2026-09-10."
     ],
     [
@@ -5505,6 +5509,12 @@
      "owner": "",
      "own": true,
      "deploy": "live"
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
@@ -5637,7 +5647,7 @@
     [
      "functionality",
      "red",
-     "9 open defects (+1 tracked for other seats)"
+     "10 open defects (+1 tracked for other seats)"
     ],
     [
      "testability",
@@ -5661,7 +5671,7 @@
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "functionality: 9 open defects (+1 tracked for other seats) \u00b7 error_handling: 19 of 29 handlers log-and-continue  (ok: testability, modularity, observability)",
+   "rating_why": "functionality: 10 open defects (+1 tracked for other seats) \u00b7 error_handling: 19 of 29 handlers log-and-continue  (ok: testability, modularity, observability)",
    "live_config": [
     {
      "name": "CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL",
