@@ -59,7 +59,7 @@
     "n": 1
    }
   ],
-  "outside": 34
+  "outside": 35
  },
  "missing_content": [],
  "live_env_service": "mobius-chat (us-central1)",
@@ -117,7 +117,7 @@
     "modules": [
      "round0"
     ],
-    "cite": 4120,
+    "cite": 4238,
     "note": "Short-circuits the loop when the caller already did the work."
    },
    {
@@ -128,7 +128,7 @@
      "capabilities",
      "parsing"
     ],
-    "cite": 4196,
+    "cite": 4314,
     "note": "Builds the planner prompt and parses the decision back out."
    },
    {
@@ -137,7 +137,7 @@
      "react_retry_guard",
      "curator_tools"
     ],
-    "cite": 5760,
+    "cite": 5878,
     "note": "Dispatches tools, and refuses a repeat of a call that already failed."
    },
    {
@@ -148,7 +148,7 @@
      "feedback_signal",
      "completion_extension_gate"
     ],
-    "cite": 5392,
+    "cite": 5510,
     "note": "Audits the draft against sources and decides whether to go round again."
    }
   ],
@@ -1880,11 +1880,12 @@
    "module": "app.pipeline.react_loop",
    "group": "pipeline",
    "path": "app/pipeline/react_loop.py",
-   "loc": 6262,
+   "loc": 6380,
    "role": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.",
    "role_full": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.\n\nReplaces (when enabled): run_plan() + _answer_for_subquestion() + run_integrate().\n\nKeeps: answer_non_patient(), answer_tool(), answer_reasoning(),\n       emitter system, badge system, jurisdiction system.\n\nEmission map (thinking chunks sent to UI via emitter=on_thinking):\n  Pre-loop:\n    [if pronoun enriched] \"\u21ba Understood: <resolved message>\"\n    [if follow-up to active context] \"\u25cc Answering from the report we just generated\u2026\"\n    [jurisdiction] emit_jurisdiction_context: \"\u2713 Confirmed: \u2026\" | \"? Payer not identified\u2026\" | etc.\n    \"I'm breaking down",
    "stage": null,
    "api": [
+    "tool_result_verdict()",
     "tool_result_is_empty()",
     "chunk_text_identity()",
     "run_react()"
@@ -2264,7 +2265,11 @@
     ],
     [
      "bad",
-     "OWNER(chat): THE STRONGEST CANDIDATE YET FOR THE SPORADIC MISS \u2014 THE PAYOR KEY IS FREE TEXT FROM THE MODEL, MATCHED EXACTLY, AND A WRONG GUESS IS BYTE-IDENTICAL TO 'NO PLAYBOOK EXISTS'. Found 2026-09-09 by following appeals' lookup gotcha. Appeals demonstrated: /playbook-guarded/Sunshine%20Health/29 returns a 2,707-byte object; /playbook-guarded/sunshine_health/29 returns 200 and {}. The key is the DISPLAY NAME, matched exactly. Chat does NOT snake_case it \u2014 verified, that hypothesis is disproved \u2014 but what it does is worse: payor comes straight from inputs.get('payor') at react_loop.py:3154, i.e. WHATEVER THE MODEL WROTE, inferred from the user's phrasing. And tool_manifest.py:258-268 tells the model nothing about the required form \u2014 no enumeration, no 'must be the exact display name', no list of valid payors. So 'Sunshine', 'sunshine health', 'Sunshine Health Plan' and 'Molina Healthcare of Florida' all return {} indistinguishably from a genuine miss, and chat then reports NO PLAYBOOK for a payor that has one. THIS PRODUCES THE EXACT REPORTED SYMPTOM AND ITS SPORADIC CHARACTER: whether the call hits depends on how the USER happened to phrase the payor's name. Ananth's original framing \u2014 'tool selection is sporadic and the model narrates a miss as a broken tool' \u2014 is satisfied by this mechanism without any manifest, JSON-parsing or executor fault. NOT YET CONFIRMED as the cause of any specific turn; it is a mechanism with a demonstrated failure mode, and it is now the first thing the instruments should be pointed at. FIX CANDIDATES: enumerate valid payors in the manifest, resolve the name server-side against the registry, or have appeals return a distinguishable 'payor unknown'. Also note react_loop.py:3170 f-string-interpolates payor into the path with NO URL ENCODING."
+     "OWNER(chat): THE STRONGEST CANDIDATE YET FOR THE SPORADIC MISS \u2014 THE PAYOR KEY IS FREE TEXT FROM THE MODEL, MATCHED EXACTLY, AND A WRONG GUESS IS BYTE-IDENTICAL TO 'NO PLAYBOOK EXISTS'. Found 2026-09-09 by following appeals' lookup gotcha. Appeals demonstrated: /playbook-guarded/Sunshine%20Health/29 returns a 2,707-byte object; /playbook-guarded/sunshine_health/29 returns 200 and {}. The key is the DISPLAY NAME, matched exactly. Chat does NOT snake_case it \u2014 verified, that hypothesis is disproved \u2014 but what it does is worse: payor comes straight from inputs.get('payor') at react_loop.py:3154, i.e. WHATEVER THE MODEL WROTE, inferred from the user's phrasing. And tool_manifest.py:258-268 tells the model nothing about the required form \u2014 no enumeration, no 'must be the exact display name', no list of valid payors. So 'Sunshine', 'sunshine health', 'Sunshine Health Plan' and 'Molina Healthcare of Florida' all return {} indistinguishably from a genuine miss, and chat then reports NO PLAYBOOK for a payor that has one. THIS PRODUCES THE EXACT REPORTED SYMPTOM AND ITS SPORADIC CHARACTER: whether the call hits depends on how the USER happened to phrase the payor's name. Ananth's original framing \u2014 'tool selection is sporadic and the model narrates a miss as a broken tool' \u2014 is satisfied by this mechanism without any manifest, JSON-parsing or executor fault. NOT YET CONFIRMED as the cause of any specific turn; it is a mechanism with a demonstrated failure mode, and it is now the first thing the instruments should be pointed at. FIX CANDIDATES: enumerate valid payors in the manifest, resolve the name server-side against the registry, or have appeals return a distinguishable 'payor unknown'. Also note react_loop.py:3170 f-string-interpolates payor into the path with NO URL ENCODING.\n\nDISPATCHED 2026-09-09 on Ananth's instruction, two halves: (1) CHAT LOGS THE PAYOR STRING ACTUALLY SENT \u2014 verbatim, unmodified, paired with whether the response was {} \u2014 and CONFIRMS or RETIRES this candidate on data. Grouped by distinct payor string with counts; a bare count of empties proves nothing since we already know empties happen. Cross-checkable against appeals' 141 rows, which turns 'some calls come back empty' into 'N calls came back empty for payors that HAVE playbooks'. (2) APPEALS RESOLVES THE NAME VIA THE LEXICON's j:payor.<slug> axis rather than requiring an exact display-name match, so the resolution moves server-side and chat stops guessing. CHAT MUST NOT BUILD A PAYOR-NAME NORMALISER \u2014 a service with no payor data making a payor judgement is the same class of mistake as chat inventing an FL Medicaid deadline."
+    ],
+    [
+     "bad",
+     "OWNER(me, rag): DISPLAY NAME IS DERIVED FROM THE SLUG BY TITLE-CASING, AND THAT IS A LATENT BUG IN MY OWN MODULE. payer_context.py:134 does display_name = slug.replace('_', ' ').title(). 'sunshine_health' -> 'Sunshine Health' happens to work; it mangles the moment a real payor name is irregular \u2014 'Molina Healthcare of Florida' (lowercase 'of'), an ampersand, a hyphen, 'UnitedHealthcare'. Slug and display name are TWO IDENTIFIER SPACES with no reliable mechanical conversion between them, and I am deriving one from the other. Surfaced 2026-09-09 while offering the Lexicon to the appeals seat as their payor resolver \u2014 flagged to them explicitly so they would not copy the pattern and inherit it. The canonical slug<->display-name mapping belongs in the Payer Reference-Data Store and should be LOOKED UP, NEVER DERIVED; RAG already calls /api/registry/payors/<display_name>/web-domain, so slug -> canonical display name is the missing half of an endpoint pair that already half-exists. Mine to fix."
     ],
     [
      "bad",

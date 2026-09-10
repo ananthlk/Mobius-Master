@@ -15,7 +15,7 @@ deliberately not yet asked because P4 has not opened. Per-phase status below is
 hand-maintained in `refactor_roadmap.py`'s `PHASE_STATUS`, because completion is a
 judgement about a gate, not something derivable from the findings file.
 
-**117 bugs · 79 sequenced into 6 phases · 34 explicitly outside · 0 UNSEQUENCED · 27 of the 79 sequenced have NO OWNER**
+**118 bugs · 79 sequenced into 6 phases · 35 explicitly outside · 0 UNSEQUENCED · 27 of the 79 sequenced have NO OWNER**
 
 > The two counts are different questions and the second one used to be invisible.
 > `UNSEQUENCED` was previously printed as "unassigned", which reads as *nobody owns
@@ -243,6 +243,7 @@ Each carries a reason. Excluding by silence is the failure mode this guards agai
 | `POST /chat` | correction | a correction to my own text, not work | CORRECTION from the DB seat to my own text: ensure_thread treats two f |
 | `POST /chat` | correction | a correction to my own text, not work | CORRECTION: chat_turns.user_id is nullable TEXT with NO foreign key —  |
 | `PHI gate` | other seat | fleet-power's fleet.yaml; a one-line note, not a chat-internal change | OWNER(fleet-power seat): A HIPAA GATE'S CORRECTNESS DEPENDS ON A SCALI |
+| `tool_manifest` | other seat | mine, in mobius-rag payer_context.py — not a chat change | OWNER(me, rag): DISPLAY NAME IS DERIVED FROM THE SLUG BY TITLE-CASING, |
 | `tool_manifest` | other seat | appeals-agent self-reported; their code, their fix — chat must stop treating the markers as 'empty' | OWNER(appeals-agent, self-reported): THE GUARD IS FAIL-OPEN ON SCALARS |
 | `tool_manifest` | other seat | appeals contract change offered; chat consumes once shipped | A MISS IS 200-WITH-{} AND 'PAYOR UNKNOWN' IS BYTE-IDENTICAL TO 'CARC N |
 | `PHI gate` | own workstream | feedback-text gate writes no audit row; compliance, not structure | TWO IMPLEMENTATIONS OF THE SAME GATE, and only one is audited |

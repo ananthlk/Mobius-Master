@@ -11,13 +11,15 @@ the POST half of the gate, not only as a report.
 
 | collected | passed | failed | errors | skipped | wall |
 |---:|---:|---:|---:|---:|---:|
-| 2587 | 2568 | 14 | 0 | 5 | 235.5s |
+| 2598 | 2578 | 15 | 0 | 5 | 208.5s |
 
 Known-failing baseline: **14** tests, frozen 2026-09-08 before any P1a
 deletion. Ananth's ruling — these predate the program, so the gate SUBTRACTS them.
 A failure not in that set is a regression. The list may shrink, never grow.
 
-**No regressions** — every failure is in the known-failing baseline.
+### REGRESSIONS — 1 failing test(s) NOT in the baseline
+
+- `tests.test_appeals_playbook_zero_result.TestAppealsGetPlaybookZeroResult::test_found_but_content_empty_signals_no_sources`
 
 ## A2 · What the tests actually cover, per schema node
 
@@ -52,7 +54,7 @@ name matches, not that the node's behaviour is asserted. Eval owns replacing it.
 | `queue` | red | 4 | `test_queue_usage_breakdown_enrich.py` | 1 |
 | `react_loop` | red | 6 | `test_react_loop.py` | 52 |
 | `state_load` | red | 7 | `test_state_load_state_integrity.py` | 10 |
-| `tool_manifest` | red | 11 | `test_tool_manifest.py` | 5 |
+| `tool_manifest` | red | 16 | `test_tool_manifest.py` | 5 |
 | `clarify` | green | 0 | `test_react_clarify_questions.py` | 23 |
 | `context` | amber | 2 | `test_message_resolver_and_skill_context.py`, `test_react_continuation_context.py`, `test_system_context.py` | 49 |
 | `critic` | amber | 3 | `test_critic_call_resilience.py`, `test_critic_skip_on_cache.py`, `test_react_completion_critic_stage_registration.py`, `test_react_critic.py`, `test_react_critic_integration.py` | 99 |
@@ -83,6 +85,6 @@ deterministic replay harness yet (P1.1). A flip would be unattributable.
 
 | modules | loc | except handlers | log-and-continue | bare except |
 |---:|---:|---:|---:|---:|
-| 205 | 67,039 | 708 | 415 | 0 |
+| 205 | 67,146 | 710 | 416 | 0 |
 
 I7 is monotonic: the log-and-continue count may fall, never rise.

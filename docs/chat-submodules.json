@@ -41,7 +41,7 @@
     "modules": [
      "round0"
     ],
-    "cite": 4120,
+    "cite": 4238,
     "note": "Short-circuits the loop when the caller already did the work."
    },
    {
@@ -52,7 +52,7 @@
      "capabilities",
      "parsing"
     ],
-    "cite": 4196,
+    "cite": 4314,
     "note": "Builds the planner prompt and parses the decision back out."
    },
    {
@@ -61,7 +61,7 @@
      "react_retry_guard",
      "curator_tools"
     ],
-    "cite": 5760,
+    "cite": 5878,
     "note": "Dispatches tools, and refuses a repeat of a call that already failed."
    },
    {
@@ -72,7 +72,7 @@
      "feedback_signal",
      "completion_extension_gate"
     ],
-    "cite": 5392,
+    "cite": 5510,
     "note": "Audits the draft against sources and decides whether to go round again."
    }
   ],
@@ -279,11 +279,12 @@
    "module": "app.pipeline.react_loop",
    "group": "pipeline",
    "path": "app/pipeline/react_loop.py",
-   "loc": 6262,
+   "loc": 6380,
    "role": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.",
    "role_full": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.\n\nReplaces (when enabled): run_plan() + _answer_for_subquestion() + run_integrate().\n\nKeeps: answer_non_patient(), answer_tool(), answer_reasoning(),\n       emitter system, badge system, jurisdiction system.\n\nEmission map (thinking chunks sent to UI via emitter=on_thinking):\n  Pre-loop:\n    [if pronoun enriched] \"\u21ba Understood: <resolved message>\"\n    [if follow-up to active context] \"\u25cc Answering from the report we just generated\u2026\"\n    [jurisdiction] emit_jurisdiction_context: \"\u2713 Confirmed: \u2026\" | \"? Payer not identified\u2026\" | etc.\n    \"I'm breaking down",
    "stage": null,
    "api": [
+    "tool_result_verdict()",
     "tool_result_is_empty()",
     "chunk_text_identity()",
     "run_react()"

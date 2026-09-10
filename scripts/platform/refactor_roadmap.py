@@ -312,6 +312,7 @@ PRINCIPLES = [
 ]
 
 OUT_OF_PROGRAM = [
+    ("tool_manifest", "DISPLAY NAME IS DERIVED FROM THE SLUG BY TITLE-CASING", "other seat", "mine, in mobius-rag payer_context.py — not a chat change"),
     ("tool_manifest", "THE GUARD IS FAIL-OPEN ON SCALARS", "other seat", "appeals-agent self-reported; their code, their fix — chat must stop treating the markers as 'empty'"),
     ("tool_manifest", "A MISS IS 200-WITH-{} AND 'PAYOR UNKNOWN'", "other seat", "appeals contract change offered; chat consumes once shipped"),
     ("PHI gate", "A HIPAA GATE'S CORRECTNESS DEPENDS ON A SCALING SETTING", "other seat", "fleet-power's fleet.yaml; a one-line note, not a chat-internal change"),
