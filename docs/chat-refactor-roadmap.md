@@ -15,7 +15,7 @@ deliberately not yet asked because P4 has not opened. Per-phase status below is
 hand-maintained in `refactor_roadmap.py`'s `PHASE_STATUS`, because completion is a
 judgement about a gate, not something derivable from the findings file.
 
-**133 bugs · 89 sequenced into 6 phases · 40 explicitly outside · 0 UNSEQUENCED · 27 of the 89 sequenced have NO OWNER**
+**130 bugs · 86 sequenced into 6 phases · 40 explicitly outside · 0 UNSEQUENCED · 26 of the 86 sequenced have NO OWNER**
 
 > The two counts are different questions and the second one used to be invisible.
 > `UNSEQUENCED` was previously printed as "unassigned", which reads as *nobody owns
@@ -29,11 +29,11 @@ judgement about a gate, not something derivable from the findings file.
 | Phase | Name | Bugs | Owner | Gate metric | Blocks | Status |
 |---|---|---:|---|---|---|---|
 | **P1** | Delete | 14 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☑ **COMPLETE** 2026-09-08 — ~31,900 lines removed across P1.1/P1a/P1b/P1c/P1d, zero regressions |
-| **P2** | Make absent producers detectable | 34 | chat + Eval | every segment timed AND each timed segment's attribution verified against a known-external call — an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☑ **COMPLETE** 2026-09-09 — P2a planner orphans, P2b latency telemetry deployed with spans bound to schema node keys |
+| **P2** | Make absent producers detectable | 33 | chat + Eval | every segment timed AND each timed segment's attribution verified against a known-external call — an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☑ **COMPLETE** 2026-09-09 — P2a planner orphans, P2b latency telemetry deployed with spans bound to schema node keys |
 | **P3** | One decision point | 19 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ◐ **IN PROGRESS** — `state_load` closed (StateUnavailable + first contract tag); `tool_manifest` opened 2026-09-09 |
 | **P4** | Split | 16 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
-| **P5** | Config UX | 5 | chat + Prompt Studio | max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped | — | ☐ not started — and correctly so; Prompt Studio has deliberately not been asked to sign yet |
-| **P6** | Tool selection | 1 | chat + Prompt Studio | manifest editable without a deploy; tools offered per turn: ALL -> a retrieved subset; prompt tokens spent on the manifest: measured before, lower after; tool-selection accuracy NOT worse than the P3 baseline; and the retrieval decision is INSPECTABLE — given a situation, the UX shows which tools were selected and why, and a real past turn can be asked the same question | — | ☐ not started — blocked on P3 `tool_manifest` closing; (c) needs P3's Stage 0 funnel as its baseline |
+| **P5** | Config UX | 4 | chat + Prompt Studio | max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped | — | ☐ not started — and correctly so; Prompt Studio has deliberately not been asked to sign yet |
+| **P6** | Tool selection | 0 | chat + Prompt Studio | manifest editable without a deploy; tools offered per turn: ALL -> a retrieved subset; prompt tokens spent on the manifest: measured before, lower after; tool-selection accuracy NOT worse than the P3 baseline; and the retrieval decision is INSPECTABLE — given a situation, the UX shows which tools were selected and why, and a real past turn can be asked the same question | — | ☐ not started — blocked on P3 `tool_manifest` closing; (c) needs P3's Stage 0 funnel as its baseline |
 
 Phase order is a blocking order: a phase does not open until the phases naming it
 in `Blocks` have passed their gate.
@@ -42,8 +42,8 @@ in `Blocks` have passed their gate.
 
 | Owner | Sequenced bugs |
 |---|---:|
-| chat | 58 |
-| unassigned-owner | 27 |
+| chat | 56 |
+| unassigned-owner | 26 |
 | me | 4 |
 
 ## P1 — Delete  ·  14 items
@@ -73,7 +73,7 @@ The cost of leading with it, stated plainly: this phase CANNOT CLAIM A LATENCY W
 | ☐ | `tool_manifest` | chat | THE STRONGEST CANDIDATE YET FOR THE SPORADIC MISS — THE PAYOR KEY IS FREE TEXT FROM THE MODEL, MATCHED EXACTLY |
 | ☐ | `tool_manifest` | chat | `usable` PASSES THE ONE CASE IT WAS BUILT TO CATCH |
 
-## P2 — Make absent producers detectable  ·  34 items
+## P2 — Make absent producers detectable  ·  33 items
 
 **Owner** chat + Eval
 **Gate** every segment timed AND each timed segment's attribution verified against a known-external call — an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join  
@@ -116,7 +116,6 @@ GATE AMENDED 2026-09-09, Chat Master's finding, from having executed it rather t
 | ☐ | `tool_manifest` | chat | expires_after_turns HAS NO WRITER, NO COMPARISON, AND ITS DECREMENT CAN NEVER RUN |
 | ☐ | `tool_manifest` | chat | THE RETRY GUARD DID NOT FIRE ON FOUR DUPLICATE CALLS |
 | ☐ | `tool_manifest` | chat | THREE ROUNDS OF 'no chunks marked relevant from the last result' WHILE THE TOOLS REPORTED SUCCESS |
-| ☐ | `tool_manifest` | chat | A FIELD THAT CAN ONLY HOLD ONE VALUE IS A PRODUCER WITH A CONSUMER AND STILL NO SIGNAL |
 | ☐ | `tool_manifest` | me | THE READINESS SIGNALS WERE READ FROM A DEAD SESSION SCRATCHPAD, AND ZERO WAS RENDERED AS A MEASUREMENT FOR ALL |
 | ☐ | `tool_manifest` | me | MY OWN OBSERVABILITY REGEX MATCHED ONLY logger.info AND NEARLY SHIPPED 19 MANUFACTURED REDS |
 | ☐ | `tool_manifest` | me | RATINGS WERE NEVER RE-DERIVED, AND NO SIGN-OFF EVER COVERED THEM |
@@ -183,7 +182,7 @@ GATE AMENDED 2026-09-09, Chat Master's finding, from having executed it rather t
 | ☐ | `react_loop` | — | react_loop.py:3922 swallows a failure to emit react_trace |
 | ☐ | `run_pipeline` | — | 1,902 lines with 42 exception handlers, 31 of which log and continue |
 
-## P5 — Config UX  ·  5 items
+## P5 — Config UX  ·  4 items
 
 **Owner** chat + Prompt Studio · **ratifier** Tech Review
 **Gate** max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped  
@@ -200,10 +199,9 @@ confidence_bar is EXCLUDED ENTIRELY, which is stronger than the bound I asked fo
 | ☐ | `governor` | chat | THE GOVERNOR IS CONFIG IN EVERYTHING BUT DELIVERY — IT IS A PYTHON DICT |
 | ☐ | `prompts` | chat | TWO PROMPTS EXIST IN BOTH PLACES AT ONCE, which is the drift the migration is supposed to end rather than crea |
 | ☐ | `prompts` | — | MOBIUS_PROMPT_SOURCE=composition on the deployed service, so the LIVE prompts are the versioned DB blocks and  |
-| ☐ | `tool_manifest` | chat | MOVE THE MANIFEST OUT OF CODE — Ananth's point, and the cost is measurable |
 | ☐ | `tool_manifest` | chat | CONTEXT-SPECIFIC TOOL SELECTION IS BUILT AND UNUSED |
 
-## P6 — Tool selection  ·  1 items
+## P6 — Tool selection  ·  0 items
 
 **Owner** chat + Prompt Studio · **ratifier** Tech Review + Eval
 **Gate** manifest editable without a deploy; tools offered per turn: ALL -> a retrieved subset; prompt tokens spent on the manifest: measured before, lower after; tool-selection accuracy NOT worse than the P3 baseline; and the retrieval decision is INSPECTABLE — given a situation, the UX shows which tools were selected and why, and a real past turn can be asked the same question  
@@ -232,7 +230,6 @@ DESIGN CONSTRAINT THAT FOLLOWS, Chat Master 2026-09-09 and it is the sharpest th
 
 | ☐ | Node | Owner | Finding |
 |---|---|---|---|
-| ☐ | `tool_manifest` | — | P6 BASELINE, MEASURED EXACTLY, 2026-09-09: THE TOOL CATALOGUE IS 35.8% OF EVERYTHING THE PLANNER READS |
 
 ## Outside the program
 

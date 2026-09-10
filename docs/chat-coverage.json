@@ -235,7 +235,7 @@
    "tags": [
     "state_load:no_silent_reset"
    ],
-   "rating": "amber"
+   "rating": "green"
   },
   {
    "node": "clarification",

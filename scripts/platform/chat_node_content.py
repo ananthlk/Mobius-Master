@@ -2107,7 +2107,7 @@ It is mid-migration and says so: five tools are now registry-owned, their descri
 living on SkillSpec.description and rendered through registry.manifest_text(), so adding a
 skill is one file and no edit here. The rest are still described inline.
 """, findings=[
- ("bad", "P6 BASELINE, MEASURED EXACTLY, 2026-09-09: THE TOOL CATALOGUE IS 35.8% OF "
+ ("watch", "P6 BASELINE, MEASURED EXACTLY, 2026-09-09: THE TOOL CATALOGUE IS 35.8% OF "
          "EVERYTHING THE PLANNER READS. 8,137 tokens per render, from Gemini's own "
          "count_tokens rather than chars/4 (chars/4 gave 8,110 — within 0.3%, and the "
          "measured figure is the one P6 is held against; an ESTIMATE held up as a "
@@ -2191,7 +2191,8 @@ skill is one file and no edit here. The rest are still described inline.
          "strictly worse. FIX: on not-found return nothing and let the answer say so. "
          "If the gap should be more useful than a blank, render the adapter's REASON "
          "CODE (unsourced = a real gap the user should act on; resolver_unavailable = "
-         "transient, retry) — RENDER THE REASON, NEVER A NUMBER."),
+         "transient, retry) — RENDER THE REASON, NEVER A NUMBER."
+         "FIXED (chat 10133ae) and LIVE in 00976-btd — verified: react_loop.py carries 'NO INVENTED DEFAULT' where the substitution was."),
  ("good", "GATE GREEN ACROSS ALL FIVE COMMITS, 2026-09-09: regressions 0, newly "
           "passing 0, known-failing baseline 14 unchanged; 2579/2598 passed, 5 "
           "skipped. Covers 10133ae and 2b0008f. AND ASKING RATHER THAN INFERRING PAID "
@@ -2252,7 +2253,8 @@ skill is one file and no edit here. The rest are still described inline.
          "and fax from document chunks — ALMOST THE PLAYBOOK'S OWN VALUES — and then "
          "its own disclaimer said the 90-day timeframe was 'not supported by the "
          "provided documents'. A correct answer, delivered unsourced, contradicted by "
-         "its own confidence note, when an authoritative record was one argument away."),
+         "its own confidence note, when an authoritative record was one argument away."
+         "FIXED (chat fc9477c, 2026-09-10) — VERIFIED IN CODE at react_loop.py:3201, which now carries the precedence explanation and prefers the numeric carc. NOT YET DEPLOYED: live is 00976-btd / image c468880, eleven commits behind, so Ananth's CARC 197 turn still fails until it ships."),
  ("bad", "OWNER(chat): THE MODEL NARRATED A TOOL MISS AS A BROKEN TOOL, IN "
          "PRODUCTION, VERBATIM. From the same turn, round 2 reasoning: 'LEARNED: The "
          "previous attempt to call appeals_lookup_rules and appeals_get_playbook "
@@ -2284,7 +2286,7 @@ skill is one file and no edit here. The rest are still described inline.
          "`keep` (never persisted) meeting in one turn, and it is why the loop cannot "
          "converge: it re-opens gaps it has already filled. Turn cost 51,799ms and "
          "three rounds to reach an answer the first tool call already contained."),
- ("bad", "OWNER(chat): A FIELD THAT CAN ONLY HOLD ONE VALUE IS A PRODUCER WITH A "
+ ("watch", "OWNER(chat): A FIELD THAT CAN ONLY HOLD ONE VALUE IS A PRODUCER WITH A "
          "CONSUMER AND STILL NO SIGNAL. Chat Master, 2026-09-10, and it is a new "
          "variant of the class rather than another instance. llm_calls.is_fallback "
          "EXISTS, IS READ (orchestrator.py:174), and is false on ALL 1,988 CALLS IN "
@@ -2908,7 +2910,8 @@ skill is one file and no edit here. The rest are still described inline.
          "split __none__ into __none__ vs __unparseable__; record dispatch EMPTINESS "
          "beside its success flag. Each is one count at a site already recording a "
          "neighbouring count."
-         "INSTRUMENTS BUILT 2026-09-09, chat b3942f3 + 2b0008f — verified in code: __unparseable__ / __unparseable_recovered__ split, tool_result_is_empty() as a module-level predicate the test imports, three-state tool verdict. NOT YET DEPLOYED, so tool.arg rows remain 0 and the funnel is still unmeasured on live traffic."),
+         "INSTRUMENTS BUILT 2026-09-09, chat b3942f3 + 2b0008f — verified in code: __unparseable__ / __unparseable_recovered__ split, tool_result_is_empty() as a module-level predicate the test imports, three-state tool verdict. NOT YET DEPLOYED, so tool.arg rows remain 0 and the funnel is still unmeasured on live traffic."
+         "RESOLVED 2026-09-10 — the layer WAS named, and not by the funnel: the three instruments were built (b3942f3 + 2b0008f, verified in code) and then Ananth pasted a live turn that exposed the cause in one read. Stage 0's verdict that the funnel could not answer it was CORRECT; a user-pasted trace beat all three instruments."),
  ("good", "THE EMIT->DISPATCH BOUNDARY IS CLEAN AND IS NOW ELIMINATED AS A CAUSE: 86 "
           "tool emissions, 86 dispatches, ZERO loss (76 success / 10 failure). 'The "
           "model asked and the executor never ran it' is off the table. Together with "
@@ -2942,7 +2945,8 @@ skill is one file and no edit here. The rest are still described inline.
          "tool, comparing it to the appeals 'Unknown tool' case. That was half right. The tool "
          "genuinely did not fire; what was fabricated was the CAUSE, not the failure. His "
          "'sporadic' is the better description and it points at selection, not at the "
-         "service."),
+         "service."
+         "RESOLVED 2026-09-10 — the cause was named and fixed: carc_group precedence at react_loop.py:3201, not the manifest. Ananth's framing was right about the symptom and its sporadic character; the mechanism was argument precedence."),
  ("bad", "OWNER(chat): A TOOL RETURNED A REAL PLAYBOOK AND CHAT REPORTED THERE WAS NONE. "
          "Found by Ananth testing live, 2026-09-09, cid 0985d25a and bb898cf5. Logged for the "
          "tool node, NOT fixed — his ruling.\n\n"
@@ -2982,7 +2986,8 @@ skill is one file and no edit here. The rest are still described inline.
          "found=False branch predates them. Not verified against the pre-refactor revision.\n\n"
          "Node moved GREEN -> RED. A control surface that silently reports 'no data' when the "
          "data exists is not green, however clean the migration around it is — rating the "
-         "guarantee, not the construction."),
+         "guarantee, not the construction."
+         "RESOLVED 2026-09-10 by the same precedence fix — reproduced against live appeals (Sunshine Health x 197 returns id 55, PRECERT, 90 days) and closed at the argument, which also restores the playbook card since :3496 gates section_hint on `usable`."),
  ("bad", "OWNER(chat): SPORADIC TOOL SELECTION — FOLDED INTO THE TOOLS REFACTOR, with the "
          "three candidate layers named. Ananth 2026-09-09: 'we will have to touch the module "
          "anyway... i think the retries or json formatting or something is wrong.. not clear "
@@ -3013,8 +3018,9 @@ skill is one file and no edit here. The rest are still described inline.
          "actually rendered — which tools were offered, (b) each tool the planner NAMED, "
          "including names that failed to parse, and (c) each dispatch with its outcome. Those "
          "three counts separate the three layers at n=1, which is exactly the discrimination "
-         "Eval's count-based design is for. A duration cannot tell them apart; a count can."),
- ("bad", "OWNER(chat): MOVE THE MANIFEST OUT OF CODE — Ananth's point, and the cost is "
+         "Eval's count-based design is for. A duration cannot tell them apart; a count can."
+         "RESOLVED — duplicate of the item above; all three candidate layers were eliminated and the answer was a fourth thing none of them covered."),
+ ("watch", "OWNER(chat): MOVE THE MANIFEST OUT OF CODE — Ananth's point, and the cost is "
          "measurable. 16 blocks are hardcoded here totalling 19,191 characters, roughly 4,800 "
          "TOKENS injected into the planner prompt. The biggest are _SERVICE_LINE_ROUTING "
          "(~798 tok), _APPEALS (~736), _RAG (~705) and _SEARCH_UPLOADED_DOCUMENT (~636). "
