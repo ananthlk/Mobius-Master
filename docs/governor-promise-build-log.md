@@ -11,6 +11,71 @@ Spec: `docs/governor-schema/index.html` (serve: `python3 -m http.server 8145 --d
 
 ---
 
+## 2026-09-10 (evening) — step 1 BUILT, not deployed; §5 not satisfied
+
+### `[READ]` `b67603c` verified firsthand — structure is as specified
+7 files, 649 insertions. `app/pipeline/react/promise.py` (329 lines),
+`db/schema/065_turn_attestations.sql`, three wiring points, 21 tests.
+Checked here independently, not taken on report:
+- close is in `run_pipeline`'s outermost `finally`, defaulting to `"unknown"`
+- all four `_publish_failed` sites carry the outcome marker (that function takes
+  no `ctx`, so it had to go at the sites — correct)
+- migration has 4 `IF NOT EXISTS` against 4 `CREATE` statements
+- `promise_kept` appears **only in a comment** naming the collision it avoids
+
+Two close-guarantee tests are **mutation-checked**: move the close onto the
+success path and both fail. That is the right kind of test for this — it proves
+the placement, not just the behaviour.
+
+### `[DESIGN]` Two deviations from my order, both accepted — both better than what I specified
+1. **`task` mode / absent `chat_mode` → a Promise with null terms plus an
+   `unpromised_reason`**, not a mapped neighbour tier. This creates a **third
+   state I had collapsed**: no promise key at all (pre-deploy) vs. a promise that
+   deliberately promises nothing vs. a real promise. My §2b only had two.
+   *"Promised nothing, and here is why"* is a different fact from *"no promise
+   travelled"*, and merging them would hide the gap step 1 exists to expose.
+2. **Empty-payload early return gets its own outcome**, not `completed`. Correct
+   — a turn that delivered nothing is not completed, and my own DoD listed it as
+   a separate run.
+
+### `[DESIGN]` The dead terminal is now a tripwire
+Chat set `ctx.publish_outcome = "clarification"` **inside** the unreachable
+`_publish_clarification_or_refinement`. It still gets deleted in step 2 — but
+until then, **a `clarification` row appearing in `turn_attestations` is itself
+the signal** that a path everyone believes is dead has fired. Dead code turned
+into an assertion. Worth reusing.
+
+They also found the sharper half of the finding: `tests/test_orchestrator.py:265`
+heads that block **"directly-testable"** — the section header *names the exact
+property that makes it blind*. **Directly testable is not reachable.**
+
+### `[OPEN]` §5 is NOT satisfied — W, P and E all require a deploy
+Demonstrated so far: **migration idempotency only** (applied twice against dev,
+second run clean, exit 0). Nothing else. Chat explicitly declined to summarise a
+green unit suite as success — which is what §5 asks for and the reason §5 was
+rewritten. **Deploy is held pending Ananth** under his standing rule to Chat:
+full gate green first, then ask, never ship unprompted.
+
+### `[RULED]` Ananth, in Chat's session — scope narrowed
+*"from now on only support governor and tools_manifest until i say otherwise."*
+The four MCP fixes are **out of scope, not deferred**. My sequencing correction
+(*"everything else can ride with your commits"*) is superseded and my bundling
+caution is moot.
+
+**Relay rule confirmed in both directions.** Chat had a direct instruction in
+their own session — *"work exclusively with governor and tool manifest for
+today"* — and correctly did not act on my faithfully-relayed hold-lift for the
+MCP fixes. **A direct instruction in a seat's own session outranks a relay.**
+The same rule that let them refuse my lift also kept the MCP work out.
+
+### `[OPEN]` Identity unresolved, honestly
+The chat seat says: session titled **Chat Master**, own memory says **Payor
+Policy Agent**, has been signing from memory, does not know which is right and
+will settle it with Ananth rather than keep asserting. Correct handling — and
+the reason to ask rather than assume.
+
+---
+
 ## 2026-09-10 (later still) — Chat Master answers §7; a dead publish terminal
 
 ### `[READ]` Eight publish call sites, not ten — my error
