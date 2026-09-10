@@ -11,6 +11,77 @@ Spec: `docs/governor-schema/index.html` (serve: `python3 -m http.server 8145 --d
 
 ---
 
+## 2026-09-10 (late) — THE WRITE PATH NEVER WORKED, and 21 green tests said it did
+
+### `[MEASURED]` The single most important finding of this build
+Chat did a **real write against the dev table** instead of trusting the suite:
+
+```
+[promise] attestation write raised: Object of type datetime is not JSON serializable
+READ BACK FROM THE TABLE: *** NOTHING PERSISTED ***
+```
+
+`write()` passed `datetime` objects as query params. `db_execute` JSON-serialises
+params for the db-agent transport, so **every INSERT raised**. And because
+`write()` swallows and logs — which is correct, telemetry must never fail a turn
+— **it would have shipped producing zero rows behind a fully green 21-test
+suite.** Verified here firsthand in `e227165`: params are now `.isoformat()`
+strings.
+
+**This is the exact failure §5 was rewritten to catch**, and it is the argument
+for the whole demonstration requirement in one artefact:
+
+- a **unit test passing against a mocked writer while nothing reaches the DB**
+- plus a **correct swallow** that hides the failure by design
+- = an attestation table that stays empty while every signal says healthy
+
+The mock was Chat's own, and they said so. Had §5 stayed "green suite = done",
+step 1 would have deployed as a **producer with no output at all** — the
+thirteenth instance of the family, created by the very build meant to close the
+twelfth. `[DESIGN]` **A swallow plus a mock is not two small risks; it is a
+guarantee that failure is invisible.** Neither is wrong alone.
+
+### `[READ]` Second bug behind the first
+`read()` returned a bare list; `db_query` returns `{columns, rows}` with
+positional rows. Now zipped, so a SELECT-list edit cannot silently shift a
+column. Verified in the diff.
+
+### `[MEASURED]` Write path proven against the real table — all three promise states
+```
+real promise  version=v1 tier=thinking delivered=12.50 worker=8.00
+              queue_wait=4.50 (>=0)  cost/quality NULL
+no promise    version/tier/posted_at NULL, notes = pre-deploy enqueue
+task mode     version=v1, tier NULL, notes = "no section-7 tier"
+```
+**The middle two are distinguishable** — deviation 1 (the third state I had
+collapsed) doing exactly the job it was accepted for, against real rows.
+
+`TestWriteParamsAreTransportSafe` added: three pure unit tests asserting the
+transport contract with no DB. **Mutation-checked** — reverting to datetimes
+fails two of three.
+
+### `[MEASURED]` Gate green
+`2704/2711 passed, 2 failed, 0 errors, 5 skipped (1250.6s)` · regressions **0** ·
+known-failing baseline **14**. 2644 → 2711 (+67: 21 promise, 46 tool_manifest).
+The 2 failures are pre-existing LOC ratchets (`main.py` 3279/2200,
+`react_loop.py` 6451/2560), neither touched. The report's "newly passing 12" is
+an interpreter artifact — `.venv/bin/python` vs a baseline frozen under system
+`python3` where those 12 were ModuleNotFoundError. **Nothing was fixed; baseline
+stays 14.** (Consistent with `feedback_pytest_interpreter_baseline`.)
+
+### `[OPEN]` §5 status — one surface partially de-risked, none closed
+| surface | state |
+|---|---|
+| **P** persisted | write path **proven against the real table** — but not via a real turn. **Not evidenced.** |
+| **W** written | not evidenced — needs a real POST payload |
+| **E** emitted | not evidenced — needs `gcloud logging read` against a deployed build |
+| migration idempotency | evidenced |
+
+**Gate is green, so step 1 is ready. Deploy is with Ananth** under his standing
+rule to Chat: gate green, then hold and say it is ready, never ship unprompted.
+
+---
+
 ## 2026-09-10 (evening) — step 1 BUILT, not deployed; §5 not satisfied
 
 ### `[READ]` `b67603c` verified firsthand — structure is as specified
