@@ -256,6 +256,30 @@ h3{font-size:.82rem;margin:1.8rem 0 .5rem;letter-spacing:.04em;text-transform:up
 
 <div class="note"><b>2. Nobody reads it.</b> The cost bound (§7) is 15× wide <i>specifically so the distribution can be observed</i>. If no one takes that reading, the bound is not an instrument, it is an unmonitored blank cheque — and the attestation becomes the thirteenth producer-without-a-consumer in this program. <b>The report is therefore part of the build, not a follow-on:</b> conformance by tier by promise version, over a window, with the delivered distribution beside the promised number. <b>If the report is not in scope, the attestation is not worth writing.</b></div>
 
+<h2>7d · The build sequence — Ananth, 2026-09-10</h2>
+<p class="sub"><i>"lets just integrate promise and promise end… for now. Then next step is translating promise to levers / targets. Then counting how much we have spent and what''s next."</i> <b>Three steps, in order. Nothing from a later step is in scope during an earlier one.</b></p>
+
+<div class="ov"><table>
+<tr><th></th><th>step</th><th>what it establishes</th><th>state</th></tr>
+<tr><td><b>1</b></td><td><b>Integrate promise-start and promise-end</b></td><td>every turn <b>carries a promise</b> from POST, and <b>closes it</b> at PUBLISH. The clock runs on the user''s boundary (§7c), not the worker''s</td><td><span class="tag t-part">NOW</span></td></tr>
+<tr><td><b>2</b></td><td><b>Translate the promise into levers / targets</b></td><td>the governor stops reasoning against invented numbers and reasons against <b>the promise it is carrying</b> — which is what makes rounds, depth and tool count answerable to something</td><td><span class="tag t-no">next</span></td></tr>
+<tr><td><b>3</b></td><td><b>Count what was spent, and what remains</b></td><td>delivered vs promised, per term. Cost attribution, the residual, the report</td><td><span class="tag t-no">after</span></td></tr>
+</table></div>
+
+<div class="note"><b>Step 1 is a boundary, not a measurement.</b> It is easy — and this page has already done it once — to slide from "attach a promise" into "measure whether it was met," and end up auditing cost attribution before a single turn carries a promise at all. <b>Step 1 succeeds when a turn can be asked "what did you promise?" and answer.</b> Whether it kept the promise is step 3''s question. <span class="sub">Deferred to step 3, and explicitly NOT step 1: the <code>parser</code> / <code>phi_classify</code> attribution gap, the cost-class declaration, the unclassified-module ruling, and the conformance report.</span></div>
+
+<h3>Step 1 — the whole of it</h3>
+<div class="ov"><table>
+<tr><th>where</th><th>what happens</th></tr>
+<tr><td><b>POST</b><br><code>api/chat.py:315</code> <code>post_chat</code></td><td>resolve the tier''s promise (§7), stamp <b><code>posted_at</code></b> (wall-clock UTC) and <b><code>promise_version</code></b> into the queue payload. <b>The promise now travels with the request.</b></td></tr>
+<tr><td><b>carry</b><br>worker → <code>PipelineContext</code></td><td>the promise rides through to the pipeline as an object, alongside the existing <code>user_id</code> / <code>chat_mode</code> fields that already make this trip</td></tr>
+<tr><td><b>PUBLISH</b><br><code>orchestrator.py:1090</code> <code>_publish_completed</code></td><td>stamp <b><code>published_at</code></b>, close the promise, write the attestation row — <b>in a <code>finally</code></b>, so a turn that errored or timed out still closes (§7b)</td></tr>
+</table></div>
+
+<div class="note"><b>The one technical trap in step 1.</b> <code>t0_start</code> is a <code>perf_counter()</code> — <b>monotonic and process-local</b>. POST runs in the API process; the turn runs in the worker. <b>Two perf_counters from two processes cannot be subtracted.</b> <code>posted_at</code> must be wall-clock UTC. Keep <code>t0_start</code> as-is for the existing in-turn timings; it is not being replaced, only joined by a second clock that spans processes.</div>
+
+<div class="note"><b>Why step 2 needs step 1 and not the reverse.</b> The governor today compares <code>elapsed_s</code> against <code>soft_target_s</code> — a <b>budget it was handed</b>, with no link to anything promised to anyone. Once the turn carries a promise, the same comparison becomes <i>"am I on track for what was promised?"</i> and the levers acquire a target. <b>That is the whole point of doing the boundary first:</b> levers pointed at an invented number are the state we are already in.</div>
+
 <h2>8 · What is missing — RECALL, and how we start tracking it</h2>
 <p class="sub">Accuracy has a live proxy. Recall has nothing. Marked here so the gap is tracked rather than assumed away.</p>
 <div class="ov"><table>
