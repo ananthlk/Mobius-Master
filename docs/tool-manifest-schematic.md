@@ -198,6 +198,78 @@ comprehensive test.**
 
 ---
 
+## 3.2 🟢 ANSWERED, 2026-09-10 — the turn was run. They are selected, and they work.
+
+[REPORTED — Payor Policy Agent. Live probe against dev rev `00977-8bl`, digest
+`sha256:ca0695e4…9327a`, commit `299519c`. Spans read back from `turn_spans`.]
+
+§3.1 named the fair test and recorded that it had not been run. It has now been run.
+**Both open questions above are closed, and they close in the direction of the caveat,
+not the finding.**
+
+| Query | Emitted | Dispatched | `tool.result` |
+|---|---|---|---|
+| market size for behavioral health | `get_market_size` | `success` | `no_sources` |
+| …in Florida | `get_market_size` | `success` | `no_sources` |
+| top organizations by market share | `get_top_orgs`, `get_market_share_timeseries` | `success` | `no_sources` |
+
+58 offered per turn, 25 of them `get_*`. Selection is not merely non-zero, it is
+**correct**: a market-share question drew `get_top_orgs` *and*
+`get_market_share_timeseries` together. The answers carry real figures — 2,923,378
+beneficiaries, $793,099,275.81 paid, named organizations with revenue.
+
+**This does not contradict §3.1's measurement.** Zero rows across the recorded window is
+true, and so is this. The window was appeals/rates/policy traffic; these are market
+analytics; nobody had asked one. Chat Master's caveat was right and the finding it
+qualified was an artifact of the query mix. That is the same shape as the payor-name
+hypothesis retired on 121 observations, and it is the third time this program has
+mistaken *what we asked* for *what the system can do*.
+
+**🔴 The design consequence, which is why this could not wait:**
+
+> §3's 58 → 32 and ~6,500 tokens/round rests, in §3.1's own words, on
+> ***"never selected" rather than "defective."*** **Neither now holds.** These 29 tools
+> are selected on the first turn that calls for them, and they return data. **Pruning
+> them removes 45% of the catalogue — the analytics half, per §8.3 — and with it a
+> working capability.** §11–§13's deterministic selector must be re-checked against
+> this before any tier assignment is built on "dead weight": a selector trained or
+> tuned to deprioritise these will suppress tools that demonstrably fire correctly.
+>
+> The token argument is untouched and still stands on its own — 29 tools cost
+> unconditionally and are used rarely. **Rare is not never, and the remedy for rare is
+> conditional inclusion, not deletion.**
+
+**One real defect did surface, and it is not tool selection** — see
+`mobius-chat/docs/mcp-analytics-tool-findings.md` (`a3ce54f`). `mcp_adapter` sets
+`signal="no_sources"` on **both** the success and failure branches, while the success
+branch also attaches a `SourceRef`. Single-valued by the tell adopted into
+`rating_rubric.py` in `4a24c4b` — the code cannot produce a second value. Three
+consumers read it expecting it can:
+
+- `_skill_golden` — a successful MCP answer is **never authoritative**, so the loop stays
+  free to escalate to `google_search` and anchor composition on web content over the
+  figures the tool returned;
+- `final_signal` (`react_loop.py:6099`) — the badge reads *no sources* on a populated
+  answer, and `citations: []` was observed on exactly that turn;
+- `tool_result_verdict` — **funnel stage 3 is blind across the whole MCP surface**, which
+  matters here because it is the instrument §3.1 was read from. A populated answer and a
+  dead server record the identical span.
+
+`ReactRetryGuard._is_zero_result` is spared, and only by the attached `SourceRef`
+— checked, not assumed. Anyone fixing the signal must not remove that source first.
+
+Characterization tests added (`TestMcpSignalIsSingleValued`, passing). **Not fixed** —
+tool surface, sequenced behind this schematic per Ananth's instruction.
+
+**Not answerable from this probe:** the turn as §3.1 phrased it —
+*"market size for behavioral health in **Tampa**"* — never reaches the planner at all.
+It returns **HTTP 422**, `identifier_labels: ["Address"]`, on the word *"Tampa"*. Any
+city name blocks; Miami too. State-level, no-geography and org phrasings pass. That is a
+third cause neither seat listed, it is on the message gate (`api/chat.py:247`), and it is
+filed for the PHI seat untouched.
+
+---
+
 ## 4. The composition path — line by line
 
 [READ throughout this section.]
