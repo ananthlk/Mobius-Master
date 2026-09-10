@@ -42,6 +42,22 @@ a consumer: a machine-checkable marker whose machine-checkable content is
 "someone thought this was relevant", believed MORE than an untagged test
 precisely because it carries a tag.
 
+HOLD RELEASED 2026-09-09 (Ananth): tag writing PROCEEDS on the convention as
+it stands — `guards("<node_key>:<guarantee_slug>")`, node_key matching the
+schema node exactly, mutation-demonstrated. Two open questions were sent to
+Eval (should an un-mutated tag render ASSERTS-NOTHING rather than
+TAGGED-UNVERIFIED; should mutation evidence be recorded somewhere the
+generator can read) and had not come back. The cost of waiting now exceeds
+the cost of a rename: at one tag the migration was free, but the hold was
+blocking the second tag on every node in the P3 pass.
+
+WHAT THIS DOES *NOT* CHANGE: a tag still renders TAGGED-UNVERIFIED, never
+GUARDED. Only Eval's audit promotes it, on Eval's own rule that a node
+cannot mark itself GUARDED. Proceeding unblocks the WRITING of tags, not
+their PROMOTION — so if Eval later rules the marker shape differently, what
+is owed is a mechanical rename of a known set of markers, and no verdict
+recorded in the meantime was ever self-granted.
+
 FIRST IMPLEMENTATION WAS WRONG AND IS RECORDED HERE. I built reachability as
 a TRANSITIVE import closure — a test importing the orchestrator "reaches"
 every module the orchestrator imports. That returned 24 of 24 nodes reached,
