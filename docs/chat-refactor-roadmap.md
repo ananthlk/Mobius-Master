@@ -15,7 +15,7 @@ deliberately not yet asked because P4 has not opened. Per-phase status below is
 hand-maintained in `refactor_roadmap.py`'s `PHASE_STATUS`, because completion is a
 judgement about a gate, not something derivable from the findings file.
 
-**138 bugs · 93 sequenced into 6 phases · 41 explicitly outside · 0 UNSEQUENCED · 27 of the 93 sequenced have NO OWNER**
+**139 bugs · 94 sequenced into 6 phases · 41 explicitly outside · 0 UNSEQUENCED · 28 of the 94 sequenced have NO OWNER**
 
 > The two counts are different questions and the second one used to be invisible.
 > `UNSEQUENCED` was previously printed as "unassigned", which reads as *nobody owns
@@ -28,7 +28,7 @@ judgement about a gate, not something derivable from the findings file.
 
 | Phase | Name | Bugs | Owner | Gate metric | Blocks | Status |
 |---|---|---:|---|---|---|---|
-| **P1** | Delete | 17 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☑ **COMPLETE** 2026-09-08 — ~31,900 lines removed across P1.1/P1a/P1b/P1c/P1d, zero regressions |
+| **P1** | Delete | 18 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☑ **COMPLETE** 2026-09-08 — ~31,900 lines removed across P1.1/P1a/P1b/P1c/P1d, zero regressions |
 | **P2** | Make absent producers detectable | 36 | chat + Eval | every segment timed AND each timed segment's attribution verified against a known-external call — an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☑ **COMPLETE** 2026-09-09 — P2a planner orphans, P2b latency telemetry deployed with spans bound to schema node keys |
 | **P3** | One decision point | 20 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ◐ **IN PROGRESS** — `state_load` closed (StateUnavailable + first contract tag); `tool_manifest` opened 2026-09-09 |
 | **P4** | Split | 16 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
@@ -43,10 +43,10 @@ in `Blocks` have passed their gate.
 | Owner | Sequenced bugs |
 |---|---:|
 | chat | 62 |
-| unassigned-owner | 27 |
+| unassigned-owner | 28 |
 | me | 4 |
 
-## P1 — Delete  ·  17 items
+## P1 — Delete  ·  18 items
 
 **Owner** chat · **ratifier** DB seat, Tech Review
 **Gate** lines removed; handler count down; ZERO invariant movement  
@@ -59,6 +59,7 @@ The cost of leading with it, stated plainly: this phase CANNOT CLAIM A LATENCY W
 | ☐ | Node | Owner | Finding |
 |---|---|---|---|
 | ☐ | `clarification` | chat | FOUR CLARIFY MECHANISMS, THREE OF THEM DEAD, ALL FOUR STILL IN THE TREE |
+| ☐ | `integrate` | — | OWNER(appeals seat + chat): THE ROUTING FIX WOULD NOT HAVE FIXED THE SYMPTOM -- THE DESTINATION SERVER FAILS O |
 | ☐ | `integrate` | chat | THE LAST LINE OF DEFENCE STRING-MATCHES AN ERROR MESSAGE IT DOES NOT OWN, AND TWO FAIL-OPENS POINT THE SAME WA |
 | ☐ | `integrate` | chat | AN HONEST EMPTY ARRIVES DRESSED AS EVIDENCE, AND THIS CREATES A FIX-ORDERING HAZARD BETWEEN TWO SEATS |
 | ☐ | `integrate` | chat | THREE APPEALS TOOLS ARE DISPATCHED TO A SERVER THAT DOES NOT HAVE THEM, AND THE ERROR IS CITED AS A SOURCE |
