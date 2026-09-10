@@ -741,3 +741,16 @@ should cover the full LOW-confidence uncorroborated heuristic-only set — Name,
 Date, MRN — in structural/contact/nav context. Recall FLOOR unchanged (Presidio-strong, clinical-context,
 real SSN, LLM patient-detection still hard-block). Still gated on Ananth's coupled decision (recall carve-out
 + chat-PHI owner). This real-user case is the argument that Option A is load-bearing, not optional.
+
+### 2.8 · Option A DEFERRED — "no user override for now" (Ananth's directive, 2026-09-09)
+
+Ananth directed: **no user-override-ingests path ships now; gate stays fail-closed.** Holds BOTH overrides —
+the false-positive override (Option A) AND the genuine-PHI attestation-admit (Ask 2, already BAA-parked).
+- **Stands (deterministic precision, no override):** reference-author names + Title-Case headings + web-nav
+  chrome suppressed for good (structurally non-patient). Reference-/heading-heavy policy docs now ingest.
+- **Still blocks (fail-closed, no override):** medical-TITLE fragments + corporate-footer address/contact
+  block — i.e. most real payer homepages (Molina case). Deferred until Ananth green-lights an override path
+  (+ chat admit infra / BAA for the genuine-PHI half).
+- **Override design** (confidence-tiered, deterministic, no LLM) specced + build-ready; classifier pings on
+  green-light. Decision brief: `DECISION_option_a.md` (outcome: DEFERRED).
+- phantom ssn/MRN = chat HTML→text extraction-boundary fix, unaffected by this ruling.

@@ -1,7 +1,15 @@
-# Decision needed (Ananth) — Option A: make fetch‑to‑RAG usable on real payer content
+# Decision — Option A: make fetch‑to‑RAG usable on real payer content
 
-**One decision, two coupled parts. Owner of the ask: Extension (lane coordinator). Blocks: everything that matters on this lane.**
+**One decision, two coupled parts. Owner of the ask: Extension (lane coordinator).**
 _2026-09-09 · full detail in `USER_FETCH_PAIRING_SPEC.md` §2.8 / §2.9_
+
+> ## ⛔ OUTCOME — DEFERRED (Ananth's directive, relayed via PHI/compliance seat 2026‑09‑09; Extension to confirm in‑session)
+> **"No user override trumps for now."** No user‑override‑ingests path ships — the gate stays **fail‑closed / hard‑block**. This holds BOTH overrides: the false‑positive override (Option A below) **and** the genuine‑PHI attestation‑admit (Ask 2, already parked behind the BAA).
+> - **What this changes:** the deterministic precision fixes already shipped **stand** (references, Title‑Case headings, web‑nav chrome — those doc classes now ingest). What **still blocks**: docs whose remaining flags are a medical‑TITLE fragment or a corporate‑footer address/contact block (i.e. most real payer homepages). No override to clear those until Ananth green‑lights an override path (and the chat‑side admit infra / BAA exist).
+> - **The override design is specced and build‑ready** (confidence‑tiered, deterministic, no LLM) — parked, not abandoned; the classifier pings when/if it's green‑lit.
+> - The rest of this brief is retained as the record of what the decision was and why.
+
+---
 
 ---
 
