@@ -535,3 +535,97 @@ Before any of this is built, and answerable today:
    substrate works and §9.2's example is real rather than illustrative.
 2. **§3 still stands** — do the 26 `get_*` tools dispatch? Independent of all of this,
    and it halves the catalogue either way.
+
+---
+
+# 10. THE TOOL-SIDE DECLARATION — subscribes vs requires
+
+**Ananth, 2026-09-10:** *"so tools will have to declare few things — what lexicon
+categories they subscribe to and what requirements they have on a lexicon basis.. the
+only thing is real lexicon drift but we will handle it."*
+
+**The two-field split is the load-bearing idea in the whole design**, and it is worth
+separating carefully because they do different jobs at different stages:
+
+| field | question it answers | stage | effect |
+|---|---|---|---|
+| **`subscribes`** | *"which tags am I relevant to?"* | Stage C rank | contributes to **score** |
+| **`requires`** | *"which tags must resolve or I cannot function?"* | Stage A/B **gate** | **eligibility, not score** |
+
+**Why the distinction matters more than it looks:** a tool that cannot work should be
+**excluded with a stated reason**, not ranked eighth. If "I need a payor and there isn't
+one" is expressed as a low score, then on a thin turn it can still surface — and it
+surfaces *without* the thing it needs, which is how a tool gets called and returns
+nothing. That is `appeals_get_playbook` with no payor: a guaranteed empty result,
+reachable today.
+
+So `requires` is a **hard filter** — same posture as authority in §8.4 constraint 1, and
+for the same reason. Eligibility is not a weight.
+
+## 10.1 The worked example, and where it stops working
+
+| tool | subscribes | requires | returns |
+|---|---|---|---|
+| `appeals_get_playbook` | `d:appeals_and_disputes` | **`j:payor.*`** | deadline, submission_method, portal, fax, mail, appeal_levels |
+| `appeals_lookup_rules` | `d:appeals_and_disputes` | **a CARC code** | appeal_argument, triggers_when, requires |
+
+[Return fields READ from the live endpoint and the manifest text.]
+
+**`requires` makes the ineligible cases mechanical**, which is real value:
+- query with a CARC but no payor → **playbook is ineligible**, stated, not silently
+  called and empty
+- query with a payor but no CARC → **rules is ineligible**
+
+**🔴 But it does not solve Ananth's actual turn, and I am not going to pretend it does.**
+*"how do i appeal a carc 197 denial for sunshine health"* supplies **both** a payor and
+a CARC. Both tools are eligible. `requires` discriminates nothing here, and both
+`subscribes` sets contain `d:appeals_and_disputes`. **On this model the tie is unbroken**
+— which is the same position we are in today, reached by a cleaner route.
+
+## 10.2 What actually discriminates them: the `p:` axis
+
+The two tools answer **different kinds of question about the same subject**, and the
+Lexicon already has an axis for that:
+
+- `appeals_get_playbook` returns **deadline, submission method, portal, fax, address,
+  escalation ladder** → this is **process / logistics**. *How do I file, where, by when.*
+- `appeals_lookup_rules` returns **appeal_argument, triggers_when, requires** → this is
+  **substance**. *What do I say.*
+
+*"How do I appeal…"* is a **process** question. So the discriminator is a `p:` tag, not
+the `j:` axis I proposed in §9.2 — **and I should correct that: §9.2 credited `j:` with
+the discrimination, and on this turn `j:` resolves for both.** The `j:` axis makes
+`requires` work; the `p:` axis is what breaks the tie.
+
+[UNVERIFIED — whether live query-side tagging actually emits a `p:` tag for *"how do i
+appeal"*, and whether the existing `p:` vocabulary (`p:prior_authorization`,
+`p:process`, `p:utilization_management` observed in code) has the granularity to
+separate *how-to-file* from *what-to-argue*. **This is the measurement that decides
+whether the design works.** It needs no code: tag the real query and look.]
+
+## 10.3 Lexicon drift — the cheap half, since Ananth has the rest
+
+He is right that drift is the real exposure and that it is handled elsewhere. **One
+mechanical piece belongs in this node and costs nothing:**
+
+**A tool declaring a tag that no longer exists in the Lexicon must fail a build, not
+silently never match.** A `requires: j:payor.*` against a retired axis makes the tool
+permanently ineligible and *invisible* — no error, no log, just a tool that is never
+offered again. That is the `make_tool_failed` shape exactly: a condition that can never
+be satisfied looks identical to a condition that is never met.
+
+The check is a set-difference between declared tags and the live vocabulary, run at
+startup or in CI. It is the same decay problem the mutation ledger solved by recording
+`verified_at` and demoting when the referenced files move — and it wants the same
+treatment: **declared-against-vocabulary-version, re-checked, demoted loudly.**
+
+## 10.4 Open, ordered by what unblocks the most
+
+1. **Does live query-side tagging emit a usable `p:` tag for *"how do i appeal…"*?**
+   (§10.2 — decides whether the tie can be broken at all. Measurable today, no code.)
+2. Who authors `subscribes` / `requires` for the **29 MCP tools**? Their descriptions
+   come from a remote `list_tools` response — so either the MCP server declares them, or
+   chat maintains an override table. This is a contract question with another team.
+3. Does `requires` support disjunction (`j:payor.* OR j:regulatory_authority.*`)? The
+   appeals ladder escalates to AHCA, so at least one tool spans both.
+4. Do the 26 `get_*` tools dispatch? (§3 — unchanged, and still halves the catalogue.)
