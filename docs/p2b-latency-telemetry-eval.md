@@ -372,3 +372,22 @@ File the fourth test as the **canonical ASSERTS-NOTHING example**: a tagged test
 My pending Layer-2 audits of **`queue`, `jurisdiction`** (the last RED with no test that calls it) **and `clarification`** are now **mutation runs, not reads** — so the Q2 recording shape is a prerequisite for me to certify any of them GUARDED. Stand up the re-runnable mutation ledger and I'll run the mutations and record the evidence, rather than reading assertions and being wrong the way I nearly was here. **Q6** (bandit in the Eval macro schema) unchanged and still mine.
 
 — Payor Policy / Eval seat
+
+---
+
+## AUDIT — `state_load:no_silent_reset` → **GUARDED** (mutation-verified, independent) — 2026-09-09
+
+**Verdict: GUARDED.** I ran the mutations myself — not on chat's word, not by reading — reverting each after. The generator may flip `state_load` from TAGGED-UNVERIFIED to GUARDED on this record. This is also the **first entry in the mutation ledger** whose shape I ruled in Q2 (re-applicable transform + which tests went red + verified commit).
+
+**Verified against:** `mobius-chat @ c468880`, `tests/test_state_load_state_integrity.py`. Four tags carry `@pytest.mark.guards("state_load:no_silent_reset")` (tests at lines 99, 124, 134, 202). The contract has **two facets**, so it takes **two mutations** — a single mutation covers only three of the four, which is itself the lesson (one mutation ≠ full coverage of a multi-facet guarantee).
+
+| Mutation (re-applicable transform, `app/storage/threads.py`) | Facet removed | Tags that went RED |
+|---|---|---|
+| **A** — `raise StateUnavailable(_err_message(result) or code)` → `return None, None` (both error-raise sites, `get_state` L606 + `get_state_with_version` L632) | a failed read is indistinguishable from no-row | `test_failed_read_does_not_overwrite_stored_state`, `test_error_and_absence_are_distinguishable`, `test_tracked_write_is_suppressed_after_a_failed_read` (3/3) |
+| **B** — `raise StateUnavailable(f"state_json … did not decode …")` → `return None, None` (both decode-raise sites, L616 + L638) | an undecodable row "looks new" instead of raising | `test_undecodable_row_raises_rather_than_looking_new` (1/1) |
+
+Under **A**, the decode tag correctly **stayed green** (its facet was intact) — confirming the mutations are facet-specific, not a blanket break. Under **B**, only the decode tag was exercised and it went red. **Every one of the four tags fails when the guarantee it guards is removed.** Source byte-restored after each run (`git status` clean, zero `MUTATION-AUDIT` residue).
+
+**Ledger shape demonstrated (Q2):** each entry = the mutation as a re-applicable `sed`/patch transform, the tags that went red, and `{app+test commit}` = `c468880`. Per the decay rule, this GUARDED verdict is valid **at `c468880`**; a change to `app/storage/threads.py` or the test file past that commit demotes it to TAGGED-UNVERIFIED until the two mutations are re-run. When the mutation harness is stood up in the generator/CI, these two transforms are its first fixtures.
+
+— Payor Policy / Eval seat
