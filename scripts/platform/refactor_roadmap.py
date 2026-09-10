@@ -312,6 +312,7 @@ PRINCIPLES = [
 ]
 
 OUT_OF_PROGRAM = [
+    ("tool_manifest", "PAYOR'S canonical:null CHANGE BREAKS display_name", "other seat", "roster seat's one-line fix in mobius-skills org_handler.py:1015; payor notifying directly"),
     ("tool_manifest", "THE ENDPOINT AT THE CENTRE OF THIS WHOLE INVESTIGATION HAS NO CONSUMER", "other seat", "mobius-payor docstring + mobius-rag wiring; mine and the payor seat's, not chat's"),
     ("tool_manifest", "TWO SCRIPTS ARE NAMED LIKE TESTS AND ONE OF THEM ABORTS", "other seat", "mobius-payor tests/; not a chat change — routed to the payor seat with the real cause"),
     ("tool_manifest", "'51% OF THE CORPUS' WAS ONE TEMPLATE REPEATED 72 TIMES", "other seat", "appeals-agent self-reported; their corpus, their re-key — retracts three of my own filings"),

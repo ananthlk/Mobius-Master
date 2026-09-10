@@ -15,7 +15,7 @@ deliberately not yet asked because P4 has not opened. Per-phase status below is
 hand-maintained in `refactor_roadmap.py`'s `PHASE_STATUS`, because completion is a
 judgement about a gate, not something derivable from the findings file.
 
-**122 bugs · 79 sequenced into 6 phases · 39 explicitly outside · 0 UNSEQUENCED · 27 of the 79 sequenced have NO OWNER**
+**123 bugs · 79 sequenced into 6 phases · 40 explicitly outside · 0 UNSEQUENCED · 27 of the 79 sequenced have NO OWNER**
 
 > The two counts are different questions and the second one used to be invisible.
 > `UNSEQUENCED` was previously printed as "unassigned", which reads as *nobody owns
@@ -247,6 +247,7 @@ Each carries a reason. Excluding by silence is the failure mode this guards agai
 | `tool_manifest` | other seat | payor seat's matcher in mobius-payor registry_admin.py; not a chat change | OWNER(payor seat): THE _GENERIC BLOCKLIST MAKES PASS 2 UNREACHABLE FOR |
 | `tool_manifest` | other seat | appeals-agent self-reported; their corpus, their re-key — retracts three of my own filings | OWNER(appeals-agent, self-reported): '51% OF THE CORPUS' WAS ONE TEMPL |
 | `tool_manifest` | other seat | mobius-payor docstring + mobius-rag wiring; mine and the payor seat's, not chat's | OWNER(me + payor seat): THE ENDPOINT AT THE CENTRE OF THIS WHOLE INVES |
+| `tool_manifest` | other seat | roster seat's one-line fix in mobius-skills org_handler.py:1015; payor notifying directly | OWNER(roster seat): PAYOR'S canonical:null CHANGE BREAKS display_name  |
 | `tool_manifest` | other seat | mobius-payor tests/; not a chat change — routed to the payor seat with the real cause | OWNER(payor seat / whoever owns intake): TWO SCRIPTS ARE NAMED LIKE TE |
 | `tool_manifest` | other seat | appeals-agent self-reported; their code, their fix — chat must stop treating the markers as 'empty' | OWNER(appeals-agent, self-reported): THE GUARD IS FAIL-OPEN ON SCALARS |
 | `tool_manifest` | other seat | appeals contract change offered; chat consumes once shipped | A MISS IS 200-WITH-{} AND 'PAYOR UNKNOWN' IS BYTE-IDENTICAL TO 'CARC N |
