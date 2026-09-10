@@ -24,7 +24,7 @@
     "owner": "chat + Eval",
     "gate": "every segment timed AND each timed segment's attribution verified against a known-external call \u2014 an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
-    "n": 21
+    "n": 23
    },
    {
     "id": "P3",
@@ -2226,6 +2226,18 @@
     [
      "watch",
      "SEQUENCED AS P6 (Ananth, 2026-09-09): the tool/capabilities manifest moves to PERSISTENCE with a UX so a tool change needs no deploy; access provisioning becomes its own model rather than riding the subscription table; and the turn RETRIEVES its tools \u2014 Ananth's mechanism: 'a simple even vector search for tool... this will cut short on tokens and make a real good determination and make the latency also faster.' Three effects measured separately: fewer prompt tokens (direct cost, countable today), better selection (P3's funnel is the before-measurement), lower latency (a consequence of the first two, NOT an independent claim). Follows P3 and cannot lead it: retrieval changes WHICH tools are offered, so shipping it while selection is still sporadic makes every miss unattributable \u2014 the exact ambiguity P3 exists to resolve. pgvector; a catalogue this small may not need an index at all \u2014 measure first."
+    ],
+    [
+     "bad",
+     "OWNER(chat): THE ONLY LIVE CONSUMER OF THE TOOL-RESULT STORE IS THE ONE THAT EMPTIES IT. chat_tool_results holds 0 rows in the entire dev database. save_tool_result (writer): 0 external callers. get_tool_result (reader): 0. format_cached_result: 0. clear_tool_results (DELETE): 1 \u2014 state_load.py:130, on every STANDALONE turn. Written by nothing, read by nothing, cleared faithfully. This is the purest instance of the producer-without-a-consumer class the program has found: not a producer whose output nobody reads, but a STORE WHOSE ONLY WORKING PART IS ITS DELETE PATH. Found by Chat Master in P3 Stage 0, 2026-09-09. It sits exactly between the two layers Stage 0 was asked to separate, which is why the traced instance could not be resolved."
+    ],
+    [
+     "bad",
+     "OWNER(chat): STAGE 0 COULD NOT NAME THE LAYER, AND THE REASON IS THE FINDING \u2014 TWO OF THE FOUR FUNNEL STAGES HAVE NO INSTRUMENT. Measured over 78 turns / 10.75h on dev. (1) OFFERED is recorded as '__unfiltered__' on all 167 records \u2014 that records the FILTER, not the MANIFEST. allowed_tools was None on 76 of 76 turns, so subscription/policy narrowing IS eliminated; but None means 'all MODE-APPROPRIATE tools', so mode still shapes the contents and nothing records them. We can say no tool was filtered out. We cannot say any tool was OFFERED. (2) CALLED is '__none__' for both 'chose nothing' and 'emitted unparseable JSON' \u2014 the parser returns None or logs at DEBUG and both land on the same value. Ananth's json-formatting hypothesis is therefore UNTESTABLE as instrumented; its one logger.warning fired 0 times in 12h but covers only the late balanced-extract path, so zero warnings is NOT evidence of zero parse failures and must not be reported as one. (3) RETURNED-NONEMPTY has no instrument at all: success is result.get('success') and does not imply content. (4) CLAIMED-ABSENCE has no counter. FIX IS SMALL AND IS THE NEXT CHANGE: per-tool names when unfiltered; split __none__ into __none__ vs __unparseable__; record dispatch EMPTINESS beside its success flag. Each is one count at a site already recording a neighbouring count."
+    ],
+    [
+     "good",
+     "THE EMIT->DISPATCH BOUNDARY IS CLEAN AND IS NOW ELIMINATED AS A CAUSE: 86 tool emissions, 86 dispatches, ZERO loss (76 success / 10 failure). 'The model asked and the executor never ran it' is off the table. Together with allowed_tools=None on 76 of 76 turns, Stage 0 eliminated two candidate causes on persisted evidence rather than by argument \u2014 which is the whole point of diagnosing before fixing."
     ],
     [
      "bad",
