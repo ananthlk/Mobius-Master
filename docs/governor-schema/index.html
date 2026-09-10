@@ -132,7 +132,68 @@ code{font-family:var(--mono);font-size:.92em;background:var(--bg3);padding:.05re
 </table></div>
 <div class="note"><b>The thinking tier executes 87% of its rounds at <code>fast</code> depth.</b> The tier name describes the budget, not the work. And <b><code>normal</code> never appears as a round depth in 4,060 rounds</b> — <code>_DEPTH_RANK</code> defines fast/normal/thinking and the middle rung of the inner dial is unreachable, so a round is either cheap or expensive with nothing between.</div>
 
-<h2>7 · Quality — the term we cannot yet state</h2>
+<h2>7 · THE PROMISE — codified</h2>
+<p class="sub">Ratified from §6's measurement, 2026-09-10. Latency and cost are stated at p50 with the observed p90 alongside. <b>Quality is stated as a posture, not a number, because §8 shows recall is not yet measured.</b></p>
+<div class="ov"><table>
+<tr><th>tier</th><th>latency</th><th>cost</th><th>quality</th><th>best suited for</th><th>tool set</th></tr>
+<tr>
+ <td><b>FAST</b><br><span class="tag">quick</span></td>
+ <td><b>~13s</b><br><span class="legend">p50 14.6 · p90 33.9</span></td>
+ <td><b>~1¢</b><br><span class="legend">$0.0104 p50</span></td>
+ <td><b>no assurance</b> on recall or accuracy — the groundedness floor never runs</td>
+ <td>simple look-ups. A known entity, a single fact, a definition</td>
+ <td><b>narrow, and only tools that can return inside the budget.</b> A tool that cannot answer in ~13s does not belong in a fast turn</td>
+</tr>
+<tr>
+ <td><b>NORMAL</b><br><span class="tag">copilot</span></td>
+ <td><b>~31s</b><br><span class="legend">p50 31.3 · p90 56.1</span></td>
+ <td><b>~3¢</b><br><span class="legend">$0.0303 p50</span></td>
+ <td><b>some assurance on all three.</b> Groundedness floor runs; 96.1% pass</td>
+ <td>the default. Most real questions</td>
+ <td>broader</td>
+</tr>
+<tr>
+ <td><b>THINKING</b><br><span class="tag">agentic</span></td>
+ <td><b>~95s</b><br><span class="legend">p50 95.5 · p90 218.5</span></td>
+ <td><b>~5¢</b><br><span class="legend">$0.0538 p50 · <b>$0.38 p90</b></span></td>
+ <td><b>best available quality and recall</b> — and the longest wait. 98.1% groundedness pass</td>
+ <td>multi-hop, cross-source, anything filing-critical</td>
+ <td>widest</td>
+</tr>
+</table></div>
+<div class="note"><b>Two of the three terms are honest today; one is a posture.</b> Latency and cost are measured and stated. <b>Quality is ordinal only</b> — <i>none &lt; some &lt; best</i> — because accuracy has a pass-rate proxy and <b>recall has no measure at all</b> (§8). Until it does, the quality column ranks the tiers against each other and promises nothing absolute.</div>
+<div class="note"><b>The fast tier's tool-set rule is a constraint, not a preference.</b> A ~13s budget cannot accommodate a tool whose own p50 exceeds it. That makes <code>tier</code> an input to tool selection, which is the Tool Selection seat's Stage A — and the two designs meet there.</div>
+
+<h2>8 · What is missing — RECALL, and how we start tracking it</h2>
+<p class="sub">Accuracy has a live proxy. Recall has nothing. Marked here so the gap is tracked rather than assumed away.</p>
+<div class="ov"><table>
+<tr><th>term</th><th>measure today</th><th>what it actually tells us</th><th>status</th></tr>
+<tr><td><b>latency</b></td><td><code>chat_turns.duration_ms</code></td><td>the real number, per turn</td><td><span class="tag t-ok">measured</span></td></tr>
+<tr><td><b>cost</b></td><td><code>llm_calls.total_tokens</code> · <code>cost_usd</code></td><td>the real number, per turn</td><td><span class="tag t-ok">measured</span></td></tr>
+<tr><td><b>accuracy</b></td><td>groundedness floor pass/fail</td><td>claims were traceable to retrieved evidence — <b>conditioned on the turn already proposing completion</b>, and never runs in fast</td><td><span class="tag t-part">proxy</span></td></tr>
+<tr><td><b>recall</b></td><td>—</td><td><b>nothing.</b> No signal distinguishes "we found everything relevant" from "we found something and stopped"</td><td><span class="tag t-no">absent</span></td></tr>
+</table></div>
+<div class="note"><b>Why recall cannot be inferred from what we have.</b> A turn that retrieves one relevant source and answers from it scores <i>identically</i> to one that retrieves all five — same groundedness pass, same latency, lower cost. <b>On today's instruments the incomplete turn looks better.</b> That is the whole reason it needs its own term.</div>
+<p class="sub" style="margin-top:.9rem"><b>Three candidate measures, cheapest first — to be chosen, not all built:</b></p>
+<div class="ov"><table>
+<tr><th>#</th><th>measure</th><th>needs</th><th>tells us</th></tr>
+<tr><td>1</td><td><b>gap closure</b> — the completion critic already emits <code>uncovered</code> gaps per round. Track: did the turn end with gaps still open?</td><td>persist <code>uncovered</code> at turn end. Small</td><td>self-reported recall. Weak, but free and available now</td></tr>
+<tr><td>2</td><td><b>bank recall@k</b> — a question bank with known-relevant sources; measure the fraction retrieved</td><td>a bank with labelled sources. Eval's</td><td>the real thing, on a fixed set</td></tr>
+<tr><td>3</td><td><b>tier-delta</b> — run the same question at fast and thinking, compare what each found</td><td>an A/B or a replay harness</td><td>what the cheaper tier <i>missed</i>, which is recall by difference</td></tr>
+</table></div>
+<div class="note"><b>Measure 3 is the one that prices the promise.</b> If thinking finds nothing fast missed, the tier is not worth 7× the latency. If it finds a great deal, the fast tier's "no assurance" is doing real work and should be said louder.</div>
+
+<h2>9 · The two override paths — marked, not built</h2>
+<p class="sub">Only two ways the tier changes. Everything else stays a system default.</p>
+<div class="ov"><table>
+<tr><th></th><th>path</th><th>trigger</th><th>effect</th><th>status</th></tr>
+<tr><td><b>1</b></td><td><b>Caller declares</b></td><td>the user or the API caller states its own requirement — "think harder", "quick answer", an explicit latency ceiling or cost cap</td><td>sets the tier directly. <b>Never widened by the system</b>, only narrowed by a hard limit</td><td><span class="tag t-part">mode exists; <code>extract_query_intent_floor</code> reads "think" intent from the message</span></td></tr>
+<tr><td><b>2</b></td><td><b>Auto-escalate on persistence</b></td><td>the user is <b>still on the same question or thread</b> — repeat asks, a long-lived thread, a re-phrase of an unanswered question</td><td>escalate the tier. The cheap tier has demonstrably failed, so keep paying</td><td><span class="tag t-no">nothing detects this</span></td></tr>
+</table></div>
+<div class="note"><b>Path 2 is the interesting one and it inverts the usual logic.</b> Normally repetition looks like cost to avoid; here it is <b>evidence the promise was not kept</b>. A user re-asking is the strongest available signal that the tier was wrong — stronger than any internal check, because it is the user's own verdict. <b>Recall failure is exactly what makes someone ask again</b>, which means path 2 is also a free recall signal (§8 measure 1's cousin) and worth instrumenting before it is worth acting on.</div>
+<div class="note"><b>Not built. Marked only.</b> Both paths need the SLA to be a real object with a caller term first (§3), and path 2 needs a persistence signal that does not exist. Recorded so the design is not re-derived.</div>
+
+<h2>10 · Quality — the measured floor</h2>
 <div class="ov"><table>
 <tr><th>mode</th><th>turns</th><th>groundedness floor ran</th><th>passed</th><th>pass rate</th><th>budget-exhausted finalize</th></tr>
 <tr><td>agentic</td><td>527</td><td>463</td><td>454</td><td><b>98.1%</b></td><td>0</td></tr>
