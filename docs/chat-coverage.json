@@ -194,7 +194,7 @@
    "node": "react_retry_guard",
    "state": "PERIPHERAL",
    "module": "app.pipeline.react_retry_guard",
-   "direct": 5,
+   "direct": 6,
    "reached": 5,
    "tags": [],
    "rating": "amber"
