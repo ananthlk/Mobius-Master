@@ -205,6 +205,25 @@ h3{font-size:.82rem;margin:1.8rem 0 .5rem;letter-spacing:.04em;text-transform:up
 
 
 
+<h2>7c · The promise clock — POST to PUBLISH, and what we measure is narrower</h2>
+<p class="sub">Ananth, 2026-09-10: <i>"promise starts once a user gives us the question — so basically at post — and ends once they see the answer, at publish."</i> That boundary is <b>wider than the number in §7</b>, and the gap is not small.</p>
+
+<div class="ov"><table>
+<tr><th>segment</th><th>from → to</th><th>in <code>duration_ms</code> today?</th><th>instrumented?</th></tr>
+<tr><td><b>1 · accept</b></td><td>request arrives → enqueued<br><span class="legend"><code>api/chat.py:315</code> <code>post_chat</code> — auth, PHI check, enqueue</span></td><td><span class="tag t-no">NO</span></td><td>PHI check is timed; the segment is not</td></tr>
+<tr><td><b>2 · queue wait</b></td><td>enqueued → worker picks it up</td><td><span class="tag t-no">NO</span></td><td><b><span class="tag t-no">NO TIMESTAMP EXISTS</span></b> — unmeasurable today</td></tr>
+<tr><td><b>3 · the turn</b></td><td>worker start → publish<br><span class="legend"><code>worker/run.py:249</code> sets <code>t0_start</code> → <code>orchestrator.py:1090</code> <code>_publish_completed</code></span></td><td><span class="tag t-part">YES — this is all of it</span></td><td>yes</td></tr>
+<tr><td><b>4 · delivery</b></td><td>publish → the user's next poll returns it</td><td><span class="tag t-no">NO</span></td><td>client-side; not observed server-side</td></tr>
+</table></div>
+
+<div class="note"><b><code>POST /chat</code> does not run the turn — it enqueues and returns a <code>correlation_id</code> to poll.</b> So <code>duration_ms</code>, and therefore the whole of §7's latency promise (14.6s / 31.3s / 95.5s), measures <b>segment 3 only</b>. Those figures are a <b>lower bound on the promise as defined</b>, not the promise. Under load, segment 2 is precisely where the wait goes — a queue absorbs pressure by making people wait, and it is the one segment with <b>no timestamp at all</b>. <b>The promise is currently blind in the place most likely to break it.</b></div>
+
+<div class="note"><b>First instrumentation, and it is small.</b> Stamp <code>posted_at</code> into the queue payload at <code>post_chat</code>, and <code>published_at</code> at <code>_publish_completed</code>. Two timestamps make segments 1, 2 and 3 all derivable and put the attestation on the user's clock instead of the worker's. Until <code>posted_at</code> exists, <b>no attestation can honestly claim to measure the promise</b> — it measures the part of the promise we happened to already time.</div>
+
+<div class="note"><b>Segment 4 is the one to name and then deliberately exclude.</b> "Until they see it" is genuinely the user's experience, but delivery lag is a client poll interval we do not observe server-side — and <b>a promise you cannot observe is unfalsifiable</b>, which is the one thing this whole design exists to prevent. So: <b>promise to PUBLISH</b> (segment 1+2+3, server-observable, attestable), and <b>instrument segment 4 separately</b> so the gap between "published" and "seen" is a known number rather than an assumption. If that gap turns out to be material, it becomes an argument for push over poll — but that is a finding to earn, not to assume.</div>
+
+<div class="note"><b>Consequence for §7 — the latency figures must be restated once <code>posted_at</code> lands.</b> Not corrected: <b>restated</b>, under a new <code>promise_version</code>, with the old version retained. The measurement was honest for what it measured; the boundary changed. This is exactly why the attestation carries <code>promise_version</code> — <b>a widened boundary will look like a latency regression in every chart</b>, and without the version stamp there is no way to tell a regression from a re-definition.</div>
+
 <h2>7b · How the attestation is presented — three surfaces, three audiences</h2>
 <p class="sub">One record, written once. Three readers who need completely different things from it. Getting this wrong in either direction is costly: a user shown the system's view learns nothing and loses trust; a system given the user's view cannot compute conformance.</p>
 
