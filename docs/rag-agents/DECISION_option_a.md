@@ -4,8 +4,12 @@ _2026-09-09 · lane coordinator: Extension · full detail in `USER_FETCH_PAIRING
 
 > **Read this first:** an earlier draft framed an "Option A" LLM/override for Ananth to approve. **Ananth already ruled against that**, and the classifier owner agrees it's the wrong tool. This page is now the accurate record. **No decision is required here** — the fix is a build already underway.
 
-## The problem (real, proven)
-The fetch‑to‑RAG lane is **built and DB‑verified end‑to‑end**, but the PHI classifier **false‑flags real payer web pages**, so the lane is **inert on real content today**. Live proof: Ananth ran the real extension on Molina's *public* FL Medicaid provider homepage → **222 flagged spans, 100% false positive, zero patient data** (nav menus, state lists, section headings, the payer's own corporate contact block, training dates). Two are outright detector bugs: `medical_record_number` firing on the words "Documentation"/"data", `address` firing on "Availity"/"HEDIS".
+## The problem (real, proven) — and the precise today/next split
+The fetch‑to‑RAG lane is **built and DB‑verified end‑to‑end**. The PHI classifier **false‑flags real payer web pages**; the precision work is landing in stages:
+- **TODAY (classifier rev `00026-w8t`, live):** reference‑author names + Title‑Case headings + web‑nav chrome are FIXED → **reference/heading‑heavy POLICY docs (the PDF class) ingest.** But the corporate **CONTACT BLOCK** (Address/Email/Phone/ZIP) + the MRN‑shaped ID still fire → **a real payer HOMEPAGE does NOT ingest yet.**
+- **NEXT (deterministic contact‑block + MRN fix, building — not shipped):** closes Email/Phone/ZIP/MRN/Address → payer homepages ingest.
+
+Live proof: Ananth ran the real extension on Molina's *public* FL Medicaid provider homepage → **222 flagged spans, 100% false positive, zero patient data** (nav menus, state lists, section headings, the payer's own corporate contact block, training dates). Two are outright detector bugs: `medical_record_number` firing on the words "Documentation"/"data", `address` firing on "Availity"/"HEDIS".
 
 ## What Ananth ruled (settled, not open)
 - **No user‑override‑trumps** for now — no user‑override‑ingests path ships.
