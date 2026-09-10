@@ -241,6 +241,16 @@ not the finding.**
 | …in Florida | `get_market_size` | `success` | `no_sources` |
 | top organizations by market share | `get_top_orgs`, `get_market_share_timeseries` | `success` | `no_sources` |
 
+**⚠️ CAVEAT ADDED 2026-09-10, by me, before anyone builds on this table.** The
+`Dispatched` column above is `tool.dispatched`, and for **MCP tools that field is
+unreliable** — see `mobius-chat/docs/mcp-appeals-routing-findings.md` §9: three
+fail-open defaults can record `success` on a call that failed. **The finding
+survives on other evidence and the column should be read as unverified.**
+`Emitted` is sound (it records the planner's selection, before any dispatch), and
+the *returned real data* claim rests on the figures in `chat_turns.final_message`
+— 2,923,378 beneficiaries, $793,099,275.81 paid, named orgs — which no fail-open
+default can manufacture. **The selection conclusion below is unaffected.**
+
 58 offered per turn, 25 of them `get_*`. Selection is not merely non-zero, it is
 **correct**: a market-share question drew `get_top_orgs` *and*
 `get_market_share_timeseries` together. The answers carry real figures — 2,923,378
