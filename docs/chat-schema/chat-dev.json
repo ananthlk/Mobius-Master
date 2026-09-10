@@ -1,5 +1,30 @@
 {
  "generated_by": "scripts/platform/gen_chat_dev.py",
+ "deploy": {
+  "checked": true,
+  "commit": "299519c8c",
+  "commit_status": {
+   "10133ae": "live",
+   "185f426": "live",
+   "299519c": "live",
+   "2b0008f": "live",
+   "65c4751": "live",
+   "b3942f3": "live",
+   "c468880": "live",
+   "c8fc7c8": "live",
+   "de43bd2": "live",
+   "e6b153e": "live",
+   "f2db529": "live",
+   "fb2f0cf": "live",
+   "fc9477c": "live"
+  },
+  "commits_behind_head": "0",
+  "deployed_commit_subject": "state_load: remove the swallow my own instrumentation pass introduced",
+  "head": "299519c8c",
+  "image_tag": "20260910-140519-299519c8ce",
+  "revision": "mobius-chat-00977-8bl",
+  "traffic_percent": "100"
+ },
  "deleted_modules": [
   "app/stages/classify.py",
   "app/stages/plan.py",
@@ -264,117 +289,140 @@
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -507,82 +555,98 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": "live"
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "fleet-power seat",
-     "own": false
+     "own": false,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "phi-classifier seat",
-     "own": false
+     "own": false,
+     "deploy": "live"
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": "live"
     }
    ],
    "dimensions": [
@@ -704,57 +768,68 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -832,17 +907,20 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -951,52 +1029,62 @@
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": "live"
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
-    },
-    {
-     "closed": false,
-     "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -1119,37 +1207,44 @@
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": "live"
     }
    ],
    "dimensions": [
@@ -1297,82 +1392,98 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": "live"
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "fleet-power seat",
-     "own": false
+     "own": false,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "phi-classifier seat",
-     "own": false
+     "own": false,
+     "deploy": "live"
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": "live"
     }
    ],
    "dimensions": [
@@ -1480,22 +1591,26 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -1603,22 +1718,26 @@
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -1720,22 +1839,26 @@
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [],
@@ -1846,62 +1969,74 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -2033,32 +2168,38 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -2191,17 +2332,20 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -2316,32 +2460,38 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -2453,32 +2603,38 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "payor-policy",
-     "own": false
+     "own": false,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -2594,17 +2750,20 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -2749,17 +2908,20 @@
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -2891,37 +3053,44 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "user-manager",
-     "own": false
+     "own": false,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -3049,37 +3218,44 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -3188,17 +3364,20 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -3347,62 +3526,74 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -3499,12 +3690,14 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -3630,42 +3823,50 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -3757,12 +3958,14 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -3968,47 +4171,56 @@
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -4126,32 +4338,38 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -4267,17 +4485,20 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -4361,7 +4582,8 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -4639,242 +4861,290 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": "live"
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": "live"
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": "live"
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
-    },
-    {
-     "closed": true,
-     "owner": "me",
-     "own": false
-    },
-    {
-     "closed": true,
-     "owner": "me",
-     "own": false
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "me",
-     "own": false
+     "own": false,
+     "deploy": null
+    },
+    {
+     "closed": true,
+     "owner": "me",
+     "own": false,
+     "deploy": null
+    },
+    {
+     "closed": true,
+     "owner": "me",
+     "own": false,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "me",
-     "own": false
+     "own": false,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": "live"
     },
     {
      "closed": false,
      "owner": "me, rag",
-     "own": false
+     "own": false,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "payor seat",
-     "own": false
+     "own": false,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": "live"
     },
     {
      "closed": true,
      "owner": "appeals-agent, self-reported",
-     "own": false
+     "own": false,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "me + payor seat",
-     "own": false
+     "own": false,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "roster seat",
-     "own": false
+     "own": false,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "payor seat / whoever owns intake",
-     "own": false
+     "own": false,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "appeals-agent, self-reported",
-     "own": false
+     "own": false,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "appeals-agent",
-     "own": false
+     "own": false,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": "live"
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -4975,17 +5245,20 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -5116,47 +5389,56 @@
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -5337,92 +5619,110 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": "live"
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": "live"
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": "live"
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": true,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": "live"
     },
     {
      "closed": false,
      "owner": "db-seat",
-     "own": false
+     "own": false,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [
@@ -5515,22 +5815,26 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [],
@@ -5594,17 +5898,20 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [],
@@ -5672,22 +5979,26 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "chat",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [],
@@ -5751,17 +6062,20 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [],
@@ -5825,17 +6139,20 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [],
@@ -5903,22 +6220,26 @@
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     },
     {
      "closed": false,
      "owner": "",
-     "own": true
+     "own": true,
+     "deploy": null
     }
    ],
    "dimensions": [],

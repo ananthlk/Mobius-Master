@@ -21,7 +21,7 @@ OUT="$ROOT/docs/chat-schema"
 DATA="$OUT/chat-dev.json"
 mkdir -p "$OUT"
 
-echo "── 1/8  parse the flow from orchestrator.py  ────────────────────────"
+echo "── 1/9  parse the flow from orchestrator.py  ────────────────────────"
 # THIS STEP WAS MISSING and the page silently drew a deleted branch for hours.
 # gen_chat_submodules.py is what re-parses run_pipeline, so leaving it out of
 # the chain meant the flow (branch_on, classic_path, react_phases) was frozen
@@ -30,12 +30,17 @@ echo "── 1/8  parse the flow from orchestrator.py  ────────�
 # drift this whole file exists to prevent, in the tool meant to prevent it.
 python3 scripts/platform/gen_chat_submodules.py > docs/chat-submodules.json
 
-echo "── 2/8  readiness signals (measured from source)  ───────────────────"
+echo "── 2/9  readiness signals (measured from source)  ───────────────────"
 # MUST run before the merge. The signals it writes used to come from a dead
 # session scratchpad, and the `else {}` fallback rendered zeros as measurements.
 python3 scripts/platform/gen_readiness.py
 
-echo "── 3/8  coverage (Eval Layer 1: reachability)  ──────────────────────"
+echo "── 3/9  deploy state (what is RUNNING)  ─────────────────────────────"
+# Before the merge, so the page can mark a fix "NOT DEPLOYED" instead of letting a
+# closure stamp imply it is live. I made that mistake in both directions in one day.
+python3 scripts/platform/gen_deploy_state.py
+
+echo "── 4/9  coverage (Eval Layer 1: reachability)  ──────────────────────"
 # MUST run BEFORE the page. It used to be step 5/6, i.e. AFTER the page was
 # written — so the page could never show a current coverage state even once
 # it learned to read the file. A generated artifact whose only consumer runs
@@ -43,23 +48,23 @@ echo "── 3/8  coverage (Eval Layer 1: reachability)  ───────�
 # the chain, in the chain that exists to prevent it.
 python3 scripts/platform/gen_coverage.py
 
-echo "── 4/8  extract + merge  ────────────────────────────────────────────"
+echo "── 5/9  extract + merge  ────────────────────────────────────────────"
 python3 scripts/platform/gen_chat_dev.py "$DATA"
 
-echo "── 5/8  page  ───────────────────────────────────────────────────────"
+echo "── 6/9  page  ───────────────────────────────────────────────────────"
 python3 scripts/platform/gen_chat_dev_page.py "$DATA" "$OUT/index.html"
 
-echo "── 6/8  page gate (MUST PASS)  ──────────────────────────────────────"
+echo "── 7/9  page gate (MUST PASS)  ──────────────────────────────────────"
 # Non-negotiable and non-skippable. Three schema defects reached Ananth in one day —
 # a blank page from a JS syntax error, day-stale ratings, and a findings list showing
 # seven reds against a derived "2 open". Each was catchable by one check I kept
 # skipping, so the check now lives in the chain and exits non-zero.
 python3 scripts/platform/verify_page.py
 
-echo "── 7/8  bug log  ────────────────────────────────────────────────────"
+echo "── 8/9  bug log  ────────────────────────────────────────────────────"
 python3 scripts/platform/gen_findings_log.py
 
-echo "── 8/8  roadmap  ────────────────────────────────────────────────────"
+echo "── 9/9  roadmap  ────────────────────────────────────────────────────"
 python3 scripts/platform/gen_roadmap.py
 
 if [ "${1:-}" = "--eval" ]; then

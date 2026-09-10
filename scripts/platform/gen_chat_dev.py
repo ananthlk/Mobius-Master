@@ -80,6 +80,32 @@ _TOMBSTONE_PATHS = {
 
 import rating_rubric as _RUBRIC
 
+# DEPLOY STATE. A "FIXED (chat abc1234)" stamp says the code changed, never that it is
+# RUNNING. I conflated those repeatedly on 2026-09-10, so the page now carries the
+# distinction instead of my memory. gen_deploy_state.py resolves each referenced commit
+# against the deployed image's commit; findings render LIVE or NOT DEPLOYED.
+_DEPLOY = {}
+try:
+    import json as _dj, pathlib as _dp, re as _dr
+    _fp = _dp.Path(__file__).resolve().parents[2] / "docs" / "chat-deploy-state.json"
+    if _fp.exists():
+        _DEPLOY = _dj.loads(_fp.read_text())
+except Exception:
+    _DEPLOY = {}
+_SHA_RE = __import__("re").compile(r"\b([0-9a-f]{7,9})\b")
+
+
+def _deploy_state_of(text):
+    """live / not_deployed / None — from the commits a finding names."""
+    st = (_DEPLOY.get("commit_status") or {})
+    if not st:
+        return None
+    found = [st[c] for c in _SHA_RE.findall(text or "") if c in st]
+    if not found:
+        return None
+    return "not_deployed" if "committed_not_deployed" in found else "live"
+
+
 _COVERAGE = {}
 try:
     import json as _j, pathlib as _pl
@@ -283,7 +309,8 @@ def main():
         obj["findings_status"] = [
             {"closed": _RUBRIC.is_closed(t),
              "owner": _RUBRIC.owner_of(t),
-             "own": _RUBRIC.is_own_defect(t)}
+             "own": _RUBRIC.is_own_defect(t),
+             "deploy": _deploy_state_of(t)}
             for _k, t in (obj.get("findings") or [])
         ]
         obj["dimensions"] = _RUBRIC.dimensions(
@@ -413,6 +440,9 @@ def main():
 
     print(json.dumps({
         "generated_by": "scripts/platform/gen_chat_dev.py",
+        # What is RUNNING, carried into the page so the reader is not left to assume
+        # that committed means deployed.
+        "deploy": _DEPLOY,
         "deleted_modules": deleted,
         "roadmap": roadmap,
         "missing_content": missing,
