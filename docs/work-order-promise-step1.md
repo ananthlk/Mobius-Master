@@ -206,9 +206,34 @@ the `finally` placement, and a happy-path-only demonstration does not close this
 | outcome | how to provoke it | expected |
 |---|---|---|
 | `completed` | any normal question | full row |
-| `clarification` | a query that trips route clarification (`ctx.needs_route_clarification`) | full row, `outcome=clarification` |
+| ~~`clarification`~~ | **UNREACHABLE — do not attempt.** See below. | **reported unreachable with evidence, not demonstrated** |
 | `failed` | force an exception on the pipeline path in dev | **full row** — a failed turn still closes its promise |
 | empty payload | a turn hitting the early `return` at `orchestrator.py:1385` | **full row**, `outcome` set, not missing |
+
+**`clarification` is struck from the four, and §5 closes as THREE of four —
+stated as three of four.** `2026-09-10`, found by Chat before deploy, verified
+independently by the Governor seat with AST over attribute stores *and*
+`setattr` across all of `app/`:
+
+```
+needs_route_clarification    WRITES: NONE   READS: orchestrator.py:1158
+needs_clarification          WRITES: NONE   READS: orchestrator.py:1245
+route_clarification_choices  WRITES: NONE   READS: orchestrator.py:1158, :1167
+clarification_message        WRITES: NONE   READS: orchestrator.py:1159, :1245, :1252
+```
+
+**Nothing anywhere sets any of the four, and every read sits inside the dead
+terminal.** The feature is dead at *both* ends: no producer for the flags, and
+no caller for the terminal that reads them.
+
+This is the **mirror** of the shape this program has catalogued twelve times —
+not a producer with no consumer, but **a consumer with no producer**. The two
+are indistinguishable from inside the reading code. `context.py:175-183` declares
+all four with **falsy defaults** (`False`, `None`, `field(default_factory=list)`),
+so the reader sees a falsy flag and proceeds **exactly as it would on a genuine
+no-clarification turn**. Nothing is ever wrong; the branch simply never runs.
+
+**Do not fake a row, and do not report three-of-four as done.**
 
 ### The queries — run these, paste the raw output
 
@@ -329,9 +354,19 @@ unreachable through a major refactor with nobody noticing is the strongest
 available evidence that the exit structure cannot be reasoned about.* Close the
 promise in the outermost `finally` exactly as specified.
 
-**Carried to step 2:** consolidation must **delete** the dead terminal, not fold
-it into the enum — *"an enum member that can't occur is the same defect wearing a
-better shape."* Delete the stale docstring clause and the test with it.
+**Carried to step 2 — the deletion is FOUR items, not three.** Consolidation must
+**delete** the dead terminal, not fold it into the enum — *"an enum member that
+can't occur is the same defect wearing a better shape."* Delete together:
+
+1. `_publish_clarification_or_refinement` (`:1093`, 209 lines)
+2. the docstring clause at `run_pipeline:430` advertising an impossible outcome
+3. the three tests at `test_orchestrator.py:265-279`
+4. **the four `PipelineContext` fields with no writers** (`context.py:175-183`)
+
+**Item 4 is why this survived.** Deleting the terminal alone leaves four fields
+that still read as live state — declared, typed, defaulted, and referenced
+nowhere that runs. The next person to find them would reasonably wire something
+to them.
 
 **Not in scope now.** Do not delete anything as part of step 1.
 
