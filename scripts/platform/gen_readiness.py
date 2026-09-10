@@ -58,10 +58,30 @@ _SWALLOW = re.compile(r"^\s*(logger\.|log\.|print\(|pass\b|continue\b|return\b)"
 # caught by spot-checking one node against grep before shipping. Same class as
 # the reachability transitive-closure error and the _APPEALS_BLOCK gate key.
 _LOG  = re.compile(r"\blogger?\.(debug|info|warning|warn|error|exception|critical)\s*\(")
-_TELE = re.compile(r"\b(emit|emit_\w+|record|_rec\w*|span|start_span|track|counter|"
-                   r"observe|histogram)\s*\(")
+# THIRD instrument error of the same kind: this pattern required the verb to be
+# IMMEDIATELY followed by "(", so `record_decision(` and `record_ambient(` — the exact
+# convention chat built for the telemetry pass — did NOT match. state_load has four
+# such calls and measured 1, so the observability dimension was understating every
+# node chat instruments, in the metric commissioned to track that work. Caught by
+# comparing a grep count against my own number instead of trusting mine. The verb now
+# takes an optional _suffix.
+_TELE = re.compile(r"\b(?:emit|record|track|observe|histogram|counter|span|start_span"
+                   r"|_rec\w*)(?:_\w+)?\s*\(")
 _TODO = re.compile(r"#\s*(TODO|FIXME|XXX|HACK)\b")
 _OUTBOUND = re.compile(r"\b(httpx\.(Client|AsyncClient)|urlopen|requests\.(get|post))\s*\(")
+
+
+def _hands_up(node) -> bool:
+    """True when the handler RETURNS a value referencing the exception it caught."""
+    name = node.name
+    if not name:
+        return False
+    for n in ast.walk(node):
+        if isinstance(n, ast.Return) and n.value is not None:
+            for sub in ast.walk(n.value):
+                if isinstance(sub, ast.Name) and sub.id == name:
+                    return True
+    return False
 
 
 def measure(relpath) -> dict:
@@ -79,7 +99,7 @@ def measure(relpath) -> dict:
         if not parts:
             return {"missing": True, "path": relpath}
         agg = {"loc": 0, "except_handlers": 0, "swallow": 0, "bare_except": 0,
-               "reraise": 0, "log_sites": 0, "telemetry_sites": 0, "todos": 0,
+               "reraise": 0, "hands_up": 0, "log_sites": 0, "telemetry_sites": 0, "todos": 0,
                "async_no_timeout": 0, "missing": False}
         for q in parts:
             for k in agg:
@@ -101,7 +121,7 @@ def measure(relpath) -> dict:
     src = open(p, encoding="utf-8", errors="replace").read()
     lines = src.splitlines()
     out = {"loc": len(lines), "except_handlers": 0, "swallow": 0, "bare_except": 0,
-           "reraise": 0, "log_sites": len(_LOG.findall(src)),
+           "reraise": 0, "hands_up": 0, "log_sites": len(_LOG.findall(src)),
            "telemetry_sites": len(_TELE.findall(src)),
            "todos": len(_TODO.findall(src)), "async_no_timeout": 0, "missing": False}
     for m in _OUTBOUND.finditer(src):
@@ -122,6 +142,14 @@ def measure(relpath) -> dict:
         body_src = "\n".join(lines[node.body[0].lineno - 1: node.body[-1].end_lineno])
         if any(isinstance(n, ast.Raise) for n in ast.walk(node)):
             out["reraise"] += 1
+        elif _hands_up(node):
+            # RETURNING THE EXCEPTION IS THE OPPOSITE OF SWALLOWING IT. My first
+            # version matched any line starting with `return`, so
+            # `return None, target, ms, exc` — a handler HANDING the error to a
+            # caller that logs it — counted as a swallow. Chat had to annotate the
+            # handler to stop the audit miscounting it, which is the wrong way round:
+            # the detector should not need prose to read code correctly.
+            out["hands_up"] += 1
         elif all(_SWALLOW.match(l) or not l.strip()
                  for l in body_src.splitlines() if l.strip()):
             out["swallow"] += 1
@@ -141,7 +169,8 @@ def main(out_path: str) -> None:
           + (f" · MISSING FILE: {miss}" if miss else ""))
     tot = lambda f: sum(v.get(f, 0) for v in sigs.values())
     print(f"  swallow {tot('swallow')} · bare_except {tot('bare_except')} · "
-          f"reraise {tot('reraise')} · un-timed outbound {tot('async_no_timeout')}")
+          f"reraise {tot('reraise')} · hands-up {tot('hands_up')} · "
+          f"un-timed outbound {tot('async_no_timeout')}")
     print(f"  log sites {tot('log_sites')} · telemetry sites {tot('telemetry_sites')}")
     blind = [k for k, v in sigs.items()
              if not v.get("missing") and not v.get("unmapped")

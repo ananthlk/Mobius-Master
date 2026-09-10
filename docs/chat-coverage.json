@@ -62,7 +62,7 @@
    "direct": 1,
    "reached": 1,
    "tags": [],
-   "rating": "red"
+   "rating": "amber"
   },
   {
    "node": "capabilities",
@@ -107,7 +107,7 @@
    "direct": 1,
    "reached": 1,
    "tags": [],
-   "rating": "red"
+   "rating": "amber"
   },
   {
    "node": "governor",
@@ -206,7 +206,7 @@
    "direct": 1,
    "reached": 1,
    "tags": [],
-   "rating": "red"
+   "rating": "amber"
   },
   {
    "node": "round0",

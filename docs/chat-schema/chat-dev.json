@@ -494,6 +494,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 2,
+    "hands_up": 0,
     "loc": 106,
     "log_sites": 5,
     "missing": false,
@@ -690,6 +691,7 @@
     "bare_except": 0,
     "except_handlers": 9,
     "files": 5,
+    "hands_up": 0,
     "loc": 372,
     "log_sites": 12,
     "missing": false,
@@ -817,6 +819,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 11,
+    "hands_up": 0,
     "loc": 405,
     "log_sites": 7,
     "missing": false,
@@ -935,6 +938,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 43,
+    "hands_up": 0,
     "loc": 1892,
     "log_sites": 44,
     "missing": false,
@@ -1100,12 +1104,13 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 10,
+    "hands_up": 0,
     "loc": 469,
     "log_sites": 1,
     "missing": false,
     "reraise": 1,
     "swallow": 8,
-    "telemetry_sites": 0,
+    "telemetry_sites": 3,
     "todos": 0
    },
    "coverage": "PERIPHERAL",
@@ -1170,12 +1175,12 @@
     ],
     [
      "observability",
-     "amber",
-     "1 log sites, NO structured telemetry \u2014 diagnosable, not operable"
+     "green",
+     "3 telemetry sites, 1 logs"
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "functionality: 1 open \u00b7 testability: called, guarantee unproven (PERIPHERAL) \u00b7 error_handling: 8 of 10 handlers swallow \u00b7 observability: 1 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: modularity)",
+   "rating_why": "functionality: 1 open \u00b7 testability: called, guarantee unproven (PERIPHERAL) \u00b7 error_handling: 8 of 10 handlers swallow  (ok: modularity, observability)",
    "live_config": [],
    "detail": {}
   },
@@ -1277,6 +1282,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 2,
+    "hands_up": 0,
     "loc": 106,
     "log_sites": 5,
     "missing": false,
@@ -1434,7 +1440,7 @@
    ],
    "fan_in": 2,
    "how": "The token adjuster. Task #98, and it exists because RAG was guessing.\n\nRAG's Structure stage used a static per-caller_mode table (chat.default 3000,\nchat.thinking 16000) for how many tokens of retrieved context it could afford, because\nchat never sent a real number. Ananth's correction was that RAG does not have to guess:\nchat knows its own context window, its system prompt, the conversation so far, and how\nmuch it must reserve to generate an answer.\n\n  token_budget_for_retrieval = context_window\n                             - system_prompt_tokens\n                             - conversation_history_tokens\n                             - answer_generation_reserve\n\nconversation_history_tokens is the term that moves \u2014 a thread's first turn and its\ntwentieth differ by thousands of tokens \u2014 so the budget is genuinely per-turn rather than\nper-mode. react_loop computes it at five separate call sites and passes it with the RAG\nrequest.",
-   "rating": "red",
+   "rating": "amber",
    "depth": "code",
    "findings": [
     [
@@ -1459,12 +1465,13 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 0,
+    "hands_up": 0,
     "loc": 136,
     "log_sites": 0,
     "missing": false,
     "reraise": 0,
     "swallow": 0,
-    "telemetry_sites": 0,
+    "telemetry_sites": 1,
     "todos": 0
    },
    "coverage": "PERIPHERAL",
@@ -1514,12 +1521,12 @@
     ],
     [
      "observability",
-     "red",
-     "no logs and no telemetry \u2014 cannot be operated"
+     "amber",
+     "1 telemetry sites, 0 logs"
     ]
    ],
    "rating_was_typed": "green",
-   "rating_why": "observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, testability, error_handling, modularity)",
+   "rating_why": "testability: called, guarantee unproven (PERIPHERAL) \u00b7 observability: 1 telemetry sites, 0 logs  (ok: functionality, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -1581,6 +1588,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 1,
+    "hands_up": 0,
     "loc": 140,
     "log_sites": 0,
     "missing": false,
@@ -1823,6 +1831,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 0,
+    "hands_up": 0,
     "loc": 1319,
     "log_sites": 0,
     "missing": false,
@@ -2009,12 +2018,13 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 13,
+    "hands_up": 0,
     "loc": 2462,
     "log_sites": 21,
     "missing": false,
     "reraise": 0,
     "swallow": 10,
-    "telemetry_sites": 0,
+    "telemetry_sites": 5,
     "todos": 0
    },
    "coverage": "PERIPHERAL",
@@ -2074,8 +2084,8 @@
     ],
     [
      "observability",
-     "amber",
-     "21 log sites, NO structured telemetry \u2014 diagnosable, not operable"
+     "green",
+     "5 telemetry sites, 21 logs"
     ]
    ],
    "rating_was_typed": "red",
@@ -2146,7 +2156,7 @@
    ],
    "key": "active_context",
    "how": "Remembers which tool the conversation is currently inside, so a follow-up lands in the right\nplace instead of starting over. Replaced an older active_skill notion with something generic\nto any tool.\n\nTwo functions, and the first is the one that matters: persist_active_context(ctx, turn_record)\nADDS active_context and failed_query to the turn record before it is saved. load_active_context\nreads them back out of merged_state or the last turns.\n\nSo this 60-line module is a WRITER INTO chat_turns \u2014 which makes it exactly the node the DB\nseat's forward note pointed at when they said the unmodelled-key failure would recur through\nwhichever node writes turns.",
-   "rating": "red",
+   "rating": "amber",
    "depth": "code",
    "findings": [
     [
@@ -2166,12 +2176,13 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 0,
+    "hands_up": 0,
     "loc": 99,
     "log_sites": 0,
     "missing": false,
     "reraise": 0,
     "swallow": 0,
-    "telemetry_sites": 0,
+    "telemetry_sites": 3,
     "todos": 0
    },
    "coverage": "PERIPHERAL",
@@ -2216,12 +2227,12 @@
     ],
     [
      "observability",
-     "red",
-     "no logs and no telemetry \u2014 cannot be operated"
+     "green",
+     "3 telemetry sites, 0 logs"
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, testability, error_handling, modularity)",
+   "rating_why": "functionality: 1 open \u00b7 testability: called, guarantee unproven (PERIPHERAL)  (ok: error_handling, modularity, observability)",
    "live_config": [],
    "detail": {}
   },
@@ -2290,6 +2301,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 0,
+    "hands_up": 0,
     "loc": 317,
     "log_sites": 0,
     "missing": false,
@@ -2426,6 +2438,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 4,
+    "hands_up": 4,
     "loc": 331,
     "log_sites": 4,
     "missing": false,
@@ -2482,7 +2495,7 @@
     [
      "error_handling",
      "green",
-     "4 handlers, none swallow"
+     "4 handlers, none swallow (4 hand the error up)"
     ],
     [
      "modularity",
@@ -2566,6 +2579,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 0,
+    "hands_up": 0,
     "loc": 425,
     "log_sites": 0,
     "missing": false,
@@ -2720,6 +2734,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 43,
+    "hands_up": 0,
     "loc": 1892,
     "log_sites": 44,
     "missing": false,
@@ -2861,12 +2876,13 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 0,
+    "hands_up": 0,
     "loc": 146,
     "log_sites": 0,
     "missing": false,
     "reraise": 0,
     "swallow": 0,
-    "telemetry_sites": 0,
+    "telemetry_sites": 1,
     "todos": 0
    },
    "coverage": "ABSENT",
@@ -2931,12 +2947,12 @@
     ],
     [
      "observability",
-     "red",
-     "no logs and no telemetry \u2014 cannot be operated"
+     "amber",
+     "1 telemetry sites, 0 logs"
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "testability: no test CALLS it (ABSENT) \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, error_handling, modularity)",
+   "rating_why": "testability: no test CALLS it (ABSENT)  (ok: functionality, error_handling, modularity, observability)",
    "live_config": [
     {
      "name": "CHAT_PERSONALIZATION_ENABLED",
@@ -3018,6 +3034,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 6,
+    "hands_up": 0,
     "loc": 791,
     "log_sites": 13,
     "missing": false,
@@ -3136,7 +3153,7 @@
    ],
    "key": "feedback_signal",
    "how": "Decides whether this is the turn where the user gets asked for feedback, computed from their own\ncadence state rather than a fixed interval. The decision is made here and stashed on\nctx.feedback_signal; the planner only chooses whether to surface it via offer_feedback.\n\nGated by FEEDBACK_PERIODIC_ENABLED, default ON. Extracted from react_loop specifically to keep\nthat file under its LOC ratchet \u2014 the extraction programme working as designed.",
-   "rating": "red",
+   "rating": "amber",
    "depth": "code",
    "findings": [
     [
@@ -3156,12 +3173,13 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 0,
+    "hands_up": 0,
     "loc": 83,
     "log_sites": 0,
     "missing": false,
     "reraise": 0,
     "swallow": 0,
-    "telemetry_sites": 0,
+    "telemetry_sites": 2,
     "todos": 0
    },
    "coverage": "PERIPHERAL",
@@ -3206,12 +3224,12 @@
     ],
     [
      "observability",
-     "red",
-     "no logs and no telemetry \u2014 cannot be operated"
+     "amber",
+     "2 telemetry sites, 0 logs"
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, testability, error_handling, modularity)",
+   "rating_why": "functionality: 1 open \u00b7 testability: called, guarantee unproven (PERIPHERAL) \u00b7 observability: 2 telemetry sites, 0 logs  (ok: error_handling, modularity)",
    "live_config": [
     {
      "name": "FEEDBACK_PERIODIC_ENABLED",
@@ -3314,12 +3332,13 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 3,
+    "hands_up": 0,
     "loc": 432,
     "log_sites": 1,
     "missing": false,
     "reraise": 0,
     "swallow": 3,
-    "telemetry_sites": 0,
+    "telemetry_sites": 1,
     "todos": 0
    },
    "coverage": "PERIPHERAL",
@@ -3410,11 +3429,11 @@
     [
      "observability",
      "amber",
-     "1 log sites, NO structured telemetry \u2014 diagnosable, not operable"
+     "1 telemetry sites, 1 logs"
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "functionality: 6 open \u00b7 testability: called, guarantee unproven (PERIPHERAL) \u00b7 error_handling: 3 of 3 handlers swallow \u00b7 observability: 1 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: modularity)",
+   "rating_why": "functionality: 6 open \u00b7 testability: called, guarantee unproven (PERIPHERAL) \u00b7 error_handling: 3 of 3 handlers swallow \u00b7 observability: 1 telemetry sites, 1 logs  (ok: modularity)",
    "live_config": [
     {
      "name": "MOBIUS_PRODUCT_PROMISE_ENABLED",
@@ -3465,6 +3484,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 2,
+    "hands_up": 0,
     "loc": 167,
     "log_sites": 2,
     "missing": false,
@@ -3595,6 +3615,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 3,
+    "hands_up": 0,
     "loc": 1380,
     "log_sites": 5,
     "missing": false,
@@ -3721,6 +3742,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 1,
+    "hands_up": 0,
     "loc": 198,
     "log_sites": 1,
     "missing": false,
@@ -3931,12 +3953,13 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 44,
+    "hands_up": 5,
     "loc": 6451,
     "log_sites": 39,
     "missing": false,
     "reraise": 0,
     "swallow": 19,
-    "telemetry_sites": 121,
+    "telemetry_sites": 122,
     "todos": 0
    },
    "coverage": "PERIPHERAL",
@@ -4012,7 +4035,7 @@
     [
      "observability",
      "green",
-     "121 telemetry sites, 39 logs"
+     "122 telemetry sites, 39 logs"
     ]
    ],
    "rating_was_typed": "red",
@@ -4229,12 +4252,13 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 1,
+    "hands_up": 0,
     "loc": 369,
     "log_sites": 0,
     "missing": false,
     "reraise": 0,
     "swallow": 0,
-    "telemetry_sites": 4,
+    "telemetry_sites": 6,
     "todos": 0
    },
    "coverage": "PERIPHERAL",
@@ -4280,7 +4304,7 @@
     [
      "observability",
      "green",
-     "4 telemetry sites, 0 logs"
+     "6 telemetry sites, 0 logs"
     ]
    ],
    "rating_was_typed": "green",
@@ -4322,6 +4346,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 0,
+    "hands_up": 0,
     "loc": 11,
     "log_sites": 0,
     "missing": false,
@@ -4599,6 +4624,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 0,
+    "hands_up": 0,
     "loc": 737,
     "log_sites": 0,
     "missing": false,
@@ -4934,6 +4960,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 0,
+    "hands_up": 0,
     "loc": 332,
     "log_sites": 0,
     "missing": false,
@@ -5074,12 +5101,13 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 29,
+    "hands_up": 0,
     "loc": 1907,
     "log_sites": 16,
     "missing": false,
     "reraise": 0,
     "swallow": 19,
-    "telemetry_sites": 3,
+    "telemetry_sites": 5,
     "todos": 0
    },
    "coverage": "PERIPHERAL",
@@ -5155,7 +5183,7 @@
     [
      "observability",
      "green",
-     "3 telemetry sites, 16 logs"
+     "5 telemetry sites, 16 logs"
     ]
    ],
    "rating_was_typed": "amber",
@@ -5292,12 +5320,13 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 2,
+    "hands_up": 1,
     "loc": 251,
     "log_sites": 2,
     "missing": false,
     "reraise": 0,
-    "swallow": 1,
-    "telemetry_sites": 1,
+    "swallow": 0,
+    "telemetry_sites": 5,
     "todos": 0
    },
    "coverage": "TAGGED-UNVERIFIED",
@@ -5409,8 +5438,8 @@
     ],
     [
      "error_handling",
-     "amber",
-     "1 of 2 handlers swallow"
+     "green",
+     "2 handlers, none swallow (1 hand the error up)"
     ],
     [
      "modularity",
@@ -5419,12 +5448,12 @@
     ],
     [
      "observability",
-     "amber",
-     "1 telemetry sites, 2 logs"
+     "green",
+     "5 telemetry sites, 2 logs"
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "testability: called, guarantee unproven (TAGGED-UNVERIFIED) \u00b7 error_handling: 1 of 2 handlers swallow \u00b7 observability: 1 telemetry sites, 2 logs  (ok: functionality, modularity)",
+   "rating_why": "testability: called, guarantee unproven (TAGGED-UNVERIFIED)  (ok: functionality, error_handling, modularity, observability)",
    "live_config": [],
    "detail": {}
   },

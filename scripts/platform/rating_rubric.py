@@ -188,6 +188,7 @@ def dimensions(*, findings, coverage, signals):
 
     # 3. ERROR HANDLING — swallows are failures the caller cannot see.
     sw, bare, hand = sg.get("swallow", 0), sg.get("bare_except", 0), sg.get("except_handlers", 0)
+    up = sg.get("hands_up", 0)
     if bare:
         d.append(("error_handling", "red", f"{bare} bare except:"))
     elif sw >= SWALLOW_RED:
@@ -196,7 +197,9 @@ def dimensions(*, findings, coverage, signals):
         d.append(("error_handling", "amber", f"{sw} of {hand} handlers swallow"))
     else:
         d.append(("error_handling", "green",
-                  f"{hand} handlers, none swallow" if hand else "no failure paths"))
+                  (f"{hand} handlers, none swallow"
+                   + (f" ({up} hand the error up)" if up else ""))
+                  if hand else "no failure paths"))
 
     # 4. MODULARITY — size is the one honest proxy available.
     loc = sg.get("loc", 0)
