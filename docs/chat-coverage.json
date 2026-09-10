@@ -1,7 +1,7 @@
 {
  "generated_by": "scripts/platform/gen_coverage.py",
  "layer": "1 \u2014 reachability (Eval's Q5 ruling); Layer 2 tags are collected, and GUARDED requires Eval's audit of the tag",
- "tests_scanned": 180,
+ "tests_scanned": 181,
  "counts": {
   "ABSENT": 5,
   "IMPORTED-NOT-CALLED": 1,
@@ -113,10 +113,10 @@
    "node": "governor",
    "state": "PERIPHERAL",
    "module": "app.pipeline.react.governor",
-   "direct": 1,
-   "reached": 1,
+   "direct": 2,
+   "reached": 2,
    "tags": [],
-   "rating": "red"
+   "rating": "amber"
   },
   {
    "node": "integrate",

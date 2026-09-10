@@ -506,7 +506,7 @@
    "module": "app.pipeline.react.governor",
    "group": "pipeline/react",
    "path": "app/pipeline/react/governor.py",
-   "loc": 382,
+   "loc": 432,
    "role": "Product Promise round governor \u2014 the contract-driven replacement for",
    "role_full": "Product Promise round governor \u2014 the contract-driven replacement for\nreact's scattered, hardcoded round policies (Ananth's proposal, spec'd in\ndocs/REACT_PRODUCT_PROMISE_SPEC.md, owned by the \"Product promise contract\"\nagent; this module is ReAct's side of the implementation, built to their\nspec against react_loop.py's actual mechanics).\n\nGated entirely behind ``MOBIUS_PRODUCT_PROMISE_ENABLED`` (default OFF) per\nChat Architecture's ruling, 2026-07-30: when OFF, none of this runs and\ntoday's `react_max_iterations_for_mode()`/`is_guidance_round()`/\n`critic_enabled()`/`should_run_critic()` behavi",
    "stage": null,

@@ -16,7 +16,7 @@
     "owner": "chat",
     "gate": "lines removed; handler count down; ZERO invariant movement",
     "blocks": "P2, P4",
-    "n": 13
+    "n": 14
    },
    {
     "id": "P2",
@@ -24,7 +24,7 @@
     "owner": "chat + Eval",
     "gate": "every segment timed AND each timed segment's attribution verified against a known-external call \u2014 an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
-    "n": 31
+    "n": 33
    },
    {
     "id": "P3",
@@ -32,7 +32,7 @@
     "owner": "chat",
     "gate": "modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target",
     "blocks": "P5",
-    "n": 18
+    "n": 19
    },
    {
     "id": "P4",
@@ -2407,7 +2407,7 @@
    "module": "app.pipeline.react.governor",
    "group": "pipeline/react",
    "path": "app/pipeline/react/governor.py",
-   "loc": 382,
+   "loc": 432,
    "role": "Product Promise round governor \u2014 the contract-driven replacement for",
    "role_full": "Product Promise round governor \u2014 the contract-driven replacement for\nreact's scattered, hardcoded round policies (Ananth's proposal, spec'd in\ndocs/REACT_PRODUCT_PROMISE_SPEC.md, owned by the \"Product promise contract\"\nagent; this module is ReAct's side of the implementation, built to their\nspec against react_loop.py's actual mechanics).\n\nGated entirely behind ``MOBIUS_PRODUCT_PROMISE_ENABLED`` (default OFF) per\nChat Architecture's ruling, 2026-07-30: when OFF, none of this runs and\ntoday's `react_max_iterations_for_mode()`/`is_guidance_round()`/\n`critic_enabled()`/`should_run_critic()` behavi",
    "stage": null,
@@ -2435,10 +2435,12 @@
     "MOBIUS_PRODUCT_PROMISE_ENABLED",
     "MOBIUS_TURN_DEADLINE_S"
    ],
-   "writes": [],
+   "writes": [
+    "record_ambient"
+   ],
    "key": "governor",
    "how": "The round policy, contract-driven: how many rounds this turn gets, what directive the model\nis given next, and \u2014 since Chat Architecture's 2026-07-30 ruling \u2014 which prompt composition\nis selected, replacing react_agent_role() as the live selector.\n\nIT IS ON. The code default is OFF, but deploy/dev.env sets\nMOBIUS_PRODUCT_PROMISE_ENABLED=true and the deployed service has it true. I previously wrote\nthat it never fires; that was reading the default and calling it behaviour.\n\nThat makes it the live complement to retrieval_budget. retrieval_budget adapts how much\nCONTEXT a turn gets; the governor and its completion-extension gate adapt how many ROUNDS a\nturn gets. Breadth and depth, both per-turn, both adaptive \u2014 and both running.\n\nOne consequence worth knowing: with the flag on, the Product Promise groundedness floor runs\nthe critic INDEPENDENTLY of critic_enabled(). The deployed service sets MOBIUS_REACT_CRITIC=0,\nwhich turns off the optional path only. The mandatory floor still runs.",
-   "rating": "red",
+   "rating": "amber",
    "depth": "code",
    "findings": [
     [
@@ -2493,12 +2495,12 @@
    "signals": {
     "async_no_timeout": 0,
     "bare_except": 0,
-    "except_handlers": 1,
-    "loc": 382,
-    "log_sites": 0,
+    "except_handlers": 3,
+    "loc": 432,
+    "log_sites": 1,
     "missing": false,
     "reraise": 0,
-    "swallow": 1,
+    "swallow": 3,
     "telemetry_sites": 0,
     "todos": 0
    },
@@ -2518,21 +2520,21 @@
     [
      "error_handling",
      "amber",
-     "1 of 1 handlers swallow"
+     "3 of 3 handlers swallow"
     ],
     [
      "modularity",
      "green",
-     "382 lines"
+     "432 lines"
     ],
     [
      "observability",
-     "red",
-     "no logs and no telemetry \u2014 cannot be operated"
+     "amber",
+     "1 log sites, NO structured telemetry \u2014 diagnosable, not operable"
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "observability: no logs and no telemetry \u2014 cannot be operated  (ok: functionality, testability, error_handling, modularity)",
+   "rating_why": "functionality: 6 open \u00b7 testability: called, guarantee unproven (PERIPHERAL) \u00b7 error_handling: 3 of 3 handlers swallow \u00b7 observability: 1 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: modularity)",
    "live_config": [
     {
      "name": "MOBIUS_PRODUCT_PROMISE_ENABLED",
@@ -3376,6 +3378,22 @@
     ],
     [
      "bad",
+     "OWNER(chat): FOUND IT \u2014 carc_group SILENTLY OVERRIDES A CORRECT CARC CODE, AND GROUP MATCHING IS CASE-SENSITIVE. Reproduced against live appeals 2026-09-10 from a real turn Ananth pasted: 'how do i appeal a carc 197 denial for sunshine health' returned 'No playbook \u2014 using FL Medicaid defaults'. THE PLAYBOOK EXISTS. GET /playbook-guarded/Sunshine%20Health/197?audience=provider returns id 55, carc_group PRECERT, deadline_appeal_days 90, submission portal, fax 1-833-504-0580, mail 'Sunshine Health PO Box 3070 Farmington MO', five appeal levels. So this is a MISS ON A PAYOR AND CARC THAT BOTH EXIST \u2014 which also retires the CARC-coverage replacement hypothesis for this turn. THE MECHANISM, at react_loop.py:3201: lookup = carc_group or str(carc) if carc else carc_group. Python parses that as (carc_group or str(carc)) if carc else carc_group \u2014 so WHENEVER THE MODEL EMITS A carc_group IT WINS OVER A CORRECT NUMERIC carc. And the endpoint is CASE-SENSITIVE on the group: verified live, '197' HITS, 'PRECERT' HITS, 'precert' RETURNS {}, 'AUTHORIZATION' and 'auth' return {}. So a model that emits carc_group='precert' alongside carc=197 \u2014 a natural thing for an LLM to produce \u2014 sends 'precert', gets {}, and chat reports NO PLAYBOOK while holding the correct code. THIS IS THE SPORADIC MISS, and its sporadic character is exactly explained: whether the turn hits depends on whether the model happened to emit a group at all. Neither the manifest nor the parser nor the executor is at fault \u2014 the ARGUMENT PRECEDENCE is. FIX: prefer the numeric carc, or try both, or normalise case \u2014 and the manifest never told the model the group had to be an exact uppercase archetype slug. THE HARM IN THE OBSERVED TURN: it fell through to rag, produced 90 days plus the PO Box and fax from document chunks \u2014 ALMOST THE PLAYBOOK'S OWN VALUES \u2014 and then its own disclaimer said the 90-day timeframe was 'not supported by the provided documents'. A correct answer, delivered unsourced, contradicted by its own confidence note, when an authoritative record was one argument away."
+    ],
+    [
+     "bad",
+     "OWNER(chat): THE MODEL NARRATED A TOOL MISS AS A BROKEN TOOL, IN PRODUCTION, VERBATIM. From the same turn, round 2 reasoning: 'LEARNED: The previous attempt to call appeals_lookup_rules and appeals_get_playbook resulted in an Unknown tool error, despite these tools being explicitly listed as available. This suggests a transient issue or misinterpretation of the tool availability. RESTRATEGIZE: I will proceed by calling these tools again.' NO UNKNOWN-TOOL ERROR OCCURRED \u2014 both calls reported done and 'Rules loaded for CARC 197'. The model invented a tooling failure to explain an empty result, then burned a round retrying the identical call. This is the filed finding confirmed on live traffic, and it is worse than filed: the fabricated diagnosis is PERSISTED IN THE REASONING TRACE, so anyone reading diagnostics later sees 'Unknown tool error' as though it happened."
+    ],
+    [
+     "bad",
+     "OWNER(chat): THE RETRY GUARD DID NOT FIRE ON FOUR DUPLICATE CALLS. Same turn: 'Checking playbook for Sunshine Health' emitted TWICE, 'Looking up CARC 197 rules' emitted TWICE, and appeals_lookup_rules was called in round 1 AND round 2 with an identical result. react_retry_guard exists at 345 lines, has NO logs and NO telemetry, and has never once reported firing \u2014 which is indistinguishable from a guard that is not wired. It is one of the eleven silent nodes in the P2 telemetry work order and this turn is the argument for taking it early."
+    ],
+    [
+     "bad",
+     "OWNER(chat): THREE ROUNDS OF 'no chunks marked relevant from the last result' WHILE THE TOOLS REPORTED SUCCESS. Same turn: every round logged 'Evidence review: no chunks marked relevant from the last result' and the SAME two gaps stayed open \u2014 'appeal argument for CARC 197', 'submission method and required documents' \u2014 while appeals_lookup_rules reported 'Rules loaded for CARC 197' twice and rag reported 48 passages, 15 relevant, top match 73%. So tool output is not reaching the evidence review at all. That is chat_tool_results (0 rows, only consumer is the DELETE) and curator `keep` (never persisted) meeting in one turn, and it is why the loop cannot converge: it re-opens gaps it has already filled. Turn cost 51,799ms and three rounds to reach an answer the first tool call already contained."
+    ],
+    [
+     "bad",
      "OWNER(chat): A FIELD THAT CAN ONLY HOLD ONE VALUE IS A PRODUCER WITH A CONSUMER AND STILL NO SIGNAL. Chat Master, 2026-09-10, and it is a new variant of the class rather than another instance. llm_calls.is_fallback EXISTS, IS READ (orchestrator.py:174), and is false on ALL 1,988 CALLS IN 24H \u2014 because nothing ever writes True. It would pass a 'the producer exists' check, a 'the consumer exists' check, AND a 'the query returns rows' check while carrying zero information. Every test this program has used to detect an absent producer would report it as healthy. ADOPTED INTO THE P2 DoD as the inverse of the consumer rule: prove the field CAN TAKE MORE THAN ONE VALUE \u2014 a distinct-value count of 1 over a real window is the tell, and it is the same shape as could-not-check-vs-checked-false (a legal enum value with 0-1 rows) generalised from enums to booleans."
     ],
     [
@@ -3541,7 +3559,7 @@
     [
      "functionality",
      "red",
-     "27 open defects"
+     "31 open defects"
     ],
     [
      "testability",
@@ -3565,7 +3583,7 @@
     ]
    ],
    "rating_was_typed": "red",
-   "rating_why": "functionality: 27 open defects \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: testability, error_handling, modularity)",
+   "rating_why": "functionality: 31 open defects \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: testability, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },

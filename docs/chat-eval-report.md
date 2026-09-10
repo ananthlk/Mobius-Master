@@ -11,7 +11,7 @@ the POST half of the gate, not only as a report.
 
 | collected | passed | failed | errors | skipped | wall |
 |---:|---:|---:|---:|---:|---:|
-| 2615 | 2596 | 14 | 0 | 5 | 174.4s |
+| 2623 | 2604 | 14 | 0 | 5 | 154.6s |
 
 Known-failing baseline: **14** tests, frozen 2026-09-08 before any P1a
 deletion. Ananth's ruling — these predate the program, so the gate SUBTRACTS them.
@@ -51,12 +51,12 @@ name matches, not that the node's behaviour is asserted. Eval owns replacing it.
 | `emit_envelope` | red | 10 | `test_emit_envelope.py`, `test_emit_envelope_fanout.py` | 37 |
 | `queue` | red | 4 | `test_queue_usage_breakdown_enrich.py` | 1 |
 | `react_loop` | red | 6 | `test_react_loop.py` | 52 |
-| `tool_manifest` | red | 26 | `test_tool_manifest.py` | 5 |
+| `tool_manifest` | red | 27 | `test_tool_manifest.py` | 5 |
 | `clarify` | green | 0 | `test_react_clarify_questions.py` | 23 |
 | `context` | amber | 2 | `test_message_resolver_and_skill_context.py`, `test_react_continuation_context.py`, `test_system_context.py` | 49 |
 | `critic` | amber | 3 | `test_critic_call_resilience.py`, `test_critic_skip_on_cache.py`, `test_react_completion_critic_stage_registration.py`, `test_react_critic.py`, `test_react_critic_integration.py` | 99 |
 | `curator_tools` | amber | 3 | `test_curator_tools.py` | 16 |
-| `governor` | amber | 6 | `test_governor_bandit_criteria.py` | 39 |
+| `governor` | amber | 6 | `test_governor_bandit_criteria.py`, `test_governor_decision_telemetry.py` | 47 |
 | `integrate` | amber | 3 | `test_integrate_fallback.py` | 2 |
 | `llm_manager` | amber | 3 | `test_llm_manager.py`, `test_llm_manager_attachments.py`, `test_llm_manager_permanent_failure_logging.py`, `test_llm_manager_v2.py` | 54 |
 | `message_resolver` | amber | 1 | `test_message_resolver_and_skill_context.py` | 13 |
@@ -83,6 +83,6 @@ deterministic replay harness yet (P1.1). A flip would be unattributable.
 
 | modules | loc | except handlers | log-and-continue | bare except |
 |---:|---:|---:|---:|---:|
-| 205 | 67,309 | 711 | 417 | 0 |
+| 205 | 67,365 | 713 | 420 | 0 |
 
 I7 is monotonic: the log-and-continue count may fall, never rise.

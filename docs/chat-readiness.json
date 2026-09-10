@@ -129,12 +129,12 @@
  "governor": {
   "async_no_timeout": 0,
   "bare_except": 0,
-  "except_handlers": 1,
-  "loc": 382,
-  "log_sites": 0,
+  "except_handlers": 3,
+  "loc": 432,
+  "log_sites": 1,
   "missing": false,
   "reraise": 0,
-  "swallow": 1,
+  "swallow": 3,
   "telemetry_sites": 0,
   "todos": 0
  },
