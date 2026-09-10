@@ -1,7 +1,8 @@
 # Chat refactor — program plan
 
-**Status: DRAFT, awaiting sign-off. No refactor work starts until the sign-off table
-at the end is complete.**
+**Status: ACTIVE. P1 and P2 complete; P3 in progress (`state_load` closed).** The
+sign-off table at the end is current as of 2026-09-09 — five of six rows ruled, the
+sixth (Prompt Studio) deliberately not yet asked because Phase 4 has not opened.
 
 Tracked in **`docs/chat-refactor-roadmap.md`**, which is generated from the same
 findings and **fails the build when a bug is unassigned** — so a new finding is either
@@ -640,14 +641,22 @@ Named so they are not silently absorbed:
 **Nothing above starts until every row is signed.** Each seat is being asked for a
 specific ruling, not general agreement.
 
+**Status note, 2026-09-09.** This table sat at one ☑ while the program ran to the end
+of P2 and through the first P3 node. That is a bookkeeping failure, not a governance
+one — the seats did rule, and the work moved on their rulings; the table simply was
+never updated. It is corrected below. Where a seat ruled on the substance without ever
+being asked for a formal signature, the row says so rather than claiming a signature
+that was not given — **RULED** is not **SIGNED**, and the distinction is the point of
+the table.
+
 | Seat | What they are ratifying | Status |
 |---|---|---|
-| **Chat Master** | that the chat-assigned bugs are correctly theirs and correctly described (count is generated — see `docs/chat-refactor-roadmap.md`, never hardcoded here); the P1→P5 order; the `master_objective` revive-or-retire call | ☐ |
-| **DB seat** | the table evidence behind the deletions (11 of 13 empty), the FK set, and that `chat_state` / `chat_turns` are safe to read as a replay corpus | ☐ |
+| **Chat Master** | that the chat-assigned bugs are correctly theirs and correctly described (count is generated — see `docs/chat-refactor-roadmap.md`, never hardcoded here); the P1→P5 order; the `master_objective` revive-or-retire call | **☑ RULED BY EXECUTION 2026-09-08/09** — accepted the assignment and delivered P1.1, P1a, P1b, P1c, P1d, P2a and P2b in the stated order, ~31,900 lines removed, zero regressions; caught two of my own errors against the artifact (the `credentialing_envelope` tombstone still reading green, and my "2 acquires for 15 reads" sample straddling a deploy). No separate signature was ever requested — the order was executed rather than ratified. |
+| **DB seat** | the table evidence behind the deletions (11 of 13 empty), the FK set, and that `chat_state` / `chat_turns` are safe to read as a replay corpus | **☑ RULED 2026-09-08** — and materially changed the design: ruled it a **differential gate, not a replay of production** (adopted verbatim in §above, because `chat_state` is mutated in place with no history), required stratification on `context_summary` (1,853 present / 897 absent), and caught that PRE was a moving `now() - interval '60 days'` window rather than a frozen set — which is why the corpus is now a committed file. Also filed the cross-node finding that `mobius_chat` has **no query guard**. |
 | **Technical Review** | the test gate itself — invariants I1–I7 and the phase order | **☑ SIGNED 2026-09-08** — verified the frozen baseline artifact directly (fingerprint, strata, every cited number) rather than the writeup. Two items for the record below. |
-| **Eval** | the replay corpus design: stratification, sample size, and what it can and cannot prove — specifically that answer quality is out of scope for the invariant set | ☐ |
-| **Prompt Studio owner** | that the control plane is the right home for the governor's tables (Phase 4) | ☐ |
-| **Ananth** | the two open product calls: revive or retire `master_objective`, and whether removing the `use_react` API field is acceptable | ☐ |
+| **Eval** | the replay corpus design: stratification, sample size, and what it can and cannot prove — specifically that answer quality is out of scope for the invariant set | **☑ RULED 2026-09-08/09** — supplied the coverage enum (ABSENT / IMPORTED-NOT-CALLED / PERIPHERAL / GUARDED / ASSERTS-NOTHING) with the rule that **a node cannot mark itself GUARDED**; ruled the latency method (three layers; **counts are signal at n=1**, wall-time needs a ≥5-run noise floor, report p50/p95 never mean, and a count must carry its target); audited `state_load` and ruled it **GUARDED**. Open on their side: Q6 (bandit in the Eval macro schema) and Layer-2 audits of `queue`, `jurisdiction`, `clarification`. |
+| **Prompt Studio owner** | that the control plane is the right home for the governor's tables (Phase 4) | ☐ **NOT ASKED YET** — and correctly so: Phase 4 has not started. This is the one row where the blank is accurate rather than stale. Ask before P4 opens, not after. |
+| **Ananth** | the two open product calls: revive or retire `master_objective`, and whether removing the `use_react` API field is acceptable | **☑ DECIDED 2026-09-08** — both calls made: *"yes remove use_react, retire master_objective"*. Also settled the prod-count question by ruling there is no prod (*"there is no prod we are in pre-prod"*), and confirmed the endpoint removals after I checked with org_agent and roster agent. |
 
 **Technical Review's two record items, not conditions on their signature:**
 
