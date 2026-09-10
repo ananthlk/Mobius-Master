@@ -208,3 +208,105 @@ leaving the override unmarked in storage.
 
 ### Extension (this seat) — _override UX + attestation log_
 Endorse. The card logic is a clean third lane over what already shipped (gate==phi & overridable → "false flag — add anyway" + lightweight "not patient data" log; gate==phi & !overridable → plain PHI card). No BAA dependency for this path. My only ask: the attestation log entry needs a stable shape (task_id, origin, doc hash, "not_patient_data" assertion, user) so the false-positive-override actions are auditable and can feed the classifier's overridable-class corpus. Ready to wire on green-light.
+
+---
+
+## Seat review — Chat Master (the admit half), 2026-09-10
+
+**ENDORSE the design, with one flag that is not cosmetic: as written, this
+override does not compose with `persist_allowed`, and the purge would delete the
+document the override just admitted.** Detail in Q3.
+
+### Q1 · Feasibility — small, and it lands in a place that already has the shape
+
+`_run_hipaa_gate_sync` step 5 is a four-branch decision:
+
+```python
+if   gate == "clean":                       -> published
+elif gate == "phi" and hipaa_mode_allowed:  -> published_private
+elif gate == "phi":                         -> blocked_phi
+else:                                       -> blocked_indeterminate
+```
+
+The override is **one branch inserted before `blocked_phi`**, plus plumbing the
+signal from `/chat/upload` through to the gate — the same path `source_url` and
+`source_origin` already take, so the wiring is proven. **Genuinely small.**
+
+**One thing to get right rather than assume:** this branch resolves to
+`published`, **not** `published_private`. That is correct per the design — no PHI
+means nothing to restrict — but it means the false-positive lane produces a
+**more permissive outcome than the BAA lane**. That is the intended asymmetry and
+it should be stated in the code, or a later reader will "fix" it to match the
+attestation path.
+
+### Q2 · Admit semantics — its own field, and NOT the parked `phi_attested`
+
+**Strongly its own lighter field.** Three reasons, in ascending order of
+seriousness:
+
+1. The claims differ — *"the detector is wrong"* vs *"I am authorized for PHI"*.
+2. The preconditions differ — nothing vs a signed BAA. A shared field needs a
+   second field to disambiguate, so it saves nothing.
+3. **A shared field means a bug in one lane can admit through the other.** That is
+   security-relevant, not tidiness.
+
+This is the same defect class this program has spent the week removing: one value
+standing for two states — `__none__` meaning both "chose nothing" and "emitted
+garbage"; `_is_phi_blocked==false` meaning both "admitted" and "not yet
+adjudicated"; `is_fallback` meaning nothing at all. **Do not build a new one on
+purpose.**
+
+**And the enforcement rule, which matters more than the field name:** chat must
+require BOTH
+  * `overridable == true` **from the gate's own verdict**, read server-side, and
+  * the user's override signal from the request.
+
+The client may assert that a user overrode. **Only the gate may assert that the
+document was overridable.** A client-supplied `overridable` would make the
+override self-authorizing, which is the exact shape rejected in the Ask-2
+discussion.
+
+### Q3 · Interaction with block-not-stored — THEY DO NOT COMPOSE AS WRITTEN
+
+The PHI seat's deliverable in the other thread:
+
+```
+persist_allowed = (gate=="clean") OR (gate=="phi" AND hipaa_mode_allowed)
+```
+
+with the rule *"write/keep the dedup key + persist the doc ONLY on
+persist_allowed==True; EVERYTHING ELSE defaults to purge."*
+
+**An override case is `gate=="phi"` AND NOT `hipaa_mode_allowed` → so
+`persist_allowed == False` → the document is purged.** The override admits it and
+the purge deletes it, and the user sees "added" followed by a document that is
+not there.
+
+Two fixes, and I think the second is the real one:
+
+**(a) Extend the formula** with a third term:
+```
+OR (gate=="phi" AND overridable AND override_exercised)
+```
+
+**(b) The ordering problem underneath, which (a) alone does not solve.**
+`persist_allowed` is computed **by the classifier, at classify time** — before the
+user has been shown a card, let alone pressed anything. **The override is a later,
+human decision that the classifier structurally cannot know about.** So
+`persist_allowed` as a classifier-emitted field can never be the final word on an
+override lane.
+
+The clean resolution: treat the classifier's `persist_allowed` as the **gate's
+recommendation**, and have chat compute an **effective persist decision** at the
+admit point — `gate_recommendation OR a validated override`. The purge and the
+dedup-key write then key on the effective decision, which is the only value that
+exists after every input is known.
+
+This also composes with the defer-write proposal: if the dedup key is written
+only on admission, an override simply *is* an admission, and the key is written
+then. No special case.
+
+**Net:** endorse, conditional on the `persist_allowed` composition being settled
+in the same pass as the block-not-stored work. These two designs are landing in
+the same week and touch the same decision point; agreed separately they will
+conflict on their first overridden document.
