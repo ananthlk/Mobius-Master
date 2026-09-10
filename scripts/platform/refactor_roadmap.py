@@ -169,7 +169,24 @@ PHASES = [
             "tool retrieved and then not called — P3's funnel with a new cause), so "
             "the UX edits both side by side; and RETRIEVAL QUALITY BECOMES TESTABLE "
             "ON ITS OWN, no LLM in the loop — given a query, does the right tool come "
-            "back? Fixture-and-assert, the cheapest test in this program."},
+            "back? Fixture-and-assert, the cheapest test in this program.\n\n"
+            "THE SECOND-ORDER EFFECT IS THE REAL PRIZE (Ananth: 'this will allow for "
+            "better options'). Today a tool's cost is paid by EVERY turn, including "
+            "every turn that will never use it — so each new tool taxes the whole "
+            "system and the rational design is FEW, BROAD tools. That is a constraint "
+            "imposed by the prompt budget, not by the problem. Retrieval inverts it: "
+            "once a tool costs ~nothing on turns that do not retrieve it, MANY NARROW, "
+            "SPECIFIC, WELL-DESCRIBED TOOLS BEAT A FEW GENERAL ONES. A tool serving 3% "
+            "of turns is not worth its prompt weight today and is obviously worth "
+            "building after. The token saving is a one-time win; the change in what is "
+            "WORTH BUILDING compounds — and it makes the catalogue somewhere product "
+            "knowledge accumulates instead of somewhere additions cost. CAVEAT, so "
+            "this is not read as a licence to proliferate: more tools means more ways "
+            "for retrieval to be wrong, and a wrong retrieval is INVISIBLE TO THE "
+            "MODEL — it cannot call what it was never offered. Which is why the "
+            "inspector and the persisted per-turn decision are gate items, not "
+            "nice-to-haves. The economics only improve while selection stays honest "
+            "and checkable."},
 ]
 
 # (phase, node or None for any, distinctive substring). First match wins.
