@@ -651,12 +651,37 @@ the table.
 
 | Seat | What they are ratifying | Status |
 |---|---|---|
-| **Chat Master** | that the chat-assigned bugs are correctly theirs and correctly described (count is generated — see `docs/chat-refactor-roadmap.md`, never hardcoded here); the P1→P5 order; the `master_objective` revive-or-retire call | **☑ RULED BY EXECUTION 2026-09-08/09** — accepted the assignment and delivered P1.1, P1a, P1b, P1c, P1d, P2a and P2b in the stated order, ~31,900 lines removed, zero regressions; caught two of my own errors against the artifact (the `credentialing_envelope` tombstone still reading green, and my "2 acquires for 15 reads" sample straddling a deploy). No separate signature was ever requested — the order was executed rather than ratified. |
+| **Chat Master** | that the chat-assigned bugs are correctly theirs and correctly described (count is generated — see `docs/chat-refactor-roadmap.md`, never hardcoded here); the P1→P5 order; the `master_objective` revive-or-retire call | **☑ SIGNED 2026-09-09** on (a), (b) and (c), with four record-items attached as notes, not conditions — all four accepted and acted on, see below. Previously stood at RULED BY EXECUTION 2026-09-08/09 — accepted the assignment and delivered P1.1, P1a, P1b, P1c, P1d, P2a and P2b in the stated order, ~31,900 lines removed, zero regressions; caught two of my own errors against the artifact (the `credentialing_envelope` tombstone still reading green, and my "2 acquires for 15 reads" sample straddling a deploy). No separate signature was ever requested — the order was executed rather than ratified. |
 | **DB seat** | the table evidence behind the deletions (11 of 13 empty), the FK set, and that `chat_state` / `chat_turns` are safe to read as a replay corpus | **☑ RULED 2026-09-08** — and materially changed the design: ruled it a **differential gate, not a replay of production** (adopted verbatim in §above, because `chat_state` is mutated in place with no history), required stratification on `context_summary` (1,853 present / 897 absent), and caught that PRE was a moving `now() - interval '60 days'` window rather than a frozen set — which is why the corpus is now a committed file. Also filed the cross-node finding that `mobius_chat` has **no query guard**. |
 | **Technical Review** | the test gate itself — invariants I1–I7 and the phase order | **☑ SIGNED 2026-09-08** — verified the frozen baseline artifact directly (fingerprint, strata, every cited number) rather than the writeup. Two items for the record below. |
 | **Eval** | the replay corpus design: stratification, sample size, and what it can and cannot prove — specifically that answer quality is out of scope for the invariant set | **☑ RULED 2026-09-08/09** — supplied the coverage enum (ABSENT / IMPORTED-NOT-CALLED / PERIPHERAL / GUARDED / ASSERTS-NOTHING) with the rule that **a node cannot mark itself GUARDED**; ruled the latency method (three layers; **counts are signal at n=1**, wall-time needs a ≥5-run noise floor, report p50/p95 never mean, and a count must carry its target); audited `state_load` and ruled it **GUARDED**. Open on their side: Q6 (bandit in the Eval macro schema) and Layer-2 audits of `queue`, `jurisdiction`, `clarification`. |
 | **Prompt Studio owner** | that the control plane is the right home for the governor's tables (Phase 4) | ☐ **NOT ASKED YET** — and correctly so: Phase 4 has not started. This is the one row where the blank is accurate rather than stale. Ask before P4 opens, not after. |
 | **Ananth** | the two open product calls: revive or retire `master_objective`, and whether removing the `use_react` API field is acceptable | **☑ DECIDED 2026-09-08** — both calls made: *"yes remove use_react, retire master_objective"*. Also settled the prod-count question by ruling there is no prod (*"there is no prod we are in pre-prod"*), and confirmed the endpoint removals after I checked with org_agent and roster agent. |
+
+**Chat Master's four record items, not conditions on their signature — all four accepted:**
+
+1. **Attribution is complete in one direction only.** Nothing is misattributed *to*
+   chat. But ~30 of the sequenced bugs carry owner `—` while sitting on chat's own
+   modules, so the chat count understates their load. Worse, the header read
+   `0 unassigned` — which means *no phase*, and reads as *nobody owns this*. Green at a
+   glance while the ownership column was largely blank. **Fixed:** the headline now
+   prints `UNSEQUENCED` and a separate no-owner count beside it.
+2. **Lessons were filed as bugs.** Four `emit_envelope` rows are generalisations, not
+   defects — a lesson with a checkbox can never be closed, so it sits ☐ forever and
+   makes the completion metric unreachable by construction. **Fixed:** moved to a
+   `PRINCIPLES` bucket, rendered as linked principles with no checkboxes.
+3. **P2's gate was insufficient, found by executing it.** "Every segment timed" was met
+   and the numbers were still wrong three times in one day — a 30s RAG call read as our
+   processing, 11.5s of model time read as `integrate`'s own code, acquire time read as
+   query time. **Timed is not attributed**, and a timed segment that misattributes is
+   worse than an untimed one because it sends someone to optimise an idle module.
+   **Fixed:** the P2 gate now requires attribution verified against a known-external call.
+4. **`master_objective` was retired incompletely** — self-reported against their own P1c
+   work. The field still exists, still round-trips, still sits in `DEFAULT_STATE`, and
+   `apply_delta` still accepts it as settable, while nothing writes it. A declared,
+   persisted field, permanently `None`, advertising a capability nothing provides — this
+   program's own defect class. **Sequenced as a P1 row rather than tidied silently, at
+   their request.**
 
 **Technical Review's two record items, not conditions on their signature:**
 

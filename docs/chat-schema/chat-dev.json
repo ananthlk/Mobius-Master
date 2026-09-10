@@ -16,15 +16,15 @@
     "owner": "chat",
     "gate": "lines removed; handler count down; ZERO invariant movement",
     "blocks": "P2, P4",
-    "n": 9
+    "n": 10
    },
    {
     "id": "P2",
     "name": "Make absent producers detectable",
     "owner": "chat + Eval",
-    "gate": "every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
+    "gate": "every segment timed AND each timed segment's attribution verified against a known-external call \u2014 an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
-    "n": 25
+    "n": 21
    },
    {
     "id": "P3",
@@ -462,6 +462,10 @@
     [
      "good",
      "The branch and the stage sequence are explicit and readable; the flow in this diagram was parsed straight out of it."
+    ],
+    [
+     "bad",
+     "OWNER(chat): MASTER_OBJECTIVE WAS RETIRED INCOMPLETELY, AND THE LEFTOVER IS THIS PROGRAM'S OWN DEFECT CLASS. Self-reported by Chat Master 2026-09-09, unprompted, against their own P1c work \u2014 recorded that way because it is the better precedent. The writer is gone and the retire call was right. But ThreadState.master_objective still exists (app/state/model.py:23), still round-trips through from_dict/to_dict, still sits in DEFAULT_STATE (app/storage/threads.py:48), and apply_delta STILL ACCEPTS IT AS A SETTABLE KEY (model.py:79) \u2014 while nothing anywhere writes a value. orchestrator.py:189 still names it in a debug string as an answer source. A declared, persisted field, permanently None, whose surface advertises a capability nothing provides: the exact shape P2 exists to make detectable. Sequenced rather than tidied silently, at their request."
     ],
     [
      "bad",

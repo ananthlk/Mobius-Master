@@ -11,6 +11,22 @@ one does not, so a new finding cannot silently escape the roadmap — it
 either gets sequenced or it gets an explicit reason for being outside.
 """
 
+# Phase status. Hand-written because completion is a JUDGEMENT (the gate passed,
+# the seats ruled), not something derivable from the findings file.
+#
+# ADDED 2026-09-09 on Chat Master's finding: gen_roadmap.py hardcoded
+# "☐ not started" on EVERY phase, so the tracker claimed the program had not
+# begun while P1, P2 and the first P3 node were done. Generated, therefore not
+# fixable by hand-editing the output — the same "green because nobody looked"
+# shape as the sign-off table, one file over, found the same day.
+PHASE_STATUS = {
+    "P1": "☑ **COMPLETE** 2026-09-08 — ~31,900 lines removed across P1.1/P1a/P1b/P1c/P1d, zero regressions",
+    "P2": "☑ **COMPLETE** 2026-09-09 — P2a planner orphans, P2b latency telemetry deployed with spans bound to schema node keys",
+    "P3": "◐ **IN PROGRESS** — `state_load` closed (StateUnavailable + first contract tag); `tool_manifest` opened 2026-09-09",
+    "P4": "☐ not started",
+    "P5": "☐ not started — and correctly so; Prompt Studio has deliberately not been asked to sign yet",
+}
+
 PHASES = [
     {"id": "P1", "name": "Delete", "owner": "chat", "ratifier": "DB seat, Tech Review",
      "gate": "lines removed; handler count down; ZERO invariant movement",
@@ -25,8 +41,10 @@ PHASES = [
             "not move latency at all — that is the argument for it being safe to go "
             "first, and it is also why it forfeits the claim."},
     {"id": "P2", "name": "Make absent producers detectable", "owner": "chat + Eval",
-     "gate": "every segment timed; invariants I1-I7 computable from emitted "
-             "telemetry alone, with no hand-written DB join",
+     "gate": "every segment timed AND each timed segment's attribution verified "
+             "against a known-external call — an LLM or HTTP boundary crossed inside "
+             "a segment must appear as such, not as our processing; invariants I1-I7 "
+             "computable from emitted telemetry alone, with no hand-written DB join",
      "blocks": "P3, P4, P5",
      "why": "REFRAMED 2026-09-09 on Chat Master's argument, better than my original 'instrument the gaps'. Every finding this program has produced is one shape: nothing here fails loudly when a PRODUCER disappears, because every consumer has a plausible default. master_objective degraded four readers to \"resolved\" for five months; variant_id made a refresh match nothing for a month; make_tool_failed has no caller so tool_failed is structurally impossible while tool_invoked and tool_completed emit normally; CallManager is wired in docstrings only. Framed as instrumenting the known gaps this phase fixes twelve instances; framed as making an absent producer detectable it fixes the class.\n\nSECOND in order, per Ananth: 'add latency across, this way we can measure when we are done we should be better and faster.' Latency lands here and is what makes 'faster' provable — but as an instance of the rule, not the point of the phase.\n\n"
             "are done we should be better and faster.' This is the phase that makes "
@@ -36,7 +54,18 @@ PHASES = [
             "knobs run on invisible defaults.\n\nBASELINE RULE: the latency numbers "
             "captured at the END of this phase are the reference every later phase "
             "measures against. P1 sits before that line and is measured on "
-            "invariants only."},
+            "invariants only.\n\nGATE AMENDED 2026-09-09, Chat Master's finding, "
+            "from having executed it rather than read it. The gate used to read only "
+            "'every segment timed'. They met it and the numbers were still wrong "
+            "three times in one day: a 30s RAG call read as 30s of OUR processing "
+            "(external wait, no span); 11.5s of integrator MODEL time read as "
+            "integrate's own code (worker-thread calls invisible to the trace); "
+            "connection-acquire time read as QUERY time (a per-target counter cannot "
+            "see the cost of REACHING the target). Every one passed 'segment timed'. "
+            "TIMED IS NOT ATTRIBUTED — and a timed segment that misattributes is "
+            "WORSE than an untimed one, because it sends someone to optimise a module "
+            "that is idle. That is not hypothetical: it is what their own integrate "
+            "finding did to me before they retracted it."},
     {"id": "P3", "name": "One decision point", "owner": "chat", "ratifier": "Tech Review",
      "gate": "modules that can grant an extension round: 2 -> 1; audited "
              "budget-exhausted turns: 0 -> the rule's target",
@@ -79,6 +108,7 @@ RULES = [
     ("P2", "emit_envelope", "FAILURE-PATH EMITTERS WERE BUILT, TESTED, AND NEVER WIRED"),
     ("P2", "emit_envelope", "184 UNWIRED CANDIDATES"),
     ("P2", "emit_envelope", "THE CONFIRMED ROSTER"),
+    ("P1", "run_pipeline", "MASTER_OBJECTIVE WAS RETIRED INCOMPLETELY"),
     ("P1", "run_pipeline",  "26 TESTS ARE ALREADY FAILING"),
     ("P1", "run_pipeline", "THE CREDENTIALING ROUTER WOULD SURVIVE LOSING ITS IMPLEMENTATION"),
     ("P4", "model_registry", "THE TEST SUITE MUTATES THE BANDIT'S LIVE STATE"),
@@ -87,11 +117,7 @@ RULES = [
     ("P3", "tool_manifest", "TOOL SELECTION IS SPORADIC, AND THE MODEL NARRATES"),
     ("P3", "state_load", "ROOT CAUSE OF THE PER-READ OVERHEAD"),
     ("P3", "state_load", "state_load IS 1.2s AT p50"),
-    ("P2", "emit_envelope", "A NAME-BASED SEARCH ANSWERS"),
-    ("P2", "emit_envelope", "AN UN-INSTRUMENTED EXTERNAL WAIT"),
-    ("P2", "emit_envelope", "A READ-BACK OF THE WRONG ARTIFACT"),
     ("P2", "react_loop", "_rich_evidence IS AN UNRECORDED BRANCH"),
-    ("P2", "emit_envelope", "AN IMPORT EDGE IS NOT A CONSUMPTION EDGE"),
     ("P2", "PHI gate", "'blocked_indeterminate' IS AMBIGUOUS BY CONSTRUCTION"),
     ("P3", "PHI gate", "THE GATE FAILS OPEN ON MISCONFIGURATION"),
     ("P2", "llm_manager", "45% OF llm_calls ROWS CANNOT BE JOINED"),
@@ -152,6 +178,18 @@ RULES = [
 
 # Explicitly outside the refactor. Each needs a REASON, not just an exclusion —
 # "a filter that makes an answer look complete" is the failure mode this guards.
+# Lessons, not defects. A generalisation filed as a bug CAN NEVER BE CLOSED — it
+# sits ☐ forever, inflates its node's count, and makes the tracker's completion
+# metric unreachable by construction. Chat Master's finding, 2026-09-09, and they
+# are right: these are theirs, they are worth keeping, and a table with checkboxes
+# is the wrong container. Rendered as principles the roadmap links, not as rows.
+PRINCIPLES = [
+    ("emit_envelope", "AN IMPORT EDGE IS NOT A CONSUMPTION EDGE"),
+    ("emit_envelope", "A NAME-BASED SEARCH ANSWERS"),
+    ("emit_envelope", "A READ-BACK OF THE WRONG ARTIFACT"),
+    ("emit_envelope", "AN UN-INSTRUMENTED EXTERNAL WAIT"),
+]
+
 OUT_OF_PROGRAM = [
     ("POST /chat", "CHAT_ENV=prod",       "security posture", "needs Ananth's authorisation + staging; no clean unauthenticated POST sent"),
     ("POST /chat", "HIPAA AUDIT WRITE",   "compliance decision", "fail-open write under a fail-closed gate; posture decision pending"),

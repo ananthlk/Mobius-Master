@@ -5,7 +5,7 @@ import importlib.util, sys, os, re, json
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from refactor_roadmap import PHASES, RULES, OUT_OF_PROGRAM
+from refactor_roadmap import PHASES, RULES, OUT_OF_PROGRAM, PHASE_STATUS, PRINCIPLES
 
 spec = importlib.util.spec_from_file_location("c", os.path.join(HERE, "chat_node_content.py"))
 m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
@@ -28,6 +28,9 @@ for node, rec in CONTENT.items():
                      "rating": rec.get("rating")})
 
 def assign(b):
+    for node, sub in PRINCIPLES:
+        if node == b["node"] and sub in b["text"]:
+            return "PRINCIPLE", None
     for ph, node, sub in RULES:
         if (node is None or node == b["node"]) and sub in b["text"]:
             return ph, None
@@ -54,13 +57,24 @@ w("derived.\n")
 w("The generator **exits non-zero when a bug is unassigned**, so a new finding is")
 w("either sequenced into a phase or given an explicit reason for being outside the")
 w("program. That is what makes this a tracker and not a snapshot.\n")
-w("Plan and gate definition: `docs/chat-refactor-program.md`. Nothing starts until")
-w("its sign-off table is complete.\n")
+w("Plan and gate definition: `docs/chat-refactor-program.md`. Its sign-off table is")
+w("complete as of 2026-09-09 — five of six seats ruled, the sixth (Prompt Studio)")
+w("deliberately not yet asked because P4 has not opened. Per-phase status below is")
+w("hand-maintained in `refactor_roadmap.py`'s `PHASE_STATUS`, because completion is a")
+w("judgement about a gate, not something derivable from the findings file.\n")
 
-inprog = [b for b in bugs if b["phase"] not in (None, "OUT")]
+inprog = [b for b in bugs if b["phase"] not in (None, "OUT", "PRINCIPLE")]
+principles = [b for b in bugs if b["phase"] == "PRINCIPLE"]
 out = [b for b in bugs if b["phase"] == "OUT"]
+noowner = sum(1 for b in inprog if not b["owner"])
 w(f"**{len(bugs)} bugs · {len(inprog)} sequenced into 5 phases · {len(out)} explicitly outside · "
-  f"{len(unassigned)} unassigned**\n")
+  f"{len(unassigned)} UNSEQUENCED · {noowner} of the {len(inprog)} sequenced have NO OWNER**\n")
+w("> The two counts are different questions and the second one used to be invisible.")
+w("> `UNSEQUENCED` was previously printed as \"unassigned\", which reads as *nobody owns")
+w("> this* but only ever meant *no phase*. Chat Master, reading the generated file rather")
+w("> than taking my count, found that a large share of sequenced bugs sit on chat's own")
+w("> modules with an empty owner column — so a headline that said `0 unassigned` was green")
+w("> at a glance while ownership was largely blank. Both numbers are now printed.\n")
 
 w("## Progress\n")
 w("| Phase | Name | Bugs | Owner | Gate metric | Blocks | Status |")
@@ -68,10 +82,10 @@ w("|---|---|---:|---|---|---|---|")
 for p in PHASES:
     n = sum(1 for b in inprog if b["phase"] == p["id"])
     w(f"| **{p['id']}** | {p['name']} | {n} | {p['owner']} | {p['gate']} | "
-      f"{p.get('blocks') or '—'} | ☐ not started |")
+      f"{p.get('blocks') or '—'} | {PHASE_STATUS.get(p['id'], '☐ not started')} |")
 w("")
-w("No phase may start before `docs/chat-refactor-program.md`'s sign-off table is")
-w("complete, and P0 blocks all of the others.\n")
+w("Phase order is a blocking order: a phase does not open until the phases naming it")
+w("in `Blocks` have passed their gate.\n")
 
 w("## By owner\n")
 own = {}
@@ -102,6 +116,16 @@ w("| Node | Bucket | Why it is outside | Finding |")
 w("|---|---|---|---|")
 for b in sorted(out, key=lambda x: (x["out"][0], x["node"])):
     w(f"| `{b['node']}` | {b['out'][0]} | {b['out'][1]} | {head(b['text'], 70)} |")
+w("")
+
+w("## Principles — lessons, not defects\n")
+w(f"{len(principles)} entries. These are generalisations the program produced, kept")
+w("because they are how we now read evidence — and deliberately NOT given checkboxes.")
+w("A lesson filed as a bug can never be closed: it sits ☐ forever, inflates its node's")
+w("count, and makes the completion metric unreachable by construction. Chat Master's")
+w("finding, 2026-09-09.\n")
+for b in principles:
+    w(f"- **{head(b['text'], 150)}**  \n  _from `{b['node']}`_")
 w("")
 
 if unassigned:

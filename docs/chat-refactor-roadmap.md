@@ -9,32 +9,42 @@ The generator **exits non-zero when a bug is unassigned**, so a new finding is
 either sequenced into a phase or given an explicit reason for being outside the
 program. That is what makes this a tracker and not a snapshot.
 
-Plan and gate definition: `docs/chat-refactor-program.md`. Nothing starts until
-its sign-off table is complete.
+Plan and gate definition: `docs/chat-refactor-program.md`. Its sign-off table is
+complete as of 2026-09-09 — five of six seats ruled, the sixth (Prompt Studio)
+deliberately not yet asked because P4 has not opened. Per-phase status below is
+hand-maintained in `refactor_roadmap.py`'s `PHASE_STATUS`, because completion is a
+judgement about a gate, not something derivable from the findings file.
 
-**103 bugs · 72 sequenced into 5 phases · 31 explicitly outside · 0 unassigned**
+**104 bugs · 69 sequenced into 5 phases · 31 explicitly outside · 0 UNSEQUENCED · 26 of the 69 sequenced have NO OWNER**
+
+> The two counts are different questions and the second one used to be invisible.
+> `UNSEQUENCED` was previously printed as "unassigned", which reads as *nobody owns
+> this* but only ever meant *no phase*. Chat Master, reading the generated file rather
+> than taking my count, found that a large share of sequenced bugs sit on chat's own
+> modules with an empty owner column — so a headline that said `0 unassigned` was green
+> at a glance while ownership was largely blank. Both numbers are now printed.
 
 ## Progress
 
 | Phase | Name | Bugs | Owner | Gate metric | Blocks | Status |
 |---|---|---:|---|---|---|---|
-| **P1** | Delete | 9 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☐ not started |
-| **P2** | Make absent producers detectable | 25 | chat + Eval | every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☐ not started |
-| **P3** | One decision point | 17 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ☐ not started |
+| **P1** | Delete | 10 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☑ **COMPLETE** 2026-09-08 — ~31,900 lines removed across P1.1/P1a/P1b/P1c/P1d, zero regressions |
+| **P2** | Make absent producers detectable | 21 | chat + Eval | every segment timed AND each timed segment's attribution verified against a known-external call — an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☑ **COMPLETE** 2026-09-09 — P2a planner orphans, P2b latency telemetry deployed with spans bound to schema node keys |
+| **P3** | One decision point | 17 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ◐ **IN PROGRESS** — `state_load` closed (StateUnavailable + first contract tag); `tool_manifest` opened 2026-09-09 |
 | **P4** | Split | 16 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
-| **P5** | Config UX | 5 | chat + Prompt Studio | max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped | — | ☐ not started |
+| **P5** | Config UX | 5 | chat + Prompt Studio | max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped | — | ☐ not started — and correctly so; Prompt Studio has deliberately not been asked to sign yet |
 
-No phase may start before `docs/chat-refactor-program.md`'s sign-off table is
-complete, and P0 blocks all of the others.
+Phase order is a blocking order: a phase does not open until the phases naming it
+in `Blocks` have passed their gate.
 
 ## By owner
 
 | Owner | Sequenced bugs |
 |---|---:|
-| chat | 42 |
-| unassigned-owner | 30 |
+| chat | 43 |
+| unassigned-owner | 26 |
 
-## P1 — Delete  ·  9 items
+## P1 — Delete  ·  10 items
 
 **Owner** chat · **ratifier** DB seat, Tech Review
 **Gate** lines removed; handler count down; ZERO invariant movement  
@@ -52,14 +62,15 @@ The cost of leading with it, stated plainly: this phase CANNOT CLAIM A LATENCY W
 | ☐ | `run_pipeline` | chat | THE CREDENTIALING ROUTER WOULD SURVIVE LOSING ITS IMPLEMENTATION, AND THAT IS THE PROBLEM |
 | ☐ | `run_pipeline` | chat | ~25 FRONTEND FETCHES ARE 404ing TODAY AND NOBODY NOTICED — this node's class, live, not hypothetical |
 | ☐ | `run_pipeline` | chat | DELETING THE CREDENTIALING PLANNER PATH WOULD SILENTLY BREAK AN UNRELATED LIVE TOOL |
+| ☐ | `run_pipeline` | chat | MASTER_OBJECTIVE WAS RETIRED INCOMPLETELY, AND THE LEFTOVER IS THIS PROGRAM'S OWN DEFECT CLASS |
 | ☐ | `run_pipeline` | chat | 26 TESTS ARE ALREADY FAILING BEFORE THE REFACTOR STARTS |
 | ☐ | `run_pipeline` | chat | THE CLASSIC PATH IS DEAD AND IT IS 1,159 LINES |
 | ☐ | `run_pipeline` | chat | THE CREDENTIALING SURFACE IS 8,994 LINES IN CHAT AND ITS TABLES ARE EMPTY |
 
-## P2 — Make absent producers detectable  ·  25 items
+## P2 — Make absent producers detectable  ·  21 items
 
 **Owner** chat + Eval
-**Gate** every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join  
+**Gate** every segment timed AND each timed segment's attribution verified against a known-external call — an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join  
 **Blocks** P3, P4, P5
 
 > REFRAMED 2026-09-09 on Chat Master's argument, better than my original 'instrument the gaps'. Every finding this program has produced is one shape: nothing here fails loudly when a PRODUCER disappears, because every consumer has a plausible default. master_objective degraded four readers to "resolved" for five months; variant_id made a refresh match nothing for a month; make_tool_failed has no caller so tool_failed is structurally impossible while tool_invoked and tool_completed emit normally; CallManager is wired in docstrings only. Framed as instrumenting the known gaps this phase fixes twelve instances; framed as making an absent producer detectable it fixes the class.
@@ -70,15 +81,13 @@ are done we should be better and faster.' This is the phase that makes 'faster' 
 
 BASELINE RULE: the latency numbers captured at the END of this phase are the reference every later phase measures against. P1 sits before that line and is measured on invariants only.
 
+GATE AMENDED 2026-09-09, Chat Master's finding, from having executed it rather than read it. The gate used to read only 'every segment timed'. They met it and the numbers were still wrong three times in one day: a 30s RAG call read as 30s of OUR processing (external wait, no span); 11.5s of integrator MODEL time read as integrate's own code (worker-thread calls invisible to the trace); connection-acquire time read as QUERY time (a per-target counter cannot see the cost of REACHING the target). Every one passed 'segment timed'. TIMED IS NOT ATTRIBUTED — and a timed segment that misattributes is WORSE than an untimed one, because it sends someone to optimise a module that is idle. That is not hypothetical: it is what their own integrate finding did to me before they retracted it.
+
 | ☐ | Node | Owner | Finding |
 |---|---|---|---|
 | ☐ | `PHI gate` | chat | 'blocked_indeterminate' IS AMBIGUOUS BY CONSTRUCTION — the upload gate emits the same verdict for at least thr |
 | ☐ | `active_context` | — | It writes two keys into the turn record by name — active_context and failed_query — and both are among the thr |
 | ☐ | `curator_tools` | — | DOES IT DO ANYTHING? Yes — and answering that properly corrected two of my own claims |
-| ☐ | `emit_envelope` | — | A NAME-BASED SEARCH ANSWERS 'IS THERE A SYMBOL CALLED X', NEVER 'DOES X HAPPEN' |
-| ☐ | `emit_envelope` | — | AN UN-INSTRUMENTED EXTERNAL WAIT IS INDISTINGUISHABLE FROM OUR OWN WORK — the most expensive variant of this n |
-| ☐ | `emit_envelope` | — | A READ-BACK OF THE WRONG ARTIFACT IS INDISTINGUISHABLE FROM A SUCCESSFUL ONE |
-| ☐ | `emit_envelope` | — | AN IMPORT EDGE IS NOT A CONSUMPTION EDGE — Chat Master's generalisation of the P1a orphan, and it belongs besi |
 | ☐ | `emit_envelope` | — | A STALE TEST WAS ASSERTING A VULNERABILITY |
 | ☐ | `emit_envelope` | — | FIVE OF THE ELEVEN P1b FAILURES DEGRADED SILENTLY RATHER THAN FAILING LOUDLY — the same property as this node, |
 | ☐ | `emit_envelope` | chat | THE DEPLOY SCRIPT PRINTS A FALSE REASSURANCE |
@@ -210,3 +219,20 @@ Each carries a reason. Excluding by silence is the failure mode this guards agai
 | `POST /chat` | security posture | needs Ananth's authorisation + staging; no clean unauthenticated POST sent | RUNTIME LENS, 2026-09-08, mobius-chat in mobius-os-dev: CHAT_ENV=prod  |
 | `personalization` | user-manager | chat cannot act on preferences it forwards | CHAT IS A PASS-THROUGH FOR PREFERENCES AND CANNOT ACT ON THEM |
 | `personalization` | user-manager | assignment itself is disputed | DISPUTED ASSIGNMENT |
+
+## Principles — lessons, not defects
+
+4 entries. These are generalisations the program produced, kept
+because they are how we now read evidence — and deliberately NOT given checkboxes.
+A lesson filed as a bug can never be closed: it sits ☐ forever, inflates its node's
+count, and makes the completion metric unreachable by construction. Chat Master's
+finding, 2026-09-09.
+
+- **A NAME-BASED SEARCH ANSWERS 'IS THERE A SYMBOL CALLED X', NEVER 'DOES X HAPPEN'**  
+  _from `emit_envelope`_
+- **AN UN-INSTRUMENTED EXTERNAL WAIT IS INDISTINGUISHABLE FROM OUR OWN WORK — the most expensive variant of this node's class, because it does not merely **  
+  _from `emit_envelope`_
+- **A READ-BACK OF THE WRONG ARTIFACT IS INDISTINGUISHABLE FROM A SUCCESSFUL ONE**  
+  _from `emit_envelope`_
+- **AN IMPORT EDGE IS NOT A CONSUMPTION EDGE — Chat Master's generalisation of the P1a orphan, and it belongs beside the producer/consumer class because i**  
+  _from `emit_envelope`_

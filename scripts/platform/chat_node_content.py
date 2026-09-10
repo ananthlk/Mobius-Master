@@ -438,6 +438,18 @@ turn needs clarification or refinement it publishes and returns without finishin
          "the turn still looks healthy."),
  ("good", "The branch and the stage sequence are explicit and readable; the flow in this "
           "diagram was parsed straight out of it."),
+ ("bad", "OWNER(chat): MASTER_OBJECTIVE WAS RETIRED INCOMPLETELY, AND THE LEFTOVER IS "
+         "THIS PROGRAM'S OWN DEFECT CLASS. Self-reported by Chat Master 2026-09-09, "
+         "unprompted, against their own P1c work — recorded that way because it is the "
+         "better precedent. The writer is gone and the retire call was right. But "
+         "ThreadState.master_objective still exists (app/state/model.py:23), still "
+         "round-trips through from_dict/to_dict, still sits in DEFAULT_STATE "
+         "(app/storage/threads.py:48), and apply_delta STILL ACCEPTS IT AS A SETTABLE "
+         "KEY (model.py:79) — while nothing anywhere writes a value. orchestrator.py:189 "
+         "still names it in a debug string as an answer source. A declared, persisted "
+         "field, permanently None, whose surface advertises a capability nothing "
+         "provides: the exact shape P2 exists to make detectable. Sequenced rather than "
+         "tidied silently, at their request."),
  ("bad", "OWNER(chat): THE MASTER_OBJECTIVE GAP — filed at Ananth's direction, 2026-09-08, and "
          "IT IS A DATED REGRESSION, not a design choice.\n\n"
          "master_objective is the per-thread record of what the user is actually trying to "
