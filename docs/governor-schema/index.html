@@ -329,15 +329,31 @@ e6042f8b…       v1       fast      <b>empty_payload</b>       6.40    4.90    
 }</pre>
 <div class="note"><b><code>posted_at</code> is wall-clock UTC, and that is the whole trick.</b> <code>t0_start</code> is a <code>perf_counter()</code> — monotonic and <b>process-local</b>. POST runs in the API process, the turn in the worker; those two cannot be subtracted. The wall clock is what makes <code>queue_wait_s</code> computable at all.</div>
 
-<h3>What YOU see on screen — almost nothing</h3>
+<h3>What YOU see on screen — the sequence</h3>
+<p class="sub">Ananth''s correction, 2026-09-10. My earlier draft said "before / during / after" and collapsed two different things. <b>It is a sequence, and the number arrives after analysis — not at the door.</b></p>
+
 <div class="ov"><table>
-<tr><th>moment</th><th>on screen</th></tr>
-<tr><td><b>before</b></td><td><i>"usually about 95 seconds"</i> — the promise, set as an expectation up front</td></tr>
-<tr><td><b>during</b>, running long</td><td><i>"taking longer than usual"</i> — said first, before you notice</td></tr>
-<tr><td><b>after</b>, promise kept</td><td><b>nothing</b></td></tr>
-<tr><td><b>after</b>, promise broken</td><td><i>"this ran long — worth re-asking in thinking mode?"</i> — only if actionable, phrased as an offer</td></tr>
+<tr><th></th><th>moment</th><th>on screen</th><th>where it comes from</th></tr>
+<tr><td><b>1</b></td><td><b>POST</b> — request accepted</td><td><i>"Got your request…"</i></td><td>immediate. <b>No number yet</b> — we have the tier, but not yet a read on the question</td></tr>
+<tr><td><b>2</b></td><td><b>after analysis</b> — planner has seen the query</td><td><i>"Analysed your request — this may take about <b>95 seconds</b>."</i></td><td>the <b>forecast</b>. Informed by the actual query, not just the tier</td></tr>
+<tr><td><b>3</b></td><td><b>forecast exceeded</b></td><td><i>"Still working — this is taking longer than expected."</i></td><td>fires when elapsed passes the forecast, <b>not</b> when it passes the promise</td></tr>
+<tr><td><b>4</b></td><td><b>answer</b></td><td>the answer. <b>Nothing about the promise</b></td><td>—</td></tr>
+<tr><td><b>4b</b></td><td>answer, but it ran long</td><td><i>"This ran long — worth re-asking in thinking mode?"</i> — only when there is a move to offer</td><td>—</td></tr>
 </table></div>
-<div class="note"><b>The attestation is not a screen feature.</b> Its job is to make the promise falsifiable; the user-facing lines above are a <i>consequence</i> of having it, not the reason to write it. <b>Cost never appears on screen</b> — it is a system term, and at a 15× exploration bound it would be actively misleading read as a price. <b>Silence is the report.</b> A badge on every answer saying the SLA was met is noise that trains you to ignore the one time it was not.</div>
+
+<div class="note"><b>The distinction I had collapsed: the PROMISE and the FORECAST are two different numbers, and only one of them is a contract.</b><br><br>
+<b>The promise</b> is the tier''s standing commitment (§7 — thinking ~95s). Resolved at POST and <b>frozen for the turn</b> (§9a), because it is the denominator the attestation measures against. It never moves mid-turn; if it could, a turn that ran 40s against a 31s promise which quietly became 95s has not been measured, it has been excused.<br><br>
+<b>The forecast</b> is what we tell the user after looking at their actual question. It <b>may differ from the promise</b> — a simple lookup on the thinking tier should forecast well under 95s — and it is <b>an estimate, not a commitment</b>. Saying "about 95 seconds" to someone whose question will take 20 is a bad experience even though the promise was technically kept.<br><br>
+This resolves what otherwise looks like a contradiction: <b>the user-facing number can be refined after analysis without the promise moving at all.</b></div>
+
+<div class="note"><b>Consequence — the attestation gets a third number, and forecast accuracy becomes measurable.</b> <code>promised_latency_s</code> · <code>forecast_latency_s</code> · <code>delivered_latency_s</code>. Two different questions fall out of that row, and they are not the same question:<br><br>
+<b>Did we keep the promise?</b> delivered vs promised — the contract.<br>
+<b>Did we tell the user the truth?</b> delivered vs forecast — <b>the experience</b>. A turn can keep the promise and still have lied to the person waiting.<br><br>
+<b>Message 3 fires off the forecast, not the promise.</b> A user told "about 20 seconds" who is still waiting at 45 needs to hear something, even though the 95s promise is nowhere near broken. <span class="sub">The reverse also matters: a user told 95s at second 60 needs nothing said.</span></div>
+
+<div class="note"><b>What is buildable when.</b> <span class="tag t-part">SEQUENCING</span> Messages <b>1</b> and <b>4</b> need nothing new. Message <b>2</b> needs a forecast, which needs the planner''s read of the query — <b>that is step 2 (levers/targets)</b>, where the governor first reasons against the promise it is carrying. Message <b>3</b> needs the forecast to exist before it can fire against it. <b>None of this is step 1</b> — step 1 is the boundary that makes all of it measurable afterwards. Recorded here so the design is not re-derived; not scope.</div>
+
+<div class="note"><b>What still never reaches the screen.</b> <b>Cost</b> — a system term, and at a 15× exploration bound it would be actively misleading read as a price. <b>And no "SLA met" badge on a kept promise:</b> a badge on every answer is noise that trains the reader to ignore the one time it mattered. The four messages above are the whole surface.</div>
 
 <div class="note"><b>Caveat, stated rather than assumed.</b> <span class="tag t-part">READ, NOT YET OBSERVED</span> <code>configure_logging()</code> at <code>main.py:172</code> removes every root handler and installs the JSON formatter, and the deployed container runs one process (<code>CMD uvicorn app.main:app</code>) that serves HTTP <b>and</b> consumes queued turns — so the structured emit should win. But <b>a worker run standalone</b> (<code>python -m app.worker</code>) never calls <code>configure_logging</code> and would render this line as <b>plain text with every structured field dropped</b>. The <b>E</b> demonstration settles it: one <code>gcloud logging read</code> either returns <code>jsonPayload</code> fields or it does not.</div>
 
