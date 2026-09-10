@@ -355,7 +355,7 @@
   "async_no_timeout": 0,
   "bare_except": 0,
   "except_handlers": 3,
-  "loc": 196,
+  "loc": 244,
   "log_sites": 2,
   "missing": false,
   "reraise": 0,

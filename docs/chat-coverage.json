@@ -6,7 +6,7 @@
   "ABSENT": 4,
   "IMPORTED-NOT-CALLED": 1,
   "PERIPHERAL": 19,
-  "GUARDED": 1,
+  "TAGGED-UNVERIFIED": 1,
   "REMOVED": 7
  },
  "nodes": [
@@ -218,17 +218,8 @@
    "rating": "amber"
   },
   {
-   "node": "tool_manifest",
-   "state": "PERIPHERAL",
-   "module": "app.pipeline.tool_manifest",
-   "direct": 6,
-   "reached": 3,
-   "tags": [],
-   "rating": "red"
-  },
-  {
    "node": "state_load",
-   "state": "GUARDED",
+   "state": "TAGGED-UNVERIFIED",
    "module": "app.stages.state_load",
    "direct": 1,
    "reached": 1,
@@ -236,6 +227,15 @@
     "state_load:no_silent_reset"
    ],
    "rating": "amber"
+  },
+  {
+   "node": "tool_manifest",
+   "state": "PERIPHERAL",
+   "module": "app.pipeline.tool_manifest",
+   "direct": 6,
+   "reached": 3,
+   "tags": [],
+   "rating": "red"
   },
   {
    "node": "clarification",

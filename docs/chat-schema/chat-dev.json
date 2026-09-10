@@ -3842,7 +3842,7 @@
    "module": "app.stages.state_load",
    "group": "stages",
    "path": "app/stages/state_load.py",
-   "loc": 196,
+   "loc": 244,
    "role": "Stage: load state, apply delta from message, build context pack.",
    "role_full": "Stage: load state, apply delta from message, build context pack.",
    "stage": "state_load",
@@ -3860,6 +3860,7 @@
    "config": [],
    "writes": [
     "record_ambient",
+    "record_decision",
     "save_state_tracked"
    ],
    "key": "state_load",
@@ -3940,7 +3941,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 3,
-    "loc": 196,
+    "loc": 244,
     "log_sites": 2,
     "missing": false,
     "reraise": 0,
@@ -3971,7 +3972,7 @@
     [
      "modularity",
      "green",
-     "196 lines"
+     "244 lines"
     ],
     [
      "observability",
