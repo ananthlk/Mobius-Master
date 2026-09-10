@@ -24,7 +24,7 @@
     "owner": "chat + Eval",
     "gate": "every segment timed AND each timed segment's attribution verified against a known-external call \u2014 an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
-    "n": 23
+    "n": 24
    },
    {
     "id": "P3",
@@ -59,7 +59,7 @@
     "n": 1
    }
   ],
-  "outside": 31
+  "outside": 32
  },
  "missing_content": [],
  "live_env_service": "mobius-chat (us-central1)",
@@ -105,10 +105,10 @@
   "shared_post_guard": "ctx.react_bypass_integrate \u2014 set in react_loop, skips the integrator and publishes the ReAct answer directly",
   "shared_post_guard_lines": [
    589,
-   878,
-   882,
-   1009,
-   1054
+   892,
+   896,
+   1023,
+   1068
   ],
   "exit": "publish",
   "react_phases": [
@@ -117,7 +117,7 @@
     "modules": [
      "round0"
     ],
-    "cite": 4090,
+    "cite": 4120,
     "note": "Short-circuits the loop when the caller already did the work."
    },
    {
@@ -128,7 +128,7 @@
      "capabilities",
      "parsing"
     ],
-    "cite": 4166,
+    "cite": 4196,
     "note": "Builds the planner prompt and parses the decision back out."
    },
    {
@@ -137,7 +137,7 @@
      "react_retry_guard",
      "curator_tools"
     ],
-    "cite": 5705,
+    "cite": 5760,
     "note": "Dispatches tools, and refuses a repeat of a call that already failed."
    },
    {
@@ -148,7 +148,7 @@
      "feedback_signal",
      "completion_extension_gate"
     ],
-    "cite": 5337,
+    "cite": 5392,
     "note": "Audits the draft against sources and decides whether to go round again."
    }
   ],
@@ -320,7 +320,15 @@
     ],
     [
      "bad",
-     "OWNER(chat): THERE IS NO SUCH THING AS 'THE PHI GATE TIMEOUT'. THREE CALL SITES, THREE DIFFERENT VALUES, ONE OF THEM NOT CONFIGURABLE AT ALL \u2014 and I conflated them when reporting to the phi-classifier seat, which nearly produced a wrong change. (1) UPLOAD gate, app/main.py:1307, POST /classify, timeout=45 HARDCODED. (2) MESSAGE gate, app/api/chat.py:247, POST /message-check, timeout=4.0 HARDCODED \u2014 no env var, cannot be tuned without a deploy, and it sits on the SYNCHRONOUS path before the user sees any acknowledgement. (3) FEEDBACK gate, app/skills/phi_gate.py:30, PHI_GATE_TIMEOUT_SEC default 4 \u2014 the only configurable one, and the least important. A single env var name that governs only the path nobody asked about is worse than none: it reads as the system's timeout knob and is not. FIX: one name per path, all three configurable, and the message gate's value chosen against MESSAGE latency, not document latency \u2014 they are different workloads and a document-sized budget on a message is a UX regression."
+     "OWNER(chat): THERE IS NO SUCH THING AS 'THE PHI GATE TIMEOUT'. THREE CALL SITES, THREE DIFFERENT VALUES, ONE OF THEM NOT CONFIGURABLE AT ALL \u2014 and I conflated them when reporting to the phi-classifier seat, which nearly produced a wrong change. (1) UPLOAD gate, app/main.py:1307, POST /classify, timeout=45 HARDCODED. (2) MESSAGE gate, app/api/chat.py:247, POST /message-check, timeout=4.0 HARDCODED \u2014 no env var, cannot be tuned without a deploy, and it sits on the SYNCHRONOUS path before the user sees any acknowledgement. (3) FEEDBACK gate, app/skills/phi_gate.py:30, PHI_GATE_TIMEOUT_SEC default 4 \u2014 the only configurable one, and the least important. A single env var name that governs only the path nobody asked about is worse than none: it reads as the system's timeout knob and is not. VERIFIED 2026-09-09, and it is worse than 'misleading': PHI_GATE_TIMEOUT_SEC is read at exactly ONE site (phi_gate.py:30) and that module is imported by exactly TWO callers \u2014 app/api/product_feedback.py:111 and app/skills/builtin/product_feedback.py:259. It governs PRODUCT FEEDBACK TEXT AND NOTHING ELSE. Setting PHI_GATE_TIMEOUT_SEC=8 is a NO-OP for document uploads (45s hardcoded) and for chat messages (4.0 hardcoded). The phi-classifier seat recommended exactly that setting twice, reasoning about document latency, in good faith and off a name I gave them. Someone would have set it, watched nothing change, and drawn a conclusion about the classifier. A knob that cannot move the thing it appears to name is a CONFIGURATION-SHAPED PLACEBO \u2014 same family as the health signal that is green by construction. RESOLVED ON VALUE, 2026-09-09: the phi-classifier seat re-measured /message-check on the RIGHT path \u2014 p50 332ms, p95 561ms, max 561ms over 15 warm chat-shaped calls, 7x headroom under the 4s \u2014 and WITHDREW the 8s recommendation. /message-check is regex+NER only, no LLM by design, so the 3.6-4.2s phi_classify figure NEVER applied to it: phi_classify is the bandit LLM stage and fires only on /classify and /redact. NO TIMEOUT CHANGE IS WARRANTED ON ANY OF THE THREE PATHS. The defect that remains is purely the SHAPE \u2014 make all three configurable, one name per path. FIX SPEC, agreed with the phi-classifier seat and recorded so nobody re-derives it: message 4s (7x headroom on a measured 561ms p95), upload 45s (8x headroom on a measured 5.66s worst case), feedback 4s (no problem raised). EVERY CURRENT VALUE IS CORRECT \u2014 this is a naming and tunability defect, not a numbers defect, and whoever implements it must not take the opportunity to change a value. The residual cold-start exposure on the message path is held off by min-instances, not by the timeout, and is closed separately in fleet.yaml c3688b7."
+    ],
+    [
+     "bad",
+     "OWNER(fleet-power seat): A HIPAA GATE'S CORRECTNESS DEPENDS ON A SCALING SETTING, AND THE SETTING'S NOTE ONLY JUSTIFIES ITS COST. The chat message gate times out at 4s. mobius-phi-classifier loads Presidio/spaCy in roughly 15s on a cold start \u2014 so a message arriving at a cold instance times out and FALSE-BLOCKS. Today that cannot happen, because fleet.yaml:45 pins mobius-phi-classifier at min:1. The problem is WHY it is pinned, as recorded: 'HIPAA gate; throttled CPU so idle min is cheap' \u2014 that is a cost justification, and it invites a future cost sweep to reasonably reclaim it. Compare fleet.yaml:50, where the web-scraper carries 'min=1 REQUIRED: brpop poll loop \u2014 min=0 stops queue polling and jobs sit pending forever (the 2026-08-17 outage)'. That note cannot be misread; this one can. The invariant \u2014 min:1 is a CORRECTNESS requirement of the chat PHI gate, not a cost preference \u2014 exists only in a session transcript. Raised by the phi-classifier seat 2026-09-09 while withdrawing an unrelated recommendation; they were explicit they would rather hold min-instances than widen the message timeout, and they are right. FIX: one line in fleet.yaml stating the dependency and naming the consequence. CLOSED 2026-09-09 by the fleet-power seat, fleet.yaml c3688b7, VERIFIED FIRSTHAND HERE rather than accepted on report. The stanza now carries a REQUIRED-comment block in the crawler's style: 'min=1 REQUIRED (correctness, not cost): chat's message PHI gate calls /message-check with a 4s timeout (mobius-chat app/api/chat.py:247) and is fail-closed; a cold start loads Presidio/spaCy in ~15s, so min=0 turns every cold start into a FALSE-BLOCK of a legitimate user message. Idle min being cheap (~$39/mo at the idle SKU) is the secondary point.' Cost demoted to secondary, apply --dry-run clean, no functional change. They also verified the 4s at chat's own call site before writing it in rather than taking my citation \u2014 which is the right instinct given that a wrong line number from me is exactly what nearly shipped an 8s message gate earlier the same day."
+    ],
+    [
+     "good",
+     "PHI CLASSIFIER SEAT SHIPPED A REAL LATENCY FIX, 2026-09-09 (mobius-phi-classifier-00029-ns4, live): the classifier now SKIPS the LLM contextual pass when regex/NER already found strong PHI, because a strong identifier blocks regardless and the LLM can only clear WEAK-only hits \u2014 so the 3-5s Vertex call was pure latency with no effect on the verdict. Caller-scoped: /redact still runs the LLM, /message-check was regex+NER already. Measured warm: explicit-PHI doc 0.28-0.32s (was ~4-5s, ~15x); clean doc 2.0s small / 5.66s at 14KB, where the LLM is necessary. THE STRUCTURAL WIN, which is better than the speedup: explicit-PHI documents are now removed from the timeout's exposure ENTIRELY \u2014 they return in ~0.3s and can never time out into a false indeterminate. Whatever the timeout is, it now gates only CLEAN-LOOKING documents, which is exactly the population it should gate. Their verdict-neutrality argument is THEIR assertion about THEIR service, recorded as such and not independently verified here."
     ],
     [
      "watch",
@@ -647,7 +655,15 @@
     ],
     [
      "bad",
-     "OWNER(chat): THERE IS NO SUCH THING AS 'THE PHI GATE TIMEOUT'. THREE CALL SITES, THREE DIFFERENT VALUES, ONE OF THEM NOT CONFIGURABLE AT ALL \u2014 and I conflated them when reporting to the phi-classifier seat, which nearly produced a wrong change. (1) UPLOAD gate, app/main.py:1307, POST /classify, timeout=45 HARDCODED. (2) MESSAGE gate, app/api/chat.py:247, POST /message-check, timeout=4.0 HARDCODED \u2014 no env var, cannot be tuned without a deploy, and it sits on the SYNCHRONOUS path before the user sees any acknowledgement. (3) FEEDBACK gate, app/skills/phi_gate.py:30, PHI_GATE_TIMEOUT_SEC default 4 \u2014 the only configurable one, and the least important. A single env var name that governs only the path nobody asked about is worse than none: it reads as the system's timeout knob and is not. FIX: one name per path, all three configurable, and the message gate's value chosen against MESSAGE latency, not document latency \u2014 they are different workloads and a document-sized budget on a message is a UX regression."
+     "OWNER(chat): THERE IS NO SUCH THING AS 'THE PHI GATE TIMEOUT'. THREE CALL SITES, THREE DIFFERENT VALUES, ONE OF THEM NOT CONFIGURABLE AT ALL \u2014 and I conflated them when reporting to the phi-classifier seat, which nearly produced a wrong change. (1) UPLOAD gate, app/main.py:1307, POST /classify, timeout=45 HARDCODED. (2) MESSAGE gate, app/api/chat.py:247, POST /message-check, timeout=4.0 HARDCODED \u2014 no env var, cannot be tuned without a deploy, and it sits on the SYNCHRONOUS path before the user sees any acknowledgement. (3) FEEDBACK gate, app/skills/phi_gate.py:30, PHI_GATE_TIMEOUT_SEC default 4 \u2014 the only configurable one, and the least important. A single env var name that governs only the path nobody asked about is worse than none: it reads as the system's timeout knob and is not. VERIFIED 2026-09-09, and it is worse than 'misleading': PHI_GATE_TIMEOUT_SEC is read at exactly ONE site (phi_gate.py:30) and that module is imported by exactly TWO callers \u2014 app/api/product_feedback.py:111 and app/skills/builtin/product_feedback.py:259. It governs PRODUCT FEEDBACK TEXT AND NOTHING ELSE. Setting PHI_GATE_TIMEOUT_SEC=8 is a NO-OP for document uploads (45s hardcoded) and for chat messages (4.0 hardcoded). The phi-classifier seat recommended exactly that setting twice, reasoning about document latency, in good faith and off a name I gave them. Someone would have set it, watched nothing change, and drawn a conclusion about the classifier. A knob that cannot move the thing it appears to name is a CONFIGURATION-SHAPED PLACEBO \u2014 same family as the health signal that is green by construction. RESOLVED ON VALUE, 2026-09-09: the phi-classifier seat re-measured /message-check on the RIGHT path \u2014 p50 332ms, p95 561ms, max 561ms over 15 warm chat-shaped calls, 7x headroom under the 4s \u2014 and WITHDREW the 8s recommendation. /message-check is regex+NER only, no LLM by design, so the 3.6-4.2s phi_classify figure NEVER applied to it: phi_classify is the bandit LLM stage and fires only on /classify and /redact. NO TIMEOUT CHANGE IS WARRANTED ON ANY OF THE THREE PATHS. The defect that remains is purely the SHAPE \u2014 make all three configurable, one name per path. FIX SPEC, agreed with the phi-classifier seat and recorded so nobody re-derives it: message 4s (7x headroom on a measured 561ms p95), upload 45s (8x headroom on a measured 5.66s worst case), feedback 4s (no problem raised). EVERY CURRENT VALUE IS CORRECT \u2014 this is a naming and tunability defect, not a numbers defect, and whoever implements it must not take the opportunity to change a value. The residual cold-start exposure on the message path is held off by min-instances, not by the timeout, and is closed separately in fleet.yaml c3688b7."
+    ],
+    [
+     "bad",
+     "OWNER(fleet-power seat): A HIPAA GATE'S CORRECTNESS DEPENDS ON A SCALING SETTING, AND THE SETTING'S NOTE ONLY JUSTIFIES ITS COST. The chat message gate times out at 4s. mobius-phi-classifier loads Presidio/spaCy in roughly 15s on a cold start \u2014 so a message arriving at a cold instance times out and FALSE-BLOCKS. Today that cannot happen, because fleet.yaml:45 pins mobius-phi-classifier at min:1. The problem is WHY it is pinned, as recorded: 'HIPAA gate; throttled CPU so idle min is cheap' \u2014 that is a cost justification, and it invites a future cost sweep to reasonably reclaim it. Compare fleet.yaml:50, where the web-scraper carries 'min=1 REQUIRED: brpop poll loop \u2014 min=0 stops queue polling and jobs sit pending forever (the 2026-08-17 outage)'. That note cannot be misread; this one can. The invariant \u2014 min:1 is a CORRECTNESS requirement of the chat PHI gate, not a cost preference \u2014 exists only in a session transcript. Raised by the phi-classifier seat 2026-09-09 while withdrawing an unrelated recommendation; they were explicit they would rather hold min-instances than widen the message timeout, and they are right. FIX: one line in fleet.yaml stating the dependency and naming the consequence. CLOSED 2026-09-09 by the fleet-power seat, fleet.yaml c3688b7, VERIFIED FIRSTHAND HERE rather than accepted on report. The stanza now carries a REQUIRED-comment block in the crawler's style: 'min=1 REQUIRED (correctness, not cost): chat's message PHI gate calls /message-check with a 4s timeout (mobius-chat app/api/chat.py:247) and is fail-closed; a cold start loads Presidio/spaCy in ~15s, so min=0 turns every cold start into a FALSE-BLOCK of a legitimate user message. Idle min being cheap (~$39/mo at the idle SKU) is the secondary point.' Cost demoted to secondary, apply --dry-run clean, no functional change. They also verified the 4s at chat's own call site before writing it in rather than taking my citation \u2014 which is the right instinct given that a wrong line number from me is exactly what nearly shipped an 8s message gate earlier the same day."
+    ],
+    [
+     "good",
+     "PHI CLASSIFIER SEAT SHIPPED A REAL LATENCY FIX, 2026-09-09 (mobius-phi-classifier-00029-ns4, live): the classifier now SKIPS the LLM contextual pass when regex/NER already found strong PHI, because a strong identifier blocks regardless and the LLM can only clear WEAK-only hits \u2014 so the 3-5s Vertex call was pure latency with no effect on the verdict. Caller-scoped: /redact still runs the LLM, /message-check was regex+NER already. Measured warm: explicit-PHI doc 0.28-0.32s (was ~4-5s, ~15x); clean doc 2.0s small / 5.66s at 14KB, where the LLM is necessary. THE STRUCTURAL WIN, which is better than the speedup: explicit-PHI documents are now removed from the timeout's exposure ENTIRELY \u2014 they return in ~0.3s and can never time out into a false indeterminate. Whatever the timeout is, it now gates only CLEAN-LOOKING documents, which is exactly the population it should gate. Their verdict-neutrality argument is THEIR assertion about THEIR service, recorded as such and not independently verified here."
     ],
     [
      "watch",
@@ -1292,7 +1308,7 @@
    "module": "app.pipeline.orchestrator",
    "group": "pipeline",
    "path": "app/pipeline/orchestrator.py",
-   "loc": 1878,
+   "loc": 1892,
    "role": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).",
    "role_full": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).\n\nRuns stages in order; handles clarification/refinement early exit; publishes response.",
    "stage": null,
@@ -1864,11 +1880,12 @@
    "module": "app.pipeline.react_loop",
    "group": "pipeline",
    "path": "app/pipeline/react_loop.py",
-   "loc": 6200,
+   "loc": 6262,
    "role": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.",
    "role_full": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.\n\nReplaces (when enabled): run_plan() + _answer_for_subquestion() + run_integrate().\n\nKeeps: answer_non_patient(), answer_tool(), answer_reasoning(),\n       emitter system, badge system, jurisdiction system.\n\nEmission map (thinking chunks sent to UI via emitter=on_thinking):\n  Pre-loop:\n    [if pronoun enriched] \"\u21ba Understood: <resolved message>\"\n    [if follow-up to active context] \"\u25cc Answering from the report we just generated\u2026\"\n    [jurisdiction] emit_jurisdiction_context: \"\u2713 Confirmed: \u2026\" | \"? Payer not identified\u2026\" | etc.\n    \"I'm breaking down",
    "stage": null,
    "api": [
+    "tool_result_is_empty()",
     "chunk_text_identity()",
     "run_react()"
    ],
@@ -2199,23 +2216,25 @@
    "module": "app.pipeline.tool_manifest",
    "group": "pipeline",
    "path": "app/pipeline/tool_manifest.py",
-   "loc": 694,
+   "loc": 737,
    "role": "TOOL_MANIFEST \u2014 the planner prompt's catalog of dispatchable tools.",
    "role_full": "TOOL_MANIFEST \u2014 the planner prompt's catalog of dispatchable tools.\n\nHybrid shape after skill-registry commit 3:\n\n  - Five tools are now **registry-owned** (document_upload_skill,\n    list_thread_document_uploads, healthcare_query, web_scrape,\n    google_search). Their descriptions live on ``SkillSpec.description``\n    and we render them here via ``registry.manifest_text(...)``. Adding\n    a new answer_tool-dispatched skill is one file \u2014 no edit here.\n\n  - Four tools are **router-owned**: ``search_corpus``,\n    ``healthcare_npi_lookup``, ``search_uploaded_document``, and\n    ``refuse`` dispatc",
    "stage": null,
    "api": [
-    "get_tool_manifest()"
+    "get_tool_manifest()",
+    "get_manifest_tool_names()"
    ],
    "telemetry": [],
    "callers": [
     "app.api.chat",
     "app.main",
+    "app.pipeline.orchestrator",
     "app.pipeline.react.prompts"
    ],
-   "fan_in": 3,
+   "fan_in": 4,
    "surfaces": [],
    "observability": "mediated",
-   "observability_note": "Emits nothing. Observable only through its callers \u2014 its behaviour has no telemetry identity of its own.",
+   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own.",
    "config": [],
    "writes": [],
    "key": "tool_manifest",
@@ -2230,6 +2249,10 @@
     [
      "watch",
      "SEQUENCED AS P6 (Ananth, 2026-09-09): the tool/capabilities manifest moves to PERSISTENCE with a UX so a tool change needs no deploy; access provisioning becomes its own model rather than riding the subscription table; and the turn RETRIEVES its tools \u2014 Ananth's mechanism: 'a simple even vector search for tool... this will cut short on tokens and make a real good determination and make the latency also faster.' Three effects measured separately: fewer prompt tokens (direct cost, countable today), better selection (P3's funnel is the before-measurement), lower latency (a consequence of the first two, NOT an independent claim). Follows P3 and cannot lead it: retrieval changes WHICH tools are offered, so shipping it while selection is still sporadic makes every miss unattributable \u2014 the exact ambiguity P3 exists to resolve. pgvector; a catalogue this small may not need an index at all \u2014 measure first."
+    ],
+    [
+     "bad",
+     "OWNER(chat): A FOURTH LAYER STAGE 0 DID NOT NAME \u2014 THE TOOL RETURNS A WELL-FORMED ENVELOPE WRAPPING NOTHING, AND IT HAS HAPPENED BEFORE IN THIS EXACT TOOL. Ananth's hypothesis, 2026-09-09: 'could it be the tool that was called was sending something off'. Verified at react_loop.py:3153-3206, and there is a DATED PRECEDENT recorded in the code by Ananth himself (2026-08-07): appeals_get_playbook 'used to report success=True + signal=None whenever the HTTP call succeeded, even when the fetched playbook had neither a deadline nor a submission method \u2014 indistinguishable from a real hit... 7 consecutive appeals_get_playbook calls, all found but content-empty (\"?d deadline \u00b7 \"), burned rounds 2-9 of a 10-round budget with zero loop-detection.' So this failure mode is not hypothetical for this tool; it is a recurrence class.\n\nTHE STRUCTURE THAT MAKES IT POSSIBLE: the handler builds result_data = {'found': found, **pb}, and on the not-found path pb is a SYNTHESISED FALLBACK \u2014 {'message': 'No playbook for <payor>. Default FL Medicaid: 60 days, certified mail.'} with found=False. So a call that found nothing still returns a plausible, well-formed, non-empty payload. TWO DIFFERENT THINGS BOTH LOOK LIKE 'success': a real playbook, and a manufactured default announcing its own absence.\n\nWHICH MEANS TURN 143309c1 MAY NOT BE A BUG AT ALL. If it took the not-found path, the model read found=False plus a message saying no playbook exists and CORRECTLY said 'our resources don't have specific instructions for a CARC 24 denial' \u2014 a right answer, mislabelled by a span that recorded 'success'. The defect would then be entirely in the REPORTING, not the behaviour. Chat Master was right that it is unresolvable on current evidence; this names the specific fork the evidence cannot resolve, which is more actionable than 'L3 or correct'. RESOLVE IT BY: persisting `usable` (already computed at :3202 as found and (days is not None or bool(method))) and the found flag beside the success flag, then re-reading 143309c1. The handler ALREADY distinguishes all three states in its emit strings \u2014 usable, found-but-empty, not-found \u2014 and throws that distinction away before anything durable records it."
     ],
     [
      "bad",

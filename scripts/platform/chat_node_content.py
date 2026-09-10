@@ -331,10 +331,6 @@ that is the file it lives in, and lost it from the node whose assessment it reco
           "now gates only CLEAN-LOOKING documents, which is exactly the population it "
           "should gate. Their verdict-neutrality argument is THEIR assertion about "
           "THEIR service, recorded as such and not independently verified here."),
-
-         "FIX: one name per path, all three configurable, and the message gate's value "
-         "chosen against MESSAGE latency, not document latency — they are different "
-         "workloads and a document-sized budget on a message is a UX regression."),
  ("watch", "PHI-CLASSIFIER SEAT RULED 2026-09-09 on the fail-open item: REFUSE. An "
            "unconfigured classifier means 'cannot screen, therefore refuse', never 'no "
            "screening required' — an unset URL yields NO VERDICT, which is the "
