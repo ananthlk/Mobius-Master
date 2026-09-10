@@ -2165,6 +2165,18 @@ skill is one file and no edit here. The rest are still described inline.
           "corrupting the very funnel being built, with a failure that did not happen. "
           "A test written for one distinction defended a different one a month later, "
           "which is the argument for encoding distinctions rather than outcomes."),
+ ("bad", "OWNER(chat): A FIELD THAT CAN ONLY HOLD ONE VALUE IS A PRODUCER WITH A "
+         "CONSUMER AND STILL NO SIGNAL. Chat Master, 2026-09-10, and it is a new "
+         "variant of the class rather than another instance. llm_calls.is_fallback "
+         "EXISTS, IS READ (orchestrator.py:174), and is false on ALL 1,988 CALLS IN "
+         "24H — because nothing ever writes True. It would pass a 'the producer "
+         "exists' check, a 'the consumer exists' check, AND a 'the query returns rows' "
+         "check while carrying zero information. Every test this program has used to "
+         "detect an absent producer would report it as healthy. ADOPTED INTO THE P2 "
+         "DoD as the inverse of the consumer rule: prove the field CAN TAKE MORE THAN "
+         "ONE VALUE — a distinct-value count of 1 over a real window is the tell, and "
+         "it is the same shape as could-not-check-vs-checked-false (a legal enum value "
+         "with 0-1 rows) generalised from enums to booleans."),
  ("bad", "OWNER(me): THE READINESS SIGNALS WERE READ FROM A DEAD SESSION "
          "SCRATCHPAD, AND ZERO WAS RENDERED AS A MEASUREMENT FOR ALL 38 NODES. Found "
          "2026-09-09 while extending the rubric to production readiness on Ananth's "

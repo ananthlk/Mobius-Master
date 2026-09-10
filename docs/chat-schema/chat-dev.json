@@ -24,7 +24,7 @@
     "owner": "chat + Eval",
     "gate": "every segment timed AND each timed segment's attribution verified against a known-external call \u2014 an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
-    "n": 30
+    "n": 31
    },
    {
     "id": "P3",
@@ -3376,6 +3376,10 @@
     ],
     [
      "bad",
+     "OWNER(chat): A FIELD THAT CAN ONLY HOLD ONE VALUE IS A PRODUCER WITH A CONSUMER AND STILL NO SIGNAL. Chat Master, 2026-09-10, and it is a new variant of the class rather than another instance. llm_calls.is_fallback EXISTS, IS READ (orchestrator.py:174), and is false on ALL 1,988 CALLS IN 24H \u2014 because nothing ever writes True. It would pass a 'the producer exists' check, a 'the consumer exists' check, AND a 'the query returns rows' check while carrying zero information. Every test this program has used to detect an absent producer would report it as healthy. ADOPTED INTO THE P2 DoD as the inverse of the consumer rule: prove the field CAN TAKE MORE THAN ONE VALUE \u2014 a distinct-value count of 1 over a real window is the tell, and it is the same shape as could-not-check-vs-checked-false (a legal enum value with 0-1 rows) generalised from enums to booleans."
+    ],
+    [
+     "bad",
      "OWNER(me): THE READINESS SIGNALS WERE READ FROM A DEAD SESSION SCRATCHPAD, AND ZERO WAS RENDERED AS A MEASUREMENT FOR ALL 38 NODES. Found 2026-09-09 while extending the rubric to production readiness on Ananth's instruction. gen_chat_dev.py did: sig_path = '/private/tmp/claude-502/.../scratchpad/readiness.json'; sigs = json.load(open(sig_path)) IF OS.PATH.EXISTS(sig_path) ELSE {}. That directory belonged to a session that had ended. The existence check made the absence SILENT, so every node got {} \u2014 and the page rendered '0 except \u00b7 0 log-and-continue \u00b7 0 emits' for all 38 as though measured. A swallowed absence presented as data, in the generator built to find swallowed absences, on a hardcoded ephemeral path that was GUARANTEED to rot. FIXED: scripts/platform/gen_readiness.py measures from source on every refresh (step 2/7, before the merge), and a missing signals file now sys.exit()s rather than falling back \u2014 'refusing to render zeroed signals as measurements'. First real numbers: 130 swallow handlers, 3 re-raise, 0 bare except, 0 un-timed outbound calls, 211 log sites, 144 telemetry sites, and 24 OF 31 LIVE NODES WITH NO STRUCTURED TELEMETRY AT ALL."
     ],
     [
@@ -3537,7 +3541,7 @@
     [
      "functionality",
      "red",
-     "26 open defects"
+     "27 open defects"
     ],
     [
      "testability",
@@ -3561,7 +3565,7 @@
     ]
    ],
    "rating_was_typed": "red",
-   "rating_why": "functionality: 26 open defects \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: testability, error_handling, modularity)",
+   "rating_why": "functionality: 27 open defects \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: testability, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },

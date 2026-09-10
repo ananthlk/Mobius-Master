@@ -227,6 +227,7 @@ RULES = [
     ("P2", "model_registry", "THE BANDIT HAS NO SURFACE"),
     ("P2", "tool_manifest", "THE COVERAGE ENUM WAS A PRODUCER WITH NO CONSUMER"),
     ("P2", "tool_manifest", "RATINGS WERE NEVER RE-DERIVED, AND NO SIGN-OFF EVER COVERED THEM"),
+    ("P2", "tool_manifest", "A FIELD THAT CAN ONLY HOLD ONE VALUE IS A PRODUCER WITH A CONSUMER"),
     ("P2", "tool_manifest", "THE READINESS SIGNALS WERE READ FROM A DEAD SESSION SCRATCHPAD"),
     ("P2", "tool_manifest", "MY OWN OBSERVABILITY REGEX MATCHED ONLY logger.info"),
     ("P2", "tool_manifest", "STAGE 0 COULD NOT NAME THE LAYER"),
