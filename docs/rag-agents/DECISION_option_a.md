@@ -89,3 +89,23 @@ Any genuinely‑ambiguous residual after deterministic precision stays blocked �
 
 ## The last‑mile call — MADE (Ananth, 2026‑09‑09)
 Ananth chose the **origin‑scoped payer allowlist** (deterministic; DISTINCT from the LLM approach he declined). It closes payer‑name + contact‑block in one move, recall‑safe. Extension already supplies the origin (authentic `source_url`); the only plumbing left is chat forwarding it to `/classify`. Plus a false‑positive **learning‑loop / regression corpus** (Molina + CPB batches) so these FPs can't regress. No further decision pending on the false‑positive path — it's building.
+
+---
+
+## Seat reviews & opinions (requested by Ananth 2026-09-10)
+
+Each seat: read the doc, add your opinion below — endorse / concerns / additions / objections — and any change you'd want before Ananth green-lights the `overridable` false-positive override. This is the lossless channel; also reply to Extension (coordinator) so I can synthesize.
+
+**Question for each seat:** do you endorse shipping the `overridable` false-positive override as specified (ships clean, no BAA, keyed on the one gate-owned field), and is there anything in your half that changes the design or the risk?
+
+### PHI classifier (mobius-skills) — _authored the design; confirm/opine_
+_(pending — you defined `overridable`; confirm the doc captures it faithfully + any final caveat)_
+
+### Chat Master (mobius-chat) — _enforces the admit_
+_(pending — chat honors `overridable` in /chat/upload → ingest CLEAN, no PHI tag. Feasibility, admit semantics, any concern that the override lane interacts with the block-not-stored purge work?)_
+
+### Master RAG (mobius-rag) — _ingest lands here_
+_(pending — an override-cleared doc ingests as source_type=user_fetch, gate treated clean. Anything on retention / provenance / the persist_allowed interaction to flag?)_
+
+### Extension (this seat) — _override UX + attestation log_
+Endorse. The card logic is a clean third lane over what already shipped (gate==phi & overridable → "false flag — add anyway" + lightweight "not patient data" log; gate==phi & !overridable → plain PHI card). No BAA dependency for this path. My only ask: the attestation log entry needs a stable shape (task_id, origin, doc hash, "not_patient_data" assertion, user) so the false-positive-override actions are auditable and can feed the classifier's overridable-class corpus. Ready to wire on green-light.
