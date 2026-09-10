@@ -140,6 +140,117 @@ Spans, bound to the schema node key per the P2b convention:
 | `tool_manifest.arm` | `1` / `2`, on **every** turn, sticky by thread |
 | `tool_manifest.v2_fallback` | reason, when 2.0 failed and 1.0 served |
 
+## 3.6 🔴 PHASE −1 — BUILD IT STANDALONE FIRST, WITH ITS OWN UX AND TESTS
+
+**Ananth, 2026-09-10:** *"include the ux and testability around this independently
+first.. a independent self sufficient tool_manifest 2.0.. then we can integrate."*
+
+**This comes before shadow and before the A/B**, and it changes the shape of the work: 2.0
+is built and proven as a **component that runs without chat**, then integrated. Nothing
+about the selector needs react, the orchestrator, a turn, or a model — §1's whole claim is
+that it is deterministic — so requiring chat to exercise it is an accident of where the
+code would otherwise live.
+
+### What "self-sufficient" has to mean, concretely
+
+| | requirement |
+|---|---|
+| **runs** | as a library and a CLI, with no chat import, no FastAPI, no DB, no LLM at request time |
+| **inputs** | `query: str`, `caller: {mode, subscriptions}`, optional `gaps: list[str]` |
+| **outputs** | ranked tools · per-signal scores · tier · reason · **rendered manifest text** · **token count** |
+| **data** | a **catalogue snapshot** (see below) + tool embeddings, both on disk |
+| **tests** | fixtures only — query → expected set. No network, no chat, no model |
+| **UX** | its own surface, not a chat page |
+
+### 🔴 The boundary problem this exposes, and it is not solvable by wishing
+
+**A standalone selector cannot see half the catalogue.** The 29 MCP tools register at
+chat's FastAPI startup against remote services (§2, §3.1). A component with no chat has no
+list_tools response, and a *local render silently returns 28 of 58 and succeeds* — which is
+the exact trap the schematic exists to document.
+
+**So the boundary is: chat EXPORTS the catalogue; the selector CONSUMES the export.**
+
+```
+chat (running, MCP registered)  ──►  catalogue snapshot (JSON)  ──►  selector (standalone)
+                                      names · text · tier ·
+                                      subscribes · requires ·
+                                      source · exported_at · rev
+```
+
+Consequences, all of which must be in the design rather than discovered:
+
+1. **The snapshot has provenance and an age.** `exported_at`, the chat revision it came
+   from, and the tool count. A selector run against a snapshot from a different revision
+   is testing a catalogue that is not deployed.
+2. **The snapshot is a decayable artifact** — same shape as the mutation ledger and the
+   tool embeddings (§14.4). A selector loading a snapshot older than the running revision
+   must **say so loudly**, not proceed.
+3. **The export is a chat-side deliverable** and the only part of Phase −1 that is not
+   independent. It is small — dump what `get_manifest_tool_names()` plus the registry
+   already know — but it must exist before the selector can be tested against reality
+   rather than against 28 tools.
+4. **A snapshot makes the A/B honest**: both arms are then provably reasoning about the
+   same catalogue.
+
+### The UX — its own surface, and what it must show
+
+From §8.5, now as the component's own page rather than a chat page. For a typed query:
+
+| panel | shows |
+|---|---|
+| **A · authority** | the caller's eligible set, **and what authority excluded** |
+| **B · requires** | tools dropped as ineligible, **each with the unmet tag** |
+| **C · signals** | every candidate with **tag / BM25 / vector scores side by side and its fused rank** — losers included |
+| **D · admitted** | the final ranked set, each with its reason, the tier that carried it, **and the rendered token count vs 1.0's 13,062** |
+| **diff** | 1.0's full manifest vs 2.0's selection, side by side |
+| **replay** | paste a **real past turn's** query and see what 2.0 would have selected — and, once integrated, what react actually called |
+
+**The signals panel is the one that earns the UX**, and it is the reason to show losers:
+§14 found that BM25 and vector rank the *same* query differently and win *opposite* query
+types. A UI that shows only the fused result hides the disagreement that is the most
+diagnostic thing on the screen.
+
+**The replay row is what makes it an instrument rather than a demo** (§8.5). Everything
+above it previews a hypothetical; only replay can say the selector was right.
+
+### Testability — what a fixture is, and what makes it honest
+
+```
+fixture:  query · caller · snapshot_rev
+          expect_contains:  [tools that MUST be in the set]
+          expect_absent:    [tools that must NOT be]
+          expect_rank_top:  optional, and used sparingly
+```
+
+**`expect_contains` is the primary assertion; `expect_rank_top` is used sparingly and
+deliberately.** §11.2 and §13.3 concluded that *"how do i appeal"* legitimately spans two
+tools and the correct output is a **set**, not a winner. A suite full of rank-1 assertions
+would encode a target the design explicitly rejects, and would fail on exactly the queries
+where the design is behaving correctly.
+
+**`expect_absent` is the assertion that catches the real regression** — 2.0 dropping a tool
+the turn needs. That is the failure the A/B guardrails also watch (§3.3).
+
+**And the collision test, which is the thing prose could never give us** (§5, §11):
+
+> a table of representative queries, asserting each maps to exactly one tool's declared
+> triggers — so **a new tool that collides fails a test rather than a live turn.**
+
+That is the property that survives the tool explosion Ananth is planning for, and it only
+works because the declarations are structured.
+
+### Phase −1 exit criteria
+
+- runs as a CLI against a snapshot, **no chat import** — verifiable by import graph
+- the UX shows all six panels, including losers and excluded-with-reason
+- **the fixture suite exists and the golden set has an owner** (§9 q3 — still the
+  prerequisite; a standalone component makes it *cheaper* to build, not unnecessary)
+- the collision test passes over the full 58-tool snapshot
+- a **stale-snapshot** run fails loudly rather than proceeding
+
+**Only then** shadow (§3.5), then the A/B (§3).
+
 ## 4. The selector
 
 Four stages, from schematic §8.1. Each is a pure function of declared inputs.
@@ -240,6 +351,7 @@ shape this program keeps finding.
 
 | phase | what runs | exit criterion |
 |---|---|---|
+| **−1 — STANDALONE** | selector as a library + CLI + UX, against a catalogue snapshot | §3.6: no chat import · six UX panels · fixture suite with an owner · collision test over all 58 · stale snapshot fails loudly |
 | **0 — shadow, brief** | 2.0 computes, 1.0 serves | no gross selector bug; recall vs called tools ≥ 99%, **every miss read by name** |
 | **1 — A/B, THE GATE** | 2.0 serves one arm, **sticky by thread** | **cost** down as designed (decidable in tens of turns) · **latency** no p50 regression, and prompt-processing is the honest claim · **accuracy** proxies show no degradation, with Eval's bank as the dependency for parity · all §3.3 guardrails held |
 | **2 — default** | 2.0 serves, 1.0 retained | 1.0 stays callable for one full cycle after |
