@@ -509,11 +509,22 @@ is settled.
 - **§8.4 constraint 3 is largely satisfied by this** — tags *are* the structured triggers
   I was arguing for, and they already exist.
 
-**New risk, mine to own:** Lexicon coverage is imperfect — `florida_blue` and
-`florida_medicaid` are absent as `j:payor.*` keys [MEASURED 2026-09-09]. A selector that
-depends on tags inherits every coverage gap in my vocabulary, and a query whose tags do
-not resolve gets a *silently* worse tool set. That needs a stated fallback and a
-countable "no tags matched" signal, or it becomes the next could-not-check-vs-checked-false.
+**Lexicon coverage is NOT a design constraint — corrected by Ananth, 2026-09-10.** I had
+filed the absence of `florida_blue` / `florida_medicaid` as `j:payor.*` keys as a risk
+the selector had to be designed around. His ruling: *"that's not your problem, that's
+someone else's problem about the completeness.. so don't bother — when we onboard them
+we will have those payors included."*
+
+He is right, and my framing was wrong in a specific way: **payor coverage is an
+onboarding output, not a vocabulary defect.** The `j:payor.*` set grows as payors are
+onboarded, by design. Designing the selector around today's snapshot would be building
+against a moving input that is *supposed* to move.
+
+What survives is one line, not a risk section: **the selector needs a defined behaviour
+when a query's tags do not resolve** — a stated fallback plus a countable "no tags
+matched" signal. Not because coverage is broken, but because onboarding is incremental
+by nature, so *some* query will always arrive ahead of its tags. That is a requirement
+on the selector, not a dependency on Curation.
 
 ## 9.4 The cheapest next measurement
 
