@@ -267,6 +267,19 @@ def main():
             coverage=obj.get("coverage"),
             deleted=bool(obj.get("deleted")),
             signals=obj.get("signals"))
+        # Per-finding status, so the LIST cannot contradict the BADGE. It did:
+        # state_load's badge derived "2 open" while the page rendered SEVEN red
+        # triangles, because the finding list styled every `bad` entry the same
+        # regardless of a closure stamp or another seat's OWNER. Ananth spotted it
+        # ("i see so many bugs / reds in the state_load — is that accurate").
+        # A rating computed from evidence and a list ignoring that evidence is worse
+        # than either alone: the reader trusts the one they can see.
+        obj["findings_status"] = [
+            {"closed": _RUBRIC.is_closed(t),
+             "owner": _RUBRIC.owner_of(t),
+             "own": _RUBRIC.is_own_defect(t)}
+            for _k, t in (obj.get("findings") or [])
+        ]
         obj["dimensions"] = _RUBRIC.dimensions(
             findings=obj.get("findings") or [],
             coverage=obj.get("coverage"),

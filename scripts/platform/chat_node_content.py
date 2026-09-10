@@ -1407,7 +1407,17 @@ WHAT IT DOES NOT LOAD, which is the part people assume:
  ("bad", "OWNER(chat): state_version is WRITE-ONLY — inserted, incremented, never read or compared anywhere "
          "in app/. So it cannot detect the above, AND read-modify-write through "
          "get_state/save_state_full is unguarded: two concurrent turns on one thread are a "
-         "lost update."),
+         "lost update."
+         "NOTE ON READING THIS NODE (2026-09-10): the page used to render SEVEN "
+         "red triangles here while the derived badge said 2 open, because the finding "
+         "list styled every `bad` entry identically regardless of a closure stamp or "
+         "another seat's OWNER. Ananth caught it — 'i see so many bugs / reds in the "
+         "state_load, is that accurate in the schema'. It was not. A rating computed "
+         "from evidence and a list that ignores the same evidence is worse than either "
+         "alone, because the reader trusts the one they can see. Closed findings are now "
+         "kept and marked (they are the history) but rendered as done, other seats' "
+         "items carry an owner chip, open items sort first, and a summary line states "
+         "the split."),
  ("bad", "OWNER(db-seat): CROSS-NODE, invisible to any code read: mobius_chat has NO query guards. "
          "statement_timeout = 0 and no idle-in-transaction guard. mobius_rag carries "
          "idle_in_transaction_session_timeout = 120s and is the ONLY per-database override on "

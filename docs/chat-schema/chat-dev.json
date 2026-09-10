@@ -260,6 +260,123 @@
     ]
    ],
    "signals": {},
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -385,6 +502,88 @@
     "telemetry_sites": 0,
     "todos": 0
    },
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": true,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": true,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": true,
+     "owner": "fleet-power seat",
+     "own": false
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": true,
+     "owner": "phi-classifier seat",
+     "own": false
+    },
+    {
+     "closed": true,
+     "owner": "chat",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -499,6 +698,63 @@
     "telemetry_sites": 0,
     "todos": 0
    },
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -569,6 +825,23 @@
     "telemetry_sites": 0,
     "todos": 0
    },
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -670,6 +943,58 @@
     "telemetry_sites": 8,
     "todos": 0
    },
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": true,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": true,
+     "owner": "chat",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -785,6 +1110,43 @@
    },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": true,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": true,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -925,6 +1287,88 @@
    },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": true,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": true,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": true,
+     "owner": "fleet-power seat",
+     "own": false
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": true,
+     "owner": "phi-classifier seat",
+     "own": false
+    },
+    {
+     "closed": true,
+     "owner": "chat",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -1025,6 +1469,28 @@
    },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -1125,6 +1591,28 @@
    },
    "coverage": "ABSENT",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -1220,6 +1708,28 @@
    },
    "coverage": "REMOVED",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [],
    "rating_was_typed": "red",
    "rating_why": "node deleted \u2014 a rating is a judgement about live code",
@@ -1323,6 +1833,68 @@
    },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -1447,6 +2019,38 @@
    },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -1572,6 +2176,23 @@
    },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -1679,6 +2300,38 @@
    },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -1783,6 +2436,38 @@
    },
    "coverage": "ABSENT",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "payor-policy",
+     "own": false
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -1891,6 +2576,23 @@
    },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -2028,6 +2730,23 @@
    },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -2152,6 +2871,43 @@
    },
    "coverage": "ABSENT",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "user-manager",
+     "own": false
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -2272,6 +3028,43 @@
    },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -2373,6 +3166,23 @@
    },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -2514,6 +3324,68 @@
    },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -2603,6 +3475,18 @@
    },
    "coverage": "IMPORTED-NOT-CALLED",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -2721,6 +3605,48 @@
    },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -2805,6 +3731,18 @@
    },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -3003,6 +3941,53 @@
    },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -3114,6 +4099,38 @@
    ],
    "ux": "No surface. ctx.completion_critic_ran / _satisfied / _gaps are set but nothing renders them",
    "signals": {},
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -3222,6 +4239,23 @@
    },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -3298,6 +4332,13 @@
    },
    "coverage": "ABSENT",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -3568,6 +4609,248 @@
    },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": true,
+     "owner": "me",
+     "own": false
+    },
+    {
+     "closed": true,
+     "owner": "me",
+     "own": false
+    },
+    {
+     "closed": true,
+     "owner": "me",
+     "own": false
+    },
+    {
+     "closed": true,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": true,
+     "owner": "me",
+     "own": false
+    },
+    {
+     "closed": true,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "me, rag",
+     "own": false
+    },
+    {
+     "closed": true,
+     "owner": "payor seat",
+     "own": false
+    },
+    {
+     "closed": true,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": true,
+     "owner": "appeals-agent, self-reported",
+     "own": false
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "me + payor seat",
+     "own": false
+    },
+    {
+     "closed": false,
+     "owner": "roster seat",
+     "own": false
+    },
+    {
+     "closed": true,
+     "owner": "payor seat / whoever owns intake",
+     "own": false
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "appeals-agent, self-reported",
+     "own": false
+    },
+    {
+     "closed": false,
+     "owner": "appeals-agent",
+     "own": false
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": true,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -3661,6 +4944,23 @@
    },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -3784,6 +5084,53 @@
    },
    "coverage": "PERIPHERAL",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [
     [
      "functionality",
@@ -3842,7 +5189,7 @@
    "module": "app.stages.state_load",
    "group": "stages",
    "path": "app/stages/state_load.py",
-   "loc": 244,
+   "loc": 251,
    "role": "Stage: load state, apply delta from message, build context pack.",
    "role_full": "Stage: load state, apply delta from message, build context pack.",
    "stage": "state_load",
@@ -3890,7 +5237,7 @@
     ],
     [
      "bad",
-     "OWNER(chat): state_version is WRITE-ONLY \u2014 inserted, incremented, never read or compared anywhere in app/. So it cannot detect the above, AND read-modify-write through get_state/save_state_full is unguarded: two concurrent turns on one thread are a lost update."
+     "OWNER(chat): state_version is WRITE-ONLY \u2014 inserted, incremented, never read or compared anywhere in app/. So it cannot detect the above, AND read-modify-write through get_state/save_state_full is unguarded: two concurrent turns on one thread are a lost update.NOTE ON READING THIS NODE (2026-09-10): the page used to render SEVEN red triangles here while the derived badge said 2 open, because the finding list styled every `bad` entry identically regardless of a closure stamp or another seat's OWNER. Ananth caught it \u2014 'i see so many bugs / reds in the state_load, is that accurate in the schema'. It was not. A rating computed from evidence and a list that ignores the same evidence is worse than either alone, because the reader trusts the one they can see. Closed findings are now kept and marked (they are the history) but rendered as done, other seats' items carry an owner chip, open items sort first, and a summary line states the split."
     ],
     [
      "bad",
@@ -3940,18 +5287,105 @@
    "signals": {
     "async_no_timeout": 0,
     "bare_except": 0,
-    "except_handlers": 3,
-    "loc": 244,
+    "except_handlers": 2,
+    "loc": 251,
     "log_sites": 2,
     "missing": false,
     "reraise": 0,
-    "swallow": 2,
+    "swallow": 1,
     "telemetry_sites": 1,
     "todos": 0
    },
-   "coverage": "GUARDED",
+   "coverage": "TAGGED-UNVERIFIED",
    "coverage_tags": [
     "state_load:no_silent_reset"
+   ],
+   "findings_status": [
+    {
+     "closed": true,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": true,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": true,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": true,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "db-seat",
+     "own": false
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
    ],
    "dimensions": [
     [
@@ -3961,18 +5395,18 @@
     ],
     [
      "testability",
-     "green",
-     "guarantee mutation-verified"
+     "amber",
+     "called, guarantee unproven (TAGGED-UNVERIFIED)"
     ],
     [
      "error_handling",
      "amber",
-     "2 of 3 handlers swallow"
+     "1 of 2 handlers swallow"
     ],
     [
      "modularity",
      "green",
-     "244 lines"
+     "251 lines"
     ],
     [
      "observability",
@@ -3981,7 +5415,7 @@
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "functionality: 2 open (+1 tracked for other seats) \u00b7 error_handling: 2 of 3 handlers swallow \u00b7 observability: 1 telemetry sites, 2 logs  (ok: testability, modularity)",
+   "rating_why": "functionality: 2 open (+1 tracked for other seats) \u00b7 testability: called, guarantee unproven (TAGGED-UNVERIFIED) \u00b7 error_handling: 1 of 2 handlers swallow \u00b7 observability: 1 telemetry sites, 2 logs  (ok: modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -4039,6 +5473,28 @@
    ],
    "coverage": "REMOVED",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [],
    "rating_was_typed": "green",
    "rating_why": "node deleted \u2014 a rating is a judgement about live code",
@@ -4096,6 +5552,23 @@
    ],
    "coverage": "REMOVED",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [],
    "rating_was_typed": "amber",
    "rating_why": "node deleted \u2014 a rating is a judgement about live code",
@@ -4157,6 +5630,28 @@
    ],
    "coverage": "REMOVED",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "chat",
+     "own": true
+    }
+   ],
    "dimensions": [],
    "rating_was_typed": "red",
    "rating_why": "node deleted \u2014 a rating is a judgement about live code",
@@ -4214,6 +5709,23 @@
    ],
    "coverage": "REMOVED",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [],
    "rating_was_typed": "green",
    "rating_why": "node deleted \u2014 a rating is a judgement about live code",
@@ -4271,6 +5783,23 @@
    ],
    "coverage": "REMOVED",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [],
    "rating_was_typed": "amber",
    "rating_why": "node deleted \u2014 a rating is a judgement about live code",
@@ -4332,6 +5861,28 @@
    ],
    "coverage": "REMOVED",
    "coverage_tags": [],
+   "findings_status": [
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    },
+    {
+     "closed": false,
+     "owner": "",
+     "own": true
+    }
+   ],
    "dimensions": [],
    "rating_was_typed": "amber",
    "rating_why": "node deleted \u2014 a rating is a judgement about live code",

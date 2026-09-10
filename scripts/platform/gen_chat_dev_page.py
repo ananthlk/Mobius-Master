@@ -122,6 +122,17 @@ header.top .lead{font-size:var(--mobius-text-xs);color:var(--mobius-text-muted);
 .find li{margin-bottom:0.3rem}
 .f-bad::marker{content:"▲ ";color:var(--mobius-error)}
 .f-watch::marker{content:"▸ ";color:var(--mobius-warning)}
+.f-done::marker{content:"✓ ";color:var(--mobius-success)}
+.f-done{opacity:.55;text-decoration-color:var(--mobius-text-muted)}
+.f-other::marker{content:"→ ";color:var(--mobius-text-muted)}
+.f-other{opacity:.72}
+.fchip{display:inline-block;font-size:0.86em;text-transform:uppercase;letter-spacing:.05em;
+ padding:0 0.3rem;margin-right:0.35rem;border-radius:var(--mobius-radius-sm);
+ background:var(--mobius-bg-tertiary)}
+.c-done{color:var(--mobius-success)}
+.c-other{color:var(--mobius-text-muted)}
+.fsum{font-size:var(--mobius-text-xs);color:var(--mobius-text-muted);
+ margin:var(--mobius-space-xs) 0 0;letter-spacing:.03em}
 .f-good::marker{content:"✓ ";color:var(--mobius-success)}
 .sigs{display:flex;flex-wrap:wrap;gap:0.15rem var(--mobius-space-md);
  font-family:var(--mobius-font-mono);font-size:var(--mobius-text-xs);color:var(--mobius-text-muted)}
@@ -365,8 +376,25 @@ function detail(k){
       '<span><b>'+(sg.fan_in||0)+'</b> callers</span>'+
       '<span><b>'+(sg.emits||0)+'</b> signals</span>'+
       '<span><b>'+((sg.tests||[]).length)+'</b> test files</span></div>' : '';
-  var findings = (m.findings||[]).length ? '<ul class="find">'+m.findings.map(function(f){
-      return '<li class="f-'+f[0]+'">'+esc(f[1])+'</li>'; }).join('')+'</ul>' : '';
+  // A closed finding is KEPT and marked, never hidden — the history is the point —
+  // but it must not render as an open defect. Open items sort first.
+  var fst = m.findings_status || [];
+  var fitems = (m.findings||[]).map(function(f, i){
+      var st = fst[i] || {};
+      var cls = 'f-'+f[0], chip = '';
+      if (f[0] === 'bad' && st.closed) { cls = 'f-done'; chip = '<span class="fchip c-done">closed</span>'; }
+      else if (f[0] === 'bad' && !st.own) { cls = 'f-other'; chip = '<span class="fchip c-other">'+esc(st.owner||'other seat')+'</span>'; }
+      var rank = (f[0]==='bad' && st.closed) ? 3 : (f[0]==='bad' && !st.own) ? 2 : (f[0]==='bad') ? 0 : 1;
+      return {rank: rank, html: '<li class="'+cls+'">'+chip+esc(f[1])+'</li>'};
+  });
+  fitems.sort(function(a,b){ return a.rank - b.rank; });
+  var nOpenOwn = fst.filter(function(x,i){ return (m.findings||[])[i] && (m.findings||[])[i][0]==='bad' && !x.closed && x.own; }).length;
+  var findings = fitems.length
+      ? '<div class="fsum">'+nOpenOwn+' open here · '+
+        fitems.filter(function(x){return x.rank===2;}).length+' other seats · '+
+        fitems.filter(function(x){return x.rank===3;}).length+' closed</div>'+
+        '<ul class="find">'+fitems.map(function(x){return x.html;}).join('')+'</ul>'
+      : '';
   var covMap = {'GUARDED':'green','TAGGED-UNVERIFIED':'amber','PERIPHERAL':'amber',
                 'IMPORTED-NOT-CALLED':'red','ABSENT':'red','REMOVED':'red'};
   var cov = m.coverage ? '<span class="pill p-'+(covMap[m.coverage]||'watch')+'" '+
