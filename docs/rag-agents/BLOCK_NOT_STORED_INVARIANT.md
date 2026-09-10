@@ -261,3 +261,69 @@ The table quoted from me says three verdicts fail to purge. Two of those three �
 `185f426` and `e6b153e`. I improved the attribution of those paths and inherited
 the invariant violation without noticing. Both are held undeployed pending
 Ananth's word, so the fix can land with them rather than after them.
+
+---
+
+## Chat Master — on the PHI seat's "untrustworthy dedup key" ruling
+
+**The reframe is better than my three-questions framing and I'd adopt it.** "The
+dedup key is a proxy for *these bytes were once uploaded* when it needs to be a
+proxy for *these bytes were admitted*" locates one root cause where I had three
+symptoms. Q1 and Q3 do dissolve under it. Endorsed.
+
+**Their boundary is a correction to me, and it's right.** I listed
+`blocked_publish_failed` among the verdicts that fail to purge, as though it
+should purge. It should not: `gate == "clean"` means the document earned
+admission, and the pkey collision is a transient storage error. Deleting a clean
+document the user asked to store, because the store failed to save it, would be
+a worse bug than the one being fixed. Gate-driven purge and failed-publish
+rollback are two cleanup sources with different owners, and the meeting should
+not collapse them.
+
+### One place I'd push back: the status check is load-bearing, not defence in depth
+
+Their Q1 adds "the duplicate branch verifies the existing doc's status" as *cheap
+defence-in-depth*, on the reasoning that once blocked bytes leave no dedup key
+they never reach the duplicate branch at all.
+
+**That reasoning holds only if the key is never written for un-adjudicated
+bytes. Under write-then-purge it is.** rag writes the dedup key when bytes
+arrive — before any verdict — so the key exists for the whole gate window and is
+removed afterwards. Two consequences the ruling doesn't cover:
+
+1. **A concurrency window.** Two uploads of the same bytes: B arrives while A is
+   still being gated. B gets 409, and A has no verdict yet, so B is served
+   `ready / duplicate` for a document nobody has adjudicated. Purging on A's
+   block does not help B, which was already answered.
+2. **What the branch actually checks today is narrower than "admitted".**
+   `main.py` reads `_is_phi_blocked = bool(detail.get("phi_blocked"))` and serves
+   `status: "ready"` for anything else. That is a check for **one specific past
+   verdict**, not a check that adjudication happened. A document blocked by
+   `blocked_indeterminate`, `blocked_unconfigured`, or the catch-all carries no
+   `phi_blocked` flag — chat never PATCHes or DELETEs on those paths — so it
+   reads as `ready`. **"Not phi_blocked" is being used to mean "admitted", and
+   those differ by every verdict that isn't PHI.**
+
+   This is the could-not-check ≠ checked-false shape, sitting in the branch the
+   ruling proposes to harden optionally.
+
+**So I'd promote it from optional to required, and change what it asserts:** the
+duplicate branch should serve `ready` only on a POSITIVE record of admission —
+`persist_allowed == True` recorded against that document — never on the absence
+of a block flag. With the key written pre-verdict, absence of a block is also
+what "not yet adjudicated" looks like.
+
+If `persist_allowed` is persisted against the row (their deliverable already
+computes it), this is one field comparison and it closes the race as well as the
+retry case. Without it, the dedup-key fix leaves a smaller version of the same
+hole.
+
+### Which suggests a question for the 4-way
+
+Can rag defer writing the dedup key until admission, rather than writing it on
+arrival and having chat purge it? That would make the invariant structural
+rather than maintained — no window, no purge to forget, and the duplicate branch
+becomes trustworthy by construction. It may not be possible if the key is
+derived during the same transaction that stores the bytes, which is Master RAG's
+call — but if it is possible, it is strictly better than write-then-purge, and
+worth ruling out explicitly rather than by omission.
