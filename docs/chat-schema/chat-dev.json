@@ -117,7 +117,7 @@
     "modules": [
      "round0"
     ],
-    "cite": 4271,
+    "cite": 4309,
     "note": "Short-circuits the loop when the caller already did the work."
    },
    {
@@ -128,7 +128,7 @@
      "capabilities",
      "parsing"
     ],
-    "cite": 4347,
+    "cite": 4385,
     "note": "Builds the planner prompt and parses the decision back out."
    },
    {
@@ -137,7 +137,7 @@
      "react_retry_guard",
      "curator_tools"
     ],
-    "cite": 5911,
+    "cite": 5949,
     "note": "Dispatches tools, and refuses a repeat of a call that already failed."
    },
    {
@@ -148,7 +148,7 @@
      "feedback_signal",
      "completion_extension_gate"
     ],
-    "cite": 5543,
+    "cite": 5581,
     "note": "Audits the draft against sources and decides whether to go round again."
    }
   ],
@@ -389,7 +389,7 @@
     [
      "functionality",
      "amber",
-     "6 open"
+     "4 open (+2 tracked for other seats)"
     ],
     [
      "testability",
@@ -413,7 +413,7 @@
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "functionality: 6 open \u00b7 testability: coverage unknown \u00b7 error_handling: 2 of 2 handlers swallow \u00b7 observability: 5 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: modularity)",
+   "rating_why": "functionality: 4 open (+2 tracked for other seats) \u00b7 testability: coverage unknown \u00b7 error_handling: 2 of 2 handlers swallow \u00b7 observability: 5 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: modularity)",
    "live_config": [
     {
      "name": "PHI_GATE_URL",
@@ -573,7 +573,7 @@
     [
      "functionality",
      "green",
-     "no open defects"
+     "no open defects owned here"
     ],
     [
      "testability",
@@ -929,7 +929,7 @@
     [
      "functionality",
      "amber",
-     "6 open"
+     "4 open (+2 tracked for other seats)"
     ],
     [
      "testability",
@@ -953,7 +953,7 @@
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "functionality: 6 open \u00b7 testability: called, guarantee unproven (PERIPHERAL) \u00b7 error_handling: 2 of 2 handlers swallow \u00b7 observability: 5 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: modularity)",
+   "rating_why": "functionality: 4 open (+2 tracked for other seats) \u00b7 testability: called, guarantee unproven (PERIPHERAL) \u00b7 error_handling: 2 of 2 handlers swallow \u00b7 observability: 5 log sites, NO structured telemetry \u2014 diagnosable, not operable  (ok: modularity)",
    "live_config": [
     {
      "name": "PHI_CLASSIFIER_URL",
@@ -1029,7 +1029,7 @@
     [
      "functionality",
      "green",
-     "no open defects"
+     "no open defects owned here"
     ],
     [
      "testability",
@@ -1519,7 +1519,7 @@
    "module": "app.pipeline.active_context",
    "group": "pipeline",
    "path": "app/pipeline/active_context.py",
-   "loc": 87,
+   "loc": 99,
    "role": "Active context persistence.",
    "role_full": "Active context persistence.\nReplaces active_skill \u2014 generic for any tool.",
    "stage": null,
@@ -1562,7 +1562,7 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 0,
-    "loc": 87,
+    "loc": 99,
     "log_sites": 0,
     "missing": false,
     "reraise": 0,
@@ -1591,7 +1591,7 @@
     [
      "modularity",
      "green",
-     "87 lines"
+     "99 lines"
     ],
     [
      "observability",
@@ -1787,7 +1787,7 @@
     [
      "functionality",
      "amber",
-     "3 open"
+     "2 open (+1 tracked for other seats)"
     ],
     [
      "testability",
@@ -2156,7 +2156,7 @@
     [
      "functionality",
      "amber",
-     "2 open"
+     "1 open (+1 tracked for other seats)"
     ],
     [
      "testability",
@@ -2809,7 +2809,7 @@
     [
      "functionality",
      "green",
-     "no open defects"
+     "no open defects owned here"
     ],
     [
      "testability",
@@ -2842,7 +2842,7 @@
    "module": "app.pipeline.react_loop",
    "group": "pipeline",
    "path": "app/pipeline/react_loop.py",
-   "loc": 6413,
+   "loc": 6451,
    "role": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.",
    "role_full": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.\n\nReplaces (when enabled): run_plan() + _answer_for_subquestion() + run_integrate().\n\nKeeps: answer_non_patient(), answer_tool(), answer_reasoning(),\n       emitter system, badge system, jurisdiction system.\n\nEmission map (thinking chunks sent to UI via emitter=on_thinking):\n  Pre-loop:\n    [if pronoun enriched] \"\u21ba Understood: <resolved message>\"\n    [if follow-up to active context] \"\u25cc Answering from the report we just generated\u2026\"\n    [jurisdiction] emit_jurisdiction_context: \"\u2713 Confirmed: \u2026\" | \"? Payer not identified\u2026\" | etc.\n    \"I'm breaking down",
    "stage": null,
@@ -2993,8 +2993,8 @@
     "async_no_timeout": 0,
     "bare_except": 0,
     "except_handlers": 44,
-    "loc": 6413,
-    "log_sites": 38,
+    "loc": 6451,
+    "log_sites": 39,
     "missing": false,
     "reraise": 0,
     "swallow": 19,
@@ -3022,16 +3022,16 @@
     [
      "modularity",
      "red",
-     "6413 lines \u2014 not reviewable in one pass"
+     "6451 lines \u2014 not reviewable in one pass"
     ],
     [
      "observability",
      "green",
-     "121 telemetry sites, 38 logs"
+     "121 telemetry sites, 39 logs"
     ]
    ],
    "rating_was_typed": "red",
-   "rating_why": "error_handling: 19 of 44 handlers log-and-continue \u00b7 modularity: 6413 lines \u2014 not reviewable in one pass  (ok: functionality, testability, observability)",
+   "rating_why": "error_handling: 19 of 44 handlers log-and-continue \u00b7 modularity: 6451 lines \u2014 not reviewable in one pass  (ok: functionality, testability, observability)",
    "live_config": [
     {
      "name": "APPEALS_AGENT_URL",
@@ -3226,7 +3226,7 @@
     [
      "functionality",
      "green",
-     "no open defects"
+     "no open defects owned here"
     ],
     [
      "testability",
@@ -3302,7 +3302,7 @@
     [
      "functionality",
      "green",
-     "no open defects"
+     "no open defects owned here"
     ],
     [
      "testability",
@@ -3572,7 +3572,7 @@
     [
      "functionality",
      "red",
-     "32 open defects"
+     "20 open defects (+12 tracked for other seats)"
     ],
     [
      "testability",
@@ -3596,7 +3596,7 @@
     ]
    ],
    "rating_was_typed": "red",
-   "rating_why": "functionality: 32 open defects \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: testability, error_handling, modularity)",
+   "rating_why": "functionality: 20 open defects (+12 tracked for other seats) \u00b7 observability: no logs and no telemetry \u2014 cannot be operated  (ok: testability, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },
@@ -3665,7 +3665,7 @@
     [
      "functionality",
      "green",
-     "no open defects"
+     "no open defects owned here"
     ],
     [
      "testability",
@@ -3876,15 +3876,15 @@
     ],
     [
      "bad",
-     "OWNER(chat): A TRANSIENT READ FAILURE DESTROYS ACCUMULATED THREAD STATE. get_state returns None for a DB error and None for no-row \u2014 identical, and its docstring says only 'or None if no row', never mentioning the error case. state_load does `raw = get_state(...) or {}`, builds ThreadState from DEFAULT_STATE, and if the message carries a delta calls save_state_full, whose UPSERT is a FULL REPLACE by design. One failed read plus any delta-bearing message overwrites the whole conversation with defaults plus that turn. Not skipped \u2014 destroyed."
+     "OWNER(chat): A TRANSIENT READ FAILURE DESTROYS ACCUMULATED THREAD STATE. get_state returns None for a DB error and None for no-row \u2014 identical, and its docstring says only 'or None if no row', never mentioning the error case. state_load does `raw = get_state(...) or {}`, builds ThreadState from DEFAULT_STATE, and if the message carries a delta calls save_state_full, whose UPSERT is a FULL REPLACE by design. One failed read plus any delta-bearing message overwrites the whole conversation with defaults plus that turn. Not skipped \u2014 destroyed.CLOSED 2026-09-09, chat \u2014 VERIFIED IN CODE: threads.py:560 declares StateUnavailable, :606 raises it, four raise sites, and get_state returns None IF AND ONLY IF there is no row. Eval independently AUDITED the tag GUARDED by running two mutations themselves (2d1ecc7). Live in 00976-btd."
     ],
     [
      "bad",
-     "OWNER(chat): AND NOTHING CAN DETECT IT AFTERWARDS. state_version increments on the same write, so the row goes 11 -> 12 exactly as a normal turn would. There is no artifact distinguishing 'turn 12 of a conversation' from 'state reset, now calling itself 12'."
+     "OWNER(chat): AND NOTHING CAN DETECT IT AFTERWARDS. state_version increments on the same write, so the row goes 11 -> 12 exactly as a normal turn would. There is no artifact distinguishing 'turn 12 of a conversation' from 'state reset, now calling itself 12'.CLOSED with the item above \u2014 the failure now raises instead of being undetectable. The state_version half remains open as its own finding, which is a write-only-field defect and not the silent-reset defect."
     ],
     [
      "bad",
-     "OWNER(chat): THE FIX IS LOCAL, NOT A REDESIGN. The same file already uses the right pattern thirty lines down: _write_state_row warns and returns on connection_error but RAISES on anything else. Write path loud, read path silent, one module \u2014 and the silent one loses data. get_state is the one function not following its own file's convention."
+     "OWNER(chat): THE FIX IS LOCAL, NOT A REDESIGN. The same file already uses the right pattern thirty lines down: _write_state_row warns and returns on connection_error but RAISES on anything else. Write path loud, read path silent, one module \u2014 and the silent one loses data. get_state is the one function not following its own file's convention.CLOSED \u2014 the local fix was made, as predicted, and needed no redesign."
     ],
     [
      "bad",
@@ -3955,7 +3955,7 @@
     [
      "functionality",
      "amber",
-     "7 open"
+     "4 open (+1 tracked for other seats)"
     ],
     [
      "testability",
@@ -3979,7 +3979,7 @@
     ]
    ],
    "rating_was_typed": "amber",
-   "rating_why": "functionality: 7 open \u00b7 observability: 1 telemetry sites, 1 logs  (ok: testability, error_handling, modularity)",
+   "rating_why": "functionality: 4 open (+1 tracked for other seats) \u00b7 observability: 1 telemetry sites, 1 logs  (ok: testability, error_handling, modularity)",
    "live_config": [],
    "detail": {}
   },

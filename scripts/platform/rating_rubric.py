@@ -66,7 +66,35 @@ _CALLED = ("PERIPHERAL", "TAGGED-UNVERIFIED", "GUARDED")
 _UNCALLED = ("ABSENT", "IMPORTED-NOT-CALLED")
 
 
-def open_bugs(findings):
+# A finding recorded on a node is not necessarily a DEFECT OF that node. During the
+# refactor I appended everything to whichever node I was working in, so `tool_manifest`
+# accumulated my own generator bugs, the payor seat's matcher, appeals' guard, the
+# roster seat's display_name and a payor repo's test scripts — 32 "open" on a node
+# whose real count was 18. That made it un-greenable for reasons that had nothing to do
+# with it, and made the number meaningless. Ananth, 2026-09-10: "0 green after 1 days
+# of work is embarassing" — part of that was this misfiling.
+#
+# The OWNER(...) prefix already carries the answer. A node's PRODUCTION READINESS is
+# scored on defects owned by the module's own team, or unowned. Everything else is
+# still TRACKED on the node — it is not deleted, hidden, or moved — but it is counted
+# under `tracked_elsewhere` and named, so the distinction is visible rather than
+# silently applied. Re-attributing to make a badge green would be metric-gaming; NOT
+# re-attributing makes the badge measure the wrong thing.
+_OWNER_RE = __import__("re").compile(r"^\s*OWNER\(([^)]*)\)")
+_OWN_NODE = ("chat", "chat-master", "")          # the module's own team
+
+
+def owner_of(text):
+    m = _OWNER_RE.match(text or "")
+    return (m.group(1).strip().lower() if m else "")
+
+
+def is_own_defect(text):
+    o = owner_of(text)
+    return any(o.startswith(x) for x in _OWN_NODE if x) or o == ""
+
+
+def open_bugs(findings, own_only=True):
     """`bad` findings not stamped closed. Only the head of the text is scanned:
     a closure stamp is appended at the front of the tail, and a later mention of
     another node's fix must not silently close this one."""
@@ -74,9 +102,23 @@ def open_bugs(findings):
     for kind, text in findings or []:
         if kind != "bad":
             continue
-        if not any(c in text[:400] for c in CLOSED_MARKERS):
-            n += 1
+        if any(c in text[:400] for c in CLOSED_MARKERS):
+            continue
+        if own_only and not is_own_defect(text):
+            continue
+        n += 1
     return n
+
+
+def tracked_elsewhere(findings):
+    """Open findings recorded here but owned by another seat. Named, not hidden."""
+    out = []
+    for kind, text in findings or []:
+        if kind != "bad" or any(c in text[:400] for c in CLOSED_MARKERS):
+            continue
+        if not is_own_defect(text):
+            out.append(owner_of(text))
+    return out
 
 
 _ORDER = {"green": 0, "amber": 1, "red": 2}
@@ -93,16 +135,21 @@ def dimensions(*, findings, coverage, signals):
     """
     sg = signals or {}
     n = open_bugs(findings)
+    others = tracked_elsewhere(findings)
     cov = coverage or "unknown"
     d = []
 
     # 1. FUNCTIONALITY — known open defects against this node.
     if n >= RED_VOLUME:
-        d.append(("functionality", "red", f"{n} open defects"))
+        d.append(("functionality", "red", f"{n} open defects"
+                  + (f" (+{len(others)} tracked for other seats)" if others else "")))
     elif n:
-        d.append(("functionality", "amber", f"{n} open"))
+        d.append(("functionality", "amber", f"{n} open"
+                  + (f" (+{len(others)} tracked for other seats)" if others else "")))
     else:
-        d.append(("functionality", "green", "no open defects"))
+        d.append(("functionality", "green",
+                  "no open defects owned here"
+                  + (f" ({len(others)} tracked for other seats)" if others else "")))
 
     # 2. TESTABILITY — Eval's Layer 1, plus the mutation ledger for GUARDED.
     if cov in ("ABSENT", "IMPORTED-NOT-CALLED"):

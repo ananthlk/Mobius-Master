@@ -1390,14 +1390,17 @@ WHAT IT DOES NOT LOAD, which is the part people assume:
          "or {}`, builds ThreadState from DEFAULT_STATE, and if the message carries a delta "
          "calls save_state_full, whose UPSERT is a FULL REPLACE by design. One failed read plus "
          "any delta-bearing message overwrites the whole conversation with defaults plus that "
-         "turn. Not skipped — destroyed."),
+         "turn. Not skipped — destroyed."
+         "CLOSED 2026-09-09, chat — VERIFIED IN CODE: threads.py:560 declares StateUnavailable, :606 raises it, four raise sites, and get_state returns None IF AND ONLY IF there is no row. Eval independently AUDITED the tag GUARDED by running two mutations themselves (2d1ecc7). Live in 00976-btd."),
  ("bad", "OWNER(chat): AND NOTHING CAN DETECT IT AFTERWARDS. state_version increments on the same write, so "
          "the row goes 11 -> 12 exactly as a normal turn would. There is no artifact "
-         "distinguishing 'turn 12 of a conversation' from 'state reset, now calling itself 12'."),
+         "distinguishing 'turn 12 of a conversation' from 'state reset, now calling itself 12'."
+         "CLOSED with the item above — the failure now raises instead of being undetectable. The state_version half remains open as its own finding, which is a write-only-field defect and not the silent-reset defect."),
  ("bad", "OWNER(chat): THE FIX IS LOCAL, NOT A REDESIGN. The same file already uses the right pattern thirty "
          "lines down: _write_state_row warns and returns on connection_error but RAISES on "
          "anything else. Write path loud, read path silent, one module — and the silent one "
-         "loses data. get_state is the one function not following its own file's convention."),
+         "loses data. get_state is the one function not following its own file's convention."
+         "CLOSED — the local fix was made, as predicted, and needed no redesign."),
  ("bad", "OWNER(chat): state_version is WRITE-ONLY — inserted, incremented, never read or compared anywhere "
          "in app/. So it cannot detect the above, AND read-modify-write through "
          "get_state/save_state_full is unguarded: two concurrent turns on one thread are a "
