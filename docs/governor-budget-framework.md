@@ -67,6 +67,7 @@ done with the answer is pure cost — which is why the gate is
 | **tool selection** | ↑ | ↓ | ↓ | **the only Pareto lever** — a better tool improves all three. Should be exhausted before buying a round |
 | **prompt / direction** | ↑ | ~ | ~ | near-free, and the *only* lever that gives direction rather than volume. **Underused** |
 | **critic** | — | ↑ | ↑ | buys information. Changes no answer by itself |
+| **model choice** | ↑↑ | ↕ | **↕↕** | Ananth''s addition. **The widest-swing lever of all** — and the only one with a control plane already built. See §3a |
 | **enricher vs direct** | ↑ presentation | ↑ | ↑ | a formatting decision, not a correctness one. Direct-from-react is viable **if the react prompt is changed to produce structure** |
 | **gap prioritisation** | ↑ | — | — | **free.** Choosing which gap to spend on is the highest-leverage decision available |
 
@@ -74,6 +75,56 @@ done with the answer is pure cost — which is why the gate is
 prioritisation, prompt) before the Pareto lever (tools), and the Pareto lever
 before the expensive one (a round). **A governor that reaches for a round first
 is skipping the two cheapest improvements it has.**
+
+### 3a. Model choice — the governor BOUNDS, the bandit CHOOSES (and this already works)
+
+Ananth added model choice to the answer-changing levers. It belongs there, and
+it is the **widest-swing lever in the table**: measured over 30 days, per-turn
+cost ran **2.56¢ p50 on gemini-2.5-flash** against **18.6¢ on gemini-2.5-pro** —
+a **7× spread**, larger than any other lever moves any term.
+
+**But the governor must not pick the model.** The bandit is a learner: it needs
+to keep exploring, and a governor overriding its draw per turn destroys the
+exploration that makes it work. The right division:
+
+> **The governor sets the envelope. The bandit chooses inside it.**
+
+`[READ]` **This is already built, and the governor is already the caller.**
+`model_registry.py:1899-1915` applies `latency_budget_ms` as a **hard pre-filter
+before Thompson sampling** — not a nudge to the draw — and
+`react_loop.py:4813-4814` imports `latency_budget_ms` from
+`react/governor.py` and passes it in. The registry''s own docstring names us:
+*"a caller with a real deadline (e.g. ReAct''s Product Promise governor nearing
+its hard ceiling) gets a guarantee, not just a probabilistic lean."*
+
+It also degrades correctly: if the filter would empty the pool it keeps the
+single fastest candidate rather than failing the turn. **Degraded beats none.**
+
+**So one of the three terms already has a working control plane. The other two
+do not:**
+
+| term | control into model selection | status |
+|---|---|---|
+| **latency** | `latency_budget_ms` hard pre-filter | **LIVE**, governor is the caller |
+| **cost** | **none** | `[OPEN]` — there is a *token* budget, which is **not a cost budget**: price per token varies across the roster, so a token cap does not bound spend. With a 7× price spread this is the gap that matters |
+| **quality** | `bandit_weights` composite, per `chat_mode` | indirect — mode-derived, not promise-derived |
+
+### 3b. "Same round, better model" — a lever the flat list hides
+
+Escalating the model **within** the current round is **distinct from buying
+another round**, and is usually cheaper:
+
+- **another round** = another full turn of tool calls, tokens and latency
+- **model escalation** = the same work, done better, at a higher unit price
+
+**When a gap stays open after a round, the first question is not "another
+round?" — it is "was this the right model for that gap?"** A synthesis failure
+on good evidence (high tool scores, low confidence — §6''s prompt-lever quadrant)
+is often a model-capability problem, and buying a second round with the same
+model repeats the failure at full price.
+
+`[OPEN]` This requires per-call escalation authority the governor does not have
+today: it can bound latency, it cannot say *"this call, spend more."*
 
 ---
 
@@ -194,6 +245,8 @@ anything measured it.
 | gap **identity + lifecycle** | `[OPEN]` **the blocker.** Producer good, consumer is a boolean |
 | gap **importance** | `[OPEN]` not emitted; needs a prompt change |
 | **cost coverage** on `react_1` | `[OPEN]` 686/1,236 — spend understated, **fails open** |
+| **cost budget into model selection** | `[OPEN]` — token budget exists, cost budget does not; 7× price spread makes them different things |
+| **per-call model escalation** | `[OPEN]` — governor can bound latency, cannot authorise spend |
 | directive **counterfactual log** | `[OPEN]` new |
 | quality **estimator combination** | `[OPEN]` design above, unbuilt |
 | time budget | **LIVE** — shipped today |
