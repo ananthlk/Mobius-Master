@@ -78,6 +78,16 @@ _TOMBSTONE_PATHS = {
 }
 
 
+_COVERAGE = {}
+try:
+    import json as _j, pathlib as _pl
+    _cp = _pl.Path(__file__).resolve().parents[2] / "docs" / "chat-coverage.json"
+    if _cp.exists():
+        _COVERAGE = {n["node"]: n for n in _j.loads(_cp.read_text()).get("nodes", [])}
+except Exception:
+    _COVERAGE = {}
+
+
 def main():
     deleted: list[str] = []
     cat = json.load(open("/Users/ananth/Mobius/docs/chat-submodules.json"))
@@ -225,6 +235,15 @@ def main():
             if c.get("ux"):
                 obj["ux"] = c["ux"]
         obj["signals"] = sigs.get(sig_alias.get(key, key), {})
+            # Eval's Layer-1 coverage state, merged so the PAGE can show it. The enum
+        # existed in docs/chat-coverage.json for a day with no reader — the page
+        # never rendered it, so "is this node guarded?" was answerable only by
+        # opening a JSON file by hand. Producer without a consumer, in the tool
+        # built to find producers without consumers.
+        _cov = _COVERAGE.get(key)
+        if _cov:
+            obj["coverage"] = _cov["state"]
+            obj["coverage_tags"] = _cov.get("tags") or []
         if obj.get("deleted"):
             # A RATING IS A JUDGEMENT ABOUT LIVE CODE. Leaving green/amber/red on a
             # module that no longer exists is worse than leaving the description:

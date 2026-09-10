@@ -360,7 +360,14 @@ function detail(k){
       '<span><b>'+((sg.tests||[]).length)+'</b> test files</span></div>' : '';
   var findings = (m.findings||[]).length ? '<ul class="find">'+m.findings.map(function(f){
       return '<li class="f-'+f[0]+'">'+esc(f[1])+'</li>'; }).join('')+'</ul>' : '';
-  var ready = m.rating ? '<div class="f"><b>Production readiness '+rate+
+  var covMap = {'GUARDED':'green','TAGGED-UNVERIFIED':'amber','PERIPHERAL':'amber',
+                'IMPORTED-NOT-CALLED':'red','ABSENT':'red','REMOVED':'red'};
+  var cov = m.coverage ? '<span class="pill p-'+(covMap[m.coverage]||'watch')+'" '+
+      'title="Eval Layer 1 reachability. GUARDED requires an Eval audit of the tag; '+
+      'a node cannot mark itself GUARDED.">test: '+esc(m.coverage)+'</span>'+
+      ((m.coverage_tags && m.coverage_tags.length)
+        ? ' <span class="depth">'+esc(m.coverage_tags.join(', '))+'</span>' : '') : '';
+  var ready = m.rating ? '<div class="f"><b>Production readiness '+rate+' '+cov+
       ' <span class="depth">read: '+esc(m.depth||'')+'</span></b>'+sigline+findings+'</div>' : '';
   var howf = m.how ? F('How it works', esc(m.how)) : '';
   // A node whose whole point is "where do I manage this" should hand you the

@@ -24,7 +24,7 @@
     "owner": "chat + Eval",
     "gate": "every segment timed AND each timed segment's attribution verified against a known-external call \u2014 an LLM or HTTP boundary crossed inside a segment must appear as such, not as our processing; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join",
     "blocks": "P3, P4, P5",
-    "n": 26
+    "n": 27
    },
    {
     "id": "P3",
@@ -582,6 +582,8 @@
     ]
    ],
    "signals": {},
+   "coverage": "PERIPHERAL",
+   "coverage_tags": [],
    "live_config": [],
    "detail": {}
   },
@@ -680,6 +682,8 @@
    ],
    "ux": "No surface of its own. The 422 body carries phi_blocked, identifier_labels and evidence so the UI can explain a block; the audit rows have no reader anywhere.",
    "signals": {},
+   "coverage": "PERIPHERAL",
+   "coverage_tags": [],
    "live_config": [
     {
      "name": "PHI_CLASSIFIER_URL",
@@ -736,6 +740,8 @@
    ],
    "ux": "No surface \u2014 the computed number rides in the RAG call payload; visible only in the retrieval trace if you look for token_budget_for_retrieval",
    "signals": {},
+   "coverage": "PERIPHERAL",
+   "coverage_tags": [],
    "live_config": [],
    "detail": {}
   },
@@ -794,6 +800,8 @@
     ]
    ],
    "signals": {},
+   "coverage": "ABSENT",
+   "coverage_tags": [],
    "live_config": [],
    "detail": {}
   },
@@ -857,6 +865,8 @@
     "todos": 0,
     "deleted": true
    },
+   "coverage": "REMOVED",
+   "coverage_tags": [],
    "rating_was": "red",
    "live_config": [],
    "detail": {}
@@ -944,6 +954,8 @@
     ]
    ],
    "signals": {},
+   "coverage": "PERIPHERAL",
+   "coverage_tags": [],
    "live_config": [],
    "detail": {}
   },
@@ -1026,6 +1038,8 @@
    ],
    "ux": "No surface. The bandit's choices appear only as ab_variant on an llm_calls row \u2014 there is no page that shows what it is learning or which model it currently prefers.",
    "signals": {},
+   "coverage": "PERIPHERAL",
+   "coverage_tags": [],
    "live_config": [
     {
      "name": "ANTHROPIC_API_KEY",
@@ -1107,6 +1121,8 @@
     ]
    ],
    "signals": {},
+   "coverage": "ABSENT",
+   "coverage_tags": [],
    "live_config": [],
    "detail": {}
   },
@@ -1172,6 +1188,8 @@
     ]
    ],
    "signals": {},
+   "coverage": "PERIPHERAL",
+   "coverage_tags": [],
    "live_config": [],
    "detail": {}
   },
@@ -1234,6 +1252,8 @@
     ]
    ],
    "signals": {},
+   "coverage": "ABSENT",
+   "coverage_tags": [],
    "live_config": [
     {
      "name": "ADMIN_API_KEY",
@@ -1300,6 +1320,8 @@
     ]
    ],
    "signals": {},
+   "coverage": "PERIPHERAL",
+   "coverage_tags": [],
    "live_config": [],
    "detail": {}
   },
@@ -1395,6 +1417,8 @@
     ]
    ],
    "signals": {},
+   "coverage": "PERIPHERAL",
+   "coverage_tags": [],
    "live_config": [
     {
      "name": "CACHE_ASSIST_DEFAULT_MAX_AGE_DAYS",
@@ -1475,6 +1499,8 @@
    ],
    "ux": "The personalization_applied envelope \u2014 the user sees their preferences were honoured. Preferences are AUTHORED in mobius-user, not here.",
    "signals": {},
+   "coverage": "ABSENT",
+   "coverage_tags": [],
    "live_config": [
     {
      "name": "CHAT_PERSONALIZATION_ENABLED",
@@ -1553,6 +1579,8 @@
     ]
    ],
    "signals": {},
+   "coverage": "PERIPHERAL",
+   "coverage_tags": [],
    "live_config": [
     {
      "name": "MOBIUS_REACT_CRITIC",
@@ -1610,6 +1638,8 @@
     ]
    ],
    "signals": {},
+   "coverage": "PERIPHERAL",
+   "coverage_tags": [],
    "live_config": [
     {
      "name": "FEEDBACK_PERIODIC_ENABLED",
@@ -1707,6 +1737,8 @@
     ]
    ],
    "signals": {},
+   "coverage": "PERIPHERAL",
+   "coverage_tags": [],
    "live_config": [
     {
      "name": "MOBIUS_PRODUCT_PROMISE_ENABLED",
@@ -1754,6 +1786,8 @@
     ]
    ],
    "signals": {},
+   "coverage": "IMPORTED-NOT-CALLED",
+   "coverage_tags": [],
    "live_config": [],
    "detail": {}
   },
@@ -1830,6 +1864,8 @@
    ],
    "ux": "Prompt Composition Studio \u2014 LIVE at https://mobius-chat-ortabkknqa-uc.a.run.app/admin/prompts (served from frontend/prompts.html via main.py:3160, backed by app/api/admin_prompts.py). Blocks, compositions, versions and monitoring. Note the route is /admin/prompts \u2014 /prompts and /prompts.html both 404.",
    "signals": {},
+   "coverage": "PERIPHERAL",
+   "coverage_tags": [],
    "live_config": [],
    "detail": {}
   },
@@ -1872,6 +1908,8 @@
     ]
    ],
    "signals": {},
+   "coverage": "PERIPHERAL",
+   "coverage_tags": [],
    "live_config": [],
    "detail": {}
   },
@@ -2028,6 +2066,8 @@
     ]
    ],
    "signals": {},
+   "coverage": "PERIPHERAL",
+   "coverage_tags": [],
    "live_config": [
     {
      "name": "APPEALS_AGENT_URL",
@@ -2175,6 +2215,8 @@
     ]
    ],
    "signals": {},
+   "coverage": "PERIPHERAL",
+   "coverage_tags": [],
    "live_config": [],
    "detail": {}
   },
@@ -2209,6 +2251,8 @@
     ]
    ],
    "signals": {},
+   "coverage": "ABSENT",
+   "coverage_tags": [],
    "live_config": [],
    "detail": {}
   },
@@ -2262,6 +2306,10 @@
     [
      "bad",
      "OWNER(chat): APPEALS AGENT RULED 2026-09-09 \u2014 REMOVE THE INVENTED FL MEDICAID DEFAULT. Ruling, verbatim in substance, four reasons in their order of severity: (a) A WRONG DEADLINE IS UNRECOVERABLE \u2014 most bad answers degrade an experience, this one LOSES THE CLAIM permanently, and it is being generated by a service with no payor data at all. (b) IT UNDOES A DELIBERATE REMEDIATION AT RENDER TIME \u2014 the 72 blank FL Medicaid deadlines are blank BECAUSE the appeals seat removed fabricated ones during P0-0; chat then refills the gap it finds with an invented default, so the net effect on the user is IDENTICAL TO NEVER HAVING DONE THE CLEANUP. A data-layer fix made invisible by the presentation layer. (c) 'DEFAULT FL MEDICAID' IS NOT A WELL-FORMED CONCEPT \u2014 a deadline resolves on a TUPLE (payer, product_line, state, network_status, audience, appeal_level, request_type) as of the DENIAL date; FL Medicaid fair hearing, plan appeal, provider claim dispute and a UM/auth denial are four different clocks, so '60 days' is not a conservative fallback, it is WRONG ON ITS FACE for most inputs it fires on. (d) IT VIOLATES A RATIFIED CONTRACT \u2014 with Payor Platform: a filing-critical value below the citable bar is REMOVED, NOT LABELLED, because a 'draft' banner does not stop a coordinator acting on a number; an UNLABELLED INVENTED one is strictly worse. FIX: on not-found return nothing and let the answer say so. If the gap should be more useful than a blank, render the adapter's REASON CODE (unsourced = a real gap the user should act on; resolver_unavailable = transient, retry) \u2014 RENDER THE REASON, NEVER A NUMBER."
+    ],
+    [
+     "bad",
+     "OWNER(me): THE COVERAGE ENUM WAS A PRODUCER WITH NO CONSUMER, IN THE TOOL BUILT TO FIND PRODUCERS WITH NO CONSUMERS \u2014 and it took Ananth asking 'did you update your schema, i want to make sure that captures everything accurately' to find it. docs/chat-coverage.json had existed for a day carrying Eval's Layer-1 state per node, and THE PAGE NEVER RENDERED IT: 'is this node guarded?' was answerable only by opening a JSON file by hand. Worse, it could not have worked even if the page had tried \u2014 gen_coverage.py ran at step 5/6, AFTER the page was written at 3/6, so any read would have been of the previous run's file. AN ORDERING DEFECT IN THE CHAIN THAT EXISTS TO PREVENT ORDERING DEFECTS, and the second one in it: gen_chat_submodules.py was missing from the same chain for hours and the page drew a deleted use_react branch. FIXED 2026-09-09: coverage moved to 3/6 with the reason in a comment, merged into each node by gen_chat_dev.py, and rendered as a `test:` pill carrying the enum plus the contract tags. VERIFIED IN A BROWSER, not by grep \u2014 state_load renders 'test: TAGGED-UNVERIFIED' with state_load:no_silent_reset, jurisdiction renders 'test: ABSENT'. And the render check earned itself immediately: my first version put an apostrophe (Eval\\'s) inside a single-quoted JS string and node --check caught the SyntaxError before it shipped \u2014 the same defect class as the blank page I shipped earlier in this program, caught this time because running the artifact is now the verification step rather than grepping it."
     ],
     [
      "bad",
@@ -2389,6 +2437,8 @@
     ]
    ],
    "signals": {},
+   "coverage": "PERIPHERAL",
+   "coverage_tags": [],
    "live_config": [],
    "detail": {}
   },
@@ -2440,6 +2490,8 @@
     ]
    ],
    "signals": {},
+   "coverage": "PERIPHERAL",
+   "coverage_tags": [],
    "live_config": [],
    "detail": {}
   },
@@ -2521,6 +2573,8 @@
    ],
    "ux": "Answer card in the chat bubble; step labels 'Composing your answer' and 'Critique & citations'",
    "signals": {},
+   "coverage": "PERIPHERAL",
+   "coverage_tags": [],
    "live_config": [
     {
      "name": "CHAT_SKILLS_PROVIDER_ROSTER_CREDENTIALING_URL",
@@ -2644,6 +2698,10 @@
     ]
    ],
    "signals": {},
+   "coverage": "TAGGED-UNVERIFIED",
+   "coverage_tags": [
+    "state_load:no_silent_reset"
+   ],
    "live_config": [],
    "detail": {}
   },
@@ -2697,6 +2755,8 @@
      "Delegates to app/state/clarification.py (88 loc) and query_refinement.py (128 loc), neither of which is in this catalogue."
     ]
    ],
+   "coverage": "REMOVED",
+   "coverage_tags": [],
    "rating_was": "green",
    "live_config": [],
    "detail": {}
@@ -2747,6 +2807,8 @@
      "Pure and side-effect free: reads merged_state, writes two ctx fields."
     ]
    ],
+   "coverage": "REMOVED",
+   "coverage_tags": [],
    "rating_was": "amber",
    "live_config": [],
    "detail": {}
@@ -2801,6 +2863,8 @@
      "OWNER(chat): CONTINUITY RUNS EVERY TURN AND CANNOT DO ANYTHING, BECAUSE ITS INPUT IS NEVER CREATED ON THE LIVE PATH. Ananth 2026-09-08 read it as duplicative; it is worse than duplicative \u2014 it is inert, and it reports a fixed answer.\n\nBoth of its functions key off ctx.merged_state['master_objective']. That objective is created by create_or_update_objective(), which has EXACTLY ONE caller: orchestrator.py:819, inside the `if not use_react` legacy branch. On the ReAct path the objective is only ever READ (orchestrator.py:725 loads it out of merged_state) and nothing on that path ever writes one. So obj is None every turn, and:\n\n  should_ask_user_for_help()  -> (False, None) always. ctx.response_payload['user_ask'] is NEVER set. The frontend has a fallback at app.js:13338 that renders user_ask as the next question when the integrator returned none \u2014 that branch is unreachable.\n  get_objective_end_state()   -> ('resolved', None) always, by the `if not obj` early return at continuity.py:83-84.\n\nTHE SECOND ONE IS NOT MERELY DEAD, IT IS WRONG. Every turn sets response_payload['objective_status'] = 'resolved' \u2014 including refusals, clarify bypasses, groundedness failures shipped with a warning, and the 203 budget-exhausted turns that ran out of rounds without the planner ever being satisfied. The four other end states (need_info, unable, user_ended, incomplete) are unreachable. The module whose stated purpose is that 'a stop is always a stated kind of stop' currently states the same kind of stop for every outcome. I previously rated this node GREEN on the strength of its typed end states; that was rating the construction and not the guarantee, and the rating is corrected to RED here.\n\nTHE DUPLICATION IS REAL AND THE OTHER COPY IS THE LIVE ONE. react_loop already computes the same three judgements and its versions ARE wired: ctx.react_unfinished_reason (no_path_forward, incomplete_coverage, need_more_info, need_more_time \u2014 measured firing on live turns), ctx.react_unfinished_summary and ctx.react_unblock_ask. integrate.py reads react_unfinished_reason at four sites, orchestrator.py at one, progress.py at one. So the product does have typed stop reasons that work; they are react_loop's, not continuity's."
     ]
    ],
+   "coverage": "REMOVED",
+   "coverage_tags": [],
    "rating_was": "red",
    "live_config": [],
    "detail": {}
@@ -2851,6 +2915,8 @@
      "No test file, for logic that decides which of two workflows a message enters."
     ]
    ],
+   "coverage": "REMOVED",
+   "coverage_tags": [],
    "rating_was": "green",
    "live_config": [],
    "detail": {}
@@ -2901,6 +2967,8 @@
      "Reusing the master objective on slot fill is the right call and is the reason a follow-up does not silently become a different question."
     ]
    ],
+   "coverage": "REMOVED",
+   "coverage_tags": [],
    "rating_was": "amber",
    "live_config": [],
    "detail": {}
@@ -2955,6 +3023,8 @@
      "validate_tool_result returns (is_valid, failure_reason) and an invalid result triggers the next layer \u2014 so a tool that returns something useless is indistinguishable downstream from one that failed outright."
     ]
    ],
+   "coverage": "REMOVED",
+   "coverage_tags": [],
    "rating_was": "amber",
    "live_config": [],
    "detail": {}

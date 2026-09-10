@@ -33,14 +33,19 @@ python3 scripts/platform/gen_chat_submodules.py > docs/chat-submodules.json
 echo "── 2/6  extract + merge  ────────────────────────────────────────────"
 python3 scripts/platform/gen_chat_dev.py "$DATA"
 
-echo "── 3/6  page  ───────────────────────────────────────────────────────"
+echo "── 3/6  coverage (Eval Layer 1: reachability)  ──────────────────────"
+# MUST run BEFORE the page. It used to be step 5/6, i.e. AFTER the page was
+# written — so the page could never show a current coverage state even once
+# it learned to read the file. A generated artifact whose only consumer runs
+# before it: the same ordering defect that let gen_chat_submodules sit outside
+# the chain, in the chain that exists to prevent it.
+python3 scripts/platform/gen_coverage.py
+
+echo "── 4/6  page  ───────────────────────────────────────────────────────"
 python3 scripts/platform/gen_chat_dev_page.py "$DATA" "$OUT/index.html"
 
-echo "── 4/6  bug log  ────────────────────────────────────────────────────"
+echo "── 5/6  bug log  ────────────────────────────────────────────────────"
 python3 scripts/platform/gen_findings_log.py
-
-echo "── 5/6  coverage (Eval Layer 1: reachability)  ──────────────────────"
-python3 scripts/platform/gen_coverage.py
 
 echo "── 6/6  roadmap  ────────────────────────────────────────────────────"
 python3 scripts/platform/gen_roadmap.py
