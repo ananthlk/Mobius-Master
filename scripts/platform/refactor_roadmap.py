@@ -24,6 +24,7 @@ PHASE_STATUS = {
     "P2": "☑ **COMPLETE** 2026-09-09 — P2a planner orphans, P2b latency telemetry deployed with spans bound to schema node keys",
     "P3": "◐ **IN PROGRESS** — `state_load` closed (StateUnavailable + first contract tag); `tool_manifest` opened 2026-09-09",
     "P4": "☐ not started",
+    "P6": "☐ not started — blocked on P3 `tool_manifest` closing; (c) needs P3's Stage 0 funnel as its baseline",
     "P5": "☐ not started — and correctly so; Prompt Studio has deliberately not been asked to sign yet",
 }
 
@@ -92,6 +93,46 @@ PHASES = [
             "the safety floor needs a second sign-off from whoever owns the Product "
             "Promise contract before it is exposed at all — not a clamp a config UI "
             "enforces on its own."},
+    {"id": "P6", "name": "Tool selection", "owner": "chat + Prompt Studio",
+     "ratifier": "Tech Review + Eval",
+     "gate": "manifest editable without a deploy; tools offered per turn: ALL -> a "
+             "retrieved subset; prompt tokens spent on the manifest: measured before, "
+             "lower after; tool-selection accuracy NOT worse than the P3 baseline",
+     "blocks": None,
+     "why": "SEQUENCED, NOT OUT OF SCOPE — Ananth, 2026-09-09, correcting my draft, "
+            "which had parked these as 'enhancements'. They are real work with a real "
+            "gate and they get a phase.\n\nThree parts, in dependency order:\n"
+            "(a) A UX for the tool and capabilities manifest, WRITTEN TO PERSISTENCE, "
+            "so changing a tool does not need a deploy. Today the catalogue is code "
+            "(app/pipeline/tool_manifest.py, 694 lines). Half the substrate already "
+            "exists: user_tool_subscriptions (migration 035) already persists per-user "
+            "policy and get_allowed_tools_for_user already reads it at turn start. The "
+            "gap is the CATALOGUE being in code, not the POLICY. Shares P5's control "
+            "plane rather than growing a second one.\n"
+            "(b) Access provisioning — WHO may use a tool. Adjacent to (a) and a "
+            "different question: (a) is what exists, (b) is who may use it. The "
+            "per-user table is a SUBSCRIPTION model, not an AUTHORIZATION model; "
+            "conflating them is the mistake to avoid early, while it is still cheap.\n"
+            "(c) RETRIEVE the tools for a turn instead of offering all of them. "
+            "Ananth's mechanism, 2026-09-09: 'a simple even vector search for tool "
+            "will be helpful or some kind of search — this will cut short on tokens "
+            "and make a real good determination and make the latency also faster.' "
+            "Three effects, and they are worth separating because they are measured "
+            "differently: FEWER TOKENS (the manifest is prompt text on every turn — "
+            "count it, it is a direct cost), BETTER SELECTION (a short relevant list "
+            "beats a long one; this is the P3 bug's own failure mode, so P3's funnel "
+            "is the before-measurement), and LOWER LATENCY (a consequence of the first "
+            "two, not an independent claim — do not claim it separately).\n\n"
+            "WHY IT FOLLOWS P3 AND CANNOT LEAD IT: retrieval changes WHICH tools are "
+            "offered. If it ships while selection is still sporadic, a miss is "
+            "unattributable — retrieval did not surface the tool, or the tool was "
+            "surfaced and not called, and we are back to the exact ambiguity P3 exists "
+            "to resolve. P3's Stage 0 funnel is also (c)'s training signal and its "
+            "baseline. Ananth: 'get current to work then add these features.'\n\n"
+            "EMBEDDING NOTE: pgvector is the standard; do not introduce a second "
+            "vector store for a catalogue of this size. A tool catalogue is small "
+            "enough that exact search over the whole set is viable — measure before "
+            "reaching for an index."},
 ]
 
 # (phase, node or None for any, distinctive substring). First match wins.

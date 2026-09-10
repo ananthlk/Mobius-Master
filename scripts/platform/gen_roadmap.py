@@ -67,7 +67,7 @@ inprog = [b for b in bugs if b["phase"] not in (None, "OUT", "PRINCIPLE")]
 principles = [b for b in bugs if b["phase"] == "PRINCIPLE"]
 out = [b for b in bugs if b["phase"] == "OUT"]
 noowner = sum(1 for b in inprog if not b["owner"])
-w(f"**{len(bugs)} bugs · {len(inprog)} sequenced into 5 phases · {len(out)} explicitly outside · "
+w(f"**{len(bugs)} bugs · {len(inprog)} sequenced into {len(PHASES)} phases · {len(out)} explicitly outside · "
   f"{len(unassigned)} UNSEQUENCED · {noowner} of the {len(inprog)} sequenced have NO OWNER**\n")
 w("> The two counts are different questions and the second one used to be invisible.")
 w("> `UNSEQUENCED` was previously printed as \"unassigned\", which reads as *nobody owns")

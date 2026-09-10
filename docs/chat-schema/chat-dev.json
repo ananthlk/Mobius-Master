@@ -49,6 +49,14 @@
     "gate": "max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped",
     "blocks": null,
     "n": 5
+   },
+   {
+    "id": "P6",
+    "name": "Tool selection",
+    "owner": "chat + Prompt Studio",
+    "gate": "manifest editable without a deploy; tools offered per turn: ALL -> a retrieved subset; prompt tokens spent on the manifest: measured before, lower after; tool-selection accuracy NOT worse than the P3 baseline",
+    "blocks": null,
+    "n": 0
    }
   ],
   "outside": 31
@@ -2199,6 +2207,10 @@
    "rating": "red",
    "depth": "code",
    "findings": [
+    [
+     "watch",
+     "SEQUENCED AS P6 (Ananth, 2026-09-09): the tool/capabilities manifest moves to PERSISTENCE with a UX so a tool change needs no deploy; access provisioning becomes its own model rather than riding the subscription table; and the turn RETRIEVES its tools \u2014 Ananth's mechanism: 'a simple even vector search for tool... this will cut short on tokens and make a real good determination and make the latency also faster.' Three effects measured separately: fewer prompt tokens (direct cost, countable today), better selection (P3's funnel is the before-measurement), lower latency (a consequence of the first two, NOT an independent claim). Follows P3 and cannot lead it: retrieval changes WHICH tools are offered, so shipping it while selection is still sporadic makes every miss unattributable \u2014 the exact ambiguity P3 exists to resolve. pgvector; a catalogue this small may not need an index at all \u2014 measure first."
+    ],
     [
      "bad",
      "OWNER(chat): TOOL SELECTION IS SPORADIC, AND THE MODEL NARRATES A MISS AS A BROKEN TOOL. Ananth, live, 2026-09-09 \u2014 and his word for it, 'sporadic', is the accurate one and worse than 'broken'.\n\n  13:27:21  'can i offer some feedback'          -> model: 'my feedback tool isn't working right now'\n  13:28:34  'the feedback is the tool section...'-> tool fired FULLY: capture card rendered, category correctly classified Bug, verbatim stored, Done button\n\nSeventy seconds apart, same session, same user. The feedback service is healthy \u2014 I called /classify directly: HTTP 200 in 1.3s, mobius-feedback rev 00002-2xm ready. So the tool is not broken; it is INTERMITTENTLY NOT SELECTED, and when it is not, the model tells the user it is broken.\n\nTHAT IS HARDER TO DIAGNOSE THAN A DEAD TOOL, not easier. A tool that always fails gets reported and fixed. One that works most of the time and blames itself the rest produces user reports nobody can reproduce, and the last three such reports (appeals playbook, PHI verification, this) all had a healthy backend.\n\nAND THE TELEMETRY CANNOT TELL THE THREE APART. I pulled the failing turn's thinking_log: it carries NO TOOL ENVELOPES AT ALL \u2014 no tool_invoked, no tool_completed, and tool_failed is structurally impossible because make_tool_failed has zero callers. So 'never selected', 'selected and returned empty' and 'selected and errored' are indistinguishable after the fact. The model has the same problem in real time, which is why it guesses \u2014 and its own trace shows the guess hardening across rounds: 'failed... likely because it wasn't triggered correctly' becomes 'failed repeatedly, indicating it's not currently functional'.\n\nCORRECTION TO MY OWN EARLIER FRAMING: I told Ananth the model 'fabricated' a broken tool, comparing it to the appeals 'Unknown tool' case. That was half right. The tool genuinely did not fire; what was fabricated was the CAUSE, not the failure. His 'sporadic' is the better description and it points at selection, not at the service."

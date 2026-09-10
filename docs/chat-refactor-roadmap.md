@@ -15,7 +15,7 @@ deliberately not yet asked because P4 has not opened. Per-phase status below is
 hand-maintained in `refactor_roadmap.py`'s `PHASE_STATUS`, because completion is a
 judgement about a gate, not something derivable from the findings file.
 
-**104 bugs · 69 sequenced into 5 phases · 31 explicitly outside · 0 UNSEQUENCED · 26 of the 69 sequenced have NO OWNER**
+**104 bugs · 69 sequenced into 6 phases · 31 explicitly outside · 0 UNSEQUENCED · 26 of the 69 sequenced have NO OWNER**
 
 > The two counts are different questions and the second one used to be invisible.
 > `UNSEQUENCED` was previously printed as "unassigned", which reads as *nobody owns
@@ -33,6 +33,7 @@ judgement about a gate, not something derivable from the findings file.
 | **P3** | One decision point | 17 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ◐ **IN PROGRESS** — `state_load` closed (StateUnavailable + first contract tag); `tool_manifest` opened 2026-09-09 |
 | **P4** | Split | 16 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
 | **P5** | Config UX | 5 | chat + Prompt Studio | max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped | — | ☐ not started — and correctly so; Prompt Studio has deliberately not been asked to sign yet |
+| **P6** | Tool selection | 0 | chat + Prompt Studio | manifest editable without a deploy; tools offered per turn: ALL -> a retrieved subset; prompt tokens spent on the manifest: measured before, lower after; tool-selection accuracy NOT worse than the P3 baseline | — | ☐ not started — blocked on P3 `tool_manifest` closing; (c) needs P3's Stage 0 funnel as its baseline |
 
 Phase order is a blocking order: a phase does not open until the phases naming it
 in `Blocks` have passed their gate.
@@ -181,6 +182,26 @@ confidence_bar is EXCLUDED ENTIRELY, which is stronger than the bound I asked fo
 | ☐ | `prompts` | — | MOBIUS_PROMPT_SOURCE=composition on the deployed service, so the LIVE prompts are the versioned DB blocks and  |
 | ☐ | `tool_manifest` | chat | MOVE THE MANIFEST OUT OF CODE — Ananth's point, and the cost is measurable |
 | ☐ | `tool_manifest` | chat | CONTEXT-SPECIFIC TOOL SELECTION IS BUILT AND UNUSED |
+
+## P6 — Tool selection  ·  0 items
+
+**Owner** chat + Prompt Studio · **ratifier** Tech Review + Eval
+**Gate** manifest editable without a deploy; tools offered per turn: ALL -> a retrieved subset; prompt tokens spent on the manifest: measured before, lower after; tool-selection accuracy NOT worse than the P3 baseline  
+**Blocks** —
+
+> SEQUENCED, NOT OUT OF SCOPE — Ananth, 2026-09-09, correcting my draft, which had parked these as 'enhancements'. They are real work with a real gate and they get a phase.
+
+Three parts, in dependency order:
+(a) A UX for the tool and capabilities manifest, WRITTEN TO PERSISTENCE, so changing a tool does not need a deploy. Today the catalogue is code (app/pipeline/tool_manifest.py, 694 lines). Half the substrate already exists: user_tool_subscriptions (migration 035) already persists per-user policy and get_allowed_tools_for_user already reads it at turn start. The gap is the CATALOGUE being in code, not the POLICY. Shares P5's control plane rather than growing a second one.
+(b) Access provisioning — WHO may use a tool. Adjacent to (a) and a different question: (a) is what exists, (b) is who may use it. The per-user table is a SUBSCRIPTION model, not an AUTHORIZATION model; conflating them is the mistake to avoid early, while it is still cheap.
+(c) RETRIEVE the tools for a turn instead of offering all of them. Ananth's mechanism, 2026-09-09: 'a simple even vector search for tool will be helpful or some kind of search — this will cut short on tokens and make a real good determination and make the latency also faster.' Three effects, and they are worth separating because they are measured differently: FEWER TOKENS (the manifest is prompt text on every turn — count it, it is a direct cost), BETTER SELECTION (a short relevant list beats a long one; this is the P3 bug's own failure mode, so P3's funnel is the before-measurement), and LOWER LATENCY (a consequence of the first two, not an independent claim — do not claim it separately).
+
+WHY IT FOLLOWS P3 AND CANNOT LEAD IT: retrieval changes WHICH tools are offered. If it ships while selection is still sporadic, a miss is unattributable — retrieval did not surface the tool, or the tool was surfaced and not called, and we are back to the exact ambiguity P3 exists to resolve. P3's Stage 0 funnel is also (c)'s training signal and its baseline. Ananth: 'get current to work then add these features.'
+
+EMBEDDING NOTE: pgvector is the standard; do not introduce a second vector store for a catalogue of this size. A tool catalogue is small enough that exact search over the whole set is viable — measure before reaching for an index.
+
+| ☐ | Node | Owner | Finding |
+|---|---|---|---|
 
 ## Outside the program
 

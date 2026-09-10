@@ -1971,6 +1971,19 @@ It is mid-migration and says so: five tools are now registry-owned, their descri
 living on SkillSpec.description and rendered through registry.manifest_text(), so adding a
 skill is one file and no edit here. The rest are still described inline.
 """, findings=[
+ ("watch", "SEQUENCED AS P6 (Ananth, 2026-09-09): the tool/capabilities manifest moves "
+           "to PERSISTENCE with a UX so a tool change needs no deploy; access "
+           "provisioning becomes its own model rather than riding the subscription "
+           "table; and the turn RETRIEVES its tools — Ananth's mechanism: 'a simple "
+           "even vector search for tool... this will cut short on tokens and make a "
+           "real good determination and make the latency also faster.' Three effects "
+           "measured separately: fewer prompt tokens (direct cost, countable today), "
+           "better selection (P3's funnel is the before-measurement), lower latency "
+           "(a consequence of the first two, NOT an independent claim). Follows P3 "
+           "and cannot lead it: retrieval changes WHICH tools are offered, so shipping "
+           "it while selection is still sporadic makes every miss unattributable — the "
+           "exact ambiguity P3 exists to resolve. pgvector; a catalogue this small may "
+           "not need an index at all — measure first."),
  ("bad", "OWNER(chat): TOOL SELECTION IS SPORADIC, AND THE MODEL NARRATES A MISS AS A "
          "BROKEN TOOL. Ananth, live, 2026-09-09 — and his word for it, 'sporadic', is the "
          "accurate one and worse than 'broken'.\n\n"
