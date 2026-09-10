@@ -29,10 +29,10 @@
   "shared_post_guard": "ctx.react_bypass_integrate \u2014 set in react_loop, skips the integrator and publishes the ReAct answer directly",
   "shared_post_guard_lines": [
    589,
-   878,
-   882,
-   1009,
-   1054
+   892,
+   896,
+   1023,
+   1068
   ],
   "exit": "publish",
   "react_phases": [
@@ -41,7 +41,7 @@
     "modules": [
      "round0"
     ],
-    "cite": 4090,
+    "cite": 4120,
     "note": "Short-circuits the loop when the caller already did the work."
    },
    {
@@ -52,7 +52,7 @@
      "capabilities",
      "parsing"
     ],
-    "cite": 4166,
+    "cite": 4196,
     "note": "Builds the planner prompt and parses the decision back out."
    },
    {
@@ -61,7 +61,7 @@
      "react_retry_guard",
      "curator_tools"
     ],
-    "cite": 5705,
+    "cite": 5760,
     "note": "Dispatches tools, and refuses a repeat of a call that already failed."
    },
    {
@@ -72,7 +72,7 @@
      "feedback_signal",
      "completion_extension_gate"
     ],
-    "cite": 5337,
+    "cite": 5392,
     "note": "Audits the draft against sources and decides whether to go round again."
    }
   ],
@@ -187,7 +187,7 @@
    "module": "app.pipeline.orchestrator",
    "group": "pipeline",
    "path": "app/pipeline/orchestrator.py",
-   "loc": 1878,
+   "loc": 1892,
    "role": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).",
    "role_full": "Orchestrator: single entry point run_pipeline(correlation_id, message, thread_id).\n\nRuns stages in order; handles clarification/refinement early exit; publishes response.",
    "stage": null,
@@ -279,11 +279,12 @@
    "module": "app.pipeline.react_loop",
    "group": "pipeline",
    "path": "app/pipeline/react_loop.py",
-   "loc": 6200,
+   "loc": 6262,
    "role": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.",
    "role_full": "ReAct loop \u2014 Reason \u2192 Act \u2192 Observe \u2192 Repeat.\n\nReplaces (when enabled): run_plan() + _answer_for_subquestion() + run_integrate().\n\nKeeps: answer_non_patient(), answer_tool(), answer_reasoning(),\n       emitter system, badge system, jurisdiction system.\n\nEmission map (thinking chunks sent to UI via emitter=on_thinking):\n  Pre-loop:\n    [if pronoun enriched] \"\u21ba Understood: <resolved message>\"\n    [if follow-up to active context] \"\u25cc Answering from the report we just generated\u2026\"\n    [jurisdiction] emit_jurisdiction_context: \"\u2713 Confirmed: \u2026\" | \"? Payer not identified\u2026\" | etc.\n    \"I'm breaking down",
    "stage": null,
    "api": [
+    "tool_result_is_empty()",
     "chunk_text_identity()",
     "run_react()"
    ],
@@ -425,23 +426,25 @@
    "module": "app.pipeline.tool_manifest",
    "group": "pipeline",
    "path": "app/pipeline/tool_manifest.py",
-   "loc": 694,
+   "loc": 737,
    "role": "TOOL_MANIFEST \u2014 the planner prompt's catalog of dispatchable tools.",
    "role_full": "TOOL_MANIFEST \u2014 the planner prompt's catalog of dispatchable tools.\n\nHybrid shape after skill-registry commit 3:\n\n  - Five tools are now **registry-owned** (document_upload_skill,\n    list_thread_document_uploads, healthcare_query, web_scrape,\n    google_search). Their descriptions live on ``SkillSpec.description``\n    and we render them here via ``registry.manifest_text(...)``. Adding\n    a new answer_tool-dispatched skill is one file \u2014 no edit here.\n\n  - Four tools are **router-owned**: ``search_corpus``,\n    ``healthcare_npi_lookup``, ``search_uploaded_document``, and\n    ``refuse`` dispatc",
    "stage": null,
    "api": [
-    "get_tool_manifest()"
+    "get_tool_manifest()",
+    "get_manifest_tool_names()"
    ],
    "telemetry": [],
    "callers": [
     "app.api.chat",
     "app.main",
+    "app.pipeline.orchestrator",
     "app.pipeline.react.prompts"
    ],
-   "fan_in": 3,
+   "fan_in": 4,
    "surfaces": [],
    "observability": "mediated",
-   "observability_note": "Emits nothing. Observable only through its callers \u2014 its behaviour has no telemetry identity of its own."
+   "observability_note": "Emits nothing. Observable only through app.pipeline.orchestrator \u2014 its behaviour has no telemetry identity of its own."
   },
   {
    "id": "app-pipeline-react-critic",
