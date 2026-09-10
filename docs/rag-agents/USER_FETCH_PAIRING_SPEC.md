@@ -774,8 +774,14 @@ already sends the discriminator (`background.ts:170` → `fd.append('access','us
    the discriminator** — its presence selects the mode; it's closed-map validated (unknown value → 422, not
    a default), so a caller can't spoof a source string. That's why Master RAG did NOT add a
    `source="browser_extension"` tag: a caller-asserted source is the exact anti-spoof problem already settled
-   on the classify caller. `source_origin` (chat-side `e6b153e`) rides through into `source_metadata` as-is
-   (tell Master RAG the allowed values if we want it close-mapped).
+   on the classify caller. `source_origin` (chat-side `e6b153e`) rides through into `source_metadata`
+   **free-form / verbatim — NOT close-mapped, NOT normalized** (settled with Master RAG 2026-09-09): the
+   anti-spoof guarantee belongs on the BOUNDED field (`access`), not the UNBOUNDED origin — close-mapping an
+   ever-growing origin space would turn a provenance field into a gate (every new payer domain a 422). No
+   normalizer on either side until a reader needs canonical origins (coverage view / per-origin policy /
+   retention rule); it lands THEN, once, on rag's write path that owns the column (same rule as
+   content_signals). A client-side "well-formed origin" *validity* check is allowed but pointless on this lane
+   — we only ever fetch the current page, so the origin is already valid.
 3. **Path — UNCHANGED, deliberately.** Extension → `/chat/upload` → rag `/upload`; chat still owns the PHI
    gate admit. Master RAG explicitly pushed back on a direct Extension→rag path — it would move the gate to a
    service that doesn't run it, worse given §BLOCK_NOT_STORED_INVARIANT (blob+row+dedup written before any
