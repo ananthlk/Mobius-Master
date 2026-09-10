@@ -136,19 +136,46 @@ training signal this design has.
 | **cost** envelope into model selection | `[OPEN]` — a token budget is not a cost budget; ~7× price spread |
 | gap **identity** | `[OPEN]` **unowned, and it is what `gap_closed` depends on** |
 
-### The per-tool latency gap — an honest no
+### The per-tool latency term — DECLARED is v1, and it becomes measured by being used
 
-Tool Manifest's `latency_ms` is built from **owner-declared** latencies, with
-four tools declaring none and priced as free. They asked me to replace
-declarations with observations from the attestation. **I checked, and I cannot:**
+Ananth, 2026-09-10: *"if we don''t start we don''t get. Now we know what to
+measure."* He is working the declarations into Tool Manifest directly.
 
-- `turn_spans` has module granularity only — `tool_manifest` (0–1ms, which
-  independently confirms their 0.34ms) and `react_loop` (avg 4,991ms, p90
-  10,147ms, max 45,110ms). **No per-tool span.**
-- `chat_tool_results` has `thread_id, turn_id, tool_hint, payload, created_at`
-  — **no duration column at all.**
+**Correction to an earlier version of this section**, which called this the
+weakest input and left it `[OPEN]` pending a producer neither seat owns. **That
+framed a starting point as a blocker.** Declared latencies are exactly the
+exploration-bound argument one level down: **a term you refuse to state because
+it is imperfect never accumulates the evidence that would improve it.**
 
-So the budget''s tool-latency term rests on **declarations nobody has checked**,
-and is wrong in a knowable direction for the four tools declaring nothing.
-`[OPEN]` **Per-tool timing needs a producer before this can be measured.**
-Neither seat can fix it alone.
+**What I could not find, stated so nobody re-searches for it:**
+- `turn_spans` is **module** granularity — `tool_manifest` 0–1ms (which
+  independently confirms Tool Manifest''s 0.34ms), `react_loop` avg 4,991ms /
+  p90 10,147ms / max 45,110ms. **No per-tool span.**
+- `chat_tool_results` carries `thread_id, turn_id, tool_hint, payload,
+  created_at` — **no duration column.**
+
+**But per-tool spans are not required to start correcting declarations.** What
+is required is that the round attestation records, every round:
+
+| field | why |
+|---|---|
+| `tools_offered` | which tools were in the set |
+| `declared_latency_ms` | **the sum the offer was priced at** |
+| `declared_version` | **which declaration was in force** — an owner updating a number must not retroactively rewrite past rounds. Same rule as `promise_version` |
+| `delivered_latency_ms` | what the round actually took |
+
+**Over enough rounds, per-tool truth falls out of set-level observations.** A
+tool that keeps appearing in rounds slower than their declarations predicted is
+visible in the co-occurrence long before any per-tool timer exists — the same
+way the bandit learns per-model quality from turn-level outcomes it never
+attributes directly.
+
+**So the sequence is: declare now → record declared-vs-delivered from the first
+round → let attribution emerge → replace declarations with measurements where
+the data disagrees with them.** Per-tool spans would make that faster, not
+possible. They are an accelerant, not a precondition.
+
+`[OPEN]` The four tools declaring nothing are priced as free, which is wrong in
+a **knowable** direction — they can only be underestimated. Worth a placeholder
+declaration rather than a zero, because **a zero is indistinguishable from a
+genuinely instant tool** and a placeholder is not.
