@@ -195,7 +195,20 @@ day of investigation could not answer "was the tool offered?"
 - the **UX**, which is the test surface, not a demo
 - the **fixture suite** and the **collision test**
 - your **DB**: declarations, tool embeddings + the text they were embedded from,
-  the golden set, fixture results, A/B assignments, selection history
+  the golden set, fixture results, selection history
+
+  **CORRECTED 2026-09-10 — A/B arm assignment is NOT yours.** I listed it here without
+  thinking about who creates a thread. Assignment is sticky by thread and happens at
+  **thread creation, which is chat's moment and chat's table**. Two writers to an
+  assignment with no enforced invariant is the exact shape this program keeps filing.
+  **Read it; do not own it.** (Caught by the Tool Selection seat on first read.)
+
+  And their refinement of this list is better than the list: **definitional data in git**
+  — declarations, snapshot, embeddings, golden set, so a tier change arrives as a pull
+  request rather than an `UPDATE` nobody saw — and **accumulating data in Postgres** —
+  selection history, fixture results. With the rule that makes §3.7 reading A survivable:
+  **the DB is written after a decision, never consulted during one**, so the request path
+  stays file-only and a later service is a wrapping exercise rather than a migration.
 
 **Not yours, and do not absorb them:**
 - **dispatch** — stays in `mobius-chat/app/pipeline/react_loop.py`. A tool being selected
