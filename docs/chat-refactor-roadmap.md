@@ -12,7 +12,7 @@ program. That is what makes this a tracker and not a snapshot.
 Plan and gate definition: `docs/chat-refactor-program.md`. Nothing starts until
 its sign-off table is complete.
 
-**102 bugs · 71 sequenced into 5 phases · 31 explicitly outside · 0 unassigned**
+**103 bugs · 72 sequenced into 5 phases · 31 explicitly outside · 0 unassigned**
 
 ## Progress
 
@@ -20,7 +20,7 @@ its sign-off table is complete.
 |---|---|---:|---|---|---|---|
 | **P1** | Delete | 9 | chat | lines removed; handler count down; ZERO invariant movement | P2, P4 | ☐ not started |
 | **P2** | Make absent producers detectable | 25 | chat + Eval | every segment timed; invariants I1-I7 computable from emitted telemetry alone, with no hand-written DB join | P3, P4, P5 | ☐ not started |
-| **P3** | One decision point | 16 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ☐ not started |
+| **P3** | One decision point | 17 | chat | modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target | P5 | ☐ not started |
 | **P4** | Split | 16 | chat | every extracted unit has a test file; total lines roughly flat | — | ☐ not started |
 | **P5** | Config UX | 5 | chat + Prompt Studio | max_rounds / max_extension_rounds / soft_target_s editable without a deploy; confidence_bar NOT shipped | — | ☐ not started |
 
@@ -32,7 +32,7 @@ complete, and P0 blocks all of the others.
 | Owner | Sequenced bugs |
 |---|---:|
 | chat | 42 |
-| unassigned-owner | 29 |
+| unassigned-owner | 30 |
 
 ## P1 — Delete  ·  9 items
 
@@ -98,7 +98,7 @@ BASELINE RULE: the latency numbers captured at the END of this phase are the ref
 | ☐ | `react_loop` | chat | THE CURATION DECISION IS NEVER PERSISTED, which makes evidence_review untestable after the fact |
 | ☐ | `state_load` | chat | state_version is WRITE-ONLY — inserted, incremented, never read or compared anywhere in app/ |
 
-## P3 — One decision point  ·  16 items
+## P3 — One decision point  ·  17 items
 
 **Owner** chat · **ratifier** Tech Review
 **Gate** modules that can grant an extension round: 2 -> 1; audited budget-exhausted turns: 0 -> the rule's target  
@@ -108,6 +108,7 @@ BASELINE RULE: the latency numbers captured at the END of this phase are the ref
 
 | ☐ | Node | Owner | Finding |
 |---|---|---|---|
+| ☐ | `PHI gate` | — | OWNER(phi-classifier seat): THE GATE FAILS OPEN ON MISCONFIGURATION |
 | ☐ | `clarification` | chat | THE ONLY LIVE CLARIFY IS WRITTEN BY ANOTHER MODULE AND FILTERED BY KEYWORDS |
 | ☐ | `completion_extension_gate` | — | The most interesting control loop in the product is an un-named `max_it += 1` inside an if-block in a 6,113-li |
 | ☐ | `completion_extension_gate` | — | CONFIRMED BUG (Chat seat, 2026-09-08) |
