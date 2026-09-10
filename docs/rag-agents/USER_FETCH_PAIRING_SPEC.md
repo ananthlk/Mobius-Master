@@ -751,6 +751,8 @@ the false-positive override (Option A) AND the genuine-PHI attestation-admit (As
 - **Still blocks (fail-closed, no override):** medical-TITLE fragments + corporate-footer address/contact
   block — i.e. most real payer homepages (Molina case). Deferred until Ananth green-lights an override path
   (+ chat admit infra / BAA for the genuine-PHI half).
-- **Override design** (confidence-tiered, deterministic, no LLM) specced + build-ready; classifier pings on
-  green-light. Decision brief: `DECISION_option_a.md` (outcome: DEFERRED).
+- **Option A WITHDRAWN, not pending** — Ananth rejected both user-override-trumps AND the LLM-clear approach
+  itself (running a doc through the LLM to admit it is processing it; LLM not certain). No caller field to
+  build. A confidence-tiered DETERMINISTIC (no-LLM) override design stays on the shelf, build-ready if
+  green-lit. Decision brief: `DECISION_option_a.md` (outcome: WITHDRAWN for now).
 - phantom ssn/MRN = chat HTML→text extraction-boundary fix, unaffected by this ruling.
