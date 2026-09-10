@@ -11,13 +11,28 @@ the POST half of the gate, not only as a report.
 
 | collected | passed | failed | errors | skipped | wall |
 |---:|---:|---:|---:|---:|---:|
-| 2641 | 2622 | 14 | 0 | 5 | 154.8s |
+| 2644 | 2637 | 2 | 0 | 5 | 1169.4s |
 
 Known-failing baseline: **14** tests, frozen 2026-09-08 before any P1a
 deletion. Ananth's ruling — these predate the program, so the gate SUBTRACTS them.
 A failure not in that set is a regression. The list may shrink, never grow.
 
 **No regressions** — every failure is in the known-failing baseline.
+
+**12 baseline failure(s) now PASS** — shrink the baseline:
+
+- `tests.test_logging_config.TestConfigureLogging::test_json_handler_installed_when_requested`
+- `tests.test_logging_config.TestJsonFormatter::test_empty_context_fields_dropped`
+- `tests.test_logging_config.TestJsonFormatter::test_extra_kwargs_propagate`
+- `tests.test_logging_config.TestJsonFormatter::test_logger_name_in_output`
+- `tests.test_logging_config.TestJsonFormatter::test_message_field_populated`
+- `tests.test_logging_config.TestJsonFormatter::test_populated_context_fields_included`
+- `tests.test_logging_config.TestJsonFormatter::test_severity_is_uppercase_python_levelname`
+- `tests.test_tracing_config.TestGetTracer::test_tracer_records_spans_when_enabled`
+- `tests.test_tracing_config.TestLoggingFilterPicksUpTraceIds::test_filter_stamps_trace_ids_when_span_active`
+- `tests.test_tracing_config.TestStartPipelineSpan::test_omits_attrs_when_not_supplied`
+- `tests.test_tracing_config.TestStartPipelineSpan::test_stamps_standard_attrs`
+- `tests.test_tracing_config.TestTraceContextIds::test_returns_populated_inside_span`
 
 ## A2 · What the tests actually cover, per schema node
 
@@ -51,7 +66,7 @@ name matches, not that the node's behaviour is asserted. Eval owns replacing it.
 | `emit_envelope` | red | 10 | `test_emit_envelope.py`, `test_emit_envelope_fanout.py` | 37 |
 | `queue` | red | 4 | `test_queue_usage_breakdown_enrich.py` | 1 |
 | `react_loop` | red | 6 | `test_react_loop.py` | 52 |
-| `tool_manifest` | red | 32 | `test_tool_manifest.py` | 5 |
+| `tool_manifest` | red | 30 | `test_tool_manifest.py` | 5 |
 | `clarify` | green | 0 | `test_react_clarify_questions.py` | 23 |
 | `context` | amber | 2 | `test_message_resolver_and_skill_context.py`, `test_react_continuation_context.py`, `test_system_context.py` | 49 |
 | `critic` | amber | 3 | `test_critic_call_resilience.py`, `test_critic_skip_on_cache.py`, `test_react_completion_critic_stage_registration.py`, `test_react_critic.py`, `test_react_critic_integration.py` | 99 |
@@ -64,7 +79,7 @@ name matches, not that the node's behaviour is asserted. Eval owns replacing it.
 | `react_retry_guard` | green | 0 | `test_react_retry_guard.py`, `test_react_retry_guard_exhaustion.py`, `test_react_retry_guard_zero_result.py` | 56 |
 | `resolve` | amber | 0 | `test_fetch_document_resolve_by_id.py`, `test_message_resolver_and_skill_context.py`, `test_prior_resolved_entities.py` | 57 |
 | `retrieval_budget` | green | 0 | `test_retrieval_budget.py` | 5 |
-| `state_load` | amber | 7 | `test_state_load_state_integrity.py` | 14 |
+| `state_load` | amber | 8 | `test_state_load_state_integrity.py` | 14 |
 | `worker` | amber | 0 | `test_worker_run.py` | 4 |
 
 ## B · Refactor gate — frozen baseline invariants
