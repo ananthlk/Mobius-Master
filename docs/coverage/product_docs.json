@@ -3,8 +3,8 @@
   "axis_semantics": "rows are DOC MODULES crossed with deployed services -- NOT a user-facing feature vocabulary. 'feature' is kept only for contract compatibility. Read entity_resolvable before using any row as an entity; 19 of 32 are either doc topics or bare tokens that collide with RCM vocabulary.",
   "taxonomy_ref": "docs/coverage/product_taxonomy.json",
   "exported_by": "mobius-c2 (platform seat) on behalf of product-awareness",
-  "exported_at": "2026-09-11T02:02:40.406121+00:00",
-  "exporter_rev": "65c09fb",
+  "exported_at": "2026-09-11T02:34:30.789526+00:00",
+  "exporter_rev": "43b0287",
   "caveats": [
     "asserts is never emitted -- it needs a page-by-page read against shipped behaviour",
     "registry.json updated_at 2026-09-07; corpus freshness is not verified here",

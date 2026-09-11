@@ -1,0 +1,298 @@
+{
+  "source_key": "product_docs",
+  "exported_by": "product-awareness (written by mobius-c2, platform seat)",
+  "exported_at": "2026-09-11T02:34:50.447031+00:00",
+  "exporter_rev": "43b0287",
+  "provenance": "declared: derived from corpus/registry.json crossed with deployed services",
+  "contract_version": "v1",
+  "axis_semantics": "the `feature` axis carries DOC MODULES crossed with deployed services, not a user-facing feature vocabulary -- see taxonomy_ref for which values may be entity-resolved",
+  "taxonomy_ref": "docs/coverage/product_taxonomy.json",
+  "caveats": [
+    "covered means a page EXISTS and is indexed -- not that a retrieval against it answers well. asserts-vs-covered still needs a page-by-page read.",
+    "15 of 32 shipped surfaces have zero pages; `absent` is the honest majority here",
+    "not the PA seat's own export; supersede when that seat produces one"
+  ],
+  "reading_notes": {
+    "unowned_tools_referred": "Tool Selection addressed four product-domain tools here; only product_help_search is ours. The others sit in the `product` DOMAIN, which is a taxonomy bucket rather than an ownership assignment, and declaring their coverage would certify a store this seat does not own. Owners: product_feedback -> feedback agent (mobius-feedback) (app/skills/builtin/product_feedback.py:1-12); vibe -> skills seat (mobius-skills/vibe) (app/skills/builtin/vibe.py:1-10); document_upload_skill -> skills-core / chat (app/skills/builtin/document_uploads.py:1-10)"
+  },
+  "tools": [
+    {
+      "tool": "product_help_search",
+      "predicate": "how a documented Mobius product surface works",
+      "values": [
+        {
+          "axis": "feature",
+          "value": "About",
+          "status": "absent",
+          "rows_present": 1,
+          "rows_sourced": 1,
+          "note": "documented but no deployed service resolved; treat as unverified rather than served"
+        },
+        {
+          "axis": "feature",
+          "value": "Answer Cache",
+          "status": "absent",
+          "rows_present": 0,
+          "rows_sourced": 0,
+          "note": "shipped surface with zero pages in the corpus -- nameable, not answerable"
+        },
+        {
+          "axis": "feature",
+          "value": "Appeals",
+          "status": "absent",
+          "rows_present": 0,
+          "rows_sourced": 0,
+          "note": "shipped surface with zero pages in the corpus -- nameable, not answerable"
+        },
+        {
+          "axis": "feature",
+          "value": "Architecture",
+          "status": "absent",
+          "rows_present": 2,
+          "rows_sourced": 2,
+          "note": "documented but no deployed service resolved; treat as unverified rather than served"
+        },
+        {
+          "axis": "feature",
+          "value": "Auth",
+          "status": "absent",
+          "rows_present": 1,
+          "rows_sourced": 1,
+          "note": "documented but no deployed service resolved; treat as unverified rather than served"
+        },
+        {
+          "axis": "feature",
+          "value": "Chat",
+          "status": "covered",
+          "rows_present": 1,
+          "rows_sourced": 1
+        },
+        {
+          "axis": "feature",
+          "value": "Credentialing",
+          "status": "covered",
+          "rows_present": 1,
+          "rows_sourced": 1
+        },
+        {
+          "axis": "feature",
+          "value": "Doc Reader",
+          "status": "absent",
+          "rows_present": 0,
+          "rows_sourced": 0,
+          "note": "shipped surface with zero pages in the corpus -- nameable, not answerable"
+        },
+        {
+          "axis": "feature",
+          "value": "Document Viewer",
+          "status": "absent",
+          "rows_present": 1,
+          "rows_sourced": 1,
+          "note": "documented but no deployed service resolved; treat as unverified rather than served"
+        },
+        {
+          "axis": "feature",
+          "value": "Eval",
+          "status": "absent",
+          "rows_present": 1,
+          "rows_sourced": 1,
+          "note": "documented but no deployed service resolved; treat as unverified rather than served"
+        },
+        {
+          "axis": "feature",
+          "value": "Extension",
+          "status": "covered",
+          "rows_present": 1,
+          "rows_sourced": 1
+        },
+        {
+          "axis": "feature",
+          "value": "Feedback",
+          "status": "absent",
+          "rows_present": 0,
+          "rows_sourced": 0,
+          "note": "shipped surface with zero pages in the corpus -- nameable, not answerable"
+        },
+        {
+          "axis": "feature",
+          "value": "HIPAA",
+          "status": "absent",
+          "rows_present": 1,
+          "rows_sourced": 1,
+          "note": "documented but no deployed service resolved; treat as unverified rather than served"
+        },
+        {
+          "axis": "feature",
+          "value": "Infra",
+          "status": "absent",
+          "rows_present": 1,
+          "rows_sourced": 1,
+          "note": "documented but no deployed service resolved; treat as unverified rather than served"
+        },
+        {
+          "axis": "feature",
+          "value": "Interact",
+          "status": "absent",
+          "rows_present": 0,
+          "rows_sourced": 0,
+          "note": "shipped surface with zero pages in the corpus -- nameable, not answerable"
+        },
+        {
+          "axis": "feature",
+          "value": "Lexicon",
+          "status": "covered",
+          "rows_present": 1,
+          "rows_sourced": 1
+        },
+        {
+          "axis": "feature",
+          "value": "Org Intelligence",
+          "status": "absent",
+          "rows_present": 0,
+          "rows_sourced": 0,
+          "note": "shipped surface with zero pages in the corpus -- nameable, not answerable"
+        },
+        {
+          "axis": "feature",
+          "value": "PHI Classifier",
+          "status": "absent",
+          "rows_present": 0,
+          "rows_sourced": 0,
+          "note": "shipped surface with zero pages in the corpus -- nameable, not answerable"
+        },
+        {
+          "axis": "feature",
+          "value": "Payor",
+          "status": "absent",
+          "rows_present": 0,
+          "rows_sourced": 0,
+          "note": "shipped surface with zero pages in the corpus -- nameable, not answerable"
+        },
+        {
+          "axis": "feature",
+          "value": "Product Awareness",
+          "status": "absent",
+          "rows_present": 0,
+          "rows_sourced": 0,
+          "note": "shipped surface with zero pages in the corpus -- nameable, not answerable"
+        },
+        {
+          "axis": "feature",
+          "value": "RAG",
+          "status": "covered",
+          "rows_present": 1,
+          "rows_sourced": 1
+        },
+        {
+          "axis": "feature",
+          "value": "Releases",
+          "status": "absent",
+          "rows_present": 1,
+          "rows_sourced": 1,
+          "note": "documented but no deployed service resolved; treat as unverified rather than served"
+        },
+        {
+          "axis": "feature",
+          "value": "Response Cards",
+          "status": "absent",
+          "rows_present": 1,
+          "rows_sourced": 1,
+          "note": "documented but no deployed service resolved; treat as unverified rather than served"
+        },
+        {
+          "axis": "feature",
+          "value": "Skills",
+          "status": "absent",
+          "rows_present": 1,
+          "rows_sourced": 1,
+          "note": "documented but no deployed service resolved; treat as unverified rather than served"
+        },
+        {
+          "axis": "feature",
+          "value": "Specs",
+          "status": "absent",
+          "rows_present": 0,
+          "rows_sourced": 0,
+          "note": "shipped surface with zero pages in the corpus -- nameable, not answerable"
+        },
+        {
+          "axis": "feature",
+          "value": "Story UI",
+          "status": "absent",
+          "rows_present": 0,
+          "rows_sourced": 0,
+          "note": "shipped surface with zero pages in the corpus -- nameable, not answerable"
+        },
+        {
+          "axis": "feature",
+          "value": "Strategy",
+          "status": "absent",
+          "rows_present": 1,
+          "rows_sourced": 1,
+          "note": "documented but no deployed service resolved; treat as unverified rather than served"
+        },
+        {
+          "axis": "feature",
+          "value": "Task Manager",
+          "status": "absent",
+          "rows_present": 0,
+          "rows_sourced": 0,
+          "note": "shipped surface with zero pages in the corpus -- nameable, not answerable"
+        },
+        {
+          "axis": "feature",
+          "value": "User",
+          "status": "absent",
+          "rows_present": 0,
+          "rows_sourced": 0,
+          "note": "shipped surface with zero pages in the corpus -- nameable, not answerable"
+        },
+        {
+          "axis": "feature",
+          "value": "Vault",
+          "status": "absent",
+          "rows_present": 0,
+          "rows_sourced": 0,
+          "note": "documented but no deployed service resolved; treat as unverified rather than served"
+        },
+        {
+          "axis": "feature",
+          "value": "Vibe",
+          "status": "absent",
+          "rows_present": 0,
+          "rows_sourced": 0,
+          "note": "shipped surface with zero pages in the corpus -- nameable, not answerable"
+        },
+        {
+          "axis": "feature",
+          "value": "Web Scraper",
+          "status": "absent",
+          "rows_present": 0,
+          "rows_sourced": 0,
+          "note": "shipped surface with zero pages in the corpus -- nameable, not answerable"
+        }
+      ],
+      "axes_served": [
+        "feature"
+      ],
+      "axes_not_served": [
+        {
+          "axis": "payor",
+          "why": "product docs describe Mobius surfaces; they say nothing about payer policy, coverage rules or prior authorisation. 'auth' in a user question means prior-authorisation far more often than the Auth doc page."
+        },
+        {
+          "axis": "service_line",
+          "why": "no clinical or billing service-line facts in the product corpus"
+        },
+        {
+          "axis": "carc",
+          "why": "denial codes are the appeals tools' question, not the docs'"
+        },
+        {
+          "axis": "provider",
+          "why": "no roster, NPI or credentialing facts in the product corpus"
+        }
+      ]
+    }
+  ]
+}
