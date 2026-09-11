@@ -38,10 +38,30 @@ twice and compared — which is how v2 is proven inert against v1 on live traffi
 
 ---
 
-## SEAT 1 — Governor *(mobius-24, me)*
+## SEAT 1 — Governor + Orchestrator v2 *(mobius-24, me)*
+
+`[RULED]` **Ananth, 2026-09-11: *"no, you build, you own the orchestrator v2."***
+**Seats 1 and 5 merge.** The governor and v2 are the same code — v2 *is* the
+posture machine — so splitting them was an artefact of my own assumption that I
+would not write production code.
 
 **Owns:** the promise, the budget, the gap ledger, posture selection, exit mode,
-the attestation. **Decisions only — I execute nothing.**
+the attestation, **and the loop that executes them.**
+
+### 🔴 The verification relationship INVERTS, and it must
+
+I argued *"Chat builds, I verify"* was the right division because the subject and
+the author of a check should not be the same seat. **That argument does not stop
+applying because the assignment changed — it points the other way now.**
+
+**The chat seat grades v2 against v1.** They own `react_loop.py`, they supplied
+the ten port hazards, and they have caught four of my errors today. **They are
+the only seat that can tell whether v2 lost something v1 had.**
+
+**What I must not do:** run the R0 equality assertion on my own build, or declare
+a phase passed on my own reading of the six exit criteria. **I write the
+criteria; someone else reads the result.** That was true when Chat built and it
+is true now that I do.
 
 | deliverable | state |
 |---|---|
@@ -134,16 +154,26 @@ may INFORM a decision and must not DECIDE one.** And `llm_calls.turn_id` is
 
 ---
 
-## SEAT 5 — Chat / orchestrator v2
+## SEAT 5 — Chat seat *(grader, and owner of v1)*
 
-**Owns:** the loop. **Everything else is already outside it.**
+`[RULED]` **v2''s build moved to Seat 1.** This seat now owns **v1 until it
+retires**, and — more importantly — **grades v2.**
+
+**Owns:** `react_loop.py` v1 · the ten port hazards
+(`docs/orchestrator-v2-port-hazards.md`) · **the R0 equality assertion** · **the
+verdict on each phase''s six exit criteria.**
+
+**Why this seat and not mine:** they are the only one who can say whether v2 lost
+something v1 had. Hazard 1 alone — `max_it` grows mid-turn, so a `range()` loop
+**silently drops every extension and the tests pass** — is a defect no author
+finds in their own code.
 
 `react_loop.py` is **6,451 lines, 61 functions**, against a ratchet of **2,560**
 set by a prior split — **2.5× past it, and that test is in the known-failing
 baseline.** Incremental refactoring of this file has a track record here and it
 is negative.
 
-**v2 = the posture machine (~15 formulas) + module calls through the contract.**
+**v2 = the posture machine (~15 formulas) + module calls through the contract — built by Seat 1, graded here.**
 
 **Routing, never forking.** `R0` shadow → `R1` single-round `fast` (**82% of
 turns have zero gaps at round 1**) → `R2` all fast → `R3` +normal → `R4` all.
