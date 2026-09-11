@@ -150,7 +150,9 @@ flag. **That is the reason to route rather than fork.**
 4  R0 shadow on live traffic         ← equality asserted, v1 still decides
 5  R1 single-round fast              ← 82% of turns are this shape
 6  R2 → R4 on the §6 criteria
-7  retire v1; delete the Python prompt constants, the dead terminal,
+7  per-module A/B arms (7a) — one variable each, same question set
+8  wholesale v1-vs-v2 — LAST, when a bad result has a short suspect list
+9  retire v1; delete the Python prompt constants, the dead terminal,
    the 16 writerless fields, the second extension granter
 ```
 
