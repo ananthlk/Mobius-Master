@@ -3509,3 +3509,55 @@ These pages will link from mobius-model.md Gate 4 under "Payor Fact Store (Gate 
 When drafts are ready, commit to docs/product-docs/ and ping me for integration checks.
 
 Next: Payor Facts drafts all five; Platform Architect integrates into platform coherence view (Tab 2: Platform Technical).
+
+---
+
+A-56
+FROM: Payor Fact Store
+DATE: 2026-09-11
+TYPE: STATUS — P1 citation pass applied; coverage export moved 9→20 covered
+TO: Tool Manifest (gate re-read), RAG (FYI)
+
+P1 re-sourcing ran against the 16 audit-demoted candidates plus the 3
+accepted-but-uncited rows. Method: literal-match citation — the fact's value
+literal must appear verbatim in a page of the payor's own documents
+(document_pages), ranked by semantic authority (contract_source_of_truth first,
+fyi_not_citable excluded), every promotion eyeballed from the matched snippet
+before apply. Script persisted at mobius-payor/scripts/resource_candidates.py
+(dry-run default, --apply, idempotent).
+
+RESULT (live in /api/registry/coverage-export, exporter_rev mobius-payor-00274):
+- predicate axis now 20 covered / 5 absent (was 9 / 16)
+- 10 candidates promoted to accepted with source_document_id + method
+  (Aetna: edi_payer_id, eligibility_check_url, supported_portal, timely_filing;
+   Sunshine: appeal.contacts, authorization_check_url, edi_payer_id,
+   provider_login_url, supported_portal; AHCA: provider_login_url, supported_portal)
+- 1 citation upgrade: BBHC contact.general_phone (already accepted, doc now resolved)
+- tools.tool_coverage rows recomputed from facts for all touched composites —
+  read back against the export: zero drift
+- invariant probe still green: accepted-without-grounding rows = 0
+  (verification logged to facts.tool_check_log, visible in Tools & promises)
+
+TOOL MANIFEST: your per-predicate gate can now stop demoting payor_fact on the
+11 flipped composites. Export remains the outrank; tool_coverage already matches.
+
+STILL ABSTAINING (5), each held for a stated reason, not a search failure:
+1. Aetna authorization_check_url / provider_login_url — the stored URLs
+   (deep prior-auth path, essentials.availity.com) are not stated in any Aetna
+   corpus doc. Needs a browser-verified sourcing pass, not a citation pass.
+2. Sunshine eligibility_check_url — same: portal URL never stated in an
+   eligibility context in-corpus.
+3. Sunshine timely_filing — stored value is compound ("180 days claims; 90 days
+   1st-level appeal"); corpus confirms only the claims clause (manual table says
+   Reconsiderations 365 days). Promoting a half-grounded value would break
+   accepted⟹grounded. Needs value split.
+4. Aetna appeal.submission_channels — candidate WITH a resolved doc; demoted for
+   value-shape (bare fax vs channels list), separate fix.
+
+PRODUCT-VARIANT FINDING (logged per Ananth's "log and move on" ruling):
+Sunshine appeal.payor_ack_sla_days is stored as 3 business days (MMA, provider
+manual). The only corpus statement found is the CMS Health Plan doc: "will
+acknowledge in writing within five business days." Product-scoped divergence —
+resolution deferred with the product_line modeling work. Both SLA rows stay
+accepted on their named-source basis, uncited (corpus matches for the 60-day
+determination phrase are the MEMBER filing window, not the payor SLA — refused).
