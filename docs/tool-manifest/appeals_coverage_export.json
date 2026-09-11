@@ -14,7 +14,8 @@
     "inheritance": "PER-PREDICATE, NOT PER-PAYOR. A flat payor-level inherits_from edge will produce confidently wrong answers \u2014 see the accompanying message.",
     "sourcing": "rows_sourced is 0 everywhere because 0 of 339 filing-critical values are citable. Treat rows_present as 'we hold a value', never as 'we verified it'.",
     "fl_medicaid": "declared `template`, not `covered`: 72 identical rows under a payor-shaped name. Supersedes any earlier declaration of it as a payor.",
-    "rarc": "AXIS-ABSENCE SHOULD GATE ONLY THE PREDICATES THAT DEPEND ON THAT AXIS. `appeals_lookup_rules` and `appeals_find_carc` declare rarc `not_implemented` \u2014 the axis is material and we hold nothing. `appeals_validate_claim` and `appeals_get_playbook` declare it `not_applicable` \u2014 filing mechanics and appeal/resubmit/write-off do not vary by remark code. Same rule as the inheritance answer: per-predicate, never per-tool-blanket."
+    "rarc": "AXIS-ABSENCE SHOULD GATE ONLY THE PREDICATES THAT DEPEND ON THAT AXIS. `appeals_lookup_rules` and `appeals_find_carc` declare rarc `not_implemented` \u2014 the axis is material and we hold nothing. `appeals_validate_claim` and `appeals_get_playbook` declare it `not_applicable` \u2014 filing mechanics and appeal/resubmit/write-off do not vary by remark code. Same rule as the inheritance answer: per-predicate, never per-tool-blanket.",
+    "exclusion_kind": "Every exclusion is kinded. not_implemented ONLY where the axis genuinely bears on the predicate and we hold nothing \u2014 that is rarc on lookup_rules and find_carc, and nothing else. The payor exclusions are not_applicable: a CARC's meaning does not vary by payor."
   },
   "tools": [
     {
@@ -26,13 +27,13 @@
       "axes_not_served": [
         {
           "axis": "payor",
-          "why": "the payor argument is accepted but does not narrow results; rules are payor-agnostic today",
-          "reason": "not_implemented"
+          "why": "a CARC's MEANING does not vary by payor, and that is the predicate this tool serves. The payor argument is accepted and does not narrow results. A payor-specific GROUNDS question ('what are Sunshine's own rules for CARC 22') is a real gap, but it is a different predicate \u2014 demoting the code-meaning answer for it withholds a correct answer.",
+          "kind": "not_applicable"
         },
         {
           "axis": "rarc",
-          "why": "this axis IS material here and we hold nothing on it. The RARC is what says WHICH information is missing on a CARC 16, or WHY on a CARC 197 \u2014 our rules are keyed on carc_group only, so we answer the code and cannot answer the remark. Demote or caveat accordingly; this is a corpus limitation, not a declaration gap.",
-          "reason": "not_implemented"
+          "why": "the axis IS material and we hold nothing. The RARC is what says WHICH information is missing on a CARC 16, or WHY on a 197. Rules key on carc_group only.",
+          "kind": "not_implemented"
         }
       ],
       "values": [
@@ -509,13 +510,13 @@
       "axes_not_served": [
         {
           "axis": "payor",
-          "why": "identification is from wording alone; payor is not used",
-          "reason": "not_applicable"
+          "why": "identification is from the user's wording alone; payor is never consulted.",
+          "kind": "not_applicable"
         },
         {
           "axis": "rarc",
-          "why": "this axis IS material here and we hold nothing on it. The RARC is what says WHICH information is missing on a CARC 16, or WHY on a CARC 197 \u2014 our rules are keyed on carc_group only, so we answer the code and cannot answer the remark. Demote or caveat accordingly; this is a corpus limitation, not a declaration gap.",
-          "reason": "not_implemented"
+          "why": "same: a description naming a remark code cannot be resolved to it; we match CARCs only.",
+          "kind": "not_implemented"
         }
       ],
       "values": [
@@ -993,8 +994,8 @@
       "axes_not_served": [
         {
           "axis": "rarc",
-          "why": "filing mechanics do not vary by remark code \u2014 the deadline, portal, fax, address, forms and appeal ladder are identical whatever RARC accompanies the CARC. A question that mentions a RARC should NOT demote this tool.",
-          "reason": "not_applicable"
+          "why": "appeal / resubmit / write-off does not turn on the remark code.",
+          "kind": "not_applicable"
         }
       ],
       "values": [
