@@ -121,6 +121,71 @@ identical to healthy progress.
 
 ---
 
+## 3a. RULED by Ananth, 2026-09-11 — two decisions that reshape this
+
+### `close` is a DIRECTIVE, not a posture
+
+The job does not change when the governor aims a round at a named gap — it is
+still explore. What changes is **what it is aimed at.** So:
+
+| | |
+|---|---|
+| **postures** (⇒ prompt profiles) | `FRAME` · `EXPLORE` · `NARROW` · `VALIDATE` · `COMMUNICATE` |
+| **directives on EXPLORE** | `DISCOVER` · `CLOSE(gap_id)` · `REFORMULATE(gap_id)` |
+
+**This simplifies the prompt seat''s work rather than adding to it**, and it
+follows their own four-axis test: discover, close and reformulate share an
+output contract (a tool call), an evidence posture (seeking), and a failure mode
+(a wasted round). **Only the aim differs — and an aim is a directive.**
+
+`[OPEN]` **REFORMULATE may be a directive too, by the same argument.** Its
+success test is arguably distinct — *"is the new query materially different"* is
+checkable where the others are not — but its output contract is identical. **The
+prompt seat''s call, not mine**, since it turns on whether one block can carry
+both instructions without the differentiation being deferred into a condition —
+which is exactly how `react_draft`/`explore`/`synthesize` became one prompt.
+
+### The ledger is THREAD-scoped, not turn-scoped
+
+**The consequences are larger than the change.**
+
+**1. A follow-up turn can skip discovery.** It starts with the thread''s open
+gaps and goes straight to `EXPLORE/CLOSE`. Today turn 2 rediscovers from
+scratch.
+
+**2. Gaps outlive the promise they were opened under.** Turn 1 may have been
+`fast` (13s) and left gaps; turn 2 may be `thinking` (95s). **A gap must carry
+`opened_turn` and the `promise_version` in force when it opened** — because *"we
+could not close this in 13 seconds"* and *"we could not close this in 95
+seconds"* are different facts about the same gap. Same discipline as the
+attestation storing the promise inline rather than by reference.
+
+**3. The re-ask override finally has a mechanism.** §9 actor 3
+(observed-frustrated) was marked *"nothing detects this."* A user still on the
+same thread with **named open gaps** is no longer an inference about mood — it
+is a list. **The strongest evidence the promise was not kept, and the reason,
+sitting in the same row.**
+
+**4. 🔴 The promise is turn-scoped; the objective is now thread-scoped.** This is
+the real complication. A turn can **keep its promise while the thread makes no
+progress**, and a turn can **breach while closing a gap three turns old.**
+Per-turn attestation cannot fully account for a thread-scoped objective — the
+cost of closing a gap is spread across turns, and only the last one gets credit.
+`[OPEN]` **Needs a thread-level view alongside the turn-level one**, or
+conformance reporting will answer *"did we keep our promises"* while never
+answering *"did we get the user their answer."*
+
+**5. Staleness needs a rule.** A gap from a thread three days idle is not
+obviously live. `[OPEN]` TTL, or relevance-check on reopen — not yet decided,
+and **it must not default to "carry everything forever"** by omission.
+
+**6. It needs storage, not just context.** A `thread_gaps` table keyed by
+`thread_id`, with the same idempotency constraint every chat migration needs
+(`run_migrations.py` re-applies every file on every boot). Gap text derives from
+user questions, so it inherits the thread''s existing PHI posture — worth
+confirming with the PHI seat rather than assuming, since it persists longer than
+a turn.
+
 ## 4. What this asks of the prompt seat
 
 Not "write prompts." **Build to posture.** The governor sends:
