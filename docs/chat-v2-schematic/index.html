@@ -48,12 +48,29 @@ h2{font-size:.95rem;margin:2.6rem 0 .8rem;padding-bottom:.3rem;border-bottom:1px
  <span><span class="tag t-open">OPEN</span> unresolved</span>
 </div>
 
+<h2>PHI &mdash; the lane that crosses every stage</h2>
+<div class="stage" style="border-left:3px solid var(--open)">
+<h3>PHI gate <span class="tag t-live">LIVE</span> <span class="tag t-open">+ new risk at 067</span></h3>
+<div class="own"><b>modules</b> <code>api/chat.py:222-273</code> &middot; <code>PHI_GATE_URL/message-check</code> &middot; <code>phi_audit_log</code> &middot; <code>hipaa_context</code> block &nbsp;·&nbsp; <b>owner</b> PHI classifier seat + <b>Governor</b> (the 067 risk)</div>
+<table>
+<tr><th>where</th><th>what</th><th>note</th></tr>
+<tr><td><b>1 &middot; POST</b>, before enqueue</td><td><code>/message-check</code> on the user''s message</td><td><b>FAIL-CLOSED.</b> Unreachable or non-200 &rarr; <code>{block:True, gate:"indeterminate"}</code>. <b>The sentinel separates <i>"the classifier said PHI"</i> from <i>"the classifier could not be reached"</i></b> &mdash; two different facts that a single boolean would merge</td></tr>
+<tr><td><b>1 &middot; POST</b>, payload</td><td><code>payload["phi_gate_verdict"]</code> + <code>_phi_gate_ms</code></td><td>the verdict travels with the turn; the gate''s own latency is timed <b>and sits inside the promise window</b></td></tr>
+<tr><td><b>audit</b></td><td><code>phi_audit_log</code> &mdash; 12 cols, <b>append-only</b></td><td><code>phi_types</code> &middot; <code>phi_count</code> &middot; <code>stage</code> &middot; <code>action_taken</code> &middot; <code>hipaa_mode_active</code> &middot; <code>baa_available</code>. <b>The record of account, and it is not the stream</b></td></tr>
+<tr><td><b>5c &middot; prompt</b></td><td><code>hipaa_context</code> &mdash; 45 tok, <code>is_authority=true</code></td><td><b>One of only two authority blocks in the whole system</b> (the other is <code>forced_json</code>). Rides every composition</td></tr>
+<tr><td><b>5c &middot; prompt</b></td><td><code>critical_rules</code> rule 6 &mdash; PHI refuse</td><td>prompt seat: <i>&ldquo;universal, negligible size, <b>stays everywhere</b>&rdquo;</i> &mdash; it does <b>not</b> split by posture</td></tr>
+<tr><td><b>10 &middot; settle</b> <span class="tag t-open">NEW RISK</span></td><td><code>thread_gaps.text</code></td><td>gap text is <b>derived from the user''s question</b> and now <b>persists beyond the turn</b>. <b>The retention window changed</b> &mdash; confirm with the PHI seat, do not assume it inherits the thread''s posture</td></tr>
+</table>
+<div class="note"><b>🔴 The measured gap.</b> <code>phi_classify</code> runs <b>1,867 times / 30d</b> at <b>0% <code>correlation_id</code> coverage</b> &mdash; and the code comment says why: <i>&ldquo;all 98 phi_classify llm_calls rows/day landed with correlation_id NULL and attributed to no turn.&rdquo;</i> So <b>a gate that runs inside the promise window, on the user''s request path, cannot be attributed to the turn it gated.</b> Its cost is $0.10/30d &mdash; trivial &mdash; but <b>its latency is inside the promise and its verdict is a compliance record</b>, and neither joins to a turn.</div>
+<div class="note"><b>Why PHI is a lane and not a stage.</b> It gates <b>before</b> the promise clock has anything to measure, instructs <b>inside</b> every prompt as an authority block, audits to <b>its own append-only table</b>, and now <b>persists into a new table 067 introduces.</b> <b>A stage can be skipped by a tier; this cannot.</b> `fast` skips NARROW and VALIDATE &mdash; <b>nothing skips the PHI gate</b>, and the schematic has to show that or it invites exactly that mistake.</div>
+</div>
+
 <div class="stage">
 <h3>1 &middot; POST <span class="tag t-live">LIVE</span> <span class="tag t-new">+ promise</span></h3>
 <div class="own"><b>module</b> <code>app/api/chat.py</code> &nbsp;·&nbsp; <b>owner</b> Chat seat (endpoint) + <b>Governor</b> (promise resolution)</div>
 <div class="where">api/chat.py:315 &nbsp;post_chat() &nbsp;&mdash;&nbsp; API process</div>
 <ul>
-<li>auth &middot; PHI gate (<code>phi_classify</code> &mdash; runs here, inside the promise window)</li>
+<li>auth &middot; <b>PHI GATE &mdash; see the PHI lane below.</b> It is a <b>fail-closed block</b>, not a line item</li>
 <li><b>resolve the promise</b> from <code>chat_mode</code> &rarr; frozen for the turn</li>
 <li><b>stamp <code>posted_at</code></b> &mdash; wall-clock UTC, <i>not</i> <code>perf_counter</code></li>
 <li>enqueue; return <code>correlation_id</code> to poll. <b>POST does not run the turn.</b></li>
@@ -222,6 +239,7 @@ else:                                            BUDGET</pre>
 <tr><td><b>React executor</b></td><td><code>react_loop.py</code> &rarr; v2</td><td><b>Governor</b> builds &middot; Chat grades</td><td>pure: prompt + tools + model &rarr; answer, evidence, gaps</td><td><span class="tag t-new">NEW</span></td></tr>
 <tr><td><b>Enricher / card</b></td><td><code>stages/integrate.py</code></td><td>Chat seat</td><td>consolidates when <code>rounds&gt;1 OR tools&gt;1</code></td><td><span class="tag t-live">LIVE</span></td></tr>
 <tr><td><b>Critic</b></td><td><code>post_run_adjudication.py</code></td><td>Chat + Eval</td><td>fire-and-forget &mdash; <b>outside the promise</b></td><td><span class="tag t-live">LIVE</span></td></tr>
+<tr><td><b>PHI gate</b></td><td><code>api/chat.py:222</code> &rarr; <code>PHI_GATE_URL</code> &middot; <code>phi_audit_log</code> &middot; <code>hipaa_context</code></td><td>PHI classifier seat</td><td><b>fail-closed</b>; <code>indeterminate</code> &ne; <code>phi_flag</code></td><td><span class="tag t-live">LIVE</span></td></tr>
 <tr><td><b>Round records</b></td><td><code>turn_rounds</code></td><td><b>Governor</b></td><td><b>no sampling column</b> &mdash; its absence is the guarantee</td><td><span class="tag t-new">NEW</span></td></tr>
 </table>
 <div class="note"><b>The uniform contract, and the rule under it.</b> <code>estimate(inputs) &rarr; {latency_ms, cost_c, confidence}</code> &middot; <code>run(inputs, directive)</code> <b>pure, clock is an input</b> &middot; <code>AFFECTS</code> signed per term &middot; <code>PRECONDITIONS</code>. <b>A module the governor cannot price cannot be budgeted</b> &mdash; <i>&ldquo;is one more round worth it?&rdquo;</i> is unanswerable if a component&rsquo;s cost is learned only by paying it.</div>
