@@ -178,3 +178,51 @@ withdrawn for holding the question constant and varying only the tier; a
 tokenizer claim was withdrawn for holding content type constant across two
 samples. **A comparison without that line stated is a shape with no experiment
 behind it.**
+
+---
+
+## Update — 2026-09-11, LIVE and exercised end-to-end
+
+Five routes, not four. The fifth is how an answer gets into a run.
+
+```
+POST /ab/runs                               -> {run_id, set_id, arms, questions}
+GET  /ab/runs                               -> {runs:[…]}
+GET  /ab/runs/{run_id}                      -> {run_id, harness, questions:[{id,q,shape,status:{arm:state}}]}
+GET  /ab/runs/{run_id}/q/{qid}              -> the comparison (below)
+POST /ab/runs/{run_id}/q/{qid}/arm/{arm}    -> {correlation_id} in; freezes that arm's answer
+```
+
+**Verified against `ab-3fb1e4a6a3` / `q01`, dev**, not asserted:
+
+```
+envelope   : version 1 | blocks 6
+block kinds: mode_badge · tool_attribution · direct_answer · bullets · first_pass · sources
+delivered  : {latency_ms: 21483, exit_mode: 'completed', rounds: 2}
+promised   : {latency_ms: 31000, promise_version: 'v1', tier: 'normal'}   kept: true
+trace      : 2 rounds, directive 'search', tool_called 'rag'
+```
+
+`answer_envelope` is the REAL `assistant_envelope` — render it through the
+production renderer, unchanged. `cost_usd` is null: step 3, not yet measured.
+`kept` is `null`, never `false`, when either side is unknown.
+
+**Columns = `len(experiment.arms)`.** Today that is 1, so the page is
+single-column and the A/B chrome must not appear. `arms` is a keyed map for
+exactly this reason.
+
+### Two defects found by CALLING the deployed service, not by the suite
+
+Both shipped behind nine green tests, and both are worth the other seats' time:
+
+1. **`Dockerfile`'s COPY list is an ALLOWLIST.** `eval/` was never in the
+   image, so every request 404'd while the fixture sat on disk in the repo.
+   Same class as `SET_ENV_VARS` in `scripts/deploy.sh`.
+2. **`app/db/run_migrations.py` HAS NO CALLER.** Nothing in `main.py`, the
+   `Dockerfile`, or `deploy.sh` invokes it. Migration 065's own header says it
+   "re-applies every file on EVERY boot" — **that is false for this service**,
+   and every migration 065–069 carries the same wrong premise in its comments.
+   An `ALTER … ADD COLUMN IF NOT EXISTS` appended to an applied file does
+   **nothing** until someone applies it by hand; the INSERT that needed the
+   column then failed silently and the endpoint reported success. A gate with
+   no caller, at the schema layer.
