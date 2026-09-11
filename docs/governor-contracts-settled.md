@@ -198,7 +198,55 @@ missed promise gets fixed by moving the tolerance.
 | "critical_rules grew unwatched, like the manifest to 57 tools" | **2 of 5 jumps are replacements with cited incidents.** Growth real; the cause was mine, not measured |
 | "validate is structurally impossible on fast (9.6s of 13s)" | **the critic is already fire-and-forget** (`schedule_post_run_adjudication`) — never in the latency budget |
 | "move the promise to first delivery" | first delivery is not the answer — see below |
-| "kill the enricher, fold its schema into a draft profile" | **`react_draft` 837 chars → final card 7,301 chars, 9.6× p50** (n=1,118). **The enricher writes; it does not format.** A fold is a transplant |
+| ~~"kill the enricher, fold its schema into a draft profile"~~ | **WITHDRAWAL ITSELF WITHDRAWN — see below.** The 9.6× measures instruction, not capability |
+
+### The enricher question — REOPENED, and the 837 explains itself
+
+Ananth: *"react did the 837 chars because we have been asking it to summarise —
+we never asked it to produce a final answer."* `[READ]` **Confirmed in the
+prompt itself.** `react.format_rules`:
+
+> *"Start with ONE bold sentence… Follow with **2–4 short bullet points (each
+> 10–25 words)**… **Do NOT write paragraphs.**"*
+
+**2–4 bullets at 10–25 words IS 837 characters.** react is not falling short of
+8,000 — **it is hitting its instructed target exactly.** So the 9.6× measures
+the gap between *what we ask react for* and *what we ask the enricher for*. It
+says nothing about capability, and **"a fold is a transplant" is unsupported.**
+
+`[DESIGN]` **Fourth instance today of one error: reading an artifact of
+instruction as a property of the system.** The others — a tier comparison that
+fanned one question across three tiers, a chars//4 bias measured only on
+manifest-like text, and a growth curve whose cause I supplied rather than
+measured. **Every one was caught by asking what varied.**
+
+### The decision rule — Ananth''s, and it is budgetable at admission
+
+> **The enricher earns its place when there is a lot to consolidate. It does not
+> when there is not.**
+
+| turn shape | path |
+|---|---|
+| 1 round, 1 tool, evidence fits in one pass | **react writes the final answer. Skip the enricher.** |
+| N rounds, many tools, evidence spread wide | **enricher consolidates.** Keep it |
+
+**Round count and tool count are already what the posture forecast produces** —
+this is the same forecast used for a second decision, not a new signal.
+
+**Saving on the simple path: 5.2s p50 / 10.3s p90 plus ~4,028 prompt tokens** —
+40% of a 13s promise, on the turns that are **82% of all turns** (1,239 of 1,514
+have zero gaps open at round 1).
+
+**Cost: react needs a second OUTPUT MODE, not a bigger prompt.** Today
+`format_rules` is one instruction set. It needs two — *summarise for downstream
+consolidation* (~837 chars, today) and *write the final answer*
+(enricher-quality, ~7,300 chars).
+
+**Which collapses two open questions into one.** `COMMUNICATE` **is react''s
+final-answer output mode**, and the enricher is the fallback when there is too
+much to consolidate in one pass. They differ on **output contract** and
+**success test** — two of the prompt seat''s four axes — so they are genuinely
+different profiles, not one with a parameter.
 
 **Provenance note on that last one:** an intermediate version compared the
 ledger''s `running_answer` (497) to `chat_turns.final_message` (8,171) and
