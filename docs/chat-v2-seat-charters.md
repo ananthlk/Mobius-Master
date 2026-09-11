@@ -84,16 +84,30 @@ anything.
 
 ## SEAT 2 — Tool Manifest
 
-**Owns:** which tools react *sees*. **The Pareto lever** — `AFFECTS = {quality
-+, latency −, cost −}`, the only module whose improvement needs no tradeoff.
+**Owns:** which tools react *sees*.
+
+🔴 **`AFFECTS = {quality: UNMEASURED, latency −, cost −}`** — their correction,
+and they are right. I wrote `quality +` and then, two lines later, quoted their
+own *"the ranking is not yet a win at all."* **The charter contradicted itself,
+and an assumption was sitting in the same braces as two measurements, borrowing
+their credibility.**
+
+The 93.8% controls for *"does selection reduce tokens"* — question varied,
+manifest held constant. **It is not a control for *"does selection pick the
+right tools"***, which needs the manifest varied against known answers, and
+**there are zero golden fixtures.** Two negatives with no tradeoff is still the
+whole Pareto claim; the third term just stops borrowing.
+
+**If any decision of mine leans on `quality +` from this seat, it is leaning on
+nothing they can show me.**
 
 | item | state |
 |---|---|
-| `estimate()` | **built** — runs the *real* selection (0.34ms, independently confirmed in `turn_spans`) and prices the actual result. **No cost model that can drift from the cost** |
-| offered-set cost | **890 tokens median** (319–1,535) vs **14,271** — **93.8%** `[MEASURED]` 120 held-out questions, **question varied, manifest held constant** |
-| refusal | **binding on the governor** `[RULED]`. Must be **explicit and reasoned** — *"nothing fits"* and *"here are two weak ones"* are different facts |
+| `estimate()` | **built as of `064df25` — and NOT when I first wrote this.** Runs the *real* selection and prices the actual result. **0.386ms**, with a test that fails if it goes back on the network; it first shipped at **430ms** from a per-call DB query on the round path. 🔴 **The "0.34ms confirmed in `turn_spans`" I previously cited measures the OLD pipeline''s module span, not this interface — do not carry it forward** |
+| offered-set cost | **890 median vs 14,271 — 93.8%** `[MEASURED]` **2026-09-10**, 120 held-out questions, question varied, manifest held constant. ⚠ **That tokenizer is no longer runnable (credit-blocked).** New per-tool `exec_tokens` are a **local ~3.5 chars/token approximation** marked `basis=approximate`, summing the catalogue to **11,243**. **Different rulers — never mix them.** Quote 93.8% with its date until re-measured |
+| refusal | **binding** `[RULED]`, and **THREE kinds — each implies a different action**:<br>• `irrelevant` — never addressed ⇒ **widening changes nothing**<br>• `unaffordable` — addressed, too slow ⇒ **widen the envelope** (carries `needed_budget_ms`)<br>• `exhausted` — addressed, tried, returned nothing ⇒ **widening changes nothing either, for the opposite reason — buy a source** |
 | what I send | `budget_ms` · `budget_c` · `token_budget` · `gaps_open`. **Never `tier`** — their refusal, and right: *a tier is a promise, difficulty is a forecast* |
-| per-tool latency | **owner-declared, not observed.** 4 tools declare nothing and are priced free. **v1, not a blocker** — recovered from set-level co-occurrence over rounds |
+| per-tool latency | **owner-declared, not observed** — v1, recovered from set-level co-occurrence over rounds. 🔴 **It was 10 tools declaring nothing, not 4, and it is now 0** — placeholders by class (network 2s/12s, store 400ms/3s, write 1.5s/8s), deliberately affordable so the attestation corrects them. `refuse` is the one true zero and **must stay affordable inside an envelope that can afford nothing else**, or the cascade cannot report refusals |
 
 **Open, volunteered by them:** `requires` **0 of 59**; authority never reached
 `tool_version`; **Stage A has never filtered anything.** Every exclusion is
