@@ -1,0 +1,246 @@
+{
+  "source_key": "product_taxonomy",
+  "decided_by": "mobius-c2 (platform / product-awareness seat)",
+  "decided_at": "2026-09-11T01:57:41.411392+00:00",
+  "rev": "c43fd53",
+  "test_applied": "does the bare token also carry meaning in ordinary English as used in a question, or in RCM/healthcare domain vocabulary? yes -> drop or alias",
+  "caveats": [
+    "the coverage export is keyed on DOC MODULES; 'feature' was my mislabel and is the root cause",
+    "10 of 32 are dropped as doc topics -- the export is not a user-facing feature vocabulary",
+    "supersede when the PA seat produces its own taxonomy"
+  ],
+  "rows": [
+    {
+      "value": "About",
+      "decision": "drop",
+      "entity_resolvable": false,
+      "why": "doc-meta page; 'about' appears in a large share of all questions"
+    },
+    {
+      "value": "Answer Cache",
+      "decision": "keep",
+      "entity_resolvable": true,
+      "slug": "answer_cache",
+      "why": "multi-word, product-specific"
+    },
+    {
+      "value": "Appeals",
+      "decision": "alias",
+      "entity_resolvable": true,
+      "slug": "appeals_module",
+      "alias": "appeals module",
+      "bare_token_must_not_fire": "appeals",
+      "why": "'appeal' is the central workflow verb; 'how do I appeal CARC 22' wants tools, not docs"
+    },
+    {
+      "value": "Architecture",
+      "decision": "drop",
+      "entity_resolvable": false,
+      "why": "internal doc topic"
+    },
+    {
+      "value": "Auth",
+      "decision": "drop",
+      "entity_resolvable": false,
+      "why": "MOST DANGEROUS collision -- 'auth' means prior-authorization throughout RCM"
+    },
+    {
+      "value": "Chat",
+      "decision": "alias",
+      "entity_resolvable": true,
+      "slug": "chat_module",
+      "alias": "chat module",
+      "bare_token_must_not_fire": "chat",
+      "why": "'in this chat' / 'chat history' are ordinary phrasings; high collision rate"
+    },
+    {
+      "value": "Credentialing",
+      "decision": "alias",
+      "entity_resolvable": true,
+      "slug": "credentialing_module",
+      "alias": "credentialing module",
+      "bare_token_must_not_fire": "credentialing",
+      "why": "'credentialing status' is a domain query the credentialing TOOLS answer"
+    },
+    {
+      "value": "Doc Reader",
+      "decision": "keep",
+      "entity_resolvable": true,
+      "slug": "doc_reader",
+      "why": "multi-word, names a surface"
+    },
+    {
+      "value": "Document Viewer",
+      "decision": "keep",
+      "entity_resolvable": true,
+      "slug": "document_viewer",
+      "why": "multi-word, names a surface"
+    },
+    {
+      "value": "Eval",
+      "decision": "drop",
+      "entity_resolvable": false,
+      "why": "internal doc topic; 'evaluation' is domain vocabulary"
+    },
+    {
+      "value": "Extension",
+      "decision": "alias",
+      "entity_resolvable": true,
+      "slug": "browser_extension",
+      "alias": "browser extension",
+      "bare_token_must_not_fire": "extension",
+      "why": "'extension' is RCM vocabulary -- a filing-deadline extension"
+    },
+    {
+      "value": "Feedback",
+      "decision": "alias",
+      "entity_resolvable": true,
+      "slug": "feedback_widget",
+      "alias": "feedback widget",
+      "bare_token_must_not_fire": "feedback",
+      "why": "'feedback from the payor' is an ordinary domain phrase"
+    },
+    {
+      "value": "HIPAA",
+      "decision": "alias",
+      "entity_resolvable": true,
+      "slug": "hipaa_page",
+      "alias": "hipaa page",
+      "bare_token_must_not_fire": "hipaa",
+      "why": "users ask about HIPAA the regulation far more often than the page"
+    },
+    {
+      "value": "Infra",
+      "decision": "drop",
+      "entity_resolvable": false,
+      "why": "internal doc topic"
+    },
+    {
+      "value": "Interact",
+      "decision": "alias",
+      "entity_resolvable": true,
+      "slug": "interact_module",
+      "alias": "interact module",
+      "bare_token_must_not_fire": "interact",
+      "why": "ordinary English verb"
+    },
+    {
+      "value": "Lexicon",
+      "decision": "keep",
+      "entity_resolvable": true,
+      "slug": "lexicon",
+      "why": "single word, but no RCM sense and no ordinary-question sense"
+    },
+    {
+      "value": "Org Intelligence",
+      "decision": "keep",
+      "entity_resolvable": true,
+      "slug": "org_intelligence",
+      "why": "multi-word, product-specific"
+    },
+    {
+      "value": "PHI Classifier",
+      "decision": "keep",
+      "entity_resolvable": true,
+      "slug": "phi_classifier",
+      "why": "multi-word; PHI is domain vocabulary but the pair is not"
+    },
+    {
+      "value": "Payor",
+      "decision": "alias",
+      "entity_resolvable": true,
+      "slug": "payor_module",
+      "alias": "payor module",
+      "bare_token_must_not_fire": "payor",
+      "why": "'payor' is core RCM vocabulary -- 'which payor covers H0031' must NOT hit a help page"
+    },
+    {
+      "value": "Product Awareness",
+      "decision": "keep",
+      "entity_resolvable": true,
+      "slug": "product_awareness",
+      "why": "multi-word; internal-leaning but unambiguous"
+    },
+    {
+      "value": "RAG",
+      "decision": "keep",
+      "entity_resolvable": true,
+      "slug": "rag",
+      "why": "acronym, no ordinary-English sense in a user question"
+    },
+    {
+      "value": "Releases",
+      "decision": "drop",
+      "entity_resolvable": false,
+      "why": "internal doc topic"
+    },
+    {
+      "value": "Response Cards",
+      "decision": "keep",
+      "entity_resolvable": true,
+      "slug": "response_cards",
+      "why": "multi-word, names a surface"
+    },
+    {
+      "value": "Skills",
+      "decision": "drop",
+      "entity_resolvable": false,
+      "why": "internal concept; ordinary English"
+    },
+    {
+      "value": "Specs",
+      "decision": "drop",
+      "entity_resolvable": false,
+      "why": "internal doc topic; also ordinary English"
+    },
+    {
+      "value": "Story UI",
+      "decision": "keep",
+      "entity_resolvable": true,
+      "slug": "story_ui",
+      "why": "multi-word, product-specific"
+    },
+    {
+      "value": "Strategy",
+      "decision": "drop",
+      "entity_resolvable": false,
+      "why": "internal doc topic; also ordinary English"
+    },
+    {
+      "value": "Task Manager",
+      "decision": "keep",
+      "entity_resolvable": true,
+      "slug": "task_manager",
+      "why": "multi-word, names a surface a user opens"
+    },
+    {
+      "value": "User",
+      "decision": "drop",
+      "entity_resolvable": false,
+      "why": "internal service name; 'user' appears in ordinary phrasing constantly"
+    },
+    {
+      "value": "Vault",
+      "decision": "keep",
+      "entity_resolvable": true,
+      "slug": "vault",
+      "why": "distinctive in this product; the query that started this thread"
+    },
+    {
+      "value": "Vibe",
+      "decision": "alias",
+      "entity_resolvable": true,
+      "slug": "vibe_module",
+      "alias": "vibe module",
+      "bare_token_must_not_fire": "vibe",
+      "why": "ordinary English noun"
+    },
+    {
+      "value": "Web Scraper",
+      "decision": "keep",
+      "entity_resolvable": true,
+      "slug": "web_scraper",
+      "why": "multi-word, names a surface"
+    }
+  ]
+}
