@@ -1,0 +1,1470 @@
+{
+  "contract_version": "1",
+  "source_key": "payor_playbooks",
+  "exported_by": "appeals-agent",
+  "exported_at": "2026-09-11T02:35:35+00:00",
+  "provenance": "measured live against mobius-appeals-prototype on 2026-09-11: 141 playbook rows, /rules/{carc} and /carc-config/{carc} probed for every CARC the corpus claims",
+  "caveats": [
+    "NOTHING IS SOURCED. 339 filing-critical values, 0 citable (0.0%). Every rows_sourced below is 0, and that is the measurement, not a placeholder.",
+    "'FL Medicaid' is declared `template`, not `covered` \u2014 see its note. Any earlier declaration of it as a payor should be read as superseded by this one.",
+    "Rules exist for 15 of the 72 CARCs the playbook corpus covers. The two tools have materially different coverage and must not be ranked as if they share it."
+  ],
+  "reading_notes": {
+    "inheritance": "PER-PREDICATE, NOT PER-PAYOR. A flat payor-level inherits_from edge will produce confidently wrong answers \u2014 see the accompanying message.",
+    "sourcing": "rows_sourced is 0 everywhere because 0 of 339 filing-critical values are citable. Treat rows_present as 'we hold a value', never as 'we verified it'.",
+    "fl_medicaid": "declared `template`, not `covered`: 72 identical rows under a payor-shaped name. Supersedes any earlier declaration of it as a payor."
+  },
+  "tools": [
+    {
+      "tool": "appeals_lookup_rules",
+      "predicate": "what a denial code means and whether there are grounds to appeal it",
+      "axes_served": [
+        "carc"
+      ],
+      "axes_not_served": [
+        {
+          "axis": "payor",
+          "why": "the payor argument is accepted but does not narrow results; rules are payor-agnostic today",
+          "reason": "not_implemented"
+        }
+      ],
+      "values": [
+        {
+          "axis": "carc",
+          "value": "1",
+          "status": "covered",
+          "rows_present": 8,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "2",
+          "status": "covered",
+          "rows_present": 3,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "3",
+          "status": "covered",
+          "rows_present": 3,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "5",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "7",
+          "status": "covered",
+          "rows_present": 5,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "16",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "22",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "29",
+          "status": "covered",
+          "rows_present": 2,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "31",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "49",
+          "status": "covered",
+          "rows_present": 3,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "50",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "96",
+          "status": "covered",
+          "rows_present": 5,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "148",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "155",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "197",
+          "status": "covered",
+          "rows_present": 5,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "4",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "6",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "8",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "11",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "18",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "23",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "27",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "32",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "45",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "51",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "56",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "57",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "97",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "109",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "119",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "136",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "146",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "149",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "150",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "151",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "152",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "157",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "163",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "164",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "165",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "167",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "170",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "171",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "172",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "173",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "177",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "181",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "182",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "183",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "184",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "185",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "191",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "192",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "200",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "204",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "210",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "217",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "218",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "219",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "220",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "226",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "227",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "231",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "236",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "240",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "243",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "250",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "252",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "256",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "261",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "268",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        },
+        {
+          "axis": "carc",
+          "value": "283",
+          "status": "absent",
+          "note": "no rules authored for this code; the tool returns rules_found: 0"
+        }
+      ]
+    },
+    {
+      "tool": "appeals_find_carc",
+      "predicate": "which denial code a plain-English description corresponds to",
+      "axes_served": [
+        "carc"
+      ],
+      "axes_not_served": [
+        {
+          "axis": "payor",
+          "why": "identification is from wording alone; payor is not used",
+          "reason": "not_applicable"
+        }
+      ],
+      "values": [
+        {
+          "axis": "carc",
+          "value": "1",
+          "status": "covered",
+          "rows_present": 8,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "2",
+          "status": "covered",
+          "rows_present": 3,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "3",
+          "status": "covered",
+          "rows_present": 3,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "5",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "7",
+          "status": "covered",
+          "rows_present": 5,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "16",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "22",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "29",
+          "status": "covered",
+          "rows_present": 2,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "31",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "49",
+          "status": "covered",
+          "rows_present": 3,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "50",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "96",
+          "status": "covered",
+          "rows_present": 5,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "148",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "155",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "197",
+          "status": "covered",
+          "rows_present": 5,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "4",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "6",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "8",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "11",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "18",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "23",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "27",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "32",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "45",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "51",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "56",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "57",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "97",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "109",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "119",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "136",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "146",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "149",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "150",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "151",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "152",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "157",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "163",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "164",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "165",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "167",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "170",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "171",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "172",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "173",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "177",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "181",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "182",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "183",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "184",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "185",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "191",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "192",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "200",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "204",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "210",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "217",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "218",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "219",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "220",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "226",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "227",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "231",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "236",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "240",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "243",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "250",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "252",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "256",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "261",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "268",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        },
+        {
+          "axis": "carc",
+          "value": "283",
+          "status": "absent",
+          "note": "outside the matchable catalog; cannot be identified from a description"
+        }
+      ]
+    },
+    {
+      "tool": "appeals_validate_claim",
+      "predicate": "whether to appeal, resubmit, or write off a specific denied claim",
+      "axes_served": [
+        "carc",
+        "payor"
+      ],
+      "axes_not_served": [],
+      "values": [
+        {
+          "axis": "carc",
+          "value": "1",
+          "status": "covered",
+          "rows_present": 8,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "2",
+          "status": "covered",
+          "rows_present": 3,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "3",
+          "status": "covered",
+          "rows_present": 3,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "5",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "7",
+          "status": "covered",
+          "rows_present": 5,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "16",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "22",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "29",
+          "status": "covered",
+          "rows_present": 2,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "31",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "49",
+          "status": "covered",
+          "rows_present": 3,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "50",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "96",
+          "status": "covered",
+          "rows_present": 5,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "148",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "155",
+          "status": "covered",
+          "rows_present": 4,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "197",
+          "status": "covered",
+          "rows_present": 5,
+          "rows_sourced": 0,
+          "note": "rules are generated, not sourced against a payor document"
+        },
+        {
+          "axis": "carc",
+          "value": "4",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "6",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "8",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "11",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "18",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "23",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "27",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "32",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "45",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "51",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "56",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "57",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "97",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "109",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "119",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "136",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "146",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "149",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "150",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "151",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "152",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "157",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "163",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "164",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "165",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "167",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "170",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "171",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "172",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "173",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "177",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "181",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "182",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "183",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "184",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "185",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "191",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "192",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "200",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "204",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "210",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "217",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "218",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "219",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "220",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "226",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "227",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "231",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "236",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "240",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "243",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "250",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "252",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "256",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "261",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "268",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "carc",
+          "value": "283",
+          "status": "absent",
+          "note": "no rules behind this code; a recommendation would be unfounded"
+        },
+        {
+          "axis": "payor",
+          "value": "Sunshine Health",
+          "status": "covered",
+          "rows_present": 69,
+          "rows_sourced": 0,
+          "note": "the only real payor in the corpus; 0 of its filing-critical values are citable"
+        },
+        {
+          "axis": "payor",
+          "value": "FL Medicaid",
+          "status": "template",
+          "rows_present": 72,
+          "rows_sourced": 0,
+          "note": "NOT A PAYOR. 72 rows sharing one identical appeal_levels signature, every payor-specific scalar blank, and a ladder that escalates TO AHCA at level 5 \u2014 which the agency cannot do to itself. A generic managed-care ladder stored under a payor-shaped name. Do not offer as payor coverage."
+        },
+        {
+          "axis": "jurisdiction",
+          "value": "FL",
+          "status": "covered",
+          "note": "all rules and playbooks are written against Florida Medicaid conventions"
+        }
+      ]
+    }
+  ]
+}
