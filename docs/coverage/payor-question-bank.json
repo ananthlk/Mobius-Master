@@ -1,7 +1,7 @@
 {
  "artifact": "payor-question-bank",
  "exported_by": "payor-fact-store",
- "exported_at": "2026-09-11T05:00:43.166375+00:00",
+ "exported_at": "2026-09-11T05:10:09.810542+00:00",
  "source": "rag_query_decisions live traffic (is_prod=true, is_calibration=false, eval_run_id null; strategy s chosen or served). Every question verbatim from telemetry.",
  "provenance": "Traffic RECEIVED, not guaranteed human-typed: callers span typed mobius_chat turns, API callers, and Deep Research sub-query decomposition (the clock-start/claim-dispute rephrasings are one research run fanning out). Curation applied: PHI-pattern test rows excluded; near-duplicate decomposition variants trimmed to representatives; compound cross-payor comparisons dropped. NOT retrieval vocabulary, NOT an authored eval bank.",
  "banks": {
@@ -25,8 +25,7 @@
    "What is the timely filing deadline for Aetna Better Health Florida Medicaid claims?",
    "timely filing limit for Aetna Better Health Florida Medicaid",
    "Aetna Better Health of Florida provider manual timely filing",
-   "phone number for Aetna member services",
-   "timely filing deadline for Sunshine Health and Aetna"
+   "phone number for Aetna member services"
   ],
   "payor_fact_expected_abstain": [
    "timely filing deadline for Simply Healthcare",
@@ -37,8 +36,7 @@
    "Molina Healthcare Florida Medicaid claim dispute appeal deadline submission method",
    "UnitedHealthcare timely filing deadline Florida",
    "United Healthcare Community Plan of Florida Medicaid behavioral health claim filing deadlines",
-   "Amerigroup Florida behavioral health prior authorization list online",
-   "timely filing deadline for Sunshine Health, Aetna, and UnitedHealthcare"
+   "Amerigroup Florida behavioral health prior authorization list online"
   ],
   "appeals_traffic_unassigned": [
    "how to appeal CARC 197 denial for Sunshine Health",
@@ -59,12 +57,23 @@
    "Practitioner Fee Schedule or Physician Services Fee Schedule for Evaluation and Management Services CPT/HCPCS",
    "T1017 coverage or definition",
    "inpatient psychiatric prior authorization process"
+  ],
+  "multi_payor_compound": [
+   "timely filing deadline for Sunshine Health and Aetna",
+   "timely filing deadline for Sunshine Health, Aetna, and UnitedHealthcare",
+   "timely filing deadlines for Sunshine Health, Aetna, and Molina",
+   "timely filing deadlines and appeal steps for Sunshine Health, Humana, and Aetna",
+   "timely filing deadlines for Sunshine Health and Aetna in Florida Medicaid",
+   "For Florida Medicaid, compare prior authorization requirements, claim filing deadlines, and appeal timeframes for behavioral health services across Aetna, Molina, and United Healthcare.",
+   "prior authorization requirements, timely filing deadlines, and appeals processes for outpatient behavioral health services for Sunshine Health, Aetna, Molina, and Humana in Florida",
+   "Florida Medicaid, Sunshine Health, and Molina provider manuals: services furnished without prior authorization, retroactive authorization requests and time limits, services exempt from prior authorization"
   ]
  },
  "bank_notes": {
-  "payor_fact": "Named held payor (Sunshine/Aetna), fact-shaped. Correct outcome: payor_fact offered AND answers.",
+  "payor_fact": "Named held payor (Sunshine/Aetna), fact-shaped. Correct outcome: payor_fact offered AND answers. CORRECTION 2026-09-11: at delivery, the 9 Sunshine timely-filing variants contradicted the coverage export (Sunshine timely_filing was absent \u2014 a held P1 item; the tool abstained). The label was wrong, the export was right. Resolved by fixing the FACT, not the label: value rewritten to match the Provider Manual p.121 table (participating/non-participating pairs), cited, accepted. The label is true as of export rev with 21 covered predicates.",
   "payor_fact_expected_abstain": "Real traffic naming payors I hold NO accepted facts for. Correct outcome: payor_fact may be offered and honestly abstains \u2014 coverage-export absent/asserts rows are the machine-readable version. The last entry mixes held and unheld payors in one question.",
   "appeals_traffic_unassigned": "Real traffic that is appeals-shaped. Ground truth assignment belongs to the Appeals seat, which is not running \u2014 I do not speak for their tools. Included as traffic only.",
-  "negative_not_payor_fact": "Real traffic strategy s WRONGLY claimed (known, parked over-route bug: gate fires on value-nouns without a stored payor or with process/conceptual intent). Ground truth is corpus RAG or product docs. A selection gate should NOT pick payor_fact here."
+  "negative_not_payor_fact": "Real traffic strategy s WRONGLY claimed (known, parked over-route bug: gate fires on value-nouns without a stored payor or with process/conceptual intent). Ground truth is corpus RAG or product docs. A selection gate should NOT pick payor_fact here.",
+  "multi_payor_compound": "Multi-tool-by-construction: one question, several payors, mixed held/unheld. No single right tool; a correct plan calls payor_fact per held payor and abstains-or-routes for the rest. Two questions moved here from payor_fact / expected_abstain (they were compound all along)."
  }
 }
