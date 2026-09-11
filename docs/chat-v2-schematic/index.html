@@ -185,16 +185,27 @@ else:                                            BUDGET</pre>
 <div class="arrow">&darr;</div>
 
 <div class="stage">
-<h3>8 &middot; COMMUNICATE <span class="tag t-new">NEW</span></h3>
-<div class="own"><b>module</b> <code>react.communicate</code> block <i>or</i> <code>app/stages/integrate.py</code> &nbsp;·&nbsp; <b>owner</b> LLM Agent (blocks) + Chat seat (integrate)</div>
-<pre>use_enricher &hArr; rounds_used &gt; 1 OR tools_used &gt; 1</pre>
+<h3>8 &middot; COMMUNICATE &mdash; ONE exit, selected components <span class="tag t-new">NEW</span></h3>
+<div class="own"><b>module</b> <code>app/pipeline/v2/communicate.py</code> &nbsp;·&nbsp; <b>owner</b> <b>Governor</b> (selection) &middot; LLM Agent (blocks) &middot; Chat seat (renderers)</div>
+
+<div class="note" style="border-left-color:var(--accent)"><b>🔴 THE HARD CONSTRAINT &mdash; Ananth: <i>&ldquo;there should just be ONE way to communicate out, even on early exit. I have had too much trouble with that.&rdquo;</i></b>
+<br><br><b>Exactly one function emits to the user. Every path reaches it &mdash; success, early exit, budget exhaustion, capability, error. No exceptions, no bypass.</b>
+<br><br>This is the fix for the measured mess: <b>8 publish call sites across 2 reachable terminals, 1 terminal with zero callers</b> that survived a 2,181-line refactor, an early <code>return</code> on empty payload at <code>:1385</code>, and two early exits (<code>:6116</code> golden-answer, <code>:6134</code> fast-mode) that each leave by their own door. <b>An early exit is not a different path &mdash; it is an <code>exit_mode</code> passed into the one path.</b></div>
+
+<p style="font-size:.82rem;margin:.8rem 0 .3rem"><b>I do not decide WHETHER to enrich. I decide WHICH WRITER produces each component.</b></p>
 <table>
-<tr><th>turn shape</th><th>path</th><th>cost</th></tr>
-<tr><td>1 round, 1 tool &mdash; <b>82% of turns</b></td><td><b>react writes the final answer</b></td><td>&mdash;</td></tr>
-<tr><td>many rounds / tools</td><td>enricher consolidates</td><td><b>+5.2s p50 / 10.3s p90</b> and ~4,028 tok</td></tr>
+<tr><th>component</th><th>when</th><th>producer</th><th>cost</th></tr>
+<tr><td><b>diagnostics</b></td><td><b>ALWAYS</b> &mdash; never optional</td><td>deterministic, from <code>turn_rounds</code> + attestation + gaps</td><td><b>~free</b></td></tr>
+<tr><td><b>answer card</b></td><td><b>ALWAYS</b> &mdash; what varies is the <b>writer</b></td><td><b>three writers:</b> react direct (<code>react.communicate</code>) &middot; <code>deterministic_format()</code> &mdash; <b>already exists</b>, <code>integrate.py:942</code>, gated by <code>_is_sufficient_for_deterministic_pass</code> &middot; enricher LLM</td><td>0 &middot; 0 &middot; <b>5.2s / 4,028 tok</b></td></tr>
+<tr><td><b>the account</b><br><span class="sub">open items, what was established</span></td><td><code>exit_mode &ne; COMPLETE</code></td><td>deterministic, from <code>thread_gaps</code></td><td><b>~free</b></td></tr>
+<tr><td><b>next steps / tasks</b></td><td><code>exit_mode &isin; {BUDGET, CAPABILITY}</code></td><td>deterministic, from gaps + <code>attempted_by</code></td><td><b>~free</b></td></tr>
+<tr><td><b>critique</b></td><td><b>never inline</b></td><td>post-publish, fire-and-forget</td><td>9.6s &mdash; <b>outside the promise</b></td></tr>
 </table>
-<div class="note"><b>react''s 837 chars is its instructed target, not its ceiling</b> &mdash; <code>react.format_rules</code> says <i>&ldquo;2&ndash;4 short bullet points (each 10&ndash;25 words)&rdquo;</i>. It needs a <b>second output mode</b>, not a bigger prompt. On a 13s promise, skipping the enricher returns <b>40% of the budget</b> on the turns that are the overwhelming majority.</div>
-</div>
+
+<div class="note"><b>Correction to my own §11 formula.</b> I wrote <code>use_enricher &hArr; rounds&gt;1 OR tools&gt;1</code> &mdash; <b>one boolean over the whole stage.</b> Wrong: <b>diagnostics can never be skipped</b>, so there is a floor the enricher''s 5.2s figure was never the right unit for. The decision is <b>per component</b>, and for the card it is <b>which of three writers</b>, not whether to write.
+<br><br><b>And most components are deterministic assembly, not LLM work</b> &mdash; which is the real saving. <code>deterministic_format()</code> already exists and is already gated on sufficiency (Task&nbsp;#76). <b>The 5.2s belongs to one writer of one component, not to &ldquo;the enricher&rdquo;.</b></div>
+
+<div class="note"><b>Why one exit makes the rest cheap.</b> With a single function, <b><code>exit_mode</code> is an argument rather than a branch</b> &mdash; so CAPABILITY cannot accidentally offer a continuation, and an ERROR cannot skip the diagnostics that say it errored. <b>The failure this constraint prevents is structural, not behavioural:</b> today the paths that most need to say something are exactly the ones that leave by a door where nothing says it.</div>
 
 <div class="arrow">&darr;</div>
 

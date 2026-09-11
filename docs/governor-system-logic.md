@@ -224,11 +224,36 @@ both high / both low                → the verdict changes nothing. Skip
 **No single signal authorises spend** — least of all self-reported confidence,
 the only signal produced by the thing being judged.
 
-### 11 · ENRICHER vs DIRECT `[RULED]`
+### 11 · COMMUNICATE — ONE exit, per-component selection `[RULED]`
+
+**Ananth: *"there should just be ONE way to communicate out, even on early exit.
+I have had too much trouble with that."*** Exactly one function emits to the
+user; every path reaches it. **An early exit is not another path — it is an
+`exit_mode` argument.**
+
+**Correction: `use_enricher ⟺ rounds>1 OR tools>1` was one boolean over a stage
+that has five components.** The decision is per component, and for the card it is
+*which writer*, not whether to write.
 
 ```python
-use_enricher ⟺ rounds_used > 1 OR tools_used > 1
+communicate(exit_mode, gaps, answer, components) -> envelope     # ONE function
+
+diagnostics   ALWAYS                              deterministic   ~free
+answer_card   ALWAYS — writer varies:
+                react direct | deterministic_format() | enricher LLM
+                                                  0 | 0 | 5.2s + 4,028 tok
+account       exit_mode != COMPLETE               deterministic   ~free
+next_steps    exit_mode in {BUDGET, CAPABILITY}   deterministic   ~free
+critique      never inline — post-publish         9.6s, outside the promise
 ```
+
+`[READ]` **`deterministic_format()` already exists** — `integrate.py:942`, gated
+by `_is_sufficient_for_deterministic_pass` (Task #76). So **three card writers
+already exist**, which is precisely the trouble the one-exit rule fixes.
+
+**With one function, `exit_mode` is an argument rather than a branch** — so
+CAPABILITY cannot accidentally offer a continuation, and an ERROR cannot skip
+the diagnostics that say it errored.
 
 **The enricher earns its place when there is a lot to consolidate.** Skipping it
 on the simple path saves **5.2s p50 / 10.3s p90 + ~4,028 tokens** — 40% of a 13s
