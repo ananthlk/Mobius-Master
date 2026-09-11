@@ -1,0 +1,252 @@
+<title>POST to PUBLISH</title>
+<style>
+:root{--bg:#fbfbfa;--ink:#17161a;--dim:#6b6873;--line:#e1dfe4;--card:#fff;
+ --live:#0a7d3c;--new:#7c3aed;--open:#a8410a;--accent:#7c3aed;--code:#f3f1f6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#131217;--ink:#eceaf0;--dim:#9a96a4;
+ --line:#2c2a33;--card:#1b1a21;--live:#4ade80;--new:#c4a8ff;--open:#fb923c;--accent:#c4a8ff;--code:#212029}}
+:root[data-theme="dark"]{--bg:#131217;--ink:#eceaf0;--dim:#9a96a4;--line:#2c2a33;--card:#1b1a21;
+ --live:#4ade80;--new:#c4a8ff;--open:#fb923c;--accent:#c4a8ff;--code:#212029}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:14px/1.6 ui-sans-serif,-apple-system,"Segoe UI",sans-serif;
+ margin:0;padding:2.2rem 1.4rem 5rem}
+.wrap{max-width:1080px;margin:0 auto}
+h1{font-size:1.5rem;margin:0 0 .3rem;letter-spacing:-.02em}
+.sub{color:var(--dim);font-size:.82rem;margin:0 0 2rem}
+.stage{border:1px solid var(--line);border-radius:9px;background:var(--card);padding:.85rem 1rem;margin:0}
+.stage h3{margin:0 0 .45rem;font-size:.78rem;letter-spacing:.07em;text-transform:uppercase;color:var(--accent)}
+.own{font-size:.74rem;color:var(--dim);border-left:2px solid var(--line);padding-left:.6rem;margin:.3rem 0 .5rem}
+.stage .where{font-family:ui-monospace,Menlo,monospace;font-size:.7rem;color:var(--dim);margin-bottom:.5rem}
+.row{display:grid;grid-template-columns:1fr;gap:0}
+.arrow{text-align:center;color:var(--dim);font-size:1.1rem;line-height:1.1;margin:.3rem 0}
+.arrow b{display:block;font-size:.68rem;font-weight:600;letter-spacing:.04em;color:var(--dim)}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.76rem;background:var(--code);
+ padding:.08rem .3rem;border-radius:3px}
+pre{font-family:ui-monospace,Menlo,monospace;font-size:.72rem;line-height:1.5;background:var(--code);
+ border:1px solid var(--line);border-radius:6px;padding:.7rem .85rem;overflow-x:auto;margin:.5rem 0}
+.tag{display:inline-block;font-size:.63rem;font-weight:700;letter-spacing:.05em;padding:.1rem .4rem;
+ border-radius:3px;border:1px solid currentColor;vertical-align:.08em}
+.t-live{color:var(--live)} .t-new{color:var(--new)} .t-open{color:var(--open)}
+ul{margin:.4rem 0 0;padding-left:1.1rem} li{margin:.2rem 0;font-size:.83rem}
+.clock{border-left:3px solid var(--accent);padding-left:.7rem;font-size:.78rem;color:var(--dim);margin:.45rem 0 0}
+.loop{border:2px dashed var(--accent);border-radius:11px;padding:.9rem;margin:0;background:transparent}
+.loop>h3{margin-top:0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:.7rem}
+table{border-collapse:collapse;width:100%;font-size:.78rem;margin:.5rem 0}
+th,td{border:1px solid var(--line);padding:.35rem .5rem;text-align:left;vertical-align:top}
+th{background:var(--code);font-weight:600;font-size:.7rem;letter-spacing:.04em;text-transform:uppercase;color:var(--dim)}
+.note{border:1px solid var(--line);border-left:3px solid var(--open);border-radius:6px;
+ background:var(--card);padding:.6rem .8rem;margin:.9rem 0;font-size:.82rem}
+.legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:.75rem;color:var(--dim);margin-bottom:1.6rem}
+h2{font-size:.95rem;margin:2.6rem 0 .8rem;padding-bottom:.3rem;border-bottom:1px solid var(--line)}
+</style>
+<div class="wrap">
+<h1>POST &rarr; PUBLISH</h1>
+<p class="sub">Orchestrator v2, end to end. Every stage marked by what exists today. Measured figures are from dev, 2026-09-11.</p>
+<div class="legend">
+ <span><span class="tag t-live">LIVE</span> shipped and running</span>
+ <span><span class="tag t-new">NEW</span> v2 builds it</span>
+ <span><span class="tag t-open">OPEN</span> unresolved</span>
+</div>
+
+<div class="stage">
+<h3>1 &middot; POST <span class="tag t-live">LIVE</span> <span class="tag t-new">+ promise</span></h3>
+<div class="own"><b>module</b> <code>app/api/chat.py</code> &nbsp;·&nbsp; <b>owner</b> Chat seat (endpoint) + <b>Governor</b> (promise resolution)</div>
+<div class="where">api/chat.py:315 &nbsp;post_chat() &nbsp;&mdash;&nbsp; API process</div>
+<ul>
+<li>auth &middot; PHI gate (<code>phi_classify</code> &mdash; runs here, inside the promise window)</li>
+<li><b>resolve the promise</b> from <code>chat_mode</code> &rarr; frozen for the turn</li>
+<li><b>stamp <code>posted_at</code></b> &mdash; wall-clock UTC, <i>not</i> <code>perf_counter</code></li>
+<li>enqueue; return <code>correlation_id</code> to poll. <b>POST does not run the turn.</b></li>
+</ul>
+<pre>promise = {version:"v1", tier:"normal", latency_s:31, band_s:8, cost_c:45, quality:"some"}</pre>
+<div class="clock"><b>posted_at</b> &mdash; the promise clock starts. Wall clock, because POST runs in the API process and the turn runs in the worker: two <code>perf_counter</code> values cannot be subtracted.</div>
+</div>
+
+<div class="arrow">&darr;<b>QUEUE</b></div>
+
+<div class="stage">
+<h3>2 &middot; WORKER PICKUP <span class="tag t-live">LIVE</span></h3>
+<div class="own"><b>module</b> <code>app/worker/run.py</code> &nbsp;·&nbsp; <b>owner</b> Chat seat</div>
+<div class="where">worker/run.py:249 &nbsp;t0_start = perf_counter()</div>
+<div class="clock"><b>queue_wait = delivered &minus; worker</b> &mdash; measured for the first time today: <b>p50 0.023s, p90 3.67s</b>, and <b>bimodal</b> (13 warm @ 23ms, 3 cold @ 3.76s). <b>A p50 reports it as negligible and is wrong about 1 turn in 5.</b></div>
+</div>
+
+<div class="arrow">&darr;</div>
+
+<div class="stage">
+<h3>3 &middot; STATE_LOAD <span class="tag t-live">LIVE</span> <span class="tag t-new">+ gaps</span></h3>
+<div class="own"><b>module</b> <code>app/persistence/memory.py</code> + <code>thread_gaps</code> &nbsp;·&nbsp; <b>owner</b> Chat seat (state) + <b>Governor</b> (gaps)</div>
+<div class="where">412.7ms p50 (from 1,572.9ms)</div>
+<div class="grid2">
+<div><b>reads today</b><ul><li><code>chat_state.state_json</code> &mdash; 13 keys</li><li>thread history</li></ul></div>
+<div><b>adds</b> <span class="tag t-new">067</span><ul><li><code>thread_gaps</code> WHERE <code>thread_id</code>, <code>status='open'</code></li><li>one indexed read &mdash; <b>measure after, do not assume</b></li></ul></div>
+</div>
+<div class="note"><b>This is what makes a follow-up turn cheap.</b> The thread''s open gaps arrive already named, already carrying <code>attempted_by</code>. A continuation <b>skips FRAME and DISCOVER and opens at CLOSE(x)</b>. Turn-scoped, <i>&ldquo;I can close those if you like&rdquo;</i> would mean rediscovering from scratch.</div>
+</div>
+
+<div class="arrow">&darr;</div>
+
+<div class="stage">
+<h3>4 &middot; ADMISSION <span class="tag t-new">NEW</span></h3>
+<div class="own"><b>module</b> <code>app/pipeline/react/promise.py</code> &nbsp;·&nbsp; <b>owner</b> <b>Governor</b></div>
+<pre>affordable(P) &hArr; &Sigma; p50(p for p in P) &le; promise.latency_s
+            AND measured_p90(config P) &le; promise.latency_s + promise.band_s
+
+postures = largest P &sube; SEQUENCE satisfying affordable(P)</pre>
+<table>
+<tr><th>tier</th><th>promise</th><th>postures admitted</th></tr>
+<tr><td><b>fast</b></td><td>13s &plusmn;5</td><td>FRAME &rarr; EXPLORE &rarr; COMMUNICATE</td></tr>
+<tr><td><b>normal</b></td><td>31s &plusmn;8</td><td>+ REFORMULATE, NARROW &mdash; <i>or</i> trade a round for VALIDATE</td></tr>
+<tr><td><b>thinking</b></td><td>95s &plusmn;25</td><td>the full sequence</td></tr>
+</table>
+<div class="note"><b>Skipping is what the tier IS</b> &mdash; not a round count, but which postures fit. <b>Never sum p90s</b>; that is not the p90 of a sum. Use measured turn-level tails: fast 33.9s &middot; normal 56.1s &middot; thinking 218.5s.</div>
+</div>
+
+<div class="arrow">&darr;</div>
+
+<div class="loop">
+<h3>5 &middot; THE POSTURE LOOP <span class="tag t-new">NEW</span></h3>
+<div class="own"><b>module</b> <code>app/pipeline/v2/</code> (new) &nbsp;·&nbsp; <b>owner</b> <b>Governor builds</b> &mdash; <b>Chat seat grades</b></div>
+<pre>if not gap_list:                        FRAME
+elif trend(gaps) == INCREASING:         EXPLORE / DISCOVER
+elif g := worth_spending(open_gaps):    EXPLORE / REFORMULATE(g) if repeating(g)
+                                        else EXPLORE / CLOSE(g)
+elif open_gaps and budget_nearly_spent: NARROW
+elif validate_worth_it():               VALIDATE
+else:                                   COMMUNICATE</pre>
+<p style="font-size:.8rem;margin:.7rem 0 .3rem"><b>Each round, in order &mdash; the budget is consumed as it flows:</b></p>
+<table>
+<tr><th>#</th><th>step</th><th>module</th><th>note</th></tr>
+<tr><td>a</td><td><b>declare the envelope</b></td><td>governor</td><td>a <b>range</b>, never a point: <code>[p25, p90]</code> &times; 3 terms + <code>gap_targeted</code> + <code>because</code></td></tr>
+<tr><td>b</td><td><b>tool exposure</b></td><td>Tool&nbsp;Manifest <span class="tag t-live">LIVE</span></td><td><code>estimate()</code> runs the real selection (0.34ms) &rarr; offer <b>or REFUSE</b>. <b>890 tok median, was 14,271.</b> A refusal is <b>binding</b></td></tr>
+<tr><td>c</td><td><b>compose the prompt</b></td><td>prompt&nbsp;seat <span class="tag t-live">LIVE</span></td><td>from <code>prompt_blocks</code> <b>only</b>. Budgeted against what (b) left. <code>token_counts</code> exact, MAX across tokenizers</td></tr>
+<tr><td>d</td><td><b>bound the model</b></td><td>bandit <span class="tag t-live">LIVE</span></td><td><code>latency_budget_ms</code> is a <b>hard pre-filter before Thompson sampling</b>. Governor <b>bounds</b>; bandit <b>chooses</b></td></tr>
+<tr><td>e</td><td><b>execute</b></td><td>react</td><td>tools run <b>after</b> react</td></tr>
+<tr><td>f</td><td><b>answer by reference</b></td><td>react</td><td><code>closed:[G3] new:[...]</code> &mdash; react does <b>zero</b> bookkeeping; the governor minted the ids</td></tr>
+<tr><td>g</td><td><b>emit the draft</b></td><td><span class="tag t-new">per round</span></td><td><code>draft_ready</code> carrying <code>running_answer</code>. <b>No schema change</b> &mdash; today it fires <b>once per turn</b> (1,231 events / ~1,266 turns)</td></tr>
+<tr><td>h</td><td><b>write the round</b></td><td><span class="tag t-new">turn_rounds</span></td><td>declared vs delivered. <b>No sampling column</b> &mdash; its absence is the guarantee</td></tr>
+</table>
+<pre>repeating(g)  &hArr; jaccard(query&#8345;, query&#8345;&#8331;&#8321;) &ge; 0.70                    <span style="color:var(--open)">[GUESS threshold]</span>
+trend(gaps)   = INCREASING | flat | DECREASING   over the last 2 rounds
+worth(g)      &hArr; importance(g) &ge; MIN_IMPORTANCE
+              AND NOT stuck(g)
+              AND remaining &ge; cost(round) + cost(acting_on_result)
+stuck(g)      &hArr; age(g) &ge; 3 AND |attempted_by(g)| &ge; 2 AND closed_last_round == 0</pre>
+<div class="note"><b>CLOSE vs REFORMULATE is decided by a free signal.</b> <code>jaccard(query&#8345;, query&#8345;&#8331;&#8321;) &ge; 0.70</code> &rarr; the <i>question</i> is the defect, not the lever. <b>Measured: 24.5% of consecutive rag queries within a turn are near-duplicate</b> &mdash; still the H0036 pattern a month after the protocol written to stop it.</div>
+<div class="note"><b>The stuck rule.</b> <code>age(g) &ge; 3 AND |attempted_by| &ge; 2 AND closed_last_round == 0</code> &rarr; <b>change the lever, not another round of the same.</b> Measured: fires on <b>182 of 837</b> multi-round turns, and <b>66.7% of the turn happens after it says stop</b> &mdash; 88.6s average. <span class="tag t-open">thresholds are GUESSES</span> calibrated on unnamed strings; re-derive on real ids first.</div>
+</div>
+
+<div class="arrow">&darr;</div>
+
+<div class="stage">
+<h3>6 &middot; NARROW &mdash; choose the exit mode <span class="tag t-new">NEW</span></h3>
+<div class="own"><b>module</b> <code>app/pipeline/v2/</code> &nbsp;·&nbsp; <b>owner</b> <b>Governor</b></div>
+<pre>if exception:                                    ERROR
+elif no open gap with importance &ge; MIN:         COMPLETE
+elif all(attempt_ran_and_returned_nothing(g)):   CAPABILITY
+else:                                            BUDGET</pre>
+<table>
+<tr><th>exit</th><th>the user is told</th><th>continuation</th></tr>
+<tr><td><b>COMPLETE</b></td><td>the answer. <b>Nothing about the promise</b></td><td>no</td></tr>
+<tr><td><b>BUDGET</b></td><td><i>&ldquo;a, b, c established; x, y, z open &mdash; I ran out of time&rdquo;</i></td><td><b>yes</b>, and cheap</td></tr>
+<tr><td><b>CAPABILITY</b></td><td><i>&ldquo;I have no source for x&rdquo;</i></td><td><b>NO</b></td></tr>
+<tr><td><b>ERROR</b></td><td><i>&ldquo;something failed on our side&rdquo;</i></td><td>yes &mdash; <b>gap list not authoritative</b></td></tr>
+</table>
+<div class="note"><span class="tag t-open">OPEN &mdash; hazard 9</span> <b>CAPABILITY cannot currently be detected for ~34 MCP tools.</b> <code>_is_zero_result</code> needs <code>no_sources</code> <i>and</i> an empty sources list, but the MCP adapter attaches a <b>self-citing <code>SourceRef</code> on success</b> &mdash; so the escape hatch is always satisfied. Such a turn would exit <b>BUDGET</b> and <b>offer a continuation that can only fail again.</b> <b>Fix: <code>attempted_by</code> records the payload check, not the tool''s success flag</b>, and a self-citing source counts as zero.</div>
+</div>
+
+<div class="arrow">&darr;</div>
+
+<div class="stage">
+<h3>7 &middot; VALIDATE &mdash; usually skipped <span class="tag t-new">NEW</span></h3>
+<div class="own"><b>module</b> <code>integrator_critic</code> / <code>post_run_adjudication.py</code> &nbsp;·&nbsp; <b>owner</b> Chat seat + Eval</div>
+<pre>run_validate &hArr; remaining &ge; cost(validate) + cost(one_fix_round)
+             AND quality_uncertain()</pre>
+<div class="note"><b>Never a mode test.</b> <code>agentic</code> was a proxy for expected <i>difficulty</i>, which is a forecast. <b>The useful signal is disagreement:</b> high tool scores + low confidence = a <b>prompt</b> lever; <b>low scores + high confidence = the dangerous quadrant, and the one case worth buying.</b> <b>A verdict you cannot act on is pure cost</b> &mdash; so reserve the fix round, not just the look.</div>
+</div>
+
+<div class="arrow">&darr;</div>
+
+<div class="stage">
+<h3>8 &middot; COMMUNICATE <span class="tag t-new">NEW</span></h3>
+<div class="own"><b>module</b> <code>react.communicate</code> block <i>or</i> <code>app/stages/integrate.py</code> &nbsp;·&nbsp; <b>owner</b> LLM Agent (blocks) + Chat seat (integrate)</div>
+<pre>use_enricher &hArr; rounds_used &gt; 1 OR tools_used &gt; 1</pre>
+<table>
+<tr><th>turn shape</th><th>path</th><th>cost</th></tr>
+<tr><td>1 round, 1 tool &mdash; <b>82% of turns</b></td><td><b>react writes the final answer</b></td><td>&mdash;</td></tr>
+<tr><td>many rounds / tools</td><td>enricher consolidates</td><td><b>+5.2s p50 / 10.3s p90</b> and ~4,028 tok</td></tr>
+</table>
+<div class="note"><b>react''s 837 chars is its instructed target, not its ceiling</b> &mdash; <code>react.format_rules</code> says <i>&ldquo;2&ndash;4 short bullet points (each 10&ndash;25 words)&rdquo;</i>. It needs a <b>second output mode</b>, not a bigger prompt. On a 13s promise, skipping the enricher returns <b>40% of the budget</b> on the turns that are the overwhelming majority.</div>
+</div>
+
+<div class="arrow">&darr;</div>
+
+<div class="stage">
+<h3>9 &middot; PUBLISH <span class="tag t-live">LIVE</span></h3>
+<div class="own"><b>module</b> <code>app/pipeline/orchestrator.py</code> &nbsp;·&nbsp; <b>owner</b> Chat seat</div>
+<div class="where">orchestrator.py:1379 _publish_completed &mdash; 8 call sites, 2 reachable terminals, 1 dead</div>
+<div class="clock"><b>published_at</b> &mdash; the promise clock stops.</div>
+</div>
+
+<div class="arrow">&darr;<b>finally &mdash; ONE site, all exits</b></div>
+
+<div class="stage">
+<h3>10 &middot; SETTLE <span class="tag t-live">LIVE</span> <span class="tag t-new">+ gaps, exit_mode</span></h3>
+<div class="own"><b>module</b> <code>app/pipeline/react/promise.py</code> &nbsp;·&nbsp; <b>owner</b> <b>Governor</b></div>
+<div class="where">run_pipeline outermost finally &mdash; never inside a publish function</div>
+<ul>
+<li><code>turn_attestations</code> &mdash; promised <b>and</b> delivered, side by side, <b>inline not by reference</b></li>
+<li><code>thread_gaps</code> &mdash; written <b>once</b>, here. An ERROR turn''s gaps land <b>marked provisional</b></li>
+</ul>
+<div class="note"><b>Why the finally and not the publish functions.</b> There are <b>8 publish call sites across 2 reachable terminals</b>, plus an early <code>return</code> on empty payload, plus <b>one terminal with zero callers</b> that survived a 2,181-line refactor because a docstring and three green tests both vouched for it. <b>A turn that failed is the most valuable attestation there is, and it is exactly the one that goes missing when the emit sits on the success path.</b></div>
+</div>
+
+<div class="arrow">&darr;<b>fire-and-forget &mdash; OUTSIDE the promise</b></div>
+
+<div class="stage">
+<h3>11 &middot; POST-RUN <span class="tag t-live">LIVE</span></h3>
+<div class="own"><b>module</b> <code>app/services/post_run_adjudication.py</code> &nbsp;·&nbsp; <b>owner</b> Chat seat + Eval</div>
+<div class="where">schedule_post_run_adjudication &mdash; &ldquo;does not block the worker&rdquo;</div>
+<p style="font-size:.82rem;margin:.3rem 0 0">Critic 9.6s p50 / 16.9s p90, follow-up tasks, eval. <b>None of it is in the latency budget</b> &mdash; which is why the 9.6s critic never had to fit inside a 13s promise.</p>
+</div>
+
+<h2>Ownership map</h2>
+<table>
+<tr><th>module</th><th>lives in</th><th>owner</th><th>contract</th><th>state</th></tr>
+<tr><td><b>Promise + attestation</b></td><td><code>react/promise.py</code></td><td><b>Governor</b></td><td>&mdash; it <i>is</i> the contract</td><td><span class="tag t-live">LIVE</span></td></tr>
+<tr><td><b>Gap ledger</b></td><td><code>thread_gaps</code> (067)</td><td><b>Governor</b></td><td>read at state_load, written once at settle</td><td><span class="tag t-new">NEW</span></td></tr>
+<tr><td><b>Posture machine</b></td><td><code>app/pipeline/v2/</code></td><td><b>Governor</b></td><td>issues <code>Directive</code></td><td><span class="tag t-new">NEW</span></td></tr>
+<tr><td><b>Tool exposure</b></td><td><code>mobius-tool-manifest</code></td><td>Tool Manifest</td><td><code>estimate()</code> &rarr; offer <b>or refuse</b></td><td><span class="tag t-live">LIVE</span></td></tr>
+<tr><td><b>Prompt blocks</b></td><td><code>prompt_blocks</code> / <code>prompt_compositions</code></td><td>LLM Agent</td><td><code>APPLIES_WHEN</code> &middot; <code>estimate()</code> &middot; <code>AFFECTS</code></td><td><span class="tag t-live">LIVE</span></td></tr>
+<tr><td><b>Model selection</b></td><td><code>services/model_registry.py</code></td><td>llm_manager</td><td>governor <b>bounds</b>, bandit <b>chooses</b></td><td><span class="tag t-live">latency only</span></td></tr>
+<tr><td><b>React executor</b></td><td><code>react_loop.py</code> &rarr; v2</td><td><b>Governor</b> builds &middot; Chat grades</td><td>pure: prompt + tools + model &rarr; answer, evidence, gaps</td><td><span class="tag t-new">NEW</span></td></tr>
+<tr><td><b>Enricher / card</b></td><td><code>stages/integrate.py</code></td><td>Chat seat</td><td>consolidates when <code>rounds&gt;1 OR tools&gt;1</code></td><td><span class="tag t-live">LIVE</span></td></tr>
+<tr><td><b>Critic</b></td><td><code>post_run_adjudication.py</code></td><td>Chat + Eval</td><td>fire-and-forget &mdash; <b>outside the promise</b></td><td><span class="tag t-live">LIVE</span></td></tr>
+<tr><td><b>Round records</b></td><td><code>turn_rounds</code></td><td><b>Governor</b></td><td><b>no sampling column</b> &mdash; its absence is the guarantee</td><td><span class="tag t-new">NEW</span></td></tr>
+</table>
+<div class="note"><b>The uniform contract, and the rule under it.</b> <code>estimate(inputs) &rarr; {latency_ms, cost_c, confidence}</code> &middot; <code>run(inputs, directive)</code> <b>pure, clock is an input</b> &middot; <code>AFFECTS</code> signed per term &middot; <code>PRECONDITIONS</code>. <b>A module the governor cannot price cannot be budgeted</b> &mdash; <i>&ldquo;is one more round worth it?&rdquo;</i> is unanswerable if a component&rsquo;s cost is learned only by paying it.</div>
+
+<h2>Conformance &mdash; the formulas that grade it</h2>
+<pre>kept        &hArr; delivered &le; promised
+in_band     &hArr; delivered &le; promised + band          <span style="color:var(--dim)">three outcomes, not a boolean</span>
+queue_wait  = delivered_latency_s &minus; worker_latency_s  <span style="color:var(--dim)">derived, never stored</span>
+
+v2 phase advances &hArr; over &ge;200 turns, ALL of:
+    in_band(v2) &ge; in_band(v1)          same tier, same window
+    no new breach class
+    turns == rows  AND  dupes == 0  AND  queue_wait &ge; 0 on every row
+    CAPABILITY_rate(v2) &le; CAPABILITY_rate(v1)      &larr; v2 stopped reaching tools
+    gaps_closed_per_turn(v2) &ge; v1                   &larr; fewer answers for better latency
+    unknown_outcomes == 0</pre>
+<div class="note"><b>Why those last two are the gate and the rest is the dashboard.</b> <b>Every other metric improves when v2 does less.</b> Latency, cost and conformance all move the right way if v2 quietly stops reaching tools. <b>Only those two move the wrong way</b> &mdash; which is what makes them the real test.</div>
+
+<h2>What the two clocks measure</h2>
+<pre>posted_at ────────────────────────────────────────────── published_at
+   │            │                                    │
+   │  queue     │  worker: t0_start ─── duration_ms ─┘
+   │  wait      │
+   └── accept ──┘        delivered_latency_s = published_at − posted_at   ← THE PROMISE
+                         worker_latency_s    = duration_ms                ← the old number
+                         queue_wait          = delivered − worker         ← derived, never stored</pre>
+<div class="note"><b>Three things must hold on every row.</b> <code>queue_wait &ge; 0</code> &mdash; a negative means the two clocks were mixed and the wiring is wrong. <code>turns == rows</code> &mdash; the finally fired exactly once. And <code>delivered_cost_c</code> is <b>null, never 0.0</b> &mdash; a zero is a step-1 failure, not a cheap turn.</div>
+</div>
