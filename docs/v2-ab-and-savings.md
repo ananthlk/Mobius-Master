@@ -125,6 +125,50 @@ so without the column the comparison cannot tell which arm produced which row.
 
 ---
 
+## 4a · DECLARED KNOWN-WRONG BASELINE — published before the numbers exist
+
+**The grader must declare the known-wrong baseline before measuring against it,
+or correct behaviour gets scored as failure.** The chat seat''s category, arriving
+from the grading side, and this is the first entry.
+
+### v1 defect: a gathering round is given a synthesize prompt
+
+`[READ]` verified independently, three facts:
+
+| | |
+|---|---|
+| `react_loop.py:4724` | `_pp_pre_state` hardcodes **`proposes_complete=False`** |
+| `governor.py:191` | the `:197` extend (*"quality issue flagged"*) sits **inside** `if state.proposes_complete:` |
+| ⟹ | **every PRE-ROUND `extend` is necessarily the `:209` path — still gathering evidence** |
+
+And `directive_to_agent_role("extend") → "synthesize"` selects the composition.
+
+> **A round that is still gathering evidence is given a synthesize prompt.**
+
+**Same bucket and same shape as the depth bug Ananth caught live on 2026-08-04**
+(*"feels like the fast mode is not triggering right"* — `consolidate` wrongly
+getting `thinking`). **Depth was fixed by going direct from directive;
+composition still routes through `agent_role` and still carries it.**
+
+### Consequence for grading, binding
+
+> **On `:209` extend rounds, a downstream behavioural difference is v2
+> CORRECTING v1, not v2 regressing. It must not be counted against v2''s exit
+> criteria.**
+
+`[DESIGN]` **Without this declared in advance, the grader would have scored v2
+being right as a regression** — and the more correct v2 was, the worse it would
+have scored. **That is the failure mode this whole section exists to prevent**,
+and it is the mirror of the hazard register: the register says what a rewrite
+would lose, this says what the baseline already gets wrong.
+
+**Encoded, not asserted:** `test_the_197_extend_path_is_unreachable_pre_round`
+fails if the pre-round state ever proposes completion — mutation-checked by
+flipping it. If that premise stops holding, the exemption stops being valid and
+the test says so.
+
+---
+
 ## 5 · Reading the result
 
 **Stop and investigate on ANY of:**

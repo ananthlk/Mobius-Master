@@ -74,6 +74,20 @@ doing exactly what §7a forbids.
 | 16 | wrote `AFFECTS = {quality +, latency −, cost −}` for tool exposure | **two-thirds evidenced.** The 93.8% controls for token reduction, not for picking the right tools — and **there are zero golden fixtures.** My own charter quoted their *"the ranking is not yet a win at all"* two lines below it | **Tool Manifest** | an assumption in the same braces as two measurements, borrowing their credibility |
 | 17 | *"I write the criteria; you read the result"* | **an author writing their own pass criteria is the same defect one level up.** Independent reading does not help if the bar can move to meet the build | **Chat seat** | would have made the whole v2 safety argument circular |
 
+| 18 | cited `_DIRECTIVE_TO_AGENT_ROLE` as *"documented KNOWN LOSSY"* to justify not aligning with it — **in a commit message and a source comment** | **the docstring belongs to `agent_role_to_reasoning_depth()` at `governor.py:275`**, a different function, and the depth path was routed around it in 2026-08-04. `_DIRECTIVE_TO_AGENT_ROLE` is live and unflagged | **Chat seat** | right decision, wrong citation — **published in code** |
+| 19 | wrote a test asserting an ordering between two reason strings in `governor.py` | `.index()` found the **module docstring copy**, not the code. The claim was positional and my proxy read the prose | **me**, when it failed | a red test for the wrong reason |
+
+**Entry 18 is entry 9 again, one level worse.** Entry 9 was a correct conclusion
+held for a weak reason. This is a correct conclusion held for a **false** one —
+and unlike entry 9, **I wrote it into the source and the commit message**, where
+the next reader inherits it. The decision survived on my *second* reason; the
+first was an invention that happened to point the right way.
+
+`[DESIGN]` **A citation is a claim.** I verified that the words existed and did
+not verify what they were attached to — which is the same shape as entry 15
+(a real measurement of the wrong subject) and, at bottom, as every
+*what-varied* error in this ledger.
+
 **Entry 15 is a provenance error I have been policing in others all day.** I
 verified a number, and then attached it to a claim it did not support. **A real
 measurement of the wrong subject is harder to catch than a fabricated one**,
