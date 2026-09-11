@@ -25,13 +25,32 @@ OUT = ROOT / "docs" / "coverage" / "tool_coverage_product.json"
 # Axes product_help_search has no business answering. One exclusion with a
 # reason beats a hundred `absent` rows, and it is the fix for the tool ranking
 # #2 on "what is the auth requirement for bh therapy".
+# kind: not_applicable = this axis does not govern our predicate, do NOT demote.
+#       not_implemented  = the axis IS material to our predicate and we hold
+#                          nothing, so DO demote.
+# All four are not_applicable. The predicate is "how a documented Mobius product
+# surface works"; none of these axes governs that, so a question mentioning one
+# is not a question we are wrongly failing to answer -- it is somebody else's
+# question. See the payor note for the one case that argues otherwise and why it
+# is a COVERAGE gap rather than an axis claim.
 DOES_NOT_SERVE = [
-    ("payor", "product docs describe Mobius surfaces; they say nothing about payer policy, "
-              "coverage rules or prior authorisation. 'auth' in a user question means "
-              "prior-authorisation far more often than the Auth doc page."),
-    ("service_line", "no clinical or billing service-line facts in the product corpus"),
-    ("carc", "denial codes are the appeals tools' question, not the docs'"),
-    ("provider", "no roster, NPI or credentialing facts in the product corpus"),
+    ("payor", "not_applicable",
+     "product docs describe Mobius surfaces; they say nothing about payer policy, coverage "
+     "rules or prior authorisation. 'auth' in a user question means prior-authorisation far "
+     "more often than the Auth doc page. ONE CASE ARGUES THE OTHER WAY and is deliberately "
+     "NOT handled here: 'does Mobius support Sunshine Health?' is a product-capability "
+     "question keyed on a payor, a user WOULD reasonably expect us to answer it, and we hold "
+     "nothing. That is a missing PAGE, not a claim about the payor axis -- it belongs as an "
+     "absent coverage row under `feature`, and marking the whole axis not_implemented to "
+     "capture it would demote us on every payer-policy question, which is the over-gating "
+     "this field was split to stop."),
+    ("service_line", "not_applicable",
+     "no clinical or billing service-line facts in the product corpus; a service-line "
+     "question is not a question about how a Mobius surface works"),
+    ("carc", "not_applicable",
+     "denial codes are the appeals tools' question, not the docs'"),
+    ("provider", "not_applicable",
+     "no roster, NPI or credentialing facts in the product corpus"),
 ]
 
 UNOWNED = [
@@ -92,7 +111,7 @@ def main() -> int:
             "predicate": "how a documented Mobius product surface works",
             "values": rows,
             "axes_served": ["feature"],
-            "axes_not_served": [{"axis": a, "why": w} for a, w in DOES_NOT_SERVE],
+            "axes_not_served": [{"axis": a, "kind": k, "why": w} for a, k, w in DOES_NOT_SERVE],
         }],
     }
     OUT.write_text(json.dumps(payload, indent=2) + "\n")

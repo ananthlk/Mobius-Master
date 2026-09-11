@@ -1,8 +1,8 @@
 {
   "source_key": "product_docs",
   "exported_by": "product-awareness (written by mobius-c2, platform seat)",
-  "exported_at": "2026-09-11T02:34:50.447031+00:00",
-  "exporter_rev": "43b0287",
+  "exported_at": "2026-09-11T02:52:52.722022+00:00",
+  "exporter_rev": "cfd7d98",
   "provenance": "declared: derived from corpus/registry.json crossed with deployed services",
   "contract_version": "v1",
   "axis_semantics": "the `feature` axis carries DOC MODULES crossed with deployed services, not a user-facing feature vocabulary -- see taxonomy_ref for which values may be entity-resolved",
@@ -278,18 +278,22 @@
       "axes_not_served": [
         {
           "axis": "payor",
-          "why": "product docs describe Mobius surfaces; they say nothing about payer policy, coverage rules or prior authorisation. 'auth' in a user question means prior-authorisation far more often than the Auth doc page."
+          "kind": "not_applicable",
+          "why": "product docs describe Mobius surfaces; they say nothing about payer policy, coverage rules or prior authorisation. 'auth' in a user question means prior-authorisation far more often than the Auth doc page. ONE CASE ARGUES THE OTHER WAY and is deliberately NOT handled here: 'does Mobius support Sunshine Health?' is a product-capability question keyed on a payor, a user WOULD reasonably expect us to answer it, and we hold nothing. That is a missing PAGE, not a claim about the payor axis -- it belongs as an absent coverage row under `feature`, and marking the whole axis not_implemented to capture it would demote us on every payer-policy question, which is the over-gating this field was split to stop."
         },
         {
           "axis": "service_line",
-          "why": "no clinical or billing service-line facts in the product corpus"
+          "kind": "not_applicable",
+          "why": "no clinical or billing service-line facts in the product corpus; a service-line question is not a question about how a Mobius surface works"
         },
         {
           "axis": "carc",
+          "kind": "not_applicable",
           "why": "denial codes are the appeals tools' question, not the docs'"
         },
         {
           "axis": "provider",
+          "kind": "not_applicable",
           "why": "no roster, NPI or credentialing facts in the product corpus"
         }
       ]
