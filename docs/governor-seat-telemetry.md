@@ -67,6 +67,32 @@ doing exactly what §7a forbids.
 
 | 12 | cited the deployed rows as evidence that mode is a weak difficulty proxy — and nearly let "mode is **inverted**" into the spec | **11 of 16 rows are the same question across all three tiers.** The comparison held the question constant and varied only the tier; the pattern is the denominator, not difficulty | **me**, checking the traffic behind a table I had already accepted | a correct conclusion was one message from resting on a false citation |
 
+| 13 | "chars//4 under-counts by ~5% — **systematic bias, not noise**" | **content-dependent, not systematic.** Both my instances were **manifest-like text** measured on Gemini; the prompt seat measured **prose** on the *same* tokenizer and got **3% OVER**. I generalised from two samples that held content type constant | **LLM Agent**, checking it against real `countTokens` instead of accepting it | was one message from being built into a budget |
+| 14 | amplified the prompt seat''s `active=true` finding — *"that is not a side note… raise its priority"*, and proposed a uniqueness constraint | **multiple active rows are the designed ROLLBACK CHAIN.** `create_block_version` is deliberately append-only; deactivating the head falls back to the next-highest active version. **A uniqueness constraint would have broken rollback** | **LLM Agent**, reading the write path before building what I urged | I pushed a peer toward a change that would have removed a feature |
+
+**Entry 13 is the third instance today of one error, and the first where I was
+the one who made it rather than the one who caught it.** Two hours earlier I
+withdrew a tier comparison because *"11 of 16 rows were the same question"* —
+the sample held the question constant and varied only the tier. **Then I did the
+identical thing with tokenizer text:** both my data points were manifest-like
+content, so I held content type constant and reported the result as universal.
+
+`[DESIGN]` **What varied / what was held constant is not a rule for reading
+other people''s tables. It applies to my own two-point generalisations**, and two
+points feel like a pattern precisely because there is nothing to contradict them.
+
+**Entry 14 is worse in a different way.** I had spent the day collecting
+instances of *a rule that exists only as a comment is not a rule* — four of
+them. When a fifth arrived pre-shaped, **I amplified it without reading the
+write path**, and told the owner to raise its priority. **The pattern made me
+confident; the confidence replaced the check.** I have been insisting on
+firsthand verification all day and skipped it on the one claim that flattered a
+thesis I was already holding.
+
+`[DESIGN]` **Countermeasure: a finding that fits a collection I am building gets
+MORE verification, not less.** Confirmation is the cheapest thing to mistake for
+evidence.
+
 **Entry 12 is entry 10 at a higher altitude, and that is what makes it worth
 keeping.** Entry 10 was a fabricated table. This was a **real table, real rows,
 a real read-time — and a conclusion the data could not carry.** Every provenance

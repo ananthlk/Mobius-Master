@@ -7,10 +7,17 @@ each measured, and the only variable is the tool output which we will have to
 wing it for now."*
 
 All figures `[MEASURED]` from `prompt_blocks` / `prompt_compositions` in dev,
-2026-09-10. **Character counts only** — token counts are marked where I have
-them, and I no longer quote chars/4: it under-counted by ~5% in two independent
-instances today (mine and Tool Manifest's), in the same direction, which makes
-it a systematic bias rather than a coincidence.
+2026-09-10. **Character counts only.**
+
+> **CORRECTION.** An earlier version said chars/4 *"under-counted by ~5% in two
+> independent instances, which makes it a systematic bias."* **Withdrawn.** The
+> prompt seat measured it against Gemini's real `countTokens` on prose and got
+> **3% OVER** — opposite sign, same tokenizer. **Both of my instances were
+> manifest-like text**, so I held content type constant across two samples and
+> reported the result as universal. The bias is **content-dependent**, not
+> systematic, and its direction is not predictable from the method alone.
+> Retained rather than deleted: this is the same *what-varied* error I withdrew
+> a tier comparison for two hours earlier.
 
 ---
 
