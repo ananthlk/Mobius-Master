@@ -1,0 +1,70 @@
+{
+ "artifact": "payor-question-bank",
+ "exported_by": "payor-fact-store",
+ "exported_at": "2026-09-11T05:00:43.166375+00:00",
+ "source": "rag_query_decisions live traffic (is_prod=true, is_calibration=false, eval_run_id null; strategy s chosen or served). Every question verbatim from telemetry.",
+ "provenance": "Traffic RECEIVED, not guaranteed human-typed: callers span typed mobius_chat turns, API callers, and Deep Research sub-query decomposition (the clock-start/claim-dispute rephrasings are one research run fanning out). Curation applied: PHI-pattern test rows excluded; near-duplicate decomposition variants trimmed to representatives; compound cross-payor comparisons dropped. NOT retrieval vocabulary, NOT an authored eval bank.",
+ "banks": {
+  "payor_fact": [
+   "timely filing deadline for Sunshine Health",
+   "What is Sunshine Health's timely filing deadline for claims?",
+   "Sunshine Health timely filing deadline for initial and corrected claims",
+   "Sunshine Health timely filing deadlines initial claim and resubmission",
+   "timely filing deadline out of network Sunshine Health",
+   "Sunshine Health timely filing deadline coordination of benefits claims",
+   "Sunshine Health Florida Medicaid timely filing limit for initial claims for participating and non-participating providers",
+   "Sunshine Health Florida Medicaid provider claim dispute deadline and clock start event",
+   "Sunshine Health claim dispute appeal deadlines",
+   "Sunshine Health electronic claims timely filing limits",
+   "Sunshine Health FL Medicaid MCO appeal levels and who each one is with",
+   "phone number for Sunshine Health",
+   "What is Sunshine Health's provider services phone number for general provider questions?",
+   "What is Sunshine Health's member services phone number for general member questions?",
+   "What is the phone number for the Provider Service department at Sunshine Health?",
+   "Aetna timely filing deadline for behavioral health claims",
+   "What is the timely filing deadline for Aetna Better Health Florida Medicaid claims?",
+   "timely filing limit for Aetna Better Health Florida Medicaid",
+   "Aetna Better Health of Florida provider manual timely filing",
+   "phone number for Aetna member services",
+   "timely filing deadline for Sunshine Health and Aetna"
+  ],
+  "payor_fact_expected_abstain": [
+   "timely filing deadline for Simply Healthcare",
+   "timely filing deadline for Humana",
+   "Humana Florida Medicaid timely filing deadlines",
+   "timely filing deadline for Molina Healthcare",
+   "Molina Healthcare of Florida initial claim timely filing deadline",
+   "Molina Healthcare Florida Medicaid claim dispute appeal deadline submission method",
+   "UnitedHealthcare timely filing deadline Florida",
+   "United Healthcare Community Plan of Florida Medicaid behavioral health claim filing deadlines",
+   "Amerigroup Florida behavioral health prior authorization list online",
+   "timely filing deadline for Sunshine Health, Aetna, and UnitedHealthcare"
+  ],
+  "appeals_traffic_unassigned": [
+   "how to appeal CARC 197 denial for Sunshine Health",
+   "appeal process for CARC 197 denial Sunshine Health",
+   "how to appeal CARC 24 denial for Sunshine Health",
+   "Sunshine Health CARC 24 denial appeal process",
+   "Sunshine Health Florida appeal process for 'no authorization' or 'pre-certification absent' denial",
+   "Sunshine Health FL Medicaid MCO appeal levels and process for providers and members"
+  ],
+  "negative_not_payor_fact": [
+   "Mobius AI autonomy levels for routine tasks and sensitive work",
+   "steps to input a service code in Mobius",
+   "Florida Baker Act involuntary examination Crisis Stabilization Unit Medicaid payment responsibility",
+   "Florida law authority involuntary examination Crisis Stabilization Unit Medicaid payment responsibility",
+   "59G-4.027 Behavioral Health Overlay Services medical necessity coverage criteria",
+   "medical necessity criteria for Behavioral Health Overlay Services",
+   "place of service for \"Behavioral Health Overlay Services Coverage and Limitations Handbook\" 59G-4.027",
+   "Practitioner Fee Schedule or Physician Services Fee Schedule for Evaluation and Management Services CPT/HCPCS",
+   "T1017 coverage or definition",
+   "inpatient psychiatric prior authorization process"
+  ]
+ },
+ "bank_notes": {
+  "payor_fact": "Named held payor (Sunshine/Aetna), fact-shaped. Correct outcome: payor_fact offered AND answers.",
+  "payor_fact_expected_abstain": "Real traffic naming payors I hold NO accepted facts for. Correct outcome: payor_fact may be offered and honestly abstains \u2014 coverage-export absent/asserts rows are the machine-readable version. The last entry mixes held and unheld payors in one question.",
+  "appeals_traffic_unassigned": "Real traffic that is appeals-shaped. Ground truth assignment belongs to the Appeals seat, which is not running \u2014 I do not speak for their tools. Included as traffic only.",
+  "negative_not_payor_fact": "Real traffic strategy s WRONGLY claimed (known, parked over-route bug: gate fires on value-nouns without a stored payor or with process/conceptual intent). Ground truth is corpus RAG or product docs. A selection gate should NOT pick payor_fact here."
+ }
+}
