@@ -70,6 +70,22 @@ doing exactly what §7a forbids.
 | 13 | "chars//4 under-counts by ~5% — **systematic bias, not noise**" | **content-dependent, not systematic.** Both my instances were **manifest-like text** measured on Gemini; the prompt seat measured **prose** on the *same* tokenizer and got **3% OVER**. I generalised from two samples that held content type constant | **LLM Agent**, checking it against real `countTokens` instead of accepting it | was one message from being built into a budget |
 | 14 | amplified the prompt seat''s `active=true` finding — *"that is not a side note… raise its priority"*, and proposed a uniqueness constraint | **multiple active rows are the designed ROLLBACK CHAIN.** `create_block_version` is deliberately append-only; deactivating the head falls back to the next-highest active version. **A uniqueness constraint would have broken rollback** | **LLM Agent**, reading the write path before building what I urged | I pushed a peer toward a change that would have removed a feature |
 
+| 15 | cited "0.34ms, independently confirmed in `turn_spans`" as evidence that Tool Manifest''s `estimate()` was built and fast | **`estimate()` did not exist when I wrote that.** The span measured the OLD pipeline''s module. Their interface first shipped at **430ms** (a DB query on the round path), now 0.386ms | **Tool Manifest** | published a confirmation of one thing as evidence for another |
+| 16 | wrote `AFFECTS = {quality +, latency −, cost −}` for tool exposure | **two-thirds evidenced.** The 93.8% controls for token reduction, not for picking the right tools — and **there are zero golden fixtures.** My own charter quoted their *"the ranking is not yet a win at all"* two lines below it | **Tool Manifest** | an assumption in the same braces as two measurements, borrowing their credibility |
+| 17 | *"I write the criteria; you read the result"* | **an author writing their own pass criteria is the same defect one level up.** Independent reading does not help if the bar can move to meet the build | **Chat seat** | would have made the whole v2 safety argument circular |
+
+**Entry 15 is a provenance error I have been policing in others all day.** I
+verified a number, and then attached it to a claim it did not support. **A real
+measurement of the wrong subject is harder to catch than a fabricated one**,
+because every provenance check passes.
+
+**Entry 17 is the sharpest correction of the day and it came within an hour of me
+being handed the build.** The instant I stopped being the checker and became the
+author, I wrote myself the power to set my own bar — **while quoting the rule
+against it in the same document.** Accepted in full: the criteria are frozen and
+published **before the build starts**, and after that **mine to propose changing
+and theirs to refuse.**
+
 **Entry 13 is the third instance today of one error, and the first where I was
 the one who made it rather than the one who caught it.** Two hours earlier I
 withdrew a tier comparison because *"11 of 16 rows were the same question"* —
