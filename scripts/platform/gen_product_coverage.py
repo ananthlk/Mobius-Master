@@ -112,8 +112,39 @@ def main() -> int:
                          "rows_present": 1, "rows_sourced": 1,
                          "note": "doc module with no declared feature mapping"})
 
+    # Merge the taxonomy decision into every row. Without this the export is a
+    # DOC-MODULE list wearing the label "feature", which is exactly how the
+    # Lexicon seat came to seed an entity axis from it and got ordinary words
+    # ("payor", "auth") firing as product entities. Acknowledging that in a
+    # sibling file was not enough: the artefact a consumer pulls has to carry
+    # the warning, or the next seat repeats the mistake from the same source.
+    tax_path = ROOT / "docs" / "coverage" / "product_taxonomy.json"
+    tax = {}
+    if tax_path.exists():
+        tax = {t["value"]: t for t in json.loads(tax_path.read_text())["rows"]}
+    for r in rows:
+        t = tax.get(r["value"])
+        if t is None:
+            # Unknown to the taxonomy -> refuse to imply it is safe to resolve.
+            r["entity_resolvable"] = None
+            r["entity_note"] = "no taxonomy decision; do NOT seed an entity axis from this row"
+        else:
+            r["entity_resolvable"] = t["entity_resolvable"]
+            if t.get("alias"):
+                r["entity_slug"] = t["slug"]
+                r["bare_token_must_not_fire"] = t["bare_token_must_not_fire"]
+            elif t["entity_resolvable"]:
+                r["entity_slug"] = t["slug"]
+
     payload = {
         "source_key": "product_docs",
+        "axis_semantics": (
+            "rows are DOC MODULES crossed with deployed services -- NOT a user-facing "
+            "feature vocabulary. 'feature' is kept only for contract compatibility. "
+            "Read entity_resolvable before using any row as an entity; 19 of 32 are "
+            "either doc topics or bare tokens that collide with RCM vocabulary."
+        ),
+        "taxonomy_ref": "docs/coverage/product_taxonomy.json",
         "exported_by": "mobius-c2 (platform seat) on behalf of product-awareness",
         "exported_at": datetime.datetime.now(datetime.UTC).isoformat(),
         "exporter_rev": subprocess.run(["git", "rev-parse", "--short", "HEAD"],
@@ -122,6 +153,9 @@ def main() -> int:
             "asserts is never emitted -- it needs a page-by-page read against shipped behaviour",
             "registry.json updated_at 2026-09-07; corpus freshness is not verified here",
             "not the PA seat's own export; supersede when that seat produces one",
+            "the 'feature' axis label was MY MISLABEL -- these are doc modules; it caused a "
+            "real entity collision in j:product before it was caught (payor/auth/about fired "
+            "as product entities). entity_resolvable is the field to trust, not the axis name.",
         ],
         "rows": rows,
     }

@@ -1,12 +1,15 @@
 {
   "source_key": "product_docs",
+  "axis_semantics": "rows are DOC MODULES crossed with deployed services -- NOT a user-facing feature vocabulary. 'feature' is kept only for contract compatibility. Read entity_resolvable before using any row as an entity; 19 of 32 are either doc topics or bare tokens that collide with RCM vocabulary.",
+  "taxonomy_ref": "docs/coverage/product_taxonomy.json",
   "exported_by": "mobius-c2 (platform seat) on behalf of product-awareness",
-  "exported_at": "2026-09-10T18:16:22.922604+00:00",
-  "exporter_rev": "b86ce54",
+  "exported_at": "2026-09-11T02:02:40.406121+00:00",
+  "exporter_rev": "65c09fb",
   "caveats": [
     "asserts is never emitted -- it needs a page-by-page read against shipped behaviour",
     "registry.json updated_at 2026-09-07; corpus freshness is not verified here",
-    "not the PA seat's own export; supersede when that seat produces one"
+    "not the PA seat's own export; supersede when that seat produces one",
+    "the 'feature' axis label was MY MISLABEL -- these are doc modules; it caused a real entity collision in j:product before it was caught (payor/auth/about fired as product entities). entity_resolvable is the field to trust, not the axis name."
   ],
   "rows": [
     {
@@ -15,7 +18,8 @@
       "status": "unknown",
       "rows_present": 1,
       "rows_sourced": 1,
-      "note": "documented but no deployed service resolved (mapped: None)"
+      "note": "documented but no deployed service resolved (mapped: None)",
+      "entity_resolvable": false
     },
     {
       "axis": "feature",
@@ -23,7 +27,9 @@
       "status": "absent",
       "rows_present": 0,
       "rows_sourced": 0,
-      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable",
+      "entity_resolvable": true,
+      "entity_slug": "answer_cache"
     },
     {
       "axis": "feature",
@@ -31,7 +37,10 @@
       "status": "absent",
       "rows_present": 0,
       "rows_sourced": 0,
-      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable",
+      "entity_resolvable": true,
+      "entity_slug": "appeals_module",
+      "bare_token_must_not_fire": "appeals"
     },
     {
       "axis": "feature",
@@ -39,7 +48,8 @@
       "status": "unknown",
       "rows_present": 2,
       "rows_sourced": 2,
-      "note": "documented but no deployed service resolved (mapped: None)"
+      "note": "documented but no deployed service resolved (mapped: None)",
+      "entity_resolvable": false
     },
     {
       "axis": "feature",
@@ -47,7 +57,8 @@
       "status": "unknown",
       "rows_present": 1,
       "rows_sourced": 1,
-      "note": "documented but no deployed service resolved (mapped: None)"
+      "note": "documented but no deployed service resolved (mapped: None)",
+      "entity_resolvable": false
     },
     {
       "axis": "feature",
@@ -55,7 +66,10 @@
       "status": "covered",
       "rows_present": 1,
       "rows_sourced": 1,
-      "note": "documented and deployed; asserts-vs-covered needs a human read"
+      "note": "documented and deployed; asserts-vs-covered needs a human read",
+      "entity_resolvable": true,
+      "entity_slug": "chat_module",
+      "bare_token_must_not_fire": "chat"
     },
     {
       "axis": "feature",
@@ -63,7 +77,10 @@
       "status": "covered",
       "rows_present": 1,
       "rows_sourced": 1,
-      "note": "documented and deployed; asserts-vs-covered needs a human read"
+      "note": "documented and deployed; asserts-vs-covered needs a human read",
+      "entity_resolvable": true,
+      "entity_slug": "credentialing_module",
+      "bare_token_must_not_fire": "credentialing"
     },
     {
       "axis": "feature",
@@ -71,7 +88,9 @@
       "status": "absent",
       "rows_present": 0,
       "rows_sourced": 0,
-      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable",
+      "entity_resolvable": true,
+      "entity_slug": "doc_reader"
     },
     {
       "axis": "feature",
@@ -79,7 +98,9 @@
       "status": "unknown",
       "rows_present": 1,
       "rows_sourced": 1,
-      "note": "documented but no deployed service resolved (mapped: None)"
+      "note": "documented but no deployed service resolved (mapped: None)",
+      "entity_resolvable": true,
+      "entity_slug": "document_viewer"
     },
     {
       "axis": "feature",
@@ -87,7 +108,8 @@
       "status": "unknown",
       "rows_present": 1,
       "rows_sourced": 1,
-      "note": "documented but no deployed service resolved (mapped: None)"
+      "note": "documented but no deployed service resolved (mapped: None)",
+      "entity_resolvable": false
     },
     {
       "axis": "feature",
@@ -95,7 +117,10 @@
       "status": "covered",
       "rows_present": 1,
       "rows_sourced": 1,
-      "note": "documented and deployed; asserts-vs-covered needs a human read"
+      "note": "documented and deployed; asserts-vs-covered needs a human read",
+      "entity_resolvable": true,
+      "entity_slug": "browser_extension",
+      "bare_token_must_not_fire": "extension"
     },
     {
       "axis": "feature",
@@ -103,7 +128,10 @@
       "status": "absent",
       "rows_present": 0,
       "rows_sourced": 0,
-      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable",
+      "entity_resolvable": true,
+      "entity_slug": "feedback_widget",
+      "bare_token_must_not_fire": "feedback"
     },
     {
       "axis": "feature",
@@ -111,7 +139,10 @@
       "status": "unknown",
       "rows_present": 1,
       "rows_sourced": 1,
-      "note": "documented but no deployed service resolved (mapped: None)"
+      "note": "documented but no deployed service resolved (mapped: None)",
+      "entity_resolvable": true,
+      "entity_slug": "hipaa_page",
+      "bare_token_must_not_fire": "hipaa"
     },
     {
       "axis": "feature",
@@ -119,7 +150,8 @@
       "status": "unknown",
       "rows_present": 1,
       "rows_sourced": 1,
-      "note": "documented but no deployed service resolved (mapped: None)"
+      "note": "documented but no deployed service resolved (mapped: None)",
+      "entity_resolvable": false
     },
     {
       "axis": "feature",
@@ -127,7 +159,10 @@
       "status": "absent",
       "rows_present": 0,
       "rows_sourced": 0,
-      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable",
+      "entity_resolvable": true,
+      "entity_slug": "interact_module",
+      "bare_token_must_not_fire": "interact"
     },
     {
       "axis": "feature",
@@ -135,7 +170,9 @@
       "status": "covered",
       "rows_present": 1,
       "rows_sourced": 1,
-      "note": "documented and deployed; asserts-vs-covered needs a human read"
+      "note": "documented and deployed; asserts-vs-covered needs a human read",
+      "entity_resolvable": true,
+      "entity_slug": "lexicon"
     },
     {
       "axis": "feature",
@@ -143,7 +180,9 @@
       "status": "absent",
       "rows_present": 0,
       "rows_sourced": 0,
-      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable",
+      "entity_resolvable": true,
+      "entity_slug": "org_intelligence"
     },
     {
       "axis": "feature",
@@ -151,7 +190,9 @@
       "status": "absent",
       "rows_present": 0,
       "rows_sourced": 0,
-      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable",
+      "entity_resolvable": true,
+      "entity_slug": "phi_classifier"
     },
     {
       "axis": "feature",
@@ -159,7 +200,10 @@
       "status": "absent",
       "rows_present": 0,
       "rows_sourced": 0,
-      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable",
+      "entity_resolvable": true,
+      "entity_slug": "payor_module",
+      "bare_token_must_not_fire": "payor"
     },
     {
       "axis": "feature",
@@ -167,7 +211,9 @@
       "status": "absent",
       "rows_present": 0,
       "rows_sourced": 0,
-      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable",
+      "entity_resolvable": true,
+      "entity_slug": "product_awareness"
     },
     {
       "axis": "feature",
@@ -175,7 +221,9 @@
       "status": "covered",
       "rows_present": 1,
       "rows_sourced": 1,
-      "note": "documented and deployed; asserts-vs-covered needs a human read"
+      "note": "documented and deployed; asserts-vs-covered needs a human read",
+      "entity_resolvable": true,
+      "entity_slug": "rag"
     },
     {
       "axis": "feature",
@@ -183,7 +231,8 @@
       "status": "unknown",
       "rows_present": 1,
       "rows_sourced": 1,
-      "note": "documented but no deployed service resolved (mapped: None)"
+      "note": "documented but no deployed service resolved (mapped: None)",
+      "entity_resolvable": false
     },
     {
       "axis": "feature",
@@ -191,7 +240,9 @@
       "status": "unknown",
       "rows_present": 1,
       "rows_sourced": 1,
-      "note": "documented but no deployed service resolved (mapped: None)"
+      "note": "documented but no deployed service resolved (mapped: None)",
+      "entity_resolvable": true,
+      "entity_slug": "response_cards"
     },
     {
       "axis": "feature",
@@ -199,7 +250,8 @@
       "status": "unknown",
       "rows_present": 1,
       "rows_sourced": 1,
-      "note": "documented but no deployed service resolved (mapped: None)"
+      "note": "documented but no deployed service resolved (mapped: None)",
+      "entity_resolvable": false
     },
     {
       "axis": "feature",
@@ -207,7 +259,8 @@
       "status": "absent",
       "rows_present": 0,
       "rows_sourced": 0,
-      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable",
+      "entity_resolvable": false
     },
     {
       "axis": "feature",
@@ -215,7 +268,9 @@
       "status": "absent",
       "rows_present": 0,
       "rows_sourced": 0,
-      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable",
+      "entity_resolvable": true,
+      "entity_slug": "story_ui"
     },
     {
       "axis": "feature",
@@ -223,7 +278,8 @@
       "status": "unknown",
       "rows_present": 1,
       "rows_sourced": 1,
-      "note": "documented but no deployed service resolved (mapped: None)"
+      "note": "documented but no deployed service resolved (mapped: None)",
+      "entity_resolvable": false
     },
     {
       "axis": "feature",
@@ -231,7 +287,9 @@
       "status": "absent",
       "rows_present": 0,
       "rows_sourced": 0,
-      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable",
+      "entity_resolvable": true,
+      "entity_slug": "task_manager"
     },
     {
       "axis": "feature",
@@ -239,7 +297,8 @@
       "status": "absent",
       "rows_present": 0,
       "rows_sourced": 0,
-      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable",
+      "entity_resolvable": false
     },
     {
       "axis": "feature",
@@ -247,7 +306,9 @@
       "status": "unknown",
       "rows_present": 0,
       "rows_sourced": 0,
-      "note": "no doc and no deployed service resolved; needs an owner ruling"
+      "note": "no doc and no deployed service resolved; needs an owner ruling",
+      "entity_resolvable": true,
+      "entity_slug": "vault"
     },
     {
       "axis": "feature",
@@ -255,7 +316,10 @@
       "status": "absent",
       "rows_present": 0,
       "rows_sourced": 0,
-      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable",
+      "entity_resolvable": true,
+      "entity_slug": "vibe_module",
+      "bare_token_must_not_fire": "vibe"
     },
     {
       "axis": "feature",
@@ -263,7 +327,9 @@
       "status": "absent",
       "rows_present": 0,
       "rows_sourced": 0,
-      "note": "deployed, zero docs in the corpus -- nameable, not answerable"
+      "note": "deployed, zero docs in the corpus -- nameable, not answerable",
+      "entity_resolvable": true,
+      "entity_slug": "web_scraper"
     }
   ]
 }
