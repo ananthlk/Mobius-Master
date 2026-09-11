@@ -113,7 +113,7 @@ cannot retroactively rewrite the accuracy history that was about to correct it.
 |---|---|
 | profile test | **four axes** — output contract · evidence posture · failure mode · success test. Match on all four ⇒ one profile with a parameter |
 | profiles | `explore` · `synthesize` · `draft` · `critique` · **`communicate`** |
-| `close` | **a DIRECTIVE, not a posture** `[RULED]`. Directives on EXPLORE: `DISCOVER` · `CLOSE(gap_id)` · `REFORMULATE(gap_id)` |
+| `close` | **a DIRECTIVE, not a posture** `[RULED]`. **Two directives: `DISCOVER` · `CLOSE(gap_id)`** — REFORMULATE folds into CLOSE with `attempted_by` injected (prompt seat, and their reasoning beat mine) |
 | `token_counts` | **built** (066) — `{tokenizer: count}` **map**, absent key = no stored count. 51/51 active blocks |
 | delta at publish | **built** — per-tokenizer `{from,to,delta,pct}`, WARNING on growth |
 | writers | **three collapsed to one** (`publish_block_version`) |

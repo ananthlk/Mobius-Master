@@ -119,7 +119,7 @@ separable from a finding about the turn.
 if not gap_list:                                    return FRAME
 if trend(gaps_open) == INCREASING:                  return EXPLORE/DISCOVER
 if g := best_worth_spending(open_gaps):
-    return EXPLORE/REFORMULATE(g) if repeating(g) else EXPLORE/CLOSE(g)
+    return EXPLORE/CLOSE(g)        # with g.attempted_by injected — see §8
 if open_gaps and budget_nearly_spent:               return NARROW
 if validate_worth_it():                             return VALIDATE
                                                     return COMMUNICATE
@@ -135,11 +135,49 @@ level: 1 gap 24.6% · 2 20.5% · 3 21.7% · 4 23.9%     ← FLAT. the level says
 **Because the list GROWS** — round 1 avg 0.46 → round 3 1.32. The denominator
 moves, so *"% of gaps closed"* is not a percentage.
 
-### 8 · CLOSE vs REFORMULATE — the free signal
+### 8 · REFORMULATE is NOT a third directive — it is `CLOSE(g)` with attempt history
+
+**Prompt seat''s correction, 2026-09-11, applying the four-axis test rather than
+citing it.** DISCOVER and CLOSE(g) differ genuinely on **evidence posture**
+(broad search vs aimed at a named gap). **REFORMULATE does not clear that bar
+against CLOSE** — it is not a different aim, it is **the same aim on a second
+attempt.**
+
+> **The distinguishing fact is not the directive name. It is whether
+> `attempted_by(g)` already has an entry.**
 
 ```python
-repeating(g) ⟺ jaccard(query_n, query_{n-1}) ≥ 0.70        # [GUESS] threshold
+directives = {DISCOVER, CLOSE(gap_id)}          # two, not three
+
+# the governor injects the gap WITH its history; materiality follows from data
+CLOSE(g) ⟹ prompt receives g.attempted_by   → [] : first look, no constraint
+                                            → [...] : the query MUST be
+                                              materially different from these
 ```
+
+**This is strictly better than what I specified**, and for a reason worth
+keeping: **it derives the constraint from data the governor already holds rather
+than from a name the governor asserts.** Fewer moving parts, and the prompt
+never branches on a directive name.
+
+#### The jaccard signal does not disappear — it changes job
+
+I had it **selecting** a directive after the fact. It becomes a **compliance
+check on the outcome**:
+
+```python
+complied(g) ⟺ jaccard(query_n, prior_queries(g)) < 0.70     # [GUESS] threshold
+```
+
+**Prevention and verification are different mechanisms and we need both.**
+Injecting prior attempts *prevents* the shallow retry; measuring overlap
+*verifies* the prevention worked. **A failure now means the instruction was
+ignored** — which is a prompt finding, not a posture decision.
+
+`[MEASURED]` **24.5% of consecutive `rag` queries within a turn are
+near-duplicate**, 52.5% ≥0.50 overlap — still the H0036 pattern a month after the
+protocol written to stop it. **That number is the baseline the compliance check
+should move.**
 
 `[MEASURED]` consecutive `rag` queries **within** a turn: **24.5% ≥0.70,
 52.5% ≥0.50.** Still the H0036 pattern — *"the model''s only real lever was
