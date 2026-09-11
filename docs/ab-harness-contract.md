@@ -97,6 +97,70 @@ is cheapest.
 
 ---
 
+## 5a · What this actually is — the fleet''s only quality instrument
+
+`[RULED]` Ananth, 2026-09-11: *"I don''t imagine this as a one-time thing but as
+a setup that we can capitalize on."*
+
+**Worth stating plainly, because it changes the priority:**
+
+| | state |
+|---|---|
+| golden fixtures, fleet-wide | **zero** — Tool Manifest, verbatim |
+| recall | **no measure** (§8 of the promise) |
+| tool-exposure `AFFECTS.quality` | **UNMEASURED** — corrected today |
+| the groundedness floor on `agentic` | **never runs** |
+
+> **A person reading two renderings side by side is the only quality signal this
+> system has.** Not a fallback for when the metric is unavailable — there is no
+> metric, anywhere, for the term the promise calls quality.
+
+So this is not a page for comparing v2. **It is the apparatus.**
+
+### And it produces the thing nobody can currently buy
+
+Every comparison where a human says *"this one is right, and here is why"*
+yields a **(question, better answer, reason)** triple. **That is a golden
+fixture** — the artifact Tool Manifest has none of, Eval cannot grade without,
+and recall cannot be measured against.
+
+**The harness pays for itself by generating its own missing input.** Nothing else
+in the fleet does.
+
+`[DESIGN]` **Accumulate them as labelled examples. Never as a score.** The moment
+*"v2 better: 13/20"* exists it will be quoted as an exit criterion, and the
+distinction between *zero data points for the criteria* and *twenty for
+judgement* stops being observed. **A fixture is evidence; a tally is a claim.**
+
+### The smallest thing that makes it a capability rather than a page
+
+| piece | why |
+|---|---|
+| `ab_runs` — `run_id · arm_a · arm_b · held_constant[] · varied[] · question_set · created_by` | **a run is a record, not a one-off.** Without it, every comparison is unreproducible the day after |
+| versioned question sets — `ab-v1`, `ab-v2`, … | sets **accumulate**; a set is what makes two runs comparable to each other |
+| verdicts as annotations keyed `(run, question, arm)` | judgement **persists** and is re-readable — and is never summed |
+| the `experiment` block **mandatory** on every run | the *what varied / what was held constant* line, enforced by the schema rather than by discipline |
+
+**Four small things. None of them is about v2.**
+
+### Self-serve, which is the actual capitalization
+
+Arm-agnostic means **any seat declares an experiment without me**:
+
+| seat | the arm they cannot currently settle |
+|---|---|
+| Tool Manifest | **manifest 57 vs 5** — they have the reduction measured and *"the ranking is not yet a win at all"* |
+| prompt seat | **profile A vs B** — the `critical_rules` split, once it exists |
+| llm_manager | **model X vs Y** on real questions, not on bandit reward |
+| governor | **v1 vs v2**, and later **enricher vs direct** |
+| Eval | any prompt or policy change, before it ships |
+
+**Every one of those seats is currently blocked on the same absence.** The
+harness is the shared unblock, and it is why it should be built once, properly,
+rather than four times badly.
+
+---
+
 ## 6 · Reusable beyond v2
 
 The same surface takes any two arms: **prompt profile A vs B · manifest 57 vs 5 ·
