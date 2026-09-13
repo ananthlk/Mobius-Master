@@ -427,6 +427,52 @@ Screenshot shows:
 
 ---
 
+### Bug #14: mobius-chat Deploys Ship an Unnamed Branch + Dirty Working Tree; No Path Back to main
+**Component:** mobius-chat / `scripts/deploy.sh`
+**Severity:** MEDIUM (no live defect; a provenance and recoverability gap)
+**Reporter:** Tool Manifest Agent, verified by Governor seat (2026-09-13)
+**Repro:**
+
+1. Run `scripts/deploy.sh dev` from `/Users/ananth/Mobius/mobius-chat` on any branch.
+2. Observe the build context submitted is `PARENT_DIR` — the working tree of the whole monorepo, with no ref and no checkout.
+3. `git rev-parse --abbrev-ref HEAD` → `claude/deterministic-envelope-formatter`, 17 commits ahead of `main`.
+
+**Expected:** A deploy either ships a named, committed ref, or refuses; and `main` eventually carries the work.
+**Actual:** Every orchestrator-v2 commit from the 2026-09-12/13 session (~19 commits) lives on `claude/deterministic-envelope-formatter` and none are on `main`. All deploys shipped that branch *plus uncommitted edits* — the log line already says so and was read past three times:
+
+```
+▸ Deploying from HEAD: 2829e883b3  (branch: claude/deterministic-envelope-formatter, working tree: DIRTY)
+```
+
+**Impact:**
+- The v2 latency work (Q1 7.6s/1 round, Q2 33.6s/2 rounds) is real and was measured against what was live — those numbers stand.
+- But any deploy from `main`, a clean checkout, or CI silently reverts to the pre-session orchestrator.
+- `working tree: DIRTY` means the shipped image is not reproducible from the named SHA. Naming a SHA on a ship is not, by itself, provenance.
+
+**Root cause hypothesis:** Two independent gaps. (a) `deploy.sh` has no `branch --show-current` guard and no clean-tree guard — it builds whatever is on disk. (b) The one line that *does* report both is printed at the top of a long deploy log and nothing forces it to be read.
+
+**Next steps:**
+- [ ] Decide with Ananth: merge `claude/deterministic-envelope-formatter` to `main`, or keep the branch deliberately.
+- [ ] Add a clean-tree + branch guard to `scripts/deploy.sh` (warn-and-confirm, not hard-fail — dirty dev deploys are a deliberate workflow here).
+- [ ] Echo branch + dirty state again at the *end* of the deploy, next to the revision name.
+- [ ] Habit adopted meanwhile: every "deployed, carrying `<sha>`" report names the chat branch alongside the SHA.
+
+**Update 2026-09-13 (partial fix shipped):** `scripts/deploy.sh` fixed in mobius-chat.
+Two changes: (a) the dirty-tree warning **stated the opposite of the truth** — it read
+"image will reflect committed HEAD only", but the build context is `${PARENT_DIR}`,
+the working tree, with no git ref and no checkout, so uncommitted edits DO ship.
+A warning naming the safe case when the unsafe one holds is worse than none: it
+stops the check. (b) provenance (`<sha> on <branch> (clean|DIRTY)`) now prints at
+the END of the deploy as well as the start — the start line sits 400 lines and
+several minutes of build output before the operator looks, which is precisely why
+three ships went unnoticed. Still open: the branch/clean-tree confirm prompt, and
+the decision on merging `claude/deterministic-envelope-formatter` to `main`.
+
+**Owner:** Governor seat (mobius-chat orchestrator v2)
+**Related:** `feedback_commit_is_not_a_deployment.md`, `feedback_shared_checkout_branch_trap.md`
+
+---
+
 ## 🟡 IN PROGRESS BUGS
 
 (None currently assigned)
@@ -476,12 +522,12 @@ When adding a new bug, use this format:
 
 | Status | Count |
 |--------|-------|
-| Open | 9 |
+| Open | 14 |
 | In Progress | 0 |
 | Fixed | 3 |
-| **Total** | **12** |
+| **Total** | **17** |
 
 ---
 
-**Last updated:** 2026-08-20 by Ananth
+**Last updated:** 2026-09-13 by Governor seat (Bug #14)
 **Next review:** When new bugs reported or weekly triage pass
