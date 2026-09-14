@@ -209,6 +209,77 @@ the fix is done once, durably, rather than re-applied into the same erasure.
 
 ---
 
+## 5.2 Change 2026-09-13 — which phrase field is authoritative for which direction (Lexicon, with Master RAG + Tool Manifest + Service Line Registry)
+
+The §5.1 erasure was one instance of a larger, silent class: **the field a
+code's vocabulary lives in silently decides which direction can read it, and
+nothing enforced that the two matched.** Traced from a live retrieval failure
+(a three-payor "care management activities" question returning nothing, while
+the TCM codes T1017/H0049/H0050 sat untagged in the corpus).
+
+**Verified firsthand (Lexicon read `policy_path_b._build_phrase_map`, lines
+175-228):** the doc-side tagger reads `phrases`, `strong_phrases`, `aliases`
+(score 1.0), falls back to `description`, and reads `weak_keywords.any_of`
+(score 0.6). It does **not** read `query_expansion_phrases`. The query side
+(Gate `_extract_phrases`, `expand_query_via_lexicon`, tool selection) reads all
+fields unioned, `query_expansion_phrases` included.
+
+Measured consequence: three whole axes held their vocabulary **only** in
+`query_expansion_phrases` and were therefore doc-side blind —
+`provider` (942), `product` (46), `service_line` (32) — **1,020 codes
+query-side live, doc-side invisible.** Every axis that used `strong_phrases`
+tagged the corpus; every axis that did not, tagged nothing.
+
+**Rule (now binding for both parties):**
+
+| Field | Doc-side (tagging) | Query-side | Use for |
+|---|---|---|---|
+| `strong_phrases` / `aliases` / `phrases` | **yes, @1.0** | yes | **Identity-grade only** — a multi-word name or a real proper name. A term here tags every document containing it at full weight, so generic English must never live here. |
+| `weak_keywords.any_of` | **yes, @0.6** | yes | Collision-prone / generic / acronym surfaces — recall without over-tagging. |
+| `query_expansion_phrases` | **no** | yes | Query-side expansion only. **Must never be a code's sole vocabulary** — that is doc-side blindness. |
+
+**Every code must carry a doc-side vocabulary field** (`strong_phrases`,
+`aliases`, or `phrases`). Absence is a defect visible at write time, not to be
+inferred from zero tags months later.
+
+**Acronym rule (Service Line Registry, replacing Lexicon's length proxy):**
+demote an acronym to `weak_keywords` when it has a **non-service-line meaning
+attested in this corpus**; **refute** it (`refuted_words`) when that meaning is
+mechanically identifiable. Length is a proxy for collision and wrong both ways
+(`fqhc` is 4 chars and unambiguous; `detox` is 5 and generic; `mrt` collides
+with *Mediator Release Test*, which no length or context filter finds — only
+corpus attestation does).
+
+**Axis rulings under this rule:**
+- `service_line` (32) — Master RAG re-filed each code's own
+  `query_expansion_phrases` into `strong_phrases` (unique, ≥8 char, identity) +
+  `weak_keywords.any_of` (shared/acronym) + `refuted_words`. Nothing invented;
+  re-filing the Registry's own words under the doc-side key is inside rule 4,
+  not across it. **Mirrored to QA by Lexicon 2026-09-13** (31 specs, verified
+  QA==RAG) so the nightly publish cannot clobber it — the §5.1 trap, avoided
+  this time before it fired.
+- `product` (46) — **stays query-side-only. Not seeded doc-side.** The axis is
+  Mobius's own module names; doc-side seeding would tag payer documents with
+  internal product vocabulary.
+- `provider` (941) — **measured 2026-09-13: seedable doc-side, low risk.** Of
+  1,763 surfaces, **1,724 (97.8%) are distinctive** multi-word org names — safe
+  as `strong_phrases` because the tagger matches the full phrase, not tokens
+  (measured corpus-match rate on distinctive names ≤0.04% of paragraphs, and
+  those matches are legitimate org mentions). The risky set is **39 (2.2%)** and
+  fully enumerated by shape: 8 short acronyms (≤4 char: ahn, ajnd, barc, cftc,
+  cmet, dlc, laar, syx) + 31 all-generic multi-word ("mental health care",
+  "community health centers", "family mental health", …) that WOULD over-tag as
+  full phrases. Seed the 1,724 to `strong_phrases`, the 39 to
+  `weak_keywords`/`refuted_words`, per §5.2. Not yet executed; a full
+  per-surface frequency scan (timed out at 45s in one pass) can confirm the tail
+  as a background job before seeding.
+- `d:*.general` (18) — carry a mix of identity and generic/acronym/OCR in
+  `strong_phrases`; Lexicon to move generic+collision to `weak_keywords`, delete
+  OCR junk, keep single- and multi-word identity in `strong_phrases`. Queued
+  behind the live service_line retag. (Same class as §3.1 stems.)
+
+---
+
 ## 6. Sign-off
 
 | Party | Position |
