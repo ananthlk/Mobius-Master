@@ -234,9 +234,20 @@ tagged the corpus; every axis that did not, tagged nothing.
 
 | Field | Doc-side (tagging) | Query-side | Use for |
 |---|---|---|---|
-| `strong_phrases` / `aliases` / `phrases` | **yes, @1.0** | yes | **Identity-grade only** — a multi-word name or a real proper name. A term here tags every document containing it at full weight, so generic English must never live here. |
-| `weak_keywords.any_of` | **yes, @0.6** | yes | Collision-prone / generic / acronym surfaces — recall without over-tagging. |
-| `query_expansion_phrases` | **no** | yes | Query-side expansion only. **Must never be a code's sole vocabulary** — that is doc-side blindness. |
+| `strong_phrases` / `aliases` / `phrases` | **yes, @1.0** | **yes** (query bag) | **Identity-grade only** — a multi-word name or a real proper name. A term here tags every document containing it at full weight AND resolves it on the query side, so generic English must never live here. |
+| `weak_keywords.any_of` | **yes, @0.6** | **NO** | Collision-prone / generic / acronym surfaces — doc-side recall without query-side mis-resolution. Doc-only is the whole point: it lets a generic surface tag a doc weakly without letting a generic query word resolve the code. |
+| `query_expansion_phrases` | **no** | **yes** (query bag) | Query-side expansion only. **Must never be a code's sole vocabulary** — that is doc-side blindness. |
+
+> **Correction 2026-09-13 (Master RAG AST-checked; Lexicon verified):** an
+> earlier draft of this table marked `weak_keywords` query-side "yes" — wrong.
+> The query bag (`corpus_search_lexicon.expand_query_via_lexicon`, line 306-307)
+> reads exactly `strong_phrases, aliases, phrases, query_expansion_phrases` —
+> NOT `weak_keywords`, which appears there only in a docstring (a comment
+> asserting a dataflow the module does not implement — the week's recurring
+> trap, this time in my own contract). Consequence: to fix a **query-side**
+> mis-resolution a surface must be **dropped from the query bag fields**;
+> demoting it to `weak_keywords` changes only doc-side tagging, and a seeder that
+> only ADDS never removes the offending surface from `query_expansion_phrases`.
 
 **Every code must carry a doc-side vocabulary field** (`strong_phrases`,
 `aliases`, or `phrases`). Absence is a defect visible at write time, not to be
@@ -257,7 +268,17 @@ corpus attestation does).
   re-filing the Registry's own words under the doc-side key is inside rule 4,
   not across it. **Mirrored to QA by Lexicon 2026-09-13** (31 specs, verified
   QA==RAG) so the nightly publish cannot clobber it — the §5.1 trap, avoided
-  this time before it fired.
+  this time before it fired. **Query-side residual (2026-09-13):** the 6 surfaces
+  demoted to `weak_keywords` (`fact`, `mrt`, `detox`, `tcm`, `case management`,
+  `targeted case management`) are STILL in `query_expansion_phrases` (the seeder
+  only adds), so they still resolve query-side — demotion fixed doc-side only.
+  Lexicon tested each in Gate: **drop `fact`** ("fact requirements" → j:service_
+  line.fact) **and `mrt`** ("mrt test results" → mobile_response; the Mediator-
+  Release-Test collision) from `query_expansion_phrases`; **keep the other four** —
+  `detox`→withdrawal_management, `tcm`/`case management`/`targeted case
+  management`→TCM lines are correct, desired query-side resolutions. Rule: a
+  query surface is dropped when generic/collision, kept when a real synonym —
+  decided by running Gate, not by shape.
 - `product` (46) — **stays query-side-only. Not seeded doc-side.** The axis is
   Mobius's own module names; doc-side seeding would tag payer documents with
   internal product vocabulary.
