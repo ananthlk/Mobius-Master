@@ -286,8 +286,16 @@ corpus attestation does).
     in the entry that deprecated it. Also: "excluded by shape because the rate
     *would* be high" is a prediction doing a measurement's job — right for the 31
     generic multi-word (self-flagged), but the shape this week keeps catching, so
-    it is caveated, not trusted. A full per-surface frequency scan (one pass timed
-    out at 45s) will confirm the tail as a background job before seeding.
+    it is caveated, not trusted.
+  - **Tail scan run (2026-09-13, 5% corpus sample, all 1,763 surfaces).** The
+    caveat paid off: it flagged **2 generics the shape rule missed** — `steps`
+    (0.43%; a provider org whose token is a common English word — "complete the
+    steps"; already visible as gate018's mis-resolution to "steps llc") and
+    `childrens hospital` (0.11%; a generic suffix across Nemours/Norton/DiMaggio)
+    → both to `weak_keywords`. Two more flags were attested as **legitimate
+    high-frequency orgs, kept in strong**: `circles of care`, `orlando health`.
+    **Final split: 1,729 → strong_phrases, 33 → weak_keywords, 1 (`ahn`) →
+    refuted_words.** Recorded in `docs/coverage/provider-seed-exclusions.json`.
 - `d:*.general` (18) — carry a mix of identity and generic/acronym/OCR in
   `strong_phrases`; Lexicon to move generic+collision to `weak_keywords`, delete
   OCR junk, keep single- and multi-word identity in `strong_phrases`. Queued

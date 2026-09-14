@@ -1,0 +1,56 @@
+{
+  "axis": "provider",
+  "n_surfaces": 1763,
+  "to_weak_keywords": [
+    "behavioral family solutions",
+    "behavioral family solutions llc",
+    "center for behavioral solutions",
+    "childrens hospital",
+    "community behavioral health",
+    "community behavioral health llc",
+    "community health centers",
+    "community health centers inc",
+    "community health therapy center",
+    "community medical center",
+    "community medical center llc",
+    "family mental health",
+    "family mental health corp",
+    "florida behavioral center",
+    "florida behavioral center inc",
+    "florida behavioral system",
+    "florida behavioral system llc",
+    "florida therapy services",
+    "florida therapy services inc",
+    "medical wellness center",
+    "medical wellness center llc",
+    "mental care medical center",
+    "mental care medical center inc",
+    "mental health care",
+    "mental health care inc",
+    "mental health network",
+    "mental health network inc",
+    "professional behavioral mental health",
+    "professional behavioral mental health inc",
+    "professional psychiatric services",
+    "steps",
+    "wellness medical group",
+    "wellness medical group llc"
+  ],
+  "to_refuted_words": {
+    "ahn": [
+      "surname",
+      "md",
+      "author",
+      "citation"
+    ]
+  },
+  "keep_in_strong_corrected": [
+    "barc",
+    "laar",
+    "cmet",
+    "circles of care",
+    "orlando health"
+  ],
+  "note": "Everything not listed -> strong_phrases (distinctive). all-generic-multiword + tail-scan generics (steps, childrens hospital) -> weak. ahn -> refute (person surname collision). barc/laar/cmet/circles of care/orlando health attested AS org -> strong (corrects char-count and rate flags). dlc/syx/ajnd/cftc negligible/zero presence.",
+  "method": "shape + 5pct corpus tail-scan (>0.1pct flagged) + policy_lines attestation, 2026-09-13"
+}
