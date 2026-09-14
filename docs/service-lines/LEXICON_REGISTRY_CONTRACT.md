@@ -294,8 +294,18 @@ corpus attestation does).
     `childrens hospital` (0.11%; a generic suffix across Nemours/Norton/DiMaggio)
     → both to `weak_keywords`. Two more flags were attested as **legitimate
     high-frequency orgs, kept in strong**: `circles of care`, `orlando health`.
-    **Final split: 1,729 → strong_phrases, 33 → weak_keywords, 1 (`ahn`) →
-    refuted_words.** Recorded in `docs/coverage/provider-seed-exclusions.json`.
+  - **Action model (corrected once the field semantics were checked):**
+    `weak_keywords` is QUERY-VISIBLE (does not fix a query-side mis-resolution);
+    `refuted_words` is DOC-SIDE ONLY (verified: read only in
+    `policy_path_b`, never in the query resolver). So the exclusion is three
+    actions, not one: **(1) drop the bare generic where a fuller sibling exists**
+    (12 codes — e.g. `provider.steps_llc` keeps "STEPS, LLC", drops bare "STEPS";
+    fixes both query mis-resolution and doc over-tag); **(2) `weak_keywords`** for
+    a generic that is the code's only surface (12); **(3) `refuted_words`** for a
+    doc-side name collision (`ahn`). `gate018` ("Steps for verifying eligibility"
+    → `j:provider.steps_llc`) is the live proof this must be a drop, not a demote.
+    Sets in `docs/coverage/provider-seed-exclusions.json`; applied with Master
+    RAG's sequenced provider seed, RAG+QA in one transaction.
 - `d:*.general` (18) — carry a mix of identity and generic/acronym/OCR in
   `strong_phrases`; Lexicon to move generic+collision to `weak_keywords`, delete
   OCR junk, keep single- and multi-word identity in `strong_phrases`. Queued
