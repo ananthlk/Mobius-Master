@@ -264,15 +264,30 @@ corpus attestation does).
 - `provider` (941) — **measured 2026-09-13: seedable doc-side, low risk.** Of
   1,763 surfaces, **1,724 (97.8%) are distinctive** multi-word org names — safe
   as `strong_phrases` because the tagger matches the full phrase, not tokens
-  (measured corpus-match rate on distinctive names ≤0.04% of paragraphs, and
-  those matches are legitimate org mentions). The risky set is **39 (2.2%)** and
-  fully enumerated by shape: 8 short acronyms (≤4 char: ahn, ajnd, barc, cftc,
-  cmet, dlc, laar, syx) + 31 all-generic multi-word ("mental health care",
-  "community health centers", "family mental health", …) that WOULD over-tag as
-  full phrases. Seed the 1,724 to `strong_phrases`, the 39 to
-  `weak_keywords`/`refuted_words`, per §5.2. Not yet executed; a full
-  per-surface frequency scan (timed out at 45s in one pass) can confirm the tail
-  as a background job before seeding.
+  (measured corpus-match rate on representative distinctive names ≤0.04% of
+  paragraphs, those matches legitimate org mentions). **31 all-generic multi-word
+  surfaces** ("mental health care", "community health centers", "family mental
+  health", …) → `weak_keywords`/`refuted`: as full strong phrases they would tag
+  every doc about the concept as the org ("Mental Health Care Inc"). Attestation
+  reasoning, sound.
+  - **Correction (Master RAG, same day):** the 8 short acronyms were first
+    excluded by `≤4 chars` — the exact length proxy this §5.2 replaced, re-applied
+    within hours by the seat that ratified the replacement. Redone by attestation
+    (reading `policy_lines`): **barc** ("BARC Housing, Inc."), **laar** ("Laar
+    Corp."), **cmet** ("CMET, LLC") appear AS THE ORG → they BELONG in
+    `strong_phrases`; the length rule wrongly excluded them. **ahn** collides with
+    a person surname ("Ahn, Byung-Joon MD"; citation author "Ahn C") → demote/
+    refute. **ajnd, cftc** have 0 corpus presence and **dlc (3 lines), syx (2)**
+    are negligible → placement immaterial. So the acronym exclusion is **ahn only
+    (+dlc/syx if one insists), not 8** — three of the "risky" acronyms are
+    legitimate identity.
+  - **Class note:** a new rule does not delete the old heuristic — it sits next to
+    it, and the old one is the one your hands already know. Length re-surfaced here,
+    in the entry that deprecated it. Also: "excluded by shape because the rate
+    *would* be high" is a prediction doing a measurement's job — right for the 31
+    generic multi-word (self-flagged), but the shape this week keeps catching, so
+    it is caveated, not trusted. A full per-surface frequency scan (one pass timed
+    out at 45s) will confirm the tail as a background job before seeding.
 - `d:*.general` (18) — carry a mix of identity and generic/acronym/OCR in
   `strong_phrases`; Lexicon to move generic+collision to `weak_keywords`, delete
   OCR junk, keep single- and multi-word identity in `strong_phrases`. Queued
