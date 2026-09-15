@@ -41,6 +41,15 @@ services:
 
   # --- Chat / user-facing ---
   mobius-chat:                 {mode: pinned, min: 1, max: 20, note: "LATENCY ONLY (safe at 0 — state lives in shared DB/Redis): warm instance for first-token; 1c/1Gi since Sep 7"}
+  # Tool execution + selection for the thinking engine, extracted from
+  # mobius-chat 2026-09-15 (Ananth: "you call tools_manifest with an end point
+  # on invoke and they get you the result"). It owns the MCP client, so the
+  # tempting reading is a warm floor for connection lifecycle — but that does
+  # not survive measurement: both MCP targets list in ~1.1s on the deployed
+  # SDK, so this is LATENCY ONLY by the taxonomy above, the same tier as chat.
+  # Starts at 0. Revisit only with a measured first-call cost, not with the
+  # assumption that owning connections implies needing to be warm.
+  mobius-tool-manifest:        {mode: active, max: 10, note: "LATENCY ONLY (safe at 0) — chat calls /invoke per round; MCP listing measured ~1.1s"}
   mobius-os-backend:           {mode: active}
   mobius-user:                 {mode: active}
   mobius-interact:             {mode: standby}
