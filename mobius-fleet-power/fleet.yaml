@@ -100,4 +100,5 @@ services:
   mobius-doc-reader:           {mode: standby}
   mobius-dbt-ui:               {mode: standby}
   mobius-org-intelligence:     {mode: "off"}
+  mobius-verify-claims:        {mode: standby, note: "new Sep 13, 1c/512Mi — registered by fleet sweep; owner: adjust mode + add what-breaks-at-0 note if a floor is ever needed"}
   mobius-vibe:                 {mode: "off"}
