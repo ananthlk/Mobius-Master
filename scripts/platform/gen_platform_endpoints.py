@@ -16,7 +16,7 @@ page a person opens. mobius-chat serves ten of them and one service URL tells yo
 none of them, which is exactly what "I lost track of the endpoints" means.
 """
 from __future__ import annotations
-import json, subprocess, pathlib, datetime, re, sys, urllib.request, urllib.error
+import json, subprocess, pathlib, datetime, re, sys, urllib.request, urllib.error, os
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 DEF = ROOT / "docs" / "platform-definition.json"
@@ -76,6 +76,58 @@ def probe(url: str, timeout: int = 20) -> int | None:
         return None
 
 
+def sweep_tool_surface() -> dict:
+    """The tools ReAct can actually be offered, counted from the live servers.
+
+    Measured here: MCP tools per server (a real handshake + tools/list), and the
+    builtin skills in chat's own registry. NOT measured here: the Tool Selection
+    registry's own numbers (declarations, refusals, owners) -- that runs on its
+    own database with no read API, so those belong to that seat and are recorded
+    as reported, with a date, or not at all.
+    """
+    servers = {}
+    chat_env = {
+        "primary": os.environ.get("CHAT_SKILLS_MCP_URL")
+                   or "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/mcp",
+        "extra": os.environ.get("EXTRA_MCP_URLS")
+                 or "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app",
+    }
+    for label, url in chat_env.items():
+        if not url:
+            continue
+        u = url if url.rstrip("/").endswith("/mcp") else url.rstrip("/") + "/mcp"
+        try:
+            import asyncio
+            from mcp.client.session import ClientSession
+            from mcp.client.streamable_http import streamable_http_client
+            import httpx
+
+            async def _list(target: str):
+                async with httpx.AsyncClient(timeout=httpx.Timeout(45, connect=10),
+                                             follow_redirects=True) as h:
+                    async with streamable_http_client(target, http_client=h) as st:
+                        async with ClientSession(st[0], st[1]) as sess:
+                            await sess.initialize()
+                            return sorted(t.name for t in (await sess.list_tools()).tools)
+
+            names = asyncio.run(asyncio.wait_for(_list(u), 90))
+            servers[u] = {"role": label, "count": len(names), "tools": names}
+        except Exception as exc:
+            servers[u] = {"role": label, "count": None,
+                          "error": f"{type(exc).__name__}: {str(exc)[:80]}"}
+    builtin = sorted({m.group(1) for m in re.finditer(
+        r'name="([a-z_]+)"',
+        "\n".join((ROOT / "mobius-chat" / "app" / "skills" / "builtin" / f).read_text(errors="ignore")
+                   for f in os.listdir(ROOT / "mobius-chat" / "app" / "skills" / "builtin")
+                   if f.endswith(".py")))})
+    total = sum(v["count"] or 0 for v in servers.values())
+    return {"mcp_servers": servers, "mcp_tool_total": total,
+            "builtin_skill_names": builtin, "builtin_count": len(builtin),
+            "note": ("every MCP tool reaches ReAct through chat's registry; the Tool Selection "
+                     "registry (mobius-tool-manifest) decides which are OFFERED and runs on its "
+                     "own database, so its declaration/refusal counts are not swept here")}
+
+
 def main() -> int:
     d = json.loads(DEF.read_text())
     live = {s["service"]: s for s in sweep_services()}
@@ -132,6 +184,7 @@ def main() -> int:
         "services_without_module": [s["service"] for s in orphan],
         "secondary_deployments": [{"service": k, "module": m["id"]} for k, m in secondary.items()],
         "surfaces": surfaces,
+        "tool_surface": sweep_tool_surface(),
     }
     d["last_updated"] = datetime.datetime.now(datetime.UTC).isoformat()
     d["updated_by"] = "gen_platform_endpoints.py (platform / product-awareness seat)"
@@ -139,7 +192,9 @@ def main() -> int:
 
     print(f"-> {DEF.relative_to(ROOT)}")
     print(f"   services live {len(live)} · modules {len(d['modules'])} · "
-          f"surfaces {len(surfaces)}")
+          f"surfaces {len(surfaces)} · mcp tools "
+          f"{d['endpoints']['tool_surface']['mcp_tool_total']} · builtins "
+          f"{d['endpoints']['tool_surface']['builtin_count']}")
     if orphan:
         print(f"   NOT IN ANY MODULE ({len(orphan)}): " + ", ".join(s['service'] for s in orphan))
     nd = [m["id"] for m in d["modules"]

@@ -2,7 +2,7 @@
   "platform": "Mobius RCM Network",
   "version": "2026-09-07",
   "description": "Five-lens view of 23 core platform modules: User experience, Technical architecture, Specifications, Eval/QA, Git operations",
-  "last_updated": "2026-09-17T03:05:22.430798+00:00",
+  "last_updated": "2026-09-17T03:07:52.669835+00:00",
   "updated_by": "gen_platform_endpoints.py (platform / product-awareness seat)",
   "tiers": {
     "A": {
@@ -1796,7 +1796,7 @@
       ],
       "deployment": {
         "url": "https://mobius-deep-research-ortabkknqa-uc.a.run.app",
-        "ready_revision": "mobius-deep-research-00003-mcq",
+        "ready_revision": "mobius-deep-research-00004-5q5",
         "state": "live"
       }
     },
@@ -2421,7 +2421,7 @@
   ],
   "basis": "Modules are deployed services and in-repo code modules, traced to the deploy config or source file that defines them. Claude agent seats appear as `owner`, never as modules \u2014 a seat with no code is not a component.",
   "endpoints": {
-    "generated_at": "2026-09-17T03:05:22.430769+00:00",
+    "generated_at": "2026-09-17T03:07:50.672872+00:00",
     "generated_by": "scripts/platform/gen_platform_endpoints.py",
     "region": "us-central1",
     "provenance": "measured: gcloud run services list + live HTTP probe",
@@ -2459,7 +2459,7 @@
       {
         "service": "mobius-deep-research",
         "url": "https://mobius-deep-research-ortabkknqa-uc.a.run.app",
-        "ready_revision": "mobius-deep-research-00003-mcq"
+        "ready_revision": "mobius-deep-research-00004-5q5"
       },
       {
         "service": "mobius-doc-reader",
@@ -2712,6 +2712,75 @@
         "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/research/console",
         "http": 200
       }
-    ]
+    ],
+    "tool_surface": {
+      "mcp_servers": {
+        "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/mcp": {
+          "role": "primary",
+          "count": 29,
+          "tools": [
+            "check_provider_credentialing",
+            "get_benchmark_dimensions",
+            "get_churn_benchmark",
+            "get_entrant_analysis",
+            "get_fact_pack",
+            "get_market_decomposition",
+            "get_market_retention",
+            "get_market_share_timeseries",
+            "get_market_size",
+            "get_market_timeseries",
+            "get_msa_map",
+            "get_org_benchmark",
+            "get_org_leakage",
+            "get_org_profile",
+            "get_org_rate_gap",
+            "get_org_service_line_profile",
+            "get_org_type_stats",
+            "get_org_universe",
+            "get_published_rates",
+            "get_rate_benchmarks",
+            "get_rate_trends",
+            "get_service_line_code_map",
+            "get_service_line_opportunity",
+            "get_service_mix",
+            "get_top_orgs",
+            "get_valid_filters",
+            "lookup_npi",
+            "search_clinician_by_name",
+            "search_orgs"
+          ]
+        },
+        "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/mcp": {
+          "role": "extra",
+          "count": 5,
+          "tools": [
+            "appeals_assemble_letter",
+            "appeals_find_carc",
+            "appeals_get_playbook",
+            "appeals_lookup_rules",
+            "appeals_validate_claim"
+          ]
+        }
+      },
+      "mcp_tool_total": 34,
+      "builtin_skill_names": [
+        "cached_answer_lookup",
+        "document_upload_skill",
+        "fetch_document",
+        "google_search",
+        "healthcare_query",
+        "list_thread_document_uploads",
+        "payor_lookup",
+        "payor_readiness",
+        "product_feedback",
+        "product_help_search",
+        "search_corpus",
+        "transform_previous_answer",
+        "vibe",
+        "web_scrape"
+      ],
+      "builtin_count": 14,
+      "note": "every MCP tool reaches ReAct through chat's registry; the Tool Selection registry (mobius-tool-manifest) decides which are OFFERED and runs on its own database, so its declaration/refusal counts are not swept here"
+    }
   }
 }
