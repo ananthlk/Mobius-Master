@@ -2,7 +2,7 @@
   "platform": "Mobius RCM Network",
   "version": "2026-09-07",
   "description": "Five-lens view of 23 core platform modules: User experience, Technical architecture, Specifications, Eval/QA, Git operations",
-  "last_updated": "2026-09-17T03:07:52.669835+00:00",
+  "last_updated": "2026-09-17T12:55:28.519973+00:00",
   "updated_by": "gen_platform_endpoints.py (platform / product-awareness seat)",
   "tiers": {
     "A": {
@@ -294,7 +294,9 @@
       "surfaces": [
         {
           "name": "Lexicon review queue",
-          "path": "/ (frontend-v2)"
+          "path": "/ (frontend-v2)",
+          "url": null,
+          "http": null
         }
       ],
       "stage": "tag",
@@ -401,19 +403,27 @@
       "surfaces": [
         {
           "name": "Chat",
-          "path": "/"
+          "path": "/",
+          "url": "https://mobius-chat-ortabkknqa-uc.a.run.app",
+          "http": 200
         },
         {
           "name": "Platform",
-          "path": "/platform"
+          "path": "/platform",
+          "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/platform",
+          "http": 200
         },
         {
           "name": "Pipeline",
-          "path": "/pipeline"
+          "path": "/pipeline",
+          "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/pipeline",
+          "http": 404
         },
         {
           "name": "Vault",
-          "path": "/vault"
+          "path": "/vault",
+          "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/vault",
+          "http": 200
         }
       ],
       "deployment": {
@@ -461,11 +471,15 @@
       "surfaces": [
         {
           "name": "Research Console",
-          "path": "/research/console"
+          "path": "/research/console",
+          "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/research/console",
+          "http": 200
         },
         {
           "name": "Service Line Registry review",
-          "path": "/service-lines/review"
+          "path": "/service-lines/review",
+          "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/service-lines/review",
+          "http": 404
         }
       ]
     },
@@ -598,7 +612,9 @@
       "surfaces": [
         {
           "name": "Runner demo",
-          "path": "/demo"
+          "path": "/demo",
+          "url": "https://mobius-interact-ortabkknqa-uc.a.run.app/demo",
+          "http": 200
         }
       ],
       "deployment": {
@@ -800,11 +816,15 @@
       "surfaces": [
         {
           "name": "Corpus admin",
-          "path": "/admin"
+          "path": "/admin",
+          "url": "https://mobius-product-awareness-ortabkknqa-uc.a.run.app/admin",
+          "http": 200
         },
         {
           "name": "Schematic",
-          "path": "/schematic"
+          "path": "/schematic",
+          "url": "https://mobius-product-awareness-ortabkknqa-uc.a.run.app/schematic",
+          "http": 200
         }
       ],
       "deployment": {
@@ -1110,7 +1130,9 @@
       "surfaces": [
         {
           "name": "Specs catalog",
-          "path": "/"
+          "path": "/",
+          "url": "https://mobius-specs-ortabkknqa-uc.a.run.app",
+          "http": 200
         }
       ],
       "deployment": {
@@ -1487,15 +1509,21 @@
       "surfaces": [
         {
           "name": "Corpus Health console",
-          "path": "/corpus/health"
+          "path": "/corpus/health",
+          "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/corpus/health",
+          "http": 200
         },
         {
           "name": "Eval console",
-          "path": "/eval"
+          "path": "/eval",
+          "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/eval",
+          "http": 200
         },
         {
           "name": "RAG frontend",
-          "path": "/"
+          "path": "/",
+          "url": "https://mobius-rag-ortabkknqa-uc.a.run.app",
+          "http": 200
         }
       ],
       "stage": "publish"
@@ -1584,7 +1612,9 @@
       "surfaces": [
         {
           "name": "dbt reports UI",
-          "path": "/"
+          "path": "/",
+          "url": "https://mobius-dbt-ui-ortabkknqa-uc.a.run.app",
+          "http": 200
         }
       ],
       "deployment": {
@@ -1694,11 +1724,15 @@
       "surfaces": [
         {
           "name": "Eval studio",
-          "path": "mobius-qa/eval-studio"
+          "path": "mobius-qa/eval-studio",
+          "url": null,
+          "http": null
         },
         {
           "name": "Retrieval bake-off",
-          "path": "mobius-qa/bakeoff"
+          "path": "mobius-qa/bakeoff",
+          "url": null,
+          "http": null
         }
       ]
     },
@@ -1792,8 +1826,20 @@
         "deploy_target": "in-repo"
       },
       "surfaces": [
-        "/research/ask",
-        "/research/console"
+        {
+          "name": "Deep Research \u2014 ask",
+          "path": "/research/ask",
+          "service": "mobius-payor",
+          "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/research/ask",
+          "http": 200
+        },
+        {
+          "name": "Deep Research \u2014 console",
+          "path": "/research/console",
+          "service": "mobius-payor",
+          "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/research/console",
+          "http": 200
+        }
       ],
       "deployment": {
         "url": "https://mobius-deep-research-ortabkknqa-uc.a.run.app",
@@ -1998,11 +2044,15 @@
       "surfaces": [
         {
           "name": "Service Lines",
-          "path": "/service-lines"
+          "path": "/service-lines",
+          "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/service-lines",
+          "http": 200
         },
         {
           "name": "Review queue",
-          "path": "/service-lines/review"
+          "path": "/service-lines/review",
+          "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/service-lines/review",
+          "http": 404
         }
       ],
       "deployment": {
@@ -2159,7 +2209,7 @@
       },
       "deployment": {
         "url": "https://mobius-tool-manifest-ortabkknqa-uc.a.run.app",
-        "ready_revision": "mobius-tool-manifest-00012-gn4",
+        "ready_revision": "mobius-tool-manifest-00017-knb",
         "state": "live"
       },
       "specs_view": {
@@ -2208,7 +2258,7 @@
       },
       "deployment": {
         "url": "https://mobius-verify-claims-ortabkknqa-uc.a.run.app",
-        "ready_revision": "mobius-verify-claims-00004-4fx",
+        "ready_revision": "mobius-verify-claims-00005-l25",
         "state": "live"
       },
       "specs_view": {
@@ -2422,7 +2472,7 @@
   ],
   "basis": "Modules are deployed services and in-repo code modules, traced to the deploy config or source file that defines them. Claude agent seats appear as `owner`, never as modules \u2014 a seat with no code is not a component.",
   "endpoints": {
-    "generated_at": "2026-09-17T03:07:50.672872+00:00",
+    "generated_at": "2026-09-17T12:55:11.825238+00:00",
     "generated_by": "scripts/platform/gen_platform_endpoints.py",
     "region": "us-central1",
     "provenance": "measured: gcloud run services list + live HTTP probe",
@@ -2565,7 +2615,7 @@
       {
         "service": "mobius-tool-manifest",
         "url": "https://mobius-tool-manifest-ortabkknqa-uc.a.run.app",
-        "ready_revision": "mobius-tool-manifest-00012-gn4"
+        "ready_revision": "mobius-tool-manifest-00017-knb"
       },
       {
         "service": "mobius-user",
@@ -2575,7 +2625,7 @@
       {
         "service": "mobius-verify-claims",
         "url": "https://mobius-verify-claims-ortabkknqa-uc.a.run.app",
-        "ready_revision": "mobius-verify-claims-00004-4fx"
+        "ready_revision": "mobius-verify-claims-00005-l25"
       },
       {
         "service": "mobius-vibe",
@@ -2712,6 +2762,23 @@
         "label": "Deep Research \u2014 the technical view",
         "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/research/console",
         "http": 200
+      }
+    ],
+    "dead_declared_surfaces": [
+      {
+        "module": "chat",
+        "path": "/pipeline",
+        "http": 404
+      },
+      {
+        "module": "payor",
+        "path": "/service-lines/review",
+        "http": 404
+      },
+      {
+        "module": "service-line-registry",
+        "path": "/service-lines/review",
+        "http": 404
       }
     ],
     "tool_surface": {

@@ -166,6 +166,31 @@ def main() -> int:
                              "service": "mobius-payor", "label": label,
                              "url": u, "http": probe(u)})
 
+    # Probe the surfaces the MODULES declare, not just chat's routes. Two were
+    # dead at the first sweep (chat /pipeline, payor /service-lines/review) and
+    # the page was about to offer them as links. A chip that looks clickable and
+    # 404s is worse than one that was honest about being a label, so the result
+    # is written onto the surface and the page decides from it.
+    for mod in d["modules"]:
+        for sf in mod.get("surfaces") or []:
+            if not isinstance(sf, dict):
+                continue            # malformed entry: leave it, don't guess a shape
+            path = sf.get("path") or ""
+            if not path.startswith("/") or " " in path:
+                sf["url"], sf["http"] = None, None    # a repo path or a label
+                continue
+            base_svc = sf.get("service") or mod.get("service")
+            base = live.get(base_svc, {}).get("url")
+            if not base:
+                sf["url"], sf["http"] = None, None
+                continue
+            u = base.rstrip("/") + ("" if path == "/" else path)
+            sf["url"], sf["http"] = u, probe(u)
+
+    dead = [(m["id"], sf["path"], sf["http"])
+            for m in d["modules"] for sf in (m.get("surfaces") or [])
+            if isinstance(sf, dict) and sf.get("url") and sf.get("http") != 200]
+
     d["endpoints"] = {
         "generated_at": datetime.datetime.now(datetime.UTC).isoformat(),
         "generated_by": "scripts/platform/gen_platform_endpoints.py",
@@ -184,6 +209,9 @@ def main() -> int:
         "services_without_module": [s["service"] for s in orphan],
         "secondary_deployments": [{"service": k, "module": m["id"]} for k, m in secondary.items()],
         "surfaces": surfaces,
+        "dead_declared_surfaces": [
+            {"module": a, "path": b, "http": c} for a, b, c in dead
+        ],
         "tool_surface": sweep_tool_surface(),
     }
     d["last_updated"] = datetime.datetime.now(datetime.UTC).isoformat()
@@ -195,6 +223,9 @@ def main() -> int:
           f"surfaces {len(surfaces)} · mcp tools "
           f"{d['endpoints']['tool_surface']['mcp_tool_total']} · builtins "
           f"{d['endpoints']['tool_surface']['builtin_count']}")
+    if dead:
+        print(f"   DECLARED SURFACE NOT ANSWERING ({len(dead)}): "
+              + ", ".join(f"{a}{b} [{c}]" for a, b, c in dead))
     if orphan:
         print(f"   NOT IN ANY MODULE ({len(orphan)}): " + ", ".join(s['service'] for s in orphan))
     nd = [m["id"] for m in d["modules"]
