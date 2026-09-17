@@ -2,20 +2,20 @@
   "platform": "Mobius RCM Network",
   "version": "2026-09-07",
   "description": "Five-lens view of 23 core platform modules: User experience, Technical architecture, Specifications, Eval/QA, Git operations",
-  "last_updated": "2026-09-07T00:00:00Z",
-  "updated_by": "Platform Architect",
+  "last_updated": "2026-09-17T03:05:22.430798+00:00",
+  "updated_by": "gen_platform_endpoints.py (platform / product-awareness seat)",
   "tiers": {
     "A": {
       "name": "Point Solutions",
-      "range": "$5M–$20M per org"
+      "range": "$5M\u2013$20M per org"
     },
     "B": {
       "name": "Network Intelligence",
-      "range": "$20M–$60M per network"
+      "range": "$20M\u2013$60M per network"
     },
     "C": {
       "name": "Virtual Network",
-      "range": "$60M–$150M+"
+      "range": "$60M\u2013$150M+"
     }
   },
   "modules": [
@@ -43,11 +43,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-skills",
@@ -61,8 +61,13 @@
         "Sourcing",
         "fetch_document"
       ],
-      "invocation": "web_scrape — appears twice in the chat tool manifest and is exposed over MCP.",
-      "stage": "acquire"
+      "invocation": "web_scrape \u2014 appears twice in the chat tool manifest and is exposed over MCP.",
+      "stage": "acquire",
+      "deployment": {
+        "url": "https://mobius-web-scraper-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-web-scraper-00042-wlp",
+        "state": "live"
+      }
     },
     {
       "id": "web-scraper-worker",
@@ -88,11 +93,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-skills",
@@ -100,9 +105,14 @@
         "status": "live",
         "deploy_target": "Cloud Run"
       },
-      "invocation": "Queue-driven. Not callable as a skill — it runs when work is enqueued.",
+      "invocation": "Queue-driven. Not callable as a skill \u2014 it runs when work is enqueued.",
       "stage": "acquire",
-      "provenance": "mobius-skills @ main · web-scraper/ · deploy script web-scraper/scripts/deploy_worker.sh. Shares the mobius-web-scraper image (tag 20260908-132159-49ffb2f583); the worker differs by entrypoint, not by codebase. Previously flagged unverified on the claim that no deploy config named it — that was wrong."
+      "provenance": "mobius-skills @ main \u00b7 web-scraper/ \u00b7 deploy script web-scraper/scripts/deploy_worker.sh. Shares the mobius-web-scraper image (tag 20260908-132159-49ffb2f583); the worker differs by entrypoint, not by codebase. Previously flagged unverified on the claim that no deploy config named it \u2014 that was wrong.",
+      "deployment": {
+        "url": "https://mobius-web-scraper-worker-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-web-scraper-worker-00032-r58",
+        "state": "live"
+      }
     },
     {
       "id": "google-search",
@@ -128,11 +138,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-skills",
@@ -145,7 +155,12 @@
         "MCP (fleet-wide)",
         "Sourcing"
       ],
-      "stage": "acquire"
+      "stage": "acquire",
+      "deployment": {
+        "url": "https://mobius-google-search-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-google-search-00002-zjn",
+        "state": "live"
+      }
     },
     {
       "id": "doc-reader",
@@ -171,11 +186,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-skills",
@@ -188,8 +203,13 @@
         "Curation",
         "Historical extraction"
       ],
-      "invocation": "Called via app/sub_skills/doc_reader.py — invoked by chat directly rather than chosen by the planner, but a task other components call.",
-      "stage": "extract"
+      "invocation": "Called via app/sub_skills/doc_reader.py \u2014 invoked by chat directly rather than chosen by the planner, but a task other components call.",
+      "stage": "extract",
+      "deployment": {
+        "url": "https://mobius-doc-reader-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-doc-reader-00002-8dp",
+        "state": "live"
+      }
     },
     {
       "id": "chunking-worker",
@@ -215,11 +235,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-rag",
@@ -227,8 +247,13 @@
         "status": "live",
         "deploy_target": "Cloud Run"
       },
-      "invocation": "Queue-driven. Not callable as a skill — it runs when work is enqueued.",
-      "stage": "chunk"
+      "invocation": "Queue-driven. Not callable as a skill \u2014 it runs when work is enqueued.",
+      "stage": "chunk",
+      "deployment": {
+        "url": "https://mobius-rag-chunking-worker-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-rag-chunking-worker-00546-2b6",
+        "state": "live"
+      }
     },
     {
       "id": "lexicon",
@@ -254,11 +279,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-qa",
@@ -272,7 +297,12 @@
           "path": "/ (frontend-v2)"
         }
       ],
-      "stage": "tag"
+      "stage": "tag",
+      "deployment": {
+        "url": "https://mobius-lexicon-maintenance-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-lexicon-maintenance-00069-gmc",
+        "state": "live"
+      }
     },
     {
       "id": "embedding-worker",
@@ -298,11 +328,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-rag",
@@ -310,8 +340,13 @@
         "status": "live",
         "deploy_target": "Cloud Run"
       },
-      "invocation": "Queue-driven. Not callable as a skill — it runs when work is enqueued.",
-      "stage": "embed"
+      "invocation": "Queue-driven. Not callable as a skill \u2014 it runs when work is enqueued.",
+      "stage": "embed",
+      "deployment": {
+        "url": "https://mobius-rag-embedding-worker-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-rag-embedding-worker-00524-vdw",
+        "state": "live"
+      }
     },
     {
       "id": "chat",
@@ -330,12 +365,12 @@
       ],
       "user_view": {
         "status": "live",
-        "description": "Chat API and UI: question → queue → worker → response, with a pluggable queue.",
+        "description": "Chat API and UI: question \u2192 queue \u2192 worker \u2192 response, with a pluggable queue.",
         "surface": "mobius-chat"
       },
       "technical_view": {
         "status": "live",
-        "description": "Chat API and UI: question → queue → worker → response, with a pluggable queue.",
+        "description": "Chat API and UI: question \u2192 queue \u2192 worker \u2192 response, with a pluggable queue.",
         "repo": "mobius-chat",
         "module": "mobius-chat"
       },
@@ -380,7 +415,12 @@
           "name": "Vault",
           "path": "/vault"
         }
-      ]
+      ],
+      "deployment": {
+        "url": "https://mobius-chat-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-chat-01177-mgf",
+        "state": "live"
+      }
     },
     {
       "id": "payor",
@@ -406,11 +446,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-payor",
@@ -455,17 +495,22 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-story-ui",
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
+      },
+      "deployment": {
+        "url": "https://mobius-story-ui-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-story-ui-00082-5gs",
+        "state": "live"
       }
     },
     {
@@ -492,17 +537,22 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-os",
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
+      },
+      "deployment": {
+        "url": "https://mobius-os-backend-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-os-backend-00005-q9c",
+        "state": "live"
       }
     },
     {
@@ -521,12 +571,12 @@
       ],
       "user_view": {
         "status": "live",
-        "description": "Declarative web-interaction engine: find → click → type → read over a page.",
+        "description": "Declarative web-interaction engine: find \u2192 click \u2192 type \u2192 read over a page.",
         "surface": "mobius-interact"
       },
       "technical_view": {
         "status": "live",
-        "description": "Declarative web-interaction engine: find → click → type → read over a page.",
+        "description": "Declarative web-interaction engine: find \u2192 click \u2192 type \u2192 read over a page.",
         "repo": "mobius-interact",
         "module": "mobius-interact"
       },
@@ -550,7 +600,12 @@
           "name": "Runner demo",
           "path": "/demo"
         }
-      ]
+      ],
+      "deployment": {
+        "url": "https://mobius-interact-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-interact-00013-f99",
+        "state": "live"
+      }
     },
     {
       "id": "vault",
@@ -567,12 +622,12 @@
       ],
       "user_view": {
         "status": "live",
-        "description": "Personal workspace panel, mounted into Chat. Static assets — no separate Cloud Run service.",
+        "description": "Personal workspace panel, mounted into Chat. Static assets \u2014 no separate Cloud Run service.",
         "surface": "mobius-vault"
       },
       "technical_view": {
         "status": "live",
-        "description": "Personal workspace panel, mounted into Chat. Static assets — no separate Cloud Run service.",
+        "description": "Personal workspace panel, mounted into Chat. Static assets \u2014 no separate Cloud Run service.",
         "repo": "mobius-vault",
         "module": "(in-repo)"
       },
@@ -675,11 +730,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-chat",
@@ -697,7 +752,7 @@
       "service": "mobius-product-awareness",
       "repo": "product-awareness",
       "verified": true,
-      "tier": "B→C",
+      "tier": "B\u2192C",
       "gates": [
         1,
         2,
@@ -751,6 +806,17 @@
           "name": "Schematic",
           "path": "/schematic"
         }
+      ],
+      "deployment": {
+        "url": "https://mobius-product-awareness-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-product-awareness-00092-8fw",
+        "state": "live"
+      },
+      "also_deployed_as": [
+        {
+          "service": "product-awareness",
+          "note": "second deployment; chat calls mobius-product-awareness (CHAT_SKILLS_PRODUCT_HELP_SEARCH_URL)"
+        }
       ]
     },
     {
@@ -798,6 +864,11 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
+      },
+      "deployment": {
+        "url": "https://mobius-feedback-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-feedback-00002-2xm",
+        "state": "live"
       }
     },
     {
@@ -824,17 +895,22 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "Mobius-user",
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
+      },
+      "deployment": {
+        "url": "https://mobius-user-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-user-00044-8z9",
+        "state": "live"
       }
     },
     {
@@ -881,7 +957,7 @@
           "compliance audit"
         ],
         "gates": [
-          "recall ≥99%",
+          "recall \u226599%",
           "false-positive < 1%"
         ],
         "status": "live"
@@ -891,6 +967,11 @@
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
+      },
+      "deployment": {
+        "url": "https://mobius-phi-classifier-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-phi-classifier-00031-k8v",
+        "state": "live"
       }
     },
     {
@@ -917,17 +998,22 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-skills",
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
+      },
+      "deployment": {
+        "url": "https://mobius-org-intelligence-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-org-intelligence-00009-gzl",
+        "state": "live"
       }
     },
     {
@@ -978,7 +1064,12 @@
         "status": "live",
         "deploy_target": "Cloud Run"
       },
-      "provenance": "mobius-skills @ main · org-agent/ · deploy config org-agent/deploy/{cloudbuild.yaml,deploy_dev.sh,dev.env}. The running image tag b96505a was reachable from no remote ref until 2026-09-08: it sat on a LOCAL feat/org-agent two commits ahead of origin, so the source of a live service existed on one machine only. Merged to main (643c48e) and pushed; the deployed sha is now an ancestor of origin/main."
+      "provenance": "mobius-skills @ main \u00b7 org-agent/ \u00b7 deploy config org-agent/deploy/{cloudbuild.yaml,deploy_dev.sh,dev.env}. The running image tag b96505a was reachable from no remote ref until 2026-09-08: it sat on a LOCAL feat/org-agent two commits ahead of origin, so the source of a live service existed on one machine only. Merged to main (643c48e) and pushed; the deployed sha is now an ancestor of origin/main.",
+      "deployment": {
+        "url": "https://mobius-org-agent-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-org-agent-00022-mg4",
+        "state": "live"
+      }
     },
     {
       "id": "specs",
@@ -1004,11 +1095,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "specs-platform",
@@ -1020,6 +1111,17 @@
         {
           "name": "Specs catalog",
           "path": "/"
+        }
+      ],
+      "deployment": {
+        "url": "https://mobius-specs-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-specs-00003-55h",
+        "state": "live"
+      },
+      "also_deployed_as": [
+        {
+          "service": "specs-platform",
+          "note": "second deployment; same repo as mobius-specs"
         }
       ]
     },
@@ -1047,17 +1149,22 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-db-agent",
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
+      },
+      "deployment": {
+        "url": "https://mobius-db-agent-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-db-agent-00003-9wj",
+        "state": "live"
       }
     },
     {
@@ -1088,17 +1195,22 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-skills",
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
+      },
+      "deployment": {
+        "url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-provider-roster-credentialing-00098-rmr",
+        "state": "live"
       }
     },
     {
@@ -1110,7 +1222,7 @@
       "service": "mobius-appeals-prototype",
       "repo": "mobius-skills",
       "verified": true,
-      "tier": "B→C",
+      "tier": "B\u2192C",
       "gates": [
         6
       ],
@@ -1139,7 +1251,7 @@
         "gates": [
           "M6 judge",
           "L3 promotion (Wilson-LB)",
-          "§11 Bayes flip-gate"
+          "\u00a711 Bayes flip-gate"
         ],
         "status": "pilot passed dev, live eval pending"
       },
@@ -1149,7 +1261,12 @@
         "status": "building",
         "deploy_target": "Cloud Run"
       },
-      "provenance": "mobius-skills @ main · appeals-agent/ · Dockerfile at appeals-agent/Dockerfile, byte-identical to the source that built the running revision (recovered from the Cloud Build source zip). No requirements.txt: dependencies are installed inline in the Dockerfile, and all but mcp remain unbounded."
+      "provenance": "mobius-skills @ main \u00b7 appeals-agent/ \u00b7 Dockerfile at appeals-agent/Dockerfile, byte-identical to the source that built the running revision (recovered from the Cloud Build source zip). No requirements.txt: dependencies are installed inline in the Dockerfile, and all but mcp remain unbounded.",
+      "deployment": {
+        "url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-appeals-prototype-00179-88w",
+        "state": "live"
+      }
     },
     {
       "id": "email",
@@ -1175,17 +1292,22 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-skills",
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
+      },
+      "deployment": {
+        "url": "https://mobius-email-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-email-00008-pbc",
+        "state": "live"
       }
     },
     {
@@ -1212,17 +1334,22 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-skills",
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
+      },
+      "deployment": {
+        "url": "https://mobius-task-manager-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-task-manager-00029-dd9",
+        "state": "live"
       }
     },
     {
@@ -1249,17 +1376,22 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-skills",
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
+      },
+      "deployment": {
+        "url": "https://mobius-healthcare-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-healthcare-00001-7d9",
+        "state": "live"
       }
     },
     {
@@ -1286,17 +1418,22 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-skills",
         "branch": "main",
         "status": "live",
         "deploy_target": "Cloud Run"
+      },
+      "deployment": {
+        "url": "https://mobius-vibe-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-vibe-00008-kz6",
+        "state": "live"
       }
     },
     {
@@ -1378,7 +1515,7 @@
       ],
       "user_view": {
         "status": "frozen",
-        "description": "Semantic cache of previously-approved answers. SHELVED 2026-09-08 — deployed and healthy but never finished, and nothing calls it. Scales to zero, so it is left running rather than torn down.",
+        "description": "Semantic cache of previously-approved answers. SHELVED 2026-09-08 \u2014 deployed and healthy but never finished, and nothing calls it. Scales to zero, so it is left running rather than torn down.",
         "surface": "mobius-answer-cache"
       },
       "technical_view": {
@@ -1389,11 +1526,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-answer-cache",
@@ -1401,7 +1538,12 @@
         "status": "live",
         "deploy_target": "Cloud Run"
       },
-      "note": "Shelved by Ananth 2026-09-08: not fully built, not being worked on. If revived, move the DB password out of CACHE_DATABASE_URL into Secret Manager."
+      "note": "Shelved by Ananth 2026-09-08: not fully built, not being worked on. If revived, move the DB password out of CACHE_DATABASE_URL into Secret Manager.",
+      "deployment": {
+        "url": "https://mobius-answer-cache-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-answer-cache-00005-9w9",
+        "state": "live"
+      }
     },
     {
       "id": "dbt",
@@ -1427,11 +1569,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-dbt",
@@ -1444,7 +1586,12 @@
           "name": "dbt reports UI",
           "path": "/"
         }
-      ]
+      ],
+      "deployment": {
+        "url": "https://mobius-dbt-ui-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-dbt-ui-00001-nqd",
+        "state": "live"
+      }
     },
     {
       "id": "fact-store",
@@ -1459,7 +1606,7 @@
       "gates": [],
       "user_view": {
         "status": "partial",
-        "description": "Certified payor facts with provenance — answer-or-abstain, no guessing. 65 facts across 3 domains from 55 templates.",
+        "description": "Certified payor facts with provenance \u2014 answer-or-abstain, no guessing. 65 facts across 3 domains from 55 templates.",
         "surface": "facts.* in mobius_rag"
       },
       "technical_view": {
@@ -1470,17 +1617,22 @@
       },
       "specs_view": {
         "status": "building",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-rag",
         "branch": "main",
         "status": "building",
         "deploy_target": "in-repo"
+      },
+      "deployment": {
+        "url": "https://mobius-rag-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-rag-00734-bvr",
+        "state": "live"
       }
     },
     {
@@ -1528,7 +1680,7 @@
         "gates": [
           "answer F1",
           "judge agreement (Wilson-LB)",
-          "§11 Bayes flip-gate"
+          "\u00a711 Bayes flip-gate"
         ],
         "status": "M6 judge + L3 promotion",
         "measures": "fingerprint in run_calibration, lift=moved+changed"
@@ -1559,19 +1711,19 @@
       "service": null,
       "repo": "mobius-rag",
       "verified": true,
-      "tier": "B→C",
+      "tier": "B\u2192C",
       "gates": [
         4,
         6
       ],
       "user_view": {
         "status": "live",
-        "description": "Judges each retrieval slot on its own bar — would another turn help? Wired into the live orchestrator 2026-07-26 after Eval's calibration (22-query forced bank + live router calibration).",
+        "description": "Judges each retrieval slot on its own bar \u2014 would another turn help? Wired into the live orchestrator 2026-07-26 after Eval's calibration (22-query forced bank + live router calibration).",
         "surface": "Transparent (feeds Router's decide_continuation)"
       },
       "technical_view": {
         "status": "live",
-        "description": "app/services/retriever/observer.py, called from orchestrator.py:445 via _observer_verdict. Per-strategy adequacy: capacity-aware fill for a/b/s, decay-floor score check for d, quote_verified for c. Portfolio-allocated slots bypass it and take a terminal stopgap verdict — but portfolio is weight 0 / shadow-only by default, so the default path is Observer.",
+        "description": "app/services/retriever/observer.py, called from orchestrator.py:445 via _observer_verdict. Per-strategy adequacy: capacity-aware fill for a/b/s, decay-floor score check for d, quote_verified for c. Portfolio-allocated slots bypass it and take a terminal stopgap verdict \u2014 but portfolio is weight 0 / shadow-only by default, so the default path is Observer.",
         "repo": "mobius-rag",
         "module": "app/services/retriever/observer.py"
       },
@@ -1602,27 +1754,27 @@
     {
       "id": "deep-research",
       "name": "Deep Research",
-      "layer": 99,
+      "layer": 4,
       "kind": "agent",
       "owner": "Deep Research",
-      "service": null,
+      "service": "mobius-deep-research",
       "repo": "mobius-skills",
       "verified": true,
-      "tier": "B→C",
+      "tier": "B\u2192C",
       "gates": [
         4,
         7
       ],
       "user_view": {
         "status": "live",
-        "description": "State machine over research.request/turn that closes questions the corpus cannot answer. Console served from mobius-payor.",
+        "description": "Deep Research closes questions the corpus cannot answer: a state machine over research.request/turn. Two surfaces a person opens \u2014 /research/ask (the user screen) and /research/console (the technical view) \u2014 both served from mobius-payor, while the engine runs as its own service (mobius-deep-research, /api/skills/v1/research*).",
         "surface": "mobius-skills"
       },
       "technical_view": {
         "status": "live",
-        "description": "State machine over research.request/turn that closes questions the corpus cannot answer. Console served from mobius-payor.",
+        "description": "Deep Research closes questions the corpus cannot answer: a state machine over research.request/turn. Two surfaces a person opens \u2014 /research/ask (the user screen) and /research/console (the technical view) \u2014 both served from mobius-payor, while the engine runs as its own service (mobius-deep-research, /api/skills/v1/research*).",
         "repo": "mobius-skills",
-        "module": "(in-repo)"
+        "module": "mobius-deep-research"
       },
       "specs_view": {
         "status": "live",
@@ -1630,13 +1782,22 @@
       },
       "eval_view": {
         "status": "partial",
-        "description": "Cost telemetry instrumented recently — 1 of 47 questions has a cost record, and the console says so on the face of the panel."
+        "description": "Cost telemetry instrumented recently \u2014 1 of 47 questions has a cost record, and the console says so on the face of the panel."
       },
       "git_view": {
         "repo": "mobius-skills",
         "branch": "main",
         "status": "live",
         "deploy_target": "in-repo"
+      },
+      "surfaces": [
+        "/research/ask",
+        "/research/console"
+      ],
+      "deployment": {
+        "url": "https://mobius-deep-research-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-deep-research-00003-mcq",
+        "state": "live"
       }
     },
     {
@@ -1652,22 +1813,22 @@
       "gates": [],
       "user_view": {
         "status": "live",
-        "description": "MCP server exposing ~15 tools fleet-wide — corpus_search, payor_fact, email_*, org_npi_lookup, check_provider_credentialing. How agents other than Chat call skills.",
+        "description": "MCP server exposing ~15 tools fleet-wide \u2014 corpus_search, payor_fact, email_*, org_npi_lookup, check_provider_credentialing. How agents other than Chat call skills.",
         "surface": "mobius-skills-mcp"
       },
       "technical_view": {
         "status": "live",
-        "description": "MCP server exposing ~15 tools fleet-wide — corpus_search, payor_fact, email_*, org_npi_lookup, check_provider_credentialing. How agents other than Chat call skills.",
+        "description": "MCP server exposing ~15 tools fleet-wide \u2014 corpus_search, payor_fact, email_*, org_npi_lookup, check_provider_credentialing. How agents other than Chat call skills.",
         "repo": "mobius-skills-mcp",
         "module": "(in-repo)"
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-skills-mcp",
@@ -1706,11 +1867,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-chat",
@@ -1743,11 +1904,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-auth",
@@ -1769,22 +1930,22 @@
       "gates": [],
       "user_view": {
         "status": "live",
-        "description": "fleet.yaml governs min/max instances for every service. Edit and apply — never raw gcloud, or a service-level minScale annotation survives deploys.",
+        "description": "fleet.yaml governs min/max instances for every service. Edit and apply \u2014 never raw gcloud, or a service-level minScale annotation survives deploys.",
         "surface": "mobius-fleet-power"
       },
       "technical_view": {
         "status": "live",
-        "description": "fleet.yaml governs min/max instances for every service. Edit and apply — never raw gcloud, or a service-level minScale annotation survives deploys.",
+        "description": "fleet.yaml governs min/max instances for every service. Edit and apply \u2014 never raw gcloud, or a service-level minScale annotation survives deploys.",
         "repo": "mobius-fleet-power",
         "module": "(in-repo)"
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-fleet-power",
@@ -1802,7 +1963,7 @@
       "service": "mobius-payor",
       "repo": "mobius-payor",
       "verified": true,
-      "tier": "B→C",
+      "tier": "B\u2192C",
       "gates": [
         4,
         5,
@@ -1810,7 +1971,7 @@
       ],
       "user_view": {
         "status": "live",
-        "description": "Which services a line covers, the codes and modifiers that bill it, and what each payor requires — answered per payor with provenance. 3,648 payor answers over 343 codes and 153 standard requirements. Fees are explicitly out of scope.",
+        "description": "Which services a line covers, the codes and modifiers that bill it, and what each payor requires \u2014 answered per payor with provenance. 3,648 payor answers over 343 codes and 153 standard requirements. Fees are explicitly out of scope.",
         "surface": "mobius-payor /service-lines"
       },
       "technical_view": {
@@ -1821,7 +1982,7 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "Lexicon↔Registry contract is signed; changes go to the contract first."
+        "description": "Lexicon\u2194Registry contract is signed; changes go to the contract first."
       },
       "eval_view": {
         "status": "partial",
@@ -1842,7 +2003,12 @@
           "name": "Review queue",
           "path": "/service-lines/review"
         }
-      ]
+      ],
+      "deployment": {
+        "url": "https://mobius-payor-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-payor-00295-nzt",
+        "state": "live"
+      }
     },
     {
       "id": "fetch-document",
@@ -1857,7 +2023,7 @@
       "gates": [],
       "user_view": {
         "status": "live",
-        "description": "Fetches and verifies an external document — policy PDFs, fee schedules — on demand during a turn.",
+        "description": "Fetches and verifies an external document \u2014 policy PDFs, fee schedules \u2014 on demand during a turn.",
         "surface": "mobius-chat"
       },
       "technical_view": {
@@ -1868,11 +2034,11 @@
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-chat",
@@ -1905,17 +2071,17 @@
       },
       "technical_view": {
         "status": "live",
-        "description": "In-repo (app/api/uploads.py, app/skills/builtin/document_uploads.py) routing to mobius-rag /upload — Path B chunking, lexicon expansion, hybrid retrieval, rerank. The standalone instant-rag envelope service was bypassed 2026-04-27 and deprecated 2026-07-09.",
+        "description": "In-repo (app/api/uploads.py, app/skills/builtin/document_uploads.py) routing to mobius-rag /upload \u2014 Path B chunking, lexicon expansion, hybrid retrieval, rerank. The standalone instant-rag envelope service was bypassed 2026-04-27 and deprecated 2026-07-09.",
         "repo": "mobius-chat",
         "module": "(in-repo)"
       },
       "specs_view": {
         "status": "live",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-chat",
@@ -1953,11 +2119,11 @@
       },
       "specs_view": {
         "status": "building",
-        "description": "—"
+        "description": "\u2014"
       },
       "eval_view": {
         "status": "planned",
-        "description": "—"
+        "description": "\u2014"
       },
       "git_view": {
         "repo": "mobius-rag",
@@ -1966,6 +2132,101 @@
         "deploy_target": "in-repo"
       },
       "stage": "publish"
+    },
+    {
+      "id": "tool-manifest",
+      "name": "Tool Selection / Tool Manifest",
+      "layer": 4,
+      "kind": "agent",
+      "owner": "Tool Manifest",
+      "service": "mobius-tool-manifest",
+      "repo": "mobius-tool-manifest",
+      "verified": true,
+      "tier": "B",
+      "gates": [
+        4
+      ],
+      "user_view": {
+        "status": "live",
+        "description": "Decides which tools ReAct is offered for a turn, and refuses tools whose owners have not declared what they hold or what a call leaves behind.",
+        "surface": "mobius-tool-manifest"
+      },
+      "technical_view": {
+        "status": "live",
+        "description": "Registry + selector. /invoke is the executor; speculative execution is refused unless a tool declares direction=inward AND reversible=true.",
+        "repo": "mobius-tool-manifest"
+      },
+      "deployment": {
+        "url": "https://mobius-tool-manifest-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-tool-manifest-00012-gn4",
+        "state": "live"
+      },
+      "specs_view": {
+        "link": "mobius-tool-manifest/docs/consequence-declaration-request.md",
+        "status": "current",
+        "coverage": "consequence declarations, coverage contract v1, adoption gate"
+      },
+      "eval_view": {
+        "owned_by": "Tool Manifest",
+        "benchmarks": [
+          "selection oracle"
+        ],
+        "gates": [
+          "no bare doc-page name captures a domain",
+          "declared-and-refused vs undeclared"
+        ],
+        "status": "self-tested"
+      },
+      "git_view": {
+        "repo": "mobius-tool-manifest",
+        "branch": "main",
+        "status": "live",
+        "deploy_target": "mobius-tool-manifest"
+      }
+    },
+    {
+      "id": "verify-claims",
+      "name": "Verify Claims",
+      "layer": 4,
+      "kind": "service",
+      "owner": null,
+      "owner_basis": "UNASSIGNED \u2014 deployed and answering /verify; no seat has claimed it. Not inferred from the name (2026-09-16).",
+      "service": "mobius-verify-claims",
+      "repo": null,
+      "verified": false,
+      "tier": null,
+      "gates": [],
+      "user_view": {
+        "status": "live",
+        "description": "Deployed and serving /verify. What it verifies, and for whom, is undeclared.",
+        "surface": "mobius-verify-claims"
+      },
+      "technical_view": {
+        "status": "live",
+        "description": "Two routes: /health, /verify. No owner, no repo recorded."
+      },
+      "deployment": {
+        "url": "https://mobius-verify-claims-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-verify-claims-00004-4fx",
+        "state": "live"
+      },
+      "specs_view": {
+        "link": null,
+        "status": "none",
+        "coverage": "no spec recorded"
+      },
+      "eval_view": {
+        "owned_by": null,
+        "benchmarks": [],
+        "gates": [],
+        "status": "none"
+      },
+      "git_view": {
+        "repo": null,
+        "branch": null,
+        "status": "live",
+        "deploy_target": "mobius-verify-claims"
+      }
     }
   ],
   "coordination": {
@@ -2033,7 +2294,7 @@
       "layer": 0,
       "label": "Pre-Layer 0",
       "name": "Sourcing & Ingestion Pipeline",
-      "description": "How knowledge gets in, stage by stage. Components are shown where they serve — several are Skills (Layer 5) doing ingestion work."
+      "description": "How knowledge gets in, stage by stage. Components are shown where they serve \u2014 several are Skills (Layer 5) doing ingestion work."
     },
     {
       "layer": 1,
@@ -2088,7 +2349,7 @@
     {
       "stage": "acquire",
       "label": "Acquire",
-      "description": "Get the document — crawl, search, fetch, or upload."
+      "description": "Get the document \u2014 crawl, search, fetch, or upload."
     },
     {
       "stage": "extract",
@@ -2158,5 +2419,299 @@
       "description": "Sets and enforces the rules."
     }
   ],
-  "basis": "Modules are deployed services and in-repo code modules, traced to the deploy config or source file that defines them. Claude agent seats appear as `owner`, never as modules — a seat with no code is not a component."
+  "basis": "Modules are deployed services and in-repo code modules, traced to the deploy config or source file that defines them. Claude agent seats appear as `owner`, never as modules \u2014 a seat with no code is not a component.",
+  "endpoints": {
+    "generated_at": "2026-09-17T03:05:22.430769+00:00",
+    "generated_by": "scripts/platform/gen_platform_endpoints.py",
+    "region": "us-central1",
+    "provenance": "measured: gcloud run services list + live HTTP probe",
+    "caveats": [
+      "http is a single unauthenticated GET at generation time; a 200 here is reachability, not a working page, and a scale-to-zero service may answer slowly on the first call",
+      "admin_gated_in_code reads _admin_enabled() in the route body; a gated route can still answer 200 when admin is enabled in that environment",
+      "services_without_module are recorded, not assigned -- guessing an owner from a name is how a registry acquires a wrong one"
+    ],
+    "services": [
+      {
+        "service": "mobius-answer-cache",
+        "url": "https://mobius-answer-cache-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-answer-cache-00005-9w9"
+      },
+      {
+        "service": "mobius-appeals-prototype",
+        "url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-appeals-prototype-00179-88w"
+      },
+      {
+        "service": "mobius-chat",
+        "url": "https://mobius-chat-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-chat-01177-mgf"
+      },
+      {
+        "service": "mobius-db-agent",
+        "url": "https://mobius-db-agent-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-db-agent-00003-9wj"
+      },
+      {
+        "service": "mobius-dbt-ui",
+        "url": "https://mobius-dbt-ui-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-dbt-ui-00001-nqd"
+      },
+      {
+        "service": "mobius-deep-research",
+        "url": "https://mobius-deep-research-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-deep-research-00003-mcq"
+      },
+      {
+        "service": "mobius-doc-reader",
+        "url": "https://mobius-doc-reader-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-doc-reader-00002-8dp"
+      },
+      {
+        "service": "mobius-email",
+        "url": "https://mobius-email-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-email-00008-pbc"
+      },
+      {
+        "service": "mobius-feedback",
+        "url": "https://mobius-feedback-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-feedback-00002-2xm"
+      },
+      {
+        "service": "mobius-google-search",
+        "url": "https://mobius-google-search-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-google-search-00002-zjn"
+      },
+      {
+        "service": "mobius-healthcare",
+        "url": "https://mobius-healthcare-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-healthcare-00001-7d9"
+      },
+      {
+        "service": "mobius-interact",
+        "url": "https://mobius-interact-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-interact-00013-f99"
+      },
+      {
+        "service": "mobius-lexicon-maintenance",
+        "url": "https://mobius-lexicon-maintenance-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-lexicon-maintenance-00069-gmc"
+      },
+      {
+        "service": "mobius-org-agent",
+        "url": "https://mobius-org-agent-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-org-agent-00022-mg4"
+      },
+      {
+        "service": "mobius-org-intelligence",
+        "url": "https://mobius-org-intelligence-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-org-intelligence-00009-gzl"
+      },
+      {
+        "service": "mobius-os-backend",
+        "url": "https://mobius-os-backend-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-os-backend-00005-q9c"
+      },
+      {
+        "service": "mobius-payor",
+        "url": "https://mobius-payor-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-payor-00295-nzt"
+      },
+      {
+        "service": "mobius-phi-classifier",
+        "url": "https://mobius-phi-classifier-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-phi-classifier-00031-k8v"
+      },
+      {
+        "service": "mobius-product-awareness",
+        "url": "https://mobius-product-awareness-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-product-awareness-00092-8fw"
+      },
+      {
+        "service": "mobius-provider-roster-credentialing",
+        "url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-provider-roster-credentialing-00098-rmr"
+      },
+      {
+        "service": "mobius-rag",
+        "url": "https://mobius-rag-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-rag-00734-bvr"
+      },
+      {
+        "service": "mobius-rag-chunking-worker",
+        "url": "https://mobius-rag-chunking-worker-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-rag-chunking-worker-00546-2b6"
+      },
+      {
+        "service": "mobius-rag-embedding-worker",
+        "url": "https://mobius-rag-embedding-worker-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-rag-embedding-worker-00524-vdw"
+      },
+      {
+        "service": "mobius-specs",
+        "url": "https://mobius-specs-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-specs-00003-55h"
+      },
+      {
+        "service": "mobius-story-ui",
+        "url": "https://mobius-story-ui-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-story-ui-00082-5gs"
+      },
+      {
+        "service": "mobius-task-manager",
+        "url": "https://mobius-task-manager-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-task-manager-00029-dd9"
+      },
+      {
+        "service": "mobius-tool-manifest",
+        "url": "https://mobius-tool-manifest-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-tool-manifest-00012-gn4"
+      },
+      {
+        "service": "mobius-user",
+        "url": "https://mobius-user-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-user-00044-8z9"
+      },
+      {
+        "service": "mobius-verify-claims",
+        "url": "https://mobius-verify-claims-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-verify-claims-00004-4fx"
+      },
+      {
+        "service": "mobius-vibe",
+        "url": "https://mobius-vibe-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-vibe-00008-kz6"
+      },
+      {
+        "service": "mobius-web-scraper",
+        "url": "https://mobius-web-scraper-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-web-scraper-00042-wlp"
+      },
+      {
+        "service": "mobius-web-scraper-worker",
+        "url": "https://mobius-web-scraper-worker-ortabkknqa-uc.a.run.app",
+        "ready_revision": "mobius-web-scraper-worker-00032-r58"
+      },
+      {
+        "service": "product-awareness",
+        "url": "https://product-awareness-ortabkknqa-uc.a.run.app",
+        "ready_revision": "product-awareness-00001-9cq"
+      },
+      {
+        "service": "specs-platform",
+        "url": "https://specs-platform-ortabkknqa-uc.a.run.app",
+        "ready_revision": "specs-platform-00006-xk5"
+      }
+    ],
+    "services_without_module": [],
+    "secondary_deployments": [
+      {
+        "service": "product-awareness",
+        "module": "product-awareness"
+      },
+      {
+        "service": "specs-platform",
+        "module": "specs"
+      }
+    ],
+    "surfaces": [
+      {
+        "path": "/",
+        "file": "index.html",
+        "admin_gated_in_code": false,
+        "service": "mobius-chat",
+        "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/",
+        "http": 200
+      },
+      {
+        "path": "/ab",
+        "file": "ab.html",
+        "admin_gated_in_code": true,
+        "service": "mobius-chat",
+        "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/ab",
+        "http": 200
+      },
+      {
+        "path": "/admin/clients",
+        "file": "clients.html",
+        "admin_gated_in_code": false,
+        "service": "mobius-chat",
+        "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/admin/clients",
+        "http": 200
+      },
+      {
+        "path": "/admin/employees",
+        "file": "employees.html",
+        "admin_gated_in_code": false,
+        "service": "mobius-chat",
+        "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/admin/employees",
+        "http": 200
+      },
+      {
+        "path": "/admin/prompts",
+        "file": "prompts.html",
+        "admin_gated_in_code": false,
+        "service": "mobius-chat",
+        "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/admin/prompts",
+        "http": 200
+      },
+      {
+        "path": "/auth/set-password",
+        "file": "set-password.html",
+        "admin_gated_in_code": false,
+        "service": "mobius-chat",
+        "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/auth/set-password",
+        "http": 200
+      },
+      {
+        "path": "/platform",
+        "file": "platform.html",
+        "admin_gated_in_code": false,
+        "service": "mobius-chat",
+        "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/platform",
+        "http": 200
+      },
+      {
+        "path": "/signin",
+        "file": "signin.html",
+        "admin_gated_in_code": false,
+        "service": "mobius-chat",
+        "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/signin",
+        "http": 200
+      },
+      {
+        "path": "/traces",
+        "file": "traces.html",
+        "admin_gated_in_code": true,
+        "service": "mobius-chat",
+        "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/traces",
+        "http": 200
+      },
+      {
+        "path": "/vault",
+        "file": "vault.html",
+        "admin_gated_in_code": false,
+        "service": "mobius-chat",
+        "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/vault",
+        "http": 200
+      },
+      {
+        "path": "/research/ask",
+        "file": null,
+        "admin_gated_in_code": null,
+        "service": "mobius-payor",
+        "label": "Deep Research \u2014 the user screen",
+        "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/research/ask",
+        "http": 200
+      },
+      {
+        "path": "/research/console",
+        "file": null,
+        "admin_gated_in_code": null,
+        "service": "mobius-payor",
+        "label": "Deep Research \u2014 the technical view",
+        "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/research/console",
+        "http": 200
+      }
+    ]
+  }
 }
