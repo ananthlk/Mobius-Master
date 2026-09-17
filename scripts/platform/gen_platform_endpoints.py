@@ -65,7 +65,10 @@ def sweep_chat_surfaces() -> list[dict]:
     return sorted(surfaces, key=lambda s: s["path"])
 
 
-def probe(url: str, timeout: int = 20) -> int | None:
+def probe(url: str, timeout: int = 20, retries: int = 1) -> int | None:
+    """None means NO RESPONSE, which is not the same as 404 and must not be shown
+    as one. Retry once: these are scale-to-zero services and the first hit after
+    idle can exceed the timeout."""
     req = urllib.request.Request(url, method="GET")
     try:
         with urllib.request.urlopen(req, timeout=timeout) as r:
@@ -73,7 +76,7 @@ def probe(url: str, timeout: int = 20) -> int | None:
     except urllib.error.HTTPError as e:
         return e.code
     except Exception:
-        return None
+        return probe(url, timeout=timeout + 20, retries=retries - 1) if retries > 0 else None
 
 
 def sweep_tool_surface() -> dict:
@@ -148,7 +151,69 @@ def main() -> int:
     # 2 — services with no module: recorded, never invented into one
     orphan = [s for k, s in live.items() if k not in by_service and k not in secondary]
 
-    # 3 — surfaces, probed live
+    # 3 — surfaces. Discovered from the services by discover_surfaces.py, not
+    # hand-listed: the hand-written list had 12 and missed the eval consoles,
+    # the research console, org intelligence, the appeals admin pages and the
+    # curator. Curated NAMES are kept where a module already named a path --
+    # "Research Console" reads better than "/research/console" -- but the SET
+    # comes from discovery, so a new page appears without anyone remembering.
+    disc_path = ROOT / "docs" / "surfaces.json"
+    discovered = {}
+    if disc_path.exists():
+        dj = json.loads(disc_path.read_text())
+        for r in dj.get("surfaces", []):
+            discovered.setdefault(r["service"], []).append(r)
+    curated_name = {}
+    for mod in d["modules"]:
+        for sf in mod.get("surfaces") or []:
+            if isinstance(sf, dict) and sf.get("path"):
+                curated_name[((sf.get("service") or mod.get("service")), sf["path"])] = sf.get("name")
+
+    # Attach the discovered set to each module, so the Product cards show every
+    # page that module actually serves.
+    # ATTRIBUTION IS NOT DERIVABLE FROM THE SERVICE. mobius-payor hosts payor,
+    # service-line-registry AND Deep Research's two pages; mobius-rag hosts the
+    # eval consoles and the fact store. An earlier version attached every
+    # discovered page to every module on that service, which made fact-store
+    # claim /eval and service-line-registry claim /research/ask. Wrong
+    # information, confidently presented -- the failure this page exists to fix.
+    #
+    # So: a module keeps the surfaces a HUMAN attributed to it, refreshed with
+    # the measured url/http from discovery. Discovery's full set lives in the
+    # endpoints block grouped by SERVICE, which is a fact, and anything
+    # discovered but attributed to no module is reported as a gap for a person
+    # to assign.
+    attributed: set[tuple[str, str]] = set()
+    for mod in d["modules"]:
+        fresh = []
+        for sf in mod.get("surfaces") or []:
+            if not isinstance(sf, dict) or not sf.get("path"):
+                continue
+            svc = sf.get("service") or mod.get("service")
+            hit = next((r for r in discovered.get(svc, []) if r["path"] == sf["path"]), None)
+            if hit:
+                sf["url"], sf["http"] = hit["url"], hit["http"]
+                sf["behind_login"] = hit["kind"] == "surface-authed"
+                attributed.add((svc, sf["path"]))
+            else:
+                # Declared by a human, not found by discovery. Resolve and probe
+                # it anyway so the page can mark it rather than silently drop it.
+                path = sf["path"]
+                base = live.get(svc, {}).get("url")
+                if base and path.startswith("/") and " " not in path:
+                    u = base.rstrip("/") + ("" if path == "/" else path)
+                    sf["url"], sf["http"] = u, probe(u)
+                else:
+                    sf["url"], sf["http"] = None, None
+            fresh.append(sf)
+        if fresh:
+            mod["surfaces"] = fresh
+
+    unattributed = [r for svc, items in discovered.items() for r in items
+                    if (svc, r["path"]) not in attributed]
+
+    # 3b — chat/payor page probe (kept: it reads chat's ROUTE TABLE, which tells
+    # us the admin gate, something a probe cannot see)
     chat = live.get("mobius-chat")
     surfaces = []
     for s in sweep_chat_surfaces():
@@ -209,6 +274,10 @@ def main() -> int:
         "services_without_module": [s["service"] for s in orphan],
         "secondary_deployments": [{"service": k, "module": m["id"]} for k, m in secondary.items()],
         "surfaces": surfaces,
+        "discovered_surfaces": sorted(
+            [r for items in discovered.values() for r in items],
+            key=lambda r: (r["service"], r["path"])),
+        "discovered_unattributed": sorted(unattributed, key=lambda r: (r["service"], r["path"])),
         "dead_declared_surfaces": [
             {"module": a, "path": b, "http": c} for a, b, c in dead
         ],
@@ -223,6 +292,10 @@ def main() -> int:
           f"surfaces {len(surfaces)} · mcp tools "
           f"{d['endpoints']['tool_surface']['mcp_tool_total']} · builtins "
           f"{d['endpoints']['tool_surface']['builtin_count']}")
+    if unattributed:
+        print(f"   DISCOVERED BUT ATTRIBUTED TO NO MODULE ({len(unattributed)}):")
+        for r in unattributed:
+            print(f"      {r['service']}{r['path']}")
     if dead:
         print(f"   DECLARED SURFACE NOT ANSWERING ({len(dead)}): "
               + ", ".join(f"{a}{b} [{c}]" for a, b, c in dead))
