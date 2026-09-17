@@ -1,0 +1,4502 @@
+{
+ "generated_by": "scripts/platform/gen_deep_research_schema.py",
+ "module": "mobius-skills/deep-research",
+ "consumers": [
+  "service_line_registry",
+  "payor facts"
+ ],
+ "loop": {
+  "opens": "a request states a question, a schema of fields it wants, and how it will judge an answer",
+  "each_round": [
+   "drafter asks the corpus and writes prose",
+   "assembler pulls typed fields out of that prose",
+   "judge checks each field against the ANSWER",
+   "judge opens the cited DOCUMENT and checks it there",
+   "registry says whether that document governs this line",
+   "resolver states what a reader should do with the result",
+   "arbiter reads the drafter's reasoning and decides"
+  ],
+  "repeats_until": "every field the requestor asked for is answered, or the round budget runs out, or nothing actionable is left",
+  "terminates_by": [
+   "settled \u2014 the answer is recorded with its provenance",
+   "escalated \u2014 a person is asked, with the diagnosis attached",
+   "abandoned \u2014 the request itself was malformed"
+  ],
+  "who_decides": "arbiter"
+ },
+ "state": {
+  "request": "the question, its schema, its authority policy",
+  "turn": "one round; carries the query actually asked",
+  "attempt": "one answer, its sources, its reasoning trace, its verdicts",
+  "verdict": "one field, one gate, kept or dropped, with the reason",
+  "diagnosis": "why a question failed and what would fix it"
+ },
+ "gates": [
+  {
+   "n": 1,
+   "gate": "quote is in the ANSWER",
+   "answers": "did the extractor invent the quote"
+  },
+  {
+   "n": 2,
+   "gate": "document was actually cited",
+   "answers": "is the source one the answer used"
+  },
+  {
+   "n": 3,
+   "gate": "authority tier",
+   "answers": "is this source good enough for this caller"
+  },
+  {
+   "n": 4,
+   "gate": "absence by reading",
+   "answers": "was the governing rule read, for a negative"
+  },
+  {
+   "n": 5,
+   "gate": "judged",
+   "answers": "does the quote support THIS value"
+  },
+  {
+   "n": 6,
+   "gate": "document opened",
+   "answers": "does the cited document say it, and where"
+  },
+  {
+   "n": 7,
+   "gate": "subject",
+   "answers": "does that document govern this service line"
+  }
+ ],
+ "modules": [
+  {
+   "id": "acquire",
+   "path": "deep_research/acquire.py",
+   "loc": 446,
+   "role": "Deep Research \u2014 the acquire arm.",
+   "role_full": "Deep Research \u2014 the acquire arm.\n\nHandles exactly one gap class: `not_in_corpus`. The document that would answer\nthe question exists, we know its URL, and we do not hold it. Fetch it, put it\nthrough the canonical ingest path, wait for it to become retrievable, then\nre-ask.\n\nDeliberately narrow. It refuses to run on a gap it has not first proved is an\nacquisition gap \u2014 the whole point of the classifier is that most misses are not\nmissing documents, and re-fetching something we already hold is the failure\nmode this module exists to prevent.\n\nEvery step writes to research.* before it acts, so a run that dies halfway\nleaves a readable trail rather than a mystery.\n\n    python3 acquire.py --consumer service_line_registry [--dry-run]",
+   "api": [
+    "db()",
+    "manifest_rows()",
+    "newest()",
+    "prove_not_in_corpus()",
+    "fetch()",
+    "upload()",
+    "wait_until_retrievable()",
+    "run()",
+    "retry()"
+   ],
+   "config": [
+    "MOBIUS_RAG_URL"
+   ],
+   "writes": [
+    "research.gap",
+    "research.repair",
+    "research.request"
+   ],
+   "reads": [
+    "research.retryable_repairs"
+   ],
+   "imports": [
+    "deep_research"
+   ],
+   "observability": "receipts",
+   "observability_note": "Files ledger events with an actor name, but records no reasoning: you can see WHAT it decided and not why.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "assessments",
+   "path": "deep_research/assessments.py",
+   "loc": 341,
+   "role": "The judge's skills, implemented.",
+   "role_full": "The judge's skills, implemented.\n\nEach answers one question and returns a verdict dict \u2014 never a decision. The\nshape is uniform so the registry can compose them without knowing what any of\nthem does:\n\n    {\"verdict\": <string>, \"why\": <sentence a human can check>, ...evidence}\n\nA skill that cannot run returns verdict=\"abstain\" rather than passing. Absence\nof a check is not a pass, and a caller must be able to tell the difference\nbetween \"checked and fine\" and \"could not check\".",
+   "api": [
+    "cross_line_scope()",
+    "contradicts_existing_fact()",
+    "product_scope()",
+    "list_recall_probe()",
+    "code_to_prose()",
+    "manifest_under_rule()",
+    "follow_reference()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [
+    "diagnose",
+    "verify_source"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "config",
+   "path": "deep_research/config.py",
+   "loc": 75,
+   "role": "Where this module gets its connections \u2014 env first, laptop second.",
+   "role_full": "Where this module gets its connections \u2014 env first, laptop second.\n\nAnanth, 2026-09-09: \"lets fix the worker, that is the real gap.\"\n\nThe gap was never a missing scheduler. It was that this package could not leave\na developer's filesystem:\n\n    ROOT = \"/Users/ananth/Mobius/\"\n    DB   = open(ROOT + \"mobius-rag/.env\")            # at IMPORT time\n    sys.path.insert(0, ROOT + \"mobius-chat\")\n    from app.services.llm_manager import generate_sync\n\nThree hard dependencies on one laptop \u2014 a sibling repo's private .env read at\nimport, a second sibling repo put on sys.path, and another team's module\nimported in-process off THEIR provider keys. A container has none of those, and\nthe failure is at import, so nothing subtler than \"it does not start\" is even\nobservable.\n\nSo: every one of them becomes an environment variable that falls back to the\nlaptop path when it is not set. Local runs keep working exactly as they did;\na container supplies the env and never touches a filesystem it does not have.\n\nRAISES A CLEAR ERROR RATHER THAN GUESSING. A worker that starts with no\ndatabase and discovers it on the first query is a worker whose logs blame the\nquery.",
+   "api": [
+    "mobius_root()",
+    "database_url()",
+    "chat_origin()",
+    "hosted()"
+   ],
+   "config": [
+    "CLOUD_RUN_JOB",
+    "DATABASE_URL",
+    "K_SERVICE",
+    "MOBIUS_CHAT_URL",
+    "MOBIUS_ROOT",
+    "RESEARCH_DATABASE_URL",
+    "RESEARCH_HOSTED"
+   ],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "console",
+   "path": "deep_research/console.py",
+   "loc": 2314,
+   "role": "Render the research console. One command, no hand-authored data.",
+   "role_full": "Render the research console. One command, no hand-authored data.\n\n    python3 -m deep_research.console            # rebuild from research.*\n    python3 -m deep_research.console --open     # and open it locally\n\nWrites a single self-contained HTML file: the dataset is embedded, so the page\nworks from disk, over a static host, or published as an artifact, with no server\nand no database reachable from wherever it ends up being read.\n\nRe-running is the update mechanism. The data comes from console_data.build(),\nwhich normalises the two verdict schemas rather than letting the page guess.",
+   "api": [
+    "served_page()",
+    "render()",
+    "main()"
+   ],
+   "config": [
+    "MOBIUS_CONSOLE_OUT"
+   ],
+   "writes": [],
+   "reads": [],
+   "imports": [
+    "console_data"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "The page a person reads: every question, every round, what each actor did, what it cost and what is waiting on somebody.",
+   "rating": "amber",
+   "group": "the surface",
+   "findings": [
+    [
+     "good",
+     "Generated from one source, with assertions, after two variants of the same page drifted apart."
+    ],
+    [
+     "bad",
+     "Ten uses of design tokens that do not exist rendered transparent, and a sticky header let rows show through it."
+    ]
+   ]
+  },
+  {
+   "id": "console_data",
+   "path": "deep_research/console_data.py",
+   "loc": 212,
+   "role": "Pull the console's dataset out of research.* \u2014 every request, turn, attempt,",
+   "role_full": "Pull the console's dataset out of research.* \u2014 every request, turn, attempt,\nverdict and repair, normalised so the page never has to guess at a shape.\n\nTwo schemas live in `attempt.evaluator_verdict`. The current one nests\n`{extract, critique}`; an earlier one is flat \u2014 `verdict_reason`, `gap_class`,\n`next_query`, written when the loop still made its own judgement inline. A\nconsole that reads only the first labels the rest \"no summary\", which says\nabsence when it means \"I do not know how to read this\" \u2014 the same error as a\nverifier reporting a claim absent from a document when it means absent from the\npassages it happened to look at.\n\nAnd a third case that is neither: extraction failed, so the judge never ran.\nThere is genuinely nothing to summarise, and saying so is different from saying\nnothing was found.",
+   "api": [
+    "build()"
+   ],
+   "config": [],
+   "writes": [
+    "research.language"
+   ],
+   "reads": [
+    "research.actor_cost",
+    "research.attempt",
+    "research.diagnosis",
+    "research.gap",
+    "research.halt",
+    "research.ledger",
+    "research.open_work",
+    "research.overdue",
+    "research.overrule_request",
+    "research.repair",
+    "research.request",
+    "research.request_cost",
+    "research.task_progress",
+    "research.turn",
+    "research.unresolved"
+   ],
+   "imports": [
+    "deep_research",
+    "run_research"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "contract",
+   "path": "deep_research/contract",
+   "loc": 2062,
+   "role": "The contract: one declaration, several consumers.",
+   "role_full": "The contract: one declaration, several consumers.\n\nAnanth, 2026-09-09: \"we need to keep your code base really modular.\"\n\nSo the declaration is a package rather than a thousand-line module, split by the\nquestion each part answers:\n\n    artifacts   the seven things every request carries, and which exist\n    authority   under what rules it may be executed\n    tools       what it may use\n    decisions   what the caller keeps and what they delegate\n    tasks       the work itself, which may serve many questions or none\n    fields      what a caller may state\n    verbs       what they can call\n    surfaces    where it is rendered\n    actions     what a person can DO about a result\n    specifics   how to say it about THIS question rather than in general\n    notes       passing the drafter what it was missing\n    words       what must never appear on a button, and who may press one\n\n`as_doc()` composes them into the row that gets published, and everything a\ncaller used to import from `contract.py` still imports from `contract`.\n\nWHY A PACKAGE AND NOT SEVEN IMPORTS AT THE CALL SITE: the router does not import\nthis at all \u2014 it reads the published row \u2014 and the generators want the whole\nthing. One composed document keeps the seam exactly where it was.",
+   "api": [
+    "as_doc()",
+    "verb()",
+    "check()",
+    "publish()",
+    "facts()",
+    "actions_for()",
+    "for_field()",
+    "admits()",
+    "right()",
+    "undeclared()"
+   ],
+   "config": [],
+   "writes": [
+    "research.contract"
+   ],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "Declares the four verbs a caller can use \u2014 submit, check status, decide, close out \u2014 and the five surfaces that render them, once, in one file. Published to a table so the router validates against it instead of restating it.",
+   "rating": "green",
+   "group": "the surface",
+   "findings": [
+    [
+     "good",
+     "Seven code paths could create a request and one of them checked anything. This is the declaration the eighth \u2014 the HTTP door \u2014 reads at request time, so it cannot drift from what the page shows."
+    ],
+    [
+     "good",
+     "The UX is declared beside the verbs it calls, so a surface rendering an API that does not exist fails the build rather than a demo."
+    ],
+    [
+     "unproven",
+     "Written 2026-09-09. Six ungated insert paths still exist; the invariant names them rather than removing them."
+    ],
+    [
+     "good",
+     "A package since the framework landed \u2014 fields, verbs, surfaces, actions, specifics, notes, words, artifacts, authority, tools, decisions, tasks. The split failed the generator's own invariant on the first build, which is the check doing its job."
+    ]
+   ]
+  },
+  {
+   "id": "contract/actions",
+   "path": "deep_research/contract/actions.py",
+   "loc": 406,
+   "role": "What a person can DO about a question \u2014 the vocabulary, when each is offered, which one is advised and why.",
+   "role_full": "What a person can DO about a question \u2014 the vocabulary, when each is offered, which one is advised and why.",
+   "api": [
+    "facts()",
+    "actions_for()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "contract/artifacts",
+   "path": "deep_research/contract/artifacts.py",
+   "loc": 91,
+   "role": "The seven things every request carries \u2014 and which of them actually exist.",
+   "role_full": "The seven things every request carries \u2014 and which of them actually exist.\n\nAnanth, 2026-09-09: \"so we have request, output, authority, tools, decisions,\n(recommendations), status.. these are good artifacts of things we need.\"\n\nMeasured across the 68 live requests at the moment this was written, because a\nframework that cannot say what it is missing is a diagram:\n\n    request          68/68   question and subject\n    output           43/68   schema \u00b7 53 judging instructions \u00b7 10 expectations\n    authority         4/68   the source bar \u00b7 35 an authority policy \u00b7 0 a rule\n    tools             0/68   nothing declares them; no column, no table\n    decisions         0/68   nothing declares them\n    recommendations  58/68   built today, and its first run found nothing usable\n    status           68/68\n\nTwo complete, two partial, three absent \u2014 and the three absent ones are exactly\nwhere the arbiter has been improvising.",
+   "api": [],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "contract/authority",
+   "path": "deep_research/contract/authority.py",
+   "loc": 120,
+   "role": "Under what rules may this request be executed?",
+   "role_full": "Under what rules may this request be executed?\n\nAnanth, 2026-09-09: \"this now calls for a new type which is rules / authority to\nexecute the request.\"\n\nIt was the third leg of the framework and the emptiest thing in the record:\n\n    authority         4 of 68 requests\n    authority_policy 35 of 68\n    rule_ref          0 of 68\n\nAnd the consequence is measurable. Of every decision ever put to a person in this\nmodule, the ONLY one anybody has ever answered is `widen_authority` \u2014 four times.\nThe single question humans have been asked is the one the caller could have\nanswered once, in advance, and on 64 of 68 requests did not.\n\nTHE BASIS, NOT JUST THE TIER. Service Line Facts, 2026-09-09, shipped\n`source_admissible` returning WHY it decided \u2014 `the corpus records payer=X`\nversus `identified from the document name`. That makes a grant conditional on\nevidence rather than on a label: you can permit a payer manual where the corpus\nsays so and refuse one inferred from a filename. A tier alone cannot express\nthat, which is part of why the tier field sat unused.",
+   "api": [
+    "for_field()",
+    "admits()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "contract/decisions",
+   "path": "deep_research/contract/decisions.py",
+   "loc": 189,
+   "role": "What may the machine decide, and what does the caller want to own?",
+   "role_full": "What may the machine decide, and what does the caller want to own?\n\nAnanth, 2026-09-09: \"they have a) the request b) the output they want c) the\nfreedom authority they have given you and what they want to own.. decisions.\"\nAnd then the sharper half: \"it also allows the arbiter / diagnoser to make\nrecommendations based on established rules as against their whims.\"\n\nThat second point is the load-bearing one and the traces prove it. The judge is\nthe only actor with a declared standard to reason against, and it visibly cites\nit \u2014 \"'59G-4.028.pdf' is wrong_rule; this caller allows published_standard,\nincorporated_by_reference\". The arbiter has none, so it reasons from patterns it\ncarries itself: \"no pattern matched\". Between them the arbiter and diagnoser have\nrecorded 13 reasoning steps against the judge's dozens. An actor with no standard\nto reason against does not merely decide worse \u2014 it has less to say.\n\nTWO AXES, NOT ONE. Ananth's (c) bundles freedom with ownership and they come\napart: `right` is who may decide, `owns` is whose name is on the record. Registry\nmade exactly this distinction about `narrow` \u2014 an appeals reviewer CAN press it\nand MUST NOT, because the competence and the accountability sit in different\nseats. One field cannot say that.\n\nUNDECLARED DEFAULTS TO ASK, and that default is a meter. Every time it fires,\nthat is a decision the request type should have cover",
+   "api": [
+    "right()",
+    "undeclared()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "contract/fields",
+   "path": "deep_research/contract/fields.py",
+   "loc": 68,
+   "role": "The field vocabulary \u2014 what a caller may state, and why each one exists.",
+   "role_full": "The field vocabulary \u2014 what a caller may state, and why each one exists.",
+   "api": [],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "contract/notes",
+   "path": "deep_research/contract/notes.py",
+   "loc": 183,
+   "role": "A note to the drafter, and what becomes of it.",
+   "role_full": "A note to the drafter, and what becomes of it.",
+   "api": [
+    "note_signals()",
+    "note_receipt()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "contract/specifics",
+   "path": "deep_research/contract/specifics.py",
+   "loc": 208,
+   "role": "The specific recommendation, not the generic one. Sentences are data: per action an ordered list of [required slots, sentence].",
+   "role_full": "The specific recommendation, not the generic one. Sentences are data: per action an ordered list of [required slots, sentence].",
+   "api": [
+    "doc_kind()",
+    "doc_scope()",
+    "slots()",
+    "specifics()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "contract/surfaces",
+   "path": "deep_research/contract/surfaces.py",
+   "loc": 117,
+   "role": "The UX doors. Declared beside the verbs they call, so a surface rendering an API that does not exist fails the build rather than a demo.",
+   "role_full": "The UX doors. Declared beside the verbs they call, so a surface rendering an API that does not exist fails the build rather than a demo.",
+   "api": [],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "contract/tasks",
+   "path": "deep_research/contract/tasks.py",
+   "loc": 133,
+   "role": "A worklist is activities, not questions.",
+   "role_full": "A worklist is activities, not questions.\n\nAnanth, 2026-09-09: \"this is a bunch of activities without regard to a question.\nretrieve this document \u2014 closes xx high priority questions. call this person and\nfind this answer .. this does not have to be about a question but we have mapped\nevery action/task to a question .. so we are unlocking this.\"\n\nEvery action in this module has been an action ON a question, one row per\nquestion. That is the wrong grain for the person doing the work, and it hides\nthe only thing that matters when choosing what to do next: how much a single\nactivity is worth.\n\nMeasured across the 39 questions currently carrying advice:\n\n    23 questions  ->  ONE activity \u2014 run them against today's checks\n    10 questions  ->  10 fetches, one per line; they do NOT collapse, because\n                      they need different documents\n     0 questions  ->  share a named rule\n\nThe collapse is real and it is concentrated. A worklist of 39 rows becomes 11,\nand its top item is worth 23 \u2014 an item that was invisible as 23 separate rows\nbecause it looked like 23 separate problems.\n\nPRIORITY IS DERIVED, NEVER ASSIGNED. The moment somebody can type a number into\nit, the number stops describing the work. What a task is worth is how many\nquestions it unblocks and how overdue they are, and both are already recorded.",
+   "api": [
+    "worth()",
+    "orderable()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "contract/tools",
+   "path": "deep_research/contract/tools.py",
+   "loc": 156,
+   "role": "What may the machine use to answer this?",
+   "role_full": "What may the machine use to answer this?\n\nAnanth, 2026-09-09, naming the artifacts: \"request, output, authority, tools,\ndecisions, (recommendations), status.\"\n\n`tools` is the one with nothing behind it at all \u2014 no column, no table, no\ndeclaration anywhere. The machine has always used whatever the entry point\nhappened to wire up, which is the same defect as the five ways to run a turn\nseen from the caller's side: what a request GETS depends on which door it came\nthrough, and nothing on the result says which.\n\nDeclaring the grant makes two things possible that are impossible today: a\ncaller can decline something that costs money or leaves the building, and a\nresult can say which tools were actually available when it was produced.\n\nCOST AND EGRESS ARE THE TWO THAT MATTER. Everything else is a preference; these\ntwo are the ones a caller would want to refuse and cannot today.",
+   "api": [
+    "granted()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "contract/verbs",
+   "path": "deep_research/contract/verbs.py",
+   "loc": 173,
+   "role": "The verbs a caller can use. One declaration; the API, the schematic and the UX all read it.",
+   "role_full": "The verbs a caller can use. One declaration; the API, the schematic and the UX all read it.",
+   "api": [],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "contract/words",
+   "path": "deep_research/contract/words.py",
+   "loc": 33,
+   "role": "Words that carry consequence outside this module, and the roles that may press things. Kept apart because two domain seats refused the same word for two different reasons, which is what made them worth enforcing.",
+   "role_full": "Words that carry consequence outside this module, and the roles that may press things. Kept apart because two domain seats refused the same word for two different reasons, which is what made them worth enforcing.",
+   "api": [],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "corroborate",
+   "path": "deep_research/corroborate.py",
+   "loc": 818,
+   "role": "Where else does this claim live, and do those places agree?",
+   "role_full": "Where else does this claim live, and do those places agree?\n\nValidation asks whether the named document supports the claim. That is the wrong\nquestion, or at least a much smaller one. A claim confirmed in one document and\ncontradicted in another is the most important thing the corpus can tell us \u2014 and\na check that stops at the first confirmation reports it as settled.\n\nSo: find every place the claim's subject appears, read what each one says, and\ncompare. Six outcomes, and only the first is boring:\n\n    corroborated       several documents, same value.\n    contradicted       several documents, DIFFERENT values, same subject.\n                       Nobody certifies this until a human rules.\n    mis_attributed     the value is real; the document named does not hold it.\n    claim_unsupported  the subject is covered and nobody states this value.\n    single_source      one document says it, nothing else mentions the subject.\n    not_found          nothing discusses the subject at all.\n\nWHY AN LLM DECIDES \"same subject\" AND NOT A REGEX. This was rules first, and the\nrules kept being wrong in ways that mattered:\n\n    \"claims\"     matched a credentialing paragraph \u2014 \"liability claims have the\n                 right to request reconsideration within 30 days\" \u2014 and the\n                 30 days was reported as a rival deadline for clean-claim\n                 adjudication.\n    \"electronic",
+   "api": [
+    "content_words()",
+    "duplicates_of()",
+    "corroborate()",
+    "verify_in_document()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [
+    "deep_research",
+    "locate",
+    "run_v2",
+    "verify_source"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "Opens the document a claim cites and decides whether it really says it, by reading the passages most likely to carry it.",
+   "rating": "amber",
+   "group": "the judge",
+   "findings": [
+    [
+     "bad",
+     "Returned `absent` \u2014 the document does not say it \u2014 when passage SELECTION found nothing to read. Seven of eleven document-gate refusals in one run were that, including a claim the rule states verbatim."
+    ],
+    [
+     "good",
+     "Now returns `undecidable` with read=0, and `absent` requires that passages were read and refused."
+    ]
+   ]
+  },
+  {
+   "id": "diagnose",
+   "path": "deep_research/diagnose.py",
+   "loc": 608,
+   "role": "Why did this fail, and what is the next step?",
+   "role_full": "Why did this fail, and what is the next step?\n\nA rejected turn is only useful if it names a repair. The four gap classes each\nimply a different one \u2014 acquire a document, reindex it, teach the lexicon a\nword, or ask a human \u2014 and picking the wrong one wastes the loop: re-running a\nquery against a corpus that does not contain the document will fail exactly the\nsame way, forever.\n\nSo this asks the database, not a model. Every step below is a fact the system\ncan already check about itself, walked in order from \"the source does not exist\"\nto \"the source exists, was read, and does not say it\". The first step that fails\nis the diagnosis, because the later ones are meaningless until the earlier one\nholds \u2014 there is no point asking whether retrieval worked for a document nobody\never downloaded.\n\nThe output is meant to be acted on without a human rewriting it: a gap class,\nthe evidence that produced it, and a next step concrete enough to execute.",
+   "api": [
+    "manifest_entry()",
+    "authority_tier()",
+    "served_the_subject()",
+    "diagnose()",
+    "governing_binds()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [
+    "deep_research",
+    "resolve",
+    "thinking"
+   ],
+   "observability": "reasons",
+   "observability_note": "Writes a step-by-step trace to research.actor_thinking \u2014 what it saw, what it made of it, what it decided.",
+   "can_record_failure": true,
+   "how": "Works out WHY a question failed \u2014 is the rule missing, is it held but unreadable, did we answer about the wrong service, is our own schema the blocker \u2014 and says what would fix it.",
+   "rating": "amber",
+   "group": "the loop",
+   "findings": [
+    [
+     "good",
+     "Every branch returns through one place, so a gate added later cannot forget to record its reasoning."
+    ],
+    [
+     "bad",
+     "authority_tier called the RIGHT rule the wrong one whenever a request carried no rule reference \u2014 nothing was compared, and all five fields of one question were refused on it."
+    ],
+    [
+     "unproven",
+     "Instrumented on 2026-09-09 and has not fired once in six runs."
+    ]
+   ]
+  },
+  {
+   "id": "diagnose_live",
+   "path": "deep_research/diagnose_live.py",
+   "loc": 305,
+   "role": "A diagnoser that can LOOK before it concludes.",
+   "role_full": "A diagnoser that can LOOK before it concludes.\n\nAnanth, 2026-09-11, after seeing what the deterministic one produced on DR-205:\n\"the actual problem is it does not have any tools to do anything .. offer it\nsome tools so that it can search or do something .. it probably needs a mini\nchat loop.\"\n\nWHAT A DECISION TREE CANNOT TELL APART. `diagnose.py` is pure SQL plus one\nlocal CSV read \u2014 no model, no tools. It is the actor that decides why a round\nfailed and what happens next, and its whole ability to check the world is a\nhandful of selects. On DR-205 it concluded:\n\n    not_in_corpus \u00b7 acquire\n    \"the question is about sipp, and the corpus holds no document for sipp at all\"\n\nThe turn had read eleven documents, several of them SIPP-specific, and the\ncorrected verifier finds the claim stated in one of them. The mechanism\ngeneralises: a guard written for payors \u2014 asked about CIGNA, the machine cited\neight other payors' documents \u2014 is self-limiting by the rule \"only run when the\nsubject's own name appears in the question, which is true of a payor and false\nof a service-line key like bh_therapy\". `sipp` is a service line whose acronym\nis spelled out in the question, so the guard fired, and then asked\n`select count(*) from documents where payer ilike '%sipp%'` \u2014 is any document's\nPAYER \"sipp\" \u2014 which is zero by construction.\n\n**A decision tree cannot tell \"we hold nothing\" from \"my quer",
+   "api": [
+    "compose()",
+    "classify()",
+    "look()",
+    "compare()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [
+    "research.turn"
+   ],
+   "imports": [
+    "deep_research",
+    "run_research"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "discovery",
+   "path": "deep_research/discovery.py",
+   "loc": 163,
+   "role": "Deep Research \u2014 the Discovery seam (ingest STUBBED).",
+   "role_full": "Deep Research \u2014 the Discovery seam (ingest STUBBED).\n\nIngest belongs to the RAG agent under MOBIUS_DISCOVERY_INGEST_CONTRACT.md. This\nmodule is only my side of it: build a well-formed request, submit it, record\nwhichever of their four outcomes came back, and afterwards check whether the gap\nI cited actually moved.\n\n`submit()` is a stub. It records the request and returns `pending` without\ncalling anything, so the loop, the ledger and the UX are all exercisable today\nand swapping in the real endpoint later touches one function.\n\nThree contract rules are honoured here rather than assumed:\n\n  * Every request names the gap it is meant to close. A request without one is\n    refused before it is written \u2014 that is the site-driven crawling the\n    contract exists to prevent.\n\n  * No local dedup. We never suppress a submission to avoid a duplicate, and a\n    `duplicate` outcome is recorded as a success and never retried. A fetcher\n    cannot tell a duplicate from a product variant from a period series; the\n    gate decides. Suppressing locally is how this year's attestation forms\n    nearly got retired in favour of last year's.\n\n  * Dates are only ever what the document states. There is no computed-date\n    path in this file and no column to put one in.",
+   "api": [
+    "db()",
+    "submit()",
+    "record_outcome()",
+    "should_retry()",
+    "measure_before()",
+    "measure_after()",
+    "report()"
+   ],
+   "config": [],
+   "writes": [
+    "research.discovery_request",
+    "research.gap_measurement"
+   ],
+   "reads": [
+    "research.discovery_effect"
+   ],
+   "imports": [
+    "deep_research"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "executor",
+   "path": "deep_research/executor.py",
+   "loc": 167,
+   "role": "The Executor \u2014 performs what the Arbiter dispatches, and nothing it decides.",
+   "role_full": "The Executor \u2014 performs what the Arbiter dispatches, and nothing it decides.\n\nOne actor with a skill registry, the mirror of the Judge: the Judge's skills\nproduce verdicts, the Executor's produce state changes. An earlier design named\nfive separate actors here \u2014 Locator, Acquirer, Indexer, Glossarist, Escalation \u2014\nwhich was inconsistent, because they share one contract and differ only in\ncapability. That is a skill, not an actor.\n\nThe attribute that matters is not the capability but the DIRECTION:\n\n  inward   changes our own state \u2014 locate, acquire, reindex, gloss.\n           Retryable. A failure costs a dispatch.\n  outward  changes the world's \u2014 file, call, escalate.\n           Consumes something. Some cannot be undone at all.\n\nThat line is where the caller's bar bites, and it is the whole reason this is\none registry with an attribute rather than five actors. Dispatching `acquire` at\n0.4 confidence is fine; being wrong costs a fetch. Dispatching `file` at the same\n0.4 spends an appeal level that does not come back.",
+   "api": [
+    "register()",
+    "dispatch()",
+    "report()"
+   ],
+   "config": [],
+   "writes": [
+    "research.ledger"
+   ],
+   "reads": [],
+   "imports": [
+    "deep_research"
+   ],
+   "observability": "receipts",
+   "observability_note": "Files ledger events with an actor name, but records no reasoning: you can see WHAT it decided and not why.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "extract_critique",
+   "path": "deep_research/extract_critique.py",
+   "loc": 1106,
+   "role": "Extraction and critique, deliberately split.",
+   "role_full": "Extraction and critique, deliberately split.\n\nThe extractor's job is to produce the JSON the fact store actually wants. The\ncritic's job is to disbelieve it \u2014 every field, every value, every source, one\nat a time.\n\nThey are separate because they pull in opposite directions. An extractor asked\nto also police itself will quietly relax its own standard to produce something;\na critic with no stake in producing output can refuse a field without refusing\nthe record. Splitting them also means the extractor can be generous \u2014 pull\neverything it can see \u2014 while the critic decides what survives.\n\nThe check that matters is per FIELD, not per record. A single quote \"grounding\"\nan eight-item list is not grounding; it is one item's evidence borrowed to cover\nseven others. Each field carries its own quote and its own document, and each is\nverified on its own:\n\n    mechanical   the quote appears verbatim in the answer  (string, not opinion)\n    mechanical   the document is one chat actually cited   (set membership)\n    judged       the quote actually supports THIS value    (model)\n\nA field failing any of the three is dropped. A record is accepted only if every\nfield the invoker marked required survives.",
+   "api": [
+    "extract()",
+    "judge_one()",
+    "critique()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [
+    "diagnose"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "Pulls typed fields out of chat's prose, then checks each one: is the quote really in the answer, was the document really cited, is the source authoritative enough for this caller, and does the quote actually support this value.",
+   "rating": "amber",
+   "group": "the judge",
+   "findings": [
+    [
+     "good",
+     "Gates are ordered and each one names what it answers, so a refusal says which question failed."
+    ],
+    [
+     "good",
+     "An absence is now evidenced by having READ the governing rule rather than by quoting one, which is the only way a true negative can ever pass."
+    ],
+    [
+     "bad",
+     "`scope` was extracted and then dropped from the verdict record, so three scoped facts read as one field with three values and the corpus looked self-contradictory."
+    ],
+    [
+     "bad",
+     "`_schema_gap` is requested in the prompt and appeared exactly once in the whole repository \u2014 in the prompt asking for it. The model complied and nothing read it."
+    ]
+   ]
+  },
+  {
+   "id": "fact_rows",
+   "path": "deep_research/fact_rows.py",
+   "loc": 88,
+   "role": "Turn accepted fields into fact-store rows.",
+   "role_full": "Turn accepted fields into fact-store rows.\n\nThe record a caller reads and the rows a fact store writes are not the same\nobject. A record is one dict for a human or a schema; a row is one claim with\nits own evidence, because that is the grain at which a store certifies, expires\nand re-verifies. A record cannot say \"this field came from page 10 of that\ndocument and here is the sentence\" \u2014 a row must.\n\nShape follows what Payor Facts asked for, and the two hard requirements are\ntheirs, learned the expensive way:\n\n  value_verbatim      what the source SAID, never what we computed. Normalise\n                      visibly at write, never silently at extract.\n  source_document_id  an id, never a name. Names are how a store ends up with\n                      facts it cannot join back to the corpus.",
+   "api": [
+    "fact_rows()",
+    "normalize_deadline()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [
+    "verify_source"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "grants",
+   "path": "deep_research/grants.py",
+   "loc": 112,
+   "role": "What this request allows \u2014 read by the loop, and recorded when it is.",
+   "role_full": "What this request allows \u2014 read by the loop, and recorded when it is.\n\nAnanth, 2026-09-09: \"take every one of those attributes and make them\nincorporated in our loop. This will be a big deal as it will create so many\nskills.\" And earlier, the reason: \"it also allows the arbiter / diagnoser to\nmake recommendations based on established rules as against their whims.\"\n\nThe traces show exactly that gap. The judge is the only actor with a declared\nstandard and it visibly cites it \u2014 \"'59G-4.028.pdf' is wrong_rule; this caller\nallows published_standard, incorporated_by_reference\". The arbiter has none, so\nit reasons from patterns it carries itself: \"no pattern matched\". Between the\narbiter and the diagnoser: 13 reasoning steps, against the judge's dozens. An\nactor with no standard to reason against does not merely decide worse \u2014 it has\nless to say.\n\nEVERY CONSULTATION IS RECORDED. A grant nothing reads is the defect this module\nhas found eleven times, one layer up: a declaration that looks like control and\nis decoration. `research.grant_use` is the read-back, and the question it lets\nanybody ask is \"which grants has this loop actually consulted?\" \u2014 which is not\nanswerable about a rule that only lives in a column.\n\nNULL IS NOT PERMISSION. An undeclared grant falls to the contract's default, and\nthe contract's defaults refuse: a payer manual is inadmissible for a state-rule\nquestion whet",
+   "api": [
+    "may_use()",
+    "may_decide()",
+    "admits()",
+    "consulted()"
+   ],
+   "config": [],
+   "writes": [
+    "research.grant_use"
+   ],
+   "reads": [
+    "research.request"
+   ],
+   "imports": [
+    "deep_research"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "halt",
+   "path": "deep_research/halt.py",
+   "loc": 193,
+   "role": "Stopping, as something the machine knows rather than something done to it.",
+   "role_full": "Stopping, as something the machine knows rather than something done to it.\n\nThe loop has three clean exits and they share a property: each is a decision the\narbiter reaches, and each writes the ledger before it returns. Halt arrives from\noutside and mid-action, so it cannot use that path \u2014 but it must end up with the\nsame property, or a stop leaves the record lying about the world.\n\nThe rule is simple and the discipline is the whole thing:\n\n    CHECK BETWEEN ACTIONS, NEVER DURING ONE.\n\nAn action already in flight finishes and records itself. The next one does not\nstart. Nothing is interrupted, so nothing is half-written. `pkill` cannot offer\nthat, which is why one landed between an acquire's corpus write and its ledger\nwrite tonight and left two rows claiming a document had failed to arrive when it\nwas already in the corpus.\n\nGeneric on purpose. Scope is a dimension every task has \u2014 who asked, what is\nbeing asked about, what kind of work it is \u2014 not a column borrowed from the\nquestion that happened to prompt it:\n\n    stop(cur, \"action\", \"acquire\",   reason=..., by=...)   every fetch, any consumer\n    stop(cur, \"consumer\", \"appeals\", reason=..., by=...)   one caller's work\n    stop(cur, \"subject\", \"bh_therapy\", reason=..., by=...) one line, any caller\n    stop(cur, \"request\", \"36\",       reason=..., by=...)   one question\n    stop(cur, \"global\", None,        reason=..., by=...) ",
+   "api": [
+    "stop()",
+    "release()",
+    "active()",
+    "checkpoint()",
+    "mark_turn_halted()",
+    "resume_after()"
+   ],
+   "config": [],
+   "writes": [
+    "research.halt",
+    "research.turn"
+   ],
+   "reads": [],
+   "imports": [
+    "deep_research"
+   ],
+   "observability": "receipts",
+   "observability_note": "Files ledger events with an actor name, but records no reasoning: you can see WHAT it decided and not why.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "intake",
+   "path": "deep_research/intake",
+   "loc": 805,
+   "role": "Get a request in \u2014 the one door, as a module.",
+   "role_full": "Get a request in \u2014 the one door, as a module.\n\nAnanth, 2026-09-09: \"get a request is what we are building and we need a place\nto store it.\" And: \"please make this modular.\"\n\nSeven code paths could create a research.request and exactly one refused a\nrequest it could not judge. That is why 15 of 68 carry no judging instructions\nand 17 have no invoker. The fix was never a seventh check; it is one intake with\nthe gate underneath it, and this is that intake as a thing with a name rather\nthan a function buried in a runner.\n\n    check.py      is this a request we can work \u2014 in the contract's own words\n    normalise.py  fill what the caller did not say, and record that we filled it\n    store.py      write it down, and keep what they actually sent\n\n`take()` returns everything a caller needs to know at submit time: the id, what\nwas refused, what will not be measurable, and \u2014 the new part \u2014 which of their\nseven artifacts they left to us.",
+   "api": [
+    "take()",
+    "required()",
+    "warnings()",
+    "vocabulary()",
+    "grants()",
+    "labelled()",
+    "deterministic()",
+    "propose()",
+    "check_provenance()",
+    "parse()"
+   ],
+   "config": [],
+   "writes": [
+    "research.request",
+    "research.turn"
+   ],
+   "reads": [],
+   "imports": [
+    "deep_research",
+    "contract.decisions",
+    "run_v2"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "intake/check",
+   "path": "deep_research/intake/check.py",
+   "loc": 116,
+   "role": "Is this request one we can actually work?",
+   "role_full": "Is this request one we can actually work?\n\nEvery refusal here is a sentence the contract already carries. The module does\nnot invent wording: a caller refused at the CLI and a caller refused over HTTP\nshould read the same words, because they are the same refusal.",
+   "api": [
+    "required()",
+    "warnings()",
+    "vocabulary()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [
+    "deep_research",
+    "contract.decisions"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "intake/normalise",
+   "path": "deep_research/intake/normalise.py",
+   "loc": 52,
+   "role": "Fill in what the caller did not say \u2014 and record that we filled it.",
+   "role_full": "Fill in what the caller did not say \u2014 and record that we filled it.\n\nTHE DEFAULTS REFUSE. Not declaring a source bar is not permission to use\nanything; not declaring a tool grant does not authorise spending somebody's\nweek acquiring a document; not declaring a decision right does not delegate it.\n64 of 68 requests declared no bar, and a check that passes on silence is a check\nthat has been passing everything.\n\n`declared` versus `defaulted` is kept per member, not per artifact, because the\ninteresting question later is which SPECIFIC defaults keep firing \u2014 that is the\nmeter on what a request type should have covered.",
+   "api": [
+    "grants()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [
+    "deep_research"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "intake/parse",
+   "path": "deep_research/intake/parse.py",
+   "loc": 363,
+   "role": "Prose in, seven artifacts out \u2014 and a hard line down the middle.",
+   "role_full": "Prose in, seven artifacts out \u2014 and a hard line down the middle.\n\nAnanth, 2026-09-09: \"the module has to do it. is it through llm, or there is\nregex? .. or a combination.\"\n\nA combination, and the split is not about which is more accurate. It is about\nwhat each field IS:\n\n    DESCRIPTIVE fields \u2014 subject, question, how_to_judge, schema, expects \u2014\n    describe the world. A model reading them out of prose can be wrong, and a\n    wrong one is VISIBLE: the question reads oddly, the schema asks for the\n    wrong thing, somebody corrects it. Model, then confirm.\n\n    GRANTS \u2014 authority, tools, decisions \u2014 are PERMISSION. They do not describe\n    anything; they say what the caller allows. A model inferring one is\n    manufacturing consent that was never given, and a manufactured grant is\n    invisible by construction: it looks exactly like a declared one. So a grant\n    is STATED or it is DEFAULTED, and the defaults refuse.\n\nThat line is the whole design. Everything else here is mechanics.\n\nTHREE-WAY PROVENANCE, not two:\n\n    stated      the caller wrote it, and we matched it deterministically\n    proposed    a model read it out of their prose \u2014 needs confirming\n    defaulted   nobody said, so the contract's default applies\n\n`proposed` on a grant is impossible, and `check_provenance` refuses it rather\nthan trusting that nothing produces one.",
+   "api": [
+    "labelled()",
+    "deterministic()",
+    "propose()",
+    "check_provenance()",
+    "parse()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [
+    "deep_research",
+    "run_v2"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "intake/readback",
+   "path": "deep_research/intake/readback.py",
+   "loc": 159,
+   "role": "Say back what you heard, in one paragraph, and then either go or ask.",
+   "role_full": "Say back what you heard, in one paragraph, and then either go or ask.\n\nAnanth, 2026-09-09: \"should this be a dialogue.. the acknowledgement for a user\nshould be as simple as 'I have everything I need' or 'clarify' .. without this\nthe right hand side is too technical for a user.\"\n\nHe is right and it is the language lesson arriving again on a new screen. The\nfirst cut of the Ask page showed field names, provenance tags and a JSON\npayload \u2014 an accurate picture of the parse and a bad answer to the only question\nthe person actually asked, which is \"did you understand me?\"\n\nTHE READBACK IS THE CONFIRMATION. If the paragraph reads right, they press go.\nIf it does not, they say what is wrong in prose and it parses again. Nobody\nshould have to edit JSON to correct a misreading, and making them do it means\nonly the people who can read JSON can catch one.\n\nWHAT MAKES IT ASK RATHER THAN GO. Only things that change the work:\n\n    no question         nothing to do\n    no standard         we cannot judge an answer for your store, and a generic\n                        one is how a confidently wrong extraction gets written\n                        to a certified store\n    no subject          the answer has nowhere to be filed\n    nothing to give back  a partial answer will close as answered\n\nEverything else \u2014 an unstated grant, an unstated tool \u2014 is not a clarification.\nIt is a default, and the ",
+   "api": [
+    "readback()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [
+    "deep_research"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "intake/store",
+   "path": "deep_research/intake/store.py",
+   "loc": 63,
+   "role": "Write it down \u2014 and keep what the caller actually sent.",
+   "role_full": "Write it down \u2014 and keep what the caller actually sent.\n\n`submitted` holds the spec verbatim. Without it, a defaulted grant and a\ndeclared one that happens to match are indistinguishable a week later, and the\nwhole point of recording `defaulted` is being able to tell them apart.",
+   "api": [
+    "put()"
+   ],
+   "config": [],
+   "writes": [
+    "research.request",
+    "research.turn"
+   ],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "journey",
+   "path": "deep_research/journey.py",
+   "loc": 87,
+   "role": "Where is my request?",
+   "role_full": "Where is my request?\n\nAnanth, 2026-09-09: \"the first tab \u2014 ask where my request is. That is massive\nand that alone gets us a major aspect.\"\n\nIt is massive because the honest answer is not the status column. Measured at\nthe moment this was written:\n\n    16 turns in flight\n    10 of them started more than six hours ago and never came back\n     4 have been `waiting` for 69 hours\n    20 turns say `complete` and carry no settled timestamp, so every duration\n       computed from them is wrong\n\nA person asking where their question is gets \"Open\" \u2014 which is true, and is the\nleast useful true thing available. What they want is: it reached round 2, round\n2 started three days ago, and nothing has polled it since.\n\nTHIS MODULE ONLY READS. It states where a request got to and what is holding it;\nit never advances anything. A page that quietly restarted a stalled round while\nsomebody was reading it would be a page nobody could trust to describe the\nmachine.",
+   "api": [
+    "rounds()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [
+    "research.attempt",
+    "research.turn"
+   ],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "Answers the one question the status column answers worst: where is my request. Round by round \u2014 when each started, what it produced, how long it took, and which one stopped.",
+   "rating": "green",
+   "group": "the surface",
+   "findings": [
+    [
+     "bad",
+     "Measured when it was written: 16 turns in flight, 10 started more than six hours ago and never came back, four `waiting` for 69 hours. The request-level status on every one of them reads `open`."
+    ],
+    [
+     "bad",
+     "20 turns say `complete` and carry no settled timestamp, so any duration computed from them is the age of the universe rather than the length of the round. The page says the clock was lost rather than showing the number."
+    ],
+    [
+     "good",
+     "Reads only. A page that quietly restarted a stalled round while somebody was looking at it would be a page nobody could trust to describe the machine."
+    ]
+   ]
+  },
+  {
+   "id": "land_limits",
+   "path": "deep_research/land_limits.py",
+   "loc": 71,
+   "role": "Write an accepted record into service_line.benefit_limit.",
+   "role_full": "Write an accepted record into service_line.benefit_limit.\n\nThe critic decides what is true; this decides nothing. It maps an accepted\nrecord onto the table's grain and lets the table's constraints have the last\nword \u2014 a limit that cannot satisfy them is not written, and the reason is\nreported rather than smoothed over. That is deliberate: the constraints encode\nwhat makes a limit meaningful (a unit count needs a unit definition, a cap needs\na period, \"no cap\" is not the same as \"unknown\"), so silently coercing a value\nto fit them would defeat the point of having them.\n\nEach limit is one row because each limit is one fact. A code with a daily cap\nand an annual cap has two rows, and the table's unique key \u2014\n(line_key, code, qualifier, limit_type, period, per_whom) \u2014 keeps them distinct\ninstead of letting the second overwrite the first.",
+   "api": [
+    "land()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "language",
+   "path": "deep_research/language.py",
+   "loc": 619,
+   "role": "What a person reads, for every internal name this machine uses.",
+   "role_full": "What a person reads, for every internal name this machine uses.\n\nAnanth, 2026-09-07: \"build it in a very Mobius-centered way.. this is the one\nthing without trace there is no way for me to follow.\"\n\nThat second half changes what this console is. It is not a debugging aid kept by\nthe person who wrote the loop \u2014 it is the primary window onto what the machine\ndid, opened by people who will never read a gap_class and should not have to.\n\nEvery term below was chosen by me for a machine to route on. `escalated` tells a\ndispatcher which queue; it tells a reader nothing. `bh_therapy` is a join key.\n`sourced` is a state name that happens to be a real word, which is worse than an\nobvious code because it looks like it means something.\n\nThe left column NEVER appears on screen. Where a mapping is missing, the fallback\nis to make the raw term readable rather than to print it \u2014 an unmapped term\nshowing through is the failure this module exists to prevent.",
+   "api": [
+    "stance()",
+    "waiting()",
+    "turn_state()",
+    "subject()",
+    "state()",
+    "counts()",
+    "line_names()",
+    "survived()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "One place that decides what every state, actor and refusal is CALLED, so the machine's vocabulary and the reader's are the same words.",
+   "rating": "green",
+   "group": "the surface",
+   "findings": [
+    [
+     "good",
+     "The reader is a front-end user, not an engineer, and the names are chosen for them."
+    ]
+   ]
+  },
+  {
+   "id": "llm_http",
+   "path": "deep_research/llm_http.py",
+   "loc": 185,
+   "role": "Reach LLMManager over HTTP, the way every other module already does.",
+   "role_full": "Reach LLMManager over HTTP, the way every other module already does.\n\n`run_research` and `run_turn` import mobius-chat's `app.services.llm_manager`\nin-process, off a sys.path insert into a sibling checkout and that repo's own\n.env. It works on one laptop and cannot be deployed, which is the whole reason\nno worker exists.\n\nChat already publishes the seam \u2014 POST {origin}/internal/skill-llm with an\nX-Mobius-Skill-LLM-Key header \u2014 and mobius-payor has used it for months. This is\nthe same call, so the bandit routes deep research's work and llm_calls counts\nit, exactly as it does for everyone else.\n\nSTAGES ARE GATED ON CHAT'S SIDE, and correctly. `_SKILL_LLM_ALLOWED_STAGES`\ndoes not yet contain the two this loop uses, so a hosted call with them returns\nHTTP 400. That is not something to work around by borrowing a stage name that is\nalready allowed: the stage is the routing and telemetry key, and mislabelling\ndrafting as `research_parse` would put this module's work into another module's\nattribution and corrupt the bandit's reward for both.\n\nSo this raises a message that names exactly what is missing and who owns it,\nrather than failing as an opaque 400.",
+   "api": [
+    "available()",
+    "generate_sync()",
+    "resolve()",
+    "check_stages()"
+   ],
+   "config": [
+    "CHAT_INTERNAL_LLM_URL",
+    "MOBIUS_SKILL_LLM_INTERNAL_KEY",
+    "RESEARCH_LLM_TIMEOUT_S"
+   ],
+   "writes": [],
+   "reads": [],
+   "imports": [
+    "deep_research"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "locate",
+   "path": "deep_research/locate.py",
+   "loc": 322,
+   "role": "Find the span in the document that a claim rests on, and cite it exactly.",
+   "role_full": "Find the span in the document that a claim rests on, and cite it exactly.\n\nAnanth, 2026-09-08: \"a) use the reference to pinpoint the line. 2) do regex or\nbm25 match for near closeness 3) if near close may be we replace the exact\nstring from the document and let it pass 4) if nowhere close mark it as\nhallucinated.\"\n\nThree measurements shaped this.\n\n1. THE QUOTE IS FROM THE ANSWER, NOT THE DOCUMENT. `_quote_in` checks the\n   extractor's quote against chat's prose, so of seven fields the judge could\n   not verify, ZERO had a quote appearing verbatim in the source. Matching a\n   quote against a document was never going to work \u2014 the quote is a sentence\n   from a paraphrase. What has to be found is the SPAN THAT SUPPORTS IT.\n\n2. THE TOKENISER WAS THE DEFECT, not the threshold. The old pattern\n   `[A-Za-z][A-Za-z-]{3,}` requires four alphabetic characters and no digits,\n   so `21`, `365`, `H2017`, `DRG` and `APR` are not words at all. On the claim\n   \"a recipient must be under the age of 21\" against 59G-4.295:\n\n       old   3 passages offered \u00b7 best overlap 2 \u00b7 \"An eligible recipient must\n             be enrolled in the Florida Medicaid pro\u2026\"\n       new  20 passages offered \u00b7 best overlap 6 \u00b7 \"services for recipients\n             under the age of 21 years\u2026\"\n\n   Lowering the floor without fixing the tokeniser would only have added noise.\n\n3. WE ALREADY HOLD THE POSITION AND THREW IT A",
+   "api": [
+    "tokens()",
+    "content()",
+    "norm()",
+    "similarity()",
+    "table_spans()",
+    "spans()",
+    "snap_to()",
+    "anchor()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "Finds the line in a document that a claim rests on and cites it by page, paragraph and character offset, instead of handing back a scored excerpt.",
+   "rating": "amber",
+   "group": "the judge",
+   "findings": [
+    [
+     "good",
+     "Numbers, codes and short acronyms are tokens at last: 21, 365/6, H2017 and APR-DRG were invisible to the old pattern, which is what refused an eligibility rule the document states."
+    ],
+    [
+     "good",
+     "Never snaps a citation on score alone. The top-scoring span for one real claim was the wrong sentence; a reader picks and the snap follows the reader."
+    ],
+    [
+     "unproven",
+     "Written 2026-09-09 and not yet exercised in a completed run. Its outcome vocabulary is argued for, not measured."
+    ]
+   ]
+  },
+  {
+   "id": "main",
+   "path": "deep_research/main.py",
+   "loc": 188,
+   "role": "Deep Research \u2014 skill API.",
+   "role_full": "Deep Research \u2014 skill API.\n\nEstablish a fact from the corpus, or say precisely why it cannot be established.\nAny fact store can call this: the service line registry was consumer #1, payor\nfacts and appeals predicates are the same shape.\n\nThe invoker brings two things and the skill supplies the rest:\n\n    question           what you need to know\n    evaluator_prompt   how to judge an answer FOR YOUR STORE\n\nThe second is required. This skill does not know what a good answer looks like\nfor someone else's fact store, and a generic evaluator is how you get\nconfidently wrong extractions written somewhere certified.\n\n    POST /api/skills/v1/research        open a request, run turn 1\n    POST /api/skills/v1/research/advance move every turn whose gate has opened\n    GET  /api/skills/v1/research/{id}   the whole conversation, turn by turn\n    POST /api/skills/v1/research/{id}/publish   sourced fact -> answer cache\n\nOnce a fact is sourced it is published to the answer cache, so the next caller\nasking the same thing gets the answer without re-running the research. That is\nthe point of the loop: research once, answer until the source changes.",
+   "api": [
+    "health()",
+    "retrieval_guidance()",
+    "research()",
+    "advance()",
+    "conversation()",
+    "publish()"
+   ],
+   "config": [
+    "SKILL_AUTH_TOKEN"
+   ],
+   "writes": [],
+   "reads": [],
+   "imports": [
+    "retrieval_guidance",
+    "service"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "modes",
+   "path": "deep_research/modes.py",
+   "loc": 179,
+   "role": "The loops. Three of them, and which one a question is in is its state.",
+   "role_full": "The loops. Three of them, and which one a question is in is its state.\n\nAn earlier version keyed posture to the round number \u2014 round 1 broad, round 2+\nnarrow \u2014 which conflated two unrelated things: how many turns a question has\nhad, and what it currently needs. A question whose claims all check out but sit\nin one document does not need a narrower re-ask; it needs someone to go looking\nfor a second opinion. A question whose citation points at the wrong document\ndoes not need a broader sweep; it needs that one document read.\n\nSo the mode is chosen from what the last round LEARNED, and each mode is a\ndifferent bargain with the retriever:\n\n    BROAD          any authority, any source, wide question. Accepts nothing.\n                   Buys direction \u2014 documents, vocabulary, the shape of the\n                   answer, and the paths the search took. Hope for most of the\n                   answer here; expect none of it to be certifiable.\n\n    CITATION       narrow, one claim at a time, citable required. Forces the\n                   retriever at a SPECIFIC document and asks whether it really\n                   says this. Buys provenance, and turns a lead into either a\n                   fact or a named defect.\n\n    CONTRADICTION  asks the opposite question: not \"is this true\" but \"where\n                   else does this live, and does it say the same thing\". Buys\n                   t",
+   "api": [
+    "next_mode()",
+    "request_status()",
+    "policy_for()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "permission",
+   "path": "deep_research/permission.py",
+   "loc": 208,
+   "role": "May we hold this document? Asked of the bytes, before they are uploaded.",
+   "role_full": "May we hold this document? Asked of the bytes, before they are uploaded.\n\nMaster RAG, 2026-09-09, releasing the CPT hold: \"your own permission check\nstill matters, and I would still build it. CPT is one licence; the next one\nwill not announce itself in a copyright line at the top of page one.\"\n\nAgreed, and it is the gap I named in my own arm. Acquire verifies three things\nand none of them is this one:\n\n    the URL is live            fetch()\n    we do not already hold it  prove_not_in_corpus()\n    the ingest endpoint works  upload()\n\nAll three are about whether the mechanism functions. None asks whether we are\nPERMITTED to keep what the mechanism just fetched. A pipeline that answers\n\"did it work\" and never \"were we allowed\" has a gap at its own boundary, and\nthe boundary is the only place the question can still be answered cheaply \u2014\nafter the upload it is a deletion problem across chunks, embeddings and a\npublished index.\n\nWHAT THIS CAN AND CANNOT DO, stated plainly because the asymmetry is the whole\ndesign:\n\n    finding a notice        is EVIDENCE. The bytes say so.\n    finding no notice       is NOT proof of absence. A scanned page, a\n                            compressed stream or an image-only PDF hides text\n                            this cannot read.\n\nSo there are three verdicts, not two, and the third is not a rounding of the\nfirst. `unreadable` means we could not look",
+   "api": [
+    "inspect()",
+    "inspect_file()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "playbook",
+   "path": "deep_research/playbook.py",
+   "loc": 115,
+   "role": "The Playbook \u2014 a candidate set that was sourced once and is reused.",
+   "role_full": "The Playbook \u2014 a candidate set that was sourced once and is reused.\n\nNot a second kind of input. Ask \"what are the ways a CARC 197 can be true\" and\nthat is a question with candidates, evidence and verdicts like any other; the\nsame pipeline answers it and this module keeps the answer. A case arriving with\nno playbook does not need a different machine \u2014 its first pass produces one.\n\nWhich means a playbook inherits every problem a fact store has. It can be stale,\nit can be wrong, and a branch missing from it is invisible in exactly the way a\nmissing document is invisible. Two consequences are built in here rather than\nleft to discipline:\n\n  every branch carries its own quote and source, or it is not certifiable\n  every REFUSED proposal is written down, because a gap nobody recorded is a\n  gap nobody can acquire against",
+   "api": [
+    "save()",
+    "load()",
+    "file_gap()",
+    "outside_set()"
+   ],
+   "config": [],
+   "writes": [
+    "research.playbook",
+    "research.playbook_branch",
+    "research.playbook_gap"
+   ],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "prior",
+   "path": "deep_research/prior.py",
+   "loc": 211,
+   "role": "What earlier rounds of this request established \u2014 because nothing remembers.",
+   "role_full": "What earlier rounds of this request established \u2014 because nothing remembers.\n\nAnanth, 2026-09-11: \"just know that we will be starting a new thread, so it\nwill not recall any of the previous runs. Memory is not that strong, and if it\nneeds to reference that then we need to create a new tool to retrieve previous\nthreads.\"\n\nTHE ISOLATION IS DELIBERATE AND IT IS RIGHT. ask_chat_streaming says so in its\nown docstring: \"New thread every call \u2014 a multi-turn research must not\naccumulate context in the thread, or turn 3 is answered partly from turn 1's\nframing.\" A shared thread lets round 1's wrong framing quietly decide round 3,\nand that is a worse failure than forgetting, because it is invisible.\n\nBut the consequence was never handled. Round 2 arrives at a fresh drafter that\nhas never seen round 1 \u2014 not its answer, not the documents it read and found\nwanting, not the field the verifier refused. The only thing that survived was\nwhatever the refiner managed to paste into the question text, which on DR-205\nwas one generic sentence, twice.\n\nSo: keep the isolation, and make the history RETRIEVABLE instead of ambient.\nTwo consumers of one function, which is the whole point of it being a function:\n\n  the refiner  renders a compact carry-forward into the next question, so a\n               round starts knowing what is already settled;\n\n  a tool       serves the full record on demand to a draft",
+   "api": [
+    "rounds()",
+    "strip()",
+    "carry_forward()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [
+    "research.turn"
+   ],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "probe",
+   "path": "deep_research/probe.py",
+   "loc": 104,
+   "role": "Start with the answer, then go and find it.",
+   "role_full": "Start with the answer, then go and find it.\n\nThe usual order is search, then answer. That requires guessing the phrasing the\ncorpus uses before you have seen it \u2014 which is the whole difficulty. A policy\nsays \"individual and family therapy\" and the question says \"H2019\", and no\namount of rewriting bridges that from the question side.\n\nSo invert it. Get a candidate answer from anywhere \u2014 an uncited tool, a web\nsearch, the model's own knowledge \u2014 and treat every claim in it as a QUERY\nrather than as a fact. The candidate supplies the vocabulary the corpus actually\nuses, and each claim becomes a precise probe instead of a guess.\n\nNothing here certifies anything. A claim that no document supports is not\nrefuted, it is unlocated: either we do not hold the document, or the claim is\nwrong, and the probe cannot tell those apart. What it does is turn one vague\nquestion into N precise ones, each of which the corpus can answer or not.",
+   "api": [
+    "probe_terms()",
+    "locate_claim()",
+    "plan()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [
+    "verify_source"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "read_thinking",
+   "path": "deep_research/read_thinking.py",
+   "loc": 187,
+   "role": "Read the drafter's reasoning, not just its answer.",
+   "role_full": "Read the drafter's reasoning, not just its answer.\n\nAnanth, 2026-09-08: \"the best part is at times in the thinking and not the\noutput.. who is having access to the thinking, the arbiter? do they have this\naccess and look and decipher this.. their instructions should point to common\npatterns so that they can execute the best course of action.. if the evidence\nwas in the thinking and missed then have them reprompt with those things.\"\n\nRequest 120 is the proof. Sixty-seven reasoning steps were recorded, and every\nreader of `thinking_log` in this codebase is a RENDERER \u2014 the console, the\ntranscript. No actor consumes it. The arbiter decides whether to go again, and\nwhat to ask next, from the verdicts alone.\n\nWhat it was missing, in the drafter's own words:\n\n  round 3  \"specified age-based programs (SIPP for under 21, State Mental\n            Health for over 64) ... HOWEVER, IT DID NOT IDENTIFY A SPECIFIC\n            'GROUPING SYSTEM'\"\n  round 5  \"I have successfully identified ... the specific grouping system\"\n  answer   \"the specific grouping system used is the All Patient Refined\n            Diagnosis-Related Groups (APR-DRG) system\"\n\nBoth of the day's findings were sitting in that trace. The age-band split is\nexactly what Service Line Registry told us hours later \u2014 that the question\nspanned two service lines paying differently \u2014 and the concession in round 3\nsays plainly that th",
+   "api": [
+    "read_thinking()",
+    "reprompt_from()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "Reads the drafter's own reasoning for shapes that recur \u2014 it conceded then asserted anyway, it named two populations, it named a rule it never cited, it ran the same search four times \u2014 and turns each into the next question.",
+   "rating": "green",
+   "group": "the loop",
+   "findings": [
+    [
+     "good",
+     "Quotes the drafter back to itself, which is harder to wave away than an instruction to try harder."
+    ],
+    [
+     "good",
+     "Every reader of the reasoning trace before this was a RENDERER. No actor consumed it."
+    ]
+   ]
+  },
+  {
+   "id": "recommend",
+   "path": "deep_research/recommend.py",
+   "loc": 273,
+   "role": "What should a reader DO with this answer?",
+   "role_full": "What should a reader DO with this answer?\n\nAnanth, 2026-09-08: \"we are not just passing good recommendations by question..\nfor instance the APR DRG.. what are the recommendations, it is inconclusive,\nneed to verify because conflicting.. that is the judgement we are not passing.\"\n\nRight, and it is the gap between what this module knows and what it says. For\nrequest 120 we emitted `grouping_system = APR-DRG`, confidence 1.0, \"3 of 4\nfields survived\" \u2014 while holding, in the same record, every fact needed to say\nsomething far more useful:\n\n    two kept values for payment_basis disagree (per diem, twice)\n    a third was refused as CONTRADICTED by its own quote (DRG)\n    the cited document does not contain the claim\n    the authoritative rate worksheets never surfaced\n\nA reader was handed a value and left to discover all of that themselves. The\nanswer was \"APR-DRG\"; the JUDGEMENT is \"inconclusive, the evidence conflicts,\nverify against 59G-4.150 before use.\"\n\nNothing here calls a model. Every signal is already recorded by the judge, the\ndocument gate and the registry check \u2014 the work was done and never summarised.\n\nTHE ORDER MATTERS AND IS DELIBERATE. Severity first, so a conflicting answer is\nnever reported as \"single source, corroborate if material\". The first matching\nstance wins, and each names what to do rather than how it feels.",
+   "api": [
+    "scalar_fields()",
+    "signals()",
+    "recommend()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "Says what a reader should DO with a result \u2014 usable, verify first, the evidence conflicts, the rule offers a choice, nobody checked \u2014 from signals the other actors already recorded. Costs nothing; the work was done and never summarised.",
+   "rating": "green",
+   "group": "the answer",
+   "findings": [
+    [
+     "good",
+     "No model call. Every signal is already in the record."
+    ],
+    [
+     "good",
+     "Tells a LIST from a CONFLICT, and a rule that offers branches from a corpus contradicting itself \u2014 three checks in this module had confused those."
+    ],
+    [
+     "bad",
+     "Had NO CALLER for a day \u2014 written, rated green, and never run. The defect this module exists to name, inside the module that names it. The runner now calls it when a request settles."
+    ],
+    [
+     "bad",
+     "Run at last over the 58 requests holding a verdict: not one came back usable. 32 requests say status='sourced'; 24 of those are `unverified` (nothing ever opened the cited document) and 8 `inconclusive`. All predate the document gate, so the reading is honest \u2014 but 'sourced' has been read as 'answered' for three weeks."
+    ]
+   ]
+  },
+  {
+   "id": "recon",
+   "path": "deep_research/recon.py",
+   "loc": 399,
+   "role": "The first pass gathers a trail, not an answer.",
+   "role_full": "The first pass gathers a trail, not an answer.\n\n`follow_reference` cannot follow what it has never seen. Neither can a narrow\nquestion be written before anyone knows which document holds the answer, what\nthe policy calls the service, or which rule governs it. That knowledge is what\nthe first pass is FOR \u2014 and it is the only thing it is for.\n\nSo recon accepts nothing. Not \"accepts under a relaxed bar\" \u2014 accepts nothing at\nall. An earlier version relaxed authority on pass 1 so the loop could see the\nlandscape, and a standard-authority request promptly accepted a payor-manual\nfact on turn 1 with nothing saying so. A pass that cannot accept cannot launder.\n\nWhat it reads is the EXPLORATION, not the answer. The answer is the narrowest\npossible summary of a search; the trace holds the whole tree, and three things in\nit matter more than the conclusion does:\n\n    queries    ReAct's own rewrites, each written after seeing the corpus \u2014\n               which beats anything written before seeing it\n    unclosed   gaps opened and never closed. Every one is a lead abandoned\n               mid-flight: a branch point to resume from, not a question to ask\n               again from the top\n    attached   documents touched at any round, including ones the final answer\n               passed over\n\nNone of it is a fact. All of it makes the next question precise.",
+   "api": [
+    "read_trace()",
+    "harvest()",
+    "field_roles()",
+    "carry()",
+    "verify_direct()",
+    "qualify()",
+    "verify_question()",
+    "sharpen()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [
+    "probe",
+    "resolve",
+    "verify_source"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "recorder",
+   "path": "deep_research/recorder.py",
+   "loc": 74,
+   "role": "The Recorder \u2014 writes what happened, and never does it.",
+   "role_full": "The Recorder \u2014 writes what happened, and never does it.\n\nSeparate from the Executor on purpose. An actor that both takes an action and\nwrites the account of that action produces a record nobody can check against it.\nThe Judge/Recorder split exists for the same reason, and it is the cheapest\nguarantee in the whole design: whoever asks later why an appeal was not filed\ngets an answer that was not authored by the thing that did not file it.\n\nIt writes the case ledger, not the world. Committing a fact to a caller's store\nis the CALLER's write \u2014 Payor Facts was explicit that they own their cert\nlifecycle \u2014 so this hands over rows and records that it did.",
+   "api": [
+    "note()",
+    "commit_units()",
+    "case()"
+   ],
+   "config": [],
+   "writes": [
+    "research.ledger"
+   ],
+   "reads": [],
+   "imports": [],
+   "observability": "receipts",
+   "observability_note": "Files ledger events with an actor name, but records no reasoning: you can see WHAT it decided and not why.",
+   "can_record_failure": false,
+   "how": "Writes the ledger \u2014 who did what, in which round, with the evidence attached.",
+   "rating": "green",
+   "group": "provenance",
+   "findings": [
+    [
+     "good",
+     "Every event carries an actor name, so the trace reads as a sequence of decisions rather than a log."
+    ]
+   ]
+  },
+  {
+   "id": "render_console",
+   "path": "deep_research/render_console.py",
+   "loc": 387,
+   "role": "Render the Deep Research console from research.* \u2014 no hand-authored data.",
+   "role_full": "Render the Deep Research console from research.* \u2014 no hand-authored data.",
+   "api": [
+    "gather()",
+    "jdefault()",
+    "esc()",
+    "render()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [
+    "research.attempt",
+    "research.discovery_effect",
+    "research.discovery_request",
+    "research.escalation",
+    "research.gap",
+    "research.repair",
+    "research.request",
+    "research.turn"
+   ],
+   "imports": [
+    "deep_research"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "render_transcript",
+   "path": "deep_research/render_transcript.py",
+   "loc": 308,
+   "role": "Render the actual conversation \u2014 what was asked, what came back, what the",
+   "role_full": "Render the actual conversation \u2014 what was asked, what came back, what the\nevaluator made of it, and what it asked next.\n\nNot a dashboard. The exchange itself, in order, with the evaluator's judgment\nsitting against the answer it judged so you can disagree with it.",
+   "api": [
+    "esc()",
+    "chat_envelope()",
+    "md()",
+    "render()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [
+    "research.attempt",
+    "research.request",
+    "research.turn"
+   ],
+   "imports": [
+    "deep_research"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "resolution",
+   "path": "deep_research/resolution.py",
+   "loc": 1591,
+   "role": "Whether a diagnosis has been resolved, asked as a question the machine can answer.",
+   "role_full": "Whether a diagnosis has been resolved, asked as a question the machine can answer.\n\nSeven times in one session this loop has produced correct state that nothing read\nback: record_extract() with no callers, a retryable_repairs view saying \"18.9d\nstale\" for eighteen days, four registry diagnoses unread while their owner\nescalated the same question elsewhere. The eighth was diagnosis #19, whose own\nevidence says \"verified_present_at: 2026_CBH_Fee_Schedule.pdf p3\" \u2014 it had\nalready found the answer and was waiting on nobody.\n\nThe tempting fix is notification, and it is the wrong one: a notification is a\nthing that has to be received, and every failure above was a message nobody\nreceived. So resolution is a PREDICATE, evaluated on a schedule, over state that\nalready exists.\n\nThree kinds, and the difference is only who can make the predicate true:\n\n    automatic   the diagnosis carries what is needed. Nobody is blocked, and a\n                row still open means the evaluator is not running.\n    observable  someone else acts and the machine can read the result \u2014 a\n                document becomes published, a term gets adopted.\n    ruling      a judgement no evidence settles. A person decides; the decision\n                is recorded so a predicate can see it.\n\n`ruling` is the only one that waits on a human, and it waits on a WRITTEN\ndecision, not on someone remembering to come back.",
+   "api": [
+    "withdraw_diagnosis()",
+    "due_for()",
+    "propose()",
+    "acknowledge()",
+    "check_one()",
+    "relax_authority()",
+    "act_on_ruling()",
+    "sweep()",
+    "rule()",
+    "assure()"
+   ],
+   "config": [],
+   "writes": [
+    "research.attempt",
+    "research.diagnosis",
+    "research.judge_override",
+    "research.overrule_request",
+    "research.request",
+    "research.resolution",
+    "research.ruling"
+   ],
+   "reads": [
+    "research.action_deadline",
+    "research.deadline_policy",
+    "research.overdue",
+    "research.repair",
+    "research.stalled",
+    "research.turn"
+   ],
+   "imports": [
+    "deep_research",
+    "corroborate"
+   ],
+   "observability": "receipts",
+   "observability_note": "Files ledger events with an actor name, but records no reasoning: you can see WHAT it decided and not why.",
+   "can_record_failure": true,
+   "how": "Holds what happens after a verdict \u2014 the options a caller can choose between, the ruling they made, and whether that closes the question or reopens it.",
+   "rating": "amber",
+   "group": "the answer",
+   "findings": [
+    [
+     "good",
+     "A decision is a contract a service can call, not only a button a person can press."
+    ],
+    [
+     "bad",
+     "A promise generated from a TERMINAL set rather than written down once let 'stop asking' reopen the question."
+    ]
+   ]
+  },
+  {
+   "id": "resolve",
+   "path": "deep_research/resolve.py",
+   "loc": 103,
+   "role": "Resolving a cited document name to the row we actually hold.",
+   "role_full": "Resolving a cited document name to the row we actually hold.\n\nA model cites a document the way a person names it. The corpus names it the way\nthe file arrived. Substring matching only works when the citation happens to be\na literal substring of the filename, and it usually is not:\n\n    cited   \"Community Behavioral Health Fee Schedule\"\n    held as Community_Behavioral_Health_Services_Fee_Schedule_2022_JULY.pdf\n    cited   \"Provider Dispute Form\"\n    held as Provider-dispute-form-011719.pdf\n\nBoth returned NOT FOUND from six call sites in this package, which reports a\nheld document as absent. That is the worse direction of the two errors: a false\nabsence sends someone to acquire a file already in the corpus, and this loop has\nalready produced one stale diagnosis doing exactly that.\n\nFound by Service Line Registry hitting it in their own resolver first.\n\nTokens, not substrings. A citation and a filename agree when they share their\ncontent words, in any order, with whatever separators and interpolated words the\nfiling convention inserted.",
+   "api": [
+    "tokens()",
+    "resolve_document()",
+    "is_uncited()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "retrieval_guidance",
+   "path": "deep_research/retrieval_guidance.py",
+   "loc": 192,
+   "role": "The retrieval strategy guidance, served live.",
+   "role_full": "The retrieval strategy guidance, served live.\n\nAnanth, 2026-09-16: \"you have the planner prompt.. they should just say get\nplanner prompt when rag /doc search is involved and use your end point.\"\n\nWHY AN ENDPOINT AND NOT A COPY. Governor asked for the size-class vocabulary so\nthey could write FRAME's line against it, and correctly named the risk: two\nvocabularies for one axis is drift. A copy in their prompt drifts silently \u2014\nneither side sees it happen. A shared TABLE fixes the words but still requires\neach consumer to know how to assemble them. An endpoint fixes both: callers ask\nfor the guidance and get whatever is true right now, including the settle rates,\nwhich MOVE as evidence accumulates and are the whole reason this is data rather\nthan prose.\n\nWHAT IS SERVED IS COMPUTED, NEVER STORED. Every call re-reads\nresearch.actor_thinking for the settle rates and research.document_size_class\nfor the corpus counts. There is no cached copy to go stale, and a rate that has\nchanged since the last run shows up on the next call without anyone republishing\nanything.\n\nFAILS OPEN WITH NO NUMBERS. If the record cannot be read the caller is told the\nodds were unavailable and is given nothing to quote. A prompt that looks\ncalibrated and is not is worse than one that admits it is planning blind \u2014 and\na consumer in another repo cannot tell the difference unless we say so.",
+   "api": [
+    "guidance()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [
+    "research.actor_thinking"
+   ],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "run_batch",
+   "path": "deep_research/run_batch.py",
+   "loc": 590,
+   "role": "N questions in flight, each with its own state machine.",
+   "role_full": "N questions in flight, each with its own state machine.\n\nThe single-question loop settles one thing and stops. Real work does not arrive\nthat way: a fact store hands over fifty (payer \u00d7 predicate) pairs, a playbook\nneeds every branch of a denial class, a service line needs every rule that\ngoverns it. Running those one session at a time throws away the thing that makes\na batch cheap \u2014 the questions are independent, so a round can advance all of\nthem, and each can take a different next step.\n\n    broad                one wide question each, accepts nothing, harvests a trail\n    citations            claims out, each checked against its named document \u2014\n                         free wherever the claim carries a literal\n    qualify              refusals sorted: wrong_page \u00b7 mis_attributed \u00b7\n                         not_in_corpus \u00b7 inconclusive\n    reformulate          per question, and BOTH knobs: the wording, and the RAG\n                         posture (broad \u2192 citable-required)\n    loop                 until every question is settled or names a repair\n\nPer QUESTION, not per batch. One question reaching `mis_attributed` needs a\ncitation repointed; another needs a turn that reads a document; a third is done.\nA batch-level verdict would spend a turn on all three to serve the one.\n\n    python3 -m deep_research.run_batch --file questions.json [--rounds 2]",
+   "api": [
+    "scope_of()",
+    "run()"
+   ],
+   "config": [
+    "MOBIUS_MODEL_PROFILE"
+   ],
+   "writes": [
+    "research.attempt",
+    "research.diagnosis",
+    "research.request",
+    "research.turn"
+   ],
+   "reads": [],
+   "imports": [
+    "deep_research",
+    "console",
+    "corroborate",
+    "extract_critique",
+    "run_research",
+    "run_v2"
+   ],
+   "observability": "receipts",
+   "observability_note": "Files ledger events with an actor name, but records no reasoning: you can see WHAT it decided and not why.",
+   "can_record_failure": true,
+   "how": "Runs a set of questions together. Opens documents, but records no reasoning and never asks the registry.",
+   "rating": "amber",
+   "group": "the loop",
+   "findings": [
+    [
+     "bad",
+     "2 of 5 guarantees. It called the document gate for months while the live runner did not, which is exactly why nobody noticed the live path had none."
+    ]
+   ]
+  },
+  {
+   "id": "run_research",
+   "path": "deep_research/run_research.py",
+   "loc": 297,
+   "role": "Run a multi-turn research and stream chat's working out as it happens.",
+   "role_full": "Run a multi-turn research and stream chat's working out as it happens.\n\nPrints chat's live thinking log while it works, then the answer, then the\nevaluator's verdict and the question it wants to ask next \u2014 turn after turn,\nuntil something extracts or the rounds run out.\n\n    python3 run_research.py --subject bh_therapy/provider_qualification         --query \"...\" --evaluator-file eval.txt --turns 3",
+   "api": [
+    "db()",
+    "ask_chat_streaming()",
+    "envelope()",
+    "evaluate()",
+    "run()"
+   ],
+   "config": [],
+   "writes": [
+    "research.attempt",
+    "research.escalation",
+    "research.request",
+    "research.turn"
+   ],
+   "reads": [],
+   "imports": [
+    "deep_research"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "run_turn",
+   "path": "deep_research/run_turn.py",
+   "loc": 142,
+   "role": "Run one real turn and keep the whole exchange.",
+   "role_full": "Run one real turn and keep the whole exchange.\n\nAsk chat, store the answer verbatim, run the invoker's evaluator over it, store\nthat verdict too. The transcript UI is built from these rows, so what it shows\nis the actual conversation \u2014 not a summary of one.",
+   "api": [
+    "db()",
+    "ask_chat()",
+    "evaluate()",
+    "run()"
+   ],
+   "config": [],
+   "writes": [
+    "research.attempt",
+    "research.turn"
+   ],
+   "reads": [],
+   "imports": [
+    "deep_research"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "run_v2",
+   "path": "deep_research/run_v2.py",
+   "loc": 672,
+   "role": "chat \u2192 extract \u2192 critique.",
+   "role_full": "chat \u2192 extract \u2192 critique.\n\nAsk the corpus, pull the fact store's JSON, then disbelieve it field by field.\nOnly what survives the critic is written.\n\n    python3 -m deep_research.run_v2 --subject X --query \"...\"         --instructions-file i.txt --schema-file s.json [--required a,b] [--turns 3]",
+   "api": [
+    "llm()",
+    "run()"
+   ],
+   "config": [
+    "MOBIUS_MODEL_PROFILE"
+   ],
+   "writes": [
+    "research.attempt",
+    "research.diagnosis",
+    "research.discovery_request",
+    "research.llm_call",
+    "research.request",
+    "research.turn"
+   ],
+   "reads": [
+    "research.model_rate"
+   ],
+   "imports": [
+    "deep_research",
+    "assessments",
+    "diagnose",
+    "extract_critique",
+    "run_research"
+   ],
+   "observability": "receipts",
+   "observability_note": "Files ledger events with an actor name, but records no reasoning: you can see WHAT it decided and not why.",
+   "can_record_failure": true,
+   "how": "An older way to run a turn. Still judges answers, and never opens a document, asks the registry, or records reasoning.",
+   "rating": "red",
+   "group": "the loop",
+   "findings": [
+    [
+     "bad",
+     "1 of 5 guarantees. An answer produced here is judged against the ANSWER only \u2014 no document is ever opened \u2014 and nothing on the result says so."
+    ],
+    [
+     "bad",
+     "Five entry points run a turn and only one is complete. This is where a gate with no caller hides."
+    ]
+   ]
+  },
+  {
+   "id": "runner",
+   "path": "deep_research/runner.py",
+   "loc": 2758,
+   "role": "Deep Research \u2014 the turn runner.",
+   "role_full": "Deep Research \u2014 the turn runner.\n\nThe invoker arrives with a query and its own evaluator prompt / extraction\nschema. From there each turn runs two tracks and advances only when both settle:\n\n    track A   ask -> parse -> validate -> extract -> refine the next query\n    track B   dispatch feedback: Discovery ingest / Lexicon / human\n\nTrack A settles in seconds. Track B settles in minutes, hours, or days \u2014 ingest\nis async and a person is asleep. So `advance()` is idempotent and resumable:\ncall it on a schedule, it moves whatever is due and returns. Nothing is held in\nmemory between turns, because nothing can be.\n\nAdvancing on track A alone re-asks the corpus that just failed and burns a turn.\nAdvancing on track B alone discards the refinement the answer earned. Both, or\nwait \u2014 and waiting is a normal state here, not a failure.\n\n    python3 runner.py open   --consumer X --subject Y --query \"...\" --evaluator-file p.txt\n    python3 runner.py advance          # move every due turn; safe to run on a cron\n    python3 runner.py status",
+   "api": [
+    "db()",
+    "open_request()",
+    "names_for()",
+    "advance()",
+    "record_extract()",
+    "await_acquire()",
+    "dispatch_feedback()",
+    "status()",
+    "perform_turn()",
+    "reconcile()"
+   ],
+   "config": [
+    "CLOUD_RUN_EXECUTION",
+    "K_REVISION",
+    "MOBIUS_REGISTRY_URL"
+   ],
+   "writes": [
+    "research.attempt",
+    "research.diagnosis",
+    "research.escalation",
+    "research.gap",
+    "research.llm_call",
+    "research.repair",
+    "research.request",
+    "research.request_message",
+    "research.turn",
+    "research.turn_stream"
+   ],
+   "reads": [
+    "research.discovery_request",
+    "research.lexicon_feedback",
+    "research.waiting_on"
+   ],
+   "imports": [
+    "deep_research",
+    "console",
+    "corroborate",
+    "diagnose",
+    "extract_critique",
+    "read_thinking",
+    "recommend",
+    "run_research",
+    "run_v2",
+    "thinking"
+   ],
+   "observability": "reasons",
+   "observability_note": "Writes a step-by-step trace to research.actor_thinking \u2014 what it saw, what it made of it, what it decided.",
+   "can_record_failure": true,
+   "how": "The live path. Picks up turns that are due, asks chat, extracts fields, judges them, opens the cited documents, asks the registry whether those documents govern the line, reads the drafter's own reasoning, and decides whether to go round again.",
+   "rating": "amber",
+   "group": "the loop",
+   "findings": [
+    [
+     "good",
+     "The only entry point carrying all five guarantees. Everything built on 2026-09-08 lands here."
+    ],
+    [
+     "bad",
+     "It is ONE of five ways to run a turn. A request answered through run_v2 is judged without any document ever being opened, and nothing warns anybody."
+    ],
+    [
+     "bad",
+     "The document-side gate existed, was tested, and was never called from this file until 2026-09-08 \u2014 the docstring of critique() had promised it ran for months."
+    ],
+    [
+     "good",
+     "Now writes the stance when a request settles, at both settle points \u2014 which is what makes `stance` on a status poll a fact rather than a field name."
+    ]
+   ]
+  },
+  {
+   "id": "service",
+   "path": "deep_research/service.py",
+   "loc": 198,
+   "role": "Deep Research \u2014 the service layer behind the skill API.",
+   "role_full": "Deep Research \u2014 the service layer behind the skill API.",
+   "api": [
+    "db()",
+    "open_and_run()",
+    "advance_all()",
+    "get_conversation()",
+    "publish_to_cache()"
+   ],
+   "config": [
+    "CACHE_SKILL_TOKEN",
+    "MOBIUS_ANSWER_CACHE_URL"
+   ],
+   "writes": [
+    "research.attempt",
+    "research.escalation",
+    "research.request",
+    "research.turn"
+   ],
+   "reads": [],
+   "imports": [
+    "deep_research",
+    "run_research",
+    "runner"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "skills",
+   "path": "deep_research/skills.py",
+   "loc": 211,
+   "role": "Assessments as skills, not as branches in a function.",
+   "role_full": "Assessments as skills, not as branches in a function.\n\nEvery check in this loop arrived the same way: something went wrong, and a\ncondition was added to the middle of `critique`. That works until the second\ncaller shows up. The registry wants the source to be the published standard;\nPayor Facts wants any cited source and would rather have a list-recall probe.\nAppeals wants speed over exhaustiveness. As a hardcoded chain, those are three\nforks of one function. As skills, they are three selections from one list.\n\nA skill is a named assessment with a holder, a cost, and a contract. It answers\none question about one thing and returns a verdict \u2014 never a decision. What to\ndo with a failed verdict belongs to the caller's policy, not to the check.\n\nThree holders, and the split is not cosmetic:\n\n  judge      assesses ONE FIELD against its evidence. Runs per field, may be\n             expensive, and must be refusable \u2014 a judge skill can only reject or\n             abstain, never repair.\n  diagnoser  assesses THE TURN and names a repair. Runs once per failure, reads\n             database state, and its output is a dispatch.\n  chat       assessments we do not hold. Declared here anyway, because a skill\n             we know we need and do not have is a gap the system can report\n             rather than a gap that lives in someone's head.\n\n`fn=None` means declared-but-unbuilt. That is delib",
+   "api": [
+    "register()",
+    "for_holder()",
+    "available()",
+    "missing()",
+    "report()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [
+    "deep_research"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "stages",
+   "path": "deep_research/stages.py",
+   "loc": 32,
+   "role": "The LLM stage names this loop asks under. Declared once, here.",
+   "role_full": "The LLM stage names this loop asks under. Declared once, here.\n\nChat Master, 2026-09-09, adding them to mobius-chat's allowlist and to the\nmodel registry: \"deep_research_parse and deep_research_adjudicate \u2014 they match\nthe rag_* / appeals_* convention.\"\n\nWHY THIS FILE EXISTS RATHER THAN FOUR STRING LITERALS. A stage is a claim about\nwho is asking; it is the routing key AND the telemetry key. Four copies of it\nacross four modules is four places for that claim to drift, and drift here does\nnot fail \u2014 it silently files this module's work under a different arm of the\nbandit and corrupts the reward for both sides.\n\nAND ALLOWLISTING IS NOT ROUTING. Chat Master's correction, which is worth\nkeeping next to the names: a stage that is allowlisted but in no model's\neligible_stages gets zero candidates, falls through to\nfallback_no_models(\"gemini-2.5-flash\"), and SUCCEEDS. The call works, an answer\ncomes back, and only the CHOOSING is lost \u2014 the bandit never sees it. That is\nthe failure mode where a fallback is indistinguishable from success, and it is\nwhy \"the endpoint stopped 400ing\" is not evidence that this is wired correctly.\n\nBoth stages are routed to {gemini-2.5-flash, gemini-2.5-pro}: extract-and-judge\nwork against supplied evidence, not open reasoning.",
+   "api": [],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "state",
+   "path": "deep_research/state.py",
+   "loc": 388,
+   "role": "Where a request is. One row, written by transitions, read by everything.",
+   "role_full": "Where a request is. One row, written by transitions, read by everything.\n\nAnanth, 2026-09-10: \"there should be a master table for every request that has\none active state .. any api should never derive .. a question as simple as\nwhere is my request needs a simple answer .. front end is rendering everything\nfrom a table, no logic.\"\n\nWHAT THIS REPLACES, in the words of what it cost. The answer to \"where is my\nrequest\" was computed from five columns across two tables, TWICE \u2014 once here\nin journey._which and once in research_console._where_it_is, because the router\ncannot import this package. Two derivations of one answer drift. On the day\nthis was written they did: the module learned three states where it had one,\nthe words were republished, and the router kept choosing the old key \u2014 so the\npage rendered the newer, more confident sentence over three turns no worker had\ntouched. The fix made the display more confidently wrong than the bug had.\n\nThat failure is not available to a column somebody wrote. It is only available\nwhen every reader recomputes.\n\nTHE RULES, and they are short:\n\n  A transition WRITES. Nothing else sets state.\n  A reader READS ONE ROW. No template, no branch, no join to figure it out.\n  The words travel with the row, so the front end renders a string it was given.\n  Exactly one row per request is active, enforced by the database.\n\n`say` is stored rather than loo",
+   "api": [
+    "move()",
+    "where()",
+    "drill()"
+   ],
+   "config": [],
+   "writes": [
+    "research.actor_state",
+    "research.request_state",
+    "research.round_state"
+   ],
+   "reads": [],
+   "imports": [
+    "language"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "thinking",
+   "path": "deep_research/thinking.py",
+   "loc": 238,
+   "role": "Every actor keeps a reasoning trace, not just the drafter.",
+   "role_full": "Every actor keeps a reasoning trace, not just the drafter.\n\nAnanth, 2026-09-08: \"this is deep research therefore we are really figuring out\nfrom their thinking and not their output.. make sure we really get detailed\nthinking logs for judge arbiter etc and show it to me on screen.\"\n\nMeasured across the Service Line pilot before this module existed:\n\n    drafter     67-120 steps, 9,500-17,500 characters of reasoning per question\n    judge       one line per field\n    arbiter     one line per decision\n    assembler   one line per candidate\n    diagnoser   nothing at all\n\nOne actor's thinking was the product; everyone else filed a receipt. And the\nwhole day turned on the one trace that WAS kept \u2014 request 120's drafter saying\nin round 3 that it had not found a grouping system, and in round 5 that it had.\nNobody could have caught that in the judge or the arbiter, because neither of\nthem thinks out loud.\n\nSAW / THOUGHT / DECIDED ARE SEPARATE, deliberately. A trace that merges them\nreads as narration and cannot be audited: when a decision turns out wrong you\ncannot tell whether the actor was given the wrong thing or made the wrong call\non the right thing. Those need different fixes and different people.\n\nNone of this costs a model call. These actors are deterministic \u2014 their\nthinking IS the sequence of checks they ran and what each check saw.",
+   "api": [
+    "latest()",
+    "for_ux()",
+    "from_verdicts()"
+   ],
+   "config": [],
+   "writes": [
+    "research.actor_thinking"
+   ],
+   "reads": [
+    "research.request",
+    "research.request_state",
+    "research.round_state"
+   ],
+   "imports": [],
+   "observability": "reasons",
+   "observability_note": "Writes a step-by-step trace to research.actor_thinking \u2014 what it saw, what it made of it, what it decided.",
+   "can_record_failure": false,
+   "how": "Lets every actor record what it saw, what it made of that, and what it decided \u2014 kept as three separate fields so a wrong decision can be traced to bad input or bad reasoning.",
+   "rating": "green",
+   "group": "provenance",
+   "findings": [
+    [
+     "good",
+     "The judge now records as much reasoning per question as the drafter does."
+    ],
+    [
+     "unproven",
+     "Three actors write traces. Nine of the twelve named actors still record nothing."
+    ]
+   ]
+  },
+  {
+   "id": "ux_data",
+   "path": "deep_research/ux_data.py",
+   "loc": 165,
+   "role": "Rows for the UX, carrying every artifact the framework names.",
+   "role_full": "Rows for the UX, carrying every artifact the framework names.\n\nAnanth, 2026-09-09: \"the schema and the ux and the modules now need to align.\"\n\nThis existed only as a script in a scratch directory \u2014 the page it feeds could\nbe rebuilt by nobody but the session that wrote it. A generator whose input is\nnot in the repository is a generated artefact that cannot be regenerated, which\nis the failure the whole schematic discipline exists to prevent, one layer out.\n\nIt lives HERE rather than beside the generator because it reads `research.*` and\ncomposes contract + worklist: the skill owns what the data MEANS, the generator\nowns how it LOOKS.",
+   "api": [
+    "dsn()",
+    "build()"
+   ],
+   "config": [
+    "DATABASE_URL",
+    "MOBIUS_RAG_ENV"
+   ],
+   "writes": [],
+   "reads": [
+    "research.actor_thinking",
+    "research.attempt",
+    "research.diagnosis",
+    "research.request",
+    "research.request_message",
+    "research.request_state",
+    "research.resolution",
+    "research.turn"
+   ],
+   "imports": [
+    "deep_research",
+    "journey",
+    "worklist"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "Composes every request the UX shows \u2014 its artifacts, its actions, its notes \u2014 and the worklist derived from them, so the page has one source rather than a query per section.",
+   "rating": "green",
+   "group": "the surface",
+   "findings": [
+    [
+     "bad",
+     "Existed only as a script in a scratch directory. The page it feeds could be rebuilt by nobody but the session that wrote it \u2014 a generated artefact that cannot be regenerated, which is the failure this whole schematic exists to prevent, one layer out."
+    ],
+    [
+     "good",
+     "Lives in the skill rather than beside the generator: it reads research.* and composes contract + worklist. The skill owns what the data MEANS; the generator owns how it LOOKS."
+    ],
+    [
+     "good",
+     "Moving it changed the emitted page by zero bytes, which is the only evidence a refactor is a refactor."
+    ]
+   ]
+  },
+  {
+   "id": "verify_source",
+   "path": "deep_research/verify_source.py",
+   "loc": 148,
+   "role": "Open the document and look.",
+   "role_full": "Open the document and look.\n\nEvery check before this one reasons about strings the loop was handed: the quote\nagainst chat's answer, the document name against a citation list, the filename\nagainst a rule number. None of them opens the PDF. So a sentence chat composed\nand the extractor copied faithfully passes everything, and the fact store keeps\na value whose cited source never said it.\n\nThat is not hypothetical. The first fact this loop certified quoted \"for\nprocedure code H2000, the HP modifier represents a physician\" and cited\n59G-4.028.pdf. That document contains no H2000, no HP, and no \"physician\".\n\nThe check here is deliberately narrow, because a document rarely phrases things\nthe way an answer does. It does not ask whether the document says the same thing\nin different words \u2014 that is the judge's job. It asks whether the document\ncontains the HARD TOKENS the claim is made of: the procedure code, the modifier,\nthe numbers. Those are not paraphrasable. A limit of 1920 units for H2017 cannot\nbe sourced from a document in which neither \"H2017\" nor \"1920\" appears, however\nthe prose is worded.\n\nWord boundaries matter more than they look. Modifiers are two letters, and \"HO\"\nas a substring matches \"who\", \"household\", \"alcohol\" \u2014 ten chunks of a document\nthat never mentions the modifier at all.",
+   "api": [
+    "claim_payload()",
+    "hard_tokens()",
+    "load_chunks()",
+    "find_in_source()",
+    "supported_by_source()"
+   ],
+   "config": [],
+   "writes": [],
+   "reads": [],
+   "imports": [],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": true,
+   "how": "",
+   "rating": "ungraded",
+   "group": "unplaced",
+   "findings": []
+  },
+  {
+   "id": "worklist",
+   "path": "deep_research/worklist.py",
+   "loc": 231,
+   "role": "Turn what we advise on each question into the work somebody actually does.",
+   "role_full": "Turn what we advise on each question into the work somebody actually does.\n\nAnanth, 2026-09-09: \"retrieve this document \u2014 closes xx high priority questions.\"\n\nThe whole module has recorded actions ON questions, one per question, which is\nthe wrong grain for whoever has to do the work and hides the only fact that\nhelps them choose: how much a single activity is worth. Twenty-three questions\nrecommending `reopen` are not twenty-three problems; they are one run.\n\nIDEMPOTENT BY CONSTRUCTION. A task is identified by (kind, resource), so\nre-deriving updates the same row and re-links the same questions rather than\nminting duplicates on every sweep. A task whose questions have all moved on is\nclosed as `done` \u2014 derived work has to be able to go away, or the list only ever\ngrows and stops being read.\n\nNEVER TOUCHES DECLARED WORK. A task somebody typed \u2014 \"call the AHCA contact\" \u2014\nhas origin='declared' and is left alone. The deriver owns what it derived.",
+   "api": [
+    "payer_of()",
+    "resolve_target()",
+    "known_payers()",
+    "derive()",
+    "worklist()"
+   ],
+   "config": [],
+   "writes": [
+    "research.task",
+    "research.task_question"
+   ],
+   "reads": [],
+   "imports": [
+    "contract",
+    "contract.specifics"
+   ],
+   "observability": "silent",
+   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
+   "can_record_failure": false,
+   "how": "Turns what we advise on each question into the work somebody actually does \u2014 grouping many questions into one errand where they need the same document, and saying which rung of the ladder told us what that document is.",
+   "rating": "amber",
+   "group": "the answer",
+   "findings": [
+    [
+     "good",
+     "39 questions carrying advice collapse into 8 activities, and the top one is worth 23 \u2014 an item invisible while it was 23 rows, because it looked like 23 problems."
+    ],
+    [
+     "good",
+     "A document class carries its own SCOPE. The corpus settles it: a provider manual is one row per payer, a 59G rule is one per service, a fee schedule is one per category. Four handbook errands were four requests for one document."
+    ],
+    [
+     "good",
+     "When nothing identifies a document, the activity is `explore` \u2014 research, not retrieval, and the only fetch-adjacent work that happens HERE rather than outside. 'Name the document' would have put the burden on somebody who already knows, and mostly nobody does."
+    ],
+    [
+     "bad",
+     "Derived from recommendations only, so it can hold only work the machine already knows how to advise. 'Call this person' cannot be derived \u2014 nothing in the record knows a person exists to call \u2014 and there is no route to declare one."
+    ],
+    [
+     "unproven",
+     "Priority is questions-unblocked plus overdue. Crude on purpose, and nobody has worked a single item, so the ordering has never been tested against what a person would actually pick up."
+    ]
+   ]
+  }
+ ],
+ "actors": [
+  {
+   "key": "requester",
+   "name": "Asked",
+   "help": "whoever asked the question"
+  },
+  {
+   "key": "planner",
+   "name": "Worked out how",
+   "help": "finds the different ways this question could be answered, tests each for whether the tools could actually carry it, and puts them in the order worth trying"
+  },
+  {
+   "key": "drafter",
+   "name": "Searched",
+   "help": "searches the library and writes an answer in prose"
+  },
+  {
+   "key": "assembler",
+   "name": "Picked out",
+   "help": "reads that prose and picks out each separate fact, with the sentence that supports it"
+  },
+  {
+   "key": "judge",
+   "name": "Checked",
+   "help": "checks every fact against the answer sentence it came from"
+  },
+  {
+   "key": "verifier",
+   "name": "Opened the document",
+   "help": "opens the document a fact cites and looks for the claim in it \u2014 a separate question from the judge's, and often a different answer"
+  },
+  {
+   "key": "arbiter",
+   "name": "Decided",
+   "help": "decides whether to accept, go again, or hand it to a person"
+  },
+  {
+   "key": "executor",
+   "name": "Acted",
+   "help": "performs what the arbiter dispatched"
+  },
+  {
+   "key": "recorder",
+   "name": "Recorded",
+   "help": "writes the account of what happened, and decides nothing"
+  },
+  {
+   "key": "diagnoser",
+   "name": "Worked out why",
+   "help": "works out why a round failed and what should happen next"
+  },
+  {
+   "key": "refiner",
+   "name": "Rewrote the question",
+   "help": "rewrites the question for the next round"
+  },
+  {
+   "key": "resolver",
+   "name": "Checked and closed",
+   "help": "checks later whether something is done, and closes it out"
+  },
+  {
+   "key": "acquirer",
+   "name": "Went to get it",
+   "help": "goes and fetches a document the corpus does not hold"
+  },
+  {
+   "key": "halter",
+   "name": "Stopped it",
+   "help": "stops the machine, and starts it again"
+  }
+ ],
+ "who_reasons": {
+  "reasons": [
+   "diagnose",
+   "runner",
+   "thinking"
+  ],
+  "receipts": [
+   "acquire",
+   "executor",
+   "halt",
+   "recorder",
+   "resolution",
+   "run_batch",
+   "run_v2"
+  ],
+  "silent": [
+   "assessments",
+   "config",
+   "console",
+   "console_data",
+   "contract",
+   "contract/actions",
+   "contract/artifacts",
+   "contract/authority",
+   "contract/decisions",
+   "contract/fields",
+   "contract/notes",
+   "contract/specifics",
+   "contract/surfaces",
+   "contract/tasks",
+   "contract/tools",
+   "contract/verbs",
+   "contract/words",
+   "corroborate",
+   "diagnose_live",
+   "discovery",
+   "extract_critique",
+   "fact_rows",
+   "grants",
+   "intake",
+   "intake/check",
+   "intake/normalise",
+   "intake/parse",
+   "intake/readback",
+   "intake/store",
+   "journey",
+   "land_limits",
+   "language",
+   "llm_http",
+   "locate",
+   "main",
+   "modes",
+   "permission",
+   "playbook",
+   "prior",
+   "probe",
+   "read_thinking",
+   "recommend",
+   "recon",
+   "render_console",
+   "render_transcript",
+   "resolve",
+   "retrieval_guidance",
+   "run_research",
+   "run_turn",
+   "service",
+   "skills",
+   "stages",
+   "state",
+   "ux_data",
+   "verify_source",
+   "worklist"
+  ]
+ },
+ "traced_by": {
+  "arbiter": [
+   "runner"
+  ],
+  "diagnoser": [
+   "diagnose"
+  ],
+  "judge": [
+   "runner"
+  ]
+ },
+ "entry_points": [
+  {
+   "id": "runner",
+   "cli": true,
+   "loc": 2758
+  },
+  {
+   "id": "console",
+   "cli": true,
+   "loc": 2314
+  },
+  {
+   "id": "run_v2",
+   "cli": true,
+   "loc": 672
+  },
+  {
+   "id": "run_batch",
+   "cli": true,
+   "loc": 590
+  },
+  {
+   "id": "acquire",
+   "cli": true,
+   "loc": 446
+  },
+  {
+   "id": "render_console",
+   "cli": false,
+   "loc": 387
+  },
+  {
+   "id": "render_transcript",
+   "cli": false,
+   "loc": 308
+  },
+  {
+   "id": "run_research",
+   "cli": true,
+   "loc": 297
+  },
+  {
+   "id": "console_data",
+   "cli": false,
+   "loc": 212
+  },
+  {
+   "id": "ux_data",
+   "cli": false,
+   "loc": 165
+  },
+  {
+   "id": "discovery",
+   "cli": false,
+   "loc": 163
+  },
+  {
+   "id": "run_turn",
+   "cli": false,
+   "loc": 142
+  }
+ ],
+ "entry_parity": [
+  {
+   "id": "runner",
+   "has": {
+    "judges the answer": true,
+    "opens the document": true,
+    "records reasoning": true,
+    "asks the registry": true,
+    "reads the drafter's trace": true
+   },
+   "at": "deep_research/runner.py",
+   "score": 5,
+   "of": 5
+  },
+  {
+   "id": "run_batch",
+   "has": {
+    "judges the answer": true,
+    "opens the document": true,
+    "records reasoning": false,
+    "asks the registry": false,
+    "reads the drafter's trace": false
+   },
+   "at": "deep_research/run_batch.py",
+   "score": 2,
+   "of": 5
+  },
+  {
+   "id": "run_v2",
+   "has": {
+    "judges the answer": true,
+    "opens the document": false,
+    "records reasoning": false,
+    "asks the registry": false,
+    "reads the drafter's trace": false
+   },
+   "at": "deep_research/run_v2.py",
+   "score": 1,
+   "of": 5
+  },
+  {
+   "id": "run_research",
+   "has": {
+    "judges the answer": false,
+    "opens the document": false,
+    "records reasoning": false,
+    "asks the registry": false,
+    "reads the drafter's trace": false
+   },
+   "at": "deep_research/run_research.py",
+   "score": 0,
+   "of": 5
+  },
+  {
+   "id": "run_turn",
+   "has": {
+    "judges the answer": false,
+    "opens the document": false,
+    "records reasoning": false,
+    "asks the registry": false,
+    "reads the drafter's trace": false
+   },
+   "at": "deep_research/run_turn.py",
+   "score": 0,
+   "of": 5
+  }
+ ],
+ "terminators": [
+  {
+   "id": "run_v2",
+   "ends": {
+    "sourced": 1,
+    "escalated": 5
+   },
+   "at": "deep_research/run_v2.py:307"
+  },
+  {
+   "id": "resolution",
+   "ends": {
+    "sourced": 2,
+    "abandoned": 2
+   },
+   "at": "deep_research/resolution.py:382"
+  },
+  {
+   "id": "run_research",
+   "ends": {
+    "sourced": 1,
+    "escalated": 1
+   },
+   "at": "deep_research/run_research.py:267"
+  },
+  {
+   "id": "runner",
+   "ends": {
+    "sourced": 1,
+    "escalated": 1
+   },
+   "at": "deep_research/runner.py:405"
+  },
+  {
+   "id": "service",
+   "ends": {
+    "sourced": 1,
+    "escalated": 1
+   },
+   "at": "deep_research/service.py:96"
+  },
+  {
+   "id": "halt",
+   "ends": {
+    "halted": 1
+   },
+   "at": "deep_research/halt.py:163"
+  }
+ ],
+ "skills": {
+  "judge": {
+   "invokes": "an ordered registry; the first validator to return a verdict settles the field, so the cheap mechanical checks run before anything that costs a model call",
+   "skills": [
+    {
+     "name": "field_was_stated",
+     "kind": "process",
+     "asks": "did the answer state this field at all?",
+     "emits": [
+      "not_stated"
+     ],
+     "at": "deep_research/extract_critique.py:642",
+     "fn": "_v_not_stated"
+    },
+    {
+     "name": "quote_present",
+     "kind": "process",
+     "asks": "did the extractor supply a quote?",
+     "emits": [
+      "no_quote"
+     ],
+     "at": "deep_research/extract_critique.py:653",
+     "fn": "_v_has_quote"
+    },
+    {
+     "name": "quote_in_answer",
+     "kind": "source",
+     "asks": "is the quote really in the answer, or invented?",
+     "emits": [
+      "quote_not_verbatim"
+     ],
+     "at": "deep_research/extract_critique.py:660",
+     "fn": "_v_quote_in_answer"
+    },
+    {
+     "name": "lead_mode",
+     "kind": "process",
+     "asks": "is an uncited claim the point of this request?",
+     "emits": [
+      "uncited_lead"
+     ],
+     "at": "deep_research/extract_critique.py:676",
+     "fn": "_v_lead"
+    },
+    {
+     "name": "document_cited",
+     "kind": "source",
+     "asks": "is the named document one the answer actually used?",
+     "emits": [
+      "document_not_cited"
+     ],
+     "at": "deep_research/extract_critique.py:687",
+     "fn": "_v_document_cited"
+    },
+    {
+     "name": "source_identifiable",
+     "kind": "source",
+     "asks": "can the citation be followed back to a real document?",
+     "emits": [
+      "source_not_identifiable"
+     ],
+     "at": "deep_research/extract_critique.py:697",
+     "fn": "_v_source_identifiable"
+    },
+    {
+     "name": "authority",
+     "kind": "process",
+     "asks": "is this source good enough for THIS caller?",
+     "emits": [
+      "tier_not_allowed",
+      "wrong_rule_for_line"
+     ],
+     "at": "deep_research/extract_critique.py:706",
+     "fn": "_v_authority"
+    },
+    {
+     "name": "absence_by_reading",
+     "kind": "reasoning",
+     "asks": "for a negative, was the governing rule actually read?",
+     "emits": [
+      "governing_rule_not_read"
+     ],
+     "at": "deep_research/extract_critique.py:726",
+     "fn": "_v_absence"
+    }
+   ],
+   "gaps": [
+    {
+     "kind": "numerical",
+     "asks": "does the arithmetic hold, does the number reproduce from its own query?",
+     "why": "nothing checks a computed value against a recomputation; a wrong sum is indistinguishable from a right one"
+    },
+    {
+     "kind": "process",
+     "asks": "did the check we CLAIM to have run actually run?",
+     "why": "partly covered. Every serious defect of 2026-09-08 was this shape \u2014 a gate with no caller, a check returning `absent` without reading \u2014 and each was found by hand, not by a validator"
+    }
+   ]
+  },
+  "arbiter": {
+   "invokes": "regex patterns over the drafter's own reasoning trace, each mapped to one course of action. Deterministic and deliberately shallow \u2014 this is the component Ananth named as the big lift.",
+   "skills": [
+    {
+     "name": "assert_ok",
+     "kind": "pattern",
+     "asks": "a recurring shape in the reasoning"
+    },
+    {
+     "name": "concede",
+     "kind": "pattern",
+     "asks": "a recurring shape in the reasoning"
+    },
+    {
+     "name": "rule",
+     "kind": "pattern",
+     "asks": "a recurring shape in the reasoning"
+    },
+    {
+     "name": "scope",
+     "kind": "pattern",
+     "asks": "a recurring shape in the reasoning"
+    }
+   ],
+   "gaps": [
+    {
+     "kind": "reasoning",
+     "asks": "should another round happen, and what should change?",
+     "why": "four patterns decide this today. A model here would be reasoning about the machine's own reasoning, where being wrong is invisible \u2014 it would need its own trace and 'I could not tell' as a real answer."
+    }
+   ]
+  },
+  "drafter": {
+   "invokes": "chat's ReAct loop and its tool manifest \u2014 NOT ours. The evidence a question can reach is decided by which tools chat holds, which is why a new evidence base is chat's work and not a new adapter here.",
+   "skills": [
+    {
+     "name": "search_corpus",
+     "kind": "tool",
+     "asks": "what does the corpus say"
+    },
+    {
+     "name": "service_line_search",
+     "kind": "tool",
+     "asks": "what does the registry know"
+    }
+   ],
+   "gaps": [
+    {
+     "kind": "tool",
+     "asks": "telemetry, logs, code, metrics",
+     "why": "a failed-query or analytical deep dive needs evidence chat cannot currently reach"
+    }
+   ]
+  }
+ },
+ "live": {
+  "available": true,
+  "verdicts_seen": 331,
+  "by_issue": {
+   "none": 188,
+   "value_absent_from_cited_document": 27,
+   "tier_not_allowed": 23,
+   "not_a_standard_source": 20,
+   "critic_no_json": 17,
+   "document_not_cited": 8,
+   "not_stated": 8,
+   "contradicted": 6,
+   "off_subject": 6,
+   "quote_not_verbatim": 6,
+   "wrong_rule_for_line": 6,
+   "overreach": 4,
+   "value_not_in_quote": 4,
+   "no_quote": 3,
+   "payor_source_for_standard": 2,
+   "contradicted_by_document": 1,
+   "about_a_document": 1,
+   "source_not_identifiable": 1
+  },
+  "by_validator": {
+   "judged": 219,
+   "mechanical": 67,
+   "document": 33,
+   "authority": 6,
+   "document_cited": 4,
+   "absence_by_reading": 2
+  },
+  "by_actor_trace": {
+   "planner": 1577,
+   "judge": 331,
+   "executor": 238,
+   "assembler": 188,
+   "arbiter": 41,
+   "verifier": 37,
+   "diagnoser": 18,
+   "resolver": 6
+  },
+  "requests_by_status": {
+   "abandoned": 83,
+   "sourced": 30,
+   "open": 7,
+   "escalated": 3
+  },
+  "spend_by_actor": {
+   "null": 19.3875,
+   "drafter": 8.949,
+   "assembler": 0.248,
+   "judge": 0.2316
+  },
+  "recent": [
+   {
+    "id": 1950,
+    "subject_id": "bh_intervention/strategy-spread-al",
+    "status": "open",
+    "turns": 0,
+    "thinking": 115
+   },
+   {
+    "id": 1841,
+    "subject_id": "sunshine_manual/emit-strategy-al",
+    "status": "open",
+    "turns": 0,
+    "thinking": 25
+   },
+   {
+    "id": 1773,
+    "subject_id": "sunshine_manual/section-read-fixed-al",
+    "status": "open",
+    "turns": 0,
+    "thinking": 31
+   },
+   {
+    "id": 1745,
+    "subject_id": "sunshine_manual/section-read-al",
+    "status": "sourced",
+    "turns": 0,
+    "thinking": 34
+   },
+   {
+    "id": 1555,
+    "subject_id": "sunshine_provider_manual/documentation-al",
+    "status": "open",
+    "turns": 0,
+    "thinking": 41
+   },
+   {
+    "id": 879,
+    "subject_id": "bh_intervention",
+    "status": "open",
+    "turns": 1,
+    "thinking": 1283
+   },
+   {
+    "id": 878,
+    "subject_id": "fqhc_encounter",
+    "status": "open",
+    "turns": 2,
+    "thinking": 10
+   },
+   {
+    "id": 877,
+    "subject_id": "therapeutic_group_care/prior_authorization#148",
+    "status": "abandoned",
+    "turns": 1,
+    "thinking": 0
+   }
+  ]
+ },
+ "contract": {
+  "fields": {
+   "subject": {
+    "label": "What is this about?",
+    "type": "string",
+    "says": "what the answer is ABOUT \u2014 the key everything joins on",
+    "example": "sipp/payment_and_grouping"
+   },
+   "question": {
+    "label": "What do you want to know?",
+    "type": "string",
+    "says": "the question, in the words you would ask a person",
+    "example": "For the Florida Medicaid Statewide Inpatient Psychiatric Program (SIPP), how is payment determined?"
+   },
+   "how_to_judge": {
+    "label": "What would a good answer have to show you?",
+    "type": "string",
+    "says": "how to grade an answer for YOUR store",
+    "because": "Deep research does not know what a good answer looks like for someone else's fact store, and a generic evaluator is how you get a confidently wrong extraction written into a certified one.",
+    "measured": "15 of 63 live requests carry none",
+    "example": "A kept field must quote the rule verbatim. An absence is only a finding if the governing rule was read."
+   },
+   "asked_by": {
+    "label": "Who is asking",
+    "type": "string",
+    "says": "who is asking",
+    "because": "An anonymous request can still be answered \u2014 it cannot be RETURNED, cannot be attributed when its answer turns out wrong, and cannot appear on anyone's worklist.",
+    "measured": "17 of 63 live requests have no invoker",
+    "example": "service_line_registry"
+   },
+   "schema": {
+    "label": "The specific things you need back",
+    "type": "object",
+    "says": "the fields you want, and the values each may take",
+    "because": "The only thing that turns 'answered' into '2 of 4'. Optional because a caller is allowed not to care \u2014 but warned, loudly, because a partial answer closes as answered without it.",
+    "measured": "21 of 63 carry none",
+    "example": {
+     "payment_basis": "per diem | per discharge | other",
+     "rule_ref": "the rule that states it"
+    }
+   },
+   "expects": {
+    "label": "What you think a good answer looks like",
+    "type": "string",
+    "says": "what a good answer would contain, in prose",
+    "note": "A hint to the drafter, not a contract. 10 of 63 carry one."
+   },
+   "authority": {
+    "label": "How authoritative does the source have to be?",
+    "type": "string",
+    "says": "the weakest source you will accept",
+    "note": "Unset stays unset. Reading silence as the strictest bar filed 25 registry repairs nobody could action.",
+    "one_of": [
+     "published_standard",
+     "payer_policy",
+     "secondary"
+    ]
+   },
+   "jurisdiction": {
+    "label": "Which state or plan",
+    "type": "string",
+    "says": "the state or plan it is scoped to"
+   },
+   "max_rounds": {
+    "label": "How many tries before someone is asked",
+    "type": "integer",
+    "says": "how many rounds before it escalates",
+    "default": 3
+   },
+   "due_at": {
+    "label": "When you need it by",
+    "type": "date",
+    "says": "when you need it by"
+   }
+  },
+  "verbs": [
+   {
+    "id": "submit",
+    "verb": "Submit",
+    "method": "POST",
+    "route": "/api/research/request",
+    "says": "Open a question and get an id to poll.",
+    "required": [
+     "subject",
+     "question",
+     "how_to_judge",
+     "asked_by"
+    ],
+    "optional": [
+     "schema",
+     "expects",
+     "authority",
+     "jurisdiction",
+     "max_rounds",
+     "due_at"
+    ],
+    "enforced_by": "runner.open_request",
+    "refusals": [
+     {
+      "when": "no how_to_judge",
+      "status": 422,
+      "say": "no evaluator prompt \u2014 we cannot judge an answer for your store without one"
+     },
+     {
+      "when": "no subject",
+      "status": 422,
+      "say": "no subject"
+     },
+     {
+      "when": "no question",
+      "status": 422,
+      "say": "no question"
+     },
+     {
+      "when": "no asked_by",
+      "status": 422,
+      "say": "no invoker \u2014 an answer with nobody to return it to cannot reach a worklist or be attributed when it is wrong"
+     }
+    ],
+    "warnings": [
+     {
+      "when": "no schema",
+      "say": "no schema \u2014 completeness cannot be measured, so a partial answer will close as answered"
+     }
+    ],
+    "returns": {
+     "request": "the id to poll",
+     "status": "open",
+     "poll": "/api/research/request/{id}",
+     "limits": "what we will NOT be able to tell you, said now rather than discovered later"
+    },
+    "audience": [
+     "end user",
+     "agent",
+     "domain queue"
+    ],
+    "live": true
+   },
+   {
+    "id": "status",
+    "verb": "Check status",
+    "method": "GET",
+    "route": "/api/research/request/{rid}",
+    "says": "What happened, and whether the result is usable.",
+    "required": [],
+    "optional": [],
+    "enforced_by": null,
+    "refusals": [
+     {
+      "when": "no such request",
+      "status": 404,
+      "say": "no request {id}"
+     }
+    ],
+    "warnings": [],
+    "returns": {
+     "status": "still moving?  open | sourced | escalated | abandoned",
+     "stance": "usable?  the ten stances resolver.recommend can take",
+     "decisions_open": "is it stuck on a person? resolution ids",
+     "fields": "every value, kept or dropped, with its quote and document",
+     "recommended_action": "which of the offered moves we advise",
+     "why": "the rationale for that advice, in a sentence",
+     "actions": "everything this caller can do about it right now",
+     "eta": "who it is waiting on, and how long that has taken before"
+    },
+    "branch_on": [
+     "status",
+     "stance",
+     "decisions_open",
+     "recommended_action"
+    ],
+    "audience": [
+     "end user",
+     "agent",
+     "arbiter",
+     "domain queue"
+    ],
+    "live": true
+   },
+   {
+    "id": "decide",
+    "verb": "Decide",
+    "method": "POST",
+    "route": "/api/research/decide",
+    "says": "Answer one waiting decision, from the options it offered.",
+    "required": [
+     "resolution_id",
+     "chose"
+    ],
+    "optional": [
+     "why"
+    ],
+    "enforced_by": null,
+    "refusals": [
+     {
+      "when": "chose was never offered",
+      "status": 400,
+      "say": "{chose} was not offered here. The choices are: ..."
+     },
+     {
+      "when": "already settled",
+      "status": 409,
+      "say": "that decision is already settled"
+     }
+    ],
+    "warnings": [],
+    "returns": {
+     "what_happens": "in the words the row already carried \u2014 not a second description that could disagree"
+    },
+    "audience": [
+     "arbiter",
+     "human operator",
+     "domain queue"
+    ],
+    "live": true
+   },
+   {
+    "id": "act",
+    "verb": "Act on it",
+    "method": "POST",
+    "route": "/api/research/request/{rid}/act",
+    "says": "Do something about it \u2014 the moves a person has, not just a state.",
+    "because": "Ananth, 2026-09-09: 'what happened to mine is not just status but recommendation and action.' A status page that stops at a status tells a person their question is stuck and leaves them nowhere to click. Fourteen actions, one recommended, with the rationale.",
+    "required": [
+     "action",
+     "because"
+    ],
+    "optional": [
+     "question",
+     "document",
+     "to",
+     "due_at",
+     "outcome"
+    ],
+    "enforced_by": null,
+    "refusals": [
+     {
+      "when": "no action",
+      "status": 422,
+      "say": "which action? the offered ones are on the status response"
+     },
+     {
+      "when": "no because",
+      "status": 422,
+      "say": "every action takes a reason \u2014 somebody reads this in a month and 'expedited' with no why is not a record"
+     },
+     {
+      "when": "action was not offered here",
+      "status": 400,
+      "say": "{action} is not available on this question right now"
+     }
+    ],
+    "warnings": [],
+    "returns": {
+     "what_happens": "in the action's own declared words",
+     "recommended": "what we advised, so the record shows whether the caller took the advice"
+    },
+    "audience": [
+     "end user",
+     "agent",
+     "human operator",
+     "domain queue"
+    ],
+    "live": true
+   },
+   {
+    "id": "note",
+    "verb": "Tell it something",
+    "method": "POST",
+    "route": "/api/research/request/{rid}/note",
+    "says": "Pass the drafter what it was missing. No reply expected.",
+    "because": "It is a state machine, not a chat: you leave information and move on. `read_thinking` already turns the drafter's own reasoning into the next question \u2014 a human note is another finding entering the same function, which is why this is a new source rather than a new subsystem.",
+    "required": [
+     "body"
+    ],
+    "optional": [
+     "document"
+    ],
+    "enforced_by": null,
+    "refusals": [
+     {
+      "when": "no body",
+      "status": 422,
+      "say": "there is nothing in the note"
+     }
+    ],
+    "warnings": [],
+    "returns": {
+     "will": "how it will be used \u2014 one of the declared note uses",
+     "next": "what happens to this question",
+     "eta": "how long that usually takes",
+     "receipt": "you will see later whether the round used it"
+    },
+    "audience": [
+     "end user",
+     "agent",
+     "human operator",
+     "domain queue"
+    ],
+    "live": true
+   },
+   {
+    "id": "close",
+    "verb": "Close out",
+    "method": "POST",
+    "route": "/api/research/request/{rid}/close",
+    "says": "Stop the machine asking, on the record.",
+    "because": "The fifth thing, not a filter over the other four. /decide closes a RESOLUTION; nothing exposed closed a REQUEST \u2014 and 12 of 32 sourced requests have no closed_at, which is the shape of a close that happened somewhere other than through a close-out.",
+    "required": [
+     "outcome",
+     "because",
+     "by"
+    ],
+    "optional": [],
+    "enforced_by": null,
+    "refusals": [
+     {
+      "when": "no because",
+      "status": 422,
+      "say": "a close needs a reason \u2014 it ends work everyone else can see, and the record has to say why"
+     },
+     {
+      "when": "outcome not one of sourced|abandoned|superseded",
+      "status": 422,
+      "say": "{outcome} is not an outcome we record"
+     },
+     {
+      "when": "already closed",
+      "status": 409,
+      "say": "that request was closed at {closed_at}"
+     }
+    ],
+    "warnings": [],
+    "returns": {
+     "stops": "what this ended \u2014 open turns, pending decisions"
+    },
+    "audience": [
+     "end user",
+     "arbiter",
+     "human operator"
+    ],
+    "live": true
+   }
+  ],
+  "surfaces": [
+   {
+    "id": "ask",
+    "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/research/ask",
+    "primary": true,
+    "tab": "Ask",
+    "title": "Ask a question",
+    "audience": "end user \u00b7 agent",
+    "shows": "the four required fields, and what we will not be able to tell you if the schema is left off",
+    "filter": null,
+    "filter_says": "Nothing to filter \u2014 this is where a question starts",
+    "calls": [
+     "submit"
+    ],
+    "state": "designed"
+   },
+   {
+    "id": "my_requests",
+    "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/research/ask#mine",
+    "primary": true,
+    "tab": "My requests",
+    "title": "What happened to mine",
+    "audience": "end user",
+    "shows": "every request I opened, its stance, and what it is waiting on",
+    "filter": "request.invoker = me",
+    "filter_says": "Questions you asked",
+    "calls": [
+     "status",
+     "close"
+    ],
+    "state": "designed"
+   },
+   {
+    "id": "worklist",
+    "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/research/ask#work",
+    "primary": true,
+    "tab": "Work",
+    "title": "My worklist",
+    "audience": "human operator",
+    "shows": "decisions assigned to me, oldest first, with the recommended option and what each one does to the question",
+    "filter": "resolution.assignee = me and resolved_at is null",
+    "filter_says": "Decisions waiting on you",
+    "calls": [
+     "decide",
+     "status"
+    ],
+    "state": "live"
+   },
+   {
+    "id": "agent_poll",
+    "primary": false,
+    "folds_into": "my_requests",
+    "scope_label": "Asked by a service",
+    "title": "Agent poll",
+    "audience": "agent (rag, registry, appeals)",
+    "shows": "status, stance and decisions_open \u2014 nothing rendered",
+    "filter": "request.invoker = this service",
+    "filter_says": "Questions this service asked",
+    "calls": [
+     "status",
+     "decide",
+     "close"
+    ],
+    "state": "live"
+   },
+   {
+    "id": "domain_queue",
+    "primary": false,
+    "folds_into": "my_requests",
+    "scope_label": "Everything for my area",
+    "title": "Domain queue",
+    "audience": "appeals \u00b7 billing \u00b7 scheduling",
+    "shows": "the same queue, narrowed to one consumer's subjects",
+    "filter": "request.consumer = this domain",
+    "filter_says": "Everything for your area",
+    "calls": [
+     "submit",
+     "status",
+     "decide",
+     "close"
+    ],
+    "state": "designed"
+   },
+   {
+    "id": "console",
+    "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/research/console",
+    "primary": false,
+    "folds_into": "my_requests",
+    "scope_label": "Everything, unfiltered",
+    "title": "The machine's own view",
+    "audience": "arbiter \u00b7 internal",
+    "shows": "every round, every actor, what each one thought, what it cost",
+    "filter": null,
+    "filter_says": "Everything, unfiltered",
+    "calls": [
+     "status",
+     "decide"
+    ],
+    "state": "live"
+   }
+  ],
+  "live": {
+   "ask": "https://mobius-payor-ortabkknqa-uc.a.run.app/research/ask",
+   "my_requests": "https://mobius-payor-ortabkknqa-uc.a.run.app/research/ask#mine",
+   "worklist": "https://mobius-payor-ortabkknqa-uc.a.run.app/research/ask#work",
+   "console": "https://mobius-payor-ortabkknqa-uc.a.run.app/research/console"
+  },
+  "live_base": "https://mobius-payor-ortabkknqa-uc.a.run.app",
+  "actions": [
+   {
+    "id": "wait",
+    "label": "The system has it",
+    "moves": "nobody \u2014 this is the no-op, and saying so is the point",
+    "does": "Nothing. Records that you looked and chose to let it run.",
+    "when": "a round is running or a repair is out",
+    "owner": "anyone",
+    "closes_as": "Answered, once the round finishes \u2014 nothing for you to do",
+    "needs": [],
+    "offer_when": [
+     "open",
+     "running"
+    ]
+   },
+   {
+    "id": "accept_partial",
+    "label": "Accept what we have so far",
+    "moves": "closes the gap you declared",
+    "does": "Settles with what survived. The unfilled fields are recorded as not required after all, by you, with your reason.",
+    "when": "some fields are kept and some required ones never came",
+    "owner": "requester",
+    "closes_as": "Answered, with what we have and your note on what you dropped",
+    "needs": [
+     "because"
+    ],
+    "offer_when": [
+     "open",
+     "partial"
+    ]
+   },
+   {
+    "id": "widen_authority",
+    "label": "Accept a less official source",
+    "moves": "the machine, on the next sweep",
+    "does": "Re-judges what was already found against a weaker authority tier. Nothing is re-asked; the answer was there and our own policy refused it.",
+    "when": "a value was refused on authority rather than on substance",
+    "owner": "requester",
+    "closes_as": "Answered from a source you have accepted as good enough",
+    "needs": [
+     "because"
+    ],
+    "offer_when": [
+     "open",
+     "authority_can_widen"
+    ]
+   },
+   {
+    "id": "rewrite",
+    "label": "Ask it differently",
+    "moves": "the machine, next round",
+    "does": "Replaces the question and mints a new round.",
+    "when": "the question is the thing that is wrong",
+    "owner": "requester",
+    "closes_as": "Answered against a better question",
+    "needs": [
+     "question",
+     "because"
+    ],
+    "offer_when": [
+     "open"
+    ]
+   },
+   {
+    "id": "flag_scope",
+    "label": "This covers two different populations",
+    "moves": "the person who owns coverage definitions",
+    "does": "Raises that one answer is doing two jobs, without deciding the split. The question stays where it is and the policy owner is asked whether the populations genuinely need different rules.",
+    "when": "you can see the answer is conflating two groups but it is not yours to say they need different rules",
+    "owner": "anyone",
+    "closes_as": "Closed by the policy owner, once they rule on whether the populations differ",
+    "offer_when": [
+     "open",
+     "two_scopes"
+    ],
+    "needs": [
+     "because"
+    ]
+   },
+   {
+    "id": "narrow",
+    "label": "Split into separate questions",
+    "moves": "the machine, as two questions",
+    "does": "Opens one request per scope. Two true answers about two populations are not a disagreement, and forcing them into one field is what makes the corpus look self-contradictory.",
+    "when": "the drafter named two populations for one field",
+    "owner": "policy owner",
+    "closes_as": "Answered \u2014 one clean answer per population, instead of one that looks contradictory",
+    "needs": [
+     "because"
+    ],
+    "offer_when": [
+     "open",
+     "scopes_differ"
+    ]
+   },
+   {
+    "id": "name_document",
+    "label": "I know where it actually lives",
+    "moves": "the machine, against the document you name",
+    "does": "Re-asks the question against that document only.",
+    "when": "the citation cannot be followed, or the cited document was read and does not support the claim",
+    "owner": "policy owner",
+    "closes_as": "Answered from the document you named",
+    "needs": [
+     "document",
+     "because"
+    ],
+    "offer_when": [
+     "open"
+    ]
+   },
+   {
+    "id": "acquire",
+    "label": "Go and find a source",
+    "moves": "Discovery, on their clock",
+    "does": "Raises an acquisition and parks the question until it lands and is retrievable. Arrival is not readiness.",
+    "when": "we do not hold a document that could answer it",
+    "owner": "policy owner",
+    "closes_as": "Answered once the document lands, or closed as one we do not hold",
+    "needs": [
+     "because"
+    ],
+    "offer_when": [
+     "open"
+    ]
+   },
+   {
+    "id": "overrule",
+    "label": "Reconsider rejected values",
+    "moves": "you \u2014 per refused field",
+    "does": "Approve, correct or uphold each refusal. A judge that cannot be overruled is a judge nobody can audit.",
+    "when": "values were refused and you believe the refusal is wrong",
+    "owner": "appeals reviewer",
+    "closes_as": "Answered with your ruling on record beside ours",
+    "needs": [
+     "because"
+    ],
+    "offer_when": [
+     "any"
+    ],
+    "post_to": "/api/research/override"
+   },
+   {
+    "id": "expedite",
+    "label": "Move it up the queue",
+    "moves": "the machine, sooner",
+    "does": "Collapses the polling backoff to the shortest step and puts the next round at the front. It does not make an answer appear \u2014 it removes the waiting we added on purpose.",
+    "when": "it is being worked and the backoff is longer than you can afford",
+    "owner": "requester",
+    "closes_as": "Answered sooner \u2014 same answer, less waiting",
+    "needs": [
+     "because"
+    ],
+    "offer_when": [
+     "open",
+     "running"
+    ]
+   },
+   {
+    "id": "extend_deadline",
+    "label": "Give it more time",
+    "moves": "the due date only",
+    "does": "Moves the deadline. The work is unchanged.",
+    "when": "it is close and the date is what is failing",
+    "owner": "requester",
+    "closes_as": "Still open, but no longer late",
+    "needs": [
+     "due_at",
+     "because"
+    ],
+    "offer_when": [
+     "open"
+    ]
+   },
+   {
+    "id": "cannot_support",
+    "label": "I cannot support this",
+    "moves": "away from you, to whoever can",
+    "does": "Records that the person asked is not the person who can answer, and why. The question stays open and goes back on the queue unassigned rather than sitting on someone who cannot move it.",
+    "when": "it was routed to you and it is not yours to judge",
+    "owner": "anyone",
+    "closes_as": "Back on the queue for someone who can close it",
+    "needs": [
+     "because"
+    ],
+    "offer_when": [
+     "open"
+    ]
+   },
+   {
+    "id": "stuck",
+    "label": "This is stuck",
+    "moves": "a human who knows the domain",
+    "does": "Flags it blocked with your reason attached and stops the machine re-asking a question that will fail the same way. Different from closing: nothing is decided.",
+    "when": "nothing on this list will move it and you know why",
+    "owner": "anyone",
+    "closes_as": "Held, with your reason, until the thing blocking it changes",
+    "needs": [
+     "because"
+    ],
+    "offer_when": [
+     "open"
+    ]
+   },
+   {
+    "id": "reassign",
+    "label": "Hand it to someone else",
+    "moves": "the person you name",
+    "does": "Reassigns and tells them what you already ruled out.",
+    "when": "you know whose question this is",
+    "owner": "anyone",
+    "closes_as": "Closed by the person who can actually close it",
+    "needs": [
+     "to",
+     "because"
+    ],
+    "offer_when": [
+     "open"
+    ]
+   },
+   {
+    "id": "reopen",
+    "label": "Run it again",
+    "moves": "the machine, from a fresh round",
+    "does": "Reopens a settled question and mints a new round. The gates it runs through are today's, not the ones that were there when it closed.",
+    "when": "it settled before a gate existed, so the answer was never actually checked. 24 requests are `sourced` and `unverified` for exactly this reason \u2014 closed clean, against a document nothing opened.",
+    "owner": "requester",
+    "closes_as": "Answered properly this time, or honestly marked as unanswerable",
+    "needs": [
+     "because"
+    ],
+    "offer_when": [
+     "settled",
+     "unusable"
+    ]
+   },
+   {
+    "id": "close",
+    "label": "Close it out",
+    "moves": "nobody \u2014 it ends",
+    "does": "Stops the machine asking, on the record, with your name on it.",
+    "when": "always available. Nothing is ever a dead end.",
+    "owner": "requester",
+    "closes_as": "Closed, with your reason on the record",
+    "needs": [
+     "outcome",
+     "because"
+    ],
+    "offer_when": [
+     "open"
+    ],
+    "post_to": "/api/research/request/{id}/close"
+   }
+  ],
+  "recommended": {
+   "ready": [
+    "close",
+    "We checked it against the document it cites and it holds up. Nothing more will improve it."
+   ],
+   "thin": [
+    "close",
+    "It holds up, but everything rests on one document. Worth a second source if this decision matters \u2014 not a reason to leave the question open."
+   ],
+   "conditional": [
+    "accept_partial",
+    "The rule gives more than one answer depending on the case. Keep both and note what decides between them; picking one would make a choice the rule deliberately leaves open."
+   ],
+   "conflicting": [
+    "overrule",
+    "Two answers for the same situation, and the system cannot tell which the rule means. That is a judgement call \u2014 somebody has to read it and say."
+   ],
+   "provenance_failed": [
+    "name_document",
+    "We opened the document it points at and it does not say this. The answer may still be right; the source is wrong. Asking the same document again will get the same result."
+   ],
+   "citation_unfollowable": [
+    "name_document",
+    "It points at something we cannot find at all. Running it again cannot fix a bad reference \u2014 only a better one can."
+   ],
+   "unverified": [
+    "wait",
+    "Nobody has opened the document to confirm this yet. That is our gap, not a problem with the source \u2014 please do not record it as a finding. The system will close it."
+   ],
+   "could_not_check": [
+    "wait",
+    "The check did not run, so nothing has been established either way. Running it again is the fix, and the system will."
+   ],
+   "closed_empty": [
+    "reopen",
+    "It was closed as answered while holding no value and naming no source. Nothing failed a check here \u2014 nothing was ever checked. Re-run it or take the answered mark off; leaving it reports an answer that does not exist."
+   ],
+   "inconclusive": [
+    "acquire",
+    "Nothing came back, and we never read the rule that governs this. Asking again will fail the same way \u2014 a document has to arrive first."
+   ],
+   "caller_decision": [
+    "widen_authority",
+    "There is an answer and our own rules rejected the source as not authoritative enough. Only you can say that source is good enough here."
+   ],
+   "None": [
+    "wait",
+    "It has not finished a first try yet. Nothing is stuck \u2014 there is simply nothing to judge."
+   ]
+  },
+  "specific": {
+   "name_document": [
+    [
+     [
+      "named_not_cited"
+     ],
+     "You have a lead already: the answer named {named_not_cited} and never cited it. If that is where it lives, say so and we ask there."
+    ],
+    [
+     [
+      "documents_shown"
+     ],
+     "It read {documents_shown}. If the rule is somewhere else, name that document and we ask it directly."
+    ]
+   ],
+   "acquire": [
+    [
+     [
+      "not_in_corpus",
+      "doc_kind"
+     ],
+     "We hold nothing that could answer this. What we need is {doc_kind} \u2014 name one and we will go and get it."
+    ],
+    [
+     [
+      "doc_kind",
+      "missing_list"
+     ],
+     "Ask for {doc_kind}. That is the document class that carries {missing_list} \u2014 what we read did not."
+    ],
+    [
+     [
+      "doc_kind"
+     ],
+     "Ask for {doc_kind}. That is the document class that settles this, and it is not what we read."
+    ]
+   ],
+   "accept_partial": [
+    [
+     [
+      "kept_list",
+      "missing_list"
+     ],
+     "Close it with {kept_list}. You would be dropping {missing_list} \u2014 recorded as your call, not as a gap."
+    ]
+   ],
+   "widen_authority": [
+    [
+     [
+      "tier_refused_list",
+      "tier_refused_doc"
+     ],
+     "{tier_refused_list} was found and refused only because {tier_refused_doc} is below the bar you set. Accept it and the question closes now."
+    ]
+   ],
+   "overrule": [
+    [
+     [
+      "dropped_count",
+      "dropped_list",
+      "dropped_issue",
+      "dropped_quote"
+     ],
+     "{dropped_count} rejected: {dropped_list} \u2014 {dropped_issue}. The quote it rested on: \u201c{dropped_quote}\u201d. Approve it, correct it, or leave the refusal standing."
+    ],
+    [
+     [
+      "dropped_list",
+      "dropped_issue"
+     ],
+     "{dropped_list} was refused \u2014 {dropped_issue}. Approve it, correct it, or leave the refusal standing."
+    ]
+   ],
+   "narrow": [
+    [
+     [
+      "two_scopes"
+     ],
+     "Two populations came back with different answers: {two_scopes}. Splitting only works if each is a service line the registry models \u2014 a facility type or a setting is a scope inside a line, not a line."
+    ]
+   ],
+   "flag_scope": [
+    [
+     [
+      "two_scopes"
+     ],
+     "One answer is covering {two_scopes}. Raise it and the policy owner decides whether those genuinely need different rules \u2014 you do not have to know."
+    ]
+   ],
+   "rewrite": [
+    [
+     [
+      "missing_list"
+     ],
+     "Ask specifically for {missing_list}. That is what never came, and the question as written did not press for it."
+    ]
+   ],
+   "reopen": [
+    [
+     [
+      "first_document"
+     ],
+     "It closed before anything opened {first_document} to check the answer. Running it again puts it through that check."
+    ]
+   ],
+   "reassign": [
+    [
+     [
+      "consumer"
+     ],
+     "It is filed under {consumer}. If somebody else owns this rule, hand it to them with what you already ruled out."
+    ]
+   ],
+   "expedite": [
+    [
+     [
+      "next_action_at"
+     ],
+     "Next round is not due until {next_action_at}. This brings it forward to now."
+    ]
+   ],
+   "close": [
+    [
+     [
+      "silent_ok"
+     ],
+     "If you are satisfied the rule genuinely says nothing, close it that way \u2014 a stated silence is a finding a biller can act on. If you are not, do not."
+    ],
+    [
+     [
+      "holds_up"
+     ],
+     "It holds up. Closing here records the answer and stops the asking."
+    ]
+   ]
+  },
+  "doc_kind": [
+   [
+    [
+     "rate",
+     "fee",
+     "per_diem",
+     "amount",
+     "payment",
+     "reimburs"
+    ],
+    "a fee schedule or rate worksheet",
+    "category"
+   ],
+   [
+    [
+     "prior_auth",
+     "authorization",
+     "precert"
+    ],
+    "the coverage policy rule (59G-4.x) for this service",
+    "service"
+   ],
+   [
+    [
+     "cover",
+     "eligib",
+     "criteria",
+     "medical_necess"
+    ],
+    "the coverage policy rule (59G-4.x) for this service",
+    "service"
+   ],
+   [
+    [
+     "document",
+     "record",
+     "chart",
+     "note"
+    ],
+    "the provider handbook",
+    "payer"
+   ],
+   [
+    [
+     "code",
+     "modifier",
+     "hcpcs",
+     "cpt",
+     "revenue"
+    ],
+    "the fee schedule that lists the codes",
+    "category"
+   ],
+   [
+    [
+     "place_of_service",
+     "pos",
+     "setting"
+    ],
+    "the coverage policy rule, which states where the service may be given",
+    "service"
+   ],
+   [
+    [
+     "grouping",
+     "drg",
+     "grouper"
+    ],
+    "the inpatient reimbursement methodology document",
+    "payer"
+   ]
+  ],
+  "reserved_words": {
+   "appeal": "filing a formal appeal with a payor against a denial \u2014 on a clock, with a submission channel. The highest-consequence word in the appeals domain.",
+   "case": "a claim, an appeal case, or a patient episode depending on who is reading \u2014 a real tracked object with an id, in every reading.",
+   "grievance": "a distinct regulated filing with its own timeline, not a synonym for a complaint or a flag.",
+   "denial": "a payor determination on a claim. Not a word for our own refusal to accept a value.",
+   "claim": "a billed encounter. Nothing in deep research is a claim."
+  },
+  "roles": [
+   "anyone",
+   "requester",
+   "appeals reviewer",
+   "policy owner",
+   "operator"
+  ],
+  "artifacts": [
+   {
+    "id": "request",
+    "title": "The request",
+    "says": "What you want to know, and what it is about",
+    "supplied_by": "caller",
+    "carried_by": [
+     "research.request.question",
+     "research.request.subject_id"
+    ],
+    "state": "present"
+   },
+   {
+    "id": "output",
+    "title": "The output you want",
+    "says": "The fields you need back, and how to judge an answer for YOUR store",
+    "supplied_by": "caller",
+    "carried_by": [
+     "research.request.extraction_schema",
+     "research.request.evaluator_prompt",
+     "research.request.expects"
+    ],
+    "state": "partial",
+    "gap": "25 of 68 carry no schema, so a partial answer closes as answered"
+   },
+   {
+    "id": "authority",
+    "title": "The authority to execute it",
+    "says": "Which sources may this answer rest on",
+    "supplied_by": "caller",
+    "carried_by": [
+     "research.request.authority",
+     "research.request.authority_policy"
+    ],
+    "declared_in": "contract.authority",
+    "state": "partial",
+    "gap": "4 of 68 declare a bar. Every ruling a person has ever made \u2014 all four \u2014 was widening it, which is the question a declaration would have answered in advance"
+   },
+   {
+    "id": "tools",
+    "title": "What it may use",
+    "says": "Which capabilities are granted, which need asking, which are refused",
+    "supplied_by": "caller",
+    "carried_by": [
+     "research.request.tools_grant"
+    ],
+    "declared_in": "contract.tools",
+    "state": "present",
+    "measured": "11 requests carry a tools grant",
+    "gap": ""
+   },
+   {
+    "id": "decisions",
+    "title": "What you keep and what you delegate",
+    "says": "Which calls the machine may make, and which come back to you",
+    "supplied_by": "caller",
+    "carried_by": [
+     "research.request.decisions_policy"
+    ],
+    "declared_in": "contract.decisions",
+    "state": "partial",
+    "measured": "8 requests carry a decisions policy",
+    "gap": "Collected and stored, but the arbiter and diagnoser do not read it yet \u2014 they reason from patterns they carry themselves. 13 reasoning steps between them against the judge's dozens, and the judge is the one actor with a declared standard"
+   },
+   {
+    "id": "recommendations",
+    "title": "What we advise",
+    "says": "The stance, the action, and the reason for both",
+    "supplied_by": "the machine",
+    "carried_by": [
+     "research.request.stance",
+     "research.request.stance_do",
+     "research.request_action.advised"
+    ],
+    "state": "present",
+    "gap": "took_advice has no rows yet \u2014 the recommender is not measured"
+   },
+   {
+    "id": "status",
+    "title": "Where it stands",
+    "says": "Whether it is moving, who it is waiting on, and how long that takes",
+    "supplied_by": "the machine",
+    "carried_by": [
+     "research.request.status",
+     "research.turn.status"
+    ],
+    "state": "present"
+   }
+  ],
+  "source_classes": {
+   "published_standard": {
+    "says": "A rule published by the authority that makes it",
+    "example": "59G-4.028, Florida Administrative Code",
+    "basis": "the filename carries a Florida Administrative Code rule number"
+   },
+   "incorporated_by_reference": {
+    "says": "A document the rule itself points at and adopts",
+    "example": "a handbook a 59G rule incorporates",
+    "basis": "named by a published standard"
+   },
+   "state_publication": {
+    "says": "Published by the state, but not the rule itself",
+    "example": "an AHCA fee schedule or provider alert",
+    "basis": "the corpus records payer=AHCA"
+   },
+   "payer_policy": {
+    "says": "A health plan's own manual or clinical policy",
+    "example": "molina_fl_provider_manual_2026.pdf",
+    "basis": "the corpus records payer=<a health plan>",
+    "note": "Correct for a question ABOUT that plan. Inadmissible for a state-rule question \u2014 which is the whole of \u00a714."
+   },
+   "inferred_source": {
+    "says": "We think it is a payer document, from its name alone",
+    "basis": "identified from the document name; no corpus row",
+    "note": "Never enough to DROP a grounded field on. A field dropped on a filename inference is a worse error than the one it prevents."
+   },
+   "unknown_source": {
+    "says": "We cannot tell what it is",
+    "basis": "no row, no signal",
+    "note": "Asserts nothing and keeps the field. A check that could not run is not a rejection."
+   }
+  },
+  "authority_default": {
+   "admit": [
+    "published_standard",
+    "incorporated_by_reference",
+    "state_publication"
+   ],
+   "refuse": [
+    "payer_policy"
+   ],
+   "keep_but_warn": [
+    "inferred_source",
+    "unknown_source"
+   ],
+   "why": "Not having declared a bar is not permission to use anything. A state-rule question answered from a health plan's own manual is wrong regardless of whether the caller thought to say so."
+  },
+  "tools": {
+   "corpus_search": {
+    "group": "inside",
+    "costs_you": "nothing extra, no waiting",
+    "says": "Search the documents we already hold",
+    "costs": "model tokens",
+    "default": "granted"
+   },
+   "open_document": {
+    "group": "inside",
+    "costs_you": "nothing extra, no waiting",
+    "says": "Open a cited document and read the passage",
+    "costs": "model tokens",
+    "default": "granted",
+    "note": "Without this the answer is judged against itself. 24 requests closed `sourced` and `unverified` because nothing opened the document they cite."
+   },
+   "ask_registry": {
+    "group": "inside",
+    "costs_you": "nothing extra, no waiting",
+    "says": "Ask Service Line Registry which rule governs this line",
+    "costs": "one call",
+    "default": "granted"
+   },
+   "check_admissible": {
+    "group": "inside",
+    "costs_you": "nothing extra, no waiting",
+    "says": "Ask whether a source is an admissible authority here",
+    "costs": "one call",
+    "default": "granted"
+   },
+   "acquire_document": {
+    "group": "outside",
+    "costs_you": "days of waiting \u2014 somebody has to go and get it",
+    "says": "Go and get a document we do not hold",
+    "costs": "time, and somebody else's queue",
+    "default": "ask",
+    "note": "Leaves the building and takes days. The clearest case for a caller declining in advance."
+   },
+   "web_search": {
+    "group": "outside",
+    "costs_you": "money, and it looks outside Mobius",
+    "says": "Look outside the corpus \u2014 usually to FIND where a document lives, not to answer from what it finds",
+    "costs": "money, and it leaves our boundary",
+    "default": "ask",
+    "does_not_cover": "fetching a URL the caller supplied; the destination was their choice, not a discovery. That answers to acquire_document.",
+    "note": "Two purposes, and an authority grant only refuses one. Answering from the web fails a state-rules-only bar; finding that the 2024 handbook exists so somebody can fetch it does not, because the answer then rests on the acquired document. Its usefulness turns on whether acquisition is allowed, not on the source bar."
+   },
+   "ask_a_person": {
+    "group": "outside",
+    "costs_you": "somebody's time, and their reply",
+    "says": "Escalate to a human",
+    "costs": "somebody's attention",
+    "default": "granted",
+    "note": "Costly in the way least visible on a bill. 12 decisions have been put to people; 3 were answered."
+   }
+  },
+  "tools_default": {
+   "corpus_search": "granted",
+   "open_document": "granted",
+   "ask_registry": "granted",
+   "check_admissible": "granted",
+   "acquire_document": "ask",
+   "web_search": "ask",
+   "ask_a_person": "granted"
+  },
+  "tool_groups": [
+   {
+    "id": "inside",
+    "says": "Works from what we already hold",
+    "note": "Free and immediate. Turning these off makes the answer worse without making it safer."
+   },
+   {
+    "id": "outside",
+    "says": "Takes time, costs money, or goes outside Mobius",
+    "note": "The three worth deciding up front. Each one is why an answer takes days instead of minutes."
+   }
+  ],
+  "decisions": {
+   "widen_the_source_bar": {
+    "says": "Accept a weaker source than you asked for",
+    "measured": "the only decision anyone has ever answered \u2014 4 rulings, all of them this",
+    "default": "ask"
+   },
+   "accept_partial": {
+    "says": "Settle with some of the fields you asked for",
+    "default": "ask"
+   },
+   "record_a_negative": {
+    "says": "Record that the rule genuinely says nothing",
+    "default": "ask",
+    "outcomes": [
+     "none_applies",
+     "silent"
+    ],
+    "gates": [
+     "governing_rule_was_read"
+    ],
+    "note": "A negative is acted on like a positive \u2014 a biller reads 'no prior authorisation required' and does not seek it. The machine cannot prove absence from having failed to find."
+   },
+   "acquire_a_document": {
+    "says": "Raise an acquisition and wait for it",
+    "default": "ask"
+   },
+   "ask_again": {
+    "says": "Re-ask with a refined question",
+    "default": "machine",
+    "note": "The one thing that has always been delegated in practice, and never declared."
+   },
+   "close": {
+    "says": "Stop asking, on the record",
+    "default": "caller",
+    "note": "Reserved by default and argued for: a close ends work everyone else can see, and it carries a name. A caller may delegate it; the machine may never assume it."
+   },
+   "reopen": {
+    "says": "Run a settled question again",
+    "default": "ask"
+   },
+   "split_by_population": {
+    "says": "Turn one question into one per population",
+    "default": "caller",
+    "gates": [
+     "registry_models_the_axis",
+     "scopes_differ"
+    ],
+    "note": "Registry: the split axis must be a service line they model, and only they can say. Not delegable to the machine."
+   }
+  },
+  "rights": [
+   "machine",
+   "ask",
+   "caller"
+  ],
+  "task_kinds": {
+   "rerun": {
+    "says": "Run settled questions through today's checks",
+    "owner_role": "requester",
+    "outside": false,
+    "groups_on": "nothing \u2014 every question needing it is the same activity",
+    "note": "The one that collapses. Twenty-three questions, one run."
+   },
+   "fetch_document": {
+    "says": "Get a document we do not hold",
+    "owner_role": "policy owner",
+    "outside": true,
+    "groups_on": "the document \u2014 a NAMED rule groups; a document CLASS does not, because 'a fee schedule for this service' is a different document for each service"
+   },
+   "explore": {
+    "says": "Find out which document holds this",
+    "owner_role": "anyone",
+    "outside": false,
+    "groups_on": "the service line",
+    "note": "Ananth, 2026-09-09: 'when we don't know the actual document, then explore \u2014 I am exploring which document may have xx. That is research, not extract.' The distinction matters: 'name the document' puts the burden on somebody who already knows, and most of the time nobody does. Exploring is work this machine can attempt itself \u2014 it is the whole point of it."
+   },
+   "contact": {
+    "says": "Ask a person outside this system",
+    "owner_role": "anyone",
+    "outside": true,
+    "groups_on": "the person",
+    "note": "The case that could not be expressed before: it may unblock six questions, one, or none yet."
+   },
+   "rule": {
+    "says": "Make a decision the machine may not make",
+    "owner_role": "appeals reviewer",
+    "outside": false,
+    "groups_on": "the decision kind and the person it is waiting on"
+   },
+   "model_line": {
+    "says": "Add a service line the registry does not model",
+    "owner_role": "policy owner",
+    "outside": true,
+    "groups_on": "the line key",
+    "note": "Registry: a split axis must be a line they model. Until it is, the question cannot be filed even when it is answered."
+   },
+   "correct_record": {
+    "says": "Fix a row that is wrong",
+    "owner_role": "policy owner",
+    "outside": false,
+    "groups_on": "the table and the reason"
+   }
+  },
+  "task_states": [
+   "open",
+   "doing",
+   "done",
+   "dropped"
+  ],
+  "target_basis": {
+   "extracted": "a document the answer actually read",
+   "named": "a rule the drafter named and never cited",
+   "class": "a document class whose scope names one document \u2014 'the provider handbook for Cigna' is one document, which is why four handbook errands were one",
+   "explore": "none of the above holds, so the activity is RESEARCH rather than retrieval: find out which document may have it. Not the same as asking a person to name one \u2014 most of the time nobody knows, and finding out is the machine's own job"
+  },
+  "task_from_recommendation": {
+   "reopen": {
+    "kind": "rerun",
+    "key": "all"
+   },
+   "acquire": {
+    "kind": "fetch_document",
+    "key": "document_or_class"
+   },
+   "name_document": {
+    "kind": "fetch_document",
+    "key": "document_or_class"
+   },
+   "overrule": {
+    "kind": "rule",
+    "key": "consumer"
+   },
+   "narrow": {
+    "kind": "rule",
+    "key": "consumer"
+   },
+   "flag_scope": {
+    "kind": "rule",
+    "key": "consumer"
+   },
+   "widen_authority": {
+    "kind": "rule",
+    "key": "consumer"
+   }
+  },
+  "note_uses": {
+   "rerun": {
+    "say": "I will ask again, aimed at what you told me.",
+    "next": "A new round starts with your note quoted to the drafter.",
+    "sets_status": "open",
+    "reversible": true
+   },
+   "fetch": {
+    "say": "I do not hold that. I will go and get it first.",
+    "next": "An acquisition is raised; the question waits until the document lands and is actually readable \u2014 arrival is not readiness.",
+    "sets_status": "open",
+    "reversible": true
+   },
+   "close": {
+    "say": "That reads as settling it.",
+    "next": "Offered as a close, with your note as the reason. A note does not end a question on its own \u2014 closing carries a name and a record, and it belongs to whoever presses it.",
+    "sets_status": null,
+    "reversible": false
+   },
+   "hold": {
+    "say": "I cannot turn that into a better question on my own.",
+    "next": "Kept on the question where the next reader sees it. Nothing moves until somebody chooses an action.",
+    "sets_status": null,
+    "reversible": true
+   },
+   "route": {
+    "say": "This is not mine to act on.",
+    "next": "Passed to whoever owns it, with your note attached.",
+    "sets_status": null,
+    "reversible": true
+   }
+  },
+  "note_rules": [
+   [
+    [
+     "says_silent",
+     "!points_elsewhere"
+    ],
+    "close"
+   ],
+   [
+    [
+     "names_document",
+     "document_held"
+    ],
+    "rerun"
+   ],
+   [
+    [
+     "names_document"
+    ],
+    "fetch"
+   ],
+   [
+    [
+     "says_not_mine"
+    ],
+    "route"
+   ],
+   [
+    [
+     "actionable"
+    ],
+    "rerun"
+   ],
+   [
+    [],
+    "hold"
+   ]
+  ],
+  "note_signals": {
+   "names_document": [
+    "59G-\\d+\\.\\d+",
+    "\\b[\\w-]+\\.pdf\\b",
+    "\\bhandbook\\b",
+    "\\bfee schedule\\b",
+    "\\bmanual\\b",
+    "\\bpolicy\\b",
+    "\\bbulletin\\b",
+    "\\brule\\b"
+   ],
+   "says_silent": [
+    "\\bdoes not (say|state|require)\\b",
+    "\\bis silent\\b",
+    "\\bno requirement\\b",
+    "\\bnothing (in|about)\\b",
+    "\\bnot required\\b"
+   ],
+   "says_not_mine": [
+    "\\bnot (mine|ours|my)\\b",
+    "\\bwrong team\\b",
+    "\\bsomeone else\\b",
+    "\\bnot our\\b"
+   ],
+   "points_elsewhere": [
+    "\\bit(?:'s| is)? in\\b",
+    "\\blook (?:at|in)\\b",
+    "\\bsee (?:the|section|chapter)\\b",
+    "\\btry the\\b",
+    "\\binstead\\b",
+    "\\bcheck the\\b",
+    "\\bshould be in\\b"
+   ],
+   "actionable": [
+    "\\b20\\d\\d\\b",
+    "\\b[A-Z]\\d{4}\\b",
+    "\\bsection\\b",
+    "\\bchapter\\b",
+    "\\bappendix\\b",
+    "\\btable\\b"
+   ]
+  },
+  "parse": {
+   "tool_phrases": [
+    [
+     "\\bdo not (?:go and )?acquire\\b|\\bno acquisition\\b|\\bdon'?t acquire\\b",
+     "acquire_document",
+     "refused",
+     "do not acquire anything"
+    ],
+    [
+     "\\bacquire (?:documents? )?if needed\\b|\\byou may acquire\\b",
+     "acquire_document",
+     "granted",
+     "you may acquire if needed"
+    ],
+    [
+     "\\bno web\\b|\\bdo not search the web\\b|\\bcorpus only\\b",
+     "web_search",
+     "refused",
+     "corpus only, no web"
+    ],
+    [
+     "\\bweb search (?:is )?(?:ok|fine|allowed)\\b",
+     "web_search",
+     "granted",
+     "web search is ok"
+    ],
+    [
+     "\\bdo not (?:ask|escalate to) a person\\b|\\bno escalation\\b",
+     "ask_a_person",
+     "refused",
+     "no escalation"
+    ]
+   ],
+   "decision_phrases": [
+    [
+     "\\bdo not close\\b|\\bclosing is (?:mine|ours)\\b|\\bonly I (?:can )?close\\b",
+     "close",
+     "caller",
+     "only I close these"
+    ],
+    [
+     "\\byou (?:may|can) close\\b|\\bclose it yourself\\b",
+     "close",
+     "machine",
+     "you may close it"
+    ],
+    [
+     "\\bask me before recording (?:a )?negative\\b|\\bnegatives? come to me\\b",
+     "record_a_negative",
+     "caller",
+     "negatives come to me"
+    ],
+    [
+     "\\byou may record (?:a )?negative\\b|\\brecord silence yourself\\b",
+     "record_a_negative",
+     "machine",
+     "you may record a negative"
+    ],
+    [
+     "\\bre-?ask (?:freely|as needed)\\b|\\byou may ask again\\b",
+     "ask_again",
+     "machine",
+     "you may ask again"
+    ]
+   ],
+   "auth_phrases": [
+    [
+     "\\bno (?:health )?plan (?:manuals?|policies)\\b|\\bstate (?:rules?|sources?) only\\b|\\bno payer polic",
+     "refuse",
+     "payer_policy",
+     "state rules only, no plan manuals"
+    ],
+    [
+     "\\bplan manuals? (?:are )?(?:ok|acceptable|fine)\\b",
+     "admit",
+     "payer_policy",
+     "plan manuals are ok"
+    ],
+    [
+     "\\bpublished (?:standards?|rules?) only\\b",
+     "refuse",
+     "state_publication",
+     "published rules only"
+    ]
+   ],
+   "model_may_fill": [
+    "subject",
+    "question",
+    "how_to_judge",
+    "schema",
+    "expects",
+    "jurisdiction",
+    "max_rounds"
+   ],
+   "grant_fields": [
+    "authority",
+    "tools",
+    "decisions"
+   ],
+   "schema": {
+    "type": "object",
+    "properties": {
+     "subject": {
+      "type": "string"
+     },
+     "question": {
+      "type": "string"
+     },
+     "how_to_judge": {
+      "type": "string"
+     },
+     "expects": {
+      "type": "string"
+     },
+     "jurisdiction": {
+      "type": "string"
+     },
+     "fields": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "name": {
+         "type": "string"
+        },
+        "values": {
+         "type": "string"
+        }
+       },
+       "required": [
+        "name",
+        "values"
+       ]
+      }
+     }
+    },
+    "required": [
+     "question"
+    ]
+   },
+   "prompt": "Read this request from one team to another and put it into fields.\n\nYou are NOT deciding what the requester allows. Do not invent an authority bar,\na tool grant, or who may make a decision \u2014 those are permissions, and if they\ndid not say it, it is not yours to supply. Only describe what they asked for.\n\n  subject        their key for the thing, if they gave one \u2014 line/requirement\n  question       the question, as they would ask a person\n  how_to_judge   what they said a good answer must SHOW them. If they did not\n                 say, leave it out \u2014 do not write a generic standard.\n  fields         the specific things they want back \u2014 one entry per field, with\n                 `name` as they would key it and `values` as the allowed values\n                 they stated, or a short description if they did not\n  expects        what they said a good answer looks like, in their words\n  jurisdiction   the state or plan, if named\n\nA sentence about WHICH SOURCES are acceptable \u2014 \"no plan manuals\", \"state rules\nonly\", \"do not acquire\" \u2014 is NOT a standard for judging an answer. Never put one\nin how_to_judge. If they did not say what a good answer must SHOW them, leave\nthat field out.\n\nLeave out anything they did not say. An omitted field is honest; an invented one\nis a requirement they never wrote and cannot see.\n\nAnswer with the JSON object and nothing else.\n\nTHE REQUEST:\n{text}\n",
+   "field_labels": {
+    "question": "what i want to know",
+    "how_to_judge": "how i will judge it",
+    "subject": "file it under",
+    "schema": "bring me back"
+   },
+   "field_label_text": {
+    "question": "What I want to know",
+    "how_to_judge": "How I will judge it",
+    "subject": "File it under",
+    "schema": "Bring me back"
+   }
+  },
+  "journey": {
+   "stale_hours": 6,
+   "claim_stale_mins": 20
+  },
+  "states": {
+   "queued": {
+    "tone": "warn",
+    "say": "Waiting for a worker to pick it up.",
+    "do": "Nothing for you to do \u2014 it has not started."
+   },
+   "working": {
+    "tone": "ok",
+    "say": "Being worked on now.",
+    "do": "Nothing for you to do."
+   },
+   "worker_gone": {
+    "tone": "bad",
+    "say": "A worker took this and never came back.",
+    "do": "It needs re-running \u2014 nothing is working on it."
+   },
+   "waiting_on_document": {
+    "tone": "warn",
+    "say": "Waiting for a document we do not hold.",
+    "do": "Somebody has to fetch it, or you can name one we already have."
+   },
+   "waiting_on_you": {
+    "tone": "bad",
+    "say": "Waiting on a decision that is yours.",
+    "do": "Open it and choose."
+   },
+   "answered": {
+    "tone": "ok",
+    "say": "Answered.",
+    "do": "Read it, and close it if it holds up."
+   },
+   "answered_partial": {
+    "tone": "warn",
+    "say": "Answered, but not everything you asked for.",
+    "do": "Accept what came back, or send it round again."
+   },
+   "nothing_found": {
+    "tone": "warn",
+    "say": "Asked, and nothing survived the checks.",
+    "do": "The gap is real \u2014 it needs a document or a person."
+   },
+   "done": {
+    "tone": "ok",
+    "say": "Finished its part.",
+    "do": ""
+   },
+   "closed": {
+    "tone": "ok",
+    "say": "Closed.",
+    "do": ""
+   },
+   "stopped": {
+    "tone": "bad",
+    "say": "Stopped.",
+    "do": "It will not move until somebody restarts it."
+   }
+  },
+  "timing": {
+   "median_round_min": 21,
+   "p90_round_min": 2896,
+   "sampled_turns": 62,
+   "measured_on": "2026-09-09"
+  },
+  "terminal_outcomes": [
+   "sourced",
+   "abandoned",
+   "superseded"
+  ]
+ },
+ "request_writers": [
+  {
+   "file": "mobius-payor/app/routers/research_console.py",
+   "gated": true,
+   "line": 1133
+  },
+  {
+   "file": "mobius-skills/deep-research/deep_research/intake/store.py",
+   "gated": true,
+   "line": 30
+  },
+  {
+   "file": "mobius-skills/deep-research/deep_research/runner.py",
+   "gated": true,
+   "line": 124
+  },
+  {
+   "file": "docs/service-lines/scripts/run_sourcing.py",
+   "gated": false,
+   "line": 264
+  },
+  {
+   "file": "mobius-skills/deep-research/deep_research/acquire.py",
+   "gated": false,
+   "line": 215
+  },
+  {
+   "file": "mobius-skills/deep-research/deep_research/run_batch.py",
+   "gated": false,
+   "line": 421
+  },
+  {
+   "file": "mobius-skills/deep-research/deep_research/run_research.py",
+   "gated": false,
+   "line": 191
+  },
+  {
+   "file": "mobius-skills/deep-research/deep_research/run_v2.py",
+   "gated": false,
+   "line": 258
+  },
+  {
+   "file": "mobius-skills/deep-research/deep_research/service.py",
+   "gated": false,
+   "line": 37
+  },
+  {
+   "file": "mobius-skills/deep-research/deep_research/state.py",
+   "gated": false,
+   "line": 155
+  },
+  {
+   "file": "mobius-skills/deep-research/tests/test_request_state.py",
+   "gated": false,
+   "line": 39
+  }
+ ],
+ "honest_limits": [
+  "Ratings and the plain-language `how` are curated, not derived. Everything else on this page is read out of the code.",
+  "`observability` is derived from what a module CALLS and what it WRITES. A name-based search answers \"is there a symbol called X\", never \"does X happen\" \u2014 recorder.py was badged silent for months because it writes the ledger with a raw INSERT rather than calling the helper the pattern looked for. Either way it proves a write site exists, not that the trace is complete or that anything reads it.",
+  "Anything that happens INLINE, with no symbol and no recognisable statement, is invisible to every derivation on this page. For a state machine whose transitions are often a few lines inside a loop, that is where the gap is.",
+  "The gate list is stated, not walked. The issue vocabulary each gate emits IS derived, so the two can be compared and a drift caught.",
+  "Module-level, not function-level. A file rated green can hold a red function."
+ ],
+ "invariants_checked": [
+  "every terminal state the loop promises is reachable from some module",
+  "no module can end a request without being declared a terminator",
+  "no curated prose describes a module that no longer exists",
+  "no trace is written for an actor the vocabulary does not declare",
+  "every verb the contract declares is served by a live route",
+  "no surface calls a verb the contract does not declare",
+  "no undeclared, ungated way to create a request has appeared",
+  "no action is offered on a condition nothing ever sets",
+  "no stance recommends an action nobody can take",
+  "no artifact claims to exist without naming what carries it",
+  "every decision defaults to a declared right",
+  "every task kind is owned by a declared role",
+  "no work is derived from a recommendation nobody makes",
+  "every way of identifying a document target is declared",
+  "every surface is a tab or folds into one, and names itself either way",
+  "no user-facing label uses a reserved domain word (appeal, case, ...)",
+  "every action is owned by a declared role",
+  "the page's own JavaScript parses \u2014 a rendered page is not a running one"
+ ],
+ "curated_on": "2026-09-09",
+ "build": {
+  "ok": false,
+  "broken": [
+   "mobius-skills/deep-research/deep_research/state.py:155 can create a request and checks nothing, and is not in KNOWN_UNGATED_WRITERS \u2014 a new door opened without anyone declaring it",
+   "mobius-skills/deep-research/tests/test_request_state.py:39 can create a request and checks nothing, and is not in KNOWN_UNGATED_WRITERS \u2014 a new door opened without anyone declaring it"
+  ],
+  "checked_at": "2026-09-17T03:09:35.089904+00:00",
+  "note": "invariants_checked lists what is CHECKED, not what passed -- read build.ok"
+ }
+}

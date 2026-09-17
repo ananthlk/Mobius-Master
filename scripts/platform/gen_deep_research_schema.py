@@ -25,6 +25,8 @@ way gen_chat_dev.py merges its content file — the two must not be confused,
 because a derived fact is checkable and a rating is an opinion.
 """
 import ast
+import io
+import datetime as _dt
 import json
 import os
 import re
@@ -834,8 +836,39 @@ def main() -> None:
     ]
     doc["curated_on"] = content.get("_curated_on", "2026-09-09")
 
+    # Discipline 5 says honest limits go IN the artefact. This generator did not
+    # follow it for its OWN gate: it wrote `invariants_checked` -- which reads as
+    # "these hold" -- then dumped, rendered, and exited 1. The file left on disk
+    # claimed a clean build every time, so anyone finding the page (or serving
+    # it) saw a pass that never happened. A wrong artefact is worse than a
+    # missing one: a missing one prompts a question, a wrong one ends it.
+    doc["build"] = {
+        "ok": not breaks,
+        "broken": breaks,
+        "checked_at": _dt.datetime.now(_dt.UTC).isoformat(),
+        "note": ("invariants_checked lists what is CHECKED, not what passed -- read "
+                 "build.ok" if breaks else "all checked invariants hold"),
+    }
     json.dump(doc, open(OUT, "w"), indent=1)
     render(doc, os.path.splitext(OUT)[0] + ".html")
+    if breaks:
+        # Stamp the rendered page too. The JSON is for machines; the HTML is what
+        # a person opens, and it must not present a failed build as a clean one.
+        _h = os.path.splitext(OUT)[0] + ".html"
+        _src = io.open(_h, encoding="utf-8").read()
+        _banner = ('<div style="background:#7f1d1d;color:#fff;padding:14px 18px;'
+                   'font:14px/1.6 system-ui;border-bottom:2px solid #f87171">'
+                   '<strong>BUILD FAILED — ' + str(len(breaks)) + ' invariant(s) broken.</strong> '
+                   'This page was generated anyway and is NOT a clean schema.<ul style="margin:8px 0 0 18px">'
+                   + "".join("<li>" + b.replace("<", "&lt;") + "</li>" for b in breaks)
+                   + '</ul></div>')
+        # This page has no <body> tag, so prepending was putting the banner ahead
+        # of the doctype and charset meta -- which must stay first. Insert after
+        # </title> instead, which is the end of the head material here.
+        _m = _src.lower().find("</title>")
+        _i = (_m + len("</title>")) if _m != -1 else 0
+        _src = _src[:_i] + _banner + _src[_i:]
+        io.open(_h, "w", encoding="utf-8").write(_src)
     if breaks:
         print("\nBUILD FAILED — " + str(len(breaks)) + " invariant(s) broken:")
         for b in breaks:
@@ -1396,7 +1429,13 @@ def render(doc, path):
 
     L = doc["loop"]
     dj = json.dumps(detail)
-    html = f"""<title>Deep Research State Model</title>
+    # No doctype and no charset meant the page mojibaked on any server that did
+    # not declare UTF-8 itself (python -m http.server does not): every em-dash
+    # in the curated prose rendered as \u00e2\u20ac\u201d. The bytes were always valid
+    # UTF-8 -- what was missing was the page SAYING so.
+    html = f"""<!doctype html>
+<meta charset="utf-8">
+<title>Deep Research State Model</title>
 <link rel=stylesheet href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 :root{{--ink:#1a1d21;--ink2:#374151;--muted:#64748b;--bg:#fafbfc;--bg2:#f1f5f9;
@@ -1593,7 +1632,9 @@ bind('tgl-detail','detail-collapsed','Hide detail','Show detail','tgl-diagram','
 var start = decodeURIComponent((location.hash||'').replace(/^#/,''));
 show(D[start] ? start : 'step:judge');
 </script>"""
-    open(path, "w").write(html)
+    # Explicit encoding: the default depends on the host locale, which is not
+    # a property this artefact should inherit.
+    open(path, "w", encoding="utf-8").write(html)
     if not check_script(html):
         sys.exit(1)
 

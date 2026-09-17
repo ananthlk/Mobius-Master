@@ -1777,8 +1777,9 @@
         "module": "mobius-deep-research"
       },
       "specs_view": {
-        "status": "live",
-        "description": "Coordination is append-only across docs/DEEPRESEARCH_*_COORDINATION.md, one file per counterpart seat."
+        "link": "docs/deep-research-schema/index.html",
+        "status": "generated \u2014 BUILD FAILED (2 invariants)",
+        "coverage": "state model, round loop, terminators, request writers, contract verbs"
       },
       "eval_view": {
         "status": "partial",
