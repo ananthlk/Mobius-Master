@@ -1,23 +1,26 @@
 {
-  "generated_at": "2026-09-17T13:53:57.770945+00:00",
+  "generated_at": "2026-09-18T10:36:53.475462+00:00",
   "generated_by": "scripts/platform/discover_surfaces.py",
   "provenance": "measured: openapi route discovery + unauthenticated GET per route; classified by response Content-Type, not by path shape",
   "method_limits": [
     "GET routes WITH path parameters are not probed -- /org/{slug} is not linkable without inventing a value, and inventing one is how a page starts lying",
     "services with no /openapi.json are probed on a fixed path list only; absence there is weak evidence, not proof there is no surface",
     "probes are unauthenticated, which is what a person clicking gets; auth-required is reported as its own state rather than folded into dead",
+    "routes WITH a path parameter are probed with a synthetic value to learn whether the route serves PAGES; they are marked linkable=false and their probe URL is not offered as a destination",
+    "a 401 whose body is application/json is treated as an API: probes follow redirects, so a page behind a login would have landed on an HTML login screen",
     "a single probe at one moment -- a scale-to-zero service can be slow on the first hit"
   ],
   "counts": {
-    "api": 209,
+    "api": 267,
     "surface": 41,
-    "dead": 49,
-    "auth-required": 39,
-    "unreachable": 15,
+    "dead": 206,
+    "surface-parameterised": 2,
+    "api-401-json": 47,
+    "unreachable": 10,
     "api-authed": 1
   },
   "services_scanned": 34,
-  "routes_probed": 354,
+  "routes_probed": 574,
   "surface_kinds": "surface = open; surface-authed = a page, but behind a login",
   "surfaces": [
     {
@@ -27,7 +30,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-appeals-prototype",
@@ -36,7 +40,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-appeals-prototype",
@@ -45,7 +50,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-appeals-prototype",
@@ -54,7 +60,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -63,7 +70,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -72,7 +80,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -81,7 +90,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -90,7 +100,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -99,7 +110,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -108,7 +120,19 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/docs/{filename}",
+      "url": null,
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "surface-parameterised",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/docs/__mobius_probe__"
     },
     {
       "service": "mobius-chat",
@@ -117,7 +141,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -126,7 +151,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -135,7 +161,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -144,7 +171,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-dbt-ui",
@@ -153,7 +181,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-interact",
@@ -162,7 +191,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-org-intelligence",
@@ -171,7 +201,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -180,7 +211,19 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/dashboard/{payor}",
+      "url": null,
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "surface-parameterised",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/dashboard/__mobius_probe__"
     },
     {
       "service": "mobius-payor",
@@ -189,7 +232,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -198,7 +242,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -207,7 +252,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -216,7 +262,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -225,7 +272,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -234,7 +282,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-product-awareness",
@@ -243,7 +292,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-product-awareness",
@@ -252,7 +302,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-product-awareness",
@@ -261,7 +312,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -270,7 +322,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -279,7 +332,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -288,7 +342,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -297,7 +352,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -306,7 +362,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -315,7 +372,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -324,7 +382,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-specs",
@@ -333,7 +392,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "mobius-story-ui",
@@ -342,7 +402,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-user",
@@ -351,7 +412,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-user",
@@ -360,7 +422,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "product-awareness",
@@ -369,7 +432,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "product-awareness",
@@ -378,7 +442,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "specs-platform",
@@ -387,7 +452,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     }
   ],
   "all_routes": [
@@ -398,7 +464,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-answer-cache",
@@ -407,7 +474,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-answer-cache",
@@ -416,7 +484,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-answer-cache",
@@ -425,7 +494,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-appeals-prototype",
@@ -434,7 +504,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-appeals-prototype",
@@ -443,7 +514,19 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/admin/analysis/{carc}/{question_id}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/analysis/__mobius_probe__/__mobius_probe__"
     },
     {
       "service": "mobius-appeals-prototype",
@@ -452,7 +535,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-appeals-prototype",
@@ -461,7 +545,30 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/admin/canonical/{carc}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/canonical/__mobius_probe__"
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/admin/canonical/{carc}/render",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/canonical/__mobius_probe__/render"
     },
     {
       "service": "mobius-appeals-prototype",
@@ -470,7 +577,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-appeals-prototype",
@@ -479,7 +587,30 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/admin/carc-descriptions/{carc}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/carc-descriptions/__mobius_probe__"
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/admin/carc-descriptions/{carc}/history",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/carc-descriptions/__mobius_probe__/history"
     },
     {
       "service": "mobius-appeals-prototype",
@@ -488,7 +619,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/admin/compositions/{carc}/{payor}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/compositions/__mobius_probe__/__mobius_probe__"
     },
     {
       "service": "mobius-appeals-prototype",
@@ -497,7 +640,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-appeals-prototype",
@@ -506,7 +650,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-appeals-prototype",
@@ -515,7 +660,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/admin/generate-playbook/result/{correlation_id}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/generate-playbook/result/__mobius_probe__"
     },
     {
       "service": "mobius-appeals-prototype",
@@ -524,7 +681,8 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-appeals-prototype",
@@ -533,7 +691,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-appeals-prototype",
@@ -542,7 +701,63 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/admin/playbooks/{payor}/{carc_group}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/playbooks/__mobius_probe__/__mobius_probe__"
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/admin/playbooks/{payor}/{carc_group}/history",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/playbooks/__mobius_probe__/__mobius_probe__/history"
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/admin/questions/{carc}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/questions/__mobius_probe__"
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/admin/questions/{carc}/{question_id}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/questions/__mobius_probe__/__mobius_probe__"
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/admin/questions/{carc}/{question_id}/history",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/questions/__mobius_probe__/__mobius_probe__/history"
     },
     {
       "service": "mobius-appeals-prototype",
@@ -551,7 +766,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-appeals-prototype",
@@ -560,7 +776,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-appeals-prototype",
@@ -569,7 +786,41 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/admin/rules/{prefix}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/rules/__mobius_probe__"
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/admin/rules/{prefix}/{rule_id}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/rules/__mobius_probe__/__mobius_probe__"
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/admin/rules/{prefix}/{rule_id}/history",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/rules/__mobius_probe__/__mobius_probe__/history"
     },
     {
       "service": "mobius-appeals-prototype",
@@ -578,7 +829,41 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/admin/strategies/{carc}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/strategies/__mobius_probe__"
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/admin/strategies/{carc}/{strategy_id}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/strategies/__mobius_probe__/__mobius_probe__"
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/admin/strategies/{carc}/{strategy_id}/history",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/strategies/__mobius_probe__/__mobius_probe__/history"
     },
     {
       "service": "mobius-appeals-prototype",
@@ -587,7 +872,30 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/carc-config/{carc}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/carc-config/__mobius_probe__"
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/carc-description/{carc}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/carc-description/__mobius_probe__"
     },
     {
       "service": "mobius-appeals-prototype",
@@ -596,7 +904,30 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/case/history/{session_id}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/case/history/__mobius_probe__"
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/case/resume/{session_id}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/case/resume/__mobius_probe__"
     },
     {
       "service": "mobius-appeals-prototype",
@@ -605,7 +936,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/case/tasks/{session_id}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/case/tasks/__mobius_probe__"
     },
     {
       "service": "mobius-appeals-prototype",
@@ -614,7 +957,30 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/investigate/result/{correlation_id}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/investigate/result/__mobius_probe__"
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/investigate/stream/{correlation_id}",
+      "url": null,
+      "http": 200,
+      "content_type": "text/event-stream",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/investigate/stream/__mobius_probe__"
     },
     {
       "service": "mobius-appeals-prototype",
@@ -623,7 +989,63 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/playbook-guarded/{payor}/{lookup}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/playbook-guarded/__mobius_probe__/__mobius_probe__"
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/playbook/{payor}/{carc_group}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/playbook/__mobius_probe__/__mobius_probe__"
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/questions/{carc}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/questions/__mobius_probe__"
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/rules/{carc}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/rules/__mobius_probe__"
+    },
+    {
+      "service": "mobius-appeals-prototype",
+      "path": "/strategies/{carc}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/strategies/__mobius_probe__"
     },
     {
       "service": "mobius-chat",
@@ -632,7 +1054,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -641,7 +1064,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -650,7 +1074,41 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/ab/runs/{run_id}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/ab/runs/__mobius_probe__"
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/ab/runs/{run_id}/q/{qid}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/ab/runs/__mobius_probe__/q/__mobius_probe__"
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/ab/runs/{run_id}/verdicts",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/ab/runs/__mobius_probe__/verdicts"
     },
     {
       "service": "mobius-chat",
@@ -659,7 +1117,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/admin/api/prompts/blocks/{block_key}/versions",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/admin/api/prompts/blocks/__mobius_probe__/versions"
     },
     {
       "service": "mobius-chat",
@@ -668,7 +1138,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/admin/api/prompts/compositions/{composition_id}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/admin/api/prompts/compositions/__mobius_probe__"
     },
     {
       "service": "mobius-chat",
@@ -677,7 +1159,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/admin/api/prompts/monitoring/{composition_id}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/admin/api/prompts/monitoring/__mobius_probe__"
     },
     {
       "service": "mobius-chat",
@@ -686,7 +1180,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -695,7 +1190,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -704,7 +1200,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -713,7 +1210,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -722,7 +1220,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -731,7 +1230,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -740,7 +1240,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -749,7 +1250,30 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/api/v1/auth/{auth_path}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/api/v1/auth/__mobius_probe__"
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/api/v1/auth/{path}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/api/v1/auth/__mobius_probe__"
     },
     {
       "service": "mobius-chat",
@@ -758,7 +1282,30 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/api/v1/org/{slug}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/api/v1/org/__mobius_probe__"
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/api/v1/org/{slug}/employees",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/api/v1/org/__mobius_probe__/employees"
     },
     {
       "service": "mobius-chat",
@@ -767,7 +1314,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -776,7 +1324,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -785,7 +1334,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -794,7 +1344,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -803,7 +1354,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -812,7 +1364,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -821,7 +1374,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/chat/config/history/{config_sha}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/chat/config/history/__mobius_probe__"
     },
     {
       "service": "mobius-chat",
@@ -830,7 +1395,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -839,7 +1405,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -848,7 +1415,8 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -857,7 +1425,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -866,7 +1435,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -875,7 +1445,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -884,7 +1455,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/chat/history/threads/{thread_id}/turns",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/chat/history/threads/__mobius_probe__/turns"
     },
     {
       "service": "mobius-chat",
@@ -893,7 +1476,41 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/chat/matrix/{correlation_id}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/chat/matrix/__mobius_probe__"
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/chat/plan/{correlation_id}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/chat/plan/__mobius_probe__"
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/chat/response/{correlation_id}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/chat/response/__mobius_probe__"
     },
     {
       "service": "mobius-chat",
@@ -902,7 +1519,8 @@
       "http": 200,
       "content_type": "text/plain",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -911,7 +1529,30 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/chat/spans/{correlation_id}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/chat/spans/__mobius_probe__"
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/chat/stream/{correlation_id}",
+      "url": null,
+      "http": 200,
+      "content_type": "text/event-stream",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/chat/stream/__mobius_probe__"
     },
     {
       "service": "mobius-chat",
@@ -920,7 +1561,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -929,7 +1571,30 @@
       "http": 200,
       "content_type": "text/csv",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/chat/tasks/{task_id}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/chat/tasks/__mobius_probe__"
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/chat/thread/{thread_id}/uploads",
+      "url": null,
+      "http": 503,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/chat/thread/__mobius_probe__/uploads"
     },
     {
       "service": "mobius-chat",
@@ -938,7 +1603,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -947,7 +1613,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -956,7 +1623,8 @@
       "http": 400,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -965,7 +1633,41 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/chat/uploads/{document_id}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/chat/uploads/__mobius_probe__"
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/chat/uploads/{document_id}/download",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/chat/uploads/__mobius_probe__/download"
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/chat/uploads/{document_id}/events",
+      "url": null,
+      "http": 200,
+      "content_type": "text/event-stream",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/chat/uploads/__mobius_probe__/events"
     },
     {
       "service": "mobius-chat",
@@ -974,7 +1676,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -983,7 +1686,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -992,7 +1696,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -1001,7 +1706,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-chat",
+      "path": "/docs/{filename}",
+      "url": null,
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "surface-parameterised",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/docs/__mobius_probe__"
     },
     {
       "service": "mobius-chat",
@@ -1010,7 +1727,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -1019,7 +1737,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -1028,7 +1747,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -1037,7 +1757,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -1046,7 +1767,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-chat",
@@ -1054,8 +1776,9 @@
       "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/user/tools",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -1066,7 +1789,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-db-agent",
@@ -1075,7 +1799,8 @@
       "http": 404,
       "content_type": "text/plain",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "mobius-db-agent",
@@ -1084,7 +1809,38 @@
       "http": 404,
       "content_type": "text/plain",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-db-agent",
+      "path": "/app",
+      "url": "https://mobius-db-agent-ortabkknqa-uc.a.run.app/app",
+      "http": 404,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-db-agent",
+      "path": "/console",
+      "url": "https://mobius-db-agent-ortabkknqa-uc.a.run.app/console",
+      "http": 404,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-db-agent",
+      "path": "/dashboard",
+      "url": "https://mobius-db-agent-ortabkknqa-uc.a.run.app/dashboard",
+      "http": 404,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "mobius-db-agent",
@@ -1093,7 +1849,8 @@
       "http": 404,
       "content_type": "text/plain",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "mobius-db-agent",
@@ -1102,7 +1859,28 @@
       "http": 404,
       "content_type": "text/plain",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-db-agent",
+      "path": "/healthz",
+      "url": "https://mobius-db-agent-ortabkknqa-uc.a.run.app/healthz",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-db-agent",
+      "path": "/home",
+      "url": "https://mobius-db-agent-ortabkknqa-uc.a.run.app/home",
+      "http": 404,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "mobius-db-agent",
@@ -1111,7 +1889,38 @@
       "http": 404,
       "content_type": "text/plain",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-db-agent",
+      "path": "/ready",
+      "url": "https://mobius-db-agent-ortabkknqa-uc.a.run.app/ready",
+      "http": 404,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-db-agent",
+      "path": "/redoc",
+      "url": "https://mobius-db-agent-ortabkknqa-uc.a.run.app/redoc",
+      "http": 404,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-db-agent",
+      "path": "/static/index.html",
+      "url": "https://mobius-db-agent-ortabkknqa-uc.a.run.app/static/index.html",
+      "http": 404,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "mobius-db-agent",
@@ -1120,7 +1929,8 @@
       "http": 404,
       "content_type": "text/plain",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "mobius-dbt-ui",
@@ -1129,7 +1939,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-dbt-ui",
@@ -1138,7 +1949,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-dbt-ui",
@@ -1147,7 +1959,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-dbt-ui",
+      "path": "/runs/{run_id}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-dbt-ui-ortabkknqa-uc.a.run.app/runs/__mobius_probe__"
     },
     {
       "service": "mobius-deep-research",
@@ -1156,7 +1980,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-deep-research",
+      "path": "/api/skills/v1/research/{request_id}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-deep-research-ortabkknqa-uc.a.run.app/api/skills/v1/research/__mobius_probe__"
     },
     {
       "service": "mobius-deep-research",
@@ -1165,7 +2001,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-doc-reader",
@@ -1174,7 +2011,8 @@
       "http": 500,
       "content_type": "text/plain",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-doc-reader",
@@ -1183,7 +2021,30 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-doc-reader",
+      "path": "/transient/{envelope_id}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-doc-reader-ortabkknqa-uc.a.run.app/transient/__mobius_probe__"
+    },
+    {
+      "service": "mobius-email",
+      "path": "/email/messages/{message_id}",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-email-ortabkknqa-uc.a.run.app/email/messages/__mobius_probe__"
     },
     {
       "service": "mobius-email",
@@ -1192,7 +2053,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-feedback",
@@ -1201,7 +2063,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-google-search",
@@ -1210,7 +2073,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-google-search",
@@ -1219,7 +2083,8 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-healthcare",
@@ -1228,7 +2093,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-interact",
@@ -1237,7 +2103,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-interact",
@@ -1246,7 +2113,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-interact",
@@ -1255,7 +2123,8 @@
       "http": 200,
       "content_type": "application/javascript",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-interact",
@@ -1264,7 +2133,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-interact",
@@ -1273,7 +2143,30 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-interact",
+      "path": "/scripts/{namespace}/{slug}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-interact-ortabkknqa-uc.a.run.app/scripts/__mobius_probe__/__mobius_probe__"
+    },
+    {
+      "service": "mobius-interact",
+      "path": "/scripts/{script_id}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-interact-ortabkknqa-uc.a.run.app/scripts/__mobius_probe__"
     },
     {
       "service": "mobius-lexicon-maintenance",
@@ -1282,7 +2175,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-lexicon-maintenance",
@@ -1291,7 +2185,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-lexicon-maintenance",
@@ -1300,17 +2195,18 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-lexicon-maintenance",
       "path": "/policy/candidates/audit-by-rule",
       "url": "https://mobius-lexicon-maintenance-ortabkknqa-uc.a.run.app/policy/candidates/audit-by-rule",
-      "http": null,
-      "content_type": "",
-      "kind": "unreachable",
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
       "discovered_by": "openapi",
-      "retried": true
+      "linkable": true
     },
     {
       "service": "mobius-lexicon-maintenance",
@@ -1319,7 +2215,8 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-lexicon-maintenance",
@@ -1328,7 +2225,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-lexicon-maintenance",
@@ -1337,7 +2235,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-lexicon-maintenance",
@@ -1346,7 +2245,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-lexicon-maintenance",
@@ -1355,7 +2255,8 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-lexicon-maintenance",
@@ -1365,6 +2266,7 @@
       "content_type": "",
       "kind": "unreachable",
       "discovered_by": "openapi",
+      "linkable": true,
       "retried": true
     },
     {
@@ -1374,7 +2276,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-lexicon-maintenance",
@@ -1383,7 +2286,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-lexicon-maintenance",
@@ -1392,17 +2296,18 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-lexicon-maintenance",
       "path": "/policy/candidates/review-queue",
       "url": "https://mobius-lexicon-maintenance-ortabkknqa-uc.a.run.app/policy/candidates/review-queue",
-      "http": null,
-      "content_type": "",
-      "kind": "unreachable",
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
       "discovered_by": "openapi",
-      "retried": true
+      "linkable": true
     },
     {
       "service": "mobius-lexicon-maintenance",
@@ -1411,7 +2316,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-lexicon-maintenance",
@@ -1420,7 +2326,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-lexicon-maintenance",
@@ -1429,7 +2336,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-lexicon-maintenance",
@@ -1439,6 +2347,7 @@
       "content_type": "",
       "kind": "unreachable",
       "discovered_by": "openapi",
+      "linkable": true,
       "retried": true
     },
     {
@@ -1448,7 +2357,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-lexicon-maintenance",
@@ -1457,7 +2367,8 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-org-agent",
@@ -1466,7 +2377,63 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-org-agent",
+      "path": "/org/{org_slug}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-org-agent-ortabkknqa-uc.a.run.app/org/__mobius_probe__"
+    },
+    {
+      "service": "mobius-org-agent",
+      "path": "/org/{org_slug}/documents",
+      "url": null,
+      "http": 502,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-org-agent-ortabkknqa-uc.a.run.app/org/__mobius_probe__/documents"
+    },
+    {
+      "service": "mobius-org-agent",
+      "path": "/org/{org_slug}/documents/search",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-org-agent-ortabkknqa-uc.a.run.app/org/__mobius_probe__/documents/search"
+    },
+    {
+      "service": "mobius-org-agent",
+      "path": "/org/{org_slug}/documents/{document_id}/pages",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-org-agent-ortabkknqa-uc.a.run.app/org/__mobius_probe__/documents/__mobius_probe__/pages"
+    },
+    {
+      "service": "mobius-org-agent",
+      "path": "/org/{org_slug}/employees",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-org-agent-ortabkknqa-uc.a.run.app/org/__mobius_probe__/employees"
     },
     {
       "service": "mobius-org-agent",
@@ -1475,7 +2442,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-org-intelligence",
@@ -1484,7 +2452,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-org-intelligence",
@@ -1493,7 +2462,30 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-org-intelligence",
+      "path": "/profile/{org_slug}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-org-intelligence-ortabkknqa-uc.a.run.app/profile/__mobius_probe__"
+    },
+    {
+      "service": "mobius-org-intelligence",
+      "path": "/report/{org_slug}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-org-intelligence-ortabkknqa-uc.a.run.app/report/__mobius_probe__"
     },
     {
       "service": "mobius-os-backend",
@@ -1502,7 +2494,8 @@
       "http": 404,
       "content_type": "text/html",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "mobius-os-backend",
@@ -1511,7 +2504,38 @@
       "http": 404,
       "content_type": "text/html",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-os-backend",
+      "path": "/app",
+      "url": "https://mobius-os-backend-ortabkknqa-uc.a.run.app/app",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-os-backend",
+      "path": "/console",
+      "url": "https://mobius-os-backend-ortabkknqa-uc.a.run.app/console",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-os-backend",
+      "path": "/dashboard",
+      "url": "https://mobius-os-backend-ortabkknqa-uc.a.run.app/dashboard",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "mobius-os-backend",
@@ -1520,7 +2544,8 @@
       "http": 404,
       "content_type": "text/html",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "mobius-os-backend",
@@ -1529,7 +2554,28 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-os-backend",
+      "path": "/healthz",
+      "url": "https://mobius-os-backend-ortabkknqa-uc.a.run.app/healthz",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-os-backend",
+      "path": "/home",
+      "url": "https://mobius-os-backend-ortabkknqa-uc.a.run.app/home",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "mobius-os-backend",
@@ -1538,7 +2584,38 @@
       "http": 404,
       "content_type": "text/html",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-os-backend",
+      "path": "/ready",
+      "url": "https://mobius-os-backend-ortabkknqa-uc.a.run.app/ready",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-os-backend",
+      "path": "/redoc",
+      "url": "https://mobius-os-backend-ortabkknqa-uc.a.run.app/redoc",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-os-backend",
+      "path": "/static/index.html",
+      "url": "https://mobius-os-backend-ortabkknqa-uc.a.run.app/static/index.html",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "mobius-os-backend",
@@ -1547,7 +2624,8 @@
       "http": 404,
       "content_type": "text/html",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1556,7 +2634,19 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/facts/audit/{payer}/{predicate}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/facts/audit/__mobius_probe__/__mobius_probe__"
     },
     {
       "service": "mobius-payor",
@@ -1565,7 +2655,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/facts/runs/{run_id}",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/facts/runs/__mobius_probe__"
     },
     {
       "service": "mobius-payor",
@@ -1574,7 +2676,30 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/facts/trace/{payer}/{predicate}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/facts/trace/__mobius_probe__/__mobius_probe__"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/facts/values/{payer}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/facts/values/__mobius_probe__"
     },
     {
       "service": "mobius-payor",
@@ -1583,7 +2708,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1592,7 +2718,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1601,7 +2728,8 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1610,7 +2738,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1619,7 +2748,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/classification/reclassify/{job_id}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/classification/reclassify/__mobius_probe__"
     },
     {
       "service": "mobius-payor",
@@ -1628,7 +2769,41 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/documents/{document_id}/file",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/documents/__mobius_probe__/file"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/documents/{document_id}/pipeline",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/documents/__mobius_probe__/pipeline"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/documents/{document_id}/text",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/documents/__mobius_probe__/text"
     },
     {
       "service": "mobius-payor",
@@ -1637,7 +2812,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1646,7 +2822,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1655,7 +2832,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1664,7 +2842,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1673,7 +2852,8 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1682,7 +2862,162 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/payors/{payor}/assets",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/payors/__mobius_probe__/assets"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/payors/{payor}/authoritative-domains",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/payors/__mobius_probe__/authoritative-domains"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/payors/{payor}/authority-review",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/payors/__mobius_probe__/authority-review"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/payors/{payor}/bucket/{asset_type}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/payors/__mobius_probe__/bucket/__mobius_probe__"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/payors/{payor}/canonical",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/payors/__mobius_probe__/canonical"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/payors/{payor}/classification-rules",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/payors/__mobius_probe__/classification-rules"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/payors/{payor}/enumerate/children",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/payors/__mobius_probe__/enumerate/children"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/payors/{payor}/enumerate/status",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/payors/__mobius_probe__/enumerate/status"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/payors/{payor}/lexicon",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/payors/__mobius_probe__/lexicon"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/payors/{payor}/populated",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/payors/__mobius_probe__/populated"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/payors/{payor}/runs",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/payors/__mobius_probe__/runs"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/payors/{payor}/shelf",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/payors/__mobius_probe__/shelf"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/payors/{payor}/sources-config",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/payors/__mobius_probe__/sources-config"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/payors/{payor}/web-domain",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/payors/__mobius_probe__/web-domain"
     },
     {
       "service": "mobius-payor",
@@ -1691,7 +3026,8 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1700,7 +3036,151 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/runs/{run_id}",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/runs/__mobius_probe__"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/runs/{run_id}/cycle",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/runs/__mobius_probe__/cycle"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/runs/{run_id}/progress",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/runs/__mobius_probe__/progress"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/runs/{run_id}/stages/classify",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/runs/__mobius_probe__/stages/classify"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/runs/{run_id}/stages/classify/activity",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/runs/__mobius_probe__/stages/classify/activity"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/runs/{run_id}/stages/classify/detail",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/runs/__mobius_probe__/stages/classify/detail"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/runs/{run_id}/stages/dedup",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/runs/__mobius_probe__/stages/dedup"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/runs/{run_id}/stages/extract",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/runs/__mobius_probe__/stages/extract"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/runs/{run_id}/stages/extract/detail",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/runs/__mobius_probe__/stages/extract/detail"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/runs/{run_id}/stages/sources",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/runs/__mobius_probe__/stages/sources"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/runs/{run_id}/stages/sources/detail",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/runs/__mobius_probe__/stages/sources/detail"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/source-run-items/{item_id}",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/source-run-items/__mobius_probe__"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/source-run-items/{item_id}/authority-status",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/source-run-items/__mobius_probe__/authority-status"
     },
     {
       "service": "mobius-payor",
@@ -1709,7 +3189,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1718,7 +3199,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1727,7 +3209,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1736,7 +3219,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/registry/work-queues/dedup/{document_id}",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/registry/work-queues/dedup/__mobius_probe__"
     },
     {
       "service": "mobius-payor",
@@ -1744,8 +3239,9 @@
       "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/research/contract",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -1755,10 +3251,22 @@
       "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/research/decisions",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/research/job/{request_id}/decisions",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/research/job/__mobius_probe__/decisions"
     },
     {
       "service": "mobius-payor",
@@ -1766,8 +3274,9 @@
       "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/research/options",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -1777,8 +3286,9 @@
       "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/research/overview",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -1788,10 +3298,44 @@
       "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/research/queue",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/research/refused/{diagnosis_id}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/research/refused/__mobius_probe__"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/research/request/{rid}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/research/request/__mobius_probe__"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/research/request/{rid}/prior-rounds",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/research/request/__mobius_probe__/prior-rounds"
     },
     {
       "service": "mobius-payor",
@@ -1800,7 +3344,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1808,8 +3353,9 @@
       "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/research/worklist",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -1820,7 +3366,41 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/service-line/codes/{code}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/service-line/codes/__mobius_probe__"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/service-line/codes/{code}/coverage",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/service-line/codes/__mobius_probe__/coverage"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/service-line/codes/{code}/limits",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/service-line/codes/__mobius_probe__/limits"
     },
     {
       "service": "mobius-payor",
@@ -1829,7 +3409,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1838,7 +3419,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1847,7 +3429,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1856,7 +3439,30 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/service-line/lines/{key}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/service-line/lines/__mobius_probe__"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/service-line/lines/{line_key}/governing",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/service-line/lines/__mobius_probe__/governing"
     },
     {
       "service": "mobius-payor",
@@ -1865,7 +3471,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1874,7 +3481,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1883,7 +3491,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1892,7 +3501,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1901,7 +3511,41 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/service-line/runs/{run_id}",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/service-line/runs/__mobius_probe__"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/service-line/runs/{run_id}/stream",
+      "url": null,
+      "http": 200,
+      "content_type": "text/event-stream",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/service-line/runs/__mobius_probe__/stream"
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/api/service-line/runs/{run_id}/tasks/{seq}",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/api/service-line/runs/__mobius_probe__/tasks/__mobius_probe__"
     },
     {
       "service": "mobius-payor",
@@ -1910,7 +3554,8 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1919,7 +3564,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1928,7 +3574,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1937,7 +3584,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-payor",
+      "path": "/dashboard/{payor}",
+      "url": null,
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "surface-parameterised",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/dashboard/__mobius_probe__"
     },
     {
       "service": "mobius-payor",
@@ -1946,7 +3605,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1955,7 +3615,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1964,7 +3625,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1973,7 +3635,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1982,7 +3645,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -1991,7 +3655,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -2000,7 +3665,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -2009,7 +3675,8 @@
       "http": 200,
       "content_type": "image/svg+xml",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-payor",
@@ -2018,7 +3685,8 @@
       "http": 200,
       "content_type": "text/css",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-phi-classifier",
@@ -2027,7 +3695,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-phi-classifier",
@@ -2036,7 +3705,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-product-awareness",
@@ -2045,7 +3715,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-product-awareness",
@@ -2053,8 +3724,9 @@
       "url": "https://mobius-product-awareness-ortabkknqa-uc.a.run.app/admin/docs",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2064,8 +3736,9 @@
       "url": "https://mobius-product-awareness-ortabkknqa-uc.a.run.app/admin/status",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2076,7 +3749,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-product-awareness",
@@ -2085,7 +3759,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-product-awareness",
@@ -2094,7 +3769,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-product-awareness",
@@ -2103,7 +3779,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2112,7 +3789,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2121,7 +3799,63 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/api/v1/org/{slug}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/api/v1/org/__mobius_probe__"
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/api/v1/org/{slug}/documents",
+      "url": null,
+      "http": 502,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/api/v1/org/__mobius_probe__/documents"
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/api/v1/org/{slug}/documents/search",
+      "url": null,
+      "http": 422,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/api/v1/org/__mobius_probe__/documents/search"
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/api/v1/org/{slug}/employees",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/api/v1/org/__mobius_probe__/employees"
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/api/v1/org/{slug}/members",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/api/v1/org/__mobius_probe__/members"
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2130,7 +3864,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2139,7 +3874,8 @@
       "http": 404,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2148,7 +3884,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2157,7 +3894,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2166,7 +3904,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2175,7 +3914,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2184,7 +3924,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2193,7 +3934,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2202,7 +3944,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/displacement/org/{slug}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/displacement/org/__mobius_probe__"
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2211,7 +3965,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2220,7 +3975,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2229,7 +3985,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2238,7 +3995,8 @@
       "http": 500,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2247,7 +4005,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2256,7 +4015,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2265,7 +4025,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2274,7 +4035,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2283,7 +4045,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2292,7 +4055,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2301,7 +4065,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2310,7 +4075,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2319,7 +4085,63 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/org/{org_slug}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/org/__mobius_probe__"
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/org/{org_slug}/doc-store",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/org/__mobius_probe__/doc-store"
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/org/{org_slug}/documents",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/org/__mobius_probe__/documents"
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/org/{org_slug}/history",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/org/__mobius_probe__/history"
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/org/{org_slug}/run-data",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/org/__mobius_probe__/run-data"
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2328,7 +4150,118 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/roster/{org_slug}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/roster/__mobius_probe__"
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/roster/{org_slug}/compliance",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/roster/__mobius_probe__/compliance"
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/roster/{org_slug}/events",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/roster/__mobius_probe__/events"
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/roster/{org_slug}/flags",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/roster/__mobius_probe__/flags"
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/roster/{org_slug}/freshness",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/roster/__mobius_probe__/freshness"
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/roster/{org_slug}/gap",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/roster/__mobius_probe__/gap"
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/roster/{org_slug}/validate/nppes",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/roster/__mobius_probe__/validate/nppes"
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/roster/{org_slug}/validate/pml",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/roster/__mobius_probe__/validate/pml"
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/roster/{org_slug}/{npi}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/roster/__mobius_probe__/__mobius_probe__"
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/roster/{org_slug}/{npi}/intelligence",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/roster/__mobius_probe__/__mobius_probe__/intelligence"
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2337,7 +4270,8 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2346,7 +4280,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2355,7 +4290,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/story/node-context/{node_id}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/story/node-context/__mobius_probe__"
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2364,7 +4311,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2373,7 +4321,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2382,7 +4331,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2391,7 +4341,19 @@
       "http": 200,
       "content_type": "text/event-stream",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/story/slot-bundle/{slot_id}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/story/slot-bundle/__mobius_probe__"
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2400,7 +4362,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2409,7 +4372,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2418,7 +4382,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-provider-roster-credentialing",
+      "path": "/taxonomy/provider/{npi}/billing",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/taxonomy/provider/__mobius_probe__/billing"
     },
     {
       "service": "mobius-provider-roster-credentialing",
@@ -2427,7 +4403,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -2435,8 +4412,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/build-eu-from-lines/status",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2446,8 +4424,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/create-database",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2457,10 +4436,50 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/db/tables",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/admin/db/tables/{table_name}/records",
+      "url": null,
+      "http": 401,
+      "content_type": "application/json",
+      "kind": "api-401-json",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/db/tables/__mobius_probe__/records",
+      "authed_http": null,
+      "authed_content_type": ""
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/admin/db/tables/{table_name}/records/{record_id}",
+      "url": null,
+      "http": 401,
+      "content_type": "application/json",
+      "kind": "api-401-json",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/db/tables/__mobius_probe__/records/__mobius_probe__",
+      "authed_http": null,
+      "authed_content_type": ""
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/admin/db/tables/{table_name}/schema",
+      "url": null,
+      "http": 401,
+      "content_type": "application/json",
+      "kind": "api-401-json",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/db/tables/__mobius_probe__/schema",
+      "authed_http": null,
+      "authed_content_type": ""
     },
     {
       "service": "mobius-rag",
@@ -2468,8 +4487,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/drive/republish/status",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2479,8 +4499,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/integrity/remediate/status",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2490,8 +4511,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/integrity/report",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2501,8 +4523,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/list_blocked_docs",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2512,10 +4535,24 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/nightly/runs",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/admin/nightly/runs/{run_id}",
+      "url": null,
+      "http": 401,
+      "content_type": "application/json",
+      "kind": "api-401-json",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/nightly/runs/__mobius_probe__",
+      "authed_http": null,
+      "authed_content_type": ""
     },
     {
       "service": "mobius-rag",
@@ -2523,8 +4560,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/nightly/status",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2534,8 +4572,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/org-docs/list",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2545,8 +4584,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/org-docs/search",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2556,8 +4596,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/pipeline_health",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2567,8 +4608,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/priors-lab/auto-jobs",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2578,10 +4620,24 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/priors-lab/history",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/admin/priors-lab/history/{computation_id}",
+      "url": null,
+      "http": 401,
+      "content_type": "application/json",
+      "kind": "api-401-json",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/priors-lab/history/__mobius_probe__",
+      "authed_http": null,
+      "authed_content_type": ""
     },
     {
       "service": "mobius-rag",
@@ -2589,8 +4645,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/repository_audit",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2600,8 +4657,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/retag-in-place/status",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2611,8 +4669,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/search_events",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2622,8 +4681,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/trace-explorer/history",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2633,8 +4693,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/trace-explorer/list",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2644,8 +4705,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/trace-explorer/result",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2655,8 +4717,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/trace-explorer/run-bank/list",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2666,8 +4729,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/trace-explorer/run-bank/result",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2677,8 +4741,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/trace-explorer/run-bank/status",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2688,8 +4753,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/trace-explorer/run-stream",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2699,8 +4765,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/vacuum/status",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2710,8 +4777,9 @@
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/admin/vector_search",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -2722,7 +4790,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -2731,7 +4800,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -2740,7 +4810,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -2749,7 +4820,8 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -2758,7 +4830,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/api/eval/results/{result_id}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/api/eval/results/__mobius_probe__"
     },
     {
       "service": "mobius-rag",
@@ -2767,7 +4851,63 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/api/eval/runs/{run_id}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/api/eval/runs/__mobius_probe__"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/api/eval/runs/{run_id}/calibration_summary",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/api/eval/runs/__mobius_probe__/calibration_summary"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/api/eval/runs/{run_id}/grade_rollup",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/api/eval/runs/__mobius_probe__/grade_rollup"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/api/eval/runs/{run_id}/pr_curve",
+      "url": null,
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/api/eval/runs/__mobius_probe__/pr_curve"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/api/eval/runs/{run_id}/progress",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/api/eval/runs/__mobius_probe__/progress"
     },
     {
       "service": "mobius-rag",
@@ -2776,7 +4916,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -2785,7 +4926,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -2794,7 +4936,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/api/routing/decisions/{decision_id}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/api/routing/decisions/__mobius_probe__"
     },
     {
       "service": "mobius-rag",
@@ -2803,7 +4957,30 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/api/uploads/{document_id}/progress",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/api/uploads/__mobius_probe__/progress"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/check/{filename}",
+      "url": null,
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/check/__mobius_probe__"
     },
     {
       "service": "mobius-rag",
@@ -2812,7 +4989,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -2821,7 +4999,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/config/llm/{version}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/config/llm/__mobius_probe__"
     },
     {
       "service": "mobius-rag",
@@ -2830,7 +5020,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/config/prompts/{name}/{version}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/config/prompts/__mobius_probe__/__mobius_probe__"
     },
     {
       "service": "mobius-rag",
@@ -2839,17 +5041,41 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
       "path": "/corpus/health",
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/corpus/health",
-      "http": null,
-      "content_type": "",
-      "kind": "unreachable",
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
       "discovered_by": "openapi",
+      "linkable": true,
       "retried": true
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/corpus/health/bucket/{bucket}",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/corpus/health/bucket/__mobius_probe__"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/corpus/health/drill/{stage}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/corpus/health/drill/__mobius_probe__"
     },
     {
       "service": "mobius-rag",
@@ -2858,7 +5084,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -2868,16 +5095,18 @@
       "content_type": "",
       "kind": "unreachable",
       "discovered_by": "openapi",
+      "linkable": true,
       "retried": true
     },
     {
       "service": "mobius-rag",
       "path": "/corpus/health/time-to-serve",
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/corpus/health/time-to-serve",
-      "http": null,
-      "content_type": "",
-      "kind": "unreachable",
+      "http": 500,
+      "content_type": "text/plain",
+      "kind": "dead",
       "discovered_by": "openapi",
+      "linkable": true,
       "retried": true
     },
     {
@@ -2887,7 +5116,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -2896,7 +5126,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -2905,7 +5136,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -2914,7 +5146,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -2923,7 +5156,217 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/documents/{document_id}/chunking/events",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/documents/__mobius_probe__/chunking/events"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/documents/{document_id}/chunking/events/stream",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/documents/__mobius_probe__/chunking/events/stream"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/documents/{document_id}/chunking/results",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/documents/__mobius_probe__/chunking/results"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/documents/{document_id}/chunking/stream",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/documents/__mobius_probe__/chunking/stream"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/documents/{document_id}/detail",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/documents/__mobius_probe__/detail"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/documents/{document_id}/download/markdown",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/documents/__mobius_probe__/download/markdown"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/documents/{document_id}/download/pdf",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/documents/__mobius_probe__/download/pdf"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/documents/{document_id}/errors",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/documents/__mobius_probe__/errors"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/documents/{document_id}/facts",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/documents/__mobius_probe__/facts"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/documents/{document_id}/file",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/documents/__mobius_probe__/file"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/documents/{document_id}/pages",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/documents/__mobius_probe__/pages"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/documents/{document_id}/policy-line-tags",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/documents/__mobius_probe__/policy-line-tags"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/documents/{document_id}/policy/candidates",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/documents/__mobius_probe__/policy/candidates"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/documents/{document_id}/policy/lines",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/documents/__mobius_probe__/policy/lines"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/documents/{document_id}/policy/paragraphs",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/documents/__mobius_probe__/policy/paragraphs"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/documents/{document_id}/policy/summary",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/documents/__mobius_probe__/policy/summary"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/documents/{document_id}/publish-status",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/documents/__mobius_probe__/publish-status"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/documents/{document_id}/status",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/documents/__mobius_probe__/status"
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/documents/{document_id}/text-tags",
+      "url": null,
+      "http": 400,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/documents/__mobius_probe__/text-tags"
     },
     {
       "service": "mobius-rag",
@@ -2932,7 +5375,8 @@
       "http": 503,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -2941,7 +5385,19 @@
       "http": 503,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/drive/folders/{folder_id}/files",
+      "url": null,
+      "http": 503,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/drive/folders/__mobius_probe__/files"
     },
     {
       "service": "mobius-rag",
@@ -2950,7 +5406,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -2959,7 +5416,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -2968,7 +5426,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -2977,7 +5436,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -2986,7 +5446,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -2995,7 +5456,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -3004,7 +5466,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -3013,7 +5476,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -3022,7 +5486,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -3032,6 +5497,7 @@
       "content_type": "",
       "kind": "unreachable",
       "discovered_by": "openapi",
+      "linkable": true,
       "retried": true
     },
     {
@@ -3041,7 +5507,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -3050,7 +5517,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -3059,7 +5527,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -3069,7 +5538,19 @@
       "content_type": "",
       "kind": "unreachable",
       "discovered_by": "openapi",
+      "linkable": true,
       "retried": true
+    },
+    {
+      "service": "mobius-rag",
+      "path": "/pipeline_health/stage/{stage}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-rag-ortabkknqa-uc.a.run.app/pipeline_health/stage/__mobius_probe__"
     },
     {
       "service": "mobius-rag",
@@ -3078,17 +5559,18 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
       "path": "/policy/candidates/aggregate",
       "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/policy/candidates/aggregate",
-      "http": null,
-      "content_type": "",
-      "kind": "unreachable",
+      "http": 200,
+      "content_type": "application/json",
+      "kind": "api",
       "discovered_by": "openapi",
-      "retried": true
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -3097,7 +5579,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -3106,7 +5589,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -3116,6 +5600,7 @@
       "content_type": "",
       "kind": "unreachable",
       "discovered_by": "openapi",
+      "linkable": true,
       "retried": true
     },
     {
@@ -3126,6 +5611,7 @@
       "content_type": "",
       "kind": "unreachable",
       "discovered_by": "openapi",
+      "linkable": true,
       "retried": true
     },
     {
@@ -3136,6 +5622,7 @@
       "content_type": "",
       "kind": "unreachable",
       "discovered_by": "openapi",
+      "linkable": true,
       "retried": true
     },
     {
@@ -3145,7 +5632,8 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -3155,6 +5643,7 @@
       "content_type": "",
       "kind": "unreachable",
       "discovered_by": "openapi",
+      "linkable": true,
       "retried": true
     },
     {
@@ -3164,7 +5653,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -3173,7 +5663,8 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -3182,7 +5673,8 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -3192,6 +5684,7 @@
       "content_type": "",
       "kind": "unreachable",
       "discovered_by": "openapi",
+      "linkable": true,
       "retried": true
     },
     {
@@ -3201,7 +5694,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -3210,7 +5704,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -3219,7 +5714,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -3228,7 +5724,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag",
@@ -3237,7 +5734,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag-chunking-worker",
@@ -3246,7 +5744,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-rag-embedding-worker",
@@ -3255,7 +5754,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-specs",
@@ -3264,7 +5764,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "mobius-specs",
@@ -3273,7 +5774,38 @@
       "http": 404,
       "content_type": "text/html",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-specs",
+      "path": "/app",
+      "url": "https://mobius-specs-ortabkknqa-uc.a.run.app/app",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-specs",
+      "path": "/console",
+      "url": "https://mobius-specs-ortabkknqa-uc.a.run.app/console",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-specs",
+      "path": "/dashboard",
+      "url": "https://mobius-specs-ortabkknqa-uc.a.run.app/dashboard",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "mobius-specs",
@@ -3282,7 +5814,8 @@
       "http": 404,
       "content_type": "text/html",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "mobius-specs",
@@ -3291,7 +5824,28 @@
       "http": 404,
       "content_type": "text/html",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-specs",
+      "path": "/healthz",
+      "url": "https://mobius-specs-ortabkknqa-uc.a.run.app/healthz",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-specs",
+      "path": "/home",
+      "url": "https://mobius-specs-ortabkknqa-uc.a.run.app/home",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "mobius-specs",
@@ -3300,7 +5854,38 @@
       "http": 404,
       "content_type": "text/html",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-specs",
+      "path": "/ready",
+      "url": "https://mobius-specs-ortabkknqa-uc.a.run.app/ready",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-specs",
+      "path": "/redoc",
+      "url": "https://mobius-specs-ortabkknqa-uc.a.run.app/redoc",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "mobius-specs",
+      "path": "/static/index.html",
+      "url": "https://mobius-specs-ortabkknqa-uc.a.run.app/static/index.html",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "mobius-specs",
@@ -3309,7 +5894,8 @@
       "http": 404,
       "content_type": "text/html",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "mobius-story-ui",
@@ -3318,7 +5904,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-story-ui",
@@ -3327,7 +5914,30 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-story-ui",
+      "path": "/proxy/chat/{path}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-story-ui-ortabkknqa-uc.a.run.app/proxy/chat/__mobius_probe__"
+    },
+    {
+      "service": "mobius-story-ui",
+      "path": "/proxy/skills/{path}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-story-ui-ortabkknqa-uc.a.run.app/proxy/skills/__mobius_probe__"
     },
     {
       "service": "mobius-task-manager",
@@ -3336,7 +5946,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-task-manager",
@@ -3345,7 +5956,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-task-manager",
@@ -3354,7 +5966,8 @@
       "http": 200,
       "content_type": "text/csv",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-task-manager",
@@ -3363,7 +5976,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-task-manager",
@@ -3372,7 +5986,19 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-task-manager",
+      "path": "/tasks/types/{interface_name}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-task-manager-ortabkknqa-uc.a.run.app/tasks/types/__mobius_probe__"
     },
     {
       "service": "mobius-task-manager",
@@ -3381,7 +6007,30 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-task-manager",
+      "path": "/tasks/{task_id}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-task-manager-ortabkknqa-uc.a.run.app/tasks/__mobius_probe__"
+    },
+    {
+      "service": "mobius-task-manager",
+      "path": "/tasks/{task_id}/related",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-task-manager-ortabkknqa-uc.a.run.app/tasks/__mobius_probe__/related"
     },
     {
       "service": "mobius-tool-manifest",
@@ -3390,7 +6039,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-tool-manifest",
@@ -3399,7 +6049,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-tool-manifest",
@@ -3408,7 +6059,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-user",
@@ -3417,7 +6069,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-user",
@@ -3426,7 +6079,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-user",
@@ -3434,8 +6088,9 @@
       "url": "https://mobius-user-ortabkknqa-uc.a.run.app/api/v1/admin/usage/summary",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -3445,10 +6100,24 @@
       "url": "https://mobius-user-ortabkknqa-uc.a.run.app/api/v1/admin/users",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
+    },
+    {
+      "service": "mobius-user",
+      "path": "/api/v1/admin/users/{user_id}",
+      "url": null,
+      "http": 401,
+      "content_type": "application/json",
+      "kind": "api-401-json",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-user-ortabkknqa-uc.a.run.app/api/v1/admin/users/__mobius_probe__",
+      "authed_http": null,
+      "authed_content_type": ""
     },
     {
       "service": "mobius-user",
@@ -3457,7 +6126,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-user",
@@ -3465,8 +6135,9 @@
       "url": "https://mobius-user-ortabkknqa-uc.a.run.app/api/v1/auth/me",
       "http": 401,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 401,
       "authed_content_type": "application/json"
     },
@@ -3477,7 +6148,8 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-user",
@@ -3486,7 +6158,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-user",
@@ -3495,7 +6168,8 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-user",
@@ -3504,7 +6178,21 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-user",
+      "path": "/api/v1/users/org/{org_slug}/members",
+      "url": null,
+      "http": 403,
+      "content_type": "application/json",
+      "kind": "api-401-json",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-user-ortabkknqa-uc.a.run.app/api/v1/users/org/__mobius_probe__/members",
+      "authed_http": null,
+      "authed_content_type": ""
     },
     {
       "service": "mobius-user",
@@ -3512,8 +6200,9 @@
       "url": "https://mobius-user-ortabkknqa-uc.a.run.app/api/v1/users/pending-memberships",
       "http": 403,
       "content_type": "application/json",
-      "kind": "auth-required",
+      "kind": "api-401-json",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 403,
       "authed_content_type": "application/json"
     },
@@ -3524,7 +6213,21 @@
       "http": 422,
       "content_type": "application/json",
       "kind": "dead",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-user",
+      "path": "/api/v1/users/{user_id}",
+      "url": null,
+      "http": 401,
+      "content_type": "application/json",
+      "kind": "api-401-json",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-user-ortabkknqa-uc.a.run.app/api/v1/users/__mobius_probe__",
+      "authed_http": null,
+      "authed_content_type": ""
     },
     {
       "service": "mobius-user",
@@ -3533,7 +6236,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-verify-claims",
@@ -3542,7 +6246,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-vibe",
@@ -3551,7 +6256,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-web-scraper",
@@ -3560,7 +6266,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "mobius-web-scraper",
@@ -3569,7 +6276,30 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
+    },
+    {
+      "service": "mobius-web-scraper",
+      "path": "/scrape/{job_id}",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-web-scraper-ortabkknqa-uc.a.run.app/scrape/__mobius_probe__"
+    },
+    {
+      "service": "mobius-web-scraper",
+      "path": "/scrape/{job_id}/stream",
+      "url": null,
+      "http": 404,
+      "content_type": "application/json",
+      "kind": "dead",
+      "discovered_by": "openapi-synthetic-param",
+      "linkable": false,
+      "probe_url": "https://mobius-web-scraper-ortabkknqa-uc.a.run.app/scrape/__mobius_probe__/stream"
     },
     {
       "service": "mobius-web-scraper-worker",
@@ -3579,6 +6309,7 @@
       "content_type": "text/html",
       "kind": "api-authed",
       "discovered_by": "openapi",
+      "linkable": true,
       "authed_http": 200,
       "authed_content_type": "application/json"
     },
@@ -3589,7 +6320,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "product-awareness",
@@ -3598,7 +6330,8 @@
       "http": 200,
       "content_type": "application/json",
       "kind": "api",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "product-awareness",
@@ -3607,7 +6340,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "product-awareness",
@@ -3616,7 +6350,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "openapi"
+      "discovered_by": "openapi",
+      "linkable": true
     },
     {
       "service": "specs-platform",
@@ -3625,7 +6360,8 @@
       "http": 200,
       "content_type": "text/html",
       "kind": "surface",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "specs-platform",
@@ -3634,7 +6370,38 @@
       "http": 404,
       "content_type": "text/html",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "specs-platform",
+      "path": "/app",
+      "url": "https://specs-platform-ortabkknqa-uc.a.run.app/app",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "specs-platform",
+      "path": "/console",
+      "url": "https://specs-platform-ortabkknqa-uc.a.run.app/console",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "specs-platform",
+      "path": "/dashboard",
+      "url": "https://specs-platform-ortabkknqa-uc.a.run.app/dashboard",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "specs-platform",
@@ -3643,7 +6410,8 @@
       "http": 404,
       "content_type": "text/html",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "specs-platform",
@@ -3652,7 +6420,28 @@
       "http": 404,
       "content_type": "text/html",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "specs-platform",
+      "path": "/healthz",
+      "url": "https://specs-platform-ortabkknqa-uc.a.run.app/healthz",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "specs-platform",
+      "path": "/home",
+      "url": "https://specs-platform-ortabkknqa-uc.a.run.app/home",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "specs-platform",
@@ -3661,7 +6450,38 @@
       "http": 404,
       "content_type": "text/html",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "specs-platform",
+      "path": "/ready",
+      "url": "https://specs-platform-ortabkknqa-uc.a.run.app/ready",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "specs-platform",
+      "path": "/redoc",
+      "url": "https://specs-platform-ortabkknqa-uc.a.run.app/redoc",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
+    },
+    {
+      "service": "specs-platform",
+      "path": "/static/index.html",
+      "url": "https://specs-platform-ortabkknqa-uc.a.run.app/static/index.html",
+      "http": 404,
+      "content_type": "text/html",
+      "kind": "dead",
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     },
     {
       "service": "specs-platform",
@@ -3670,7 +6490,8 @@
       "http": 404,
       "content_type": "text/html",
       "kind": "dead",
-      "discovered_by": "fixed-path-probe"
+      "discovered_by": "fixed-path-probe",
+      "linkable": true
     }
   ]
 }

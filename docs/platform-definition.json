@@ -2,7 +2,7 @@
   "platform": "Mobius RCM Network",
   "version": "2026-09-07",
   "description": "Five-lens view of 23 core platform modules: User experience, Technical architecture, Specifications, Eval/QA, Git operations",
-  "last_updated": "2026-09-17T13:58:08.597604+00:00",
+  "last_updated": "2026-09-18T10:56:32.642555+00:00",
   "updated_by": "gen_platform_endpoints.py (platform / product-awareness seat)",
   "tiers": {
     "A": {
@@ -416,22 +416,88 @@
           "behind_login": false
         },
         {
-          "name": "Pipeline",
-          "path": "/pipeline",
-          "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/pipeline",
-          "http": 404
-        },
-        {
           "name": "Vault",
           "path": "/vault",
           "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/vault",
           "http": 200,
           "behind_login": false
+        },
+        {
+          "name": "/ab",
+          "path": "/ab",
+          "service": "mobius-chat",
+          "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/ab",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
+        },
+        {
+          "name": "/admin/clients",
+          "path": "/admin/clients",
+          "service": "mobius-chat",
+          "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/admin/clients",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
+        },
+        {
+          "name": "/admin/employees",
+          "path": "/admin/employees",
+          "service": "mobius-chat",
+          "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/admin/employees",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
+        },
+        {
+          "name": "/admin/prompts",
+          "path": "/admin/prompts",
+          "service": "mobius-chat",
+          "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/admin/prompts",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
+        },
+        {
+          "name": "/auth/set-password",
+          "path": "/auth/set-password",
+          "service": "mobius-chat",
+          "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/auth/set-password",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
+        },
+        {
+          "name": "/docs/{filename}",
+          "path": "/docs/{filename}",
+          "service": "mobius-chat",
+          "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/docs/{filename}",
+          "http": 404,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
+        },
+        {
+          "name": "/signin",
+          "path": "/signin",
+          "service": "mobius-chat",
+          "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/signin",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
+        },
+        {
+          "name": "/traces",
+          "path": "/traces",
+          "service": "mobius-chat",
+          "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/traces",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
         }
       ],
       "deployment": {
         "url": "https://mobius-chat-ortabkknqa-uc.a.run.app",
-        "ready_revision": "mobius-chat-01180-p7v",
+        "ready_revision": "mobius-chat-01184-xj4",
         "state": "live"
       }
     },
@@ -480,10 +546,31 @@
           "behind_login": false
         },
         {
-          "name": "Service Line Registry review",
-          "path": "/service-lines/review",
-          "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/service-lines/review",
-          "http": 404
+          "name": "/",
+          "path": "/",
+          "service": "mobius-payor",
+          "url": "https://mobius-payor-ortabkknqa-uc.a.run.app",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "evidence: title \"Mobius Payor\""
+        },
+        {
+          "name": "/dashboard/{payor}",
+          "path": "/dashboard/{payor}",
+          "service": "mobius-payor",
+          "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/dashboard/{payor}",
+          "http": 404,
+          "behind_login": false,
+          "attributed_by": "evidence: per-payor dashboard; path names the payor"
+        },
+        {
+          "name": "/preview/sources-structure",
+          "path": "/preview/sources-structure",
+          "service": "mobius-payor",
+          "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/preview/sources-structure",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "evidence: title \"Mobius Payor\""
         }
       ]
     },
@@ -529,7 +616,18 @@
         "url": "https://mobius-story-ui-ortabkknqa-uc.a.run.app",
         "ready_revision": "mobius-story-ui-00082-5gs",
         "state": "live"
-      }
+      },
+      "surfaces": [
+        {
+          "name": "/",
+          "path": "/",
+          "service": "mobius-story-ui",
+          "url": "https://mobius-story-ui-ortabkknqa-uc.a.run.app",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
+        }
+      ]
     },
     {
       "id": "os-backend",
@@ -832,6 +930,33 @@
           "url": "https://mobius-product-awareness-ortabkknqa-uc.a.run.app/schematic",
           "http": 200,
           "behind_login": false
+        },
+        {
+          "name": "/welcome-preview",
+          "path": "/welcome-preview",
+          "service": "mobius-product-awareness",
+          "url": "https://mobius-product-awareness-ortabkknqa-uc.a.run.app/welcome-preview",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
+        },
+        {
+          "name": "/schematic",
+          "path": "/schematic",
+          "service": "product-awareness",
+          "url": "https://product-awareness-ortabkknqa-uc.a.run.app/schematic",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
+        },
+        {
+          "name": "/welcome-preview",
+          "path": "/welcome-preview",
+          "service": "product-awareness",
+          "url": "https://product-awareness-ortabkknqa-uc.a.run.app/welcome-preview",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
         }
       ],
       "deployment": {
@@ -938,7 +1063,27 @@
         "url": "https://mobius-user-ortabkknqa-uc.a.run.app",
         "ready_revision": "mobius-user-00044-8z9",
         "state": "live"
-      }
+      },
+      "surfaces": [
+        {
+          "name": "/admin",
+          "path": "/admin",
+          "service": "mobius-user",
+          "url": "https://mobius-user-ortabkknqa-uc.a.run.app/admin",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
+        },
+        {
+          "name": "/admin/usage",
+          "path": "/admin/usage",
+          "service": "mobius-user",
+          "url": "https://mobius-user-ortabkknqa-uc.a.run.app/admin/usage",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
+        }
+      ]
     },
     {
       "id": "phi-classifier",
@@ -1041,7 +1186,18 @@
         "url": "https://mobius-org-intelligence-ortabkknqa-uc.a.run.app",
         "ready_revision": "mobius-org-intelligence-00009-gzl",
         "state": "live"
-      }
+      },
+      "surfaces": [
+        {
+          "name": "/",
+          "path": "/",
+          "service": "mobius-org-intelligence",
+          "url": "https://mobius-org-intelligence-ortabkknqa-uc.a.run.app",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
+        }
+      ]
     },
     {
       "id": "org-agent",
@@ -1141,6 +1297,15 @@
           "url": "https://mobius-specs-ortabkknqa-uc.a.run.app",
           "http": 200,
           "behind_login": false
+        },
+        {
+          "name": "/",
+          "path": "/",
+          "service": "specs-platform",
+          "url": "https://specs-platform-ortabkknqa-uc.a.run.app",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
         }
       ],
       "deployment": {
@@ -1296,7 +1461,45 @@
         "url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app",
         "ready_revision": "mobius-appeals-prototype-00179-88w",
         "state": "live"
-      }
+      },
+      "surfaces": [
+        {
+          "name": "/",
+          "path": "/",
+          "service": "mobius-appeals-prototype",
+          "url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
+        },
+        {
+          "name": "/admin",
+          "path": "/admin",
+          "service": "mobius-appeals-prototype",
+          "url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
+        },
+        {
+          "name": "/admin/canonical-review",
+          "path": "/admin/canonical-review",
+          "service": "mobius-appeals-prototype",
+          "url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/canonical-review",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
+        },
+        {
+          "name": "/admin/rules-library",
+          "path": "/admin/rules-library",
+          "service": "mobius-appeals-prototype",
+          "url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/rules-library",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "sole module on this service"
+        }
+      ]
     },
     {
       "id": "email",
@@ -1516,12 +1719,6 @@
       },
       "surfaces": [
         {
-          "name": "Corpus Health console",
-          "path": "/corpus/health",
-          "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/corpus/health",
-          "http": 200
-        },
-        {
           "name": "Eval console",
           "path": "/eval",
           "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/eval",
@@ -1533,6 +1730,33 @@
           "path": "/",
           "url": "https://mobius-rag-ortabkknqa-uc.a.run.app",
           "http": 200
+        },
+        {
+          "name": "/curator",
+          "path": "/curator",
+          "service": "mobius-rag",
+          "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/curator",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "evidence: title \"Source Registry \u2014 Curator\""
+        },
+        {
+          "name": "/drive/popup-success",
+          "path": "/drive/popup-success",
+          "service": "mobius-rag",
+          "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/drive/popup-success",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "evidence: title \"Drive connected\" \u2014 OAuth callback, not a product page"
+        },
+        {
+          "name": "/trace-explorer",
+          "path": "/trace-explorer",
+          "service": "mobius-rag",
+          "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/trace-explorer",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "evidence: title \"Payor Policy \u2014 Trace Explorer\""
         }
       ],
       "stage": "publish"
@@ -1743,6 +1967,33 @@
           "path": "mobius-qa/bakeoff",
           "url": null,
           "http": null
+        },
+        {
+          "name": "/eval/bank",
+          "path": "/eval/bank",
+          "service": "mobius-rag",
+          "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/eval/bank",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "evidence: title \"Eval Console \u00b7 Run the bank\""
+        },
+        {
+          "name": "/eval/query",
+          "path": "/eval/query",
+          "service": "mobius-rag",
+          "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/eval/query",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "evidence: title \"Mobius Eval \u00b7 Query\""
+        },
+        {
+          "name": "/eval/runs",
+          "path": "/eval/runs",
+          "service": "mobius-rag",
+          "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/eval/runs",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "evidence: title \"Eval Console \u00b7 Runs\""
         }
       ]
     },
@@ -1851,6 +2102,24 @@
           "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/research/console",
           "http": 200,
           "behind_login": false
+        },
+        {
+          "name": "/research",
+          "path": "/research",
+          "service": "mobius-payor",
+          "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/research",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "evidence: title \"Mobius Research \u2014 Ask\""
+        },
+        {
+          "name": "/research-console",
+          "path": "/research-console",
+          "service": "mobius-payor",
+          "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/research-console",
+          "http": 200,
+          "behind_login": false,
+          "attributed_by": "evidence: research console; sibling of /research/console"
         }
       ],
       "deployment": {
@@ -2060,12 +2329,6 @@
           "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/service-lines",
           "http": 200,
           "behind_login": false
-        },
-        {
-          "name": "Review queue",
-          "path": "/service-lines/review",
-          "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/service-lines/review",
-          "http": 404
         }
       ],
       "deployment": {
@@ -2485,7 +2748,7 @@
   ],
   "basis": "Modules are deployed services and in-repo code modules, traced to the deploy config or source file that defines them. Claude agent seats appear as `owner`, never as modules \u2014 a seat with no code is not a component.",
   "endpoints": {
-    "generated_at": "2026-09-17T13:58:06.888531+00:00",
+    "generated_at": "2026-09-18T10:56:21.392513+00:00",
     "generated_by": "scripts/platform/gen_platform_endpoints.py",
     "region": "us-central1",
     "provenance": "measured: gcloud run services list + live HTTP probe",
@@ -2508,7 +2771,7 @@
       {
         "service": "mobius-chat",
         "url": "https://mobius-chat-ortabkknqa-uc.a.run.app",
-        "ready_revision": "mobius-chat-01180-p7v"
+        "ready_revision": "mobius-chat-01184-xj4"
       },
       {
         "service": "mobius-db-agent",
@@ -2785,7 +3048,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-appeals-prototype",
@@ -2794,7 +3058,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-appeals-prototype",
@@ -2803,7 +3068,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-appeals-prototype",
@@ -2812,7 +3078,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-chat",
@@ -2821,7 +3088,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-chat",
@@ -2830,7 +3098,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-chat",
@@ -2839,7 +3108,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-chat",
@@ -2848,7 +3118,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-chat",
@@ -2857,7 +3128,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-chat",
@@ -2866,7 +3138,19 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
+      },
+      {
+        "service": "mobius-chat",
+        "path": "/docs/{filename}",
+        "url": null,
+        "http": 404,
+        "content_type": "text/html",
+        "kind": "surface-parameterised",
+        "discovered_by": "openapi-synthetic-param",
+        "linkable": false,
+        "probe_url": "https://mobius-chat-ortabkknqa-uc.a.run.app/docs/__mobius_probe__"
       },
       {
         "service": "mobius-chat",
@@ -2875,7 +3159,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-chat",
@@ -2884,7 +3169,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-chat",
@@ -2893,7 +3179,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-chat",
@@ -2902,7 +3189,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-dbt-ui",
@@ -2911,7 +3199,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-interact",
@@ -2920,7 +3209,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-org-intelligence",
@@ -2929,7 +3219,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-payor",
@@ -2938,7 +3229,19 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
+      },
+      {
+        "service": "mobius-payor",
+        "path": "/dashboard/{payor}",
+        "url": null,
+        "http": 404,
+        "content_type": "text/html",
+        "kind": "surface-parameterised",
+        "discovered_by": "openapi-synthetic-param",
+        "linkable": false,
+        "probe_url": "https://mobius-payor-ortabkknqa-uc.a.run.app/dashboard/__mobius_probe__"
       },
       {
         "service": "mobius-payor",
@@ -2947,7 +3250,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-payor",
@@ -2956,7 +3260,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-payor",
@@ -2965,7 +3270,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-payor",
@@ -2974,7 +3280,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-payor",
@@ -2983,7 +3290,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-payor",
@@ -2992,7 +3300,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-product-awareness",
@@ -3001,7 +3310,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-product-awareness",
@@ -3010,7 +3320,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-product-awareness",
@@ -3019,7 +3330,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-rag",
@@ -3028,7 +3340,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-rag",
@@ -3037,7 +3350,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-rag",
@@ -3046,7 +3360,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-rag",
@@ -3055,7 +3370,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-rag",
@@ -3064,7 +3380,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-rag",
@@ -3073,7 +3390,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-rag",
@@ -3082,7 +3400,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-specs",
@@ -3091,7 +3410,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "fixed-path-probe"
+        "discovered_by": "fixed-path-probe",
+        "linkable": true
       },
       {
         "service": "mobius-story-ui",
@@ -3100,7 +3420,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-user",
@@ -3109,7 +3430,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "mobius-user",
@@ -3118,7 +3440,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "product-awareness",
@@ -3127,7 +3450,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "product-awareness",
@@ -3136,7 +3460,8 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "openapi"
+        "discovered_by": "openapi",
+        "linkable": true
       },
       {
         "service": "specs-platform",
@@ -3145,289 +3470,211 @@
         "http": 200,
         "content_type": "text/html",
         "kind": "surface",
-        "discovered_by": "fixed-path-probe"
+        "discovered_by": "fixed-path-probe",
+        "linkable": true
       }
     ],
-    "discovered_unattributed": [
-      {
-        "service": "mobius-appeals-prototype",
-        "path": "/",
-        "url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-appeals-prototype",
-        "path": "/admin",
-        "url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-appeals-prototype",
-        "path": "/admin/canonical-review",
-        "url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/canonical-review",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-appeals-prototype",
-        "path": "/admin/rules-library",
-        "url": "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/admin/rules-library",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-chat",
-        "path": "/ab",
-        "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/ab",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-chat",
-        "path": "/admin/clients",
-        "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/admin/clients",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-chat",
-        "path": "/admin/employees",
-        "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/admin/employees",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-chat",
-        "path": "/admin/prompts",
-        "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/admin/prompts",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-chat",
-        "path": "/auth/set-password",
-        "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/auth/set-password",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-chat",
-        "path": "/signin",
-        "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/signin",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-chat",
-        "path": "/traces",
-        "url": "https://mobius-chat-ortabkknqa-uc.a.run.app/traces",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-org-intelligence",
-        "path": "/",
-        "url": "https://mobius-org-intelligence-ortabkknqa-uc.a.run.app",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-payor",
-        "path": "/",
-        "url": "https://mobius-payor-ortabkknqa-uc.a.run.app",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-payor",
-        "path": "/preview/sources-structure",
-        "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/preview/sources-structure",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-payor",
-        "path": "/research",
-        "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/research",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-payor",
-        "path": "/research-console",
-        "url": "https://mobius-payor-ortabkknqa-uc.a.run.app/research-console",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-product-awareness",
-        "path": "/welcome-preview",
-        "url": "https://mobius-product-awareness-ortabkknqa-uc.a.run.app/welcome-preview",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-rag",
-        "path": "/curator",
-        "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/curator",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-rag",
-        "path": "/drive/popup-success",
-        "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/drive/popup-success",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-rag",
-        "path": "/eval/bank",
-        "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/eval/bank",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-rag",
-        "path": "/eval/query",
-        "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/eval/query",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-rag",
-        "path": "/eval/runs",
-        "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/eval/runs",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-rag",
-        "path": "/trace-explorer",
-        "url": "https://mobius-rag-ortabkknqa-uc.a.run.app/trace-explorer",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-story-ui",
-        "path": "/",
-        "url": "https://mobius-story-ui-ortabkknqa-uc.a.run.app",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-user",
-        "path": "/admin",
-        "url": "https://mobius-user-ortabkknqa-uc.a.run.app/admin",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "mobius-user",
-        "path": "/admin/usage",
-        "url": "https://mobius-user-ortabkknqa-uc.a.run.app/admin/usage",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "product-awareness",
-        "path": "/schematic",
-        "url": "https://product-awareness-ortabkknqa-uc.a.run.app/schematic",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "product-awareness",
-        "path": "/welcome-preview",
-        "url": "https://product-awareness-ortabkknqa-uc.a.run.app/welcome-preview",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "openapi"
-      },
-      {
-        "service": "specs-platform",
-        "path": "/",
-        "url": "https://specs-platform-ortabkknqa-uc.a.run.app",
-        "http": 200,
-        "content_type": "text/html",
-        "kind": "surface",
-        "discovered_by": "fixed-path-probe"
-      }
-    ],
-    "dead_declared_surfaces": [
+    "retired_declared_surfaces": [
       {
         "module": "chat",
+        "service": "mobius-chat",
         "path": "/pipeline",
-        "http": 404
+        "http": 404,
+        "why": "route is absent from the service's own table and 404s"
       },
       {
         "module": "payor",
+        "service": "mobius-payor",
         "path": "/service-lines/review",
-        "http": 404
+        "http": 404,
+        "why": "route is absent from the service's own table and 404s"
+      },
+      {
+        "module": "rag",
+        "service": "mobius-rag",
+        "path": "/corpus/health",
+        "http": 200,
+        "why": "declared a surface but serves application/json \u2014 it is an API"
       },
       {
         "module": "service-line-registry",
+        "service": "mobius-payor",
         "path": "/service-lines/review",
-        "http": 404
+        "http": 404,
+        "why": "route is absent from the service's own table and 404s"
       }
     ],
+    "attributed_automatically": [
+      {
+        "module": "appeals",
+        "service": "mobius-appeals-prototype",
+        "path": "/"
+      },
+      {
+        "module": "appeals",
+        "service": "mobius-appeals-prototype",
+        "path": "/admin"
+      },
+      {
+        "module": "appeals",
+        "service": "mobius-appeals-prototype",
+        "path": "/admin/canonical-review"
+      },
+      {
+        "module": "appeals",
+        "service": "mobius-appeals-prototype",
+        "path": "/admin/rules-library"
+      },
+      {
+        "module": "chat",
+        "service": "mobius-chat",
+        "path": "/ab"
+      },
+      {
+        "module": "chat",
+        "service": "mobius-chat",
+        "path": "/admin/clients"
+      },
+      {
+        "module": "chat",
+        "service": "mobius-chat",
+        "path": "/admin/employees"
+      },
+      {
+        "module": "chat",
+        "service": "mobius-chat",
+        "path": "/admin/prompts"
+      },
+      {
+        "module": "chat",
+        "service": "mobius-chat",
+        "path": "/auth/set-password"
+      },
+      {
+        "module": "chat",
+        "service": "mobius-chat",
+        "path": "/docs/{filename}"
+      },
+      {
+        "module": "chat",
+        "service": "mobius-chat",
+        "path": "/signin"
+      },
+      {
+        "module": "chat",
+        "service": "mobius-chat",
+        "path": "/traces"
+      },
+      {
+        "module": "org-intelligence",
+        "service": "mobius-org-intelligence",
+        "path": "/"
+      },
+      {
+        "module": "payor",
+        "service": "mobius-payor",
+        "path": "/",
+        "how": "evidence"
+      },
+      {
+        "module": "payor",
+        "service": "mobius-payor",
+        "path": "/dashboard/{payor}",
+        "how": "evidence"
+      },
+      {
+        "module": "payor",
+        "service": "mobius-payor",
+        "path": "/preview/sources-structure",
+        "how": "evidence"
+      },
+      {
+        "module": "deep-research",
+        "service": "mobius-payor",
+        "path": "/research",
+        "how": "evidence"
+      },
+      {
+        "module": "deep-research",
+        "service": "mobius-payor",
+        "path": "/research-console",
+        "how": "evidence"
+      },
+      {
+        "module": "product-awareness",
+        "service": "mobius-product-awareness",
+        "path": "/welcome-preview"
+      },
+      {
+        "module": "rag",
+        "service": "mobius-rag",
+        "path": "/curator",
+        "how": "evidence"
+      },
+      {
+        "module": "rag",
+        "service": "mobius-rag",
+        "path": "/drive/popup-success",
+        "how": "evidence"
+      },
+      {
+        "module": "eval",
+        "service": "mobius-rag",
+        "path": "/eval/bank",
+        "how": "evidence"
+      },
+      {
+        "module": "eval",
+        "service": "mobius-rag",
+        "path": "/eval/query",
+        "how": "evidence"
+      },
+      {
+        "module": "eval",
+        "service": "mobius-rag",
+        "path": "/eval/runs",
+        "how": "evidence"
+      },
+      {
+        "module": "rag",
+        "service": "mobius-rag",
+        "path": "/trace-explorer",
+        "how": "evidence"
+      },
+      {
+        "module": "story-ui",
+        "service": "mobius-story-ui",
+        "path": "/"
+      },
+      {
+        "module": "user",
+        "service": "mobius-user",
+        "path": "/admin"
+      },
+      {
+        "module": "user",
+        "service": "mobius-user",
+        "path": "/admin/usage"
+      },
+      {
+        "module": "product-awareness",
+        "service": "product-awareness",
+        "path": "/schematic"
+      },
+      {
+        "module": "product-awareness",
+        "service": "product-awareness",
+        "path": "/welcome-preview"
+      },
+      {
+        "module": "specs",
+        "service": "specs-platform",
+        "path": "/"
+      }
+    ],
+    "discovered_unattributed": [],
+    "attribution_rule": "a service backing exactly one module attributes unambiguously; shared services are left for a person with candidates named",
+    "dead_declared_surfaces": [],
     "tool_surface": {
       "mcp_servers": {
         "https://mobius-provider-roster-credentialing-ortabkknqa-uc.a.run.app/mcp": {
@@ -3463,7 +3710,8 @@
             "lookup_npi",
             "search_clinician_by_name",
             "search_orgs"
-          ]
+          ],
+          "attempts": 1
         },
         "https://mobius-appeals-prototype-ortabkknqa-uc.a.run.app/mcp": {
           "role": "extra",
@@ -3474,7 +3722,8 @@
             "appeals_get_playbook",
             "appeals_lookup_rules",
             "appeals_validate_claim"
-          ]
+          ],
+          "attempts": 1
         }
       },
       "mcp_tool_total": 34,

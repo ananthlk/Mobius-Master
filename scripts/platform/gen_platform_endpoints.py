@@ -113,11 +113,25 @@ def sweep_tool_surface() -> dict:
                             await sess.initialize()
                             return sorted(t.name for t in (await sess.list_tools()).tools)
 
-            names = asyncio.run(asyncio.wait_for(_list(u), 90))
-            servers[u] = {"role": label, "count": len(names), "tools": names}
+            # Retry once. A single failed handshake against a scale-to-zero
+            # service is not an outage, and reporting count:None for a server
+            # that is actually serving five tools is a false alarm on the page.
+            last = None
+            for attempt in (1, 2):
+                try:
+                    names = asyncio.run(asyncio.wait_for(_list(u), 90))
+                    break
+                except Exception as exc:          # noqa: PERF203 - two tries
+                    last = exc
+                    names = None
+            if names is None:
+                raise last
+            servers[u] = {"role": label, "count": len(names), "tools": names,
+                          "attempts": attempt}
         except Exception as exc:
             servers[u] = {"role": label, "count": None,
-                          "error": f"{type(exc).__name__}: {str(exc)[:80]}"}
+                          "error": f"{type(exc).__name__}: {str(exc)[:80]}",
+                          "note": "two handshakes failed; treat as unknown, not as zero tools"}
     builtin = sorted({m.group(1) for m in re.finditer(
         r'name="([a-z_]+)"',
         "\n".join((ROOT / "mobius-chat" / "app" / "skills" / "builtin" / f).read_text(errors="ignore")
@@ -184,20 +198,34 @@ def main() -> int:
     # discovered but attributed to no module is reported as a gap for a person
     # to assign.
     attributed: set[tuple[str, str]] = set()
+    retired: list[dict] = []
     for mod in d["modules"]:
         fresh = []
         for sf in mod.get("surfaces") or []:
             if not isinstance(sf, dict) or not sf.get("path"):
                 continue
             svc = sf.get("service") or mod.get("service")
+            allr = (dj.get("all_routes", []) if disc_path.exists() else [])
+            as_api = next((r for r in allr
+                           if r["service"] == svc and r["path"] == sf["path"]
+                           and r["kind"].startswith("api")), None)
+            if as_api:
+                retired.append({"module": mod["id"], "service": svc, "path": sf["path"],
+                                "http": as_api["http"],
+                                "why": f"declared a surface but serves {as_api['content_type']} — it is an API"})
+                continue
             hit = next((r for r in discovered.get(svc, []) if r["path"] == sf["path"]), None)
             if hit:
                 sf["url"], sf["http"] = hit["url"], hit["http"]
                 sf["behind_login"] = hit["kind"] == "surface-authed"
                 attributed.add((svc, sf["path"]))
             else:
-                # Declared by a human, not found by discovery. Resolve and probe
-                # it anyway so the page can mark it rather than silently drop it.
+                # Declared by a human, not found by discovery. Probe it, then
+                # RETIRE it if the probe agrees it is not a page -- either the
+                # route is gone (404, absent from the service's own table) or it
+                # was never a page (an API mis-declared as a surface). Retiring
+                # is recorded, never silent: a hand-written entry disappearing
+                # without a trace is how the next person re-adds it.
                 path = sf["path"]
                 base = live.get(svc, {}).get("url")
                 if base and path.startswith("/") and " " not in path:
@@ -205,12 +233,85 @@ def main() -> int:
                     sf["url"], sf["http"] = u, probe(u)
                 else:
                     sf["url"], sf["http"] = None, None
+                in_table = any(r["path"] == sf["path"]
+                               for r in (dj.get("all_routes", []) if disc_path.exists() else [])
+                               if r["service"] == svc)
+                if "{" not in sf["path"] and sf.get("http") not in (200, None):
+                    retired.append({"module": mod["id"], "service": svc, "path": sf["path"],
+                                    "http": sf.get("http"),
+                                    "why": ("route is absent from the service's own table and 404s"
+                                            if not in_table else "declared as a surface but does not answer")})
+                    continue
             fresh.append(sf)
         if fresh:
             mod["surfaces"] = fresh
 
-    unattributed = [r for svc, items in discovered.items() for r in items
-                    if (svc, r["path"]) not in attributed]
+    # ATTRIBUTION, where it is derivable and only there. A service that backs
+    # exactly ONE module attributes unambiguously -- that is 32 of 34 services.
+    # The two shared ones (mobius-payor: payor + service-line-registry + Deep
+    # Research's pages; mobius-rag: rag + fact-store) cannot be settled by any
+    # rule available here, so their unclaimed pages are left for a person WITH
+    # the candidate modules named, rather than assigned to whichever module the
+    # dict happened to hold.
+    mods_on: dict[str, list] = {}
+    for m in d["modules"]:
+        if m.get("service"):
+            mods_on.setdefault(m["service"], []).append(m)
+        for a in m.get("also_deployed_as", []):
+            mods_on.setdefault(a["service"], []).append(m)
+
+    # Where a service backs several modules the rule cannot decide, so these are
+    # decided from EVIDENCE — each page's own <title>, fetched 2026-09-18 — and
+    # enumerated so they are reviewable and reversible. A title is what the page
+    # says it is; it beats both the service name and the path shape.
+    BY_EVIDENCE = {
+        ("mobius-payor", "/"):                         ("payor", 'title "Mobius Payor"'),
+        ("mobius-payor", "/preview/sources-structure"): ("payor", 'title "Mobius Payor"'),
+        ("mobius-payor", "/dashboard/{payor}"):        ("payor", "per-payor dashboard; path names the payor"),
+        ("mobius-payor", "/research"):                 ("deep-research", 'title "Mobius Research — Ask"'),
+        ("mobius-payor", "/research-console"):         ("deep-research", "research console; sibling of /research/console"),
+        ("mobius-rag", "/eval"):                       ("eval", 'Eval Console'),
+        ("mobius-rag", "/eval/bank"):                  ("eval", 'title "Eval Console · Run the bank"'),
+        ("mobius-rag", "/eval/query"):                 ("eval", 'title "Mobius Eval · Query"'),
+        ("mobius-rag", "/eval/runs"):                  ("eval", 'title "Eval Console · Runs"'),
+        ("mobius-rag", "/curator"):                    ("rag", 'title "Source Registry — Curator"'),
+        ("mobius-rag", "/trace-explorer"):             ("rag", 'title "Payor Policy — Trace Explorer"'),
+        ("mobius-rag", "/drive/popup-success"):        ("rag", 'title "Drive connected" — OAuth callback, not a product page'),
+    }
+    by_id = {m["id"]: m for m in d["modules"]}
+
+    auto, needs_human = [], []
+    for svc, items in discovered.items():
+        owners = mods_on.get(svc, [])
+        for r in items:
+            if (svc, r["path"]) in attributed:
+                continue
+            ev = BY_EVIDENCE.get((svc, r["path"]))
+            if ev and ev[0] in by_id:
+                m = by_id[ev[0]]
+                m.setdefault("surfaces", []).append({
+                    "name": r["path"], "path": r["path"], "service": svc,
+                    "url": r["url"], "http": r["http"],
+                    "behind_login": r["kind"] == "surface-authed",
+                    "attributed_by": f"evidence: {ev[1]}",
+                })
+                auto.append({"module": ev[0], "service": svc, "path": r["path"],
+                             "how": "evidence"})
+            elif len(owners) == 1:
+                m = owners[0]
+                m.setdefault("surfaces", []).append({
+                    "name": r["path"], "path": r["path"], "service": svc,
+                    "url": r["url"], "http": r["http"],
+                    "behind_login": r["kind"] == "surface-authed",
+                    "attributed_by": "sole module on this service",
+                })
+                auto.append({"module": m["id"], "service": svc, "path": r["path"]})
+            else:
+                needs_human.append({
+                    "service": svc, "path": r["path"], "url": r["url"],
+                    "candidates": [m["id"] for m in owners] or ["(no module on this service)"],
+                })
+    unattributed = needs_human
 
     # 3b — chat/payor page probe (kept: it reads chat's ROUTE TABLE, which tells
     # us the admin gate, something a probe cannot see)
@@ -252,9 +353,12 @@ def main() -> int:
             u = base.rstrip("/") + ("" if path == "/" else path)
             sf["url"], sf["http"] = u, probe(u)
 
+    # A parameterised path is probed with a synthetic value, so its 404 is
+    # expected and says nothing about the route. Excluded from the dead list.
     dead = [(m["id"], sf["path"], sf["http"])
             for m in d["modules"] for sf in (m.get("surfaces") or [])
-            if isinstance(sf, dict) and sf.get("url") and sf.get("http") != 200]
+            if isinstance(sf, dict) and sf.get("url") and sf.get("http") != 200
+            and "{" not in sf["path"]]
 
     d["endpoints"] = {
         "generated_at": datetime.datetime.now(datetime.UTC).isoformat(),
@@ -277,7 +381,11 @@ def main() -> int:
         "discovered_surfaces": sorted(
             [r for items in discovered.values() for r in items],
             key=lambda r: (r["service"], r["path"])),
+        "retired_declared_surfaces": retired,
+        "attributed_automatically": sorted(auto, key=lambda r: (r["service"], r["path"])),
         "discovered_unattributed": sorted(unattributed, key=lambda r: (r["service"], r["path"])),
+        "attribution_rule": ("a service backing exactly one module attributes unambiguously; "
+                             "shared services are left for a person with candidates named"),
         "dead_declared_surfaces": [
             {"module": a, "path": b, "http": c} for a, b, c in dead
         ],
@@ -292,10 +400,16 @@ def main() -> int:
           f"surfaces {len(surfaces)} · mcp tools "
           f"{d['endpoints']['tool_surface']['mcp_tool_total']} · builtins "
           f"{d['endpoints']['tool_surface']['builtin_count']}")
+    if retired:
+        print(f"   RETIRED (declared but not a live page): {len(retired)}")
+        for r in retired:
+            print(f"      {r['module']:22} {r['path']:28} {r['why']}")
+    if auto:
+        print(f"   attributed automatically (sole module on service): {len(auto)}")
     if unattributed:
-        print(f"   DISCOVERED BUT ATTRIBUTED TO NO MODULE ({len(unattributed)}):")
+        print(f"   NEEDS A HUMAN ({len(unattributed)}) -- shared service, candidates named:")
         for r in unattributed:
-            print(f"      {r['service']}{r['path']}")
+            print(f"      {r['service']}{r['path']}  -> {' | '.join(r['candidates'])}")
     if dead:
         print(f"   DECLARED SURFACE NOT ANSWERING ({len(dead)}): "
               + ", ".join(f"{a}{b} [{c}]" for a, b, c in dead))
