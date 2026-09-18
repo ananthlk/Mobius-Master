@@ -1,0 +1,976 @@
+[
+ {
+  "subject_id": "bh_assessment/place_of_service#62",
+  "question": "For Florida Medicaid: In which place-of-service settings may Behavioral Health Assessment Services be delivered and billed? The governing rule is 59G-4.028. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "pos_codes": "array of POS codes stated verbatim, or empty",
+   "settings": "array of named settings stated verbatim",
+   "telehealth_allowed": "boolean or null"
+  },
+  "expects": [
+   "pos_codes",
+   "settings",
+   "telehealth_allowed"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.028",
+  "governing_document_id": "bb843014-3d3c-450c-887a-b98491b6b234",
+  "governing_chunks": 23
+ },
+ {
+  "subject_id": "bh_assessment/prior_authorization#112",
+  "question": "For Florida Medicaid: Does Behavioral Health Assessment Services require prior authorization? The governing rule is 59G-4.028. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "required": "boolean \u2014 does the rule require prior authorization",
+   "threshold_units": "integer or null \u2014 units above which authorization is needed",
+   "threshold_period": "one of day|week|month|state_fiscal_year, or null"
+  },
+  "expects": [
+   "required",
+   "threshold_units",
+   "threshold_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.028",
+  "governing_document_id": "bb843014-3d3c-450c-887a-b98491b6b234",
+  "governing_chunks": 23
+ },
+ {
+  "subject_id": "bh_community_support/documentation#67",
+  "question": "For Florida Medicaid: What documentation must be in the record to support billing Behavioral Health Community Support Services? The governing rule is 59G-4.031. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "elements": "array of required record elements stated verbatim",
+   "retention_period": "string or null"
+  },
+  "expects": [
+   "elements",
+   "retention_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.031",
+  "governing_document_id": "db88c1f4-7c54-46d2-95f6-9008cabfb6f7",
+  "governing_chunks": 62
+ },
+ {
+  "subject_id": "bh_community_support/place_of_service#66",
+  "question": "For Florida Medicaid: In which place-of-service settings may Behavioral Health Community Support Services be delivered and billed? The governing rule is 59G-4.031. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "pos_codes": "array of POS codes stated verbatim, or empty",
+   "settings": "array of named settings stated verbatim",
+   "telehealth_allowed": "boolean or null"
+  },
+  "expects": [
+   "pos_codes",
+   "settings",
+   "telehealth_allowed"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.031",
+  "governing_document_id": "db88c1f4-7c54-46d2-95f6-9008cabfb6f7",
+  "governing_chunks": 62
+ },
+ {
+  "subject_id": "bh_intervention/coverage_criteria#121",
+  "question": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for Behavioral Health Intervention Services? The governing rule is 59G-4.370. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "criteria": "array of medical-necessity criteria stated verbatim",
+   "diagnosis_required": "boolean or null"
+  },
+  "expects": [
+   "criteria",
+   "diagnosis_required"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.370",
+  "governing_document_id": "1f526799-fc8f-44ac-8070-8ad78edc46aa",
+  "governing_chunks": 14
+ },
+ {
+  "subject_id": "bh_intervention/documentation#73",
+  "question": "For Florida Medicaid: What documentation must be in the record to support billing Behavioral Health Intervention Services? The governing rule is 59G-4.370. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "elements": "array of required record elements stated verbatim",
+   "retention_period": "string or null"
+  },
+  "expects": [
+   "elements",
+   "retention_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.370",
+  "governing_document_id": "1f526799-fc8f-44ac-8070-8ad78edc46aa",
+  "governing_chunks": 14
+ },
+ {
+  "subject_id": "bh_intervention/place_of_service#72",
+  "question": "For Florida Medicaid: In which place-of-service settings may Behavioral Health Intervention Services be delivered and billed? The governing rule is 59G-4.370. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "pos_codes": "array of POS codes stated verbatim, or empty",
+   "settings": "array of named settings stated verbatim",
+   "telehealth_allowed": "boolean or null"
+  },
+  "expects": [
+   "pos_codes",
+   "settings",
+   "telehealth_allowed"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.370",
+  "governing_document_id": "1f526799-fc8f-44ac-8070-8ad78edc46aa",
+  "governing_chunks": 14
+ },
+ {
+  "subject_id": "bh_intervention/prior_authorization#122",
+  "question": "For Florida Medicaid: Does Behavioral Health Intervention Services require prior authorization? The governing rule is 59G-4.370. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "required": "boolean \u2014 does the rule require prior authorization",
+   "threshold_units": "integer or null \u2014 units above which authorization is needed",
+   "threshold_period": "one of day|week|month|state_fiscal_year, or null"
+  },
+  "expects": [
+   "required",
+   "threshold_units",
+   "threshold_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.370",
+  "governing_document_id": "1f526799-fc8f-44ac-8070-8ad78edc46aa",
+  "governing_chunks": 14
+ },
+ {
+  "subject_id": "bh_medication_mgmt/documentation#65",
+  "question": "For Florida Medicaid: What documentation must be in the record to support billing Behavioral Health Medication Management Services? The governing rule is 59G-4.029. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "elements": "array of required record elements stated verbatim",
+   "retention_period": "string or null"
+  },
+  "expects": [
+   "elements",
+   "retention_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.029",
+  "governing_document_id": "168b798d-0652-46ed-8134-60e29e5386c7",
+  "governing_chunks": 15
+ },
+ {
+  "subject_id": "bh_medication_mgmt/place_of_service#64",
+  "question": "For Florida Medicaid: In which place-of-service settings may Behavioral Health Medication Management Services be delivered and billed? The governing rule is 59G-4.029. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "pos_codes": "array of POS codes stated verbatim, or empty",
+   "settings": "array of named settings stated verbatim",
+   "telehealth_allowed": "boolean or null"
+  },
+  "expects": [
+   "pos_codes",
+   "settings",
+   "telehealth_allowed"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.029",
+  "governing_document_id": "168b798d-0652-46ed-8134-60e29e5386c7",
+  "governing_chunks": 15
+ },
+ {
+  "subject_id": "bh_medication_mgmt/prior_authorization#114",
+  "question": "For Florida Medicaid: Does Behavioral Health Medication Management Services require prior authorization? The governing rule is 59G-4.029. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "required": "boolean \u2014 does the rule require prior authorization",
+   "threshold_units": "integer or null \u2014 units above which authorization is needed",
+   "threshold_period": "one of day|week|month|state_fiscal_year, or null"
+  },
+  "expects": [
+   "required",
+   "threshold_units",
+   "threshold_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.029",
+  "governing_document_id": "168b798d-0652-46ed-8134-60e29e5386c7",
+  "governing_chunks": 15
+ },
+ {
+  "subject_id": "bh_overlay/prior_authorization#126",
+  "question": "For Florida Medicaid: Does Behavioral Health Overlay Services require prior authorization? The governing rule is 59G-4.027. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "required": "boolean \u2014 does the rule require prior authorization",
+   "threshold_units": "integer or null \u2014 units above which authorization is needed",
+   "threshold_period": "one of day|week|month|state_fiscal_year, or null"
+  },
+  "expects": [
+   "required",
+   "threshold_units",
+   "threshold_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.027",
+  "governing_document_id": "58bd52d2-6ee0-4ba5-8610-9e6eed797099",
+  "governing_chunks": 153
+ },
+ {
+  "subject_id": "bh_therapy/coverage_criteria#117",
+  "question": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for Behavioral Health Therapy Services? The governing rule is 59G-4.052. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "criteria": "array of medical-necessity criteria stated verbatim",
+   "diagnosis_required": "boolean or null"
+  },
+  "expects": [
+   "criteria",
+   "diagnosis_required"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.052",
+  "governing_document_id": "8f46101d-b9f6-444e-ba2c-14ba4121c712",
+  "governing_chunks": 19
+ },
+ {
+  "subject_id": "bh_therapy/documentation#69",
+  "question": "For Florida Medicaid: What documentation must be in the record to support billing Behavioral Health Therapy Services? The governing rule is 59G-4.052. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "elements": "array of required record elements stated verbatim",
+   "retention_period": "string or null"
+  },
+  "expects": [
+   "elements",
+   "retention_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.052",
+  "governing_document_id": "8f46101d-b9f6-444e-ba2c-14ba4121c712",
+  "governing_chunks": 19
+ },
+ {
+  "subject_id": "bh_therapy/place_of_service#68",
+  "question": "For Florida Medicaid: In which place-of-service settings may Behavioral Health Therapy Services be delivered and billed? The governing rule is 59G-4.052. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "pos_codes": "array of POS codes stated verbatim, or empty",
+   "settings": "array of named settings stated verbatim",
+   "telehealth_allowed": "boolean or null"
+  },
+  "expects": [
+   "pos_codes",
+   "settings",
+   "telehealth_allowed"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.052",
+  "governing_document_id": "8f46101d-b9f6-444e-ba2c-14ba4121c712",
+  "governing_chunks": 19
+ },
+ {
+  "subject_id": "bh_therapy/prior_authorization#118",
+  "question": "For Florida Medicaid: Does Behavioral Health Therapy Services require prior authorization? The governing rule is 59G-4.052. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "required": "boolean \u2014 does the rule require prior authorization",
+   "threshold_units": "integer or null \u2014 units above which authorization is needed",
+   "threshold_period": "one of day|week|month|state_fiscal_year, or null"
+  },
+  "expects": [
+   "required",
+   "threshold_units",
+   "threshold_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.052",
+  "governing_document_id": "8f46101d-b9f6-444e-ba2c-14ba4121c712",
+  "governing_chunks": 19
+ },
+ {
+  "subject_id": "chd_clinic/coverage_criteria#145",
+  "question": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for County Health Department clinic services? The governing rule is 59G-4.055. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "criteria": "array of medical-necessity criteria stated verbatim",
+   "diagnosis_required": "boolean or null"
+  },
+  "expects": [
+   "criteria",
+   "diagnosis_required"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.055",
+  "governing_document_id": "3df48f32-6096-41c6-ba16-1106ba71bf59",
+  "governing_chunks": 1
+ },
+ {
+  "subject_id": "chd_clinic/documentation#99",
+  "question": "For Florida Medicaid: What documentation must be in the record to support billing County Health Department clinic services? The governing rule is 59G-4.055. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "elements": "array of required record elements stated verbatim",
+   "retention_period": "string or null"
+  },
+  "expects": [
+   "elements",
+   "retention_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.055",
+  "governing_document_id": "3df48f32-6096-41c6-ba16-1106ba71bf59",
+  "governing_chunks": 1
+ },
+ {
+  "subject_id": "chd_clinic/place_of_service#98",
+  "question": "For Florida Medicaid: In which place-of-service settings may County Health Department clinic services be delivered and billed? The governing rule is 59G-4.055. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "pos_codes": "array of POS codes stated verbatim, or empty",
+   "settings": "array of named settings stated verbatim",
+   "telehealth_allowed": "boolean or null"
+  },
+  "expects": [
+   "pos_codes",
+   "settings",
+   "telehealth_allowed"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.055",
+  "governing_document_id": "3df48f32-6096-41c6-ba16-1106ba71bf59",
+  "governing_chunks": 1
+ },
+ {
+  "subject_id": "chd_clinic/prior_authorization#146",
+  "question": "For Florida Medicaid: Does County Health Department clinic services require prior authorization? The governing rule is 59G-4.055. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "required": "boolean \u2014 does the rule require prior authorization",
+   "threshold_units": "integer or null \u2014 units above which authorization is needed",
+   "threshold_period": "one of day|week|month|state_fiscal_year, or null"
+  },
+  "expects": [
+   "required",
+   "threshold_units",
+   "threshold_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.055",
+  "governing_document_id": "3df48f32-6096-41c6-ba16-1106ba71bf59",
+  "governing_chunks": 1
+ },
+ {
+  "subject_id": "evaluation_management/coverage_criteria#139",
+  "question": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for Evaluation and Management (outpatient primary care)? The governing rule is 59G-4.087. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "criteria": "array of medical-necessity criteria stated verbatim",
+   "diagnosis_required": "boolean or null"
+  },
+  "expects": [
+   "criteria",
+   "diagnosis_required"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.087",
+  "governing_document_id": "7f946da2-2453-40a2-b407-b76b39ea3a1d",
+  "governing_chunks": 13
+ },
+ {
+  "subject_id": "evaluation_management/documentation#91",
+  "question": "For Florida Medicaid: What documentation must be in the record to support billing Evaluation and Management (outpatient primary care)? The governing rule is 59G-4.087. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "elements": "array of required record elements stated verbatim",
+   "retention_period": "string or null"
+  },
+  "expects": [
+   "elements",
+   "retention_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.087",
+  "governing_document_id": "7f946da2-2453-40a2-b407-b76b39ea3a1d",
+  "governing_chunks": 13
+ },
+ {
+  "subject_id": "evaluation_management/place_of_service#90",
+  "question": "For Florida Medicaid: In which place-of-service settings may Evaluation and Management (outpatient primary care) be delivered and billed? The governing rule is 59G-4.087. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "pos_codes": "array of POS codes stated verbatim, or empty",
+   "settings": "array of named settings stated verbatim",
+   "telehealth_allowed": "boolean or null"
+  },
+  "expects": [
+   "pos_codes",
+   "settings",
+   "telehealth_allowed"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.087",
+  "governing_document_id": "7f946da2-2453-40a2-b407-b76b39ea3a1d",
+  "governing_chunks": 13
+ },
+ {
+  "subject_id": "evaluation_management/prior_authorization#140",
+  "question": "For Florida Medicaid: Does Evaluation and Management (outpatient primary care) require prior authorization? The governing rule is 59G-4.087. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "required": "boolean \u2014 does the rule require prior authorization",
+   "threshold_units": "integer or null \u2014 units above which authorization is needed",
+   "threshold_period": "one of day|week|month|state_fiscal_year, or null"
+  },
+  "expects": [
+   "required",
+   "threshold_units",
+   "threshold_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.087",
+  "governing_document_id": "7f946da2-2453-40a2-b407-b76b39ea3a1d",
+  "governing_chunks": 13
+ },
+ {
+  "subject_id": "fact/coverage_criteria#119",
+  "question": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for Florida Assertive Community Treatment (FACT)? The governing rule is 59G-4.127. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "criteria": "array of medical-necessity criteria stated verbatim",
+   "diagnosis_required": "boolean or null"
+  },
+  "expects": [
+   "criteria",
+   "diagnosis_required"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.127",
+  "governing_document_id": "229d11d8-a816-4e2f-b8e3-d4dd86061f10",
+  "governing_chunks": 66
+ },
+ {
+  "subject_id": "fact/documentation#71",
+  "question": "For Florida Medicaid: What documentation must be in the record to support billing Florida Assertive Community Treatment (FACT)? The governing rule is 59G-4.127. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "elements": "array of required record elements stated verbatim",
+   "retention_period": "string or null"
+  },
+  "expects": [
+   "elements",
+   "retention_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.127",
+  "governing_document_id": "229d11d8-a816-4e2f-b8e3-d4dd86061f10",
+  "governing_chunks": 66
+ },
+ {
+  "subject_id": "fact/place_of_service#70",
+  "question": "For Florida Medicaid: In which place-of-service settings may Florida Assertive Community Treatment (FACT) be delivered and billed? The governing rule is 59G-4.127. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "pos_codes": "array of POS codes stated verbatim, or empty",
+   "settings": "array of named settings stated verbatim",
+   "telehealth_allowed": "boolean or null"
+  },
+  "expects": [
+   "pos_codes",
+   "settings",
+   "telehealth_allowed"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.127",
+  "governing_document_id": "229d11d8-a816-4e2f-b8e3-d4dd86061f10",
+  "governing_chunks": 66
+ },
+ {
+  "subject_id": "fact/prior_authorization#120",
+  "question": "For Florida Medicaid: Does Florida Assertive Community Treatment (FACT) require prior authorization? The governing rule is 59G-4.127. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "required": "boolean \u2014 does the rule require prior authorization",
+   "threshold_units": "integer or null \u2014 units above which authorization is needed",
+   "threshold_period": "one of day|week|month|state_fiscal_year, or null"
+  },
+  "expects": [
+   "required",
+   "threshold_units",
+   "threshold_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.127",
+  "governing_document_id": "229d11d8-a816-4e2f-b8e3-d4dd86061f10",
+  "governing_chunks": 66
+ },
+ {
+  "subject_id": "fqhc_encounter/coverage_criteria#141",
+  "question": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for FQHC encounter \u2014 primary care and BH? The governing rule is 59G-4.100. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "criteria": "array of medical-necessity criteria stated verbatim",
+   "diagnosis_required": "boolean or null"
+  },
+  "expects": [
+   "criteria",
+   "diagnosis_required"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.100",
+  "governing_document_id": "39a0f5b8-8274-4340-9161-255ec483b339",
+  "governing_chunks": 1
+ },
+ {
+  "subject_id": "fqhc_encounter/credentialing#94",
+  "question": "For Florida Medicaid: What provider enrollment, licensure or certification is required to bill FQHC encounter \u2014 primary care and BH? The governing rule is 59G-4.100. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "enrollment_required": "boolean",
+   "certification": "string or null",
+   "programme": "string or null"
+  },
+  "expects": [
+   "enrollment_required",
+   "certification",
+   "programme"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.100",
+  "governing_document_id": "39a0f5b8-8274-4340-9161-255ec483b339",
+  "governing_chunks": 1
+ },
+ {
+  "subject_id": "fqhc_encounter/documentation#93",
+  "question": "For Florida Medicaid: What documentation must be in the record to support billing FQHC encounter \u2014 primary care and BH? The governing rule is 59G-4.100. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "elements": "array of required record elements stated verbatim",
+   "retention_period": "string or null"
+  },
+  "expects": [
+   "elements",
+   "retention_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.100",
+  "governing_document_id": "39a0f5b8-8274-4340-9161-255ec483b339",
+  "governing_chunks": 1
+ },
+ {
+  "subject_id": "fqhc_encounter/place_of_service#92",
+  "question": "For Florida Medicaid: In which place-of-service settings may FQHC encounter \u2014 primary care and BH be delivered and billed? The governing rule is 59G-4.100. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "pos_codes": "array of POS codes stated verbatim, or empty",
+   "settings": "array of named settings stated verbatim",
+   "telehealth_allowed": "boolean or null"
+  },
+  "expects": [
+   "pos_codes",
+   "settings",
+   "telehealth_allowed"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.100",
+  "governing_document_id": "39a0f5b8-8274-4340-9161-255ec483b339",
+  "governing_chunks": 1
+ },
+ {
+  "subject_id": "fqhc_encounter/prior_authorization#142",
+  "question": "For Florida Medicaid: Does FQHC encounter \u2014 primary care and BH require prior authorization? The governing rule is 59G-4.100. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "required": "boolean \u2014 does the rule require prior authorization",
+   "threshold_units": "integer or null \u2014 units above which authorization is needed",
+   "threshold_period": "one of day|week|month|state_fiscal_year, or null"
+  },
+  "expects": [
+   "required",
+   "threshold_units",
+   "threshold_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.100",
+  "governing_document_id": "39a0f5b8-8274-4340-9161-255ec483b339",
+  "governing_chunks": 1
+ },
+ {
+  "subject_id": "rhc_encounter/coverage_criteria#143",
+  "question": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for Rural Health Clinic encounter? The governing rule is 59G-4.280. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "criteria": "array of medical-necessity criteria stated verbatim",
+   "diagnosis_required": "boolean or null"
+  },
+  "expects": [
+   "criteria",
+   "diagnosis_required"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.280",
+  "governing_document_id": "9d64e81f-2936-4a46-a6be-6afc5ef02bb7",
+  "governing_chunks": 1
+ },
+ {
+  "subject_id": "rhc_encounter/documentation#96",
+  "question": "For Florida Medicaid: What documentation must be in the record to support billing Rural Health Clinic encounter? The governing rule is 59G-4.280. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "elements": "array of required record elements stated verbatim",
+   "retention_period": "string or null"
+  },
+  "expects": [
+   "elements",
+   "retention_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.280",
+  "governing_document_id": "9d64e81f-2936-4a46-a6be-6afc5ef02bb7",
+  "governing_chunks": 1
+ },
+ {
+  "subject_id": "rhc_encounter/place_of_service#95",
+  "question": "For Florida Medicaid: In which place-of-service settings may Rural Health Clinic encounter be delivered and billed? The governing rule is 59G-4.280. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "pos_codes": "array of POS codes stated verbatim, or empty",
+   "settings": "array of named settings stated verbatim",
+   "telehealth_allowed": "boolean or null"
+  },
+  "expects": [
+   "pos_codes",
+   "settings",
+   "telehealth_allowed"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.280",
+  "governing_document_id": "9d64e81f-2936-4a46-a6be-6afc5ef02bb7",
+  "governing_chunks": 1
+ },
+ {
+  "subject_id": "rhc_encounter/prior_authorization#144",
+  "question": "For Florida Medicaid: Does Rural Health Clinic encounter require prior authorization? The governing rule is 59G-4.280. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "required": "boolean \u2014 does the rule require prior authorization",
+   "threshold_units": "integer or null \u2014 units above which authorization is needed",
+   "threshold_period": "one of day|week|month|state_fiscal_year, or null"
+  },
+  "expects": [
+   "required",
+   "threshold_units",
+   "threshold_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.280",
+  "governing_document_id": "9d64e81f-2936-4a46-a6be-6afc5ef02bb7",
+  "governing_chunks": 1
+ },
+ {
+  "subject_id": "sipp/documentation#106",
+  "question": "For Florida Medicaid: What documentation must be in the record to support billing Statewide Inpatient Psychiatric Program (SIPP)? The governing rule is 59G-4.120. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "elements": "array of required record elements stated verbatim",
+   "retention_period": "string or null"
+  },
+  "expects": [
+   "elements",
+   "retention_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.120",
+  "governing_document_id": "f4e9c5ec-6fa6-45c4-ba1e-6f47139fa6ff",
+  "governing_chunks": 15
+ },
+ {
+  "subject_id": "sipp/prior_authorization#152",
+  "question": "For Florida Medicaid: Does Statewide Inpatient Psychiatric Program (SIPP) require prior authorization? The governing rule is 59G-4.120. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "required": "boolean \u2014 does the rule require prior authorization",
+   "threshold_units": "integer or null \u2014 units above which authorization is needed",
+   "threshold_period": "one of day|week|month|state_fiscal_year, or null"
+  },
+  "expects": [
+   "required",
+   "threshold_units",
+   "threshold_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.120",
+  "governing_document_id": "f4e9c5ec-6fa6-45c4-ba1e-6f47139fa6ff",
+  "governing_chunks": 15
+ },
+ {
+  "subject_id": "state_mental_health/coverage_criteria#127",
+  "question": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for State Mental Health? The governing rule is 59G-4.300. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "criteria": "array of medical-necessity criteria stated verbatim",
+   "diagnosis_required": "boolean or null"
+  },
+  "expects": [
+   "criteria",
+   "diagnosis_required"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.300",
+  "governing_document_id": "24602c3f-f49d-4678-ae4e-ab065e740d28",
+  "governing_chunks": 44
+ },
+ {
+  "subject_id": "state_mental_health/documentation#79",
+  "question": "For Florida Medicaid: What documentation must be in the record to support billing State Mental Health? The governing rule is 59G-4.300. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "elements": "array of required record elements stated verbatim",
+   "retention_period": "string or null"
+  },
+  "expects": [
+   "elements",
+   "retention_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.300",
+  "governing_document_id": "24602c3f-f49d-4678-ae4e-ab065e740d28",
+  "governing_chunks": 44
+ },
+ {
+  "subject_id": "state_mental_health/place_of_service#78",
+  "question": "For Florida Medicaid: In which place-of-service settings may State Mental Health be delivered and billed? The governing rule is 59G-4.300. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "pos_codes": "array of POS codes stated verbatim, or empty",
+   "settings": "array of named settings stated verbatim",
+   "telehealth_allowed": "boolean or null"
+  },
+  "expects": [
+   "pos_codes",
+   "settings",
+   "telehealth_allowed"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.300",
+  "governing_document_id": "24602c3f-f49d-4678-ae4e-ab065e740d28",
+  "governing_chunks": 44
+ },
+ {
+  "subject_id": "state_mental_health/prior_authorization#128",
+  "question": "For Florida Medicaid: Does State Mental Health require prior authorization? The governing rule is 59G-4.300. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "required": "boolean \u2014 does the rule require prior authorization",
+   "threshold_units": "integer or null \u2014 units above which authorization is needed",
+   "threshold_period": "one of day|week|month|state_fiscal_year, or null"
+  },
+  "expects": [
+   "required",
+   "threshold_units",
+   "threshold_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.300",
+  "governing_document_id": "24602c3f-f49d-4678-ae4e-ab065e740d28",
+  "governing_chunks": 44
+ },
+ {
+  "subject_id": "tcm_child_health/coverage_criteria#129",
+  "question": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for Child Health Services Targeted Case Management? The governing rule is 59G-8.700. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "criteria": "array of medical-necessity criteria stated verbatim",
+   "diagnosis_required": "boolean or null"
+  },
+  "expects": [
+   "criteria",
+   "diagnosis_required"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-8.700",
+  "governing_document_id": "c4cfce95-2b5e-4e69-a968-6ce347be8b54",
+  "governing_chunks": 104
+ },
+ {
+  "subject_id": "tcm_child_health/documentation#81",
+  "question": "For Florida Medicaid: What documentation must be in the record to support billing Child Health Services Targeted Case Management? The governing rule is 59G-8.700. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "elements": "array of required record elements stated verbatim",
+   "retention_period": "string or null"
+  },
+  "expects": [
+   "elements",
+   "retention_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-8.700",
+  "governing_document_id": "c4cfce95-2b5e-4e69-a968-6ce347be8b54",
+  "governing_chunks": 104
+ },
+ {
+  "subject_id": "tcm_child_health/place_of_service#80",
+  "question": "For Florida Medicaid: In which place-of-service settings may Child Health Services Targeted Case Management be delivered and billed? The governing rule is 59G-8.700. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "pos_codes": "array of POS codes stated verbatim, or empty",
+   "settings": "array of named settings stated verbatim",
+   "telehealth_allowed": "boolean or null"
+  },
+  "expects": [
+   "pos_codes",
+   "settings",
+   "telehealth_allowed"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-8.700",
+  "governing_document_id": "c4cfce95-2b5e-4e69-a968-6ce347be8b54",
+  "governing_chunks": 104
+ },
+ {
+  "subject_id": "tcm_children_at_risk/place_of_service#74",
+  "question": "For Florida Medicaid: In which place-of-service settings may Targeted Case Management for Children at Risk of Abuse and Neglect be delivered and billed? The governing rule is 59G-4.310. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "pos_codes": "array of POS codes stated verbatim, or empty",
+   "settings": "array of named settings stated verbatim",
+   "telehealth_allowed": "boolean or null"
+  },
+  "expects": [
+   "pos_codes",
+   "settings",
+   "telehealth_allowed"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.310",
+  "governing_document_id": "546687a8-1b79-41b6-88eb-2685cf367dbe",
+  "governing_chunks": 191
+ },
+ {
+  "subject_id": "therapeutic_group_care/coverage_criteria#147",
+  "question": "For Florida Medicaid: What medical-necessity or coverage criteria must a recipient meet for Therapeutic Group Care Services? The governing rule is 59G-4.295. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "criteria": "array of medical-necessity criteria stated verbatim",
+   "diagnosis_required": "boolean or null"
+  },
+  "expects": [
+   "criteria",
+   "diagnosis_required"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.295",
+  "governing_document_id": "8d6f0b9d-3a4d-431c-a71f-f9862c66299d",
+  "governing_chunks": 12
+ },
+ {
+  "subject_id": "therapeutic_group_care/documentation#102",
+  "question": "For Florida Medicaid: What documentation must be in the record to support billing Therapeutic Group Care Services? The governing rule is 59G-4.295. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "elements": "array of required record elements stated verbatim",
+   "retention_period": "string or null"
+  },
+  "expects": [
+   "elements",
+   "retention_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.295",
+  "governing_document_id": "8d6f0b9d-3a4d-431c-a71f-f9862c66299d",
+  "governing_chunks": 12
+ },
+ {
+  "subject_id": "therapeutic_group_care/place_of_service#101",
+  "question": "For Florida Medicaid: In which place-of-service settings may Therapeutic Group Care Services be delivered and billed? The governing rule is 59G-4.295. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "pos_codes": "array of POS codes stated verbatim, or empty",
+   "settings": "array of named settings stated verbatim",
+   "telehealth_allowed": "boolean or null"
+  },
+  "expects": [
+   "pos_codes",
+   "settings",
+   "telehealth_allowed"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.295",
+  "governing_document_id": "8d6f0b9d-3a4d-431c-a71f-f9862c66299d",
+  "governing_chunks": 12
+ },
+ {
+  "subject_id": "therapeutic_group_care/prior_authorization#148",
+  "question": "For Florida Medicaid: Does Therapeutic Group Care Services require prior authorization? The governing rule is 59G-4.295. Quote the governing policy text and name the source document.",
+  "evaluator_prompt": "Fill only the named slots, each from a sentence quoted verbatim from a cited document. A slot the document does not address is null \u2014 do not infer it, and do not carry a value from a neighbouring service. If the document explicitly states that no requirement applies, that is an answer: say so plainly rather than reporting nothing found.",
+  "extraction_schema": {
+   "required": "boolean \u2014 does the rule require prior authorization",
+   "threshold_units": "integer or null \u2014 units above which authorization is needed",
+   "threshold_period": "one of day|week|month|state_fiscal_year, or null"
+  },
+  "expects": [
+   "required",
+   "threshold_units",
+   "threshold_period"
+  ],
+  "jurisdiction": "Florida Medicaid",
+  "authority": "standard",
+  "rule_ref": "59G-4.295",
+  "governing_document_id": "8d6f0b9d-3a4d-431c-a71f-f9862c66299d",
+  "governing_chunks": 12
+ }
+]

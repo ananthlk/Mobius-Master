@@ -135,14 +135,23 @@ def governing(cur, line_key):
             "resolvable": True, "chunks": d["chunks"]}
 
 
-def targets(cur, line_key, only_unsourced=True, limit=None):
+def targets(cur, line_key, only_unsourced=True, limit=None, types=None):
+    # `types` narrows to named requirement types. A run that settles some tasks and loses
+    # others needs to re-ask exactly the ones that did not settle — without it the only
+    # choices are re-asking nothing (they are already sourced) or re-asking everything,
+    # which throws away answers that did survive.
+    want = [t for t in (types or list(SLOTS)) if t in SLOTS]
+    if types and not want:
+        raise NothingToSource(
+            f"no such requirement type(s): {sorted(set(types) - set(SLOTS))}; "
+            f"known types are {sorted(SLOTS)}")
     cur.execute(f"""select id, requirement_type, code, qualifier, sourced
                       from service_line.standard_requirement
                      where line_key=%s {'and not sourced' if only_unsourced else ''}
                        and requirement_type = any(%s)
                      order by requirement_type, code nulls first
                      {f'limit {int(limit)}' if limit else ''}""",
-                (line_key, list(SLOTS)))
+                (line_key, want))
     return [dict(r) for r in cur.fetchall()]
 
 
@@ -354,7 +363,7 @@ class NothingToSource(Exception):
 
 
 def run(line_key, requested_by, limit=None, dry=False, max_rounds=2,
-        existing_run=None, profile=None):
+        existing_run=None, profile=None, include_sourced=False, types=None):
     conn, cur = db()
     cur.execute("select key, name from service_line.line where key=%s", (line_key,))
     line = cur.fetchone()
@@ -364,9 +373,15 @@ def run(line_key, requested_by, limit=None, dry=False, max_rounds=2,
     if not line:
         raise NothingToSource(f"no such service line: {line_key}")
 
-    reqs = targets(cur, line_key, limit=limit)
+    # include_sourced re-asks requirements that already carry a finding. The default
+    # stays unsourced-only because that is what a queue drain should do; an explicit
+    # re-ask is a person deciding to re-open a settled answer, so it is never implicit.
+    # file_finding() still refuses to overwrite anything a person has reviewed.
+    reqs = targets(cur, line_key, only_unsourced=not include_sourced, limit=limit,
+                   types=types)
     if not reqs:
-        raise NothingToSource(f"{line_key}: nothing unsourced to source")
+        raise NothingToSource(
+            f"{line_key}: nothing {'' if include_sourced else 'unsourced '}to source")
 
     if existing_run:
         # The API already created the run and emitted run_started when it queued it.
@@ -440,6 +455,14 @@ def run(line_key, requested_by, limit=None, dry=False, max_rounds=2,
     with ExitStack() as stack:
         if profile:
             try:
+                # `app` is mobius-chat's package. deep_research.llm_http.resolve() puts
+                # mobius-chat on sys.path itself, but only when IT is imported — so this
+                # import raced it and lost, every time, reporting "No module named 'app'"
+                # as though the capability were missing. It was a path-ordering bug in
+                # this script. Do it here so the pin never depends on another module
+                # having run first; resolve() inserting the same entry later is a no-op.
+                if ROOT + "mobius-chat" not in sys.path:
+                    sys.path.insert(0, ROOT + "mobius-chat")
                 from app.services.model_profile import profile_override  # noqa: E402
                 stack.enter_context(profile_override(profile))
                 print(f"  in-process extraction pinned to profile: {profile}")
@@ -577,11 +600,19 @@ if __name__ == "__main__":
     p.add_argument("--profile", default=None,
                    help="chat model profile: gemini | anthropic | auto | bandit | "
                         "optimal | default. Omit to take the worker's own default.")
+    p.add_argument("--type", action="append", dest="types",
+                   help="re-ask only this requirement type; repeatable. Use with "
+                        "--include-sourced to re-open one that already has a finding.")
+    p.add_argument("--include-sourced", action="store_true",
+                   help="re-ask requirements that already carry a finding, not just "
+                        "the unsourced ones. Human-reviewed values are still never "
+                        "overwritten.")
     p.add_argument("--dry", action="store_true")
     a = p.parse_args()
     if a.serve:
         serve()
     elif a.line_key:
-        print(run(a.line_key, a.by, a.limit, a.dry, a.rounds, profile=a.profile))
+        print(run(a.line_key, a.by, a.limit, a.dry, a.rounds, profile=a.profile,
+                  include_sourced=a.include_sourced, types=a.types))
     else:
         p.error("give a line_key, or --serve to take requests from the surface")

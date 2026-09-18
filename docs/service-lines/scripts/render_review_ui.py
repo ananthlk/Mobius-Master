@@ -201,11 +201,26 @@ def build():
         common = fold(common)
         groupings = fold(groupings)
 
+        # 🔴 `ready` USED TO BE `bool(codes or bc.get("covered"))`, which is blind to
+        # sourced REQUIREMENTS. So Behavior Analysis Services — 4 of 4 requirements
+        # sourced and quoted from its coverage policy — sat under AWAITING SOURCES
+        # while the panel beside it said "Every requirement here has a source". Two
+        # fields, same renderer, same data, disagreeing on one screen: the banner
+        # reads `toSource` (origin != asserted) and the sidebar read codes.
+        #
+        # Re-rendering produced a BYTE-IDENTICAL file after 41 requirements were
+        # newly sourced, which is what proved the classifier could not see them.
+        # 13 of 31 in-scope lines were affected. Same defect as the /lines/{key}
+        # emptiness test fixed in the API today: codes as a stale proxy for "do we
+        # hold anything", after requirements acquired an independent source.
+        _all_items = ([i for c in codes.values() for i in c["items"]]
+                      + common + groupings)
+        _n_sourced = sum(1 for x in _all_items if x["origin"] != "asserted")
         lines.append({
             "id": l["key"],                       # DOM handle only, never displayed
             "name": l["name"],
             "rule": l.get("rule"),
-            "ready": bool(codes or bc.get("covered")),
+            "ready": bool(codes or bc.get("covered") or _n_sourced),
             "codes": list(codes.values()),
             "common": common,
             "search": " ".join([l["name"]] + [c["code"] for c in l.get("codes", [])]).lower(),
@@ -224,9 +239,7 @@ def build():
             "toCheck": sum(1 for x in ([i for c in codes.values() for i in c["items"]]
                                        + common + groupings)
                            if x["state"] == "unreviewed" and x["origin"] != "asserted"),
-            "toSource": sum(1 for x in ([i for c in codes.values() for i in c["items"]]
-                                        + common + groupings)
-                            if x["origin"] == "asserted"),
+            "toSource": sum(1 for x in _all_items if x["origin"] == "asserted"),
             "checked": (rc.get("total", 0) - rc.get("unreviewed", 0)),
         })
 
