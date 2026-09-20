@@ -77,7 +77,13 @@ NOTES_RE = re.compile(r'\brec(?:order)?\.note\(|_rec\.note\(')
 ROUTER = "/Users/ananth/Mobius/mobius-payor/app/routers/research_console.py"
 # Every place in the repo that can create a request. A door nobody declared is
 # how fifteen unjudgeable requests got in.
-REQUEST_WRITERS = re.compile(r"insert\s+into\s+research\.request", re.I)
+# `\b(?!_)` BECAUSE research.request IS A PREFIX OF SIX OTHER TABLES.
+# Without it this matched `research.request_state`, `request_message`,
+# `request_action` and the rest, and reported deep_research/state.py as a door
+# that can create a request. It writes a request's STATE. A guard that cries
+# about the wrong file is a guard people learn to wave through, which is worse
+# than not having it.
+REQUEST_WRITERS = re.compile(r"insert\s+into\s+research\.request\b(?!_)", re.I)
 # Ungated writers we KNOW about. A new one appearing fails the build — the same
 # discipline as KNOWN_TERMINATORS, applied to the entry side.
 KNOWN_UNGATED_WRITERS = {
@@ -85,6 +91,11 @@ KNOWN_UNGATED_WRITERS = {
     "deep_research/acquire.py", "deep_research/run_batch.py",
     "deep_research/run_v2.py",
     "docs/service-lines/scripts/run_sourcing.py",
+    # Payor Fact Store's intake: turns a payor predicate into a request, one
+    # per (consumer, subject_type, subject_id). A real door and it was
+    # genuinely undeclared -- the guard was right about this one, and only this
+    # one, out of the five it was reporting.
+    "scripts/research/payor_intake.py",
 }
 
 
@@ -136,7 +147,15 @@ def request_writers() -> list[dict]:
                 # (the router). Anything else takes what it is handed.
                 gated = ("evaluator_prompt is required" in src
                          or "research.contract" in src)
-                out.append({"file": rel, "gated": gated,
+                # A FIXTURE IS NOT A DOOR. A test that inserts a request is
+                # building the world it then asserts on; requiring each to be
+                # declared makes the build fail every time somebody writes a
+                # test, which is how a gate gets waved through. They are still
+                # LISTED -- so a writer cannot hide by moving into tests/ --
+                # and simply do not break the build.
+                is_test = "/tests/" in rel.replace(os.sep, "/") or \
+                          os.path.basename(rel).startswith("test_")
+                out.append({"file": rel, "gated": gated, "test": is_test,
                             "line": next((i + 1 for i, ln in enumerate(src.splitlines())
                                           if REQUEST_WRITERS.search(ln)), None)})
     return sorted(out, key=lambda x: (not x["gated"], x["file"]))
@@ -807,7 +826,7 @@ def main() -> None:
                           f"{spec.get('kind')!r}, which is not declared")
 
     for w in doc["request_writers"]:
-        if w["gated"]:
+        if w["gated"] or w.get("test"):
             continue
         if not any(w["file"].endswith(k) for k in KNOWN_UNGATED_WRITERS):
             breaks.append(f"{w['file']}:{w['line']} can create a request and checks "

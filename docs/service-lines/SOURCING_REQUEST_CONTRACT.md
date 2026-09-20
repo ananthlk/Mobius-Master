@@ -82,8 +82,12 @@ question_incoherent → registry     authority_incoherent → registry  corrobor
 **A request shape with slots already in it** — `research.request.expects` and
 `.extraction_schema`, both live, both used by other consumers.
 
-**A console** — `deep_research/render_console.py`, rendered entirely from `research.*` with no
-hand-authored data.
+**A console** — the Technical door at
+`https://mobius-payor-ortabkknqa-uc.a.run.app/research/console`, served live from
+`research.*` with no hand-authored data. It was two static generators until
+2026-09-19 (`render_console.py`, `console.py`); both are deleted, because a page
+somebody has to re-run is a page that is stale by default — the last render sat
+a month old, and the generator had fallen two doors behind the served copy.
 
 ### 1.1 The Registry has not been using any of it
 

@@ -193,21 +193,6 @@
    ]
   ]
  },
- "console": {
-  "group": "the surface",
-  "rating": "amber",
-  "how": "The page a person reads: every question, every round, what each actor did, what it cost and what is waiting on somebody.",
-  "findings": [
-   [
-    "good",
-    "Generated from one source, with assertions, after two variants of the same page drifted apart."
-   ],
-   [
-    "bad",
-    "Ten uses of design tokens that do not exist rendered transparent, and a sticky header let rows show through it."
-   ]
-  ]
- },
  "language": {
   "group": "the surface",
   "rating": "green",

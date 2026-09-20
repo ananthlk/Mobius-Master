@@ -72,7 +72,7 @@
   {
    "id": "acquire",
    "path": "deep_research/acquire.py",
-   "loc": 446,
+   "loc": 587,
    "role": "Deep Research \u2014 the acquire arm.",
    "role_full": "Deep Research \u2014 the acquire arm.\n\nHandles exactly one gap class: `not_in_corpus`. The document that would answer\nthe question exists, we know its URL, and we do not hold it. Fetch it, put it\nthrough the canonical ingest path, wait for it to become retrievable, then\nre-ask.\n\nDeliberately narrow. It refuses to run on a gap it has not first proved is an\nacquisition gap \u2014 the whole point of the classifier is that most misses are not\nmissing documents, and re-fetching something we already hold is the failure\nmode this module exists to prevent.\n\nEvery step writes to research.* before it acts, so a run that dies halfway\nleaves a readable trail rather than a mystery.\n\n    python3 acquire.py --consumer service_line_registry [--dry-run]",
    "api": [
@@ -82,6 +82,7 @@
     "prove_not_in_corpus()",
     "fetch()",
     "upload()",
+    "source_yield()",
     "wait_until_retrievable()",
     "run()",
     "retry()"
@@ -95,6 +96,8 @@
     "research.request"
    ],
    "reads": [
+    "research.document_size_class",
+    "research.fetch_policy",
     "research.retryable_repairs"
    ],
    "imports": [
@@ -169,42 +172,6 @@
    "rating": "ungraded",
    "group": "unplaced",
    "findings": []
-  },
-  {
-   "id": "console",
-   "path": "deep_research/console.py",
-   "loc": 2314,
-   "role": "Render the research console. One command, no hand-authored data.",
-   "role_full": "Render the research console. One command, no hand-authored data.\n\n    python3 -m deep_research.console            # rebuild from research.*\n    python3 -m deep_research.console --open     # and open it locally\n\nWrites a single self-contained HTML file: the dataset is embedded, so the page\nworks from disk, over a static host, or published as an artifact, with no server\nand no database reachable from wherever it ends up being read.\n\nRe-running is the update mechanism. The data comes from console_data.build(),\nwhich normalises the two verdict schemas rather than letting the page guess.",
-   "api": [
-    "served_page()",
-    "render()",
-    "main()"
-   ],
-   "config": [
-    "MOBIUS_CONSOLE_OUT"
-   ],
-   "writes": [],
-   "reads": [],
-   "imports": [
-    "console_data"
-   ],
-   "observability": "silent",
-   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
-   "can_record_failure": false,
-   "how": "The page a person reads: every question, every round, what each actor did, what it cost and what is waiting on somebody.",
-   "rating": "amber",
-   "group": "the surface",
-   "findings": [
-    [
-     "good",
-     "Generated from one source, with assertions, after two variants of the same page drifted apart."
-    ],
-    [
-     "bad",
-     "Ten uses of design tokens that do not exist rendered transparent, and a sticky header let rows show through it."
-    ]
-   ]
   },
   {
    "id": "console_data",
@@ -1455,41 +1422,6 @@
    ]
   },
   {
-   "id": "render_console",
-   "path": "deep_research/render_console.py",
-   "loc": 387,
-   "role": "Render the Deep Research console from research.* \u2014 no hand-authored data.",
-   "role_full": "Render the Deep Research console from research.* \u2014 no hand-authored data.",
-   "api": [
-    "gather()",
-    "jdefault()",
-    "esc()",
-    "render()"
-   ],
-   "config": [],
-   "writes": [],
-   "reads": [
-    "research.attempt",
-    "research.discovery_effect",
-    "research.discovery_request",
-    "research.escalation",
-    "research.gap",
-    "research.repair",
-    "research.request",
-    "research.turn"
-   ],
-   "imports": [
-    "deep_research"
-   ],
-   "observability": "silent",
-   "observability_note": "Records nothing of its own. Observable only through whatever calls it \u2014 its behaviour has no identity in the trace.",
-   "can_record_failure": true,
-   "how": "",
-   "rating": "ungraded",
-   "group": "unplaced",
-   "findings": []
-  },
-  {
    "id": "render_transcript",
    "path": "deep_research/render_transcript.py",
    "loc": 308,
@@ -1727,7 +1659,7 @@
   {
    "id": "run_v2",
    "path": "deep_research/run_v2.py",
-   "loc": 672,
+   "loc": 695,
    "role": "chat \u2192 extract \u2192 critique.",
    "role_full": "chat \u2192 extract \u2192 critique.\n\nAsk the corpus, pull the fact store's JSON, then disbelieve it field by field.\nOnly what survives the critic is written.\n\n    python3 -m deep_research.run_v2 --subject X --query \"...\"         --instructions-file i.txt --schema-file s.json [--required a,b] [--turns 3]",
    "api": [
@@ -1775,7 +1707,7 @@
   {
    "id": "runner",
    "path": "deep_research/runner.py",
-   "loc": 2758,
+   "loc": 2797,
    "role": "Deep Research \u2014 the turn runner.",
    "role_full": "Deep Research \u2014 the turn runner.\n\nThe invoker arrives with a query and its own evaluator prompt / extraction\nschema. From there each turn runs two tracks and advances only when both settle:\n\n    track A   ask -> parse -> validate -> extract -> refine the next query\n    track B   dispatch feedback: Discovery ingest / Lexicon / human\n\nTrack A settles in seconds. Track B settles in minutes, hours, or days \u2014 ingest\nis async and a person is asleep. So `advance()` is idempotent and resumable:\ncall it on a schedule, it moves whatever is due and returns. Nothing is held in\nmemory between turns, because nothing can be.\n\nAdvancing on track A alone re-asks the corpus that just failed and burns a turn.\nAdvancing on track B alone discards the refinement the answer earned. Both, or\nwait \u2014 and waiting is a normal state here, not a failure.\n\n    python3 runner.py open   --consumer X --subject Y --query \"...\" --evaluator-file p.txt\n    python3 runner.py advance          # move every due turn; safe to run on a cron\n    python3 runner.py status",
    "api": [
@@ -1809,6 +1741,7 @@
    ],
    "reads": [
     "research.discovery_request",
+    "research.field_answer",
     "research.lexicon_feedback",
     "research.waiting_on"
    ],
@@ -1852,7 +1785,7 @@
   {
    "id": "service",
    "path": "deep_research/service.py",
-   "loc": 198,
+   "loc": 220,
    "role": "Deep Research \u2014 the service layer behind the skill API.",
    "role_full": "Deep Research \u2014 the service layer behind the skill API.",
    "api": [
@@ -1872,7 +1805,9 @@
     "research.request",
     "research.turn"
    ],
-   "reads": [],
+   "reads": [
+    "research.answer_for_requestor"
+   ],
    "imports": [
     "deep_research",
     "run_research",
@@ -2078,7 +2013,7 @@
   {
    "id": "worklist",
    "path": "deep_research/worklist.py",
-   "loc": 231,
+   "loc": 296,
    "role": "Turn what we advise on each question into the work somebody actually does.",
    "role_full": "Turn what we advise on each question into the work somebody actually does.\n\nAnanth, 2026-09-09: \"retrieve this document \u2014 closes xx high priority questions.\"\n\nThe whole module has recorded actions ON questions, one per question, which is\nthe wrong grain for whoever has to do the work and hides the only fact that\nhelps them choose: how much a single activity is worth. Twenty-three questions\nrecommending `reopen` are not twenty-three problems; they are one run.\n\nIDEMPOTENT BY CONSTRUCTION. A task is identified by (kind, resource), so\nre-deriving updates the same row and re-links the same questions rather than\nminting duplicates on every sweep. A task whose questions have all moved on is\nclosed as `done` \u2014 derived work has to be able to go away, or the list only ever\ngrows and stops being read.\n\nNEVER TOUCHES DECLARED WORK. A task somebody typed \u2014 \"call the AHCA contact\" \u2014\nhas origin='declared' and is left alone. The deriver owns what it derived.",
    "api": [
@@ -2093,7 +2028,9 @@
     "research.task",
     "research.task_question"
    ],
-   "reads": [],
+   "reads": [
+    "research.decisions_owed"
+   ],
    "imports": [
     "contract",
     "contract.specifics"
@@ -2218,7 +2155,6 @@
   "silent": [
    "assessments",
    "config",
-   "console",
    "console_data",
    "contract",
    "contract/actions",
@@ -2259,7 +2195,6 @@
    "read_thinking",
    "recommend",
    "recon",
-   "render_console",
    "render_transcript",
    "resolve",
    "retrieval_guidance",
@@ -2289,17 +2224,12 @@
   {
    "id": "runner",
    "cli": true,
-   "loc": 2758
-  },
-  {
-   "id": "console",
-   "cli": true,
-   "loc": 2314
+   "loc": 2797
   },
   {
    "id": "run_v2",
    "cli": true,
-   "loc": 672
+   "loc": 695
   },
   {
    "id": "run_batch",
@@ -2309,12 +2239,7 @@
   {
    "id": "acquire",
    "cli": true,
-   "loc": 446
-  },
-  {
-   "id": "render_console",
-   "cli": false,
-   "loc": 387
+   "loc": 587
   },
   {
    "id": "render_transcript",
@@ -2421,7 +2346,7 @@
     "sourced": 1,
     "escalated": 5
    },
-   "at": "deep_research/run_v2.py:307"
+   "at": "deep_research/run_v2.py:330"
   },
   {
    "id": "resolution",
@@ -2649,83 +2574,83 @@
    "absence_by_reading": 2
   },
   "by_actor_trace": {
-   "planner": 1577,
+   "planner": 10663,
+   "executor": 2109,
+   "assembler": 1608,
    "judge": 331,
-   "executor": 238,
-   "assembler": 188,
+   "verifier": 312,
    "arbiter": 41,
-   "verifier": 37,
    "diagnoser": 18,
    "resolver": 6
   },
   "requests_by_status": {
-   "abandoned": 83,
-   "sourced": 30,
-   "open": 7,
+   "open": 188,
+   "sourced": 89,
+   "abandoned": 72,
    "escalated": 3
   },
   "spend_by_actor": {
-   "null": 19.3875,
+   "null": 31.8306,
    "drafter": 8.949,
    "assembler": 0.248,
    "judge": 0.2316
   },
   "recent": [
    {
-    "id": 1950,
-    "subject_id": "bh_intervention/strategy-spread-al",
+    "id": 2912,
+    "subject_id": "fqhc_encounter/prior_authorization-al",
     "status": "open",
     "turns": 0,
-    "thinking": 115
+    "thinking": 38
    },
    {
-    "id": 1841,
-    "subject_id": "sunshine_manual/emit-strategy-al",
+    "id": 2911,
+    "subject_id": "fqhc_encounter/prior_authorization-al",
     "status": "open",
     "turns": 0,
-    "thinking": 25
+    "thinking": 35
    },
    {
-    "id": 1773,
-    "subject_id": "sunshine_manual/section-read-fixed-al",
-    "status": "open",
-    "turns": 0,
-    "thinking": 31
-   },
-   {
-    "id": 1745,
-    "subject_id": "sunshine_manual/section-read-al",
+    "id": 2910,
+    "subject_id": "state_mental_health/prior_authorization-al",
     "status": "sourced",
     "turns": 0,
-    "thinking": 34
+    "thinking": 30
    },
    {
-    "id": 1555,
-    "subject_id": "sunshine_provider_manual/documentation-al",
-    "status": "open",
+    "id": 2909,
+    "subject_id": "state_mental_health/prior_authorization-al",
+    "status": "sourced",
     "turns": 0,
-    "thinking": 41
+    "thinking": 35
    },
    {
-    "id": 879,
-    "subject_id": "bh_intervention",
-    "status": "open",
-    "turns": 1,
-    "thinking": 1283
+    "id": 2908,
+    "subject_id": "bh_assessment/prior_authorization-al",
+    "status": "sourced",
+    "turns": 0,
+    "thinking": 38
    },
    {
-    "id": 878,
-    "subject_id": "fqhc_encounter",
-    "status": "open",
-    "turns": 2,
-    "thinking": 10
+    "id": 2907,
+    "subject_id": "bh_assessment/prior_authorization-al",
+    "status": "sourced",
+    "turns": 0,
+    "thinking": 35
    },
    {
-    "id": 877,
-    "subject_id": "therapeutic_group_care/prior_authorization#148",
-    "status": "abandoned",
-    "turns": 1,
-    "thinking": 0
+    "id": 2906,
+    "subject_id": "rhc_encounter/documentation-al",
+    "status": "sourced",
+    "turns": 0,
+    "thinking": 33
+   },
+   {
+    "id": 2905,
+    "subject_id": "rhc_encounter/documentation-al",
+    "status": "sourced",
+    "turns": 0,
+    "thinking": 30
    }
   ]
  },
@@ -4409,56 +4334,79 @@
   {
    "file": "mobius-payor/app/routers/research_console.py",
    "gated": true,
-   "line": 1133
+   "test": false,
+   "line": 1822
   },
   {
    "file": "mobius-skills/deep-research/deep_research/intake/store.py",
    "gated": true,
+   "test": false,
    "line": 30
   },
   {
    "file": "mobius-skills/deep-research/deep_research/runner.py",
    "gated": true,
+   "test": false,
    "line": 124
   },
   {
    "file": "docs/service-lines/scripts/run_sourcing.py",
    "gated": false,
+   "test": false,
    "line": 264
   },
   {
    "file": "mobius-skills/deep-research/deep_research/acquire.py",
    "gated": false,
-   "line": 215
+   "test": false,
+   "line": 338
   },
   {
    "file": "mobius-skills/deep-research/deep_research/run_batch.py",
    "gated": false,
+   "test": false,
    "line": 421
   },
   {
    "file": "mobius-skills/deep-research/deep_research/run_research.py",
    "gated": false,
+   "test": false,
    "line": 191
   },
   {
    "file": "mobius-skills/deep-research/deep_research/run_v2.py",
    "gated": false,
-   "line": 258
+   "test": false,
+   "line": 281
   },
   {
    "file": "mobius-skills/deep-research/deep_research/service.py",
    "gated": false,
+   "test": false,
    "line": 37
   },
   {
-   "file": "mobius-skills/deep-research/deep_research/state.py",
+   "file": "mobius-skills/deep-research/scripts/research/payor_intake.py",
    "gated": false,
-   "line": 155
+   "test": false,
+   "line": 197
+  },
+  {
+   "file": "mobius-skills/deep-research/tests/test_a_finding_is_not_unfound.py",
+   "gated": false,
+   "test": true,
+   "line": 45
+  },
+  {
+   "file": "mobius-skills/deep-research/tests/test_decisions_the_machine_may_not_make.py",
+   "gated": false,
+   "test": true,
+   "line": 43
   },
   {
    "file": "mobius-skills/deep-research/tests/test_request_state.py",
    "gated": false,
+   "test": true,
    "line": 39
   }
  ],
@@ -4491,12 +4439,9 @@
  ],
  "curated_on": "2026-09-09",
  "build": {
-  "ok": false,
-  "broken": [
-   "mobius-skills/deep-research/deep_research/state.py:155 can create a request and checks nothing, and is not in KNOWN_UNGATED_WRITERS \u2014 a new door opened without anyone declaring it",
-   "mobius-skills/deep-research/tests/test_request_state.py:39 can create a request and checks nothing, and is not in KNOWN_UNGATED_WRITERS \u2014 a new door opened without anyone declaring it"
-  ],
-  "checked_at": "2026-09-17T03:09:35.089904+00:00",
-  "note": "invariants_checked lists what is CHECKED, not what passed -- read build.ok"
+  "ok": true,
+  "broken": [],
+  "checked_at": "2026-09-20T02:14:32.000294+00:00",
+  "note": "all checked invariants hold"
  }
 }
