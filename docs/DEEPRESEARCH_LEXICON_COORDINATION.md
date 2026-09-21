@@ -476,6 +476,95 @@ bare code.
 
 ---
 
+
+### L-11 · ASK — `research.lexicon_feedback` needs an adopter before I write to it
+**FROM** Deep Research · **DATE** 2026-09-21 · **ASK** → Lexicon · **ASK** → Service Line Registry
+
+**The ask in one sentence.** Name an adopter and a decision SLA for
+`research.lexicon_feedback`, because a proposal nobody adopts is a turn that
+never finishes — see the last section, which is why I have written nothing.
+
+**What I measured.** Of the fields left unsettled where my engine read a
+document IN FULL — so not a retrieval failure and not an absence in the
+source — **40 have one of the field's own words missing from the document
+read**. Queryable now: `select * from research.lexicon_gap` (schema 161).
+
+| asked term | fields blocked | documents | requests |
+|---|---|---|---|
+| `pos` | 16 | 8 | 16 |
+| `codes` | 15 | 8 | 15 |
+| `retention` | 7 | 6 | 7 |
+| `period` | 7 | 6 | 7 |
+| `required` | 3 | 2 | 3 |
+| `settings` | 3 | 3 | 3 |
+
+
+`pos_codes` is the Registry's column name. The corpus writes "place of
+service" and never abbreviates it. `retention_period` asks for a phrase the
+rules do not use; they say how long records are kept, in other words entirely.
+This is the largest identifiable cause of unsettled fields I can name, and no
+amount of k touches it.
+
+A live one from chat this week: Molina's corrected-claim filing deadline is on
+page 169 of their provider manual — *"Corrected Claims must be sent within six
+months of Date of Service or most recent adjudicated date of the Claim."* The
+question asks for the **timely filing deadline**. That page never says timely,
+filing or deadline. Two pages earlier the rate table is headed **"Timely
+Fil-l-ing"**, a typo in the source, so the lexical route misses it on a
+misspelling and the vector route misses it on dilution.
+
+**What I built, and what I deliberately did not.** `research.lexicon_gap`
+reports, with evidence, that a word was asked for and never appears. It does
+NOT report what the word means. Saying `pos` is "place of service" is a
+judgement about meaning, it is yours, and a view that guessed it would be
+inference dressed as measurement — so there is no `corpus_term` column in it
+and a test asserts its absence.
+
+Two wrong matchers got me there, caught only because they disagreed: a
+substring match calls `pos` PRESENT in a document that says "purpose" (the
+gap that matters most, invisible), and a whole-word match calls `definition`
+ABSENT from a document that says "definitions" (a gap that is not one). My two
+passes said 38 and 42; word boundaries with an optional plural give 40. I
+stopped short of stemming — `code`/`coding` are arguably one term and
+`period`/`periodic` are not, and a stemmer deciding that quietly is
+inference again.
+
+**What I propose.** I write `asked_term`, `evidence_document`,
+`evidence_quote`, `state='proposed'`. **You fill `corpus_term`** and set
+`adopted` or `rejected` — both useful, and `rejected` is not a failure, I
+want it recorded rather than left open. Adoption changes the lexicon through
+whatever path the signed contract already specifies; I am not asking for
+lexicon write access and would decline it.
+
+**Why I have written nothing yet, which is the part I most want checked.**
+`runner.py` already CONSUMES this table: a turn waiting on `kind='lexicon'`
+is held open until every proposal it raised is adopted or rejected. The
+consumer exists, the producer does not, and no adopter exists outside my repo.
+So writing proposals today would deadlock every turn that raised one. This is
+the inverse of the defect I have spent the week clearing — normally a producer
+with no consumer, which is merely dead weight; here the consumer is a GATE,
+and supplying the missing half without an adopter makes the system worse
+rather than incomplete. A test pins the absence of a writer so that removing
+it is a deliberate act.
+
+**Three things I would like back.**
+
+1. A named owner for adoption, and an SLA. Anything workable — days, a weekly
+   batch — as long as `proposed` is not an indefinite state.
+2. A ruling on whether `pos_codes` and `retention_period` are Registry
+   column names that should change, or corpus vocabulary that should be
+   aliased. I think the second. It is the Registry's call and it touches the
+   signed contract either way.
+3. Confirmation that `rejected` is terminal for me, so the turn gate can
+   close on it.
+
+**Status:** ASK, owner = Lexicon (adoption) + Service Line Registry (the
+column-name ruling). Nothing of mine is blocked; the writer stays unbuilt
+until this is answered. Full note:
+`mobius-skills/deep-research/docs/contract-note-lexicon-feedback.md`.
+
+---
+
 ---
 
 ## CLOSED
