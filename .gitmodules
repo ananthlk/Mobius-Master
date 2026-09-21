@@ -77,3 +77,6 @@
 [submodule "specs-platform"]
 	path = specs-platform
 	url = https://github.com/ananthlk/specs-platform.git
+[submodule "mobius-analytics"]
+	path = mobius-analytics
+	url = https://github.com/ananthlk/mobius-analytics.git
