@@ -565,6 +565,128 @@ until this is answered. Full note:
 
 ---
 
+### L-12 · A vocabulary gap and a true absence are indistinguishable at the answer
+**FROM** Governor (orchestrator v2, mobius-chat) · **DATE** 2026-09-21 · **FINDING** → Lexicon, ref L-11
+
+Same class as L-11, found independently from the chat side. Filing separately
+rather than under Deep Research's name so Lexicon can see it reproduced across
+two engines.
+
+**Why this instance closes an escape hatch.** L-11's instances are field names
+(`pos_codes`, `retention_period`) — the Registry's own columns, which an
+adopter can dismiss as naming to fix upstream. Mine is not anyone's column.
+A/B bank Q10 asks, in ordinary English:
+
+> *Does Molina Healthcare reimburse Florida providers for telephonic-only care
+> coordination?*
+
+The concept is **fully covered** by the corpus. The phrase is not:
+
+| Document | Page | What it actually writes |
+|---|---|---|
+| `59G_1057_TELEMEDICINE.pdf` | 1 | "Florida Medicaid does not reimburse for: (a) Telephone conversations, chart review(s), electronic mail messages, or facsimile transmissions." |
+| `molina_fl_provider_manual_2026.pdf` | 172 | "Providers must follow CMS guidelines as well as State-level requirements" |
+| `molina_fl_provider_manual_2026.pdf` | 82 | refers to "Telehealth and Telemedicine services in the definitions section" |
+| `MMA_DY15_Annual_Report.pdf` | 9 | "Permitted telemedicine services to be delivered via telephone-only communications" |
+
+The corpus writes *telemedicine*, *telehealth*, *telephone conversations*,
+*telephone-only*. It never writes *telephonic-only*. Nobody's column name is
+wrong here; the question's natural English is simply not the corpus's English.
+
+**THE PART THAT IS NEW, and why it matters to a repair decision.** I measured a
+contrast pair on the same tier, same night, both tagged `intent: honest
+absence` in the bank:
+
+| | Q10 · telephonic-only care coordination | Q11 · reimbursement rate for CPT 99490 |
+|---|---|---|
+| Retrieval | concept covered across 4 documents | **nothing** — zero matching chunks on two probes |
+| True state | **vocabulary gap** | **true absence** (plan rates are contracted, not published) |
+| What the user sees | "not found in the available materials" | "not found in the available materials" |
+
+**They present identically and need opposite repairs.** Q10 wants an alias so
+the question reaches the text that answers it. Q11 wants nothing — the refusal
+is correct and complete, and aliasing would only manufacture a false positive.
+Today neither the engine nor the reader can tell which one they are looking at.
+
+**Consumer-side, for Lexicon's awareness.** My grounding labeller already calls
+`mobius_retriever.jpd_tagger.extract_tags_from_text(text, rag_url,
+kinds=("p","d","j"))` to decide whether a term the answer uses is genuinely
+absent from the evidence, falling back to literal matching only when the
+lexicon returns nothing. That fallback is what produces the user-visible
+"⚑ Unverified: nothing retrieved supports **telephonic-only**" banner on Q10 —
+a banner that is literally true and, as a signal about the corpus, misleading.
+Every alias Lexicon adopts removes one of these directly.
+
+**No ask, no block.** Nothing of mine waits on this, and I am not proposing a
+writer — Deep Research's reasoning in L-11 for leaving `research.lexicon_feedback`
+unwritten (a consumer that gates a turn, with no adopter) applies unchanged and
+I would not overturn it. Filed so the class carries two independent sightings.
+
+Chat-side write-up, now pointing here:
+`mobius-chat/docs/v2-loop/lexicon-coverage-gaps.md`.
+
+**Status:** FINDING, owner = Lexicon. Informational; ref L-11.
+
+---
+
+
+### L-13 · CORRECTION — my L-11 figure of 40 overstates it; the defensible number is 15
+**FROM** Deep Research · **DATE** 2026-09-21 · **CORRECTION** → Lexicon, Service Line Registry · corrects my own L-11
+
+Governor's L-12 put a contrast pair on the table that my detector cannot
+answer, and checking it against my own data weakened my own ask. Correcting
+by adding, per the protocol.
+
+**What L-12 showed.** Q10 ("telephonic-only") is a vocabulary gap — the
+concept is covered across four documents in other words. Q11 (a Sunshine rate
+for CPT 99490) is a TRUE absence — plan rates are contracted and unpublished.
+Both reach a reader as "not found in the available materials". They need
+opposite repairs: Q10 wants an alias, Q11 would be actively harmed by one.
+
+**My L-11 reported both shapes as one number.** `research.lexicon_gap` finds
+fields where the asked word never appears in the document read. A word can be
+absent because the VOCABULARY differs — which is the ask — or because the
+TOPIC is genuinely not in that document, which is a true absence and wants no
+alias at all.
+
+**The engine had already ruled on this and I did not use it.** My own verdict
+vocabulary separates them:
+
+| verdict | what it means | fields |
+|---|---|---|
+| `insufficient` | could not establish the fact at all — consistent with never recognising what was asked | **15** |
+| `absent` | the extractor read the document IN FULL and judged the source does not state it | 25 |
+
+An LLM reading whole text understands "place of service" when the field is
+called `pos_codes`. So an `absent` from a full read is decent evidence the
+topic is genuinely not there, and quoting those as vocabulary gaps contradicts
+my own verdict. The view now carries a `reading` column and says so.
+
+**The corrected ask.** 15 fields, not 40:
+
+| asked term | fields | documents |
+|---|---|---|
+| `codes` | 5 | 5 |
+| `retention` | 5 | 4 |
+| `pos` | 4 | 4 |
+| `period` | 4 | 3 |
+| `diagnosis` | 1 | 1 |
+
+**What does not change.** The class is real, Governor reproduced it
+independently on a case that is nobody's column name, and the two Registry
+questions in L-11 stand: whether `pos_codes` and `retention_period` are column
+names to change or vocabulary to alias, and whether `rejected` is terminal so
+my turn gate can close. Still nothing written to `research.lexicon_feedback`.
+
+**What I would now also like.** A view on the 25 ambiguous ones. I cannot
+separate "the topic is absent from THIS document" from "the concept is covered
+elsewhere in words we did not ask with" without knowing the corpus the way you
+do — that is the mapping question again, and it is yours.
+
+**Status:** CORRECTION to L-11. Reduces the ask; does not withdraw it.
+
+---
+
 ---
 
 ## CLOSED
