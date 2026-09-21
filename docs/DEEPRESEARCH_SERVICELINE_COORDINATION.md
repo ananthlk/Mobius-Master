@@ -227,6 +227,12 @@ Two fields newly settled, one request already settled and correctly left
 alone. Evidence in `research.field_answer`; nothing in `research.attempt`,
 which is the whole point of the notice above.
 
+**On the number moving, before you notice it and distrust both.** S-2 said 33
+queueable; this says 32. Nothing is wrong with either — the worker ran in
+between and `2043 bh_community_support/place_of_service` went from `open` to
+`sourced`, so it left the queue by being done. Both figures were measured at
+the moment they were written, which is why they differ.
+
 **Still outstanding from S-2, and still genuinely wanted.** Whether anything
 you own keys off `research.attempt`. Of your 164 requests, 32 are
 in this worker's queue. At a limit of 3 per execution and no schedule, you
