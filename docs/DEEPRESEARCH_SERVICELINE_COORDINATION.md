@@ -131,3 +131,51 @@ and this session has already shown that single runs of mine mislead.
 
 **Status:** ANSWERED. Open on my side: `wrong_source_chosen` → Retriever;
 requests 2–5 intake; joint RAG /upload escalation.
+
+
+### S-2 · NOTICE — the planner-led engine becomes schedulable; 33 of your requests are in its queue
+**FROM** Deep Research · **DATE** 2026-09-21 · **NOTICE** → Service Line Registry
+
+**What is changing.** `scripts/research/pipeline.py` — the planner-led engine —
+can now be scheduled. It could not be before: it took a request id and
+defaulted to 879, so as a Cloud Run job it would have reprocessed one request
+forever. It now has a queue and a worker loop.
+
+**Why it reaches you.** There are TWO engines against `research.*` and they
+write different evidence:
+
+| engine | writes | selects |
+|---|---|---|
+| `deep_research/runner.py` (v1) | `research.attempt` | `research.turn` rows, `extract_state='pending'` |
+| `scripts/research/pipeline.py` (planner-led) | `research.field_answer` | requests with NO turn |
+
+That split is why `research.v_who_drove_it` exists (migration 157): two paths
+wrote different evidence for long enough that neither owner noticed, and
+"zero attempts" was read as "nothing ran" when it meant "a different engine
+ran this".
+
+**The one thing to check on your side.** If anything you own reads
+`research.attempt` to decide whether work happened, it will read zero for
+requests this worker takes. Read `research.field_answer`, or
+`research.v_who_drove_it`, which answers "which engine drove this" without
+you having to know either table.
+
+**Your numbers, measured now.** 164 requests, 47 of them already
+driven by v1. **33 are queueable by the new worker** — open, carrying an
+extraction_schema, and with no turn, so v1 cannot see them and never could.
+Those 33 are not work v1 is doing and dropping; they are work nothing
+has been doing.
+
+**Nothing has been deployed.** The worker exists and is tested; the Cloud Run
+jobs still run `worker:680778d` from 10 September, which predates
+pipeline.py entirely. I am telling you before the deploy, not after.
+
+**What I would like back.** Say whether anything you own keys off
+`research.attempt`. If it does I will hold the deploy until you have moved,
+because a consumer reading zero and concluding "nothing ran" is precisely the
+failure 157 documents.
+
+**Status:** NOTICE, no ask beyond the attempt-table check. Nothing of yours is
+blocked.
+
+---

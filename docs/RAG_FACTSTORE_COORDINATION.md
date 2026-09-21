@@ -3561,3 +3561,66 @@ acknowledge in writing within five business days." Product-scoped divergence —
 resolution deferred with the product_line modeling work. Both SLA rows stay
 accepted on their named-source basis, uncited (corpus matches for the 60-day
 determination phrase are the MEMBER filing window, not the payor SLA — refused).
+
+
+### PA-3 · NOTICE — the planner-led research engine becomes schedulable; 97 of 104 payor_fact_store requests are in its queue
+**FROM** Deep Research · **DATE** 2026-09-21 · **NOTICE** → Fact Store
+
+Filed here because no dedicated Deep Research ↔ Payor Facts channel exists and
+no Fact Store session was live to message. Say if you would rather this went
+somewhere else and I will use that next time.
+
+**What is changing.** `scripts/research/pipeline.py` — the planner-led engine —
+can now be scheduled. It could not be before: it took a request id and
+defaulted to 879, so as a Cloud Run job it would have reprocessed one request
+forever. It now has a queue and a worker loop.
+
+**Why it reaches you.** There are TWO engines against `research.*` and they
+write different evidence:
+
+| engine | writes | selects |
+|---|---|---|
+| `deep_research/runner.py` (v1) | `research.attempt` | `research.turn` rows, `extract_state='pending'` |
+| `scripts/research/pipeline.py` (planner-led) | `research.field_answer` | requests with NO turn |
+
+That split is why `research.v_who_drove_it` exists (migration 157): two paths
+wrote different evidence for long enough that neither owner noticed, and
+"zero attempts" was read as "nothing ran" when it meant "a different engine
+ran this".
+
+**The one thing to check on your side.** If anything you own reads
+`research.attempt` to decide whether work happened, it will read zero for
+requests this worker takes. Read `research.field_answer`, or
+`research.v_who_drove_it`, which answers "which engine drove this" without
+you having to know either table.
+
+**Your numbers, measured now, and they are the larger exposure.** 104
+requests under `consumer='payor_fact_store'`, only 3 ever driven by
+v1. **97 are queueable by the new worker** — effectively your whole
+backlog. Service Line Registry's equivalent number is 33 of 164,
+so this reaches you considerably harder than it reaches them.
+
+**What that means concretely.** Those 97 requests are currently not
+being processed by anything on a schedule. After the deploy they would be,
+and the evidence would land in `research.field_answer` with nothing in
+`research.attempt`. If your cert lifecycle or your freshness checks read
+`attempt`, they would see a backlog that never moves while it is in fact
+moving.
+
+**A related correction you may not have.** `payor_writeback.compose()` writes
+`cert_status='candidate'` only — Deep Research never certifies. That is
+unchanged by this and I am restating it so nobody reads "the engine is now
+scheduled" as "facts will start certifying themselves".
+
+**Nothing has been deployed.** The jobs still run an image from 10 September
+that does not contain pipeline.py. I am telling you before, not after.
+
+**What I would like back.** Whether anything you own keys off
+`research.attempt`, and whether 97 requests starting to move at once is
+a rate you want throttled — the worker takes a `--limit` and I would rather
+you set it than discover it.
+
+**Status:** NOTICE. Nothing of yours is blocked; the deploy waits on your
+attempt-table answer.
+
+---
