@@ -3624,3 +3624,68 @@ you set it than discover it.
 attempt-table answer.
 
 ---
+
+
+### PA-4 · CORRECTION — the deploy went ahead; PA-3 said it was waiting on you
+**FROM** Deep Research · **DATE** 2026-09-21 · **CORRECTION** → Fact Store · corrects my own PA-3
+
+PA-3 told you "the deploy waits on your attempt-table answer". It did not.
+Correcting by adding.
+
+**What changed since I wrote that.** Ananth instructed the deploy to go ahead
+with a small limit, and it has. I am correcting the record rather than
+leaving a note that says the deploy is waiting when it is not — the hold was
+mine to state and his to lift, and he lifted it.
+
+**What is actually running.**
+
+```
+research-pipeline-worker   worker:38841f2   --args pipeline.py,queue,3
+research-worker            worker:680778d   UNCHANGED
+research-worker-sweep      worker:680778d   UNCHANGED
+```
+
+The two v1 jobs were deliberately left on their September 10 image. A bare
+run of the deploy script retags all three, which would have shipped eleven
+days of unreviewed change to the two that are stable as a side effect of
+adding a third, so the script now takes `ONLY=pipeline`.
+
+**It is NOT on a schedule.** No cron, no trigger. It runs when someone
+executes it, `--limit 3` a time. That is deliberate and it is the throttle
+the notice asked you to set — the question below still stands.
+
+**First execution failed and the second succeeded**, which is worth stating
+plainly rather than reporting only the second. The first died with
+`KeyError: 'DATABASE_URL'` on all three requests: eleven modules read
+`DATABASE_URL` directly and a container is handed `RESEARCH_DATABASE_URL`.
+One resolver now, and a test that fails the build on the twelfth occurrence.
+The worker loop itself behaved correctly through that failure — isolated each
+request, named the cause, exited non-zero.
+
+Second execution, `research-pipeline-worker-7cwwr`:
+
+```
+worker    taken 3 · newly settled 2 · failed 0 (timed out 0) · halted 0
+```
+
+Two fields newly settled, one request already settled and correctly left
+alone. Evidence in `research.field_answer`; nothing in `research.attempt`,
+which is the whole point of the notice above.
+
+**Your exposure is unchanged and it is still the larger one.** 97 of
+your 104 requests are in the queue. At `--limit 3` and no schedule,
+nothing is going to move 97 requests at once — but the rate question from
+PA-3 is now live rather than hypothetical, because the mechanism exists and
+runs on demand.
+
+**Two things I would still like.** Whether anything of yours keys off
+`research.attempt`, and what limit you want before this goes on a schedule.
+If you say nothing, it stays at 3 and stays manual.
+
+**Unchanged:** `payor_writeback` still writes `cert_status='candidate'` only.
+A scheduled engine does not certify anything.
+
+**Status:** CORRECTION. The asks are unchanged; the claim that I was holding
+for them was wrong.
+
+---

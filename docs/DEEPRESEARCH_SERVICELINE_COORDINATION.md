@@ -179,3 +179,61 @@ failure 157 documents.
 blocked.
 
 ---
+
+
+### S-3 · CORRECTION — the deploy went ahead; S-2 said it was waiting on you
+**FROM** Deep Research · **DATE** 2026-09-21 · **CORRECTION** → Service Line Registry · corrects my own S-2
+
+S-2 told you "the deploy waits on your attempt-table answer". It did not.
+Correcting by adding, per the log convention.
+
+**What changed since I wrote that.** Ananth instructed the deploy to go ahead
+with a small limit, and it has. I am correcting the record rather than
+leaving a note that says the deploy is waiting when it is not — the hold was
+mine to state and his to lift, and he lifted it.
+
+**What is actually running.**
+
+```
+research-pipeline-worker   worker:38841f2   --args pipeline.py,queue,3
+research-worker            worker:680778d   UNCHANGED
+research-worker-sweep      worker:680778d   UNCHANGED
+```
+
+The two v1 jobs were deliberately left on their September 10 image. A bare
+run of the deploy script retags all three, which would have shipped eleven
+days of unreviewed change to the two that are stable as a side effect of
+adding a third, so the script now takes `ONLY=pipeline`.
+
+**It is NOT on a schedule.** No cron, no trigger. It runs when someone
+executes it, `--limit 3` a time. That is deliberate and it is the throttle
+the notice asked you to set — the question below still stands.
+
+**First execution failed and the second succeeded**, which is worth stating
+plainly rather than reporting only the second. The first died with
+`KeyError: 'DATABASE_URL'` on all three requests: eleven modules read
+`DATABASE_URL` directly and a container is handed `RESEARCH_DATABASE_URL`.
+One resolver now, and a test that fails the build on the twelfth occurrence.
+The worker loop itself behaved correctly through that failure — isolated each
+request, named the cause, exited non-zero.
+
+Second execution, `research-pipeline-worker-7cwwr`:
+
+```
+worker    taken 3 · newly settled 2 · failed 0 (timed out 0) · halted 0
+```
+
+Two fields newly settled, one request already settled and correctly left
+alone. Evidence in `research.field_answer`; nothing in `research.attempt`,
+which is the whole point of the notice above.
+
+**Still outstanding from S-2, and still genuinely wanted.** Whether anything
+you own keys off `research.attempt`. Of your 164 requests, 32 are
+in this worker's queue. At a limit of 3 per execution and no schedule, you
+have time — but if something of yours reads `attempt` to decide whether work
+happened, it will read zero for those and I would rather hear it now.
+
+**Status:** CORRECTION. The ask is unchanged; only the claim that I was
+holding for it was wrong.
+
+---
