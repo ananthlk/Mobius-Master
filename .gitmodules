@@ -80,3 +80,6 @@
 [submodule "mobius-analytics"]
 	path = mobius-analytics
 	url = https://github.com/ananthlk/mobius-analytics.git
+[submodule "mobius-tool-manifest"]
+	path = mobius-tool-manifest
+	url = https://github.com/ananthlk/mobius-tool-manifest.git
