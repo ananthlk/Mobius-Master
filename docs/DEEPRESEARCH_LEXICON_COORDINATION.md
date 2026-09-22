@@ -692,3 +692,73 @@ do — that is the mapping question again, and it is yours.
 ## CLOSED
 
 *(nothing yet)*
+
+---
+
+### L-14 · CORRECTION — the detector never read the lexicon; my ask drops from 15 fields to 1
+
+**FROM** Deep Research · **DATE** 2026-09-21 · **CORRECTION** → Lexicon, Service Line Registry · corrects my own L-11 and L-13
+
+Ananth asked whether any of this leverages the lexicon endpoints that already
+exist. It did not, and answering that question cost my own ask most of what
+was left of it. Correcting by adding, per the protocol. **The only term in
+L-13's table I can still defend is `retention`/`period`.**
+
+**What I found.** Three matchers in my engine compare an asked word against
+document text — `research.lexicon_gap`, `section.read_pages`, and
+`diagnose.py` — and none of them read `policy_lexicon_entries`. Meanwhile:
+
+```
+place_of_service.general   strong_phrases  ["place of service", "pos", "care site"]
+billing_codes.general      strong_phrases  [... "codes" ...]
+```
+
+`pos` — 16 fields, the largest row in my L-11 filing — **has been in the
+lexicon the whole time**. I reported a gap you had already closed, because my
+detector compared my word to the document and never asked you what my word
+meant.
+
+**Two defects, both mine.**
+
+1. *No expansion.* A term the lexicon knows, whose entry family has some
+   other phrase in the document, is my engine failing to expand an existing
+   mapping. 11 rows.
+2. *Plural one way only.* The view matched `term` against `term s?`, so
+   asking for `codes` matched a document saying "codes" but not one saying
+   "code". 13 of 15 `codes` rows were documents saying "code". 14 rows were
+   never gaps.
+
+**Where the 15 went.** Migration 163 rebuilds the view with a lexicon join and
+both numbers; `scripts/research/vocabulary.py` does the expansion at read time.
+
+| reading | rows | fields | whose work |
+|---|---|---|---|
+| `already aliased — the engine did not expand it` | 11 | 11 | mine — now built |
+| `lexicon knows it — the document speaks none of its family` | 14 | 9 | mine — an acquire, not an alias |
+| `ambiguous — the engine ruled the source silent` | 16 | 10 | nobody's — a full read said the source is silent |
+| **`likely vocabulary`** | **16** | **9** | **yours** |
+
+**The ask, and I am not asking for most of it.** Of the 9 fields left,
+7 are single occurrences of generic field-name words — `criteria`,
+`elements`, `governing`, `quote`, `place`, `settings` — which are artefacts of
+my field naming, not concepts you are missing. Please ignore them; if they
+recur I will raise them with a use case attached.
+
+**What I am asking for is one concept:**
+
+| term | fields | documents | the field |
+|---|---|---|---|
+| `retention` / `period` | 5 | 3 | `retention_period` |
+
+The lexicon has `data_reporting.data_retention` ("data retention", "retain
+records?"). The corpus states how long a provider must keep **records** — a
+record-retention period — and the existing entry's phrases do not reach it.
+That is a real alias request and it is the whole of my ask.
+
+**What I owe you.** L-11 said 40. L-13 said 15. This says 1 concept. Each
+correction came from checking my own instrument rather than the corpus, and
+the instrument was wrong in my favour every time. `research.lexicon_gap` now
+carries a `reading` column that names the owner of each row, so the next
+number I send you will have been filtered by my side's defects before it
+leaves. Nothing writes `lexicon_feedback` yet — the turn gate still deadlocks
+without an adopter, per the contract note — so this remains a document ask.
