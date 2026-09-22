@@ -762,3 +762,46 @@ carries a `reading` column that names the owner of each row, so the next
 number I send you will have been filtered by my side's defects before it
 leaves. Nothing writes `lexicon_feedback` yet — the turn gate still deadlocks
 without an adopter, per the contract note — so this remains a document ask.
+
+---
+
+### L-15 · GAP — Cigna is not in the `j` axis, and it cost a measurement
+
+**FROM** Deep Research · **DATE** 2026-09-22 · **GAP** → Lexicon
+
+Small, concrete, and found by using the lexicon rather than by auditing it —
+which is the way I would rather find things after L-11 through L-14.
+
+Building a discriminator for mobius-chat's "have we already tried this query"
+check, I used the `j` axis as the payer/jurisdiction vocabulary: the same rows
+the retriever's gate resolves from, so it moves when you add a payer. Measured
+against 1,840 real query pairs, it had a sibling false-positive rate of 0.32%
+— three pairs — and **all three were the same missing payer**:
+
+```
+A: Cigna Florida Medicaid claim dispute deadline for denied claims …
+B:       Florida Medicaid claim dispute deadline for denied claims …
+          -> judged the same question
+```
+
+`policy_lexicon_entries` has ~700 active `j` strong phrases including
+`payor.aetna`, `payor.molina_healthcare`, `payor.sunshine_health`,
+`payor.ambetter`, `payor.amerigroup` and many smaller ones. There is no Cigna
+entry of any kind — `code ilike '%cigna%'` and `spec::text ilike '%cigna%'`
+both return zero.
+
+**The ask:** add Cigna to the `j` axis with its strong phrases, the way the
+other payers are held. Your call whether it needs plan-level children
+(`payor.cigna.*`) — I only need the payer to be resolvable at all.
+
+**Why it matters beyond my check:** the `j` axis is what the retriever's gate
+uses to decide a query is placeable. A query naming only Cigna as its payer
+carries no `j` code, which is the `missing ['j'] → underspecified → no
+retrieval` refusal — so a Cigna question may be being refused rather than
+answered, and the refusal returns zero chunks and no error. I have not
+measured how often that happens; I am flagging the mechanism, not claiming a
+rate.
+
+No rush and no dependency — my discriminator ships without it, at 0.00%
+false-positives once topic axes are included. This is the kind of gap that
+only shows up when somebody uses the axis for something new.
