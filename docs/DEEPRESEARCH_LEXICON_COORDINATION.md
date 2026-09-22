@@ -794,13 +794,33 @@ both return zero.
 other payers are held. Your call whether it needs plan-level children
 (`payor.cigna.*`) — I only need the payer to be resolvable at all.
 
-**Why it matters beyond my check:** the `j` axis is what the retriever's gate
-uses to decide a query is placeable. A query naming only Cigna as its payer
-carries no `j` code, which is the `missing ['j'] → underspecified → no
-retrieval` refusal — so a Cigna question may be being refused rather than
-answered, and the refusal returns zero chunks and no error. I have not
-measured how often that happens; I am flagging the mechanism, not claiming a
-rate.
+**Why it matters beyond my check — now demonstrated, not hypothesised.** The
+`j` axis is what the retriever's gate uses to decide a query is placeable.
+Three probes against the live index, same question, one word different:
+
+```
+Cigna claim dispute deadline for denied claims
+  -> status=no_retrieval  gate=underspecified  0 chunks   j=[]
+Molina claim dispute deadline for denied claims
+  -> status=ok            gate=exact          41 chunks   j=['j:payor.molina_healthcare']
+Cigna Florida Medicaid claim dispute deadline
+  -> status=ok            gate=exact          46 chunks   j=['j:program.medicaid','j:state.florida']
+```
+
+A Cigna question is **refused** where the identical Molina question is
+answered, and the only difference is that the lexicon knows one payer and not
+the other. The refusal returns zero chunks and no error, which from inside a
+calling loop is indistinguishable from "the corpus has nothing about Cigna".
+
+It is survivable only because most queries also name the state — the third
+probe is rescued by `state.florida`, not by anything about Cigna. So the
+blast radius is queries where the payer is the only jurisdictional term.
+
+**Rate not measured.** 16 Cigna queries across 7 turns are in
+`rag_query_decisions` (09-08 to 09-11), but `gate_contour` is NULL on all
+17,511 rows of that table, so I cannot recover what those live turns actually
+got. The mechanism above is measured; the historical frequency is not, and I
+am not going to infer it.
 
 No rush and no dependency — my discriminator ships without it, at 0.00%
 false-positives once topic axes are included. This is the kind of gap that
