@@ -65,6 +65,9 @@ services:
   # filed against their module), so a cold-start timeout is invisible in
   # data. EXPLICIT HOLD: keep min=1 until mobius-f2 separates those signals;
   # only then does min=0 become a measurable trade instead of a blind one.
+  # COUPLING: deploy/deploy_cloudrun_dev.sh:108 duplicates 1..2 at revision
+  # level — correct today, but it will silently reassert these numbers after
+  # any stanza change. Change the script IN THE SAME COMMIT as this stanza.
   mobius-payor:                {mode: pinned, min: 1, max: 2, note: "quality floor + EXPLICIT HOLD for mobius-f2 signal fix, see comment"}
   # min=1 REQUIRED (correctness, not cost): chat's message PHI gate calls
   # /message-check with a 4s timeout (mobius-chat app/api/chat.py:247) and is
@@ -83,7 +86,16 @@ services:
   # Both are CORRECTNESS constraints, not tuning. cpu-throttling stays false
   # (background thread needs CPU between requests).
   mobius-web-scraper-worker:   {mode: pinned, min: 1, max: 1, note: "CRAWLER AGENT owns — min=1 poll-loop floor, max=1 politeness invariant §48; 1c/512Mi since Sep 8 (I/O-bound, Crawler-approved); apply only when idle (SIGTERM kills a live crawl)"}
-  mobius-org-agent:            {mode: standby}
+  # ARMED CONFLICT (Sep 23, Deep Research's find) — owner adjudication pending:
+  # deploy dev.env pins min=1 + no-cpu-throttling citing "/org/setup background
+  # discovery/provision task survives past the HTTP response" — an in-process-
+  # background CORRECTNESS claim (the mobius-rag pattern). This stanza's min=0
+  # came from the Sep 7 cost pass made WITHOUT that knowledge. Live has run 0
+  # for 16 days (tiny traffic; /org/setup likely unexercised). Org Agent seat
+  # asked to rule: if the task is real and long-running, this becomes pinned
+  # min=1; if it moved out-of-process or completes <15min, dev.env drops to 0.
+  # Until ruled, a deploy-created drift is EXPLAINED, not an accident.
+  mobius-org-agent:            {mode: standby, note: "min=0 vs owner's dev.env pin — adjudication pending, see comment"}
   mobius-task-manager:         {mode: active, max: 5}
   mobius-db-agent:             {mode: standby, max: 1}
   mobius-google-search:        {mode: active}
@@ -108,4 +120,8 @@ services:
   # Throttled CPU -> the warm floor bills at the idle SKU, ~$10/mo.
   mobius-deep-research:        {mode: pinned, min: 1, max: 3, note: "quality floor vs chat 4s fail-open caller, see comment; /research/ask user-facing"}
   mobius-verify-claims:        {mode: standby, note: "new Sep 13, 1c/512Mi — registered by fleet sweep; owner: adjust mode + add what-breaks-at-0 note if a floor is ever needed"}
+  # Owner-documented LATENCY floor (deploy script header: trap-aware, measured
+  # 6.3s cold start vs 240ms query; deliberately revision-level so each deploy
+  # reasserts it). Registered to match owner intent; throttled -> ~$10/mo idle.
+  mobius-analytics:            {mode: pinned, min: 1, max: 4, note: "LATENCY floor, owner-measured (6.3s cold vs 240ms query); shares SQL instance w/ rag"}
   mobius-vibe:                 {mode: "off"}
