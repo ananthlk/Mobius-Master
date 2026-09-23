@@ -112,13 +112,23 @@ services:
   mobius-doc-reader:           {mode: standby}
   mobius-dbt-ui:               {mode: standby}
   mobius-org-intelligence:     {mode: "off"}
-  # min=1 is a QUALITY floor (fail-open, silent): mobius-chat calls a
-  # deep-research endpoint synchronously in live chat turns with a 4s
-  # timeout, failing open; cold start measured at 1.2-5.1s (4/23 over 4s,
-  # 40 cold starts/7d — Deep Research seat's measurement, Sep 23), so at
-  # min=0 an idle period silently drops the next turn's critic call.
-  # Throttled CPU -> the warm floor bills at the idle SKU, ~$10/mo.
-  mobius-deep-research:        {mode: pinned, min: 1, max: 3, note: "quality floor vs chat 4s fail-open caller, see comment; /research/ask user-facing"}
+  # min=1 is a QUALITY floor (fail-open, silent) — RE-RULED Sep 23 PM after
+  # the endpoint changed category: chat v2 now calls POST /validate once per
+  # turn when the model first claims completion, and the response BUYS a
+  # round (steers the loop, no longer advisory). Still fail-open at 4s, so
+  # the consequence class is unchanged — silent quality loss, not
+  # correctness — but the stakes rose and the loss is now UNCOUNTABLE in a
+  # second way: a dropped call ≡ "nothing to buy"; no path records the
+  # counterfactual (the payor pattern). The countable signal (distinguish
+  # call-failed from nothing-to-buy in the loop's telemetry) belongs to the
+  # chat/deep-research seam, not to capacity; when it exists, any future
+  # min=0 debate becomes measurable. Cold start 1.2-5.1s vs the 4s budget
+  # remains the floor's justification. CPU shape 1c/512Mi CONFIRMED right:
+  # in-turn load degraded to 12s not from CPU shortage but an owner-side
+  # regex scan since 10x'd (0.21s mean/0.38s worst vs 4s budget) — precedent:
+  # capacity asks come with a profile; the first honest answer to "more CPU?"
+  # was "my code was wasting it."
+  mobius-deep-research:        {mode: pinned, min: 1, max: 3, note: "QUALITY floor, steers chat loop mid-turn since Sep 23 (buys rounds, fail-open 4s); loss uncountable — signal fix owned by chat/DR seam"}
   mobius-verify-claims:        {mode: standby, note: "new Sep 13, 1c/512Mi — registered by fleet sweep; owner: adjust mode + add what-breaks-at-0 note if a floor is ever needed"}
   # Owner-documented LATENCY floor (deploy script header: trap-aware, measured
   # 6.3s cold start vs 240ms query; deliberately revision-level so each deploy
