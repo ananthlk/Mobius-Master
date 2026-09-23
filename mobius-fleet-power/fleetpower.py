@@ -268,14 +268,22 @@ def cmd_status(m: dict, args) -> int:
 
 
 def plan_changes(m: dict, live: dict) -> list[dict]:
+    """Diff manifest vs live. Two kinds of change:
+    - effective correction: the running min/max differs from the target;
+    - durability assertion: the effective value agrees but only via a
+      REVISION annotation, which the next deploy replaces. A floor that
+      fleet.yaml claims must live at the SERVICE level or it is an illusion
+      (found by the analytics seat, Sep 23: apply skipped a pinned service
+      because a deploy flag already supplied eff_min, so removing that flag
+      per our own guidance would have silently dropped the floor to 0).
+    Service-level --min/--max are annotation-only: no new revision, safe
+    even on the crawler's SIGTERM-sensitive worker."""
     changes = []
     for name, entry in m["services"].items():
         cfg = live.get(name)
         if cfg is None:
             continue
         t = entry["target"]
-        if cfg["eff_min"] == t["min"] and cfg["eff_max"] == t["max"]:
-            continue
         # The revision-level floor can only be lowered by a new revision.
         needs_redeploy = (cfg["rev_min"] or 0) > t["min"]
         flags = []
@@ -283,14 +291,19 @@ def plan_changes(m: dict, live: dict) -> list[dict]:
             if needs_redeploy:
                 flags += [f"--min-instances={t['min'] if t['min'] else 'default'}"]
             flags += [f"--min={t['min'] if t['min'] else 'default'}"]
-        if cfg["eff_max"] != t["max"]:
+        elif t["min"] > 0 and cfg["svc_min"] != t["min"]:
+            flags += [f"--min={t['min']}"]
+        if cfg["svc_max"] != t["max"]:
             flags += [f"--max={t['max']}"]
+        if not flags:
+            continue
         changes.append({
             "service": name,
             "from": f"{cfg['eff_min']}..{cfg['eff_max']}",
             "to": f"{t['min']}..{t['max']}",
             "flags": flags,
-            "needs_redeploy": needs_redeploy,
+            "needs_redeploy": needs_redeploy and cfg["eff_min"] != t["min"],
+            "durability_only": cfg["eff_min"] == t["min"] and cfg["eff_max"] == t["max"],
         })
     return changes
 
@@ -306,6 +319,8 @@ def cmd_apply(m: dict, args) -> int:
         cmd = ["gcloud", "run", "services", "update", ch["service"],
                "--project", m["project"], "--region", m["region"], *ch["flags"]]
         tag = " (creates new revision)" if ch["needs_redeploy"] else ""
+        if ch.get("durability_only"):
+            tag = " (durability: asserting service-level annotation, effective value unchanged)"
         print(f"{ch['service']}: {ch['from']} -> {ch['to']}{tag}")
         if args.dry_run:
             print("  would run:", " ".join(cmd))
