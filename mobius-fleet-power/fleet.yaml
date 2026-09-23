@@ -123,5 +123,12 @@ services:
   # Owner-documented LATENCY floor (deploy script header: trap-aware, measured
   # 6.3s cold start vs 240ms query; deliberately revision-level so each deploy
   # reasserts it). Registered to match owner intent; throttled -> ~$10/mo idle.
-  mobius-analytics:            {mode: pinned, min: 1, max: 4, note: "LATENCY floor, owner-measured (6.3s cold vs 240ms query); shares SQL instance w/ rag"}
+  # TIER QUESTION (Sep 23, from Analytics seat): chat's planner can now call
+  # ask_claims_analytics MID-TURN, so a cold start lands inside a user's turn
+  # (the deep-research caller shape). Whether this is LATENCY (chat waits) or
+  # QUALITY (chat times out fail-open, silently loses the call) depends on
+  # chat's timeout semantics for this path — unverified; floor held either way.
+  # As of e2f4a74 this service's deploy script passes NO capacity flags:
+  # first fully manifest-governed module. fleet.yaml is the only author.
+  mobius-analytics:            {mode: pinned, min: 1, max: 4, note: "floor owner-measured (6.3s cold vs 240ms); tier LATENCY-or-QUALITY pending chat timeout semantics, see comment"}
   mobius-vibe:                 {mode: "off"}
