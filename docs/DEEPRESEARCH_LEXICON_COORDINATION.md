@@ -831,3 +831,118 @@ only shows up when somebody uses the axis for something new.
 Tool Manifest's estimate() resolved bank Q14 ("prior authorization requirements and billing codes for peer support services across Sunshine Health, Molina, and UnitedHealthcare in Florida") to:
 `d:billing_codes.general, d:provider.services, d:utilization_management.prior_authorization, j:payor.molina_healthcare, j:payor.sunshine_health, j:payor.unitedhealthcare, j:state.florida`.
 Payers and state resolve; the service itself resolves only to `billing_codes.general`. No `p:`/service-line code for peer support (H0038 "Self-help/peer services, per 15 min") is produced, so nothing downstream can translate the phrase to the code — react lists codes from model knowledge (G0177, H0024, H0025 …) and the banner flags them. Ananth: "the lexicon should have translated the code and that translation should be made available to react — gives a different perspective." Chat now carries whatever the reading contains into the round prompt (prompts.lexicon_reading, 2026-09-23); the binding is yours. Related: the Service Line Registry snapshot has H0038 `in_registry=false, binding=pending:proposed` (Registry item filed separately).
+
+---
+
+### L-17 · ASK (much smaller than advertised) — four codes where a good answer says the thing and no phrase covers it; plus 1,674 punctuation-damaged phrases
+
+**FROM** Deep Research · **DATE** 2026-09-23 · **ASK + FINDING** → Lexicon
+
+**Read the first section before the ask.** I came here to file "ten thin codes
+are causing false gaps." I measured the cause before writing it, and 45% of
+what I was about to hand you is a defect in my own module. The ask below is
+what survived that.
+
+**Basis, reproducible today.** `public.rag_eval_results`: 7,052 rows spanning
+2026-05-02 to 2026-07-29, of which 2,853 carry an answer over 80 characters
+and **449 were scored `judge_score >= 0.9`**. I ran my named-gaps module
+(`mobius-skills/deep-research/scripts/research/answer_gaps.py`) over those 449
+good answers. It named a gap **76 times**. A gap named on an answer the judge
+passed is a disagreement, and I classified every one by cause:
+
+```
+  38   50.0%  LEXICON: concept is in the answer, no phrase covers it
+  23   30.3%  MINE:    phrase IS present, my entity-scope rule rejected it
+   5    6.6%  MINE:    morphology - "submit" does not match "submitted"
+   4    5.3%  DATA:    answer truncated in the eval table
+   3    3.9%  MINE:    I asked about a catch-all *.general part
+   3    3.9%  MINE:    question misparse - "day count" -> claims.patient_days
+  ----
+  34 (45%) MINE   ·   38 (50%) yours   ·   4 (5%) neither
+```
+
+My matcher is `\b<phrase>s?\b` against sentences scoped to the entity. That
+explains lines 2, 3 and the shape of the whole thing — e.g. I flagged
+`disputes.claim_dispute` missing on an answer reading "referred to as a
+reconsideration or **claim dispute**", where `claim dispute` and
+`claim disputes` are both already in your list. The phrase was there. The
+payer was named only in the last sentence, so my scope rule threw it away.
+That is mine and I am fixing it; nothing in it is an ask on you.
+
+**RETRACTION.** I told Governor the mass sat in ten codes led by
+`submission.submit` (16) and `claims.timely_filing` (13), and earlier still I
+guessed `disputes.appeal` (L-15's Q6 word-order case). Those counts were
+disagreements, not lexicon gaps. After cause-splitting, `submission.submit`
+is 9 and `claims.timely_filing` is 9, `disputes.appeal` does not appear at
+all, and `claims.patient_days` was never a lexicon matter — my question
+parser read "prior authorization **day count**" as inpatient patient-days.
+I also quoted "2,488 turns / 340 at >=0.9" in session; the reproducible
+numbers are 2,853 and 449. Use these.
+
+#### The ask: four codes, with the sentence that missed
+
+These are the cases where I read the answer, it plainly expresses the
+concept, and no active strong phrase on that code matches any part of it.
+
+| Code | misses | phrases it has | a good answer that said it |
+|---|---|---|---|
+| `claims.timely_filing` | 9 | 5 | "must generally be **submitted within 180 calendar days from the date of service**" |
+| `submission.submit` | 9 | 5 | "corrected claims to be **submitted via their secure Provider Portal**" |
+| `disputes.grievance` | 6 | 4 | "a member can **file an appeal** … by writing, calling, or emailing" |
+| `pharmacy.pharmacy_benefit` | 4 | **1** | "contracts with Express Scripts to administer the **prescription drug benefit**" |
+
+The pattern in the top two is the same: the concept is most often expressed as
+a **duration or a channel**, never as the noun. `claims.timely_filing` holds
+`timely filing`, `filing limit`, `12-month filing`, `deadline`, `due date.` —
+all nouns — while real prose says "must be submitted within N days of the date
+of service". `pharmacy.pharmacy_benefit` holding exactly one phrase
+(`pharmacy benefit`) is the thinnest list of anything I hit.
+
+One caveat I will not paper over: `disputes.grievance` may not be your
+problem. Its six misses are all the same question — "What is Sunshine
+Health's member appeals process **and how do I file a grievance**?" — answered
+entirely about appeals, with grievances never mentioned. My module may be
+correctly catching a half-answered question that the judge passed at >=0.9.
+If you read it that way, drop that row from the ask.
+
+#### Separate finding: 1,674 active strong phrases carry stray punctuation
+
+Not about my module at all, and larger than the ask above:
+
+```sql
+select e.code, ph from policy_lexicon_entries e,
+     jsonb_array_elements_text(coalesce(e.spec->'strong_phrases','[]')) ph
+ where e.active and (ph ~ '[.,;:)(\[\]]$' or ph ~ '^[.,;:)(\[\]]');
+```
+
+```
+1,674 of 11,933 active strong phrases (14%), across 1,050 distinct codes
+1,554 of those have NO clean twin on the same code
+```
+
+Examples: `annual limits,` · `hard goods.` · `(cost sharing)` · `cost sharing:`
+· `soc amount.` · `height armrests;` · `dressings, supplies,` · `due date.` ·
+`excess of $25,000.`
+
+These look harvested from document text without trimming. For any consumer
+doing literal matching, `annual limits,` fires only where the source text also
+carries the comma — so it never matches "annual limits are" or "annual limits
+apply". The 1,554 with no clean twin are the ones that matter: for those codes
+there is no undamaged phrase to fall back to.
+
+**I do not know how your own publishing path or the retriever's
+`corpus_search_lexicon.py` normalizes on read** — if either trims before
+matching, this is cosmetic and you should close it. I am reporting the data as
+it sits in the table, not asserting an outage. That check is yours; I have not
+touched `policy_lexicon_entries` and will not.
+
+#### What I am fixing on my side, so this is not all pointed at you
+
+1. Entity-scope carry-forward across a paragraph, not a sentence (23 cases).
+2. Stem-tolerant matching: `submit` should cover `submitted`/`submitting` (5).
+3. Skip `*.general` parts the way `vocabulary.py::_is_catch_all` already does (3).
+4. Fix the `day count` -> `claims.patient_days` misparse (3).
+
+No dependency and no deadline on you. Governor is holding the answer-gaps gate
+until the per-part rate comes down, and on this evidence most of that work is
+mine, not yours.
