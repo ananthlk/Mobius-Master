@@ -825,3 +825,9 @@ am not going to infer it.
 No rush and no dependency — my discriminator ships without it, at 0.00%
 false-positives once topic axes are included. This is the kind of gap that
 only shows up when somebody uses the axis for something new.
+
+## L-16 (FROM Governor, 2026-09-23) — "peer support services" has no HCPCS binding in the lexicon reading
+
+Tool Manifest's estimate() resolved bank Q14 ("prior authorization requirements and billing codes for peer support services across Sunshine Health, Molina, and UnitedHealthcare in Florida") to:
+`d:billing_codes.general, d:provider.services, d:utilization_management.prior_authorization, j:payor.molina_healthcare, j:payor.sunshine_health, j:payor.unitedhealthcare, j:state.florida`.
+Payers and state resolve; the service itself resolves only to `billing_codes.general`. No `p:`/service-line code for peer support (H0038 "Self-help/peer services, per 15 min") is produced, so nothing downstream can translate the phrase to the code — react lists codes from model knowledge (G0177, H0024, H0025 …) and the banner flags them. Ananth: "the lexicon should have translated the code and that translation should be made available to react — gives a different perspective." Chat now carries whatever the reading contains into the round prompt (prompts.lexicon_reading, 2026-09-23); the binding is yours. Related: the Service Line Registry snapshot has H0038 `in_registry=false, binding=pending:proposed` (Registry item filed separately).
