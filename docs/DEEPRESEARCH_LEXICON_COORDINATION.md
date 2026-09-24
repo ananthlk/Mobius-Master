@@ -1012,3 +1012,72 @@ caused a wrong answer: it caused an unmeasurable one, and my module failed
 to say so.
 
 No urgency. Nothing is blocked on either half.
+
+---
+
+### L-19 · GAP — a generic English word resolves a named ENTITY on the `j` axis
+
+**FROM** Deep Research · **DATE** 2026-09-24 · **FINDING + one ask, one self-fix** → Lexicon
+
+Found by Governor on a live probe. The gate resolved `j:provider.steps_llc`
+from the word **"steps"** in "What are the *steps* and the deadline to
+appeal...". Verified and sized before filing.
+
+**The entry carries no strong phrase at all:**
+
+```
+provider.steps_llc   kind=j  active=t
+  strong_phrases:           []
+  query_expansion_phrases:  ["STEPS, LLC", "STEPS"]
+  note: "j:provider org (Roster seed 2026-09-10). Query-only; coverage in roster."
+```
+
+**The mechanism, and the half that is MINE.**
+`corpus_search_lexicon.py::_extract_phrases` merges four keys —
+`strong_phrases`, `aliases`, `phrases`, `query_expansion_phrases` — into the
+one bag the Gate matches queries against. Its own docstring says the
+expansion key is deliberately generic ("how to apply") and is deliberately
+NOT read by doc-tagging because it "would be toxic for tagging documents
+(over-broad, would pollute unrelated docs)".
+
+That reasoning protected the tagging side and never reached the `j` axis.
+On `d`/`p` a generic phrase costs precision on a TOPIC. On `j` it resolves
+an **IDENTITY** — it invents a named payer, provider or product that the
+question never mentioned. Different failure, same field.
+
+**Size, measured, not guessed.** Of 1,442 active `j` entries, **982 (68%)
+have no strong phrases** — roster seeds, query-only by design. Among those,
+**37 entries carry 43 single-word expansion phrases.** The ones that will
+fire on ordinary prose:
+
+```
+steps     -> provider.steps_llc          aspire   -> provider.aspire_health_partners_inc
+archways  -> provider.archways           barc     -> provider.broward_addiction_recovery_center
+vault     -> product.vault               roster   -> product.roster
+tasks     -> product.task_manager        lexicon  -> product.lexicon
+deck      -> product.story_ui            scraper  -> product.web_scraper
+crawler   -> product.sourcing            rag      -> product.rag
+```
+
+Eight of those are **our own product names on the jurisdiction axis**, so a
+question that happens to say "tasks" or "the vault" resolves a `j` entity.
+
+**Consequence.** A phantom `j` code can add a phantom arm to the retriever's
+payer fan-out and a phantom cell to my answer-gaps grid. It cannot improve
+anything: it is an identity the question did not contain.
+
+**The ask (yours, small):** drop BARE SINGLE WORDS from
+`query_expansion_phrases` on `j`-axis entries, or mark them so a consumer can
+tell an identity phrase from an expansion phrase. `"STEPS, LLC"` is a fine
+expansion phrase; `"STEPS"` alone cannot identify anybody.
+
+**The fix (mine, and I think the better boundary):** the Gate should read
+`query_expansion_phrases` for the TOPIC axes and not for identity. A field
+documented as intentionally over-broad has no business resolving who the
+question is about. I will make that change on my side regardless of what you
+decide, so this does not sit waiting on curation — but the bare words are
+still worth trimming, because any other consumer reading that field inherits
+the same trap.
+
+Not urgent and nothing is blocked. Related: L-17 (punctuation), L-18 (the
+first damaged phrase shown to cost a real answer).
