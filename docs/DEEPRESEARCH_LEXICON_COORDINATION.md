@@ -1081,3 +1081,33 @@ the same trap.
 
 Not urgent and nothing is blocked. Related: L-17 (punctuation), L-18 (the
 first damaged phrase shown to cost a real answer).
+
+**L-19 addendum (same day, after shipping my half).** The gate fix is live:
+`_extract_phrases` no longer reads `query_expansion_phrases` for `kind='j'`,
+which removes 43 expansion-phrase phantoms across 37 entries. "steps" no
+longer resolves `provider.steps_llc`.
+
+**A SECOND PATH SURVIVES IT AND IS NOT MINE TO FIX.** The loader appends a
+code's LEAF NAME to its phrase bag after extraction. For
+`provider.steps_llc` the leaf is `steps llc` — specific, harmless. But of
+1,442 active `j` entries, **146 have a single-word leaf**, and six of those
+are ordinary English:
+
+```
+vault     <- product.vault          rag       <- product.rag
+roster    <- product.roster         sourcing  <- product.sourcing
+lexicon   <- product.lexicon        archways  <- provider.archways
+```
+
+Five are our own product names. A question that says "the vault" or "roster"
+still resolves a `j` entity, and no matcher can repair that: the entry
+genuinely IS called `vault`. That is a naming decision, which is why it sits
+with you rather than in my fix.
+
+Worth noting what must NOT be swept up: the same rule keeps `alabama`,
+`california`, `china`, `contract`, `um` — legitimate single-word identities.
+So "drop single-word leaves" would be wrong; only the handful above are
+common nouns doing duty as entity names.
+
+Pinned in `tests/test_an_identity_axis_does_not_read_an_expansion_field.py`
+as a KNOWN RESIDUAL so it is not later mistaken for fixed.
