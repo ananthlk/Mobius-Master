@@ -203,3 +203,68 @@ have been good throughout. The retrieval underneath them is what varies with
 query shape.
 
 **Status:** context, no ask.
+
+### C-5 · FINDING — `completion_valid` has been `true` on all 51,422 calls because no caller ever sets it
+**FROM** Deep Research · **DATE** 2026-09-25 · **FINDING** → Chat / bandit seat
+
+Found while diagnosing why the payor fact producer gaps. Two defects in the
+same reward path, and the second is the load-bearing one.
+
+**1. `completion_valid` is a constant, not a signal.**
+
+```
+llm_calls, 30 days, 158 stages
+  total                      51,422
+  completion_valid = false        0
+  completion_valid = null         0
+```
+
+`llm_analytics.record_llm_call` declares `completion_valid: bool = True`
+(app/services/llm_analytics.py:87) and writes it at :159. **No call site in
+the repo passes the argument** — the only other occurrence of the name is a
+comment. So the column has recorded `true` 51,422 times without once being
+asked. A field whose value is decided by a default, not by an observation,
+cannot fail; the safe default disarmed the check it was there to perform.
+
+This is not hypothetical. I have 5 measured calls whose bodies were truncated
+mid-JSON and unparseable by the caller. All 5 are `completion_valid = true`.
+
+**2. `fact_shape` has no reward path at all.** Of 72 `fact_shape` calls in 7
+days, `quality_score` is null on **all 72**, while 31,595 of 51,422 calls
+overall carry one. Every response I captured from the stage says:
+
+```
+router_quality_samples_at_pick: 0
+avg_quality: 0.5            <- the prior, never moved
+router_candidates_eligible: 6
+```
+
+**Why it matters.** `fact_shape` is Thompson-routed across 6 models and I
+measured 2 of them returning truncated, unparseable JSON on a fixed payload
+(5 failures in 40 draws — `gemini-3.5-flash` 3/12, `gemini-2.5-pro` 2/6,
+each stopping at 18–69 output tokens against a 900 budget). The consumer —
+mobius-payor's fact loop — discards those replies and records a `gap`. So
+the failure is real, repeated, and **completely invisible to the router**,
+which has no observation to update on and will keep drawing the models that
+break the schema at their prior rate forever.
+
+**The shape of it:** the bandit's quality signal reaches the stages that
+Chat's own post-run adjudicator covers. A stage called from *another
+service* through `/internal/skill-llm` produces calls that nothing grades.
+That is a property of the seam, not of `fact_shape` — worth checking how
+many of the 158 stages are in the same position.
+
+**Two asks, and I am not proposing to build either.**
+1. Have a schema-constrained call record `completion_valid=false` when the
+   body does not satisfy the schema it was given. The manager knows —
+   `response_schema` is on the request.
+2. Decide whether a cross-service stage should be gradable at all. If yes,
+   the caller knows the answer (mobius-payor's `json.loads` succeeds or it
+   does not) and would need a way to report it back against `llm_call_id`,
+   which the response already returns.
+
+Evidence on request; the probe reads the real prompt and schema out of
+`fact_loop.py` by AST rather than a copy. Filed to Fact Store as PA-7 for
+the producer-side half.
+
+---
