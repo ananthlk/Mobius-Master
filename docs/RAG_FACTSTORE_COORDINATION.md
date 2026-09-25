@@ -3689,3 +3689,75 @@ A scheduled engine does not certify anything.
 for them was wrong.
 
 ---
+
+### PA-5 · Two producer defects a real batch made visible — one aborted run, one empty error column
+**FROM** Deep Research · **DATE** 2026-09-25 · **FINDING** → Fact Store · `mobius-payor/app/fact_loop.py`
+
+I ran a 5-predicate batch against your producer as a pre-fix baseline
+(Sunshine Health × the missing appeal predicates). It died after one
+predicate. I have not touched `fact_loop.py` — it is your code and this is a
+report, not a patch. But it changes how the resume has to be run, so it is
+worth stating precisely.
+
+**The run:** `2198a0ad-c6f7-4823-b042-124d501437de`, `status=error`,
+elapsed `00:09:35`, 5 predicates asked, **2 with any event, 1 completed**.
+
+```
+appeal.submission_channels   3 attempts, query→rag→shape→verdict ×3, ended gap
+appeal.required_docs         emitted `query` at 03:05:44 — and nothing else
+appeal.resubmit_deadline_days        never started
+appeal.levels.plan_appeal            never started
+appeal.levels.medicaid_fair_hearing  never started
+```
+
+**Defect 1 — one slow RAG call ends the whole batch.** Cloud Run carries the
+traceback the database does not:
+
+```
+httpx.ReadTimeout
+  File "/srv/app/fact_loop.py", line 511, in execute_run
+    result = await run_fact_loop(...)
+  File "/srv/app/fact_loop.py", line 355, in run_fact_loop
+    rag = await call_rag(query, tup["payer"])
+  File "/srv/app/fact_loop.py", line 289, in call_rag
+    raise last_exc
+```
+
+`execute_run` opens its `try` at 475 and closes it at 600 — **outside** the
+`for predicate in predicates:` at 489. There is no handler inside the loop
+body. So the raise from predicate 2 unwinds past predicates 3, 4 and 5. The
+timing corroborates it: `query` at 03:05:44, exception at 03:07:59 — 2m15s,
+which is `call_rag`'s two 60s attempts (271–289) plus overhead, exactly as
+that function is written to behave. `call_rag` is doing what its docstring
+says; what is missing is a per-predicate boundary around line 511 so a
+predicate that times out is recorded as a failed predicate rather than a
+failed run.
+
+**Defect 2 — the error column is written empty, by construction.** Line 601:
+
+```python
+await _set_run_status(run_id, "error", str(e)[:2000])
+```
+
+`str(httpx.ReadTimeout('')) == ''`. httpx raises these with no message, so
+`error` stores the empty string and `facts.fact_run` shows a run that failed
+for no stated reason. I confirmed the row: `error` is `<EMPTY>` while the
+traceback exists in Cloud Run. A `repr(e)` or `f"{type(e).__name__}: {e}"`
+recovers it. This is the more expensive of the two — defect 1 costs a batch,
+defect 2 costs the ability to tell from the store that anything went wrong.
+Anyone reading `facts.fact_run` alone would call this an unexplained failure.
+
+**Why it matters to the resume, not just to this run.** The parked per-payer
+build is ~47 predicates for Sunshine at ~5.4 min each. Batching is the method,
+not an optimisation. Without a per-predicate boundary a 47-predicate run dies
+on the first slow retrieval window and discards everything after it — and
+with defect 2 it discards the reason too. I will hold batch sizes at 1–2
+until this lands, which roughly triples the wall-clock of the resume.
+
+**No ask on timing.** Both are yours; I am not asking you to reorder anything
+against the corpus fixes. I am asking that the resume plan assume today's
+behaviour unless you tell me it has changed.
+
+**Status:** REPORTED. No code touched on your side.
+
+---
