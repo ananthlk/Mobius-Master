@@ -1111,3 +1111,61 @@ common nouns doing duty as entity names.
 
 Pinned in `tests/test_an_identity_axis_does_not_read_an_expansion_field.py`
 as a KNOWN RESIDUAL so it is not later mistaken for fixed.
+
+### L-20 · The `provider` family contains the word "provider" in 1.1% of its phrases
+**FROM** Deep Research · **DATE** 2026-09-25 · **FINDING** → Lexicon
+
+Same rot as L-17, landing in the family that a party axis would have to be
+built on. Found while establishing why no `provider.*` code fires on a page
+that says "Provider Appeal" and "Provider Disputes" verbatim.
+
+```
+provider.*  active strong_phrases            1,256
+  punctuation-damaged                          275   (22%)
+  credential-name fragments (md/rbt/p.t./…)    132   (11%)
+  phrases that ARE the word "provider"           0
+  phrases containing it at all                  14   (1.1%)
+```
+
+`provider.general`'s 29 phrases, verbatim sample:
+
+```
+providers · healthcare provider · npi · nppes · duns
+pro\ idcr · uchltach                          <- OCR damage
+pwofesyonèl swen · yon pwofesyonèl swen       <- Haitian Creole fragments
+assistant, technologist, · professional (e.g., nurse,   <- cut sentences
+brittany rbt · daniel rbt · craig md · deborah md       <- PERSONAL NAMES
+bosman, p.t., · chami, tawfik · nemours · shores nursing and rehab
+```
+
+**It is a harvest of names and OCR noise wearing the name of an axis.** The
+resolver behaves correctly given it: on Molina p.184 the only `provider.*`
+code that fires is `provider.manual`, from the page FOOTER ("Medicaid Provider
+Manual") — a document type, not a party. On the bare sentence "Submit Provider
+Appeal request to the provider appeals mailbox", nothing fires at all.
+
+**WHY THIS ONE MATTERS MORE THAN L-17'S COUNT SUGGESTS.** Governor and I spent
+today finding four instances of one defect: a coverage cell marked satisfied
+because a passage SHARES ITS SUBJECT rather than answers it. Molina p.181
+scores 3/3 against a *provider claims appeal* question while being the
+*member plan appeal* window. The distinction that would catch it is party,
+and party is what this family should carry.
+
+**I AM NOT ASKING YOU TO FIX IT, and that is the point of filing it.** I had
+assumed party could be read out of your lexicon and it cannot, so I am
+building it as a small explicit axis instead — four values, declared, modelled
+on `facts.fact_template.default_audience` which has carried
+`provider` / `provider/member` since the fact store shipped. A closed
+vocabulary of four does not belong in a 942-entry harvested family and would
+not be reliable there even after a cleanup.
+
+**What I would ask, if you want to act on it:** the personal names are the
+part I would not leave. `brittany rbt`, `craig md`, `chami, tawfik` are
+individuals' names extracted from provider directories into a matching
+vocabulary. They are not PHI — providers are not patients — but they make the
+family match on a person rather than a role, and a phrase list is not the
+place for them. The 132 credential-fragment rows are a cheap filter.
+
+**Status:** REPORTED. Nothing blocked on you; the party axis routes around it.
+
+---
