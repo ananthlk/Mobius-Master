@@ -433,3 +433,76 @@ up as a false mis-citation is the kind of thing that stays invisible until
 something goes looking, and something just did.
 
 **Status:** OPEN → Master RAG / Maintaining.
+
+---
+
+### D-13 · ASK → Curation — `section_path` is a heading detector, not a section assignment
+
+**FROM** Deep Research · **DATE** 2026-09-25 · **ASK** → Curation (chunk → embed → tag → publish)
+
+Retrieval cannot answer "give me this section" because the corpus has no
+column that says which section a chunk belongs to. `section_path` holds the
+heading that happened to appear **on that page**, so it does not carry
+forward to the pages that sit under it.
+
+**The specimen.** `molina_fl_provider_manual_2026.pdf`, the appeals section:
+
+```
+page 181  section_path = "Complaints, grievance and appeals process"
+page 182  section_path = (empty)
+page 183  section_path = "Agency for Health Care Administration"   <- a heading
+                                                                     printed on
+                                                                     that page
+page 184  section_path = (empty)     <- "Submit requests directly to Molina
+page 185  section_path = (empty)        Healthcare of Florida via the Availity
+page 186  section_path = (empty)        Essentials portal"
+```
+
+A query for the appeals section matches **exactly one row**, p.181, which
+says members have the right to file and stops. The deadline (p.183) and the
+submission channel (p.184) are in the same section and unreachable by it.
+
+**Corpus-wide, measured 2026-09-25:**
+
+```
+published chunks                     2,339,099
+carrying any section_path            1,368,969   (58.5%)
+carrying any chapter_path                    0   (0%)
+Molina manual: 9,060 chunks, 4,649 with a section_path, 129 distinct
+```
+
+**The ask:** make `section_path` an INHERITED assignment — every chunk
+carries the enclosing section, not just the page where the heading was
+printed — and populate `chapter_path`, which is empty on all 2.3M rows. A
+heading-on-this-page value is useful for display and cannot support
+retrieval; the two want different columns if you would rather keep both.
+
+**Why it matters now, concretely.** The payor fact producer was restarted
+2026-09-24 and returned `gap` on both Molina appeal predicates after three
+correctly-refined attempts. The answers are in the corpus, published,
+embedded and correctly attributed — the loop could not reach them. Related
+and separate: p.184 carries `disputes.appeal` **once** against p.183's
+**eleven**, and `tag_coverage` is 0.40 of the reranker's weight, so an
+appeal-framed query ranks it nowhere. Proof it is ranking rather than
+reachability, same corpus and retriever:
+
+```
+"...member appeal deadline and how to submit an appeal"   p.184 ABSENT of 37
+"...submit appeal request Availity Essentials portal..."  p.184 RANK 2
+```
+
+You have to already know the answer to retrieve it.
+
+**What is NOT yours.** The one function named for section retrieval,
+`filler_c._retrieve_at_section_page`, asked for `LIMIT 1` and clipped to 600
+characters — it returned a section's first fragment by construction. Fixed
+on my side (`725b639`). It is also **uncalled** in the live path, and I have
+deliberately NOT wired it in: over today's data a section step would match
+the heading page, return it confidently, and look like it worked. That
+wiring waits on this ask.
+
+**Not blocking, and no rush.** Nothing is broken that was working. It does
+mean more fact-producer volume against this corpus will keep producing
+honest gaps, so the ordering matters more than the urgency.
+
+**Status:** OPEN → Curation.
