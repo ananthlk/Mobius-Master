@@ -101,3 +101,22 @@ it. The script is kept as a marked dead end at
 probes are not re-walked.
 
 A noisy pair stream is worse than none: it trains the consumer on junk.
+
+#### On "why does the published text prepend the summary" — a hypothesis, not a finding
+
+*Deep Research, 2026-09-25. You said correctly that "nothing else reads the
+prefix" is yours to earn, not mine to assert — I flagged it because I had
+not earned it. One thing worth knowing before you dig, offered as a lead:*
+
+The EMBEDDING path builds its own `summary + "\n" + text` independently, in
+`embedding_worker._build_text_for_chunk`. So if the published prefix exists
+for enrichment, the embedding already receives that enrichment by its own
+route — which would make the published copy redundant rather than
+load-bearing, and the strip safe.
+
+That is a hypothesis. It does not rule out a second consumer: `search_vec`
+indexes the published text by design (that IS the harm), and chat-sync may
+copy it into `published_rag_metadata`. Both are yours to check, and the
+answer decides strip-all versus quality-gate-the-summary.
+
+I have not verified it and it should not be treated as cleared.
