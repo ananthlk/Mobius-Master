@@ -64,3 +64,40 @@ but it caps what more producer volume can achieve.
 against p.183's eleven while holding the appeal submission channel, and
 `tag_coverage` is 0.40 of the reranker's weight — so an appeal-framed query
 ranks it nowhere. Chunk tagging, not section structure.
+
+### Withdrawn: the automated failed-query pair stream
+
+*Deep Research, 2026-09-25, after the Curation session ended. You accepted
+my offer to feed failed-query pairs into the tag-selectivity loop ("feed
+them; the loop consumes them"). **Do not wait for them.** I built it and it
+produces noise, so I am withdrawing the automated version.*
+
+Three lexical probes over a real gap run, all wrong:
+
+- **AND over the predicate's words** — zero pairs, on a run whose deficit I
+  had already found by hand. Molina p.184 holds *"Submit requests … via the
+  Availity Essentials portal"* and contains neither "appeal" nor "channels",
+  so the AND excluded the one chunk the pair was about.
+- **OR over the same words** — a 24-hour nurse advice line, a provider
+  directory page, and a chunk reading *"No substantive policy content was
+  provided"*.
+- **OR + value-shape from `fact_template.value_shape`** (a deadline answer
+  must contain `<n> days`) — still the advice line and the directory,
+  because a long chunk contains some day-count somewhere.
+
+**The root:** a pair is "a chunk that ANSWERS this predicate", which is a
+semantic judgement. The one verified pair exists because I picked *"Availity
+Essentials portal"* — a term taken from the answer. No probe that does not
+already know the answer selects that term.
+
+**What you have instead:** one hand-verified pair (Molina p.184) with the
+two-query proof, already in the messages and in D-14. Not a stream.
+
+**What would work**, if you still want volume: read the gapped predicate and
+the candidate chunks with a model and ask which one carries the answer.
+That is its own piece of work, not a by-product — say so and I will scope
+it. The script is kept as a marked dead end at
+`mobius-rag/scripts/checks/tagging_deficit_pairs.py` (38dc4c7) so the three
+probes are not re-walked.
+
+A noisy pair stream is worse than none: it trains the consumer on junk.
