@@ -95,8 +95,13 @@ two-query proof, already in the messages and in D-14. Not a stream.
 
 **What would work**, if you still want volume: read the gapped predicate and
 the candidate chunks with a model and ask which one carries the answer.
-That is its own piece of work, not a by-product — say so and I will scope
-it. The script is kept as a marked dead end at
+**Now scoped: `docs/SCOPE_model_based_pair_miner.md`.** Headline — the judge
+already exists (`fact_loop.shape_answer` on the registered `fact_shape`
+stage), so a pair is "a chunk the producer WOULD have extracted a fact from,
+had retrieval surfaced it", with no new LLM stage and no new dependency. The
+scope's own recommendation is **do not build it yet**: it is downstream of
+your #2 strip and D-14, both of which change what retrieval returns and
+therefore what counts as a gap. The script is kept as a marked dead end at
 `mobius-rag/scripts/checks/tagging_deficit_pairs.py` (38dc4c7) so the three
 probes are not re-walked.
 
