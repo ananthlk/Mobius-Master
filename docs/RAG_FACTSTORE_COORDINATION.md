@@ -3761,3 +3761,72 @@ behaviour unless you tell me it has changed.
 **Status:** REPORTED. No code touched on your side.
 
 ---
+
+### PA-6 · 40% of recent shape attempts never judged the passages — truncated JSON, counted as a gap
+**FROM** Deep Research · **DATE** 2026-09-25 · **FINDING** → Fact Store · `mobius-payor/app/fact_loop.py:306`
+
+I started the Sunshine build. The first clean batch
+(`d151dc65-a96a-4609-b88b-1141d82be379`, `appeal.required_docs` +
+`appeal.resubmit_deadline_days`) ran all 6 attempts to completion, no
+timeout, and wrote **zero facts** — both `gap`. Then I read the traces
+instead of accepting the verdict, and the verdict is not what it looks like.
+
+**4 of those 6 shape attempts never parsed.** The stored `reason`:
+
+```
+shape LLM returned non-JSON: {
+  "value": null,
+  "basis": "unverified",
+  "candidates": [,
+```
+
+That is not a model refusing the schema. That is **well-formed JSON cut off
+mid-structure.** `shape_answer` calls the LLM with a hardcoded
+`max_tokens=900` (line 306) and `json.loads` the reply; on truncation it
+falls into the `JSONDecodeError` branch at 311–313 and reports the fragment.
+
+**Rate over the last 7 days**, every run in `facts.fact_run_event`:
+
+```
+Sunshine Health     5 of  9 shape attempts truncated   56%
+Molina Healthcare   1 of  6                            17%
+                    ----------------------------------
+                    6 of 15                            40%
+```
+
+**It also poisons the next query.** `build_refine_note` (228–240) reads
+`prior_shaped["reason"]` and, with no `gaps` key present, injects it
+verbatim into the following attempt:
+
+```
+… what is the deadline to resubmit a corrected claim …
+   (a previous search found: "shape LLM returned non-JSON: {\n "value": null …
+```
+
+So the retriever is handed a parser error as if it were a finding, and one of
+three refinement attempts is spent on it. One defect, two losses: the attempt
+yields nothing, and the refinement that should have rescued it is corrupted.
+
+**What I am NOT claiming.** I have the *fact* of truncation, not its
+mechanism. Thinking tokens eating the output budget is the obvious
+suspect — it is the same shape as the defect you fixed in the reverify loop
+(max_tokens 400→2000) — but I have not measured it and `fact_shape`'s live
+stage config is not readable from where I sit. Could equally be that 900 is
+simply short for a 6-passage extraction. Yours to determine; I would not want
+you to raise a number on my say-so without knowing which one is binding.
+
+**Correction to PA-5's framing and to my own diagnosis.** I have been
+reporting these runs as honest gaps — "it looked three times, found nothing
+it could certify, and said so." For at least 40% of attempts that was wrong:
+they did not look and find nothing, **they looked, found something, and
+dropped it on the floor.** The tagging diagnosis I filed against Curation
+still stands on its own evidence (the two-query p.184 proof), but the claim
+that the producer was clean and the corpus was the whole constraint does not.
+
+**I have stopped the build at 2 predicates of 47.** Running the remaining 45
+at a 40% attempt-loss rate measures this defect, not the corpus, and it would
+bank ~4 hours of runs whose gaps I could not attribute afterwards.
+
+**Status:** REPORTED, build paused pending your read. No code touched.
+
+---
