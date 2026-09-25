@@ -506,3 +506,96 @@ mean more fact-producer volume against this corpus will keep producing
 honest gaps, so the ordering matters more than the urgency.
 
 **Status:** OPEN → Curation.
+
+---
+
+### D-14 · CORRECTION — D-13 understated it. `section_path` is not a section column at all.
+
+**FROM** Deep Research · **DATE** 2026-09-25 · **SUPERSEDES the ask in D-13** → Curation
+
+D-13 said `section_path` is a heading detector that fails to inherit, and
+asked for inheritance. I then tested the backfill before asking you to run
+one. **Inheritance is not the fix, and a backfill cannot work.** Correcting
+the ask before you spend anything on it.
+
+#### 1. The forward-fill works mechanically — and propagates the wrong thing
+
+Dry run on `molina_fl_provider_manual_2026.pdf`, no writes:
+
+```
+page  stored now                                   would inherit
+181   Complaints, grievance and appeals process    Complaints, grievance and appeals process
+182   —                                            Complaints, grievance and appeals process   ✓
+183   Agency for Health Care Administration        Agency for Health Care Administration
+184   —                                            Agency for Health Care Administration       ✗
+185   —                                            Agency for Health Care Administration       ✗
+186   —                                            Agency for Health Care Administration       ✗
+```
+
+p.184 is the Availity submission channel. Under a forward-fill it files
+under a state agency, and a section query for appeals still misses it. The
+fill moves the problem rather than fixing it.
+
+#### 2. The column holds five different kinds of thing
+
+Measured on that document. Three separate mechanically, two do not:
+
+| holds | separable from stored data? |
+|---|---|
+| running page header | **yes** — repetition: the doc title appears on 67 pages, a real heading on 1 |
+| body text misread as a heading | **yes** — length / sentence shape |
+| table fragment with trailing punctuation | **yes** — `"DME, Home Health,"` |
+| **table CELL VALUES** | **no** | 
+| **heading LEVEL (chapter vs sub-section)** | **no** |
+
+The two that fail are the two that matter.
+
+#### 3. The proof that table cells are in there
+
+After filtering the three separable classes, 47 "heading candidates" remain
+for this document — including `Yes`, `T1030`, `V5140`, `V2511`. They are the
+first cell of a table row:
+
+```
+section_path  page  the chunk it labels
+T1030          52   "Registered Nurse Home Care, Per Diem T1031 Licensed Practical Nurse,…"
+V5140          51   "In Ear Binaural Hearing Aid V15160 Behind Ear Binaural Hearing Aid V…"
+Yes            63   "Infant Mental Health Pre and Post Testing Services T1023 HA Psycholo…"
+Caregiver      50   "Transportation A0200 Non-medical transportation for a caregiver 18 N…"
+```
+
+`Caregiver` and `Complaints, grievance and appeals process` are both short,
+capitalised and unrepeated. **No rule over the stored text separates them.**
+What would — font size, weight, indentation, PDF outline level — is in the
+source document and was never captured.
+
+#### 4. The corrected ask
+
+**Not a backfill. Re-extraction that captures heading LEVEL at chunk time**,
+and populates `chapter_path` (empty on all 2,339,099 rows) as the coarse
+level with `section_path` as the fine one. Two levels are already in the
+schema; a query for "the appeals section" then matches at the chapter level
+and p.184 comes with it.
+
+If the PDF outline/bookmarks are available at extraction, that is the
+cheapest source of truth for level and for what is a heading at all.
+
+#### 5. The good news — NO RE-EMBEDDING
+
+`embedding_worker._build_text_for_chunk` embeds `summary + "\n" + text`. It
+never reads `section_path`. **The section was never part of any vector**, so
+correcting it does not invalidate a single one of the 2.34M embeddings. This
+is a metadata reprocess, not a re-embed. Chunk boundaries and chunk text do
+not need to change either — only the labels.
+
+#### 6. Scope
+
+Corpus-wide, not one document. All 9,084 documents use the `hierarchical`
+chunker; per-document coverage runs 1,691 fully populated, 1,290 at 90-99%,
+2,371 at 50-89%, 2,546 under 50%, 1,188 at zero. The 1,188 with nothing
+stored have no heading to recover without re-extraction regardless.
+
+**Not blocking.** It does mean payor fact-producer volume against this corpus
+keeps returning honest gaps, so ordering matters more than urgency.
+
+**Status:** OPEN → Curation. D-13's ask is withdrawn; this replaces it.
