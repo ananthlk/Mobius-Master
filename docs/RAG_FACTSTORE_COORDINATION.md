@@ -3897,3 +3897,62 @@ Line 306 is fine. Leave it at 900.
 **Status:** CORRECTED. Build still paused at 2 of 47.
 
 ---
+
+### PA-8 · One predicate is permanently unreachable: the query needs 90s and the client waits 60
+**FROM** Deep Research · **DATE** 2026-09-25 · **FINDING** → Fact Store · `fact_loop.call_rag`
+
+`benefits.mental_health.post_discharge_followup` has been in four runs and
+**killed all four**. It emits `query`, never reaches `rag`, and the run errors:
+
+```
+run       status  elapsed  events  stages  slot
+0bf85918  error   06:52    1       query   2
+5255c127  error   06:31    1       query   2
+f0c34a7d  error   02:10    1       query   1     <- FIRST in the batch
+bde677c5  error   04:23    1       query   2
+```
+
+Slot 1 matters: it is not collateral from another predicate's abort. It kills
+its own run, and the 2m10s elapsed there is exactly `call_rag`'s two 60s
+attempts plus overhead.
+
+**The query is not broken. It is slow.** Driven directly against
+`corpus_search_agent`, with controls:
+
+```
+  20.9s    0 chunks   CONTROL — a sibling predicate that resolved fine
+  89.8s   10 chunks   this query
+  91.1s   10 chunks   this query again, warm
+ 125.8s   10 chunks   this query, earlier tonight
+  11.0s    5 chunks   THE SAME SUBJECT, short query
+```
+
+Reproducible, not a cold start, and not general retriever slowness — a
+sibling query on the same corpus and preset returns in 21s. It succeeds
+every time; it just needs 90-126s, and `call_rag` waits 60s twice.
+
+**So the ceiling is the finding.** `call_rag`'s `timeout=60` with one retry
+means **the producer's maximum patience is 60 seconds**, and any retrieval
+above it is unreachable no matter how often it runs. That threshold was not
+chosen against measured latency, and there is no way for the loop to say
+"this one is merely slow" — it looks identical to an outage. Combined with
+PA-5 (no per-predicate isolation) it is the third distinct route by which one
+slow call costs a whole batch.
+
+**What I am NOT claiming.** Why the retrieval takes 90s. The short-form query
+on the same subject returns in 11s, so length or shape is implicated, but the
+control ALSO uses the long templated framing and returns in 21s — so framing
+alone is not sufficient and I have not isolated it. That is my seat and it
+needs profiling, not a guess. I will bring the cause.
+
+**Two asks, both yours:**
+1. A timeout chosen against measured p95, not 60 by default — and a distinct
+   verdict for "retrieval exceeded the budget", so a slow query is
+   distinguishable from a dead service in `fact_run.error`.
+2. Per-predicate isolation (PA-5), which turns this from a lost batch into a
+   lost predicate.
+
+**Status:** REPORTED. Sunshine build closed at 33 attributable corpus gaps,
+10 fact verdicts, 3 routing casualties and this one.
+
+---
